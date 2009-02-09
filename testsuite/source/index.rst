@@ -5,7 +5,8 @@
 Welcome to BreatheExample's documentation!
 ==========================================
 
-.. doxygenclass:: Test
+.. doxygenindex:: Test
+   :path: ../examples/doxygen/class/xml
 
 Indices and tables
 ==================
