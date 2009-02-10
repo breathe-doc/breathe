@@ -55,11 +55,9 @@ def doxygenclass_directive(name, arguments, options, content, lineno,
 def doxygenindex_directive(name, arguments, options, content, lineno,
         content_offset, block_text, state, state_machine):
 
-    classname = arguments[0]
+    # node = DoxygenIndex(block_text)
 
-    node = DoxygenIndex(block_text)
-
-    node.classes = []
+    # node.classes = []
 
     path = options["path"]
 
@@ -67,12 +65,15 @@ def doxygenindex_directive(name, arguments, options, content, lineno,
 
     root_object = index.parse( index_file )
 
+    new_nodes = []
 
     for entry in root_object.compound:
         if entry.get_kind() == "class":
-            node.classes.append(entry.get_name())
+            cls = nodes.emphasis(text="class")
+            name = nodes.strong(text=entry.get_name())
+            new_nodes.append(nodes.paragraph("", "", cls, nodes.Text(" "), name))
 
-    return [node]
+    return new_nodes
 
 
 def doxygenfunction_directive(name, arguments, options, content, lineno,
@@ -99,7 +100,7 @@ def setup(app):
             "doxygenindex",
             doxygenindex_directive,
             0,
-            (1,2,0),
+            (0,1,0),
             path = unchanged_required,
             )
 

@@ -5,8 +5,12 @@
 Welcome to BreatheExample's documentation!
 ==========================================
 
-.. doxygenindex:: Test
-   :path: ../examples/doxygen/class/xml
+Test pages:
+
+.. toctree::
+   :maxdepth: 1
+
+   doxygen
 
 Indices and tables
 ==================
