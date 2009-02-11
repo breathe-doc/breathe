@@ -44,12 +44,35 @@ def doxygenclass_directive(name, arguments, options, content, lineno,
         content_offset, block_text, state, state_machine):
 
     classname = arguments[0]
-
     node = DoxygenClass(block_text)
-
     node.name = classname
 
     return [node]
+
+
+def process_member(member):
+
+    kind = nodes.emphasis(text=member.get_kind())
+    name = nodes.strong(text=member.get_name())
+
+    return [nodes.paragraph("", "", kind, nodes.Text(" "), name)]
+
+def process(compound):
+
+    kind = nodes.emphasis(text=compound.get_kind())
+    name = nodes.strong(text=compound.get_name())
+
+    new_nodes = [nodes.paragraph("", "", kind, nodes.Text(" "), name)]
+
+    members = []
+
+    for entry in compound.member:
+        members.extend(process_member(entry))
+
+    new_nodes.extend(nodes.block_quote("", *members))
+
+    return new_nodes
+
 
 
 def doxygenindex_directive(name, arguments, options, content, lineno,
@@ -68,10 +91,7 @@ def doxygenindex_directive(name, arguments, options, content, lineno,
     new_nodes = []
 
     for entry in root_object.compound:
-        if entry.get_kind() == "class":
-            cls = nodes.emphasis(text="class")
-            name = nodes.strong(text=entry.get_name())
-            new_nodes.append(nodes.paragraph("", "", cls, nodes.Text(" "), name))
+        new_nodes.extend(process(entry))
 
     return new_nodes
 
