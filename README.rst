@@ -13,7 +13,7 @@ Still in planning and basic design stage.
 Running Testsuite
 -----------------
 
-The ``generateDS.py`` scripts referenced below is Dave Kuhlman's Pytho
+The ``generateDS.py`` script referenced below is Dave Kuhlman's Python
 module available from:
 
    `http://www.rexx.com/~dkuhlman/generateDS.html#download`.
