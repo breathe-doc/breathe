@@ -4,7 +4,8 @@ from docutils.parsers.rst.directives import unchanged_required
 
 import os
 
-import doxparsers.index as index
+import doxparsers.index
+import doxparsers.compound
 
 # Nodes
 # -----
@@ -57,17 +58,50 @@ def process_member(member):
 
     return [nodes.paragraph("", "", kind, nodes.Text(" "), name)]
 
-def process(compound):
+def process_compounddef(compounddef):
+
+    members = []
+
+    for section in compounddef.sectiondef:
+
+        for memberdef in section.memberdef:
+
+            type_obj = memberdef.get_type()
+            text = ""
+            
+            if type_obj:
+                for i in type_obj.content_:
+                    text += str(i.value)
+            else:
+                text = "No type"
+
+            type_ = nodes.emphasis(text=text)
+
+            name = nodes.strong(text=memberdef.get_name())
+
+            members.extend( [nodes.paragraph("", "", type_, nodes.Text(" "), name)] )
+
+    return members
+
+
+def process_compound(compound, path):
 
     kind = nodes.emphasis(text=compound.get_kind())
     name = nodes.strong(text=compound.get_name())
 
     new_nodes = [nodes.paragraph("", "", kind, nodes.Text(" "), name)]
 
-    members = []
+    # members = []
 
-    for entry in compound.member:
-        members.extend(process_member(entry))
+    # for entry in compound.member:
+    #     members.extend(process_member(entry))
+
+    refid = compound.get_refid()  
+    ref_xml_path = os.path.join( path, "%s.xml" % refid )
+
+    root_object = doxparsers.compound.parse( ref_xml_path )
+    
+    members = process_compounddef(root_object.compounddef)
 
     new_nodes.extend(nodes.block_quote("", *members))
 
@@ -86,12 +120,12 @@ def doxygenindex_directive(name, arguments, options, content, lineno,
 
     index_file = os.path.join(path, "index.xml")
 
-    root_object = index.parse( index_file )
+    root_object = doxparsers.index.parse( index_file )
 
     new_nodes = []
 
     for entry in root_object.compound:
-        new_nodes.extend(process(entry))
+        new_nodes.extend(process_compound(entry, path))
 
     return new_nodes
 
