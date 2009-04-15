@@ -11,6 +11,7 @@ Test pages:
    :maxdepth: 1
 
    doxygen
+   tinyxml
 
 Indices and tables
 ==================
