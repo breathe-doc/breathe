@@ -1,19 +1,25 @@
 #!/usr/bin/env python
 
-#
-# Generated Mon Feb  9 19:08:05 2009 by generateDS.py.
-#
+"""
+Generated Mon Feb  9 19:08:05 2009 by generateDS.py.
+"""
 
-import sys
 from string import lower as str_lower
 from xml.dom import minidom
-from xml.sax import handler, make_parser
+from docutils import nodes
+
+import sys
 
 import compoundsuper as supermod
 
 class DoxygenTypeSub(supermod.DoxygenType):
     def __init__(self, version=None, compounddef=None):
         supermod.DoxygenType.__init__(self, version, compounddef)
+
+    def rst_nodes(self):
+
+        return self.compounddef.rst_nodes()
+
 supermod.DoxygenType.subclass = DoxygenTypeSub
 # end class DoxygenTypeSub
 
@@ -21,6 +27,16 @@ supermod.DoxygenType.subclass = DoxygenTypeSub
 class compounddefTypeSub(supermod.compounddefType):
     def __init__(self, kind=None, prot=None, id=None, compoundname='', title='', basecompoundref=None, derivedcompoundref=None, includes=None, includedby=None, incdepgraph=None, invincdepgraph=None, innerdir=None, innerfile=None, innerclass=None, innernamespace=None, innerpage=None, innergroup=None, templateparamlist=None, sectiondef=None, briefdescription=None, detaileddescription=None, inheritancegraph=None, collaborationgraph=None, programlisting=None, location=None, listofallmembers=None):
         supermod.compounddefType.__init__(self, kind, prot, id, compoundname, title, basecompoundref, derivedcompoundref, includes, includedby, incdepgraph, invincdepgraph, innerdir, innerfile, innerclass, innernamespace, innerpage, innergroup, templateparamlist, sectiondef, briefdescription, detaileddescription, inheritancegraph, collaborationgraph, programlisting, location, listofallmembers)
+
+    def rst_nodes(self):
+
+        nodelist = []
+
+        for sectiondef in self.sectiondef:
+            nodelist.extend(sectiondef.rst_nodes())
+
+        return nodelist
+
 supermod.compounddefType.subclass = compounddefTypeSub
 # end class compounddefTypeSub
 
@@ -77,6 +93,19 @@ supermod.refTextType.subclass = refTextTypeSub
 class sectiondefTypeSub(supermod.sectiondefType):
     def __init__(self, kind=None, header='', description=None, memberdef=None):
         supermod.sectiondefType.__init__(self, kind, header, description, memberdef)
+
+    def rst_nodes(self):
+
+        kind = nodes.emphasis(text=self.kind)
+
+        nodelist = [nodes.paragraph("", "", kind)]
+
+        for memberdef in self.memberdef:
+            nodelist.extend(memberdef.rst_nodes())
+
+        return nodelist
+
+
 supermod.sectiondefType.subclass = sectiondefTypeSub
 # end class sectiondefTypeSub
 
@@ -84,6 +113,15 @@ supermod.sectiondefType.subclass = sectiondefTypeSub
 class memberdefTypeSub(supermod.memberdefType):
     def __init__(self, initonly=None, kind=None, volatile=None, const=None, raisexx=None, virt=None, readable=None, prot=None, explicit=None, new=None, final=None, writable=None, add=None, static=None, remove=None, sealed=None, mutable=None, gettable=None, inline=None, settable=None, id=None, templateparamlist=None, typexx=None, definition='', argsstring='', name='', read='', write='', bitfield='', reimplements=None, reimplementedby=None, param=None, enumvalue=None, initializer=None, exceptions=None, briefdescription=None, detaileddescription=None, inbodydescription=None, location=None, references=None, referencedby=None):
         supermod.memberdefType.__init__(self, initonly, kind, volatile, const, raisexx, virt, readable, prot, explicit, new, final, writable, add, static, remove, sealed, mutable, gettable, inline, settable, id, templateparamlist, typexx, definition, argsstring, name, read, write, bitfield, reimplements, reimplementedby, param, enumvalue, initializer, exceptions, briefdescription, detaileddescription, inbodydescription, location, references, referencedby)
+    def rst_nodes(self):
+
+        kind = nodes.emphasis(text=self.typexx)
+        name = nodes.emphasis(text=self.name)
+
+        nodelist = [nodes.paragraph("", "", kind, nodes.Text(" "), name)]
+
+        return nodelist
+
 supermod.memberdefType.subclass = memberdefTypeSub
 # end class memberdefTypeSub
 
@@ -425,127 +463,10 @@ supermod.docCharType.subclass = docCharTypeSub
 
 
 
-#
-# SAX handler used to determine the top level element.
-#
-class SaxSelectorHandler(handler.ContentHandler):
-    def __init__(self):
-        self.topElementName = None
-    def getTopElementName(self):
-        return self.topElementName
-    def startElement(self, name, attrs):
-        self.topElementName = name
-        raise StopIteration
-
-
-def parseSelect(inFileName):
-    infile = file(inFileName, 'r')
-    topElementName = None
-    parser = make_parser()
-    documentHandler = SaxSelectorHandler()
-    parser.setContentHandler(documentHandler)
-    try:
-        try:
-            parser.parse(infile)
-        except StopIteration:
-            topElementName = documentHandler.getTopElementName()
-        if topElementName is None:
-            raise RuntimeError, 'no top level element'
-        topElementName = topElementName.replace('-', '_').replace(':', '_')
-        if topElementName not in supermod.__dict__:
-            raise RuntimeError, 'no class for top element: %s' % topElementName
-        topElement = supermod.__dict__[topElementName]
-        infile.seek(0)
-        doc = minidom.parse(infile)
-    finally:
-        infile.close()
-    rootNode = doc.childNodes[0]
-    rootObj = topElement.factory()
-    rootObj.build(rootNode)
-    # Enable Python to collect the space used by the DOM.
-    doc = None
-    sys.stdout.write('<?xml version="1.0" ?>\n')
-    rootObj.export(sys.stdout, 0)
-    return rootObj
-
-
-def saxParse(inFileName):
-    parser = make_parser()
-    documentHandler = supermod.Sax_doxygenHandler()
-    parser.setDocumentHandler(documentHandler)
-    parser.parse('file:%s' % inFileName)
-    rootObj = documentHandler.getRoot()
-    #sys.stdout.write('<?xml version="1.0" ?>\n')
-    #rootObj.export(sys.stdout, 0)
-    return rootObj
-
-
-def saxParseString(inString):
-    parser = make_parser()
-    documentHandler = supermod.SaxContentHandler()
-    parser.setDocumentHandler(documentHandler)
-    parser.feed(inString)
-    parser.close()
-    rootObj = documentHandler.getRoot()
-    #sys.stdout.write('<?xml version="1.0" ?>\n')
-    #rootObj.export(sys.stdout, 0)
-    return rootObj
-
-
 def parse(inFilename):
     doc = minidom.parse(inFilename)
     rootNode = doc.documentElement
     rootObj = supermod.DoxygenType.factory()
     rootObj.build(rootNode)
     return rootObj
-
-
-def parseString(inString):
-    doc = minidom.parseString(inString)
-    rootNode = doc.documentElement
-    rootObj = supermod.DoxygenType.factory()
-    rootObj.build(rootNode)
-    # Enable Python to collect the space used by the DOM.
-    doc = None
-    sys.stdout.write('<?xml version="1.0" ?>\n')
-    rootObj.export(sys.stdout, 0, name_="doxygen")
-    return rootObj
-
-
-def parseLiteral(inFilename):
-    doc = minidom.parse(inFilename)
-    rootNode = doc.documentElement
-    rootObj = supermod.DoxygenType.factory()
-    rootObj.build(rootNode)
-    # Enable Python to collect the space used by the DOM.
-    doc = None
-    sys.stdout.write('from compoundsuper import *\n\n')
-    sys.stdout.write('rootObj = doxygen(\n')
-    rootObj.exportLiteral(sys.stdout, 0, name_="doxygen")
-    sys.stdout.write(')\n')
-    return rootObj
-
-
-USAGE_TEXT = """
-Usage: python compoundsuper.py <infilename>
-"""
-
-def usage():
-    print USAGE_TEXT
-    sys.exit(-1)
-
-
-def main():
-    args = sys.argv[1:]
-    if len(args) != 1:
-        usage()
-    infilename = args[0]
-    root = parse(infilename)
-
-
-if __name__ == '__main__':
-    main()
-    #import pdb
-    #pdb.run('main()')
-
 

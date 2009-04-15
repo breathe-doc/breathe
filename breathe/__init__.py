@@ -91,11 +91,6 @@ def process_compound(compound, path):
 
     new_nodes = [nodes.paragraph("", "", kind, nodes.Text(" "), name)]
 
-    # members = []
-
-    # for entry in compound.member:
-    #     members.extend(process_member(entry))
-
     refid = compound.get_refid()  
     ref_xml_path = os.path.join( path, "%s.xml" % refid )
 
@@ -112,22 +107,13 @@ def process_compound(compound, path):
 def doxygenindex_directive(name, arguments, options, content, lineno,
         content_offset, block_text, state, state_machine):
 
-    # node = DoxygenIndex(block_text)
-
-    # node.classes = []
-
     path = options["path"]
 
     index_file = os.path.join(path, "index.xml")
 
     root_object = doxparsers.index.parse( index_file )
 
-    new_nodes = []
-
-    for entry in root_object.compound:
-        new_nodes.extend(process_compound(entry, path))
-
-    return new_nodes
+    return root_object.rst_nodes(path)
 
 
 def doxygenfunction_directive(name, arguments, options, content, lineno,
