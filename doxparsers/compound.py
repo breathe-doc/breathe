@@ -115,10 +115,25 @@ class memberdefTypeSub(supermod.memberdefType):
         supermod.memberdefType.__init__(self, initonly, kind, volatile, const, raisexx, virt, readable, prot, explicit, new, final, writable, add, static, remove, sealed, mutable, gettable, inline, settable, id, templateparamlist, typexx, definition, argsstring, name, read, write, bitfield, reimplements, reimplementedby, param, enumvalue, initializer, exceptions, briefdescription, detaileddescription, inbodydescription, location, references, referencedby)
     def rst_nodes(self):
 
-        kind = nodes.emphasis(text=self.typexx)
-        name = nodes.emphasis(text=self.name)
+        kind = []
+        
+        if self.typexx:
+            kind = self.typexx.rst_nodes()
 
-        nodelist = [nodes.paragraph("", "", kind, nodes.Text(" "), name)]
+        name = nodes.strong(text=self.name)
+
+        args = ["",""]
+        args.extend(kind)
+        args.extend([nodes.Text(" "), name])
+
+        if self.param:
+            args.append(nodes.Text("("))
+            for parameter in self.param:
+                args.extend(parameter.rst_nodes())
+                args.append(nodes.Text(", "))
+            args.append(nodes.Text(")"))
+
+        nodelist = [nodes.paragraph(*args)]
 
         return nodelist
 
@@ -150,6 +165,20 @@ supermod.templateparamlistType.subclass = templateparamlistTypeSub
 class paramTypeSub(supermod.paramType):
     def __init__(self, typexx=None, declname='', defname='', array='', defval=None, briefdescription=None):
         supermod.paramType.__init__(self, typexx, declname, defname, array, defval, briefdescription)
+    
+    def rst_nodes(self):
+
+        nodelist = []
+
+        kind = []
+        
+        if self.typexx:
+            kind = self.typexx.rst_nodes()
+
+        nodelist.extend(kind)
+
+        return nodelist
+
 supermod.paramType.subclass = paramTypeSub
 # end class paramTypeSub
 
@@ -157,6 +186,19 @@ supermod.paramType.subclass = paramTypeSub
 class linkedTextTypeSub(supermod.linkedTextType):
     def __init__(self, ref=None, mixedclass_=None, content_=None):
         supermod.linkedTextType.__init__(self, mixedclass_, content_)
+
+    def rst_nodes(self):
+
+        nodelist = []
+        for i in self.content_:
+            try:
+                nodelist.append(nodes.emphasis(text=i.getValue().valueOf_))
+            except AttributeError:
+                nodelist.append(nodes.emphasis(text=i.getValue()))
+            nodelist.append(nodes.Text(" "))
+
+        return nodelist
+
 supermod.linkedTextType.subclass = linkedTextTypeSub
 # end class linkedTextTypeSub
 
