@@ -4,13 +4,12 @@
 Generated Mon Feb  9 19:08:05 2009 by generateDS.py.
 """
 
-from string import lower as str_lower
 from xml.dom import minidom
 from docutils import nodes
 
 import os
 import sys
-import doxparsers.compound
+import breathe.doxparsers.compound
 
 import indexsuper as supermod
 
@@ -44,7 +43,7 @@ class CompoundTypeSub(supermod.CompoundType):
 
         ref_xml_path = os.path.join( path, "%s.xml" % self.refid )
         
-        root_object = doxparsers.compound.parse( ref_xml_path )
+        root_object = breathe.doxparsers.compound.parse( ref_xml_path )
 
         nodelist.extend(root_object.rst_nodes())
         

@@ -100,8 +100,14 @@ class sectiondefTypeSub(supermod.sectiondefType):
 
         nodelist = [nodes.paragraph("", "", kind)]
 
+        defs = []
+
         for memberdef in self.memberdef:
-            nodelist.extend(memberdef.rst_nodes())
+            defs.extend(memberdef.rst_nodes())
+
+        def_list = nodes.definition_list(*defs)
+
+        nodelist.append(def_list)
 
         return nodelist
 
@@ -122,18 +128,25 @@ class memberdefTypeSub(supermod.memberdefType):
 
         name = nodes.strong(text=self.name)
 
-        args = ["",""]
+        args = []
         args.extend(kind)
         args.extend([nodes.Text(" "), name])
 
-        if self.param:
+        if self.kind == "function":
             args.append(nodes.Text("("))
             for parameter in self.param:
                 args.extend(parameter.rst_nodes())
                 args.append(nodes.Text(", "))
             args.append(nodes.Text(")"))
 
-        nodelist = [nodes.paragraph(*args)]
+        term = nodes.term("","", *args)
+        classifier = nodes.classifier("", nodes.Text("classifier"))
+
+        if self.briefdescription:
+            desc_nodes = self.briefdescription.rst_nodes()
+            definition = nodes.definition("", *desc_nodes)
+
+        nodelist = [nodes.definition_list_item("",term, definition)]
 
         return nodelist
 
@@ -144,6 +157,20 @@ supermod.memberdefType.subclass = memberdefTypeSub
 class descriptionTypeSub(supermod.descriptionType):
     def __init__(self, title='', para=None, sect1=None, internal=None, mixedclass_=None, content_=None):
         supermod.descriptionType.__init__(self, mixedclass_, content_)
+
+    def rst_nodes(self):
+
+        nodelist = []
+        
+        for item in self.content_:
+            value = item.getValue()
+            try:
+                nodelist.extend(value.rst_nodes())
+            except AttributeError:
+                pass
+
+        return nodelist
+
 supermod.descriptionType.subclass = descriptionTypeSub
 # end class descriptionTypeSub
 
@@ -502,6 +529,17 @@ class docCharTypeSub(supermod.docCharType):
         supermod.docCharType.__init__(self, char)
 supermod.docCharType.subclass = docCharTypeSub
 # end class docCharTypeSub
+
+class docParaTypeSub(supermod.docParaType):
+    def __init__(self, char=None, valueOf_=''):
+        supermod.docParaType.__init__(self, char)
+
+    def rst_nodes(self):
+
+        return [nodes.paragraph("", "", nodes.Text(self.valueOf_))]
+
+supermod.docParaType.subclass = docParaTypeSub
+# end class docParaTypeSub
 
 
 
