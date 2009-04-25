@@ -21,6 +21,7 @@ class DoxygenTypeSub(supermod.DoxygenType):
 
         nodelist = []
 
+        # Process all the compound children
         for compound in self.compound:
             nodelist.extend(compound.rst_nodes(path))
 
@@ -36,17 +37,17 @@ class CompoundTypeSub(supermod.CompoundType):
 
     def rst_nodes(self, path):
         
+        # Set up the title and a reference for it (refid)
         kind = nodes.emphasis(text=self.kind)
         name = nodes.strong(text=self.name)
+        nodelist = [nodes.paragraph("", "", kind, nodes.Text(" "), name, ids=[self.refid])]
 
-        nodelist = [nodes.paragraph("", "", kind, nodes.Text(" "), name)]
-
+        # Read in the corresponding xml file and process
         ref_xml_path = os.path.join( path, "%s.xml" % self.refid )
-        
         root_object = breathe.doxparsers.compound.parse( ref_xml_path )
 
         nodelist.extend(root_object.rst_nodes())
-        
+
         return nodelist
 
 supermod.CompoundType.subclass = CompoundTypeSub

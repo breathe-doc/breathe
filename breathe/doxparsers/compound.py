@@ -18,6 +18,7 @@ class DoxygenTypeSub(supermod.DoxygenType):
 
     def rst_nodes(self):
 
+        # Only interested in the compounddef child node
         return self.compounddef.rst_nodes()
 
 supermod.DoxygenType.subclass = DoxygenTypeSub
@@ -28,14 +29,39 @@ class compounddefTypeSub(supermod.compounddefType):
     def __init__(self, kind=None, prot=None, id=None, compoundname='', title='', basecompoundref=None, derivedcompoundref=None, includes=None, includedby=None, incdepgraph=None, invincdepgraph=None, innerdir=None, innerfile=None, innerclass=None, innernamespace=None, innerpage=None, innergroup=None, templateparamlist=None, sectiondef=None, briefdescription=None, detaileddescription=None, inheritancegraph=None, collaborationgraph=None, programlisting=None, location=None, listofallmembers=None):
         supermod.compounddefType.__init__(self, kind, prot, id, compoundname, title, basecompoundref, derivedcompoundref, includes, includedby, incdepgraph, invincdepgraph, innerdir, innerfile, innerclass, innernamespace, innerpage, innergroup, templateparamlist, sectiondef, briefdescription, detaileddescription, inheritancegraph, collaborationgraph, programlisting, location, listofallmembers)
 
+    titles = {
+                "public-func": "Public Functions", 
+                "private-func": "Private Functions", 
+                "public-attrib": "Public Members", 
+                "private-attrib": "Private Members", 
+             }
+
+    def extend_nodelist(self, nodelist, section, section_nodelists):
+
+        # Add title and contents if found
+        if section_nodelists.has_key(section):
+            nodelist.append(nodes.emphasis(text=self.titles[section]))
+            nodelist.append(nodes.block_quote("", *section_nodelists[section]))
+
+
     def rst_nodes(self):
 
-        nodelist = []
+        section_nodelists = {}
 
+        # Get all sub sections
         for sectiondef in self.sectiondef:
-            nodelist.extend(sectiondef.rst_nodes())
+            kind, subnodes = sectiondef.rst_nodes()
+            section_nodelists[kind] = subnodes
 
-        return nodelist
+        nodelist = []    
+
+        # Order the results in an appropriate manner
+        self.extend_nodelist(nodelist, "public-func", section_nodelists)
+        self.extend_nodelist(nodelist, "private-func", section_nodelists)
+        self.extend_nodelist(nodelist, "public-attrib", section_nodelists)
+        self.extend_nodelist(nodelist, "private-attrib", section_nodelists)
+
+        return [nodes.block_quote("", *nodelist)]
 
 supermod.compounddefType.subclass = compounddefTypeSub
 # end class compounddefTypeSub
@@ -86,30 +112,34 @@ supermod.refType.subclass = refTypeSub
 class refTextTypeSub(supermod.refTextType):
     def __init__(self, refid=None, kindref=None, external=None, valueOf_='', mixedclass_=None, content_=None):
         supermod.refTextType.__init__(self, mixedclass_, content_)
+
+    def rst_nodes(self):
+
+        # Create a reference using the refid
+        nodelist = [nodes.reference("", self.valueOf_, refid=self.refid )]
+
+        return nodelist
+
 supermod.refTextType.subclass = refTextTypeSub
 # end class refTextTypeSub
 
-
 class sectiondefTypeSub(supermod.sectiondefType):
+
     def __init__(self, kind=None, header='', description=None, memberdef=None):
         supermod.sectiondefType.__init__(self, kind, header, description, memberdef)
 
     def rst_nodes(self):
 
-        kind = nodes.emphasis(text=self.kind)
-
-        nodelist = [nodes.paragraph("", "", kind)]
-
         defs = []
 
+        # Get all the memberdef info
         for memberdef in self.memberdef:
             defs.extend(memberdef.rst_nodes())
 
-        def_list = nodes.definition_list(*defs)
+        def_list = nodes.definition_list("", *defs)
 
-        nodelist.append(def_list)
-
-        return nodelist
+        # Return with information about which section this is
+        return self.kind, [def_list]
 
 
 supermod.sectiondefType.subclass = sectiondefTypeSub
@@ -119,10 +149,12 @@ supermod.sectiondefType.subclass = sectiondefTypeSub
 class memberdefTypeSub(supermod.memberdefType):
     def __init__(self, initonly=None, kind=None, volatile=None, const=None, raisexx=None, virt=None, readable=None, prot=None, explicit=None, new=None, final=None, writable=None, add=None, static=None, remove=None, sealed=None, mutable=None, gettable=None, inline=None, settable=None, id=None, templateparamlist=None, typexx=None, definition='', argsstring='', name='', read='', write='', bitfield='', reimplements=None, reimplementedby=None, param=None, enumvalue=None, initializer=None, exceptions=None, briefdescription=None, detaileddescription=None, inbodydescription=None, location=None, references=None, referencedby=None):
         supermod.memberdefType.__init__(self, initonly, kind, volatile, const, raisexx, virt, readable, prot, explicit, new, final, writable, add, static, remove, sealed, mutable, gettable, inline, settable, id, templateparamlist, typexx, definition, argsstring, name, read, write, bitfield, reimplements, reimplementedby, param, enumvalue, initializer, exceptions, briefdescription, detaileddescription, inbodydescription, location, references, referencedby)
+
     def rst_nodes(self):
 
         kind = []
         
+        # Variable type or function return type
         if self.typexx:
             kind = self.typexx.rst_nodes()
 
@@ -133,6 +165,8 @@ class memberdefTypeSub(supermod.memberdefType):
         args.extend([nodes.Text(" "), name])
 
         if self.kind == "function":
+
+            # Get the function arguments
             args.append(nodes.Text("("))
             for parameter in self.param:
                 args.extend(parameter.rst_nodes())
@@ -140,12 +174,12 @@ class memberdefTypeSub(supermod.memberdefType):
             args.append(nodes.Text(")"))
 
         term = nodes.term("","", *args)
-        classifier = nodes.classifier("", nodes.Text("classifier"))
 
         if self.briefdescription:
             desc_nodes = self.briefdescription.rst_nodes()
             definition = nodes.definition("", *desc_nodes)
 
+        # Build the list item
         nodelist = [nodes.definition_list_item("",term, definition)]
 
         return nodelist
@@ -162,6 +196,7 @@ class descriptionTypeSub(supermod.descriptionType):
 
         nodelist = []
         
+        # Get description in rst_nodes if possible
         for item in self.content_:
             value = item.getValue()
             try:
@@ -199,6 +234,7 @@ class paramTypeSub(supermod.paramType):
 
         kind = []
         
+        # Parameter type
         if self.typexx:
             kind = self.typexx.rst_nodes()
 
@@ -217,11 +253,15 @@ class linkedTextTypeSub(supermod.linkedTextType):
     def rst_nodes(self):
 
         nodelist = []
+
+        # Recursively process where possible
         for i in self.content_:
             try:
-                nodelist.append(nodes.emphasis(text=i.getValue().valueOf_))
+                ns = i.getValue().rst_nodes()
+                nodelist.extend(ns)
             except AttributeError:
                 nodelist.append(nodes.emphasis(text=i.getValue()))
+
             nodelist.append(nodes.Text(" "))
 
         return nodelist
