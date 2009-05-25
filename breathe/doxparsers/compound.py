@@ -220,9 +220,9 @@ class memberdefTypeSub(supermod.memberdefType):
 
             # Get the function arguments
             args.append(nodes.Text("("))
-            for parameter in self.param:
+            for i, parameter in enumerate(self.param):
+                if i: args.append(nodes.Text(", "))
                 args.extend(parameter.rst_nodes())
-                args.append(nodes.Text(", "))
             args.append(nodes.Text(")"))
 
         term = nodes.term("","", *args)
@@ -291,6 +291,18 @@ class paramTypeSub(supermod.paramType):
             kind = self.typexx.rst_nodes()
 
         nodelist.extend(kind)
+
+        # Parameter name
+        if self.declname:
+            nodelist.append(nodes.Text(self.declname))
+
+        if self.defname:
+            nodelist.append(nodes.Text(self.defname))
+
+        # Default value
+        if self.defval:
+            nodelist.append(nodes.Text(" = "))
+            nodelist.extend(self.defval.rst_nodes())
 
         return nodelist
 
