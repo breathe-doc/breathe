@@ -4,7 +4,7 @@ Doxygen Test Suite
 
 
 .. doxygenindex::
-   :path: ../examples/doxygen/class/xml
+   :project: class
 
 .. doxygenindex::
    :path: ../examples/doxygen/define/xml
