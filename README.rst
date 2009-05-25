@@ -10,7 +10,7 @@ Status
 
 Basic functionality is in place with a reasonable output of the doxygen
 information and some cross linking. The result of the testsuite is visible
-here::
+here:
 
    http://michaeljones.github.com/breathe/
 
