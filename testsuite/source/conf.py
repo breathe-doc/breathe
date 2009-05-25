@@ -92,7 +92,13 @@ pygments_style = 'sphinx'
 # Options for breathe extension
 # -----------------------------
 
-breathe_path = [ "../../examples/doxygen/class/xml/" ]
+breathe_projects = {
+    "class":"../examples/doxygen/class/xml/",
+    "structcmd":"../examples/doxygen/structcmd/xml/",
+    "tinyxml":"../examples/custom/tinyxml/xml/",
+    }
+
+breathe_default_project = "tinyxml"
 
 
 # Options for HTML output
