@@ -29,18 +29,50 @@ class compounddefTypeSub(supermod.compounddefType):
     def __init__(self, kind=None, prot=None, id=None, compoundname='', title='', basecompoundref=None, derivedcompoundref=None, includes=None, includedby=None, incdepgraph=None, invincdepgraph=None, innerdir=None, innerfile=None, innerclass=None, innernamespace=None, innerpage=None, innergroup=None, templateparamlist=None, sectiondef=None, briefdescription=None, detaileddescription=None, inheritancegraph=None, collaborationgraph=None, programlisting=None, location=None, listofallmembers=None):
         supermod.compounddefType.__init__(self, kind, prot, id, compoundname, title, basecompoundref, derivedcompoundref, includes, includedby, incdepgraph, invincdepgraph, innerdir, innerfile, innerclass, innernamespace, innerpage, innergroup, templateparamlist, sectiondef, briefdescription, detaileddescription, inheritancegraph, collaborationgraph, programlisting, location, listofallmembers)
 
-    titles = {
-                "public-func": "Public Functions", 
-                "private-func": "Private Functions", 
-                "public-attrib": "Public Members", 
-                "private-attrib": "Private Members", 
-             }
+    section_titles = [
+                ("user-defined", "User Defined"),
+                ("public-type", "Public Type"),
+                ("public-func", "Public Functions"),
+                ("public-attrib", "Public Members"),
+                ("public-slot", "Public Slot"),
+                ("signal", "Signal"),
+                ("dcop-func",  "DCOP Function"),
+                ("property",  "Property"),
+                ("event",  "Event"),
+                ("public-static-func", "Public Static Functons"),
+                ("public-static-attrib", "Public Static Attributes"),
+                ("protected-type",  "Protected Types"),
+                ("protected-func",  "Protected Functions"),
+                ("protected-attrib",  "Protected Attributes"),
+                ("protected-slot",  "Protected Slots"),
+                ("protected-static-func",  "Protected Static Functions"),
+                ("protected-static-attrib",  "Protected Static Attributes"),
+                ("package-type",  "Package Types"),
+                ("private-func", "Private Functions", "Private Functions"),
+                ("package-attrib", "Package Attributes"),
+                ("package-static-func", "Package Static Functions"),
+                ("package-static-attrib", "Package Static Attributes"),
+                ("private-type", "Private Types"),
+                ("private-func", "Private Functions"),
+                ("private-attrib", "Private Members"),
+                ("private-slot",  "Private Slots"),
+                ("private-static-func", "Private Static Functions"),
+                ("private-static-attrib",  "Private Static Attributes"),
+                ("friend",  "Friends"),
+                ("related",  "Related"),
+                ("define",  "Defines"),
+                ("prototype",  "Prototypes"),
+                ("typedef",  "Typedefs"),
+                ("enum",  "Enums"),
+                ("func",  "Functions"),
+                ("var",  "Variables"),
+             ]
 
-    def extend_nodelist(self, nodelist, section, section_nodelists):
+    def extend_nodelist(self, nodelist, section, title, section_nodelists):
 
         # Add title and contents if found
         if section_nodelists.has_key(section):
-            nodelist.append(nodes.emphasis(text=self.titles[section]))
+            nodelist.append(nodes.emphasis(text=title))
             nodelist.append(nodes.block_quote("", *section_nodelists[section]))
 
 
@@ -56,10 +88,10 @@ class compounddefTypeSub(supermod.compounddefType):
         nodelist = []    
 
         # Order the results in an appropriate manner
-        self.extend_nodelist(nodelist, "public-func", section_nodelists)
-        self.extend_nodelist(nodelist, "private-func", section_nodelists)
-        self.extend_nodelist(nodelist, "public-attrib", section_nodelists)
-        self.extend_nodelist(nodelist, "private-attrib", section_nodelists)
+        for entry in self.section_titles:
+            self.extend_nodelist(nodelist, entry[0], entry[1], section_nodelists)
+
+        self.extend_nodelist(nodelist, "", "", section_nodelists)
 
         return [nodes.block_quote("", *nodelist)]
 
