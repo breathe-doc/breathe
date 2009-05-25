@@ -27,6 +27,19 @@ class DoxygenTypeSub(supermod.DoxygenType):
 
         return nodelist
 
+    def find_compounds_and_members(self, details):
+        """
+        Returns a list of all compounds and their members which match details
+        """
+
+        results = []
+        for compound in self.compound:
+            members = compound.find_members(details)
+            if members:
+                results.append([compound, members])
+
+        return results
+
 supermod.DoxygenType.subclass = DoxygenTypeSub
 # end class DoxygenTypeSub
 
@@ -49,6 +62,19 @@ class CompoundTypeSub(supermod.CompoundType):
         nodelist.extend(root_object.rst_nodes())
 
         return nodelist
+
+    def find_members(self, details):
+        """
+        Returns a list of all members which match details
+        """
+
+        results = []
+
+        for member in self.member:
+            if member.name == details.name and member.kind == details.kind:
+                results.append(member)
+
+        return results
 
 supermod.CompoundType.subclass = CompoundTypeSub
 # end class CompoundTypeSub

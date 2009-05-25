@@ -21,6 +21,10 @@ class DoxygenTypeSub(supermod.DoxygenType):
         # Only interested in the compounddef child node
         return self.compounddef.rst_nodes()
 
+    def find(self, details):
+
+        return self.compounddef.find(details)
+
 supermod.DoxygenType.subclass = DoxygenTypeSub
 # end class DoxygenTypeSub
 
@@ -94,6 +98,14 @@ class compounddefTypeSub(supermod.compounddefType):
         self.extend_nodelist(nodelist, "", "", section_nodelists)
 
         return [nodes.block_quote("", *nodelist)]
+
+    def find(self, details):
+
+        for sectiondef in self.sectiondef:
+            result = sectiondef.find(details)
+            if result:
+                return result
+
 
 supermod.compounddefType.subclass = compounddefTypeSub
 # end class compounddefTypeSub
@@ -172,6 +184,14 @@ class sectiondefTypeSub(supermod.sectiondefType):
 
         # Return with information about which section this is
         return self.kind, [def_list]
+
+    def find(self, details):
+
+        for memberdef in self.memberdef:
+            if memberdef.id == details.refid:
+                return memberdef
+
+        return None
 
 
 supermod.sectiondefType.subclass = sectiondefTypeSub
