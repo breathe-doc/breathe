@@ -6,11 +6,15 @@ Generated Mon Feb  9 19:08:05 2009 by generateDS.py.
 
 from string import lower as str_lower
 from xml.dom import minidom
+from xml.dom import Node
 from docutils import nodes
+
 
 import sys
 
 import compoundsuper as supermod
+from compoundsuper import MixedContainer
+
 
 class DoxygenTypeSub(supermod.DoxygenType):
     def __init__(self, version=None, compounddef=None):
@@ -199,16 +203,16 @@ supermod.sectiondefType.subclass = sectiondefTypeSub
 
 
 class memberdefTypeSub(supermod.memberdefType):
-    def __init__(self, initonly=None, kind=None, volatile=None, const=None, raisexx=None, virt=None, readable=None, prot=None, explicit=None, new=None, final=None, writable=None, add=None, static=None, remove=None, sealed=None, mutable=None, gettable=None, inline=None, settable=None, id=None, templateparamlist=None, typexx=None, definition='', argsstring='', name='', read='', write='', bitfield='', reimplements=None, reimplementedby=None, param=None, enumvalue=None, initializer=None, exceptions=None, briefdescription=None, detaileddescription=None, inbodydescription=None, location=None, references=None, referencedby=None):
-        supermod.memberdefType.__init__(self, initonly, kind, volatile, const, raisexx, virt, readable, prot, explicit, new, final, writable, add, static, remove, sealed, mutable, gettable, inline, settable, id, templateparamlist, typexx, definition, argsstring, name, read, write, bitfield, reimplements, reimplementedby, param, enumvalue, initializer, exceptions, briefdescription, detaileddescription, inbodydescription, location, references, referencedby)
+    def __init__(self, initonly=None, kind=None, volatile=None, const=None, raise_=None, virt=None, readable=None, prot=None, explicit=None, new=None, final=None, writable=None, add=None, static=None, remove=None, sealed=None, mutable=None, gettable=None, inline=None, settable=None, id=None, templateparamlist=None, type_=None, definition='', argsstring='', name='', read='', write='', bitfield='', reimplements=None, reimplementedby=None, param=None, enumvalue=None, initializer=None, exceptions=None, briefdescription=None, detaileddescription=None, inbodydescription=None, location=None, references=None, referencedby=None):
+        supermod.memberdefType.__init__(self, initonly, kind, volatile, const, raise_, virt, readable, prot, explicit, new, final, writable, add, static, remove, sealed, mutable, gettable, inline, settable, id, templateparamlist, type_, definition, argsstring, name, read, write, bitfield, reimplements, reimplementedby, param, enumvalue, initializer, exceptions, briefdescription, detaileddescription, inbodydescription, location, references, referencedby)
 
     def rst_nodes(self):
 
         kind = []
         
         # Variable type or function return type
-        if self.typexx:
-            kind = self.typexx.rst_nodes()
+        if self.type_:
+            kind = self.type_.rst_nodes()
 
         name = nodes.strong(text=self.name)
 
@@ -227,9 +231,15 @@ class memberdefTypeSub(supermod.memberdefType):
 
         term = nodes.term("","", *args)
 
+        description_nodes = []
+
         if self.briefdescription:
-            desc_nodes = self.briefdescription.rst_nodes()
-            definition = nodes.definition("", *desc_nodes)
+            description_nodes.extend(self.briefdescription.rst_nodes())
+
+        if self.detaileddescription:
+            description_nodes.extend(self.detaileddescription.rst_nodes())
+
+        definition = nodes.definition("", *description_nodes)
 
         # Build the list item
         nodelist = [nodes.definition_list_item("",term, definition)]
@@ -251,10 +261,12 @@ class descriptionTypeSub(supermod.descriptionType):
         # Get description in rst_nodes if possible
         for item in self.content_:
             value = item.getValue()
-            try:
+            if hasattr(value, "rst_nodes"):
                 nodelist.extend(value.rst_nodes())
-            except AttributeError:
+            else:
                 pass
+
+            # nodelist.extend(self.para.rst_nodes())
 
         return nodelist
 
@@ -277,8 +289,8 @@ supermod.templateparamlistType.subclass = templateparamlistTypeSub
 
 
 class paramTypeSub(supermod.paramType):
-    def __init__(self, typexx=None, declname='', defname='', array='', defval=None, briefdescription=None):
-        supermod.paramType.__init__(self, typexx, declname, defname, array, defval, briefdescription)
+    def __init__(self, type_=None, declname='', defname='', array='', defval=None, briefdescription=None):
+        supermod.paramType.__init__(self, type_, declname, defname, array, defval, briefdescription)
     
     def rst_nodes(self):
 
@@ -287,8 +299,8 @@ class paramTypeSub(supermod.paramType):
         kind = []
         
         # Parameter type
-        if self.typexx:
-            kind = self.typexx.rst_nodes()
+        if self.type_:
+            kind = self.type_.rst_nodes()
 
         nodelist.extend(kind)
 
@@ -320,10 +332,11 @@ class linkedTextTypeSub(supermod.linkedTextType):
 
         # Recursively process where possible
         for i in self.content_:
-            try:
+            value = i.getValue()
+            if hasattr( value, "rst_nodes" ):
                 ns = i.getValue().rst_nodes()
                 nodelist.extend(ns)
-            except AttributeError:
+            else:
                 nodelist.append(nodes.emphasis(text=i.getValue()))
 
             nodelist.append(nodes.Text(" "))
@@ -377,7 +390,7 @@ supermod.codelineType.subclass = codelineTypeSub
 
 
 class highlightTypeSub(supermod.highlightType):
-    def __init__(self, classxx=None, sp=None, ref=None, mixedclass_=None, content_=None):
+    def __init__(self, class_=None, sp=None, ref=None, mixedclass_=None, content_=None):
         supermod.highlightType.__init__(self, mixedclass_, content_)
 supermod.highlightType.subclass = highlightTypeSub
 # end class highlightTypeSub
@@ -519,6 +532,13 @@ supermod.docVarListEntryType.subclass = docVarListEntryTypeSub
 class docRefTextTypeSub(supermod.docRefTextType):
     def __init__(self, refid=None, kindref=None, external=None, valueOf_='', mixedclass_=None, content_=None):
         supermod.docRefTextType.__init__(self, mixedclass_, content_)
+
+    def rst_nodes(self):
+
+        nodelist = [nodes.reference("", self.valueOf_, refid=self.refid )]
+
+        return nodelist
+
 supermod.docRefTextType.subclass = docRefTextTypeSub
 # end class docRefTextTypeSub
 
@@ -552,7 +572,7 @@ supermod.docHeadingType.subclass = docHeadingTypeSub
 
 
 class docImageTypeSub(supermod.docImageType):
-    def __init__(self, width=None, typexx=None, name=None, height=None, valueOf_='', mixedclass_=None, content_=None):
+    def __init__(self, width=None, type_=None, name=None, height=None, valueOf_='', mixedclass_=None, content_=None):
         supermod.docImageType.__init__(self, mixedclass_, content_)
 supermod.docImageType.subclass = docImageTypeSub
 # end class docImageTypeSub
@@ -589,6 +609,18 @@ supermod.docLanguageType.subclass = docLanguageTypeSub
 class docParamListTypeSub(supermod.docParamListType):
     def __init__(self, kind=None, parameteritem=None):
         supermod.docParamListType.__init__(self, kind, parameteritem)
+
+    def rst_nodes(self):
+
+        nodelist = []
+        for entry in self.parameteritem:
+            nodelist.extend(entry.rst_nodes())
+
+        def_list = nodes.definition_list("", *nodelist)
+
+        return [def_list]
+
+
 supermod.docParamListType.subclass = docParamListTypeSub
 # end class docParamListTypeSub
 
@@ -596,6 +628,25 @@ supermod.docParamListType.subclass = docParamListTypeSub
 class docParamListItemSub(supermod.docParamListItem):
     def __init__(self, parameternamelist=None, parameterdescription=None):
         supermod.docParamListItem.__init__(self, parameternamelist, parameterdescription)
+
+    def rst_nodes(self):
+
+        nodelist = []
+        for entry in self.parameternamelist:
+            nodelist.extend(entry.rst_nodes())
+
+        term = nodes.term("","", *nodelist)
+
+        nodelist = []
+
+        if self.parameterdescription:
+            nodelist.extend(self.parameterdescription.rst_nodes())
+
+        definition = nodes.definition("", *nodelist)
+
+        return [nodes.definition_list_item("", term, definition)]
+
+
 supermod.docParamListItem.subclass = docParamListItemSub
 # end class docParamListItemSub
 
@@ -603,6 +654,16 @@ supermod.docParamListItem.subclass = docParamListItemSub
 class docParamNameListSub(supermod.docParamNameList):
     def __init__(self, parametername=None):
         supermod.docParamNameList.__init__(self, parametername)
+
+    def rst_nodes(self):
+
+        nodelist = []
+        for entry in self.parametername:
+            nodelist.extend(entry.rst_nodes())
+
+        return nodelist
+
+
 supermod.docParamNameList.subclass = docParamNameListSub
 # end class docParamNameListSub
 
@@ -610,6 +671,20 @@ supermod.docParamNameList.subclass = docParamNameListSub
 class docParamNameSub(supermod.docParamName):
     def __init__(self, direction=None, ref=None, mixedclass_=None, content_=None):
         supermod.docParamName.__init__(self, mixedclass_, content_)
+
+    def rst_nodes(self):
+
+        nodelist = []
+        for item in self.content_:
+            value = item.getValue()
+            if hasattr(value, "rst_nodes"):
+                nodelist.extend(value.rst_nodes())
+            else:
+                nodelist.extend(nodes.Text(value))
+
+
+        return nodelist
+
 supermod.docParamName.subclass = docParamNameSub
 # end class docParamNameSub
 
@@ -638,9 +713,34 @@ class docParaTypeSub(supermod.docParaType):
     def __init__(self, char=None, valueOf_=''):
         supermod.docParaType.__init__(self, char)
 
+        self.parameterlist = []
+
     def rst_nodes(self):
 
-        return [nodes.paragraph("", "", nodes.Text(self.valueOf_))]
+        nodelist = []
+        for entry in self.parameterlist:
+            nodelist.extend(entry.rst_nodes())
+
+        nodelist.append(nodes.paragraph("", "", nodes.Text(self.valueOf_)))
+
+        return nodelist
+
+    def buildChildren(self, child_, nodeName_):
+
+        if child_.nodeType == Node.TEXT_NODE:
+            obj_ = self.mixedclass_(MixedContainer.CategoryText,
+                MixedContainer.TypeNone, '', child_.nodeValue)
+            self.content_.append(obj_)
+        if child_.nodeType == Node.TEXT_NODE:
+            self.valueOf_ += child_.nodeValue
+        elif child_.nodeType == Node.CDATA_SECTION_NODE:
+            self.valueOf_ += '![CDATA['+child_.nodeValue+']]'
+        elif child_.nodeType == Node.ELEMENT_NODE and \
+            nodeName_ == 'parameterlist':
+            obj_ = supermod.docParamListType.factory()
+            obj_.build(child_)
+            self.parameterlist.append(obj_)
+
 
 supermod.docParaType.subclass = docParaTypeSub
 # end class docParaTypeSub
