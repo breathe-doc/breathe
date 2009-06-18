@@ -37,6 +37,9 @@ class DoxygenTypeSub(supermod.DoxygenType):
             members = compound.find_members(details)
             if members:
                 results.append([compound, members])
+            else:
+                if details.match(compound):
+                    results.append([compound, []])
 
         return results
 
@@ -71,7 +74,7 @@ class CompoundTypeSub(supermod.CompoundType):
         results = []
 
         for member in self.member:
-            if member.name == details.name and member.kind == details.kind:
+            if details.match(member):
                 results.append(member)
 
         return results

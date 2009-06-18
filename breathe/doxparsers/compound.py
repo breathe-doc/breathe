@@ -105,6 +105,9 @@ class compounddefTypeSub(supermod.compounddefType):
 
     def find(self, details):
 
+        if self.id == details.refid:
+            return self
+
         for sectiondef in self.sectiondef:
             result = sectiondef.find(details)
             if result:

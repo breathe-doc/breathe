@@ -57,6 +57,20 @@ matches.
       :project: ...
       :path: ...
 
+doxygenstruct Directive
+~~~~~~~~~~~~~~~~~~~~~~~
+
+This directive generates the appropriate output for a single struct. Currently
+the struct name is required to be unique in the project.  There are plans for
+options for adding further criteria to narrow the search if there are multiple
+matches.
+
+::
+
+   .. doxygenstruct:: <struct name>
+      :project: ...
+      :path: ...
+
 
 Config Values
 -------------
@@ -81,6 +95,7 @@ Directives
    :maxdepth: 1
 
    function
+   struct
 
 
 General

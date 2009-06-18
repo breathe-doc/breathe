@@ -16,6 +16,9 @@ class ElementDescription(object):
         self.name = name
         self.kind = kind
 
+    def match(self, other):
+        return self.name == other.name and self.kind == other.kind
+
 
 class DoxygenBase(object):
 
@@ -36,6 +39,12 @@ class DoxygenBase(object):
 
         return index_path
 
+    def get_index_object(self):
+
+        index_path = self.get_path()
+        index_file = os.path.join(index_path, "index.xml")
+
+        return doxparsers.index.parse( index_file )
 
 
 # Directives
@@ -118,6 +127,39 @@ class DoxygenFunctionDirective(rst.Directive, DoxygenBase):
         return objects[0].rst_nodes()
 
 
+class DoxygenStructDirective(rst.Directive, DoxygenBase):
+
+    required_arguments = 1
+    optional_arguments = 1
+    option_spec = {
+            "path" : unchanged_required,
+            "project" : unchanged_required,
+            }
+    has_content = False 
+
+    def run(self):
+
+        struct_name = self.arguments[0]
+        root_object = self.get_index_object()
+
+        # Find function in the index file
+        details = ElementDescription(name=struct_name, kind="struct")
+        results = root_object.find_compounds_and_members( details )
+
+        if not results:
+            warning = 'doxygenstruct: Cannot find struct "%s" in doxygen xml output' % struct_name
+            return [ nodes.warning( "", nodes.paragraph("", "", nodes.Text(warning))),
+                    self.state.document.reporter.warning( warning, line=self.lineno) ]
+
+        elif len( results ) > 1:
+            warning =  'doxygenstruct: Found multiple matches for "%s" in doxygen xml output.' % struct_name
+            warning += '               Please be more specific.'
+            return [ self.state.document.reporter.warning( warning, line=self.lineno) ]
+
+        return results[0][0].rst_nodes(self.get_path())
+
+
+
 
 def get_config_values(app):
 
@@ -140,8 +182,15 @@ def setup(app):
             DoxygenFunctionDirective,
             )
 
+    app.add_directive(
+            "doxygenstruct",
+            DoxygenStructDirective,
+            )
+
+
     app.add_config_value("breathe_projects", {}, True)
     app.add_config_value("breathe_default_project", "", True)
 
     app.connect("builder-inited", get_config_values)
+
 
