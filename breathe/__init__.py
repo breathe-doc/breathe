@@ -159,6 +159,38 @@ class DoxygenStructDirective(rst.Directive, DoxygenBase):
         return results[0][0].rst_nodes(self.get_path())
 
 
+class DoxygenClassDirective(rst.Directive, DoxygenBase):
+
+    required_arguments = 1
+    optional_arguments = 1
+    option_spec = {
+            "file" : unchanged_required,
+            "project" : unchanged_required,
+            }
+    has_content = False
+
+    def run(self):
+
+        class_name = self.arguments[0]
+        root_object = self.get_index_object()
+
+        # Find function in the index file
+        details = ElementDescription(name=class_name, kind="class")
+        results = root_object.find_compounds_and_members( details )
+
+        if not results:
+            warning = 'doxygenclass: Cannot find class "%s" in doxygen xml output' % class_name
+            return [ nodes.warning( "", nodes.paragraph("", "", nodes.Text(warning))),
+                    self.state.document.reporter.warning( warning, line=self.lineno) ]
+
+        elif len( results ) > 1:
+            warning =  'doxygenclass: Found multiple matches for "%s" in doxygen xml output.' % class_name
+            warning += '               Please be more specific.'
+            return [ self.state.document.reporter.warning( warning, line=self.lineno) ]
+
+        return results[0][0].rst_nodes(self.get_path())
+
+
 
 
 def get_config_values(app):
@@ -187,6 +219,10 @@ def setup(app):
             DoxygenStructDirective,
             )
 
+    app.add_directive(
+            "doxygenclass",
+            DoxygenClassDirective,
+            )
 
     app.add_config_value("breathe_projects", {}, True)
     app.add_config_value("breathe_default_project", "", True)
