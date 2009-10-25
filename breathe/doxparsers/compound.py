@@ -95,6 +95,12 @@ class compounddefTypeSub(supermod.compounddefType):
 
         nodelist = []    
 
+        if self.briefdescription:
+            nodelist.extend( self.briefdescription.rst_nodes())
+
+        if self.detaileddescription:
+            nodelist.extend( self.detaileddescription.rst_nodes())
+
         # Order the results in an appropriate manner
         for entry in self.section_titles:
             self.extend_nodelist(nodelist, entry[0], entry[1], section_nodelists)
@@ -272,6 +278,7 @@ class descriptionTypeSub(supermod.descriptionType):
             # nodelist.extend(self.para.rst_nodes())
 
         return nodelist
+
 
 supermod.descriptionType.subclass = descriptionTypeSub
 # end class descriptionTypeSub
