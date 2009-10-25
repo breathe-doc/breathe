@@ -2,10 +2,10 @@
 # This file was generated from Makefile.in on Sat Dec 13 12:17:28 GMT 2008
 #
 
-DOXYGEN   = /user_data/RND/git/vendor/doxygen/doxygen-1.5.8
-TMAKEPATH = /user_data/RND/git/vendor/doxygen/doxygen/doxygen/tmake/lib/linux-g++
+DOXYGEN   = /usr
+TMAKEPATH = 
 ENV       = env TMAKEPATH=$(TMAKEPATH)
-TMAKE     = /user_data/RND/git/vendor/doxygen/doxygen-1.5.8/tmake/bin/tmake
+TMAKE     = 
 MAKE      = /usr/bin/make
 PERL      = /usr/bin/perl
 RM        = rm -f
