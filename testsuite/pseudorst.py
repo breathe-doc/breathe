@@ -1,11 +1,18 @@
-#!/bin/env python2.5
+#!/usr/bin/env python2.5
 
 import sys
 
 sys.path.insert(0, "../")
+sys.path.insert(0, "source")
 
 import breathe
 import docutils
+
+# Sphinx source/conf.py file
+import conf
+
+breathe.DoxygenBase.projects = conf.breathe_projects
+breathe.DoxygenBase.default_project = conf.breathe_default_project
 
 from docutils.core import publish_cmdline, default_description
 
