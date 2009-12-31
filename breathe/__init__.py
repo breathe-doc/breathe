@@ -129,6 +129,8 @@ class DoxygenFunctionDirective(rst.Directive, DoxygenBase):
 
 class DoxygenStructDirective(rst.Directive, DoxygenBase):
 
+    kind = "struct"
+
     required_arguments = 1
     optional_arguments = 1
     option_spec = {
@@ -143,11 +145,11 @@ class DoxygenStructDirective(rst.Directive, DoxygenBase):
         root_object = self.get_index_object()
 
         # Find function in the index file
-        details = ElementDescription(name=struct_name, kind="struct")
+        details = ElementDescription(name=struct_name, kind=self.kind)
         results = root_object.find_compounds_and_members( details )
 
         if not results:
-            warning = 'doxygenstruct: Cannot find struct "%s" in doxygen xml output' % struct_name
+            warning = 'doxygenstruct: Cannot find %s "%s" in doxygen xml output' % ( self.kind, struct_name )
             return [ nodes.warning( "", nodes.paragraph("", "", nodes.Text(warning))),
                     self.state.document.reporter.warning( warning, line=self.lineno) ]
 
@@ -159,38 +161,9 @@ class DoxygenStructDirective(rst.Directive, DoxygenBase):
         return results[0][0].rst_nodes(self.get_path())
 
 
-class DoxygenClassDirective(rst.Directive, DoxygenBase):
+class DoxygenClassDirective(DoxygenStructDirective):
 
-    required_arguments = 1
-    optional_arguments = 1
-    option_spec = {
-            "file" : unchanged_required,
-            "project" : unchanged_required,
-            }
-    has_content = False
-
-    def run(self):
-
-        class_name = self.arguments[0]
-        root_object = self.get_index_object()
-
-        # Find function in the index file
-        details = ElementDescription(name=class_name, kind="class")
-        results = root_object.find_compounds_and_members( details )
-
-        if not results:
-            warning = 'doxygenclass: Cannot find class "%s" in doxygen xml output' % class_name
-            return [ nodes.warning( "", nodes.paragraph("", "", nodes.Text(warning))),
-                    self.state.document.reporter.warning( warning, line=self.lineno) ]
-
-        elif len( results ) > 1:
-            warning =  'doxygenclass: Found multiple matches for "%s" in doxygen xml output.' % class_name
-            warning += '               Please be more specific.'
-            return [ self.state.document.reporter.warning( warning, line=self.lineno) ]
-
-        return results[0][0].rst_nodes(self.get_path())
-
-
+    kind = "class"
 
 
 def get_config_values(app):
