@@ -724,6 +724,7 @@ class docParaTypeSub(supermod.docParaType):
         supermod.docParaType.__init__(self, char)
 
         self.parameterlist = []
+        self.content = []
 
     def rst_nodes(self):
 
@@ -731,26 +732,36 @@ class docParaTypeSub(supermod.docParaType):
         for entry in self.parameterlist:
             nodelist.extend(entry.rst_nodes())
 
-        nodelist.append(nodes.paragraph("", "", nodes.Text(self.valueOf_)))
+        for item in self.content:
+            if hasattr(item, "rst_nodes"):
+                nodes_ = item.rst_nodes()
+                nodelist.extend(nodes_)
+            else:
+                value = item.getValue()
+                nodelist.extend(nodes.Text(value))
 
-        return nodelist
+
+        return [nodes.paragraph("", "", *nodelist)]
 
     def buildChildren(self, child_, nodeName_):
+        supermod.docParaType.buildChildren(self, child_, nodeName_)
 
         if child_.nodeType == Node.TEXT_NODE:
             obj_ = self.mixedclass_(MixedContainer.CategoryText,
                 MixedContainer.TypeNone, '', child_.nodeValue)
-            self.content_.append(obj_)
-        if child_.nodeType == Node.TEXT_NODE:
-            self.valueOf_ += child_.nodeValue
-        elif child_.nodeType == Node.CDATA_SECTION_NODE:
-            self.valueOf_ += '![CDATA['+child_.nodeValue+']]'
+            self.content.append(obj_)
         elif child_.nodeType == Node.ELEMENT_NODE and \
-            nodeName_ == 'parameterlist':
+                nodeName_ == "ref":
+            obj_ = supermod.docRefTextType.factory()
+            obj_.build(child_)
+            self.content.append(obj_)
+
+
+        if child_.nodeType == Node.ELEMENT_NODE and \
+                nodeName_ == 'parameterlist':
             obj_ = supermod.docParamListType.factory()
             obj_.build(child_)
             self.parameterlist.append(obj_)
-
 
 supermod.docParaType.subclass = docParaTypeSub
 # end class docParaTypeSub
