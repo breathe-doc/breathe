@@ -168,7 +168,6 @@ class sectiondefTypeSub(supermod.sectiondefType):
                 ("protected-static-func",  "Protected Static Functions"),
                 ("protected-static-attrib",  "Protected Static Attributes"),
                 ("package-type",  "Package Types"),
-                ("private-func", "Private Functions"),
                 ("package-attrib", "Package Attributes"),
                 ("package-static-func", "Package Static Functions"),
                 ("package-static-attrib", "Package Static Attributes"),
