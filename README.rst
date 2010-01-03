@@ -8,11 +8,9 @@ render the Doxygen xml output.
 Status
 ------
 
-Basic functionality is in place with a reasonable output of the doxygen
-information and some cross linking. The result of the testsuite is visible
-here:
-
-   http://michaeljones.github.com/breathe/
+This has passed proof of concept stage and has proved itself to be a useful
+tool. The testsuite is currently out of date and no unit tests have been
+written. It is usable, but will generate a couple of warnings from time to time.
 
 Running Testsuite
 -----------------
