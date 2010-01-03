@@ -7,50 +7,30 @@ import sys
 import copy
 
 from docutils.parsers import rst
-import breathe.doxparsers.index
-import breathe.doxparsers.compound
+from breathe.builder import RstBuilder, BuilderFactory
+from breathe.finder import FinderFactory, NoMatchesError, MultipleMatchesError
+from breathe.parser import DoxygenParserFactory, DoxygenIndexParser
+from breathe.renderer.rst.doxygen import DoxygenToRstRendererFactoryCreator
+from breathe.finder.doxygen import DoxygenItemFinderFactoryCreator, ItemMatcherFactory
 
-class ElementDescription(object):
+import docutils.nodes
+import sphinx.addnodes
 
-    def __init__(self, name, kind):
-        self.name = name
-        self.kind = kind
+class BaseDirective(rst.Directive):
 
-    def match(self, other):
-        return self.name == other.name and self.kind == other.kind
+    def __init__(self, builder_factory, finder_factory, matcher_factory, project_info_factory, *args):
+        rst.Directive.__init__(self, *args)
 
-
-class DoxygenBase(object):
-
-    def get_path(self):
-
-        index_path = DoxygenBase.projects[ DoxygenBase.default_project ]
-
-        if self.options.has_key("project"):
-            try:
-                index_path = DoxygenBase.projects[ self.options["project"] ]
-            except KeyError, e:
-                sys.stderr.write(
-                        "Unable to find project '%s' in breathe_projects dictionary" % self.options["project"]
-                        )
-
-        if self.options.has_key("path"):
-            index_path = self.options["path"]
-
-        return index_path
-
-    def get_index_object(self):
-
-        index_path = self.get_path()
-        index_file = os.path.join(index_path, "index.xml")
-
-        return doxparsers.index.parse( index_file )
+        self.builder_factory = builder_factory
+        self.finder_factory = finder_factory
+        self.matcher_factory = matcher_factory
+        self.project_info_factory = project_info_factory
 
 
 # Directives
 # ----------
 
-class DoxygenIndexDirective(rst.Directive, DoxygenBase):
+class DoxygenIndexDirective(BaseDirective):
 
     required_arguments = 0
     optional_arguments = 2
@@ -62,16 +42,20 @@ class DoxygenIndexDirective(rst.Directive, DoxygenBase):
 
     def run(self):
 
-        index_path = self.get_path()
+        project_info = self.project_info_factory.create_project_info(self.options)
 
-        index_file = os.path.join(index_path, "index.xml")
+        finder = self.finder_factory.create_finder(project_info)
 
-        root_object = doxparsers.index.parse( index_file )
+        # try:
+        data_object = finder.root()
+        # except
 
-        return root_object.rst_nodes(index_path)
+        builder = self.builder_factory.create_builder(project_info, self.state.document)
+        nodes = builder.build(data_object)
 
+        return nodes
 
-class DoxygenFunctionDirective(rst.Directive, DoxygenBase):
+class DoxygenFunctionDirective(BaseDirective):
 
     required_arguments = 1
     optional_arguments = 1
@@ -85,49 +69,29 @@ class DoxygenFunctionDirective(rst.Directive, DoxygenBase):
 
         function_name = self.arguments[0]
 
-        index_path = self.get_path()
-        index_file = os.path.join(index_path, "index.xml")
+        project_info = self.project_info_factory.create_project_info(self.options)
 
-        root_object = doxparsers.index.parse( index_file )
+        finder = self.finder_factory.create_finder(project_info)
 
-        # Find function in the index file
-        details = ElementDescription(name=function_name, kind="function")
-        results = root_object.find_compounds_and_members( details )
+        matcher = self.matcher_factory.create_name_type_matcher(function_name, "function")
 
-        if not results:
+        try:
+            data_object = finder.find_one(matcher)
+        except NoMatchesError, e:
             warning = 'doxygenfunction: Cannot find function "%s" in doxygen xml output' % function_name
-            return [ nodes.warning( "", nodes.paragraph("", "", nodes.Text(warning))),
+            return [ docutils.nodes.warning( "", docutils.nodes.paragraph("", "", docutils.nodes.Text(warning))),
                     self.state.document.reporter.warning( warning, line=self.lineno) ]
 
-        objects = []
-
-        # Find functions in files suggested by index
-        for entry in results:
-
-            ref_xml_path = os.path.join( index_path, "%s.xml" % entry[0].refid )
-            root_object = breathe.doxparsers.compound.parse( ref_xml_path )
-
-            for memberdef in entry[1]:
-                
-                criteria = copy.deepcopy(details)
-                criteria.refid = memberdef.refid
-
-                objects.append(root_object.find(criteria))
-
-        if not objects:
-            warning = 'doxygenfunction: Cannot find %s in doxygen xml output' % function_name
-            return [ self.state.document.reporter.warning( warning, line=self.lineno) ]
-
-        elif len( objects ) > 1:
-            warning =  'doxygenfunction: Found multiple matches for "%s" in doxygen xml output.' % function_name
-            warning += '                 Please be more specific.'
-            return [ self.state.document.reporter.warning( warning, line=self.lineno) ]
 
 
-        return objects[0].rst_nodes()
+        builder = self.builder_factory.create_builder(project_info, self.state.document)
+        nodes = builder.build(data_object)
+
+        return nodes
 
 
-class DoxygenStructDirective(rst.Directive, DoxygenBase):
+
+class DoxygenStructDirective(BaseDirective):
 
     kind = "struct"
 
@@ -142,23 +106,20 @@ class DoxygenStructDirective(rst.Directive, DoxygenBase):
     def run(self):
 
         struct_name = self.arguments[0]
-        root_object = self.get_index_object()
 
-        # Find function in the index file
-        details = ElementDescription(name=struct_name, kind=self.kind)
-        results = root_object.find_compounds_and_members( details )
+        project_info = self.project_info_factory.create_project_info(self.options)
 
-        if not results:
-            warning = 'doxygenstruct: Cannot find %s "%s" in doxygen xml output' % ( self.kind, struct_name )
-            return [ nodes.warning( "", nodes.paragraph("", "", nodes.Text(warning))),
-                    self.state.document.reporter.warning( warning, line=self.lineno) ]
+        finder = self.finder_factory.create_finder(project_info)
 
-        elif len( results ) > 1:
-            warning =  'doxygenstruct: Found multiple matches for "%s" in doxygen xml output.' % struct_name
-            warning += '               Please be more specific.'
-            return [ self.state.document.reporter.warning( warning, line=self.lineno) ]
+        # try:
+        matcher = self.matcher_factory.create_name_type_matcher(struct_name, self.kind)
+        data_object = finder.find_one(matcher)
+        # except
 
-        return results[0][0].rst_nodes(self.get_path())
+        builder = self.builder_factory.create_builder(project_info, self.state.document)
+        nodes = builder.build(data_object)
+
+        return nodes
 
 
 class DoxygenClassDirective(DoxygenStructDirective):
@@ -166,10 +127,157 @@ class DoxygenClassDirective(DoxygenStructDirective):
     kind = "class"
 
 
-def get_config_values(app):
 
-    DoxygenBase.projects = app.config.breathe_projects
-    DoxygenBase.default_project = app.config.breathe_default_project
+# Setup Administration
+# --------------------
+
+class DirectiveContainer(object):
+
+    def __init__(self, directive, builder, finder_factory, matcher_factory, project_info_factory):
+
+        self.directive = directive
+        self.builder = builder
+        self.finder_factory = finder_factory
+        self.matcher_factory = matcher_factory
+        self.project_info_factory = project_info_factory
+
+        # Required for sphinx to inspect 
+        self.required_arguments = directive.required_arguments
+        self.optional_arguments = directive.optional_arguments
+        self.option_spec = directive.option_spec
+        self.has_content = directive.has_content
+
+    def __call__(self, *args):
+
+        return self.directive(self.builder, self.finder_factory, self.matcher_factory, self.project_info_factory, *args)
+
+
+class ProjectInfo(object):
+
+    def __init__(self, name, path):
+
+        self._name = name
+        self._path = path
+
+    def name(self):
+        return self._name
+
+    def path(self):
+        return self._path 
+
+class ProjectInfoFactory(object):
+
+    def __init__(self):
+
+        self.projects = {}
+        self.default_project = None
+
+        self.project_count = 0
+        self.project_info_store = {}
+
+    def update(self, projects, default_project):
+
+        self.projects = projects
+        self.default_project = default_project
+
+    def default_path(self):
+
+        return self.projects[self.default_project]
+
+    def create_project_info(self, options):
+
+        name = ""
+        path = self.default_path()
+
+        if options.has_key("project"):
+            try:
+                path = self.projects[ options["project"] ]
+                name = options["project"]
+            except KeyError, e:
+                sys.stderr.write(
+                        "Unable to find project '%s' in breathe_projects dictionary" % options["project"]
+                        )
+
+        if options.has_key("path"):
+            path = options["path"]
+
+
+        try:
+            return self.project_info_store[path]
+        except KeyError:
+            if not name:
+                name = "project%s" % self.project_count
+                self.project_count += 1
+
+            project_info = ProjectInfo(name, path)
+
+            self.project_info_store[path] = project_info
+
+            return project_info
+
+    
+
+class DoxygenDirectiveFactory(object):
+
+    directives = {
+            "doxygenindex" : DoxygenIndexDirective,
+            "doxygenfunction" : DoxygenFunctionDirective,
+            "doxygenstruct" : DoxygenStructDirective,
+            "doxygenclass" : DoxygenClassDirective,
+            }
+
+    def __init__(self, builder_factory, finder_factory, matcher_factory, project_info_factory):
+        self.builder_factory = builder_factory
+        self.finder_factory = finder_factory
+        self.matcher_factory = matcher_factory
+        self.project_info_factory = project_info_factory
+
+    def create_index_directive_container(self):
+        return self.create_directive_container("doxygenindex")
+
+    def create_function_directive_container(self):
+        return self.create_directive_container("doxygenfunction")
+
+    def create_struct_directive_container(self):
+        return self.create_directive_container("doxygenstruct")
+
+    def create_class_directive_container(self):
+        return self.create_directive_container("doxygenclass")
+
+    def create_directive_container(self, type_):
+
+        return DirectiveContainer(
+                self.directives[type_],
+                self.builder_factory,
+                self.finder_factory,
+                self.matcher_factory,
+                self.project_info_factory
+                )  
+
+    def get_config_values(self, app):
+
+        # All DirectiveContainers maintain references to this project info factory
+        # so we can update this to update them
+        self.project_info_factory.update(
+                app.config.breathe_projects,
+                app.config.breathe_default_project
+                )
+
+class NodeFactory(object):
+
+    def __init__(self, *args):
+
+        self.sources = args
+
+    def __getattr__(self, node_name):
+
+        for source in self.sources:
+            try:
+                return getattr(source, node_name)
+            except AttributeError:
+                pass
+
+        raise NodeNotFoundError(node_name)
 
 
 # Setup
@@ -177,29 +285,42 @@ def get_config_values(app):
 
 def setup(app):
 
+    parser_factory = DoxygenParserFactory()
+    matcher_factory = ItemMatcherFactory()
+    item_finder_factory_creator = DoxygenItemFinderFactoryCreator(parser_factory, matcher_factory)
+    index_parser = DoxygenIndexParser()
+    finder_factory = FinderFactory(index_parser, item_finder_factory_creator)
+
+    node_factory = NodeFactory(docutils.nodes, sphinx.addnodes)
+    renderer_factory_creator = DoxygenToRstRendererFactoryCreator(node_factory, parser_factory)
+    builder_factory = BuilderFactory(RstBuilder, renderer_factory_creator)
+
+    project_info_factory = ProjectInfoFactory()
+    directive_factory = DoxygenDirectiveFactory(builder_factory, finder_factory, matcher_factory, project_info_factory)
+
     app.add_directive(
             "doxygenindex",
-            DoxygenIndexDirective,
+            directive_factory.create_index_directive_container(),
             )
 
     app.add_directive(
             "doxygenfunction",
-            DoxygenFunctionDirective,
+            directive_factory.create_function_directive_container(),
             )
 
     app.add_directive(
             "doxygenstruct",
-            DoxygenStructDirective,
+            directive_factory.create_struct_directive_container(),
             )
 
     app.add_directive(
             "doxygenclass",
-            DoxygenClassDirective,
+            directive_factory.create_class_directive_container(),
             )
 
     app.add_config_value("breathe_projects", {}, True)
     app.add_config_value("breathe_default_project", "", True)
 
-    app.connect("builder-inited", get_config_values)
+    app.connect("builder-inited", directive_factory.get_config_values)
 
 

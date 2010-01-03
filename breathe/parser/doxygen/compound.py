@@ -149,43 +149,6 @@ supermod.refTextType.subclass = refTextTypeSub
 
 class sectiondefTypeSub(supermod.sectiondefType):
 
-    section_titles = [
-                ("user-defined", "User Defined"),
-                ("public-type", "Public Type"),
-                ("public-func", "Public Functions"),
-                ("public-attrib", "Public Members"),
-                ("public-slot", "Public Slot"),
-                ("signal", "Signal"),
-                ("dcop-func",  "DCOP Function"),
-                ("property",  "Property"),
-                ("event",  "Event"),
-                ("public-static-func", "Public Static Functons"),
-                ("public-static-attrib", "Public Static Attributes"),
-                ("protected-type",  "Protected Types"),
-                ("protected-func",  "Protected Functions"),
-                ("protected-attrib",  "Protected Attributes"),
-                ("protected-slot",  "Protected Slots"),
-                ("protected-static-func",  "Protected Static Functions"),
-                ("protected-static-attrib",  "Protected Static Attributes"),
-                ("package-type",  "Package Types"),
-                ("package-attrib", "Package Attributes"),
-                ("package-static-func", "Package Static Functions"),
-                ("package-static-attrib", "Package Static Attributes"),
-                ("private-type", "Private Types"),
-                ("private-func", "Private Functions"),
-                ("private-attrib", "Private Members"),
-                ("private-slot",  "Private Slots"),
-                ("private-static-func", "Private Static Functions"),
-                ("private-static-attrib",  "Private Static Attributes"),
-                ("friend",  "Friends"),
-                ("related",  "Related"),
-                ("define",  "Defines"),
-                ("prototype",  "Prototypes"),
-                ("typedef",  "Typedefs"),
-                ("enum",  "Enums"),
-                ("func",  "Functions"),
-                ("var",  "Variables"),
-             ]
 
     def __init__(self, kind=None, header='', description=None, memberdef=None):
         supermod.sectiondefType.__init__(self, kind, header, description, memberdef)
@@ -787,4 +750,5 @@ def parse(inFilename):
     rootObj = supermod.DoxygenType.factory()
     rootObj.build(rootNode)
     return rootObj
+
 

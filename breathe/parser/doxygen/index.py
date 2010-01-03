@@ -9,23 +9,13 @@ from docutils import nodes
 
 import os
 import sys
-import breathe.doxparsers.compound
+import breathe.parser.doxygen.compound
 
 import indexsuper as supermod
 
 class DoxygenTypeSub(supermod.DoxygenType):
     def __init__(self, version=None, compound=None):
         supermod.DoxygenType.__init__(self, version, compound)
-
-    def rst_nodes(self, path):
-
-        nodelist = []
-
-        # Process all the compound children
-        for compound in self.compound:
-            nodelist.extend(compound.rst_nodes(path))
-
-        return nodelist
 
     def find_compounds_and_members(self, details):
         """
@@ -53,6 +43,7 @@ class CompoundTypeSub(supermod.CompoundType):
 
     def rst_nodes(self, path):
         
+
         # Set up the title and a reference for it (refid)
         kind = nodes.emphasis(text=self.kind)
         name = nodes.strong(text=self.name)
