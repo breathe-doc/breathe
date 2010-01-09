@@ -46,10 +46,8 @@ referenced by it.
 doxygenfunction Directive
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-This directive generates the appropriate output for a single function. Currently
-the function name is required to be unique in the project. There are plans for
-options for adding further criteria to narrow the search if there are multiple
-matches.
+This directive generates the appropriate output for a single function. The
+function name is required to be unique in the project.
 
 ::
 
@@ -60,16 +58,27 @@ matches.
 doxygenstruct Directive
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-This directive generates the appropriate output for a single struct. Currently
-the struct name is required to be unique in the project.  There are plans for
-options for adding further criteria to narrow the search if there are multiple
-matches.
+This directive generates the appropriate output for a single struct. The struct
+name is required to be unique in the project.
 
 ::
 
    .. doxygenstruct:: <struct name>
       :project: ...
       :path: ...
+
+doxygenclass Directive
+~~~~~~~~~~~~~~~~~~~~~~
+
+This directive generates the appropriate output for a single class. It behaves
+the same as the doxygenstruct directive.
+
+::
+
+   .. doxygenclass:: <class name>
+      :project: ...
+      :path: ...
+
 
 
 Config Values
@@ -85,21 +94,18 @@ Config Values
    the directive.
 
 
-Test pages
-----------
-
-Directives
-~~~~~~~~~~
+Example pages
+-------------
 
 .. toctree::
    :maxdepth: 1
 
    function
    struct
+   class
 
-
-General
-~~~~~~~
+Test Pages
+----------
 
 .. toctree::
    :maxdepth: 1

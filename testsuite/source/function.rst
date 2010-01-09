@@ -1,13 +1,29 @@
 
-doxygenfunction Directive Tests
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+doxygenfunction Directive Example
+=================================
 
-This should work.
+Working Example
+---------------
+
+This should work::
+
+   .. doxygenfunction:: open
+      :project: structcmd
+
+It produces this output:
 
 .. doxygenfunction:: open
    :project: structcmd
 
-This intentionally fails.
+Failing Example
+---------------
+
+This intentionally fails::
+
+   .. doxygenfunction:: made_up_function
+      :project: structcmd
+
+It produces the following warning message:
 
 .. doxygenfunction:: made_up_function
    :project: structcmd

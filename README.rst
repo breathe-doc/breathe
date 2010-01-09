@@ -9,8 +9,12 @@ Status
 ------
 
 This has passed proof of concept stage and has proved itself to be a useful
-tool. The testsuite is currently out of date and no unit tests have been
-written. It is usable, but will generate a couple of warnings from time to time.
+tool. It is usable, but will generate a couple of warnings from time to time.
+
+For example usage, please see the `documentation
+<http://michaeljones.github.com/breathe>`_.
+
+There are no unittests.
 
 Running Testsuite
 -----------------
