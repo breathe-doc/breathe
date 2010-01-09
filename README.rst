@@ -31,3 +31,13 @@ First run ``make`` for each folder in the examples directory, then::
 Then view the resulting html with your browser of choice.
 
 
+Credits
+-------
+
+Thanks to:
+
+- Dimitri van Heesch for `Doxygen <http://www.stack.nl/~dimitri/doxygen/>`_.
+- Georg Brandl for `Sphinx <http://sphinx.pocoo.org>`_.
+- David Goodger for `Docutils <http://docutils.sourceforge.net/>`_ and Restructured Text. 
+
+
