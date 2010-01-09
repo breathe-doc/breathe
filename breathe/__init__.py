@@ -113,8 +113,13 @@ class DoxygenStructDirective(BaseDirective):
 
         # try:
         matcher = self.matcher_factory.create_name_type_matcher(struct_name, self.kind)
-        data_object = finder.find_one(matcher)
-        # except
+
+        try:
+            data_object = finder.find_one(matcher)
+        except NoMatchesError, e:
+            warning = 'doxygen%s: Cannot find %s "%s" in doxygen xml output' % (self.kind, self.kind, struct_name)
+            return [ docutils.nodes.warning( "", docutils.nodes.paragraph("", "", docutils.nodes.Text(warning))),
+                    self.state.document.reporter.warning( warning, line=self.lineno) ]
 
         builder = self.builder_factory.create_builder(project_info, self.state.document)
         nodes = builder.build(data_object)
