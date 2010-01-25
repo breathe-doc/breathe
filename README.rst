@@ -1,4 +1,3 @@
-
 Breathe
 =======
 
@@ -39,5 +38,3 @@ Thanks to:
 - Dimitri van Heesch for `Doxygen <http://www.stack.nl/~dimitri/doxygen/>`_.
 - Georg Brandl for `Sphinx <http://sphinx.pocoo.org>`_.
 - David Goodger for `Docutils <http://docutils.sourceforge.net/>`_ and Restructured Text. 
-
-
