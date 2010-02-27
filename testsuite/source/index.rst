@@ -74,6 +74,18 @@ name is required to be unique in the project.
       :project: ...
       :path: ...
 
+doxygenenum Directive
+~~~~~~~~~~~~~~~~~~~~~~~
+
+This directive generates the appropriate output for a single enum. It behaves
+the same as the doxygenstruct directive.
+
+::
+
+   .. doxygenenum:: <enum name>
+      :project: ...
+      :path: ...
+
 doxygenclass Directive
 ~~~~~~~~~~~~~~~~~~~~~~
 
@@ -109,6 +121,7 @@ Example pages
 
    function
    struct
+   enum
    class
 
 Test Pages
