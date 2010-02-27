@@ -248,6 +248,7 @@ class DocRefTextTypeSubRenderer(Renderer):
                     "",
                     reftype="ref",
                     refid=refid, 
+                    refdoc=None,
                     reftarget=refid,
                     refcaption=refid,
                     *nodelist
