@@ -132,6 +132,11 @@ class DoxygenClassDirective(DoxygenStructDirective):
     kind = "class"
 
 
+class DoxygenEnumDirective(DoxygenStructDirective):
+
+    kind = "enum"
+
+
 
 # Setup Administration
 # --------------------
@@ -229,6 +234,7 @@ class DoxygenDirectiveFactory(object):
             "doxygenfunction" : DoxygenFunctionDirective,
             "doxygenstruct" : DoxygenStructDirective,
             "doxygenclass" : DoxygenClassDirective,
+            "doxygenenum" : DoxygenEnumDirective,
             }
 
     def __init__(self, builder_factory, finder_factory, matcher_factory, project_info_factory):
@@ -245,6 +251,9 @@ class DoxygenDirectiveFactory(object):
 
     def create_struct_directive_container(self):
         return self.create_directive_container("doxygenstruct")
+
+    def create_enum_directive_container(self):
+        return self.create_directive_container("doxygenenum")
 
     def create_class_directive_container(self):
         return self.create_directive_container("doxygenclass")
@@ -316,6 +325,11 @@ def setup(app):
     app.add_directive(
             "doxygenstruct",
             directive_factory.create_struct_directive_container(),
+            )
+
+    app.add_directive(
+            "doxygenenum",
+            directive_factory.create_enum_directive_container(),
             )
 
     app.add_directive(
