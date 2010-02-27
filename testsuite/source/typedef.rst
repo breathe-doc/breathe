@@ -1,0 +1,30 @@
+
+doxygentypedef Directive Example
+================================
+
+Working Example
+---------------
+
+This should work::
+
+   .. doxygentypedef:: UINT32
+      :project: structcmd
+
+It produces this output:
+
+.. doxygentypedef:: UINT32
+  :project: structcmd
+
+Failing Example
+---------------
+
+This intentionally fails::
+
+   .. doxygentypedef:: made_up_typedef
+      :project: restypedef
+
+It produces the following warning message:
+
+.. doxygentypedef:: made_up_typedef
+   :project: restypedef
+
