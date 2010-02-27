@@ -38,7 +38,7 @@ class DoxygenIndexDirective(BaseDirective):
             "path" : unchanged_required,
             "project" : unchanged_required,
             }
-    has_content = False 
+    has_content = False
 
     def run(self):
 
@@ -63,7 +63,7 @@ class DoxygenFunctionDirective(BaseDirective):
             "path" : unchanged_required,
             "project" : unchanged_required,
             }
-    has_content = False 
+    has_content = False
 
     def run(self):
 
@@ -101,7 +101,7 @@ class DoxygenStructDirective(BaseDirective):
             "path" : unchanged_required,
             "project" : unchanged_required,
             }
-    has_content = False 
+    has_content = False
 
     def run(self):
 
@@ -137,6 +137,11 @@ class DoxygenEnumDirective(DoxygenStructDirective):
     kind = "enum"
 
 
+class DoxygenEnumDirective(DoxygenStructDirective):
+
+    kind = "typedef"
+
+
 
 # Setup Administration
 # --------------------
@@ -151,7 +156,7 @@ class DirectiveContainer(object):
         self.matcher_factory = matcher_factory
         self.project_info_factory = project_info_factory
 
-        # Required for sphinx to inspect 
+        # Required for sphinx to inspect
         self.required_arguments = directive.required_arguments
         self.optional_arguments = directive.optional_arguments
         self.option_spec = directive.option_spec
@@ -173,7 +178,7 @@ class ProjectInfo(object):
         return self._name
 
     def path(self):
-        return self._path 
+        return self._path
 
 class ProjectInfoFactory(object):
 
@@ -225,7 +230,7 @@ class ProjectInfoFactory(object):
 
             return project_info
 
-    
+
 
 class DoxygenDirectiveFactory(object):
 
@@ -235,6 +240,7 @@ class DoxygenDirectiveFactory(object):
             "doxygenstruct" : DoxygenStructDirective,
             "doxygenclass" : DoxygenClassDirective,
             "doxygenenum" : DoxygenEnumDirective,
+            "doxygentypedef" : DoxygenEnumDirective,
             }
 
     def __init__(self, builder_factory, finder_factory, matcher_factory, project_info_factory):
@@ -255,6 +261,9 @@ class DoxygenDirectiveFactory(object):
     def create_enum_directive_container(self):
         return self.create_directive_container("doxygenenum")
 
+    def create_typedef_directive_container(self):
+        return self.create_directive_container("doxygentypedef")
+
     def create_class_directive_container(self):
         return self.create_directive_container("doxygenclass")
 
@@ -266,7 +275,7 @@ class DoxygenDirectiveFactory(object):
                 self.finder_factory,
                 self.matcher_factory,
                 self.project_info_factory
-                )  
+                )
 
     def get_config_values(self, app):
 
@@ -330,6 +339,11 @@ def setup(app):
     app.add_directive(
             "doxygenenum",
             directive_factory.create_enum_directive_container(),
+            )
+
+    app.add_directive(
+            "doxygentypedef",
+            directive_factory.create_typedef_directive_container(),
             )
 
     app.add_directive(

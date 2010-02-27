@@ -86,6 +86,18 @@ the same as the doxygenstruct directive.
       :project: ...
       :path: ...
 
+doxygentypedef Directive
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+This directive generates the appropriate output for a single typedef. It behaves
+the same as the doxygenstruct directive.
+
+::
+
+   .. doxygentypedef:: <typedef name>
+      :project: ...
+      :path: ...
+
 doxygenclass Directive
 ~~~~~~~~~~~~~~~~~~~~~~
 
@@ -121,6 +133,7 @@ Example pages
 
    function
    struct
+   typedef
    enum
    class
 
