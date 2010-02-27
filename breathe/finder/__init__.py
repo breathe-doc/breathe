@@ -34,7 +34,9 @@ class Finder(object):
         if count == 1:
             return results[0]
         elif count > 1:
-            raise MultipleMatchesError()
+            # Multiple matches can easily happen as same thing
+            # can be present in both file and group sections
+            return results[0]
         elif count < 1:
             raise NoMatchesError(matcher)
 
