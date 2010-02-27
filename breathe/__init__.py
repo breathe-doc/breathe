@@ -137,7 +137,7 @@ class DoxygenEnumDirective(DoxygenStructDirective):
     kind = "enum"
 
 
-class DoxygenEnumDirective(DoxygenStructDirective):
+class DoxygenTypedefDirective(DoxygenStructDirective):
 
     kind = "typedef"
 
@@ -240,7 +240,7 @@ class DoxygenDirectiveFactory(object):
             "doxygenstruct" : DoxygenStructDirective,
             "doxygenclass" : DoxygenClassDirective,
             "doxygenenum" : DoxygenEnumDirective,
-            "doxygentypedef" : DoxygenEnumDirective,
+            "doxygentypedef" : DoxygenTypedefDirective,
             }
 
     def __init__(self, builder_factory, finder_factory, matcher_factory, project_info_factory):
