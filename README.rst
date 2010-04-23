@@ -38,7 +38,7 @@ Thank you to:
 - `nijel <http://github.com/nijel>`_
 - `sebastianschaetz <http://github.com/sebastianschaetz>`_
 
-For there contributions; improving the code and the documentation. And thanks to:
+For their contributions; improving the code and the documentation. And thanks to:
 
 - Dimitri van Heesch for `Doxygen <http://www.stack.nl/~dimitri/doxygen/>`_.
 - Georg Brandl for `Sphinx <http://sphinx.pocoo.org>`_.
