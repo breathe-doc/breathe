@@ -35,8 +35,8 @@ Credits
 
 Thank you to:
 
-- `nijel <http://github.com/nijel`
-- `sebastianschaetz <http://github.com/sebastianschaetz>`
+- `nijel <http://github.com/nijel>`_
+- `sebastianschaetz <http://github.com/sebastianschaetz>`_
 
 For there contributions; improving the code and the documentation. And thanks to:
 
