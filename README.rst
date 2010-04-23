@@ -33,7 +33,12 @@ Then view the resulting html with your browser of choice.
 Credits
 -------
 
-Thanks to:
+Thank you to:
+
+- `nijel <http://github.com/nijel`
+- `sebastianschaetz <http://github.com/sebastianschaetz>`
+
+For there contributions; improving the code and the documentation. And thanks to:
 
 - Dimitri van Heesch for `Doxygen <http://www.stack.nl/~dimitri/doxygen/>`_.
 - Georg Brandl for `Sphinx <http://sphinx.pocoo.org>`_.
