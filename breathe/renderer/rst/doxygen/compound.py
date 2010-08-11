@@ -272,6 +272,13 @@ class DocParaTypeSubRenderer(Renderer):
             renderer = self.renderer_factory.create_renderer(item)
             nodelist.extend(renderer.render())
 
+        def_list_items = []
+        for item in self.data_object.simplesects:
+            renderer = self.renderer_factory.create_renderer(item)
+            def_list_items.extend(renderer.render())
+
+        nodelist.append(self.node_factory.definition_list("", *def_list_items))
+
         return [self.node_factory.paragraph("", "", *nodelist)]
 
 class DocParamListTypeSubRenderer(Renderer):
@@ -345,4 +352,21 @@ class MixedContainerRenderer(Renderer):
         renderer = self.renderer_factory.create_renderer(self.data_object.getValue())
         return renderer.render()
 
+
+class DocSimpleSectTypeSubRenderer(Renderer):
+
+    def render(self):
+
+        text = self.node_factory.Text(self.data_object.kind.capitalize())
+        emphasis = self.node_factory.emphasis("", text)
+        term = self.node_factory.term("","", emphasis)
+
+        nodelist = []
+        for item in self.data_object.para:
+            renderer = self.renderer_factory.create_renderer(item)
+            nodelist.extend(renderer.render())
+
+        definition = self.node_factory.definition("", *nodelist)
+
+        return [self.node_factory.definition_list_item("", term, definition)]
 
