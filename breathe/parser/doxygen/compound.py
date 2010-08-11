@@ -700,6 +700,7 @@ class docParaTypeSub(supermod.docParaType):
         supermod.docParaType.__init__(self, char)
 
         self.parameterlist = []
+        self.simplesects = []
         self.content = []
 
     def rst_nodes(self):
@@ -731,13 +732,17 @@ class docParaTypeSub(supermod.docParaType):
             obj_ = supermod.docRefTextType.factory()
             obj_.build(child_)
             self.content.append(obj_)
-
-
-        if child_.nodeType == Node.ELEMENT_NODE and \
+        elif child_.nodeType == Node.ELEMENT_NODE and \
                 nodeName_ == 'parameterlist':
             obj_ = supermod.docParamListType.factory()
             obj_.build(child_)
             self.parameterlist.append(obj_)
+        elif child_.nodeType == Node.ELEMENT_NODE and \
+                nodeName_ == 'simplesect':
+            obj_ = supermod.docSimpleSectType.factory()
+            obj_.build(child_)
+            self.simplesects.append(obj_)
+
 
 supermod.docParaType.subclass = docParaTypeSub
 # end class docParaTypeSub
