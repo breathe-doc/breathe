@@ -44,4 +44,3 @@ For their contributions; improving the code and the documentation. And thanks to
 - Georg Brandl for `Sphinx <http://sphinx.pocoo.org>`_.
 - David Goodger for `Docutils <http://docutils.sourceforge.net/>`_ and Restructured Text. 
 
-
