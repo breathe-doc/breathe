@@ -30,6 +30,16 @@ First run ``make`` for each folder in the examples directory, then::
 Then view the resulting html with your browser of choice.
 
 
+Requirements
+------------
+
+Development is currently done with:
+ 
+- Python 2.5
+- Docutils 0.7
+- Sphinx 1.0.4
+- Doxygen 1.7.2
+
 Credits
 -------
 
