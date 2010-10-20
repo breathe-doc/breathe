@@ -229,6 +229,10 @@ class DocRefTextTypeSubRenderer(Renderer):
             renderer = self.renderer_factory.create_renderer(item)
             nodelist.extend(renderer.render())
 
+        for item in self.data_object.para:
+            renderer = self.renderer_factory.create_renderer(item)
+            nodelist.extend(renderer.render())
+
         refid = "%s%s" % (self.project_info.name(), self.data_object.refid)
         nodelist = [
                 self.node_factory.pending_xref(
@@ -243,6 +247,7 @@ class DocRefTextTypeSubRenderer(Renderer):
                 ]
 
         return nodelist
+
 
 class DocParaTypeSubRenderer(Renderer):
 
