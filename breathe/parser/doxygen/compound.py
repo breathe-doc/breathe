@@ -343,6 +343,18 @@ supermod.docVarListEntryType.subclass = docVarListEntryTypeSub
 class docRefTextTypeSub(supermod.docRefTextType):
     def __init__(self, refid=None, kindref=None, external=None, valueOf_='', mixedclass_=None, content_=None):
         supermod.docRefTextType.__init__(self, mixedclass_, content_)
+
+        self.para = []
+
+    def buildChildren(self, child_, nodeName_):
+        supermod.docRefTextType.buildChildren(self, child_, nodeName_)
+
+        if child_.nodeType == Node.ELEMENT_NODE and \
+            nodeName_ == 'para':
+            obj_ = supermod.docParaType.factory()
+            obj_.build(child_)
+            self.para.append(obj_)
+
 supermod.docRefTextType.subclass = docRefTextTypeSub
 # end class docRefTextTypeSub
 
