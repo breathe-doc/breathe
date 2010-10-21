@@ -133,6 +133,27 @@ supermod.descriptionType.subclass = descriptionTypeSub
 class enumvalueTypeSub(supermod.enumvalueType):
     def __init__(self, prot=None, id=None, name='', initializer=None, briefdescription=None, detaileddescription=None, mixedclass_=None, content_=None):
         supermod.enumvalueType.__init__(self, mixedclass_, content_)
+
+    def buildChildren(self, child_, nodeName_):
+        # Get text from <name> child and put it in self.name
+        if child_.nodeType == Node.ELEMENT_NODE and \
+            nodeName_ == 'name':
+            value_ = []
+            for text_ in child_.childNodes:
+                value_.append(text_.nodeValue)
+            valuestr_ = ''.join(value_)
+            self.name = valuestr_
+        elif child_.nodeType == Node.ELEMENT_NODE and \
+            nodeName_ == 'briefdescription':
+            obj_ = supermod.descriptionType.factory()
+            obj_.build(child_)
+            self.set_briefdescription(obj_)
+        elif child_.nodeType == Node.ELEMENT_NODE and \
+            nodeName_ == 'detaileddescription':
+            obj_ = supermod.descriptionType.factory()
+            obj_.build(child_)
+            self.set_detaileddescription(obj_)
+
 supermod.enumvalueType.subclass = enumvalueTypeSub
 # end class enumvalueTypeSub
 

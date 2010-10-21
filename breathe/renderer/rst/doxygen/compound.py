@@ -105,6 +105,7 @@ class SectionDefTypeSubRenderer(Renderer):
         # Return with information about which section this is
         return []
 
+
 class MemberDefTypeSubRenderer(Renderer):
 
     def render(self):
@@ -145,6 +146,15 @@ class MemberDefTypeSubRenderer(Renderer):
             renderer = self.renderer_factory.create_renderer(self.data_object.detaileddescription)
             description_nodes.append(self.node_factory.paragraph( "", "", *renderer.render()))
 
+        # This test should be done in the RendererFactory
+        if self.data_object.kind == "enum":
+            enums = []
+            for item in self.data_object.enumvalue:
+                renderer = self.renderer_factory.create_renderer(item)
+                enums.extend(renderer.render())
+
+            description_nodes.append( self.node_factory.bullet_list("", *enums))
+
         definition = self.node_factory.definition("", *description_nodes)
 
         refid = "%s%s" % (self.project_info.name(), self.data_object.id)
@@ -161,6 +171,26 @@ class MemberDefTypeSubRenderer(Renderer):
 
         return nodelist
 
+
+class EnumvalueTypeSubRenderer(Renderer):
+
+    def render(self):
+
+        name = self.node_factory.literal(text=self.data_object.name)
+
+        description_nodes = []
+
+        if self.data_object.briefdescription:
+            renderer = self.renderer_factory.create_renderer(self.data_object.briefdescription)
+            description_nodes.extend(renderer.render())
+
+        if self.data_object.detaileddescription:
+            renderer = self.renderer_factory.create_renderer(self.data_object.detaileddescription)
+            description_nodes.extend(renderer.render())
+
+        # Build the list item
+        separator = self.node_factory.Text(" - ")
+        return [self.node_factory.list_item("", name, separator, *description_nodes)]
 
 class DescriptionTypeSubRenderer(Renderer):
 
@@ -217,6 +247,7 @@ class ParamTypeSubRenderer(Renderer):
             nodelist.extend(renderer.render())
 
         return nodelist
+
 
 
 class DocRefTextTypeSubRenderer(Renderer):
