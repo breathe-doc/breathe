@@ -60,6 +60,7 @@ class DoxygenToRstRendererFactoryCreator(object):
             compound.compounddefTypeSub : compoundrenderer.CompoundDefTypeSubRenderer,
             compound.sectiondefTypeSub : compoundrenderer.SectionDefTypeSubRenderer,
             compound.memberdefTypeSub : compoundrenderer.MemberDefTypeSubRenderer,
+            compound.enumvalueTypeSub : compoundrenderer.EnumvalueTypeSubRenderer,
             compound.linkedTextTypeSub : compoundrenderer.LinkedTextTypeSubRenderer,
             compound.descriptionTypeSub : compoundrenderer.DescriptionTypeSubRenderer,
             compound.paramTypeSub : compoundrenderer.ParamTypeSubRenderer,
