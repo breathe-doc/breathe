@@ -14,16 +14,27 @@ class UnicodeRenderer(Renderer):
 
 class DoxygenToRstRendererFactory(object):
 
-   def __init__(self, renderers, node_factory, project_info, document):
+    def __init__(self, renderers, node_factory, project_info, document):
 
         self.node_factory = node_factory
         self.project_info = project_info
         self.renderers = renderers
         self.document = document
 
-   def create_renderer(self, data_object):
+    def create_renderer(self, data_object):
 
-        return self.renderers[data_object.__class__](
+        Renderer = self.renderers[data_object.__class__]
+
+        if data_object.__class__ == compound.memberdefTypeSub:
+
+            if data_object.kind == "function":
+                Renderer = compoundrenderer.FuncMemberDefTypeSubRenderer
+            elif data_object.kind == "enum":
+                Renderer = compoundrenderer.EnumMemberDefTypeSubRenderer
+            elif data_object.kind == "typedef":
+                Renderer = compoundrenderer.TypedefMemberDefTypeSubRenderer
+
+        return Renderer(
                 self.project_info,
                 data_object,
                 self,

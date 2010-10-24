@@ -172,6 +172,22 @@ class MemberDefTypeSubRenderer(Renderer):
         return nodelist
 
 
+class FuncMemberDefTypeSubRenderer(MemberDefTypeSubRenderer):
+
+    def render(self):
+        return MemberDefTypeSubRenderer.render(self)
+
+class EnumMemberDefTypeSubRenderer(MemberDefTypeSubRenderer):
+
+    def render(self):
+        return MemberDefTypeSubRenderer.render(self)
+
+class TypedefMemberDefTypeSubRenderer(MemberDefTypeSubRenderer):
+
+    def render(self):
+        return MemberDefTypeSubRenderer.render(self)
+
+
 class EnumvalueTypeSubRenderer(Renderer):
 
     def render(self):
