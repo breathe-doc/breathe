@@ -145,6 +145,7 @@ Test Pages
 
    doxygen
    tinyxml
+   specific
 
 
 Indices and tables
