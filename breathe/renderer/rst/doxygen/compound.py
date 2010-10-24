@@ -108,7 +108,20 @@ class SectionDefTypeSubRenderer(Renderer):
 
 class MemberDefTypeSubRenderer(Renderer):
 
-    def render(self):
+    def create_target(self):
+
+        refid = "%s%s" % (self.project_info.name(), self.data_object.id)
+        target = self.node_factory.target(refid=refid, ids=[refid], names=[refid])
+
+        # Tell the document about our target
+        try:
+            self.document.note_explicit_target(target)
+        except Exception, e:
+            print "Failed to register id: %s. It is probably a duplicate." % refid
+
+        return target
+
+    def title(self):
 
         kind = []
         
@@ -123,18 +136,10 @@ class MemberDefTypeSubRenderer(Renderer):
         args.extend(kind)
         args.extend([self.node_factory.Text(" "), name])
 
-        # This test should be done in the RendererFactory
-        if self.data_object.kind == "function":
+        return args
 
-            # Get the function arguments
-            args.append(self.node_factory.Text("("))
-            for i, parameter in enumerate(self.data_object.param):
-                if i: args.append(self.node_factory.Text(", "))
-                renderer = self.renderer_factory.create_renderer(parameter)
-                args.extend(renderer.render())
-            args.append(self.node_factory.Text(")"))
 
-        term = self.node_factory.term("","", *args)
+    def description(self):
 
         description_nodes = []
 
@@ -146,46 +151,63 @@ class MemberDefTypeSubRenderer(Renderer):
             renderer = self.renderer_factory.create_renderer(self.data_object.detaileddescription)
             description_nodes.append(self.node_factory.paragraph( "", "", *renderer.render()))
 
-        # This test should be done in the RendererFactory
-        if self.data_object.kind == "enum":
-            enums = []
-            for item in self.data_object.enumvalue:
-                renderer = self.renderer_factory.create_renderer(item)
-                enums.extend(renderer.render())
+        return description_nodes
 
-            description_nodes.append( self.node_factory.bullet_list("", *enums))
 
-        definition = self.node_factory.definition("", *description_nodes)
+    def render(self):
 
-        refid = "%s%s" % (self.project_info.name(), self.data_object.id)
-        target = self.node_factory.target(refid=refid, ids=[refid], names=[refid])
+        term = self.node_factory.term("","", *self.title())
+        definition = self.node_factory.definition("", *self.description())
+        entry = self.node_factory.definition_list_item("",term, definition)
 
-        # Tell the document about our target
-        try:
-            self.document.note_explicit_target(target)
-        except Exception, e:
-            print "Failed to register id: %s. It is probably a duplicate." % refid
-
-        # Build the list item
-        nodelist = [target, self.node_factory.definition_list_item("",term, definition)]
-
-        return nodelist
+        return [self.create_target(), entry]
 
 
 class FuncMemberDefTypeSubRenderer(MemberDefTypeSubRenderer):
 
-    def render(self):
-        return MemberDefTypeSubRenderer.render(self)
+    def title(self):
+
+        args = MemberDefTypeSubRenderer.title(self)
+
+        # Get the function arguments
+        args.append(self.node_factory.Text("("))
+        for i, parameter in enumerate(self.data_object.param):
+            if i: args.append(self.node_factory.Text(", "))
+            renderer = self.renderer_factory.create_renderer(parameter)
+            args.extend(renderer.render())
+        args.append(self.node_factory.Text(")"))
+
+        return args
+
 
 class EnumMemberDefTypeSubRenderer(MemberDefTypeSubRenderer):
 
-    def render(self):
-        return MemberDefTypeSubRenderer.render(self)
+    def description(self):
+
+        description_nodes = MemberDefTypeSubRenderer.description(self)
+
+        enums = []
+        for item in self.data_object.enumvalue:
+            renderer = self.renderer_factory.create_renderer(item)
+            enums.extend(renderer.render())
+
+        description_nodes.append( self.node_factory.bullet_list("", *enums))
+
+        return description_nodes
+
 
 class TypedefMemberDefTypeSubRenderer(MemberDefTypeSubRenderer):
 
-    def render(self):
-        return MemberDefTypeSubRenderer.render(self)
+    def title(self):
+
+        args = [self.node_factory.Text("typedef ")]
+        args.extend(MemberDefTypeSubRenderer.title(self))
+
+        if self.data_object.argsstring:
+            renderer = self.renderer_factory.create_renderer(self.data_object.argsstring)
+            args.extend(renderer.render())
+
+        return args
 
 
 class EnumvalueTypeSubRenderer(Renderer):
