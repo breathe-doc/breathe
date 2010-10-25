@@ -2,7 +2,7 @@
 # This file was generated from Makefile.in on Sat Dec 13 12:17:28 GMT 2008
 #
 
-DOXYGEN   = /usr
+DOXYGEN   = `which doxygen`
 TMAKEPATH = 
 ENV       = env TMAKEPATH=$(TMAKEPATH)
 TMAKE     = 
@@ -24,7 +24,7 @@ clean:
 	rm -rf functypedef
            
 functypedef/xml/index.xml: functypedef.h functypedef.cfg
-	$(DOXYGEN)/bin/doxygen functypedef.cfg
+	$(DOXYGEN) functypedef.cfg
 
 
 
