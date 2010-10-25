@@ -2,7 +2,7 @@
 # This file was generated from Makefile.in on Sat Dec 13 12:17:28 GMT 2008
 #
 
-DOXYGEN   = /usr
+DOXYGEN   = `which doxygen`
 TMAKEPATH = 
 ENV       = env TMAKEPATH=$(TMAKEPATH)
 TMAKE     = 
@@ -53,87 +53,87 @@ clean:
 		memgrp docstring pyexample mux manual
 
 class/xml/index.xml: class.h class.cfg
-	$(DOXYGEN)/bin/doxygen class.cfg
+	$(DOXYGEN) class.cfg
 
 define/xml/index.xml: define.h define.cfg
-	$(DOXYGEN)/bin/doxygen define.cfg
+	$(DOXYGEN) define.cfg
 
 enum/xml/index.xml: enum.h enum.cfg
-	$(DOXYGEN)/bin/doxygen enum.cfg
+	$(DOXYGEN) enum.cfg
 
 file/xml/index.xml: file.h file.cfg
-	$(DOXYGEN)/bin/doxygen file.cfg
+	$(DOXYGEN) file.cfg
 
 func/xml/index.xml: func.h func.cfg
-	$(DOXYGEN)/bin/doxygen func.cfg
+	$(DOXYGEN) func.cfg
 
 page/xml/index.xml: page.doc page.cfg
-	$(DOXYGEN)/bin/doxygen page.cfg
+	$(DOXYGEN) page.cfg
 
 relates/xml/index.xml: relates.cpp relates.cfg
-	$(DOXYGEN)/bin/doxygen relates.cfg
+	$(DOXYGEN) relates.cfg
 
 author/xml/index.xml: author.cpp author.cfg
-	$(DOXYGEN)/bin/doxygen author.cfg
+	$(DOXYGEN) author.cfg
 
 par/xml/index.xml: par.cpp par.cfg
-	$(DOXYGEN)/bin/doxygen par.cfg
+	$(DOXYGEN) par.cfg
 
 overload/xml/index.xml: overload.cpp overload.cfg
-	$(DOXYGEN)/bin/doxygen overload.cfg
+	$(DOXYGEN) overload.cfg
 
 example/xml/index.xml: example.cpp example_test.cpp example.cfg 
-	$(DOXYGEN)/bin/doxygen example.cfg
+	$(DOXYGEN) example.cfg
 
 include/xml/index.xml: include.cpp example_test.cpp include.cfg 
-	$(DOXYGEN)/bin/doxygen include.cfg
+	$(DOXYGEN) include.cfg
 
 qtstyle/xml/index.xml: qtstyle.cpp qtstyle.cfg 
-	$(DOXYGEN)/bin/doxygen qtstyle.cfg
+	$(DOXYGEN) qtstyle.cfg
 
 jdstyle/xml/index.xml: jdstyle.cpp jdstyle.cfg 
-	$(DOXYGEN)/bin/doxygen jdstyle.cfg
+	$(DOXYGEN) jdstyle.cfg
 
 structcmd/xml/index.xml: structcmd.h structcmd.cfg 
-	$(DOXYGEN)/bin/doxygen structcmd.cfg
+	$(DOXYGEN) structcmd.cfg
 
 autolink/xml/index.xml: autolink.cpp autolink.cfg 
-	$(DOXYGEN)/bin/doxygen autolink.cfg
+	$(DOXYGEN) autolink.cfg
 
 tag/xml/index.xml: tag.cpp tag.cfg example/xml/index.xml
-	$(DOXYGEN)/bin/doxygen tag.cfg
+	$(DOXYGEN) tag.cfg
 #	sed -e "1,1s#perl#$(PERL)#g" tag/xml/installdox >tag/xml/installdox.perl
 #	cd tag/xml ; $(PERL) installdox.perl -lexample.tag@../../example/xml
 
 restypedef/xml/index.xml: restypedef.cpp restypedef.cfg 
-	$(DOXYGEN)/bin/doxygen restypedef.cfg
+	$(DOXYGEN) restypedef.cfg
 
 afterdoc/xml/index.xml: afterdoc.h afterdoc.cfg
-	$(DOXYGEN)/bin/doxygen afterdoc.cfg
+	$(DOXYGEN) afterdoc.cfg
 
 template/xml/index.xml: templ.cpp templ.cfg
-	$(DOXYGEN)/bin/doxygen templ.cfg
+	$(DOXYGEN) templ.cfg
 
 group/xml/index.xml: group.cpp group.cfg
-	$(DOXYGEN)/bin/doxygen group.cfg
+	$(DOXYGEN) group.cfg
 
 memgrp/xml/index.xml: memgrp.cpp memgrp.cfg
-	$(DOXYGEN)/bin/doxygen memgrp.cfg
+	$(DOXYGEN) memgrp.cfg
 
 pyexample/xml/index.xml: pyexample.py pyexample.cfg
-	$(DOXYGEN)/bin/doxygen pyexample.cfg
+	$(DOXYGEN) pyexample.cfg
 
 mux/xml/index.xml: mux.vhdl mux.cfg
-	$(DOXYGEN)/bin/doxygen mux.cfg
+	$(DOXYGEN) mux.cfg
 
 manual/xml/index.xml: manual.c manual.cfg
-	$(DOXYGEN)/bin/doxygen manual.cfg
+	$(DOXYGEN) manual.cfg
 
 docstring/xml/index.xml: docstring.py docstring.cfg
-	$(DOXYGEN)/bin/doxygen docstring.cfg
+	$(DOXYGEN) docstring.cfg
 
 diagrams/xml/index.xml: diagrams_a.h diagrams_b.h diagrams_c.h diagrams_d.h diagrams_e.h diagrams.cfg
 ifneq ($(HAVE_DOT),)
-	$(DOXYGEN)/bin/doxygen diagrams.cfg
+	$(DOXYGEN) diagrams.cfg
 endif
 
