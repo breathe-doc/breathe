@@ -40,6 +40,10 @@ Development is currently done with:
 - Sphinx 1.0.4
 - Doxygen 1.7.2
 
+Doxygen 1.5.1 seems to produce xml with repeated sections which causes Breathe
+some confusion. Not sure when this was resolved but it might be best to go for
+the latest possible.
+
 Credits
 -------
 
@@ -47,6 +51,7 @@ Thank you to:
 
 - `nijel <http://github.com/nijel>`_
 - `sebastianschaetz <http://github.com/sebastianschaetz>`_
+- `mbolivar <http://github.com/mbolivar>`_
 
 For their contributions; improving the code and the documentation. And thanks to:
 
