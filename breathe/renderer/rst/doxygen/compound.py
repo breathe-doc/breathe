@@ -182,6 +182,15 @@ class FuncMemberDefTypeSubRenderer(MemberDefTypeSubRenderer):
 
 class EnumMemberDefTypeSubRenderer(MemberDefTypeSubRenderer):
 
+    def title(self):
+
+        if self.data_object.name.startswith("@"):
+            # Assume anonymous enum
+            return [self.node_factory.strong(text="Anonymous enum")]
+
+        name = self.node_factory.strong(text="%s enum" % self.data_object.name)
+        return [name]
+
     def description(self):
 
         description_nodes = MemberDefTypeSubRenderer.description(self)
@@ -215,8 +224,16 @@ class EnumvalueTypeSubRenderer(Renderer):
     def render(self):
 
         name = self.node_factory.literal(text=self.data_object.name)
+        description_nodes = [name]
 
-        description_nodes = []
+        if self.data_object.initializer:
+            renderer = self.renderer_factory.create_renderer(self.data_object.initializer)
+            nodelist = [self.node_factory.Text(" = ")]
+            nodelist.extend(renderer.render())
+            description_nodes.append(self.node_factory.literal("", "", *nodelist))
+
+        separator = self.node_factory.Text(" - ")
+        description_nodes.append(separator)
 
         if self.data_object.briefdescription:
             renderer = self.renderer_factory.create_renderer(self.data_object.briefdescription)
@@ -227,8 +244,7 @@ class EnumvalueTypeSubRenderer(Renderer):
             description_nodes.extend(renderer.render())
 
         # Build the list item
-        separator = self.node_factory.Text(" - ")
-        return [self.node_factory.list_item("", name, separator, *description_nodes)]
+        return [self.node_factory.list_item("", *description_nodes)]
 
 class DescriptionTypeSubRenderer(Renderer):
 
@@ -436,5 +452,6 @@ class MixedContainerRenderer(Renderer):
 
         renderer = self.renderer_factory.create_renderer(self.data_object.getValue())
         return renderer.render()
+
 
 
