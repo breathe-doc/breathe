@@ -21,10 +21,7 @@ HAVE_DOT  = /usr/bin/dot
 all: tinyxml/xml/index.xml
 
 clean:
-	rm -rf  class define enum file func page relates author \
-                par overload example include qtstyle jdstyle structcmd \
-		autolink tag restypedef afterdoc template tag group diagrams \
-		memgrp docstring pyexample mux manual
+	rm -rf tinyxml
 
 tinyxml/xml/index.xml: tinyxml.h tinyxml.cfg
 	$(DOXYGEN) tinyxml.cfg
