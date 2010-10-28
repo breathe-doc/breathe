@@ -372,7 +372,8 @@ class DocParamListTypeSubRenderer(Renderer):
             nodelist.extend(renderer.render())
 
         name = self.lookup[self.data_object.kind]
-        title = self.node_factory.emphasis("", self.node_factory.Text(name))
+        name = self.node_factory.emphasis("", self.node_factory.Text(name))
+        title = self.node_factory.paragraph("", "", name)
 
         return [title,self.node_factory.bullet_list("", *nodelist)]
 
