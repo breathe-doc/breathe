@@ -34,6 +34,33 @@ class DoxygenToRstRendererFactory(object):
             elif data_object.kind == "typedef":
                 Renderer = compoundrenderer.TypedefMemberDefTypeSubRenderer
 
+        if data_object.__class__ == compound.docMarkupTypeSub:
+
+            creator = self.node_factory.inline
+            if data_object.type_ == "emphasis":
+                creator = self.node_factory.emphasis
+            elif data_object.type_ == "computeroutput":
+                creator = self.node_factory.literal
+            elif data_object.type_ == "bold":
+                creator = self.node_factory.strong
+            elif data_object.type_ == "superscript":
+                creator = self.node_factory.superscript
+            elif data_object.type_ == "subscript":
+                creator = self.node_factory.subscript
+            elif data_object.type_ == "center":
+                print "Warning: does not currently handle 'center' text display"
+            elif data_object.type_ == "small":
+                print "Warning: does not currently handle 'small' text display"
+
+            return Renderer(
+                    creator,
+                    self.project_info,
+                    data_object,
+                    self,
+                    self.node_factory,
+                    self.document
+                    )
+
         return Renderer(
                 self.project_info,
                 data_object,
@@ -77,6 +104,7 @@ class DoxygenToRstRendererFactoryCreator(object):
             compound.paramTypeSub : compoundrenderer.ParamTypeSubRenderer,
             compound.docRefTextTypeSub : compoundrenderer.DocRefTextTypeSubRenderer,
             compound.docParaTypeSub : compoundrenderer.DocParaTypeSubRenderer,
+            compound.docMarkupTypeSub : compoundrenderer.DocMarkupTypeSubRenderer,
             compound.docParamListTypeSub : compoundrenderer.DocParamListTypeSubRenderer,
             compound.docParamListItemSub : compoundrenderer.DocParamListItemSubRenderer,
             compound.docParamNameListSub : compoundrenderer.DocParamNameListSubRenderer,

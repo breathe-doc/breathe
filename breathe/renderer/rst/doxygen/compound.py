@@ -357,6 +357,24 @@ class DocParaTypeSubRenderer(Renderer):
         
         return nodelist
 
+class DocMarkupTypeSubRenderer(Renderer):
+
+    def __init__(self, creator, project_info, data_object, renderer_factory, node_factory, document):
+        Renderer.__init__(self, project_info, data_object, renderer_factory, node_factory, document)
+
+        self.creator = creator
+
+    def render(self):
+
+        nodelist = []
+
+        for item in self.data_object.content_:
+            renderer = self.renderer_factory.create_renderer(item)
+            nodelist.extend(renderer.render())
+
+        return [self.creator("", *nodelist)]
+
+
 class DocParamListTypeSubRenderer(Renderer):
 
     lookup = {
