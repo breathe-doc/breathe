@@ -531,12 +531,29 @@ class docParaTypeSub(supermod.docParaType):
             obj_ = supermod.docSimpleSectType.factory()
             obj_.build(child_)
             self.simplesects.append(obj_)
-
+        elif child_.nodeType == Node.ELEMENT_NODE and (
+                nodeName_ == 'bold' or
+                nodeName_ == 'emphasis' or
+                nodeName_ == 'computeroutput' or
+                nodeName_ == 'subscript' or
+                nodeName_ == 'superscript' or
+                nodeName_ == 'center' or
+                nodeName_ == 'small'):
+            obj_ = supermod.docMarkupType.factory()
+            obj_.build(child_)
+            obj_.type_ = nodeName_
+            self.content.append(obj_)
 
 supermod.docParaType.subclass = docParaTypeSub
 # end class docParaTypeSub
 
 
+class docMarkupTypeSub(supermod.docMarkupType):
+    def __init__(self, valueOf_='', mixedclass_=None, content_=None):
+        supermod.docMarkupType.__init__(self, valueOf_, mixedclass_, content_)
+        self.type_ = None
+supermod.docMarkupType.subclass = docMarkupTypeSub
+# end class docMarkupTypeSub
 
 def parse(inFilename):
     doc = minidom.parse(inFilename)
