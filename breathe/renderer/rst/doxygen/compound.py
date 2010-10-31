@@ -195,6 +195,10 @@ class EnumMemberDefTypeSubRenderer(MemberDefTypeSubRenderer):
 
         description_nodes = MemberDefTypeSubRenderer.description(self)
 
+        name = self.node_factory.emphasis("", self.node_factory.Text("Values:"))
+        title = self.node_factory.paragraph("", "", name)
+        description_nodes.append(title)
+
         enums = []
         for item in self.data_object.enumvalue:
             renderer = self.renderer_factory.create_renderer(item)
