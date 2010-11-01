@@ -33,6 +33,8 @@ class DoxygenToRstRendererFactory(object):
                 Renderer = compoundrenderer.EnumMemberDefTypeSubRenderer
             elif data_object.kind == "typedef":
                 Renderer = compoundrenderer.TypedefMemberDefTypeSubRenderer
+            elif data_object.kind == "variable":
+                Renderer = compoundrenderer.VariableMemberDefTypeSubRenderer
 
         if data_object.__class__ == compound.docMarkupTypeSub:
 
