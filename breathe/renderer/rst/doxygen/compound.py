@@ -223,6 +223,19 @@ class TypedefMemberDefTypeSubRenderer(MemberDefTypeSubRenderer):
         return args
 
 
+class VariableMemberDefTypeSubRenderer(MemberDefTypeSubRenderer):
+
+    def title(self):
+
+        args = MemberDefTypeSubRenderer.title(self)
+
+        if self.data_object.argsstring:
+            renderer = self.renderer_factory.create_renderer(self.data_object.argsstring)
+            args.extend(renderer.render())
+
+        return args
+
+
 class EnumvalueTypeSubRenderer(Renderer):
 
     def render(self):
