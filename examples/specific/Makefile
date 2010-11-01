@@ -18,13 +18,15 @@ DOCDIR    = $(INSTALL)/share/doc/packages/doxygen
 QTDIR     = 
 HAVE_DOT  = /usr/bin/dot
 
-all: typedef/xml/index.xml
+all: typedef/xml/index.xml class/xml/index.xml
 
 clean:
-	rm -rf typedef
+	rm -rf typedef class
            
 typedef/xml/index.xml: typedef.h typedef.cfg
 	$(DOXYGEN) typedef.cfg
 
+class/xml/index.xml: class.h class.cfg
+	$(DOXYGEN) class.cfg
 
 

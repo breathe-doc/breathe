@@ -55,6 +55,7 @@ class DoxygenIndexDirective(BaseDirective):
 
         return nodes
 
+
 class DoxygenFunctionDirective(BaseDirective):
 
     required_arguments = 1
@@ -67,22 +68,29 @@ class DoxygenFunctionDirective(BaseDirective):
 
     def run(self):
 
-        function_name = self.arguments[0]
+        try:
+            (namespace, function_name) = self.arguments[0].rsplit("::", 1)
+        except ValueError:
+            (namespace, function_name) = "", self.arguments[0]
 
         project_info = self.project_info_factory.create_project_info(self.options)
 
         finder = self.finder_factory.create_finder(project_info)
 
-        matcher = self.matcher_factory.create_name_type_matcher(function_name, "function")
+        matcher_stack = self.matcher_factory.create_matcher_stack(
+                {
+                    "compound" : self.matcher_factory.create_name_matcher(namespace),
+                    "member" : self.matcher_factory.create_name_type_matcher(function_name, "function")
+                },
+                "member"
+            )
 
         try:
-            data_object = finder.find_one(matcher)
+            data_object = finder.find_one(matcher_stack)
         except NoMatchesError, e:
-            warning = 'doxygenfunction: Cannot find function "%s" in doxygen xml output' % function_name
+            warning = 'doxygenfunction: Cannot find function "%s%s" in doxygen xml output' % (namespace, function_name)
             return [ docutils.nodes.warning( "", docutils.nodes.paragraph("", "", docutils.nodes.Text(warning))),
                     self.state.document.reporter.warning( warning, line=self.lineno) ]
-
-
 
         builder = self.builder_factory.create_builder(project_info, self.state.document)
         nodes = builder.build(data_object)
@@ -91,9 +99,7 @@ class DoxygenFunctionDirective(BaseDirective):
 
 
 
-class DoxygenStructDirective(BaseDirective):
-
-    kind = "struct"
+class DoxygenBaseDirective(BaseDirective):
 
     required_arguments = 1
     optional_arguments = 1
@@ -105,19 +111,18 @@ class DoxygenStructDirective(BaseDirective):
 
     def run(self):
 
-        struct_name = self.arguments[0]
+        name = self.arguments[0]
 
         project_info = self.project_info_factory.create_project_info(self.options)
 
         finder = self.finder_factory.create_finder(project_info)
 
-        # try:
-        matcher = self.matcher_factory.create_name_type_matcher(struct_name, self.kind)
+        matcher_stack = self.create_matcher_stack(name)
 
         try:
-            data_object = finder.find_one(matcher)
+            data_object = finder.find_one(matcher_stack)
         except NoMatchesError, e:
-            warning = 'doxygen%s: Cannot find %s "%s" in doxygen xml output' % (self.kind, self.kind, struct_name)
+            warning = 'doxygen%s: Cannot find %s "%s" in doxygen xml output' % (self.kind, self.kind, name)
             return [ docutils.nodes.warning( "", docutils.nodes.paragraph("", "", docutils.nodes.Text(warning))),
                     self.state.document.reporter.warning( warning, line=self.lineno) ]
 
@@ -127,19 +132,61 @@ class DoxygenStructDirective(BaseDirective):
         return nodes
 
 
-class DoxygenClassDirective(DoxygenStructDirective):
+class DoxygenStructDirective(DoxygenBaseDirective):
+
+    kind = "struct"
+
+    def create_matcher_stack(self, name):
+
+        return self.matcher_factory.create_matcher_stack(
+                {
+                    "compound" : self.matcher_factory.create_name_type_matcher(name, self.kind)
+                },
+                "compound"
+            )
+
+
+class DoxygenClassDirective(DoxygenBaseDirective):
 
     kind = "class"
 
+    def create_matcher_stack(self, name):
 
-class DoxygenEnumDirective(DoxygenStructDirective):
+        return self.matcher_factory.create_matcher_stack(
+                {
+                    "compound" : self.matcher_factory.create_name_type_matcher(name, self.kind)
+                },
+                "compound"
+            )
+
+
+class DoxygenEnumDirective(DoxygenBaseDirective):
 
     kind = "enum"
 
+    def create_matcher_stack(self, name):
 
-class DoxygenTypedefDirective(DoxygenStructDirective):
+        return self.matcher_factory.create_matcher_stack(
+                {
+                    "compound" : self.matcher_factory.create_name_matcher(""),
+                    "member" : self.matcher_factory.create_name_type_matcher(name, self.kind)
+                },
+                "member"
+            )
+
+class DoxygenTypedefDirective(DoxygenBaseDirective):
 
     kind = "typedef"
+
+    def create_matcher_stack(self, name):
+
+        return self.matcher_factory.create_matcher_stack(
+                {
+                    "compound" : self.matcher_factory.create_name_matcher(""),
+                    "member" : self.matcher_factory.create_name_type_matcher(name, self.kind)
+                },
+                "member"
+            )
 
 
 
