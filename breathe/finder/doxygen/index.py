@@ -3,7 +3,7 @@ from breathe.finder.doxygen.base import ItemFinder
 
 class DoxygenTypeSubItemFinder(ItemFinder):
 
-    def find(self, matcher):
+    def find(self, matcher_stack):
 
         compounds = self.data_object.get_compound()
 
@@ -11,8 +11,9 @@ class DoxygenTypeSubItemFinder(ItemFinder):
 
         for compound in compounds:
 
-            compound_finder = self.item_finder_factory.create_finder(compound)
-            results.extend(compound_finder.find(matcher))
+            if matcher_stack.match("compound", compound):
+                compound_finder = self.item_finder_factory.create_finder(compound)
+                results.extend(compound_finder.find(matcher_stack))
 
         return results
 
@@ -24,15 +25,16 @@ class CompoundTypeSubItemFinder(ItemFinder):
         self.matcher_factory = matcher_factory
         self.compound_parser = compound_parser
 
-    def find(self, matcher):
+    def find(self, matcher_stack):
 
         members = self.data_object.get_member()
 
         member_results = []
 
         for member in members:
-            member_finder = self.item_finder_factory.create_finder(member)
-            member_results.extend(member_finder.find(matcher))
+            if matcher_stack.match("member", member):
+                member_finder = self.item_finder_factory.create_finder(member)
+                member_results.extend(member_finder.find(matcher_stack))
 
         results = []
 
@@ -44,19 +46,20 @@ class CompoundTypeSubItemFinder(ItemFinder):
             finder = self.item_finder_factory.create_finder(file_data)
 
             for member_data in member_results:
-                ref_matcher = self.matcher_factory.create_ref_matcher(member_data.refid)
-                results.extend(finder.find(matcher))
+                ref_matcher_stack = self.matcher_factory.create_ref_matcher_stack("", member_data.refid)
+                # TODO: Fix this! Should be ref_matcher_stack!
+                results.extend(finder.find(matcher_stack))
 
-        elif matcher.match(self.data_object):
+        elif matcher_stack.full_match("compound", self.data_object):
             results.append(self.data_object)
 
         return results
 
 class MemberTypeSubItemFinder(ItemFinder):
 
-    def find(self, matcher):
+    def find(self, matcher_stack):
 
-        if matcher.match(self.data_object):
+        if matcher_stack.full_match("member", self.data_object):
             return [self.data_object]
         else:
             return []

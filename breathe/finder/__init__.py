@@ -8,10 +8,6 @@ class MultipleMatchesError(FinderError):
 class NoMatchesError(FinderError):
     pass
 
-class Matcher(object):
-    pass
-
-
 class Finder(object):
 
     def __init__(self, root, item_finder_factory):
@@ -19,16 +15,16 @@ class Finder(object):
         self._root = root
         self.item_finder_factory = item_finder_factory
 
-    def find(self, matcher):
+    def find(self, matcher_stack):
 
         item_finder = self.item_finder_factory.create_finder(self._root)
 
-        return item_finder.find(matcher)
+        return item_finder.find(matcher_stack)
 
 
-    def find_one(self, matcher):
+    def find_one(self, matcher_stack):
 
-        results = self.find(matcher)
+        results = self.find(matcher_stack)
 
         count = len(results)
         if count == 1:
@@ -38,7 +34,7 @@ class Finder(object):
             # can be present in both file and group sections
             return results[0]
         elif count < 1:
-            raise NoMatchesError(matcher)
+            raise NoMatchesError(matcher_stack)
 
 
     def root(self):
