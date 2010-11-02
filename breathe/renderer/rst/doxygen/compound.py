@@ -204,7 +204,7 @@ class EnumMemberDefTypeSubRenderer(MemberDefTypeSubRenderer):
             renderer = self.renderer_factory.create_renderer(item)
             enums.extend(renderer.render())
 
-        description_nodes.append( self.node_factory.bullet_list("", *enums))
+        description_nodes.append(self.node_factory.bullet_list("", classes=["breatheenumvalues"], *enums))
 
         return description_nodes
 
@@ -372,7 +372,7 @@ class DocParaTypeSubRenderer(Renderer):
         if def_list_items:
             nodelist.append(self.node_factory.definition_list("", *def_list_items))
         
-        return nodelist
+        return [self.node_factory.paragraph("", "", *nodelist)]
 
 class DocMarkupTypeSubRenderer(Renderer):
 
@@ -412,7 +412,7 @@ class DocParamListTypeSubRenderer(Renderer):
         name = self.node_factory.emphasis("", self.node_factory.Text(name))
         title = self.node_factory.paragraph("", "", name)
 
-        return [title,self.node_factory.bullet_list("", *nodelist)]
+        return [title,self.node_factory.bullet_list("", classes=["breatheparameterlist"], *nodelist)]
 
 
 
@@ -490,6 +490,7 @@ class MixedContainerRenderer(Renderer):
 
         renderer = self.renderer_factory.create_renderer(self.data_object.getValue())
         return renderer.render()
+
 
 
 
