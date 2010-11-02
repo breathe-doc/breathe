@@ -397,6 +397,8 @@ class DocParamListTypeSubRenderer(Renderer):
     lookup = {
             "param" : "Parameters",
             "exception" : "Exceptions",
+            "templateparam" : "Templates",
+            "retval" : "Return Value",
             }
 
     def render(self):
