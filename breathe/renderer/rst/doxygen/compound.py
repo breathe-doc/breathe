@@ -340,10 +340,10 @@ class DocRefTextTypeSubRenderer(Renderer):
                 self.node_factory.pending_xref(
                     "",
                     reftype="ref",
+                    refdomain="std",
+                    refexplicit=True,
                     refid=refid, 
-                    refdoc=None,
                     reftarget=refid,
-                    refcaption=refid,
                     *nodelist
                     )
                 ]
