@@ -108,9 +108,8 @@ class SectionDefTypeSubRenderer(Renderer):
 
 class MemberDefTypeSubRenderer(Renderer):
 
-    def create_target(self):
+    def create_target(self, refid):
 
-        refid = "%s%s" % (self.project_info.name(), self.data_object.id)
         target = self.node_factory.target(refid=refid, ids=[refid], names=[refid])
 
         # Tell the document about our target
@@ -156,11 +155,15 @@ class MemberDefTypeSubRenderer(Renderer):
 
     def render(self):
 
-        term = self.node_factory.term("","", *self.title())
+        refid = "%s%s" % (self.project_info.name(), self.data_object.id)
+
+        title = self.title()
+        title.insert(0, self.create_target(refid))
+        term = self.node_factory.term("","", ids=[refid], *title )
         definition = self.node_factory.definition("", *self.description())
         entry = self.node_factory.definition_list_item("",term, definition)
 
-        return [self.create_target(), entry]
+        return [entry]
 
 
 class FuncMemberDefTypeSubRenderer(MemberDefTypeSubRenderer):
