@@ -25,6 +25,5 @@ This intentionally fails::
 
 It produces the following warning message:
 
-.. doxygenclass:: made_up_class
-   :project: class
+.. warning:: doxygenclass: Cannot find class "made_up_class" in doxygen xml output
 

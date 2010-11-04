@@ -25,6 +25,5 @@ This intentionally fails::
 
 It produces the following warning message:
 
-.. doxygentypedef:: made_up_typedef
-   :project: restypedef
+.. warning:: doxygentypedef: Cannot find typedef "made_up_typedef" in doxygen xml output
 

@@ -25,6 +25,5 @@ This intentionally fails::
 
 It produces the following warning message:
 
-.. doxygenenum:: made_up_enum
-   :project: restypedef
+.. warning:: doxygenenum: Cannot find enum "made_up_enum" in doxygen xml output
 

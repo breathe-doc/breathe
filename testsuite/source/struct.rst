@@ -25,6 +25,5 @@ This intentionally fails::
 
 It produces the following warning message:
 
-.. doxygenstruct:: made_up_struct
-   :project: restypedef
+.. warning:: doxygenstruct: Cannot find struct "made_up_struct" in doxygen xml output
 
