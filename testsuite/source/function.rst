@@ -25,6 +25,5 @@ This intentionally fails::
 
 It produces the following warning message:
 
-.. doxygenfunction:: made_up_function
-   :project: structcmd
+.. warning:: doxygenfunction: Cannot find function "made_up_function" in doxygen xml output
 
