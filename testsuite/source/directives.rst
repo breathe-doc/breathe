@@ -18,6 +18,7 @@ Where:
    Directly specifies the path to the folder with the doxygen output. This
    overrides the project and default project if they have bee specified.
 
+.. _doxygenindex:
 
 doxygenindex Directive
 ~~~~~~~~~~~~~~~~~~~~~~
@@ -79,6 +80,9 @@ the same as the doxygenstruct directive.
    .. doxygentypedef:: <typedef name>
       :project: ...
       :path: ...
+
+
+.. _doxygenclass:
 
 doxygenclass Directive
 ~~~~~~~~~~~~~~~~~~~~~~
