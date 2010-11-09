@@ -97,6 +97,7 @@ breathe_projects = {
     "structcmd":"../examples/doxygen/structcmd/xml/",
     "tinyxml":"../examples/tinyxml/tinyxml/xml/",
     "restypedef":"../examples/doxygen/restypedef/xml/",
+    "nutshell":"../examples/specific/nutshell/xml/",
     }
 
 breathe_default_project = "tinyxml"
