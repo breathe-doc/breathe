@@ -19,11 +19,6 @@ from compoundsuper import MixedContainer
 class DoxygenTypeSub(supermod.DoxygenType):
     def __init__(self, version=None, compounddef=None):
         supermod.DoxygenType.__init__(self, version, compounddef)
-
-    def find(self, details):
-
-        return self.compounddef.find(details)
-
 supermod.DoxygenType.subclass = DoxygenTypeSub
 # end class DoxygenTypeSub
 
@@ -31,18 +26,6 @@ supermod.DoxygenType.subclass = DoxygenTypeSub
 class compounddefTypeSub(supermod.compounddefType):
     def __init__(self, kind=None, prot=None, id=None, compoundname='', title='', basecompoundref=None, derivedcompoundref=None, includes=None, includedby=None, incdepgraph=None, invincdepgraph=None, innerdir=None, innerfile=None, innerclass=None, innernamespace=None, innerpage=None, innergroup=None, templateparamlist=None, sectiondef=None, briefdescription=None, detaileddescription=None, inheritancegraph=None, collaborationgraph=None, programlisting=None, location=None, listofallmembers=None):
         supermod.compounddefType.__init__(self, kind, prot, id, compoundname, title, basecompoundref, derivedcompoundref, includes, includedby, incdepgraph, invincdepgraph, innerdir, innerfile, innerclass, innernamespace, innerpage, innergroup, templateparamlist, sectiondef, briefdescription, detaileddescription, inheritancegraph, collaborationgraph, programlisting, location, listofallmembers)
-
-    def find(self, details):
-
-        if self.id == details.refid:
-            return self
-
-        for sectiondef in self.sectiondef:
-            result = sectiondef.find(details)
-            if result:
-                return result
-
-
 supermod.compounddefType.subclass = compounddefTypeSub
 # end class compounddefTypeSub
 
@@ -98,20 +81,8 @@ supermod.refTextType.subclass = refTextTypeSub
 # end class refTextTypeSub
 
 class sectiondefTypeSub(supermod.sectiondefType):
-
-
     def __init__(self, kind=None, header='', description=None, memberdef=None):
         supermod.sectiondefType.__init__(self, kind, header, description, memberdef)
-
-    def find(self, details):
-
-        for memberdef in self.memberdef:
-            if memberdef.id == details.refid:
-                return memberdef
-
-        return None
-
-
 supermod.sectiondefType.subclass = sectiondefTypeSub
 # end class sectiondefTypeSub
 
