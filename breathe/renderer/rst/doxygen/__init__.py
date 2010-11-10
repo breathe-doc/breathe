@@ -25,17 +25,6 @@ class DoxygenToRstRendererFactory(object):
 
         Renderer = self.renderers[data_object.__class__]
 
-        if data_object.__class__ == compound.memberdefTypeSub:
-
-            if data_object.kind == "function":
-                Renderer = compoundrenderer.FuncMemberDefTypeSubRenderer
-            elif data_object.kind == "enum":
-                Renderer = compoundrenderer.EnumMemberDefTypeSubRenderer
-            elif data_object.kind == "typedef":
-                Renderer = compoundrenderer.TypedefMemberDefTypeSubRenderer
-            elif data_object.kind == "variable":
-                Renderer = compoundrenderer.VariableMemberDefTypeSubRenderer
-
         if data_object.__class__ == compound.docMarkupTypeSub:
 
             creator = self.node_factory.inline
@@ -62,6 +51,21 @@ class DoxygenToRstRendererFactory(object):
                     self.node_factory,
                     self.document
                     )
+
+        if data_object.__class__ == compound.memberdefTypeSub:
+
+            if data_object.kind == "function":
+                Renderer = compoundrenderer.FuncMemberDefTypeSubRenderer
+            elif data_object.kind == "enum":
+                Renderer = compoundrenderer.EnumMemberDefTypeSubRenderer
+            elif data_object.kind == "typedef":
+                Renderer = compoundrenderer.TypedefMemberDefTypeSubRenderer
+            elif data_object.kind == "variable":
+                Renderer = compoundrenderer.VariableMemberDefTypeSubRenderer
+
+        if data_object.__class__ == compound.docSimpleSectTypeSub:
+            if data_object.kind == "par":
+                Renderer = compoundrenderer.ParDocSimpleSectTypeSubRenderer
 
         return Renderer(
                 self.project_info,
@@ -113,6 +117,7 @@ class DoxygenToRstRendererFactoryCreator(object):
             compound.docParamNameSub : compoundrenderer.DocParamNameSubRenderer,
             compound.docSect1TypeSub : compoundrenderer.DocSect1TypeSubRenderer,
             compound.docSimpleSectTypeSub : compoundrenderer.DocSimpleSectTypeSubRenderer,
+            compound.docTitleTypeSub : compoundrenderer.DocTitleTypeSubRenderer,
             compoundsuper.MixedContainer : compoundrenderer.MixedContainerRenderer,
             unicode : UnicodeRenderer,
             }

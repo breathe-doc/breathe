@@ -555,6 +555,14 @@ class docMarkupTypeSub(supermod.docMarkupType):
 supermod.docMarkupType.subclass = docMarkupTypeSub
 # end class docMarkupTypeSub
 
+
+class docTitleTypeSub(supermod.docTitleType):
+    def __init__(self, valueOf_='', mixedclass_=None, content_=None):
+        supermod.docTitleType.__init__(self, valueOf_, mixedclass_, content_)
+        self.type_ = None
+supermod.docTitleType.subclass = docTitleTypeSub
+# end class docTitleTypeSub
+
 def parse(inFilename):
     doc = minidom.parse(inFilename)
     rootNode = doc.documentElement
