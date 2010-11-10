@@ -29,3 +29,9 @@ Namespaced Function Examples
 .. doxygenfunction:: ClassTest::anotherFunction
    :path: ../examples/specific/class/xml
 
+Alias Example
+-------------
+
+.. doxygenfunction:: frob_foos
+   :path: ../examples/specific/alias/xml
+

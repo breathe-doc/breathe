@@ -471,11 +471,16 @@ class DocSect1TypeSubRenderer(Renderer):
 
 class DocSimpleSectTypeSubRenderer(Renderer):
 
-    def render(self):
+    def title(self):
 
         text = self.node_factory.Text(self.data_object.kind.capitalize())
         emphasis = self.node_factory.emphasis("", text)
-        term = self.node_factory.term("","", emphasis)
+
+        return [emphasis]
+
+    def render(self):
+
+        term = self.node_factory.term("","", *self.title())
 
         nodelist = []
         for item in self.data_object.para:
@@ -485,6 +490,29 @@ class DocSimpleSectTypeSubRenderer(Renderer):
         definition = self.node_factory.definition("", *nodelist)
 
         return [self.node_factory.definition_list_item("", term, definition)]
+
+
+class ParDocSimpleSectTypeSubRenderer(DocSimpleSectTypeSubRenderer):
+
+    def title(self):
+
+        renderer = self.renderer_factory.create_renderer(self.data_object.title)
+        emphasis = self.node_factory.emphasis("", *renderer.render())
+
+        return [emphasis]
+
+
+class DocTitleTypeSubRenderer(Renderer):
+
+    def render(self):
+
+        nodelist = []
+
+        for item in self.data_object.content_:
+            renderer = self.renderer_factory.create_renderer(item)
+            nodelist.extend(renderer.render())
+
+        return nodelist
 
 
 class MixedContainerRenderer(Renderer):
