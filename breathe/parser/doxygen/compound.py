@@ -93,7 +93,6 @@ class memberdefTypeSub(supermod.memberdefType):
 supermod.memberdefType.subclass = memberdefTypeSub
 # end class memberdefTypeSub
 
-
 class descriptionTypeSub(supermod.descriptionType):
     def __init__(self, title='', para=None, sect1=None, internal=None, mixedclass_=None, content_=None):
         supermod.descriptionType.__init__(self, mixedclass_, content_)
@@ -472,6 +471,39 @@ class docCharTypeSub(supermod.docCharType):
 supermod.docCharType.subclass = docCharTypeSub
 # end class docCharTypeSub
 
+
+class rstTypeSub(object):
+    """
+    New node type. Structure is largely pillaged from other nodes in order to
+    match the set.
+    """
+
+    def __init__(self, valueOf_='', mixedclass_=None, content_=None):
+        if mixedclass_ is None:
+            self.mixedclass_ = MixedContainer
+        else:
+            self.mixedclass_ = mixedclass_
+        if content_ is None:
+            self.content_ = []
+        else:
+            self.content_ = content_
+        self.text = ""
+    def factory(*args, **kwargs):
+        return rstTypeSub(*args, **kwargs)
+    factory = staticmethod(factory)
+    def buildAttributes(self, attrs):
+        pass
+    def build(self, node_):
+        attrs = node_.attributes
+        self.buildAttributes(attrs)
+        self.valueOf_ = ''
+        for child_ in node_.childNodes:
+            nodeName_ = child_.nodeName.split(':')[-1]
+            self.buildChildren(child_, nodeName_)
+    def buildChildren(self, child_, nodeName_):
+        if child_.nodeType == Node.TEXT_NODE:
+            self.text += child_.nodeValue
+
 class docParaTypeSub(supermod.docParaType):
     def __init__(self, char=None, valueOf_=''):
         supermod.docParaType.__init__(self, char)
@@ -513,6 +545,13 @@ class docParaTypeSub(supermod.docParaType):
             obj_ = supermod.docMarkupType.factory()
             obj_.build(child_)
             obj_.type_ = nodeName_
+            self.content.append(obj_)
+        elif child_.nodeType == Node.ELEMENT_NODE and \
+            nodeName_ == 'rst':
+            childobj_ = rstTypeSub.factory()
+            childobj_.build(child_)
+            obj_ = self.mixedclass_(MixedContainer.CategoryComplex,
+                MixedContainer.TypeNone, 'rst', childobj_)
             self.content.append(obj_)
 
 supermod.docParaType.subclass = docParaTypeSub

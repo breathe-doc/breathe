@@ -5,6 +5,20 @@ from breathe.renderer.rst.doxygen import compound as compoundrenderer
 
 from breathe.parser.doxygen import index, compound, compoundsuper
 
+class RstContentCreator(object):
+
+    def __init__(self, list_type):
+
+        self.list_type = list_type
+
+    def __call__(self, text):
+
+        # Inspired by autodoc.py in Sphinx
+        result = self.list_type()
+        for line in text.split("\n"):
+            result.append(line, "<breathe>")
+
+        return result
 
 class UnicodeRenderer(Renderer):
 
@@ -19,17 +33,21 @@ class DoxygenToRstRendererFactory(object):
             renderers,
             node_factory,
             project_info,
+            state,
             document,
             domain_handler_factory,
             domain_handler,
+            rst_content_creator
             ):
 
         self.node_factory = node_factory
         self.project_info = project_info
         self.renderers = renderers
+        self.state = state
         self.document = document
         self.domain_handler_factory = domain_handler_factory
         self.domain_handler = domain_handler
+        self.rst_content_creator = rst_content_creator
 
     def create_renderer(self, data_object):
 
@@ -84,6 +102,20 @@ class DoxygenToRstRendererFactory(object):
                     data_object,
                     renderer_factory,
                     self.node_factory,
+                    self.state,
+                    self.document,
+                    domain_handler
+                    )
+
+        if data_object.__class__ == compound.rstTypeSub:
+
+            return Renderer(
+                    self.rst_content_creator,
+                    self.project_info,
+                    data_object,
+                    renderer_factory,
+                    self.node_factory,
+                    self.state,
                     self.document,
                     domain_handler
                     )
@@ -108,6 +140,7 @@ class DoxygenToRstRendererFactory(object):
                 data_object,
                 renderer_factory,
                 self.node_factory,
+                self.state,
                 self.document,
                 domain_handler
                 )
@@ -123,9 +156,11 @@ class DoxygenToRstRendererFactory(object):
                     self.renderers,
                     self.node_factory,
                     self.project_info,
+                    self.state,
                     self.document,
                     self.domain_handler_factory,
-                    domain_handler
+                    domain_handler,
+                    self.rst_content_creator
                     )
 
 class DomainRendererFactory(DoxygenToRstRendererFactory):
@@ -153,14 +188,16 @@ class DoxygenToRstRendererFactoryCreator(object):
             self,
             node_factory,
             parser_factory,
-            domain_handler_factory_creator
+            domain_handler_factory_creator,
+            rst_content_creator
             ):
 
         self.node_factory = node_factory
         self.parser_factory = parser_factory
         self.domain_handler_factory_creator = domain_handler_factory_creator
+        self.rst_content_creator = rst_content_creator
 
-    def create_factory(self, project_info, document):
+    def create_factory(self, project_info, state, document):
 
         renderers = {
             index.DoxygenTypeSub : indexrenderer.DoxygenTypeSubRenderer,
@@ -183,6 +220,7 @@ class DoxygenToRstRendererFactoryCreator(object):
             compound.docSect1TypeSub : compoundrenderer.DocSect1TypeSubRenderer,
             compound.docSimpleSectTypeSub : compoundrenderer.DocSimpleSectTypeSubRenderer,
             compound.docTitleTypeSub : compoundrenderer.DocTitleTypeSubRenderer,
+            compound.rstTypeSub : compoundrenderer.RstTypeSubRenderer,
             compoundsuper.MixedContainer : compoundrenderer.MixedContainerRenderer,
             unicode : UnicodeRenderer,
             }
@@ -199,9 +237,11 @@ class DoxygenToRstRendererFactoryCreator(object):
                 renderers,
                 self.node_factory,
                 project_info,
+                state,
                 document,
                 domain_handler_factory,
-                domain_handler
+                domain_handler,
+                self.rst_content_creator
                 )
 
 
