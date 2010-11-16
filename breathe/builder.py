@@ -24,9 +24,9 @@ class BuilderFactory(object):
         self.builder_class = builder_class
         self.renderer_factory_creator = renderer_factory_creator
 
-    def create_builder(self, project_info, document):
+    def create_builder(self, project_info, state, document):
 
-        renderer_factory = self.renderer_factory_creator.create_factory(project_info, document)
+        renderer_factory = self.renderer_factory_creator.create_factory(project_info, state, document)
 
         return self.builder_class(renderer_factory)
 

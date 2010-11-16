@@ -396,8 +396,28 @@ class DocParaTypeSubRenderer(Renderer):
 
 class DocMarkupTypeSubRenderer(Renderer):
 
-    def __init__(self, creator, project_info, data_object, renderer_factory, node_factory, document, domain_handler):
-        Renderer.__init__(self, project_info, data_object, renderer_factory, node_factory, document, domain_handler)
+    def __init__(
+            self,
+            creator,
+            project_info,
+            data_object,
+            renderer_factory,
+            node_factory,
+            state,
+            document,
+            domain_handler
+            ):
+
+        Renderer.__init__(
+                self,
+                project_info,
+                data_object,
+                renderer_factory,
+                node_factory,
+                state,
+                document,
+                domain_handler
+                )
 
         self.creator = creator
 
@@ -530,6 +550,27 @@ class DocTitleTypeSubRenderer(Renderer):
             nodelist.extend(renderer.render())
 
         return nodelist
+
+
+class RstTypeSubRenderer(Renderer):
+
+    def __init__(self, content_creator, *args):
+        Renderer.__init__(self, *args)
+
+        self.content_creator = content_creator
+
+    def render(self):
+
+        rst = self.content_creator(self.data_object.text)
+
+        # Parent node for the generated node subtree
+        node = self.node_factory.paragraph()
+        node.document = self.state.document
+
+        # Generate node subtree
+        self.state.nested_parse(rst, 0, node)
+
+        return node
 
 
 class MixedContainerRenderer(Renderer):

@@ -9,4 +9,5 @@ Test Pages
    tinyxml
    specific
    domains
+   embeddedrst
 

@@ -9,12 +9,13 @@ import fnmatch
 import re
 
 from docutils.parsers import rst
+from docutils.statemachine import ViewList
 from sphinx.domains.cpp import DefinitionParser
 
 from breathe.builder import RstBuilder, BuilderFactory
 from breathe.finder import FinderFactory, NoMatchesError, MultipleMatchesError
 from breathe.parser import DoxygenParserFactory, DoxygenIndexParser, ParserError
-from breathe.renderer.rst.doxygen import DoxygenToRstRendererFactoryCreator
+from breathe.renderer.rst.doxygen import DoxygenToRstRendererFactoryCreator, RstContentCreator
 from breathe.renderer.rst.doxygen.domain import DomainHandlerFactoryCreator, CppDomainHelper, CDomainHelper
 from breathe.finder.doxygen import DoxygenItemFinderFactoryCreator, ItemMatcherFactory
 
@@ -62,7 +63,7 @@ class DoxygenIndexDirective(BaseDirective):
 
         data_object = finder.root()
 
-        builder = self.builder_factory.create_builder(project_info, self.state.document)
+        builder = self.builder_factory.create_builder(project_info, self.state, self.state.document)
         nodes = builder.build(data_object)
 
         return nodes
@@ -104,7 +105,7 @@ class DoxygenFunctionDirective(BaseDirective):
             return [ docutils.nodes.warning( "", docutils.nodes.paragraph("", "", docutils.nodes.Text(warning))),
                     self.state.document.reporter.warning( warning, line=self.lineno) ]
 
-        builder = self.builder_factory.create_builder(project_info, self.state.document)
+        builder = self.builder_factory.create_builder(project_info, self.state, self.state.document)
         nodes = builder.build(data_object)
 
         return nodes
@@ -138,7 +139,7 @@ class DoxygenBaseDirective(BaseDirective):
             return [ docutils.nodes.warning( "", docutils.nodes.paragraph("", "", docutils.nodes.Text(warning))),
                     self.state.document.reporter.warning( warning, line=self.lineno) ]
 
-        builder = self.builder_factory.create_builder(project_info, self.state.document)
+        builder = self.builder_factory.create_builder(project_info, self.state, self.state.document)
         nodes = builder.build(data_object)
 
         return nodes
@@ -428,7 +429,8 @@ def setup(app):
     c_domain_helper = CDomainHelper()
     domain_helpers = {"c" : c_domain_helper, "cpp" : cpp_domain_helper}
     domain_handler_factory_creator = DomainHandlerFactoryCreator(node_factory, domain_helpers)
-    renderer_factory_creator = DoxygenToRstRendererFactoryCreator(node_factory, parser_factory, domain_handler_factory_creator)
+    rst_content_creator = RstContentCreator( ViewList )
+    renderer_factory_creator = DoxygenToRstRendererFactoryCreator(node_factory, parser_factory, domain_handler_factory_creator, rst_content_creator)
     builder_factory = BuilderFactory(RstBuilder, renderer_factory_creator)
 
     project_info_factory = ProjectInfoFactory(fnmatch.fnmatch)
