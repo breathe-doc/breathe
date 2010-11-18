@@ -5,16 +5,25 @@ from docutils.parsers.rst.directives import unchanged_required
 import os
 import sys
 import copy
+import fnmatch
+import re
 
 from docutils.parsers import rst
+from sphinx.domains.cpp import DefinitionParser
+
 from breathe.builder import RstBuilder, BuilderFactory
 from breathe.finder import FinderFactory, NoMatchesError, MultipleMatchesError
 from breathe.parser import DoxygenParserFactory, DoxygenIndexParser
 from breathe.renderer.rst.doxygen import DoxygenToRstRendererFactoryCreator
+from breathe.renderer.rst.doxygen.domain import DomainHandlerFactoryCreator, CppDomainHelper, CDomainHelper
 from breathe.finder.doxygen import DoxygenItemFinderFactoryCreator, ItemMatcherFactory
 
 import docutils.nodes
 import sphinx.addnodes
+
+# Somewhat outrageously, reach in and fix a Sphinx regex 
+import sphinx.domains.cpp
+sphinx.domains.cpp._identifier_re = re.compile(r'(~?\b[a-zA-Z_][a-zA-Z0-9_]*)\b')
 
 class BaseDirective(rst.Directive):
 
@@ -216,10 +225,14 @@ class DirectiveContainer(object):
 
 class ProjectInfo(object):
 
-    def __init__(self, name, path):
+    def __init__(self, name, path, reference, domain_by_extension, domain_by_file_pattern, match):
 
         self._name = name
         self._path = path
+        self._reference = reference
+        self._domain_by_extension = domain_by_extension
+        self._domain_by_file_pattern = domain_by_file_pattern
+        self._match = match
 
     def name(self):
         return self._name
@@ -227,20 +240,53 @@ class ProjectInfo(object):
     def path(self):
         return self._path
 
+    def reference(self):
+        return self._reference
+
+    def domain_for_file(self, file_):
+
+        domain = ""
+        extension = file_.split(".")[-1]
+
+        try:
+            domain = self._domain_by_extension[extension]
+        except KeyError:
+            pass
+
+        for pattern, pattern_domain in self._domain_by_file_pattern.items():
+            if self._match(file_, pattern):
+                domain = pattern_domain
+
+        return domain
+
+
 class ProjectInfoFactory(object):
 
-    def __init__(self):
+    def __init__(self, match):
+
+        self.match = match
 
         self.projects = {}
         self.default_project = None
+        self.domain_by_extension = {}
+        self.domain_by_file_pattern = {}
 
         self.project_count = 0
         self.project_info_store = {}
+        
 
-    def update(self, projects, default_project):
+    def update(
+            self,
+            projects,
+            default_project,
+            domain_by_extension,
+            domain_by_file_pattern,
+            ):
 
         self.projects = projects
         self.default_project = default_project
+        self.domain_by_extension = domain_by_extension
+        self.domain_by_file_pattern = domain_by_file_pattern
 
     def default_path(self):
 
@@ -267,11 +313,22 @@ class ProjectInfoFactory(object):
         try:
             return self.project_info_store[path]
         except KeyError:
+
+            reference = name
+
             if not name:
                 name = "project%s" % self.project_count
+                reference = path
                 self.project_count += 1
 
-            project_info = ProjectInfo(name, path)
+            project_info = ProjectInfo(
+                    name,
+                    path,
+                    reference,
+                    self.domain_by_extension,
+                    self.domain_by_file_pattern,
+                    self.match
+                    )
 
             self.project_info_store[path] = project_info
 
@@ -330,7 +387,9 @@ class DoxygenDirectiveFactory(object):
         # so we can update this to update them
         self.project_info_factory.update(
                 app.config.breathe_projects,
-                app.config.breathe_default_project
+                app.config.breathe_default_project,
+                app.config.breathe_domain_by_extension,
+                app.config.breathe_domain_by_file_pattern,
                 )
 
 class NodeFactory(object):
@@ -362,10 +421,14 @@ def setup(app):
     finder_factory = FinderFactory(index_parser, item_finder_factory_creator)
 
     node_factory = NodeFactory(docutils.nodes, sphinx.addnodes)
-    renderer_factory_creator = DoxygenToRstRendererFactoryCreator(node_factory, parser_factory)
+    cpp_domain_helper = CppDomainHelper(DefinitionParser, re.sub)
+    c_domain_helper = CDomainHelper()
+    domain_helpers = {"c" : c_domain_helper, "cpp" : cpp_domain_helper}
+    domain_handler_factory_creator = DomainHandlerFactoryCreator(node_factory, domain_helpers)
+    renderer_factory_creator = DoxygenToRstRendererFactoryCreator(node_factory, parser_factory, domain_handler_factory_creator)
     builder_factory = BuilderFactory(RstBuilder, renderer_factory_creator)
 
-    project_info_factory = ProjectInfoFactory()
+    project_info_factory = ProjectInfoFactory(fnmatch.fnmatch)
     directive_factory = DoxygenDirectiveFactory(builder_factory, finder_factory, matcher_factory, project_info_factory)
 
     app.add_directive(
@@ -400,6 +463,8 @@ def setup(app):
 
     app.add_config_value("breathe_projects", {}, True)
     app.add_config_value("breathe_default_project", "", True)
+    app.add_config_value("breathe_domain_by_extension", {}, True)
+    app.add_config_value("breathe_domain_by_file_pattern", {}, True)
 
     app.connect("builder-inited", directive_factory.get_config_values)
 

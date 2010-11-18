@@ -58,17 +58,16 @@ class CompoundDefTypeSubRenderer(Renderer):
             nodelist.append(self.node_factory.block_quote("", *section_nodelists[section]))
 
     def render(self):
-         
+
         section_nodelists = {}
 
         # Get all sub sections
         for sectiondef in self.data_object.sectiondef:
             kind = sectiondef.kind
-
             renderer = self.renderer_factory.create_renderer(sectiondef)
             subnodes = renderer.render()
             section_nodelists[kind] = subnodes
-                                               
+
         nodelist = []    
 
         if self.data_object.briefdescription:
@@ -120,6 +119,10 @@ class MemberDefTypeSubRenderer(Renderer):
 
         return target
 
+    def create_domain_id(self):
+
+        return ""
+
     def title(self):
 
         kind = []
@@ -157,9 +160,11 @@ class MemberDefTypeSubRenderer(Renderer):
 
         refid = "%s%s" % (self.project_info.name(), self.data_object.id)
 
+        domain_id = self.create_domain_id()
+
         title = self.title()
         title.insert(0, self.create_target(refid))
-        term = self.node_factory.term("","", ids=[refid], *title )
+        term = self.node_factory.term("","", ids=[domain_id,refid], *title )
         definition = self.node_factory.definition("", *self.description())
         entry = self.node_factory.definition_list_item("",term, definition)
 
@@ -167,6 +172,18 @@ class MemberDefTypeSubRenderer(Renderer):
 
 
 class FuncMemberDefTypeSubRenderer(MemberDefTypeSubRenderer):
+
+    def create_target(self, refid):
+
+        self.domain_handler.create_function_target(self.data_object)
+
+        return MemberDefTypeSubRenderer.create_target(self, refid)
+
+
+    def create_domain_id(self):
+
+        return self.domain_handler.create_function_id(self.data_object)
+
 
     def title(self):
 
@@ -379,8 +396,8 @@ class DocParaTypeSubRenderer(Renderer):
 
 class DocMarkupTypeSubRenderer(Renderer):
 
-    def __init__(self, creator, project_info, data_object, renderer_factory, node_factory, document):
-        Renderer.__init__(self, project_info, data_object, renderer_factory, node_factory, document)
+    def __init__(self, creator, project_info, data_object, renderer_factory, node_factory, document, domain_handler):
+        Renderer.__init__(self, project_info, data_object, renderer_factory, node_factory, document, domain_handler)
 
         self.creator = creator
 

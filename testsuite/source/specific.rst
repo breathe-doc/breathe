@@ -16,7 +16,6 @@ Namespaced Function Examples
 .. doxygenfunction:: testnamespace::NamespacedClassTest::function
    :path: ../examples/specific/class/xml
 
-
 .. doxygenfunction:: testnamespace::ClassTest::function
    :path: ../examples/specific/class/xml
 
