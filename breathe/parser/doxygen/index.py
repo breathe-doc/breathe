@@ -34,9 +34,16 @@ supermod.MemberType.subclass = MemberTypeSub
 # end class MemberTypeSub
 
 
+class ParseError(Exception):
+    pass
+
 def parse(inFilename):
 
-    doc = minidom.parse(inFilename)
+    try:
+        doc = minidom.parse(inFilename)
+    except IOError, e:
+        raise ParseError(inFilename)
+       
     rootNode = doc.documentElement
     rootObj = supermod.DoxygenType.factory()
     rootObj.build(rootNode)
