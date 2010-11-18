@@ -5,7 +5,11 @@ namespace testnamespace {
 class NamespacedClassTest {
 
     //! \brief namespaced class function
-    void function() {};
+    virtual void function() const = 0;
+
+    static void functionS();
+
+    explicit NamespacedClassTest() {};
 
     //! \brief namespaced class other function
     void anotherFunction() {};

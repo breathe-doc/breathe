@@ -8,4 +8,5 @@ Test Pages
    doxygen
    tinyxml
    specific
+   domains
 

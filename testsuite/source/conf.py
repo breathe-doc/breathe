@@ -102,6 +102,15 @@ breathe_projects = {
 
 breathe_default_project = "tinyxml"
 
+breathe_domain_by_extension = {
+        "h" : "cpp",
+        }
+
+breathe_domain_by_file_pattern = {
+        "*/class.h" : "cpp",
+        "*/alias.h" : "c",
+        }
+
 
 # Options for HTML output
 # -----------------------

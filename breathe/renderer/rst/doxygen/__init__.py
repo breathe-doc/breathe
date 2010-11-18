@@ -14,14 +14,49 @@ class UnicodeRenderer(Renderer):
 
 class DoxygenToRstRendererFactory(object):
 
-    def __init__(self, renderers, node_factory, project_info, document):
+    def __init__(
+            self,
+            renderers,
+            node_factory,
+            project_info,
+            document,
+            domain_handler_factory,
+            domain_handler,
+            ):
 
         self.node_factory = node_factory
         self.project_info = project_info
         self.renderers = renderers
         self.document = document
+        self.domain_handler_factory = domain_handler_factory
+        self.domain_handler = domain_handler
 
     def create_renderer(self, data_object):
+
+        renderer_factory = self
+
+        location = ""
+
+        try:
+            location = data_object.location.file
+        except AttributeError:
+            # No location attribute
+            pass
+
+        renderer_factory = self.create_domain_renderer_factory(location)
+
+        return self.create_renderer_with_factory(
+                data_object,
+                renderer_factory,
+                renderer_factory.domain_handler
+                )
+
+    def create_renderer_with_factory(
+            self,
+            data_object,
+            renderer_factory,
+            domain_handler
+            ):
 
         Renderer = self.renderers[data_object.__class__]
 
@@ -47,9 +82,10 @@ class DoxygenToRstRendererFactory(object):
                     creator,
                     self.project_info,
                     data_object,
-                    self,
+                    renderer_factory,
                     self.node_factory,
-                    self.document
+                    self.document,
+                    domain_handler
                     )
 
         if data_object.__class__ == compound.memberdefTypeSub:
@@ -70,10 +106,33 @@ class DoxygenToRstRendererFactory(object):
         return Renderer(
                 self.project_info,
                 data_object,
-                self,
+                renderer_factory,
                 self.node_factory,
-                self.document
+                self.document,
+                domain_handler
                 )
+
+    def create_domain_renderer_factory(self, location):
+
+        if not location:
+            return self
+
+        domain_handler = self.domain_handler_factory.create_domain_handler(location)
+
+        return DomainRendererFactory(
+                    self.renderers,
+                    self.node_factory,
+                    self.project_info,
+                    self.document,
+                    self.domain_handler_factory,
+                    domain_handler
+                    )
+
+class DomainRendererFactory(DoxygenToRstRendererFactory):
+
+    def create_renderer(self, data_object):
+
+        return self.create_renderer_with_factory(data_object, self, self.domain_handler)
 
 
 class CreateCompoundTypeSubRenderer(object):
@@ -90,10 +149,16 @@ class CreateCompoundTypeSubRenderer(object):
 
 class DoxygenToRstRendererFactoryCreator(object):
 
-    def __init__(self, node_factory, parser_factory):
+    def __init__(
+            self,
+            node_factory,
+            parser_factory,
+            domain_handler_factory_creator
+            ):
 
         self.node_factory = node_factory
         self.parser_factory = parser_factory
+        self.domain_handler_factory_creator = domain_handler_factory_creator
 
     def create_factory(self, project_info, document):
 
@@ -122,6 +187,21 @@ class DoxygenToRstRendererFactoryCreator(object):
             unicode : UnicodeRenderer,
             }
 
-        return DoxygenToRstRendererFactory(renderers, self.node_factory, project_info, document)
+        domain_handler_factory = self.domain_handler_factory_creator.create(
+                project_info,
+                document,
+                document.settings.env
+                )
+
+        domain_handler = domain_handler_factory.create_null_domain_handler()
+
+        return DoxygenToRstRendererFactory(
+                renderers,
+                self.node_factory,
+                project_info,
+                document,
+                domain_handler_factory,
+                domain_handler
+                )
 
 
