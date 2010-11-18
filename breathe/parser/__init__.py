@@ -3,6 +3,9 @@ import breathe.parser.doxygen.index
 import breathe.parser.doxygen.compound
 import os
 
+class ParserError(Exception):
+    pass
+
 class Parser(object):
 
     pass
@@ -13,7 +16,10 @@ class DoxygenIndexParser(Parser):
     def parse(self, project_info):
 
         filename = os.path.join(project_info.path(), "index.xml")
-        return breathe.parser.doxygen.index.parse(filename)
+        try:
+            return breathe.parser.doxygen.index.parse(filename)
+        except breathe.parser.doxygen.index.ParseError:
+            raise ParserError(filename)
 
 
 class DoxygenCompoundParser(Parser):
@@ -25,8 +31,11 @@ class DoxygenCompoundParser(Parser):
     def parse(self, refid):
 
         filename = os.path.join(self.project_info.path(), "%s.xml" % refid)
-        return breathe.parser.doxygen.compound.parse(filename)
 
+        try:
+            return breathe.parser.doxygen.compound.parse(filename)
+        except breathe.parser.doxygen.compound.ParseError:
+            raise ParserError(filename)
 
 class DoxygenParserFactory(object):
 

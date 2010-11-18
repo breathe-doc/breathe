@@ -534,8 +534,18 @@ class docTitleTypeSub(supermod.docTitleType):
 supermod.docTitleType.subclass = docTitleTypeSub
 # end class docTitleTypeSub
 
+
+class ParseError(Exception):
+    pass
+
 def parse(inFilename):
-    doc = minidom.parse(inFilename)
+
+    try:
+        doc = minidom.parse(inFilename)
+    except IOError, e:
+        print e
+        raise ParseError(inFilename)
+       
     rootNode = doc.documentElement
     rootObj = supermod.DoxygenType.factory()
     rootObj.build(rootNode)

@@ -13,7 +13,7 @@ from sphinx.domains.cpp import DefinitionParser
 
 from breathe.builder import RstBuilder, BuilderFactory
 from breathe.finder import FinderFactory, NoMatchesError, MultipleMatchesError
-from breathe.parser import DoxygenParserFactory, DoxygenIndexParser
+from breathe.parser import DoxygenParserFactory, DoxygenIndexParser, ParserError
 from breathe.renderer.rst.doxygen import DoxygenToRstRendererFactoryCreator
 from breathe.renderer.rst.doxygen.domain import DomainHandlerFactoryCreator, CppDomainHelper, CDomainHelper
 from breathe.finder.doxygen import DoxygenItemFinderFactoryCreator, ItemMatcherFactory
@@ -53,11 +53,14 @@ class DoxygenIndexDirective(BaseDirective):
 
         project_info = self.project_info_factory.create_project_info(self.options)
 
-        finder = self.finder_factory.create_finder(project_info)
+        try:
+            finder = self.finder_factory.create_finder(project_info)
+        except ParserError, e:
+            warning = 'doxygenindex: Unable to parse file "%s"' % e
+            return [ docutils.nodes.warning( "", docutils.nodes.paragraph("", "", docutils.nodes.Text(warning))),
+                    self.state.document.reporter.warning( warning, line=self.lineno) ]
 
-        # try:
         data_object = finder.root()
-        # except
 
         builder = self.builder_factory.create_builder(project_info, self.state.document)
         nodes = builder.build(data_object)
