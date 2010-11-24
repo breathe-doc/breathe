@@ -90,6 +90,117 @@ supermod.sectiondefType.subclass = sectiondefTypeSub
 class memberdefTypeSub(supermod.memberdefType):
     def __init__(self, initonly=None, kind=None, volatile=None, const=None, raise_=None, virt=None, readable=None, prot=None, explicit=None, new=None, final=None, writable=None, add=None, static=None, remove=None, sealed=None, mutable=None, gettable=None, inline=None, settable=None, id=None, templateparamlist=None, type_=None, definition='', argsstring='', name='', read='', write='', bitfield='', reimplements=None, reimplementedby=None, param=None, enumvalue=None, initializer=None, exceptions=None, briefdescription=None, detaileddescription=None, inbodydescription=None, location=None, references=None, referencedby=None):
         supermod.memberdefType.__init__(self, initonly, kind, volatile, const, raise_, virt, readable, prot, explicit, new, final, writable, add, static, remove, sealed, mutable, gettable, inline, settable, id, templateparamlist, type_, definition, argsstring, name, read, write, bitfield, reimplements, reimplementedby, param, enumvalue, initializer, exceptions, briefdescription, detaileddescription, inbodydescription, location, references, referencedby)
+
+        self.parameterlist = supermod.docParamListType.factory()
+        self.parameterlist.kind = "param"
+
+
+    def buildChildren(self, child_, nodeName_):
+        supermod.memberdefType.buildChildren(self, child_, nodeName_)
+        
+        if child_.nodeType == Node.ELEMENT_NODE and \
+            nodeName_ == 'param':
+
+            # Get latest param
+            param = self.param[-1]
+
+            # If it doesn't have a description we're done
+            if not param.briefdescription:
+                return
+
+            # Construct our own param list from the descriptions stored inline
+            # with the parameters
+            paramdescription = param.briefdescription
+            paramname = supermod.docParamName.factory()
+
+            # Add parameter name
+            obj_ = paramname.mixedclass_(MixedContainer.CategoryText,
+                MixedContainer.TypeNone, '', param.declname)
+            paramname.content_.append(obj_)
+
+            paramnamelist = supermod.docParamNameList.factory()
+            paramnamelist.parametername.append(paramname)
+
+            paramlistitem = supermod.docParamListItem.factory()
+            paramlistitem.parameternamelist.append(paramnamelist)
+
+            # Add parameter description
+            paramlistitem.parameterdescription = paramdescription
+
+            self.parameterlist.parameteritem.append(paramlistitem)
+
+        elif child_.nodeType == Node.ELEMENT_NODE and \
+            nodeName_ == 'detaileddescription':
+
+            # Assume supermod.memberdefType.buildChildren has already built the
+            # description object, we just want to slot our parameterlist in at
+            # a reasonable point
+
+            if not self.detaileddescription:
+                # Create one if it doesn't exist
+                self.detaileddescription = supermod.descriptionType.factory()
+
+            detaileddescription = self.detaileddescription
+
+            # Find parameterlist in detaileddescription
+            parameterlist = None
+            found = False
+            for dditem in detaileddescription.content_:
+
+                # Find para nodes
+                if dditem.value.__class__ == supermod.docParaType.subclass:
+
+                    # If param node has a non-empty parameterlist member, get the
+                    # first item as our parameterlist and exit
+                    if dditem.value.parameterlist and dditem.value.parameterlist[0].kind == "param":
+
+                        parameterlist = dditem.value.parameterlist[0]
+                        found = True
+                        break
+
+                if found:
+                    break
+
+            if found:
+                # Merge our list into the one in detaildescription
+                print "Warning: mixing inline and non-line parameters. This case isn't handled yet"
+                return
+
+            # Else, we're giving the detaildescription our parameterlist
+            insert_before = None
+            # Find insertion point
+            for dditem in detaileddescription.content_:
+                # Find para nodes
+                if dditem.value.__class__ == supermod.docParaType.subclass:
+
+                    # Check the contents of every entry in the para's content list
+                    # If every item's value is a whitespace string, then we
+                    # assume this para contains other information and we can
+                    # insert our parameter list before it.
+                    no_content = True
+                    for item in dditem.value.content:
+                        try:
+                            if item.value.strip(): no_content = False
+                        except AttributeError:
+                            no_content = False
+
+                    if no_content:
+                        insert_before = dditem
+
+
+            index = 0
+            if insert_before:
+                index = detaileddescription.content_.index( insert_before )
+
+            para = supermod.docParaType.factory()
+            para.parameterlist.append(self.parameterlist)
+
+            obj_ = detaileddescription.mixedclass_(MixedContainer.CategoryComplex, MixedContainer.TypeNone, 'para', para)
+
+            detaileddescription.content_.insert( index, obj_ )
+
+
+
 supermod.memberdefType.subclass = memberdefTypeSub
 # end class memberdefTypeSub
 
