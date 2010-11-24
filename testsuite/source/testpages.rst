@@ -10,4 +10,5 @@ Test Pages
    specific
    domains
    embeddedrst
+   inline 
 
