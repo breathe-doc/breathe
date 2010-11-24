@@ -132,6 +132,11 @@ class memberdefTypeSub(supermod.memberdefType):
         elif child_.nodeType == Node.ELEMENT_NODE and \
             nodeName_ == 'detaileddescription':
 
+            if not self.parameterlist.parameteritem:
+                # No items in our list
+                return
+
+
             # Assume supermod.memberdefType.buildChildren has already built the
             # description object, we just want to slot our parameterlist in at
             # a reasonable point
@@ -142,61 +147,12 @@ class memberdefTypeSub(supermod.memberdefType):
 
             detaileddescription = self.detaileddescription
 
-            # Find parameterlist in detaileddescription
-            parameterlist = None
-            found = False
-            for dditem in detaileddescription.content_:
-
-                # Find para nodes
-                if dditem.value.__class__ == supermod.docParaType.subclass:
-
-                    # If param node has a non-empty parameterlist member, get the
-                    # first item as our parameterlist and exit
-                    if dditem.value.parameterlist and dditem.value.parameterlist[0].kind == "param":
-
-                        parameterlist = dditem.value.parameterlist[0]
-                        found = True
-                        break
-
-                if found:
-                    break
-
-            if found:
-                # Merge our list into the one in detaildescription
-                print "Warning: mixing inline and non-line parameters. This case isn't handled yet"
-                return
-
-            # Else, we're giving the detaildescription our parameterlist
-            insert_before = None
-            # Find insertion point
-            for dditem in detaileddescription.content_:
-                # Find para nodes
-                if dditem.value.__class__ == supermod.docParaType.subclass:
-
-                    # Check the contents of every entry in the para's content list
-                    # If every item's value is a whitespace string, then we
-                    # assume this para contains other information and we can
-                    # insert our parameter list before it.
-                    no_content = True
-                    for item in dditem.value.content:
-                        try:
-                            if item.value.strip(): no_content = False
-                        except AttributeError:
-                            no_content = False
-
-                    if no_content:
-                        insert_before = dditem
-
-
-            index = 0
-            if insert_before:
-                index = detaileddescription.content_.index( insert_before )
-
             para = supermod.docParaType.factory()
             para.parameterlist.append(self.parameterlist)
 
             obj_ = detaileddescription.mixedclass_(MixedContainer.CategoryComplex, MixedContainer.TypeNone, 'para', para)
 
+            index = 0
             detaileddescription.content_.insert( index, obj_ )
 
 
