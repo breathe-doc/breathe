@@ -552,7 +552,7 @@ class DocTitleTypeSubRenderer(Renderer):
         return nodelist
 
 
-class RstTypeSubRenderer(Renderer):
+class VerbatimTypeSubRenderer(Renderer):
 
     def __init__(self, content_creator, *args):
         Renderer.__init__(self, *args)
@@ -560,6 +560,9 @@ class RstTypeSubRenderer(Renderer):
         self.content_creator = content_creator
 
     def render(self):
+
+        if not self.data_object.text.strip().startswith("embed:rst"):
+            return []
 
         rst = self.content_creator(self.data_object.text)
 
@@ -579,6 +582,7 @@ class MixedContainerRenderer(Renderer):
 
         renderer = self.renderer_factory.create_renderer(self.data_object.getValue())
         return renderer.render()
+
 
 
 

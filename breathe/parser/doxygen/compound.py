@@ -539,7 +539,7 @@ supermod.docCharType.subclass = docCharTypeSub
 # end class docCharTypeSub
 
 
-class rstTypeSub(object):
+class verbatimTypeSub(object):
     """
     New node type. Structure is largely pillaged from other nodes in order to
     match the set.
@@ -556,7 +556,7 @@ class rstTypeSub(object):
             self.content_ = content_
         self.text = ""
     def factory(*args, **kwargs):
-        return rstTypeSub(*args, **kwargs)
+        return verbatimTypeSub(*args, **kwargs)
     factory = staticmethod(factory)
     def buildAttributes(self, attrs):
         pass
@@ -614,11 +614,11 @@ class docParaTypeSub(supermod.docParaType):
             obj_.type_ = nodeName_
             self.content.append(obj_)
         elif child_.nodeType == Node.ELEMENT_NODE and \
-            nodeName_ == 'rst':
-            childobj_ = rstTypeSub.factory()
+            nodeName_ == 'verbatim':
+            childobj_ = verbatimTypeSub.factory()
             childobj_.build(child_)
             obj_ = self.mixedclass_(MixedContainer.CategoryComplex,
-                MixedContainer.TypeNone, 'rst', childobj_)
+                MixedContainer.TypeNone, 'verbatim', childobj_)
             self.content.append(obj_)
 
 supermod.docParaType.subclass = docParaTypeSub

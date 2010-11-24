@@ -7,11 +7,18 @@ from breathe.parser.doxygen import index, compound, compoundsuper
 
 class RstContentCreator(object):
 
-    def __init__(self, list_type):
+    def __init__(self, list_type, dedent):
 
         self.list_type = list_type
+        self.dedent = dedent
 
     def __call__(self, text):
+
+        # Remove the first line
+        text = "\n".join(text.split(u"\n")[1:])
+
+        # Remove starting whitespace
+        text = self.dedent(text)
 
         # Inspired by autodoc.py in Sphinx
         result = self.list_type()
@@ -107,7 +114,7 @@ class DoxygenToRstRendererFactory(object):
                     domain_handler
                     )
 
-        if data_object.__class__ == compound.rstTypeSub:
+        if data_object.__class__ == compound.verbatimTypeSub:
 
             return Renderer(
                     self.rst_content_creator,
@@ -220,7 +227,7 @@ class DoxygenToRstRendererFactoryCreator(object):
             compound.docSect1TypeSub : compoundrenderer.DocSect1TypeSubRenderer,
             compound.docSimpleSectTypeSub : compoundrenderer.DocSimpleSectTypeSubRenderer,
             compound.docTitleTypeSub : compoundrenderer.DocTitleTypeSubRenderer,
-            compound.rstTypeSub : compoundrenderer.RstTypeSubRenderer,
+            compound.verbatimTypeSub : compoundrenderer.VerbatimTypeSubRenderer,
             compoundsuper.MixedContainer : compoundrenderer.MixedContainerRenderer,
             unicode : UnicodeRenderer,
             }
