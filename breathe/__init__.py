@@ -7,6 +7,7 @@ import sys
 import copy
 import fnmatch
 import re
+import textwrap
 
 from docutils.parsers import rst
 from docutils.statemachine import ViewList
@@ -429,7 +430,7 @@ def setup(app):
     c_domain_helper = CDomainHelper()
     domain_helpers = {"c" : c_domain_helper, "cpp" : cpp_domain_helper}
     domain_handler_factory_creator = DomainHandlerFactoryCreator(node_factory, domain_helpers)
-    rst_content_creator = RstContentCreator( ViewList )
+    rst_content_creator = RstContentCreator( ViewList, textwrap.dedent )
     renderer_factory_creator = DoxygenToRstRendererFactoryCreator(node_factory, parser_factory, domain_handler_factory_creator, rst_content_creator)
     builder_factory = BuilderFactory(RstBuilder, renderer_factory_creator)
 

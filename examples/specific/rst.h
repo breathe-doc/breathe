@@ -8,6 +8,9 @@ public:
     Inserting additional restructured text information.
 
     \rst
+
+    This is some funky non-xml compliant text: <& !><
+
     .. note::
         
        This restructured text has been handled correctly.
