@@ -562,7 +562,12 @@ class VerbatimTypeSubRenderer(Renderer):
     def render(self):
 
         if not self.data_object.text.strip().startswith("embed:rst"):
-            return []
+
+            # Remove trailing new lines. Purely subjective call from viewing results
+            text = self.data_object.text.rstrip()
+
+            # Handle has a preformatted text
+            return [self.node_factory.literal_block(text, text)]
 
         rst = self.content_creator(self.data_object.text)
 
@@ -582,6 +587,7 @@ class MixedContainerRenderer(Renderer):
 
         renderer = self.renderer_factory.create_renderer(self.data_object.getValue())
         return renderer.render()
+
 
 
 
