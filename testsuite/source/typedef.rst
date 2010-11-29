@@ -1,4 +1,6 @@
 
+.. _typedef-example:
+
 doxygentypedef Directive Example
 ================================
 
