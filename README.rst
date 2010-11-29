@@ -4,16 +4,11 @@ Breathe
 This is an extension to restructured text and Sphinx to be able to read and
 render the Doxygen xml output.
 
-Status
-------
+Documentation
+-------------
 
-This has passed proof of concept stage and has proved itself to be a useful
-tool. It is usable, but will generate a couple of warnings from time to time.
-
-For example usage, please see the `documentation
+Documentation is available in the ``testsuite`` folder and up in full `here
 <http://michaeljones.github.com/breathe>`_.
-
-There are no unittests.
 
 Running Testsuite
 -----------------
