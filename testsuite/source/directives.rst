@@ -1,13 +1,18 @@
 
-Directives
-==========
+Directives & Config Variables
+=============================
 
-These directives are a work in progress and may change in syntax as the project
-develops.
+.. toctree::
+   :hidden:
 
-In each case the ``project`` and ``path`` options have the following meaning.
+   function
+   struct
+   class
+   enum
+   typedef
 
-Where:
+The available directives are shown below. In each case the ``project`` and
+``path`` options have the following meaning:  
 
 ``project``
    Specifies which project, as defined in the breathe_projects config value,
@@ -16,7 +21,7 @@ Where:
 
 ``path``
    Directly specifies the path to the folder with the doxygen output. This
-   overrides the project and default project if they have bee specified.
+   overrides the project and default project if they have been specified.
 
 .. _doxygenindex:
 
@@ -33,6 +38,8 @@ referenced by it.
       :project: ...
       :path: ...
 
+
+
 doxygenfunction Directive
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -44,6 +51,8 @@ function name is required to be unique in the project.
    .. doxygenfunction:: <function name>
       :project: ...
       :path: ...
+
+Checkout the :ref:`example <function-example>` to see it in action.
 
 doxygenstruct Directive
 ~~~~~~~~~~~~~~~~~~~~~~~
@@ -57,6 +66,8 @@ name is required to be unique in the project.
       :project: ...
       :path: ...
 
+Checkout the :ref:`example <function-example>` to see it in action.
+
 doxygenenum Directive
 ~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -68,6 +79,8 @@ the same as the doxygenstruct directive.
    .. doxygenenum:: <enum name>
       :project: ...
       :path: ...
+
+Checkout the :ref:`example <enum-example>` to see it in action.
 
 doxygentypedef Directive
 ~~~~~~~~~~~~~~~~~~~~~~~~
@@ -81,6 +94,7 @@ the same as the doxygenstruct directive.
       :project: ...
       :path: ...
 
+Checkout the :ref:`example <typedef-example>` to see it in action.
 
 .. _doxygenclass:
 
@@ -96,30 +110,49 @@ the same as the doxygenstruct directive.
       :project: ...
       :path: ...
 
+Checkout the :ref:`example <class-example>` to see it in action.
 
 
 Config Values
 -------------
 
-**breathe_projects**
+.. confval:: breathe_projects
+
    This should be a dictionary in which the keys are project names and the values are
    paths to the folder containing the doxygen output for that project.
 
-**breathe_default_project**
-   This should match one of the keys in the **breathe_projects** dictionary and
+.. confval:: breathe_default_project
+
+   This should match one of the keys in the :confval:`breathe_projects` dictionary and
    indicates which project should be used when the project is not specified on
    the directive.
 
+.. confval:: breathe_domain_by_extension
 
-Example pages
--------------
+   Allows you to specify domains for particular files according to their
+   extension.
 
-.. toctree::
-   :maxdepth: 1
+   For example::
 
-   function
-   struct
-   typedef
-   enum
-   class
+      breathe_domain_by_extension = {
+              "h" : "cpp",
+              }
+
+.. confval:: breathe_domain_by_file_pattern
+
+   Allows you to specify domains for particular files by wildcard syntax. This
+   is checked after :confval:`breathe_domain_by_extension` and so will override
+   it when necessary.
+
+   For example::
+
+      breathe_domain_by_file_pattern = {
+              "\*/alias.h" : "c",
+              }
+
+   If you wanted all ``.h`` header files to be treated as being in the **cpp**
+   domain you might use the :confval:`breathe_domain_by_extension` example
+   above. But if you had one ``.h`` file that should be treated as being in the
+   **c** domain then you can override as above.
+
 

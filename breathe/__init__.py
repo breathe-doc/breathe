@@ -472,6 +472,8 @@ def setup(app):
     app.add_config_value("breathe_domain_by_extension", {}, True)
     app.add_config_value("breathe_domain_by_file_pattern", {}, True)
 
+    app.add_stylesheet("breathe.css")
+
     app.connect("builder-inited", directive_factory.get_config_values)
 
 

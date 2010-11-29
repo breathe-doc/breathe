@@ -1,4 +1,6 @@
 
+.. _struct-example:
+
 doxygenstruct Directive Example
 ===============================
 

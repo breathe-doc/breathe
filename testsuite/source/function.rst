@@ -1,4 +1,6 @@
 
+.. _function-example:
+
 doxygenfunction Directive Example
 =================================
 

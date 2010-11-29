@@ -1,4 +1,6 @@
 
+.. _enum-example:
+
 doxygenenum Directive Example
 ===============================
 

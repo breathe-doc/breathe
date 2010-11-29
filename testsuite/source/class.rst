@@ -1,4 +1,6 @@
 
+.. _class-example:
+
 doxygenclass Directive Example
 ==============================
 
