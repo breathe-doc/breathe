@@ -8,7 +8,8 @@ class Renderer(object):
             node_factory,
             state,
             document,
-            domain_handler
+            domain_handler,
+            target_handler
             ):
 
         self.project_info = project_info
@@ -18,5 +19,6 @@ class Renderer(object):
         self.state = state
         self.document = document
         self.domain_handler = domain_handler
+        self.target_handler = target_handler
 
 
