@@ -11,4 +11,5 @@ Test Pages
    domains
    embeddedrst
    inline 
+   members
 

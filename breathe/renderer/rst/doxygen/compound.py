@@ -54,8 +54,12 @@ class CompoundDefTypeSubRenderer(Renderer):
 
         # Add title and contents if found
         if section_nodelists.has_key(section):
-            nodelist.append(self.node_factory.emphasis(text=title))
-            nodelist.append(self.node_factory.block_quote("", *section_nodelists[section]))
+            nodes = section_nodelists[section]
+
+            if nodes:
+
+                nodelist.append(self.node_factory.emphasis(text=title))
+                nodelist.append(self.node_factory.block_quote("", *nodes))
 
     def render(self):
 
@@ -95,7 +99,7 @@ class SectionDefTypeSubRenderer(Renderer):
 
         # Get all the memberdef info
         for memberdef in self.data_object.memberdef:
-            renderer = self.renderer_factory.create_renderer(memberdef)
+            renderer = self.renderer_factory.create_member_renderer(memberdef)
             defs.extend(renderer.render())
 
         if defs:
@@ -109,15 +113,7 @@ class MemberDefTypeSubRenderer(Renderer):
 
     def create_target(self, refid):
 
-        target = self.node_factory.target(refid=refid, ids=[refid], names=[refid])
-
-        # Tell the document about our target
-        try:
-            self.document.note_explicit_target(target)
-        except Exception, e:
-            print "Failed to register id: %s. It is probably a duplicate." % refid
-
-        return target
+        return self.target_handler.create_target(refid)
 
     def create_domain_id(self):
 
@@ -163,8 +159,9 @@ class MemberDefTypeSubRenderer(Renderer):
         domain_id = self.create_domain_id()
 
         title = self.title()
-        title.insert(0, self.create_target(refid))
-        term = self.node_factory.term("","", ids=[domain_id,refid], *title )
+        target = self.create_target(refid)
+        target.extend(title)
+        term = self.node_factory.term("","", ids=[domain_id,refid], *target )
         definition = self.node_factory.definition("", *self.description())
         entry = self.node_factory.definition_list_item("",term, definition)
 
@@ -399,25 +396,10 @@ class DocMarkupTypeSubRenderer(Renderer):
     def __init__(
             self,
             creator,
-            project_info,
-            data_object,
-            renderer_factory,
-            node_factory,
-            state,
-            document,
-            domain_handler
+            *args
             ):
 
-        Renderer.__init__(
-                self,
-                project_info,
-                data_object,
-                renderer_factory,
-                node_factory,
-                state,
-                document,
-                domain_handler
-                )
+        Renderer.__init__( self, *args )
 
         self.creator = creator
 

@@ -25,12 +25,7 @@ class CompoundTypeSubRenderer(Renderer):
     def render(self):
          
         refid = "%s%s" % (self.project_info.name(), self.data_object.refid)
-        target = self.node_factory.target(refid=refid, ids=[refid], names=[refid])
-
-        # Tell the document about our target
-        self.document.note_explicit_target(target)
-
-        nodelist = [target]
+        nodelist = self.target_handler.create_target(refid)
 
         # Set up the title and a reference for it (refid)
         kind = self.node_factory.emphasis(text=self.data_object.kind)
