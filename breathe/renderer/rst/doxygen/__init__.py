@@ -191,7 +191,16 @@ class DoxygenToRstRendererFactory(object):
 
         name = data_object.name
 
-        if self.member_filter.allow(name):
+        if self.member_filter.allow_member(name):
+            return self.create_renderer(data_object)
+
+        return NullRenderer()
+
+    def create_section_renderer(self, data_object):
+
+        name = data_object.kind
+
+        if self.member_filter.allow_section(name):
             return self.create_renderer(data_object)
 
         return NullRenderer()

@@ -17,7 +17,7 @@ from breathe.finder import FinderFactory, NoMatchesError, MultipleMatchesError
 from breathe.parser import DoxygenParserFactory, DoxygenIndexParser, ParserError
 from breathe.renderer.rst.doxygen import DoxygenToRstRendererFactoryCreator, RstContentCreator
 from breathe.renderer.rst.doxygen.domain import DomainHandlerFactoryCreator, CppDomainHelper, CDomainHelper
-from breathe.renderer.rst.doxygen.filter import MemberFilterFactory
+from breathe.renderer.rst.doxygen.filter import FilterFactory, GlobFactory
 from breathe.renderer.rst.doxygen.target import TargetHandlerFactory
 from breathe.finder.doxygen import DoxygenItemFinderFactoryCreator, ItemMatcherFactory
 
@@ -514,7 +514,8 @@ def setup(app):
     renderer_factory_creator = DoxygenToRstRendererFactoryCreator(node_factory, parser_factory, domain_handler_factory_creator, rst_content_creator)
 
     project_info_factory = ProjectInfoFactory(fnmatch.fnmatch)
-    member_filter_factory = MemberFilterFactory()
+    glob_factory = GlobFactory(fnmatch.fnmatch)
+    member_filter_factory = FilterFactory(glob_factory)
     target_handler_factory = TargetHandlerFactory(node_factory)
 
     directive_factory = DoxygenDirectiveFactory(
