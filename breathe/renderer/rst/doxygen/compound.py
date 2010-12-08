@@ -68,7 +68,7 @@ class CompoundDefTypeSubRenderer(Renderer):
         # Get all sub sections
         for sectiondef in self.data_object.sectiondef:
             kind = sectiondef.kind
-            renderer = self.renderer_factory.create_renderer(sectiondef)
+            renderer = self.renderer_factory.create_section_renderer(sectiondef)
             subnodes = renderer.render()
             section_nodelists[kind] = subnodes
 
