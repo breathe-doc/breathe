@@ -411,23 +411,26 @@ class DocParaTypeSubRenderer(Renderer):
     def render(self):
 
         nodelist = []
-        for entry in self.data_object.parameterlist:
+        for item in self.data_object.content:              # Description
+            renderer = self.renderer_factory.create_renderer(item)
+            nodelist.extend(renderer.render())
+
+        field_nodes = []
+        for entry in self.data_object.parameterlist:        # Parameters/Exceptions
             renderer = self.renderer_factory.create_renderer(entry)
-            nodelist.extend(renderer.render())
+            field_nodes.extend(renderer.render())  # Field lists
 
-        for item in self.data_object.content:
+        for item in self.data_object.simplesects:           # Returns
             renderer = self.renderer_factory.create_renderer(item)
-            nodelist.extend(renderer.render())
+            field_nodes.extend(renderer.render())
 
-        def_list_items = []
-        for item in self.data_object.simplesects:
-            renderer = self.renderer_factory.create_renderer(item)
-            def_list_items.extend(renderer.render())
-
-        if def_list_items:
-            nodelist.append(self.node_factory.definition_list("", *def_list_items))
+        if field_nodes:
+            field_list = self.node_factory.field_list()
+            for node in field_nodes:
+                field_list += node;
+            nodelist.extend([field_list])
         
-        return [self.node_factory.paragraph("", "", *nodelist)]
+        return nodelist
 
 class DocMarkupTypeSubRenderer(Renderer):
 
@@ -453,6 +456,7 @@ class DocMarkupTypeSubRenderer(Renderer):
 
 
 class DocParamListTypeSubRenderer(Renderer):
+    """ Parameter/Exectpion documentation """
 
     lookup = {
             "param" : "Parameters",
@@ -468,15 +472,19 @@ class DocParamListTypeSubRenderer(Renderer):
             renderer = self.renderer_factory.create_renderer(entry)
             nodelist.extend(renderer.render())
 
-        name = self.lookup[self.data_object.kind]
-        name = self.node_factory.emphasis("", self.node_factory.Text(name))
-        title = self.node_factory.paragraph("", "", name)
-
-        return [title,self.node_factory.bullet_list("", classes=["breatheparameterlist"], *nodelist)]
+        # Fild list entry
+        nodelist_list = self.node_factory.bullet_list("", classes=["breatheparameterlist"], *nodelist) 
+        
+        field_name = self.lookup[self.data_object.kind]
+        field_name = self.node_factory.field_name("", field_name)
+        field_body = self.node_factory.field_body('', nodelist_list)
+        
+        return [self.node_factory.field('', field_name, field_body)]
 
 
 
 class DocParamListItemSubRenderer(Renderer):
+    """ Paramter Description Renderer  """
 
     def render(self):
 
@@ -498,6 +506,7 @@ class DocParamListItemSubRenderer(Renderer):
         return [self.node_factory.list_item("", term, separator, *nodelist)]
 
 class DocParamNameListSubRenderer(Renderer):
+    """ Parameter Name Renderer """
 
     def render(self):
 
@@ -527,6 +536,7 @@ class DocSect1TypeSubRenderer(Renderer):
 
 
 class DocSimpleSectTypeSubRenderer(Renderer):
+    """ Other Type documentation such as Warning, Note, Retuns..."""
 
     def title(self):
 
@@ -537,16 +547,15 @@ class DocSimpleSectTypeSubRenderer(Renderer):
 
     def render(self):
 
-        term = self.node_factory.term("","", *self.title())
-
         nodelist = []
         for item in self.data_object.para:
             renderer = self.renderer_factory.create_renderer(item)
             nodelist.append(self.node_factory.paragraph("", "", *renderer.render()))
 
-        definition = self.node_factory.definition("", *nodelist)
+        field_name = self.node_factory.field_name("", self.node_factory.Text(self.data_object.kind.capitalize()))
+        field_body = self.node_factory.field_body('', *nodelist)
 
-        return [self.node_factory.definition_list_item("", term, definition)]
+        return [self.node_factory.field('', field_name, field_body)]
 
 
 class ParDocSimpleSectTypeSubRenderer(DocSimpleSectTypeSubRenderer):
