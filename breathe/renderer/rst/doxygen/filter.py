@@ -141,6 +141,7 @@ class RenderingFilter(object):
             context - Context within caller method
         '''
         
+        return
         message = '%s: %s' % (renderer.__class__.__name__, callee)
         if context:
             message = "%s@%s" % (message, context)
