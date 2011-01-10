@@ -54,7 +54,8 @@ class DoxygenToRstRendererFactory(object):
             domain_handler,
             rst_content_creator,
             member_filter,
-            target_handler
+            target_handler,
+            rendering_filter
             ):
 
         self.node_factory = node_factory
@@ -67,10 +68,9 @@ class DoxygenToRstRendererFactory(object):
         self.rst_content_creator = rst_content_creator
         self.member_filter = member_filter
         self.target_handler = target_handler
+        self.rendering_filter = rendering_filter
 
     def create_renderer(self, data_object):
-
-        renderer_factory = self
 
         location = ""
 
@@ -124,7 +124,8 @@ class DoxygenToRstRendererFactory(object):
                     self.state,
                     self.document,
                     domain_handler,
-                    self.target_handler
+                    self.target_handler,
+                    self.rendering_filter
                     )
 
         if data_object.__class__ == compound.verbatimTypeSub:
@@ -138,7 +139,8 @@ class DoxygenToRstRendererFactory(object):
                     self.state,
                     self.document,
                     domain_handler,
-                    self.target_handler
+                    self.target_handler,
+                    self.rendering_filter
                     )
 
         if data_object.__class__ == compound.memberdefTypeSub:
@@ -164,7 +166,8 @@ class DoxygenToRstRendererFactory(object):
                 self.state,
                 self.document,
                 domain_handler,
-                self.target_handler
+                self.target_handler,
+                self.rendering_filter
                 )
 
     def create_domain_renderer_factory(self, location):
@@ -184,7 +187,8 @@ class DoxygenToRstRendererFactory(object):
                     domain_handler,
                     self.rst_content_creator,
                     self.member_filter,
-                    self.target_handler
+                    self.target_handler,
+                    self.rendering_filter
                     )
 
     def create_member_renderer(self, data_object):
@@ -240,7 +244,7 @@ class DoxygenToRstRendererFactoryCreator(object):
         self.domain_handler_factory_creator = domain_handler_factory_creator
         self.rst_content_creator = rst_content_creator
 
-    def create_factory(self, project_info, state, document, member_filter, target_handler):
+    def create_factory(self, project_info, state, document, member_filter, target_handler, rendering_filter):
 
         renderers = {
             index.DoxygenTypeSub : indexrenderer.DoxygenTypeSubRenderer,
@@ -286,7 +290,8 @@ class DoxygenToRstRendererFactoryCreator(object):
                 domain_handler,
                 self.rst_content_creator,
                 member_filter,
-                target_handler
+                target_handler,
+                rendering_filter
                 )
 
 

@@ -5,11 +5,7 @@ Generated Mon Feb  9 19:08:05 2009 by generateDS.py.
 """
 
 from xml.dom import minidom
-from docutils import nodes
 
-import os
-import sys
-import breathe.parser.doxygen.compound
 
 import indexsuper as supermod
 
