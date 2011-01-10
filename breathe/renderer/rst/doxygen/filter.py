@@ -1,3 +1,4 @@
+from breathe.renderer.rst.doxygen.compound import CompoundDefTypeSubRenderer, FuncMemberDefTypeSubRenderer, EnumMemberDefTypeSubRenderer, VariableMemberDefTypeSubRenderer
 
 class NamedFilter(object):
 
@@ -99,3 +100,76 @@ class FilterFactory(object):
 
         return CombinedFilter(OpenFilter(), OpenFilter())
 
+
+
+# Rendering filters
+# -----------------
+
+
+class RenderingFilter(object):
+    
+    filter_rules = []
+    
+    def match_rule(self, renderer, callee='', context=''):
+        ''' Runs through all rules, returns False upon match.
+        
+            renderer - Renderer instance
+            callee  - Caller method
+            context - Context within caller method
+        '''
+        
+        for rule in self.filter_rules:
+            if rule[0] and not isinstance(renderer, rule[0]):
+                continue
+            if rule[1] and (rule[1] != callee):
+                continue
+            if rule[2] and (rule[2] != context):
+                continue
+            
+            self.print_trace(renderer, callee, context, False)
+            return False
+        
+        # None of the rules matched
+        self.print_trace(renderer, callee, context, True)
+        return True
+    
+    def print_trace(self, renderer, callee, context, status):
+        ''' Prints a stack trace of matches
+        
+            renderer - Renderer instance
+            callee  - Caller method
+            context - Context within caller method
+        '''
+        
+        message = '%s: %s' % (renderer.__class__.__name__, callee)
+        if context:
+            message = "%s@%s" % (message, context)
+        if not status:
+            print '  [!!]  %s' % message
+        print ' [OK]  %s' % message
+    
+    def continue_rendering(self, renderer, callee='', context=''):
+        return self.match_rule(renderer, callee, context)
+
+class NullRenderingFilter(RenderingFilter):
+    def continue_rendering(self, renderer, callee='', context=''):
+        return True
+
+class OutlineRenderingFilter(RenderingFilter):
+    ''' Filters out all descriptions, in order to display a compact outline '''
+    
+    filter_rules = [
+        (CompoundDefTypeSubRenderer,       'render',      'description'),
+        (FuncMemberDefTypeSubRenderer,     'description', ''),
+        (EnumMemberDefTypeSubRenderer,     'description', ''),
+        (VariableMemberDefTypeSubRenderer, 'description', ''),
+        ]
+
+class RenderingFilterCollection(RenderingFilter):
+    pass
+
+class RenderingFilterFactory(object):
+    def create_filter(self, options):
+        if options.has_key('outline'):
+            return OutlineRenderingFilter()
+        return NullRenderingFilter()
