@@ -13,17 +13,12 @@ Documentation is available in the ``testsuite`` folder and up in full `here
 Running Testsuite
 -----------------
 
-This process assumes the ``sphinx-build`` script is on your path. If it is not,
-then either edit ``testsuite/Makefile`` to point at it or create a link to it in
-the ``testsuite`` directory.
+Run ``make`` in the root of the project. 
 
-First run ``make`` for each folder in the examples directory, then::
+This will run doxygen over the example code and then run the Breathe
+documentation/testsuite. View the results at::
 
-   cd testsuite
-   make html
-
-Then view the resulting html with your browser of choice.
-
+   testsuite/build/html/index.html
 
 Requirements
 ------------
@@ -32,7 +27,7 @@ Development is currently done with:
  
 - Python 2.5
 - Docutils 0.7
-- Sphinx 1.0.4
+- Sphinx 1.0.7
 - Doxygen 1.7.2
 
 Doxygen 1.5.1 seems to produce xml with repeated sections which causes Breathe
