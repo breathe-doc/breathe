@@ -90,7 +90,7 @@ class FilterFactory(object):
                     OpenFilter()
                     )
 
-        # Matches sphinx-autodoc behaviour
+        # Matches sphinx-autodoc behaviour of comma separated values
         members = set([x.strip() for x in text.split(",")])
 
         return CombinedFilter(OpenFilter(), NamedFilter(members))

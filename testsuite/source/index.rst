@@ -60,6 +60,7 @@ Then in your Sphinx documentation, you add something like this::
 
    .. doxygenclass:: Nutshell
       :project: nutshell
+      :members:
 
 With a ``conf.py`` setting like this::
 
@@ -73,6 +74,7 @@ And you get something like this:
 
    .. doxygenclass:: Nutshell
       :project: nutshell
+      :members:
 
 ----
 
