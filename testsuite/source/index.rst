@@ -35,6 +35,7 @@ Contents
 
    quickstart
    directives
+   markups
    contributing
    codeguide
    testpages

@@ -16,15 +16,25 @@ public:
        This restructured text has been handled correctly.
     \endrst
 
-    \verbatim
     This is just a standard verbatim block with code:
 
+    \verbatim
         child = 0;
         while( child = parent->IterateChildren( child ) )
     \endverbatim
 
     */
     virtual void function() const = 0;
+
+    /*!
+    Inserting additional restructured text information.
+    \verbatim embed:rst
+    .. note::
+
+       This restructured text has been handled correctly.
+    \endverbatim
+    */
+    virtual void rawVerbatim() const = 0;
 
     //! Brief desc
     virtual void testFunction() const {};
