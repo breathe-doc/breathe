@@ -456,20 +456,20 @@ class DocParaTypeSubRenderer(Renderer):
             field_nodes = []
             for entry in self.data_object.parameterlist:        # Parameters/Exceptions
                 renderer = self.renderer_factory.create_renderer(entry)
-                field_nodes.extend(renderer.render())  # Field lists
+                field_nodes.extend(renderer.render())
 
             for item in self.data_object.simplesects:           # Returns
                 renderer = self.renderer_factory.create_renderer(item)
                 field_nodes.extend(renderer.render())
 
             if field_nodes:
-                field_list = self.node_factory.field_list()
-                for node in field_nodes:
-                    field_list += node;
-                nodelist.extend([field_list])
-        
-            return nodelist
+                field_list = self.node_factory.field_list("", *field_nodes)
+                nodelist.append(field_list)
+
+            return [self.node_factory.paragraph("", "", *nodelist)]
+
         return []
+
 
 class DocMarkupTypeSubRenderer(Renderer):
 

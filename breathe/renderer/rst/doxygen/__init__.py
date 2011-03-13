@@ -31,7 +31,14 @@ class UnicodeRenderer(Renderer):
 
     def render(self):
 
-        return [self.node_factory.Text(self.data_object)]
+        # Skip any nodes that are pure whitespace
+        # Probably need a better way to do this as currently we're only doing
+        # it skip whitespace between higher-level nodes, but this will also
+        # skip any pure whitespace entries in actual content nodes
+        if self.data_object.strip():
+            return [self.node_factory.Text(self.data_object)]
+        else:
+            return []
 
 class NullRenderer(Renderer):
 
