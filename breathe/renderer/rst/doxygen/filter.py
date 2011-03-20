@@ -1,53 +1,108 @@
-from breathe.renderer.rst.doxygen.compound import CompoundDefTypeSubRenderer, FuncMemberDefTypeSubRenderer, EnumMemberDefTypeSubRenderer, VariableMemberDefTypeSubRenderer
 
-class NamedFilter(object):
+class NameAccessor(object):
 
-    def __init__(self, members):
+    def __call__(self, data_object):
+        return data_object.name
 
+class NodeNameAccessor(object):
+
+    def __call__(self, data_object):
+        try:
+            return data_object.node_name
+        except AttributeError, e:
+
+            # Horrible hack to silence errors on filtering unicode objects
+            # until we fix the parsing
+            if type(data_object) == unicode:
+                return "unicode"
+            else:
+                raise e
+
+class KindAccessor(object):
+
+    def __call__(self, data_object):
+        return data_object.kind
+
+class NameFilter(object):
+
+    def __init__(self, accessor, members):
+
+        self.accessor = accessor
         self.members = members
 
-    def allow(self, name):
+    def allow(self, parent_name, data_object):
+
+        name = self.accessor(data_object)
 
         return name in self.members
 
 class GlobFilter(object):
 
-    def __init__(self, glob):
+    def __init__(self, accessor, glob):
 
+        self.accessor = accessor
         self.glob = glob
 
-    def allow(self, name):
+    def allow(self, parent_name, data_object):
 
-        return self.glob.match(name)
+        text = self.accessor(data_object)
+        return self.glob.match(text)
 
 
 class OpenFilter(object):
 
-    def allow(self, name):
+    def allow(self, parent_name, data_object):
 
         return True
 
 class ClosedFilter(object):
 
-    def allow(self, name):
+    def allow(self, parent_name, data_object):
 
         return False
 
-class CombinedFilter(object):
+class ParentFilter(object):
 
-    def __init__(self, section_filter, member_filter):
+    def __init__(self, parent_name):
 
-        self.section_filter = section_filter
-        self.member_filter = member_filter
+        self.parent_name = parent_name
 
-    def allow_section(self, name):
+    def allow(self, parent_name, data_object):
 
-        return self.section_filter.allow(name)
+        return parent_name == self.parent_name
 
-    def allow_member(self, name):
+class NotFilter(object):
 
-        return self.member_filter.allow(name)
+    def __init__(self, child_filter):
+        self.child_filter = child_filter
 
+    def allow(self, parent_name, data_object):
+
+        return not self.child_filter.allow(parent_name, data_object)
+
+class AndFilter(object):
+
+    def __init__(self, first_filter, second_filter):
+
+        self.first_filter = first_filter
+        self.second_filter = second_filter
+
+    def allow(self, parent_name, data_object):
+
+        return self.first_filter.allow(parent_name, data_object) \
+                and self.second_filter.allow(parent_name, data_object)
+
+class OrFilter(object):
+
+    def __init__(self, first_filter, second_filter):
+
+        self.first_filter = first_filter
+        self.second_filter = second_filter
+
+    def allow(self, parent_name, data_object):
+
+        return self.first_filter.allow(parent_name, data_object) \
+                or self.second_filter.allow(parent_name, data_object)
 
 class Glob(object):
 
@@ -59,7 +114,6 @@ class Glob(object):
     def match(self, name):
 
         return self.method(name, self.pattern)
-
 
 class GlobFactory(object):
 
@@ -80,96 +134,43 @@ class FilterFactory(object):
 
     def create_filter(self, options):
 
+        return AndFilter(
+                self.create_members_filter(options),
+                self.create_outline_filter(options),
+                )
+
+    def create_members_filter(self, options):
+
         try:
             text = options["members"]
         except KeyError:
-            return CombinedFilter(ClosedFilter(), ClosedFilter())
+            return OrFilter(
+                    NotFilter(ParentFilter("sectiondef")),
+                    NotFilter(NameFilter(NodeNameAccessor(),["memberdef"]))
+                    )
 
         if not text.strip():
-            return CombinedFilter(
-                    GlobFilter(self.globber_factory.create("public*")),
-                    OpenFilter()
+            return OrFilter(
+                    NotFilter(NameFilter(NodeNameAccessor(), ["sectiondef"])),
+                    GlobFilter(KindAccessor(), self.globber_factory.create("public*"))
                     )
 
         # Matches sphinx-autodoc behaviour of comma separated values
         members = set([x.strip() for x in text.split(",")])
 
-        return CombinedFilter(OpenFilter(), NamedFilter(members))
+        return OrFilter(
+                NotFilter(ParentFilter("sectiondef")),
+                NameFilter(NameAccessor(), members)
+                )
+
+    def create_outline_filter(self, options):
+
+        if options.has_key("outline"):
+            return NotFilter(NameFilter(NodeNameAccessor(), ["description"]))
+        else:
+            return OpenFilter()
 
     def create_open_filter(self):
 
-        return CombinedFilter(OpenFilter(), OpenFilter())
+        return OpenFilter()
 
-
-
-# Rendering filters
-# -----------------
-
-
-class RenderingFilter(object):
-
-    filter_rules = []
-
-    def match_rule(self, renderer, callee='', context=''):
-        ''' Runs through all rules, returns False upon match.
-
-            renderer - Renderer instance
-            callee  - Caller method
-            context - Context within caller method
-        '''
-
-        for rule in self.filter_rules:
-            if rule[0] and not isinstance(renderer, rule[0]):
-                continue
-            if rule[1] and (rule[1] != callee):
-                continue
-            if rule[2] and (rule[2] != context):
-                continue
-
-            self.print_trace(renderer, callee, context, False)
-            return False
-
-        # None of the rules matched
-        self.print_trace(renderer, callee, context, True)
-        return True
-
-    def print_trace(self, renderer, callee, context, status):
-        ''' Prints a stack trace of matches
-
-            renderer - Renderer instance
-            callee  - Caller method
-            context - Context within caller method
-        '''
-
-        message = '%s: %s' % (renderer.__class__.__name__, callee)
-        if context:
-            message = "%s@%s" % (message, context)
-        if not status:
-            print '  [!!]  %s' % message
-        print ' [OK]  %s' % message
-
-    def continue_rendering(self, renderer, callee='', context=''):
-        return self.match_rule(renderer, callee, context)
-
-class NullRenderingFilter(RenderingFilter):
-    def continue_rendering(self, renderer, callee='', context=''):
-        return True
-
-class OutlineRenderingFilter(RenderingFilter):
-    ''' Filters out all descriptions, in order to display a compact outline '''
-
-    filter_rules = [
-        (CompoundDefTypeSubRenderer,       'render',      'description'),
-        (FuncMemberDefTypeSubRenderer,     'description', ''),
-        (EnumMemberDefTypeSubRenderer,     'description', ''),
-        (VariableMemberDefTypeSubRenderer, 'description', ''),
-        ]
-
-class RenderingFilterCollection(RenderingFilter):
-    pass
-
-class RenderingFilterFactory(object):
-    def create_filter(self, options):
-        if options.has_key('outline'):
-            return OutlineRenderingFilter()
-        return NullRenderingFilter()

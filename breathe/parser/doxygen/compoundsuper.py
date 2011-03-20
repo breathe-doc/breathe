@@ -103,6 +103,9 @@ def quote_python(inStr):
 
 
 class MixedContainer:
+
+    node_name = "mixedcontainer"
+
     # Constants for category:
     CategoryNone = 0
     CategoryText = 1

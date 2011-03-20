@@ -1,4 +1,3 @@
-import inspect
 
 class Renderer(object):
 
@@ -10,8 +9,7 @@ class Renderer(object):
             state,
             document,
             domain_handler,
-            target_handler,
-            rendering_filter,
+            target_handler
             ):
 
         self.project_info = project_info
@@ -22,10 +20,5 @@ class Renderer(object):
         self.document = document
         self.domain_handler = domain_handler
         self.target_handler = target_handler
-        self.rendering_filter = rendering_filter
 
-    def render(self):
-        return []
 
-    def continue_rendering(self, context=''):
-        return self.rendering_filter.continue_rendering(self, inspect.stack()[1][3], context)

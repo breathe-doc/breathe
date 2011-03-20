@@ -4,8 +4,23 @@
 doxygenclass Directive Example
 ==============================
 
-Working Example
----------------
+Example without Members
+-----------------------
+
+This should work::
+
+   .. doxygenclass:: Nutshell
+      :project: nutshell
+
+It produces this output:
+
+.. doxygenclass:: Nutshell
+   :project: nutshell
+   :no-link:
+
+
+Example with Members
+--------------------
 
 This should work::
 
@@ -18,6 +33,8 @@ It produces this output:
 .. doxygenclass:: Nutshell
    :project: nutshell
    :members:
+   :no-link:
+
 
 Working Example with Specific Members
 -------------------------------------
@@ -27,7 +44,6 @@ This should work::
    .. doxygenclass:: Nutshell
       :project: nutshell
       :members: crack, isCracked
-      :no-link:
 
 It produces this output:
 
@@ -35,6 +51,26 @@ It produces this output:
    :project: nutshell
    :members: crack, isCracked
    :no-link:
+
+
+Example as Outline
+------------------
+
+This should work::
+
+   .. doxygenclass:: Nutshell
+      :project: nutshell
+      :outline:
+      :members:
+
+It produces this output:
+
+.. doxygenclass:: Nutshell
+   :project: nutshell
+   :outline:
+   :members:
+   :no-link:
+
 
 Failing Example
 ---------------
@@ -48,4 +84,5 @@ This intentionally fails::
 It produces the following warning message:
 
 .. warning:: doxygenclass: Cannot find class "made_up_class" in doxygen xml output
+
 
