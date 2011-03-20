@@ -187,4 +187,3 @@ class DomainHandlerFactoryCreator(object):
 
         return DomainHandlerFactory(project_info, self.node_factory, document, env, self.helpers)
 
-

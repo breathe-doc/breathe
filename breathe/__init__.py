@@ -16,8 +16,9 @@ from sphinx.domains.cpp import DefinitionParser
 from breathe.finder import FinderFactory, NoMatchesError, MultipleMatchesError
 from breathe.parser import DoxygenParserFactory, DoxygenIndexParser, ParserError
 from breathe.renderer.rst.doxygen import DoxygenToRstRendererFactoryCreator, RstContentCreator
-from breathe.renderer.rst.doxygen.domain import DomainHandlerFactoryCreator, CppDomainHelper, CDomainHelper
-from breathe.renderer.rst.doxygen.filter import FilterFactory, GlobFactory, RenderingFilterFactory
+from breathe.renderer.rst.doxygen.domain import DomainHandlerFactoryCreator, NullDomainHandler
+from breathe.renderer.rst.doxygen.domain import CppDomainHelper, CDomainHelper
+from breathe.renderer.rst.doxygen.filter import FilterFactory, GlobFactory
 from breathe.renderer.rst.doxygen.target import TargetHandlerFactory
 from breathe.finder.doxygen import DoxygenItemFinderFactoryCreator, ItemMatcherFactory
 
@@ -36,9 +37,8 @@ class BaseDirective(rst.Directive):
             finder_factory,
             matcher_factory,
             project_info_factory,
-            member_filter_factory,
+            filter_factory,
             target_handler_factory,
-            rendering_filter_factory,
             *args
             ):
         rst.Directive.__init__(self, *args)
@@ -47,9 +47,8 @@ class BaseDirective(rst.Directive):
         self.finder_factory = finder_factory
         self.matcher_factory = matcher_factory
         self.project_info_factory = project_info_factory
-        self.member_filter_factory = member_filter_factory
+        self.filter_factory = filter_factory
         self.target_handler_factory = target_handler_factory
-        self.rendering_filter_factory = rendering_filter_factory
 
 
 # Directives
@@ -80,15 +79,15 @@ class DoxygenIndexDirective(BaseDirective):
         data_object = finder.root()
 
         target_handler = self.target_handler_factory.create(self.options, project_info, self.state.document)
-        member_filter = self.member_filter_factory.create_open_filter()
-        rendering_filter = self.rendering_filter_factory.create_filter(self.options)
+        filter_ = self.filter_factory.create_open_filter()
 
-        renderer_factory = self.renderer_factory_creator.create_factory(project_info,
-                                                                        self.state,
-                                                                        self.state.document,
-                                                                        member_filter,
-                                                                        target_handler,
-                                                                        rendering_filter)
+        renderer_factory = self.renderer_factory_creator.create_factory(
+                project_info,
+                self.state,
+                self.state.document,
+                filter_,
+                target_handler
+                )
         object_renderer = renderer_factory.create_renderer(data_object)
         nodes = object_renderer.render()
 
@@ -132,16 +131,14 @@ class DoxygenFunctionDirective(BaseDirective):
                     self.state.document.reporter.warning( warning, line=self.lineno) ]
 
         target_handler = self.target_handler_factory.create(self.options, project_info, self.state.document)
-        member_filter = self.member_filter_factory.create_open_filter()
-        rendering_filter = self.rendering_filter_factory.create_filter(self.options)
+        filter_ = self.filter_factory.create_open_filter()
 
         renderer_factory = self.renderer_factory_creator.create_factory(
                 project_info,
                 self.state,
                 self.state.document,
-                member_filter,
+                filter_,
                 target_handler,
-                rendering_filter
                 )
         object_renderer = renderer_factory.create_renderer(data_object)
         nodes = object_renderer.render()
@@ -189,16 +186,14 @@ class DoxygenClassDirective(BaseDirective):
                     self.state.document.reporter.warning( warning, line=self.lineno) ]
 
         target_handler = self.target_handler_factory.create(self.options, project_info, self.state.document)
-        member_filter = self.member_filter_factory.create_filter(self.options)
-        rendering_filter = self.rendering_filter_factory.create_filter(self.options)
+        filter_ = self.filter_factory.create_filter(self.options)
 
         renderer_factory = self.renderer_factory_creator.create_factory(
                 project_info,
                 self.state,
                 self.state.document,
-                member_filter,
+                filter_,
                 target_handler,
-                rendering_filter
                 )
         object_renderer = renderer_factory.create_renderer(data_object)
 
@@ -237,16 +232,13 @@ class DoxygenBaseDirective(BaseDirective):
                     self.state.document.reporter.warning( warning, line=self.lineno) ]
 
         target_handler = self.target_handler_factory.create(self.options, project_info, self.state.document)
-        member_filter = self.member_filter_factory.create_open_filter()
-        rendering_filter = self.rendering_filter_factory.create_filter(self.options)
-
+        filter_ = self.filter_factory.create_open_filter()
         renderer_factory = self.renderer_factory_creator.create_factory(
                 project_info,
                 self.state,
                 self.state.document,
-                member_filter,
+                filter_,
                 target_handler,
-                rendering_filter
                 )
         object_renderer = renderer_factory.create_renderer(data_object)
 
@@ -459,17 +451,15 @@ class DoxygenDirectiveFactory(object):
             finder_factory,
             matcher_factory,
             project_info_factory,
-            member_filter_factory,
-            target_handler_factory,
-            rendering_filter_factory
+            filter_factory,
+            target_handler_factory
             ):
         self.renderer_factory_creator = renderer_factory_creator
         self.finder_factory = finder_factory
         self.matcher_factory = matcher_factory
         self.project_info_factory = project_info_factory
-        self.member_filter_factory = member_filter_factory
+        self.filter_factory = filter_factory
         self.target_handler_factory = target_handler_factory
-        self.rendering_filter_factory = rendering_filter_factory
 
     def create_index_directive_container(self):
         return self.create_directive_container("doxygenindex")
@@ -497,9 +487,8 @@ class DoxygenDirectiveFactory(object):
                 self.finder_factory,
                 self.matcher_factory,
                 self.project_info_factory,
-                self.member_filter_factory,
-                self.target_handler_factory,
-                self.rendering_filter_factory
+                self.filter_factory,
+                self.target_handler_factory
                 )
 
     def get_config_values(self, app):
@@ -549,22 +538,27 @@ def setup(app):
     domain_handler_factory_creator = DomainHandlerFactoryCreator(node_factory, domain_helpers)
 
     rst_content_creator = RstContentCreator( ViewList, textwrap.dedent )
-    renderer_factory_creator = DoxygenToRstRendererFactoryCreator(node_factory, parser_factory, domain_handler_factory_creator, rst_content_creator)
+    default_domain_handler = NullDomainHandler()
+    renderer_factory_creator = DoxygenToRstRendererFactoryCreator(
+            node_factory,
+            parser_factory,
+            default_domain_handler,
+            domain_handler_factory_creator,
+            rst_content_creator
+            )
 
     project_info_factory = ProjectInfoFactory(fnmatch.fnmatch)
     glob_factory = GlobFactory(fnmatch.fnmatch)
-    member_filter_factory = FilterFactory(glob_factory)
+    filter_factory = FilterFactory(glob_factory)
     target_handler_factory = TargetHandlerFactory(node_factory)
-    rendering_filter_factory = RenderingFilterFactory()
 
     directive_factory = DoxygenDirectiveFactory(
             renderer_factory_creator,
             finder_factory,
             matcher_factory,
             project_info_factory,
-            member_filter_factory,
-            target_handler_factory,
-            rendering_filter_factory
+            filter_factory,
+            target_handler_factory
             )
 
     app.add_directive(
