@@ -63,7 +63,6 @@ class DoxygenIndexDirective(BaseDirective):
             "path" : unchanged_required,
             "project" : unchanged_required,
             "outline": flag,
-            "display" : unchanged,
             }
     has_content = False
 
@@ -103,7 +102,6 @@ class DoxygenFunctionDirective(BaseDirective):
     option_spec = {
             "path" : unchanged_required,
             "project" : unchanged_required,
-            "display" : unchanged,
             }
     has_content = False
 
@@ -137,12 +135,14 @@ class DoxygenFunctionDirective(BaseDirective):
         member_filter = self.member_filter_factory.create_open_filter()
         rendering_filter = self.rendering_filter_factory.create_filter(self.options)
 
-        renderer_factory = self.renderer_factory_creator.create_factory(project_info,
-																		self.state,
-																		self.state.document,
-																		member_filter,
-																		target_handler,
-																		rendering_filter)
+        renderer_factory = self.renderer_factory_creator.create_factory(
+                project_info,
+                self.state,
+                self.state.document,
+                member_filter,
+                target_handler,
+                rendering_filter
+                )
         object_renderer = renderer_factory.create_renderer(data_object)
         nodes = object_renderer.render()
 
@@ -162,7 +162,6 @@ class DoxygenClassDirective(BaseDirective):
             "members" : unchanged,
             "no-link" : flag,
             "outline": flag,
-            "display" : unchanged,
             }
     has_content = False
 
@@ -193,12 +192,14 @@ class DoxygenClassDirective(BaseDirective):
         member_filter = self.member_filter_factory.create_filter(self.options)
         rendering_filter = self.rendering_filter_factory.create_filter(self.options)
 
-        renderer_factory = self.renderer_factory_creator.create_factory(project_info,
-																		self.state,
-																		self.state.document,
-																		member_filter,
-																		target_handler,
-																		rendering_filter)
+        renderer_factory = self.renderer_factory_creator.create_factory(
+                project_info,
+                self.state,
+                self.state.document,
+                member_filter,
+                target_handler,
+                rendering_filter
+                )
         object_renderer = renderer_factory.create_renderer(data_object)
 
         nodes = object_renderer.render()
@@ -215,7 +216,6 @@ class DoxygenBaseDirective(BaseDirective):
             "path" : unchanged_required,
             "project" : unchanged_required,
             "outline": flag,
-            "display" : unchanged,
             }
     has_content = False
 
@@ -240,12 +240,14 @@ class DoxygenBaseDirective(BaseDirective):
         member_filter = self.member_filter_factory.create_open_filter()
         rendering_filter = self.rendering_filter_factory.create_filter(self.options)
 
-        renderer_factory = self.renderer_factory_creator.create_factory(project_info,
-																		self.state,
-																		self.state.document,
-																		member_filter,
-																		target_handler,
-																		rendering_filter)
+        renderer_factory = self.renderer_factory_creator.create_factory(
+                project_info,
+                self.state,
+                self.state.document,
+                member_filter,
+                target_handler,
+                rendering_filter
+                )
         object_renderer = renderer_factory.create_renderer(data_object)
 
         nodes = object_renderer.render()
