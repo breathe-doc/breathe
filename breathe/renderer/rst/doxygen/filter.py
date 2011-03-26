@@ -132,7 +132,7 @@ class FilterFactory(object):
 
         self.globber_factory = globber_factory
 
-    def create_filter(self, options):
+    def create_class_filter(self, options):
 
         return AndFilter(
                 self.create_members_filter(options),

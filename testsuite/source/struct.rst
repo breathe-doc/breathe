@@ -4,8 +4,8 @@
 doxygenstruct Directive Example
 ===============================
 
-Working Example
----------------
+Example with Full Description
+-----------------------------
 
 This should work::
 
@@ -16,6 +16,24 @@ It produces this output:
 
 .. doxygenstruct:: CoordStruct
    :project: restypedef
+
+
+Example with Outline
+--------------------
+
+This should work::
+
+   .. doxygenstruct:: CoordStruct
+      :project: restypedef
+      :outline:
+
+It produces this output:
+
+.. doxygenstruct:: CoordStruct
+   :project: restypedef
+   :outline:
+   :no-link:
+
 
 Failing Example
 ---------------
