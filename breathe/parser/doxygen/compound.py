@@ -18,7 +18,7 @@ from compoundsuper import MixedContainer
 
 class DoxygenTypeSub(supermod.DoxygenType):
 
-    node_name = "doxygen"
+    node_name = "doxygendef"
 
     def __init__(self, version=None, compounddef=None):
         supermod.DoxygenType.__init__(self, version, compounddef)
