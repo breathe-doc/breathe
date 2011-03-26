@@ -12,7 +12,7 @@ Directives & Config Variables
    typedef
 
 The available directives are shown below. In each case the ``project``,
-``path`` and ``no-link`` options have the following meaning:  
+``path``, ``no-link`` and ``outline`` options have the following meaning:  
 
 ``project``
    Specifies which project, as defined in the breathe_projects config value,
@@ -32,6 +32,10 @@ The available directives are shown below. In each case the ``project``,
    parts of the documentation to illustrate particular points without
    Sphinx getting confused what should be linked to by other references.
 
+``outline``
+   Results in Breathe only outputting the raw code definitions without
+   any additional description information.
+
 
 .. _doxygenindex:
 
@@ -47,6 +51,7 @@ referenced by it.
    .. doxygenindex::
       :project: ...
       :path: ...
+      :outline:
       :no-link:
 
 
@@ -61,6 +66,7 @@ function name is required to be unique in the project.
    .. doxygenfunction:: <function name>
       :project: ...
       :path: ...
+      :outline:
       :no-link:
 
 Checkout the :ref:`example <function-example>` to see it in action.
@@ -76,9 +82,10 @@ name is required to be unique in the project.
    .. doxygenstruct:: <struct name>
       :project: ...
       :path: ...
+      :outline:
       :no-link:
 
-Checkout the :ref:`example <function-example>` to see it in action.
+Checkout the :ref:`example <struct-example>` to see it in action.
 
 doxygenenum Directive
 ~~~~~~~~~~~~~~~~~~~~~~~
@@ -91,6 +98,7 @@ the same as the doxygenstruct directive.
    .. doxygenenum:: <enum name>
       :project: ...
       :path: ...
+      :outline:
       :no-link:
 
 Checkout the :ref:`example <enum-example>` to see it in action.
@@ -106,6 +114,7 @@ the same as the doxygenstruct directive.
    .. doxygentypedef:: <typedef name>
       :project: ...
       :path: ...
+      :outline:
       :no-link:
 
 Checkout the :ref:`example <typedef-example>` to see it in action.
@@ -116,8 +125,8 @@ doxygenclass Directive
 ~~~~~~~~~~~~~~~~~~~~~~
 
 This directive generates the appropriate output for a single class. It takes the
-standard ``project``, ``path`` and ``no-link`` options and additonally
-``members`` and ``outline`` options.
+standard ``project``, ``path``, ``outline`` and ``no-link`` options and additonally
+``members`` option.
 
 ``members``
    Designed to behavior in a similar manner to the ``members`` option for the
@@ -130,16 +139,13 @@ standard ``project``, ``path`` and ``no-link`` options and additonally
    Breathe will treat the arguments as names of members and provide
    documentation for only those members that have been named.
 
-``outline``
-   Results in Breathe only outputting the class and member definitions without
-   any additional description information.
-
 ::
 
    .. doxygenclass:: <class name>
       :project: ...
       :path: ...
       :members: [...]
+      :outline:
       :no-link:
 
 Checkout the :ref:`example <class-example>` to see it in action.

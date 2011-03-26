@@ -80,7 +80,7 @@ class DoxygenIndexDirective(BaseDirective):
         data_object = finder.root()
 
         target_handler = self.target_handler_factory.create(self.options, project_info, self.state.document)
-        filter_ = self.filter_factory.create_open_filter()
+        filter_ = self.filter_factory.create_outline_filter(self.options)
 
         renderer_factory = self.renderer_factory_creator.create_factory(
                 project_info,
@@ -102,6 +102,7 @@ class DoxygenFunctionDirective(BaseDirective):
     option_spec = {
             "path" : unchanged_required,
             "project" : unchanged_required,
+            "outline": flag,
             "no-link": flag,
             }
     has_content = False
@@ -133,7 +134,7 @@ class DoxygenFunctionDirective(BaseDirective):
                     self.state.document.reporter.warning( warning, line=self.lineno) ]
 
         target_handler = self.target_handler_factory.create(self.options, project_info, self.state.document)
-        filter_ = self.filter_factory.create_open_filter()
+        filter_ = self.filter_factory.create_outline_filter(self.options)
 
         renderer_factory = self.renderer_factory_creator.create_factory(
                 project_info,
@@ -188,7 +189,7 @@ class DoxygenClassDirective(BaseDirective):
                     self.state.document.reporter.warning( warning, line=self.lineno) ]
 
         target_handler = self.target_handler_factory.create(self.options, project_info, self.state.document)
-        filter_ = self.filter_factory.create_filter(self.options)
+        filter_ = self.filter_factory.create_class_filter(self.options)
 
         renderer_factory = self.renderer_factory_creator.create_factory(
                 project_info,
@@ -235,7 +236,7 @@ class DoxygenBaseDirective(BaseDirective):
                     self.state.document.reporter.warning( warning, line=self.lineno) ]
 
         target_handler = self.target_handler_factory.create(self.options, project_info, self.state.document)
-        filter_ = self.filter_factory.create_open_filter()
+        filter_ = self.filter_factory.create_outline_filter(self.options)
         renderer_factory = self.renderer_factory_creator.create_factory(
                 project_info,
                 self.state,
