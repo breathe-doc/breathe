@@ -52,7 +52,7 @@ class DoxygenToRstRendererFactory(object):
 
     def __init__(
             self,
-            node_name,
+            node_type,
             type_,
             renderers,
             renderer_factory_creator,
@@ -67,7 +67,7 @@ class DoxygenToRstRendererFactory(object):
             target_handler
             ):
 
-        self.node_name = node_name
+        self.node_type = node_type
         self.type_ = type_
         self.node_factory = node_factory
         self.project_info = project_info
@@ -83,28 +83,29 @@ class DoxygenToRstRendererFactory(object):
 
     def create_renderer(
             self,
+            parent_data_object,
             data_object
             ):
 
-        if not self.filter_.allow(self.node_name, data_object):
+        if not self.filter_.allow(parent_data_object, data_object):
             return NullRenderer()
 
         child_renderer_factory = self.renderer_factory_creator.create_child_factory(data_object, self)
 
         try:
-            node_name = data_object.node_name
+            node_type = data_object.node_type
         except AttributeError, e:
 
             # Horrible hack to silence errors on filtering unicode objects
             # until we fix the parsing
             if type(data_object) == unicode:
-                node_name = "unicode"
+                node_type = "unicode"
             else:
                 raise e
 
-        Renderer = self.renderers[node_name]
+        Renderer = self.renderers[node_type]
 
-        if node_name == "docmarkup":
+        if node_type == "docmarkup":
 
             creator = self.node_factory.inline
             if data_object.type_ == "emphasis":
@@ -134,7 +135,7 @@ class DoxygenToRstRendererFactory(object):
                     self.target_handler
                     )
 
-        if node_name == "verbatim":
+        if node_type == "verbatim":
 
             return Renderer(
                     self.rst_content_creator,
@@ -148,7 +149,7 @@ class DoxygenToRstRendererFactory(object):
                     self.target_handler
                     )
 
-        if node_name == "memberdef":
+        if node_type == "memberdef":
 
             if data_object.kind == "function":
                 Renderer = compoundrenderer.FuncMemberDefTypeSubRenderer
@@ -159,7 +160,7 @@ class DoxygenToRstRendererFactory(object):
             elif data_object.kind == "variable":
                 Renderer = compoundrenderer.VariableMemberDefTypeSubRenderer
 
-        if node_name == "docsimplesect":
+        if node_type == "docsimplesect":
             if data_object.kind == "par":
                 Renderer = compoundrenderer.ParDocSimpleSectTypeSubRenderer
 
@@ -174,13 +175,11 @@ class DoxygenToRstRendererFactory(object):
                 self.target_handler
                 )
 
-
 class DomainRendererFactory(DoxygenToRstRendererFactory):
 
     def create_renderer(self, data_object):
 
         return self.create_renderer_with_factory(data_object, self, self.domain_handler)
-
 
 class CreateCompoundTypeSubRenderer(object):
 
@@ -192,6 +191,18 @@ class CreateCompoundTypeSubRenderer(object):
 
         compound_parser = self.parser_factory.create_compound_parser(project_info)
         return indexrenderer.CompoundTypeSubRenderer(compound_parser, project_info, *args)
+
+
+class CreateRefTypeSubRenderer(object):
+
+    def __init__(self, parser_factory):
+
+        self.parser_factory = parser_factory
+
+    def __call__(self, project_info, *args):
+
+        compound_parser = self.parser_factory.create_compound_parser(project_info)
+        return compoundrenderer.RefTypeSubRenderer(compound_parser, project_info, *args)
 
 
 class DoxygenToRstRendererFactoryCreator(object):
@@ -234,6 +245,7 @@ class DoxygenToRstRendererFactoryCreator(object):
             "docsect1" : compoundrenderer.DocSect1TypeSubRenderer,
             "docsimplesect" : compoundrenderer.DocSimpleSectTypeSubRenderer,
             "doctitle" : compoundrenderer.DocTitleTypeSubRenderer,
+            "ref" : CreateRefTypeSubRenderer(self.parser_factory),
             "verbatim" : compoundrenderer.VerbatimTypeSubRenderer,
             "mixedcontainer" : compoundrenderer.MixedContainerRenderer,
             "unicode" : UnicodeRenderer,
@@ -284,18 +296,18 @@ class DoxygenToRstRendererFactoryCreator(object):
             renderer_factory_class = DomainRendererFactory
 
         try:
-            node_name = data_object.node_name
+            node_type = data_object.node_type
         except AttributeError, e:
 
             # Horrible hack to silence errors on filtering unicode objects
             # until we fix the parsing
             if type(data_object) == unicode:
-                node_name = "unicode"
+                node_type = "unicode"
             else:
                 raise e
 
         return renderer_factory_class(
-                    node_name,
+                    node_type,
                     type_,
                     parent_renderer_factory.renderers,
                     self,

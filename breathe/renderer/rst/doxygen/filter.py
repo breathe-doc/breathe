@@ -1,14 +1,40 @@
 
-class NameAccessor(object):
+class Selecter(object):
+    pass
 
-    def __call__(self, data_object):
-        return data_object.name
+class Parent(Selecter):
 
-class NodeNameAccessor(object):
+    def __call__(self, parent_data_object, child_data_object):
+        return parent_data_object
 
-    def __call__(self, data_object):
+class Child(Selecter):
+
+    def __call__(self, parent_data_object, child_data_object):
+        return child_data_object
+
+
+class Accessor(object):
+
+    def __init__(self, selecter):
+        self.selecter = selecter
+
+class NameAccessor(Accessor):
+
+    def __call__(self, parent_data_object, child_data_object):
+        return self.selecter(parent_data_object, child_data_object).name
+
+class NodeNameAccessor(Accessor):
+
+    def __call__(self, parent_data_object, child_data_object):
+        return self.selecter(parent_data_object, child_data_object).node_name
+
+class NodeTypeAccessor(Accessor):
+
+    def __call__(self, parent_data_object, child_data_object):
+
+        data_object = self.selecter(parent_data_object, child_data_object)
         try:
-            return data_object.node_name
+            return data_object.node_type
         except AttributeError, e:
 
             # Horrible hack to silence errors on filtering unicode objects
@@ -18,10 +44,10 @@ class NodeNameAccessor(object):
             else:
                 raise e
 
-class KindAccessor(object):
+class KindAccessor(Accessor):
 
-    def __call__(self, data_object):
-        return data_object.kind
+    def __call__(self, parent_data_object, child_data_object):
+        return self.selecter(parent_data_object, child_data_object).kind
 
 class NameFilter(object):
 
@@ -30,10 +56,9 @@ class NameFilter(object):
         self.accessor = accessor
         self.members = members
 
-    def allow(self, parent_name, data_object):
+    def allow(self, parent_data_object, child_data_object):
 
-        name = self.accessor(data_object)
-
+        name = self.accessor(parent_data_object, child_data_object)
         return name in self.members
 
 class GlobFilter(object):
@@ -43,42 +68,32 @@ class GlobFilter(object):
         self.accessor = accessor
         self.glob = glob
 
-    def allow(self, parent_name, data_object):
+    def allow(self, parent_data_object, child_data_object):
 
-        text = self.accessor(data_object)
+        text = self.accessor(parent_data_object, child_data_object)
         return self.glob.match(text)
 
 
 class OpenFilter(object):
 
-    def allow(self, parent_name, data_object):
+    def allow(self, parent_data_object, child_data_object):
 
         return True
 
 class ClosedFilter(object):
 
-    def allow(self, parent_name, data_object):
+    def allow(self, parent_data_object, child_data_object):
 
         return False
-
-class ParentFilter(object):
-
-    def __init__(self, parent_name):
-
-        self.parent_name = parent_name
-
-    def allow(self, parent_name, data_object):
-
-        return parent_name == self.parent_name
 
 class NotFilter(object):
 
     def __init__(self, child_filter):
         self.child_filter = child_filter
 
-    def allow(self, parent_name, data_object):
+    def allow(self, parent_data_object, child_data_object):
 
-        return not self.child_filter.allow(parent_name, data_object)
+        return not self.child_filter.allow(parent_data_object, child_data_object)
 
 class AndFilter(object):
 
@@ -87,10 +102,10 @@ class AndFilter(object):
         self.first_filter = first_filter
         self.second_filter = second_filter
 
-    def allow(self, parent_name, data_object):
+    def allow(self, parent_data_object, child_data_object):
 
-        return self.first_filter.allow(parent_name, data_object) \
-                and self.second_filter.allow(parent_name, data_object)
+        return self.first_filter.allow(parent_data_object, child_data_object) \
+                and self.second_filter.allow(parent_data_object, child_data_object)
 
 class OrFilter(object):
 
@@ -99,10 +114,10 @@ class OrFilter(object):
         self.first_filter = first_filter
         self.second_filter = second_filter
 
-    def allow(self, parent_name, data_object):
+    def allow(self, parent_data_object, child_data_object):
 
-        return self.first_filter.allow(parent_name, data_object) \
-                or self.second_filter.allow(parent_name, data_object)
+        return self.first_filter.allow(parent_data_object, child_data_object) \
+                or self.second_filter.allow(parent_data_object, child_data_object)
 
 class Glob(object):
 
@@ -145,30 +160,69 @@ class FilterFactory(object):
             text = options["members"]
         except KeyError:
             return OrFilter(
-                    NotFilter(ParentFilter("sectiondef")),
-                    NotFilter(NameFilter(NodeNameAccessor(),["memberdef"]))
+                    NotFilter(NameFilter(NodeTypeAccessor(Parent()), ["sectiondef"])),
+                    NotFilter(NameFilter(NodeTypeAccessor(Child()), ["memberdef"]))
                     )
 
         if not text.strip():
             return OrFilter(
-                    NotFilter(NameFilter(NodeNameAccessor(), ["sectiondef"])),
-                    GlobFilter(KindAccessor(), self.globber_factory.create("public*"))
+                    NotFilter(NameFilter(NodeTypeAccessor(Child()), ["sectiondef"])),
+                    GlobFilter(KindAccessor(Child()), self.globber_factory.create("public*"))
                     )
 
         # Matches sphinx-autodoc behaviour of comma separated values
         members = set([x.strip() for x in text.split(",")])
 
         return OrFilter(
-                NotFilter(ParentFilter("sectiondef")),
-                NameFilter(NameAccessor(), members)
+                NotFilter(NameFilter(NodeTypeAccessor(Parent()),["sectiondef"])),
+                NameFilter(NameAccessor(Child()), members)
                 )
 
     def create_outline_filter(self, options):
 
         if options.has_key("outline"):
-            return NotFilter(NameFilter(NodeNameAccessor(), ["description"]))
+            return NotFilter(NameFilter(NodeTypeAccessor(Child()), ["description"]))
         else:
             return OpenFilter()
+
+    def create_file_filter(self, options):
+
+        filter_ = OrFilter(
+                NotFilter(
+                    AndFilter(
+                        NameFilter(NodeTypeAccessor(Parent()), ["compounddef"]),
+                        NameFilter(KindAccessor(Parent()), ["class"]),
+                        )
+                    ),
+                NotFilter(
+                    AndFilter(
+                        NameFilter(NodeTypeAccessor(Child()),["ref"]),
+                        NameFilter(NodeNameAccessor(Child()),["innerclass"])
+                        )
+                    )
+                )
+
+        return AndFilter(
+                self.create_outline_filter(options),
+                filter_
+                )
+
+    def create_index_filter(self, options):
+
+        filter_ = OrFilter(
+                NotFilter(NameFilter(NodeTypeAccessor(Parent()), ["compounddef"])),
+                NotFilter(
+                    AndFilter(
+                        NameFilter(NodeTypeAccessor(Child()),["ref"]),
+                        NameFilter(NodeNameAccessor(Child()),["innerclass"])
+                        )
+                    )
+                )
+
+        return AndFilter(
+                self.create_outline_filter(options),
+                filter_
+                )
 
     def create_open_filter(self):
 

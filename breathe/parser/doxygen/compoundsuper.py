@@ -104,7 +104,7 @@ def quote_python(inStr):
 
 class MixedContainer:
 
-    node_name = "mixedcontainer"
+    node_type = "mixedcontainer"
 
     # Constants for category:
     CategoryNone = 0
@@ -422,32 +422,32 @@ class compounddefType(GeneratedsSuper):
             self.set_invincdepgraph(obj_)
         elif child_.nodeType == Node.ELEMENT_NODE and \
             nodeName_ == 'innerdir':
-            obj_ = refType.factory()
+            obj_ = refType.factory(nodeName_)
             obj_.build(child_)
             self.innerdir.append(obj_)
         elif child_.nodeType == Node.ELEMENT_NODE and \
             nodeName_ == 'innerfile':
-            obj_ = refType.factory()
+            obj_ = refType.factory(nodeName_)
             obj_.build(child_)
             self.innerfile.append(obj_)
         elif child_.nodeType == Node.ELEMENT_NODE and \
             nodeName_ == 'innerclass':
-            obj_ = refType.factory()
+            obj_ = refType.factory(nodeName_)
             obj_.build(child_)
             self.innerclass.append(obj_)
         elif child_.nodeType == Node.ELEMENT_NODE and \
             nodeName_ == 'innernamespace':
-            obj_ = refType.factory()
+            obj_ = refType.factory(nodeName_)
             obj_.build(child_)
             self.innernamespace.append(obj_)
         elif child_.nodeType == Node.ELEMENT_NODE and \
             nodeName_ == 'innerpage':
-            obj_ = refType.factory()
+            obj_ = refType.factory(nodeName_)
             obj_.build(child_)
             self.innerpage.append(obj_)
         elif child_.nodeType == Node.ELEMENT_NODE and \
             nodeName_ == 'innergroup':
-            obj_ = refType.factory()
+            obj_ = refType.factory(nodeName_)
             obj_.build(child_)
             self.innergroup.append(obj_)
         elif child_.nodeType == Node.ELEMENT_NODE and \

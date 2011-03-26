@@ -2,7 +2,5 @@
 TinyXML Test Suite
 ==================
 
-
 .. doxygenindex::
-
 

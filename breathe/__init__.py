@@ -33,6 +33,7 @@ class BaseDirective(rst.Directive):
 
     def __init__(
             self,
+            root_data_object,
             renderer_factory_creator,
             finder_factory,
             matcher_factory,
@@ -43,6 +44,7 @@ class BaseDirective(rst.Directive):
             ):
         rst.Directive.__init__(self, *args)
 
+        self.root_data_object = root_data_object
         self.renderer_factory_creator = renderer_factory_creator
         self.finder_factory = finder_factory
         self.matcher_factory = matcher_factory
@@ -80,7 +82,7 @@ class DoxygenIndexDirective(BaseDirective):
         data_object = finder.root()
 
         target_handler = self.target_handler_factory.create(self.options, project_info, self.state.document)
-        filter_ = self.filter_factory.create_outline_filter(self.options)
+        filter_ = self.filter_factory.create_index_filter(self.options)
 
         renderer_factory = self.renderer_factory_creator.create_factory(
                 project_info,
@@ -89,7 +91,7 @@ class DoxygenIndexDirective(BaseDirective):
                 filter_,
                 target_handler
                 )
-        object_renderer = renderer_factory.create_renderer(data_object)
+        object_renderer = renderer_factory.create_renderer(self.root_data_object, data_object)
         nodes = object_renderer.render()
 
         return nodes
@@ -143,7 +145,7 @@ class DoxygenFunctionDirective(BaseDirective):
                 filter_,
                 target_handler,
                 )
-        object_renderer = renderer_factory.create_renderer(data_object)
+        object_renderer = renderer_factory.create_renderer(self.root_data_object, data_object)
         nodes = object_renderer.render()
 
         return nodes
@@ -198,13 +200,63 @@ class DoxygenClassDirective(BaseDirective):
                 filter_,
                 target_handler,
                 )
-        object_renderer = renderer_factory.create_renderer(data_object)
+        object_renderer = renderer_factory.create_renderer(self.root_data_object, data_object)
 
         nodes = object_renderer.render()
 
         return nodes
 
 
+class DoxygenFileDirective(BaseDirective):
+
+    kind = "file"
+
+    required_arguments = 1
+    optional_arguments = 1
+    option_spec = {
+            "path" : unchanged_required,
+            "project" : unchanged_required,
+            }
+    has_content = False
+
+
+    def run(self):
+
+        name = self.arguments[0]
+
+        project_info = self.project_info_factory.create_project_info(self.options)
+
+        finder = self.finder_factory.create_finder(project_info)
+
+        matcher_stack = self.matcher_factory.create_matcher_stack(
+                {
+                    "compound" : self.matcher_factory.create_name_type_matcher(name, self.kind)
+                },
+                "compound"
+            )
+
+        try:
+            data_object = finder.find_one(matcher_stack)
+        except NoMatchesError, e:
+            warning = 'doxygen%s: Cannot find %s "%s" in doxygen xml output' % (self.kind, self.kind, name)
+            return [ docutils.nodes.warning( "", docutils.nodes.paragraph("", "", docutils.nodes.Text(warning))),
+                    self.state.document.reporter.warning( warning, line=self.lineno) ]
+
+        target_handler = self.target_handler_factory.create(self.options, project_info, self.state.document)
+        filter_ = self.filter_factory.create_file_filter(self.options)
+
+        renderer_factory = self.renderer_factory_creator.create_factory(
+                project_info,
+                self.state,
+                self.state.document,
+                filter_,
+                target_handler,
+                )
+        object_renderer = renderer_factory.create_renderer(self.root_data_object, data_object)
+
+        nodes = object_renderer.render()
+
+        return nodes
 
 class DoxygenBaseDirective(BaseDirective):
 
@@ -244,7 +296,7 @@ class DoxygenBaseDirective(BaseDirective):
                 filter_,
                 target_handler,
                 )
-        object_renderer = renderer_factory.create_renderer(data_object)
+        object_renderer = renderer_factory.create_renderer(self.root_data_object, data_object)
 
         nodes = object_renderer.render()
 
@@ -447,10 +499,12 @@ class DoxygenDirectiveFactory(object):
             "doxygenclass" : DoxygenClassDirective,
             "doxygenenum" : DoxygenEnumDirective,
             "doxygentypedef" : DoxygenTypedefDirective,
+            "doxygenfile" : DoxygenFileDirective,
             }
 
     def __init__(
             self,
+            root_data_object,
             renderer_factory_creator,
             finder_factory,
             matcher_factory,
@@ -458,6 +512,7 @@ class DoxygenDirectiveFactory(object):
             filter_factory,
             target_handler_factory
             ):
+        self.root_data_object = root_data_object
         self.renderer_factory_creator = renderer_factory_creator
         self.finder_factory = finder_factory
         self.matcher_factory = matcher_factory
@@ -483,10 +538,14 @@ class DoxygenDirectiveFactory(object):
     def create_class_directive_container(self):
         return self.create_directive_container("doxygenclass")
 
+    def create_file_directive_container(self):
+        return self.create_directive_container("doxygenfile")
+
     def create_directive_container(self, type_):
 
         return DirectiveContainer(
                 self.directives[type_],
+                self.root_data_object,
                 self.renderer_factory_creator,
                 self.finder_factory,
                 self.matcher_factory,
@@ -522,6 +581,9 @@ class NodeFactory(object):
 
         raise NodeNotFoundError(node_name)
 
+class RootDataObject(object):
+
+    node_type = "root"
 
 # Setup
 # -----
@@ -556,7 +618,10 @@ def setup(app):
     filter_factory = FilterFactory(glob_factory)
     target_handler_factory = TargetHandlerFactory(node_factory)
 
+    root_data_object = RootDataObject()
+
     directive_factory = DoxygenDirectiveFactory(
+            root_data_object,
             renderer_factory_creator,
             finder_factory,
             matcher_factory,
@@ -593,6 +658,11 @@ def setup(app):
     app.add_directive(
             "doxygenclass",
             directive_factory.create_class_directive_container(),
+            )
+
+    app.add_directive(
+            "doxygenfile",
+            directive_factory.create_file_directive_container(),
             )
 
     app.add_config_value("breathe_projects", {}, True)
