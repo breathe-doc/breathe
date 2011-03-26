@@ -42,6 +42,7 @@ Thank you to:
 - `nijel <http://github.com/nijel>`_
 - `sebastianschaetz <http://github.com/sebastianschaetz>`_
 - `mbolivar <http://github.com/mbolivar>`_
+- `queezythegreat <https://github.com/queezythegreat>`_
 
 For their contributions; improving the code and the documentation. And thanks to:
 
