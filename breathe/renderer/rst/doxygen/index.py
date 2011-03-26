@@ -9,7 +9,7 @@ class DoxygenTypeSubRenderer(Renderer):
 
         # Process all the compound children
         for compound in self.data_object.get_compound():
-            compound_renderer = self.renderer_factory.create_renderer(compound)
+            compound_renderer = self.renderer_factory.create_renderer(self.data_object, compound)
             nodelist.extend(compound_renderer.render())
 
         return nodelist
@@ -43,7 +43,7 @@ class CompoundTypeSubRenderer(Renderer):
 
         # Read in the corresponding xml file and process
         file_data = self.compound_parser.parse(self.data_object.refid)
-        data_renderer = self.renderer_factory.create_renderer(file_data)
+        data_renderer = self.renderer_factory.create_renderer(self.data_object, file_data)
 
         nodelist.extend(data_renderer.render())
 

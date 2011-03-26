@@ -11,7 +11,7 @@ import indexsuper as supermod
 
 class DoxygenTypeSub(supermod.DoxygenType):
 
-    node_name = "doxygen"
+    node_type = "doxygen"
 
     def __init__(self, version=None, compound=None):
         supermod.DoxygenType.__init__(self, version, compound)
@@ -21,7 +21,7 @@ supermod.DoxygenType.subclass = DoxygenTypeSub
 
 class CompoundTypeSub(supermod.CompoundType):
     
-    node_name = "compound"
+    node_type = "compound"
 
     def __init__(self, kind=None, refid=None, name='', member=None):
         supermod.CompoundType.__init__(self, kind, refid, name, member)
@@ -31,7 +31,7 @@ supermod.CompoundType.subclass = CompoundTypeSub
 
 class MemberTypeSub(supermod.MemberType):
 
-    node_name = "member"
+    node_type = "member"
 
     def __init__(self, kind=None, refid=None, name=''):
         supermod.MemberType.__init__(self, kind, refid, name)

@@ -5,7 +5,7 @@ class DoxygenTypeSubRenderer(Renderer):
 
     def render(self):
 
-        compound_renderer = self.renderer_factory.create_renderer(self.data_object.compounddef)
+        compound_renderer = self.renderer_factory.create_renderer(self.data_object, self.data_object.compounddef)
         return compound_renderer.render()
 
 
@@ -66,11 +66,11 @@ class CompoundDefTypeSubRenderer(Renderer):
         nodelist = []    
 
         if self.data_object.briefdescription:
-            renderer = self.renderer_factory.create_renderer(self.data_object.briefdescription)
+            renderer = self.renderer_factory.create_renderer(self.data_object, self.data_object.briefdescription)
             nodelist.append(self.node_factory.paragraph("", "", *renderer.render()))
 
         if self.data_object.detaileddescription:
-            renderer = self.renderer_factory.create_renderer(self.data_object.detaileddescription)
+            renderer = self.renderer_factory.create_renderer(self.data_object, self.data_object.detaileddescription)
             nodelist.append(self.node_factory.paragraph("", "", *renderer.render()))
 
         section_nodelists = {}
@@ -78,13 +78,18 @@ class CompoundDefTypeSubRenderer(Renderer):
         # Get all sub sections
         for sectiondef in self.data_object.sectiondef:
             kind = sectiondef.kind
-            renderer = self.renderer_factory.create_renderer(sectiondef)
+            renderer = self.renderer_factory.create_renderer(self.data_object, sectiondef)
             subnodes = renderer.render()
             section_nodelists[kind] = subnodes
 
         # Order the results in an appropriate manner
         for kind in self.section_titles:
             nodelist.extend(section_nodelists.get(kind, []))
+
+        # Take care of innerclasses
+        for innerclass in self.data_object.innerclass:
+            renderer = self.renderer_factory.create_renderer(self.data_object, innerclass)
+            nodelist.append(self.node_factory.paragraph("", "", *renderer.render()))
 
         return [self.node_factory.block_quote("", *nodelist)]
 
@@ -135,7 +140,7 @@ class SectionDefTypeSubRenderer(Renderer):
 
         # Get all the memberdef info
         for memberdef in self.data_object.memberdef:
-            renderer = self.renderer_factory.create_renderer(memberdef)
+            renderer = self.renderer_factory.create_renderer(self.data_object, memberdef)
             defs.extend(renderer.render())
 
         if defs:
@@ -163,7 +168,7 @@ class MemberDefTypeSubRenderer(Renderer):
         
         # Variable type or function return type
         if self.data_object.type_:
-            renderer = self.renderer_factory.create_renderer(self.data_object.type_)
+            renderer = self.renderer_factory.create_renderer(self.data_object, self.data_object.type_)
             kind = renderer.render()
 
         name = self.node_factory.strong(text=self.data_object.name)
@@ -180,11 +185,11 @@ class MemberDefTypeSubRenderer(Renderer):
         description_nodes = []
 
         if self.data_object.briefdescription:
-            renderer = self.renderer_factory.create_renderer(self.data_object.briefdescription)
+            renderer = self.renderer_factory.create_renderer(self.data_object, self.data_object.briefdescription)
             description_nodes.append(self.node_factory.paragraph("", "", *renderer.render()))
 
         if self.data_object.detaileddescription:
-            renderer = self.renderer_factory.create_renderer(self.data_object.detaileddescription)
+            renderer = self.renderer_factory.create_renderer(self.data_object, self.data_object.detaileddescription)
             description_nodes.append(self.node_factory.paragraph( "", "", *renderer.render()))
 
         return description_nodes
@@ -228,7 +233,7 @@ class FuncMemberDefTypeSubRenderer(MemberDefTypeSubRenderer):
         args.append(self.node_factory.Text("("))
         for i, parameter in enumerate(self.data_object.param):
             if i: args.append(self.node_factory.Text(", "))
-            renderer = self.renderer_factory.create_renderer(parameter)
+            renderer = self.renderer_factory.create_renderer(self.data_object, parameter)
             args.extend(renderer.render())
         args.append(self.node_factory.Text(")"))
 
@@ -256,7 +261,7 @@ class EnumMemberDefTypeSubRenderer(MemberDefTypeSubRenderer):
 
         enums = []
         for item in self.data_object.enumvalue:
-            renderer = self.renderer_factory.create_renderer(item)
+            renderer = self.renderer_factory.create_renderer(self.data_object, item)
             enums.extend(renderer.render())
 
         description_nodes.append(self.node_factory.bullet_list("", classes=["breatheenumvalues"], *enums))
@@ -272,7 +277,7 @@ class TypedefMemberDefTypeSubRenderer(MemberDefTypeSubRenderer):
         args.extend(MemberDefTypeSubRenderer.title(self))
 
         if self.data_object.argsstring:
-            renderer = self.renderer_factory.create_renderer(self.data_object.argsstring)
+            renderer = self.renderer_factory.create_renderer(self.data_object, self.data_object.argsstring)
             args.extend(renderer.render())
 
         return args
@@ -285,7 +290,7 @@ class VariableMemberDefTypeSubRenderer(MemberDefTypeSubRenderer):
         args = MemberDefTypeSubRenderer.title(self)
 
         if self.data_object.argsstring:
-            renderer = self.renderer_factory.create_renderer(self.data_object.argsstring)
+            renderer = self.renderer_factory.create_renderer(self.data_object, self.data_object.argsstring)
             args.extend(renderer.render())
 
         return args
@@ -299,7 +304,7 @@ class EnumvalueTypeSubRenderer(Renderer):
         description_nodes = [name]
 
         if self.data_object.initializer:
-            renderer = self.renderer_factory.create_renderer(self.data_object.initializer)
+            renderer = self.renderer_factory.create_renderer(self.data_object, self.data_object.initializer)
             nodelist = [self.node_factory.Text(" = ")]
             nodelist.extend(renderer.render())
             description_nodes.append(self.node_factory.literal("", "", *nodelist))
@@ -308,11 +313,11 @@ class EnumvalueTypeSubRenderer(Renderer):
         description_nodes.append(separator)
 
         if self.data_object.briefdescription:
-            renderer = self.renderer_factory.create_renderer(self.data_object.briefdescription)
+            renderer = self.renderer_factory.create_renderer(self.data_object, self.data_object.briefdescription)
             description_nodes.extend(renderer.render())
 
         if self.data_object.detaileddescription:
-            renderer = self.renderer_factory.create_renderer(self.data_object.detaileddescription)
+            renderer = self.renderer_factory.create_renderer(self.data_object, self.data_object.detaileddescription)
             description_nodes.extend(renderer.render())
 
         # Build the list item
@@ -326,7 +331,7 @@ class DescriptionTypeSubRenderer(Renderer):
         
         # Get description in rst_nodes if possible
         for item in self.data_object.content_:
-            renderer = self.renderer_factory.create_renderer(item)
+            renderer = self.renderer_factory.create_renderer(self.data_object, item)
             nodelist.extend(renderer.render())
 
         return nodelist
@@ -340,7 +345,7 @@ class LinkedTextTypeSubRenderer(Renderer):
 
         # Recursively process where possible
         for i in self.data_object.content_:
-            renderer = self.renderer_factory.create_renderer(i)
+            renderer = self.renderer_factory.create_renderer(self.data_object, i)
             nodelist.extend(renderer.render())
             nodelist.append(self.node_factory.Text(" "))
 
@@ -356,7 +361,7 @@ class ParamTypeSubRenderer(Renderer):
 
         # Parameter type
         if self.data_object.type_:
-            renderer = self.renderer_factory.create_renderer(self.data_object.type_)
+            renderer = self.renderer_factory.create_renderer(self.data_object, self.data_object.type_)
             nodelist.extend(renderer.render())
 
         # Parameter name
@@ -369,7 +374,7 @@ class ParamTypeSubRenderer(Renderer):
         # Default value
         if self.data_object.defval:
             nodelist.append(self.node_factory.Text(" = "))
-            renderer = self.renderer_factory.create_renderer(self.data_object.defval)
+            renderer = self.renderer_factory.create_renderer(self.data_object, self.data_object.defval)
             nodelist.extend(renderer.render())
 
         return nodelist
@@ -383,11 +388,11 @@ class DocRefTextTypeSubRenderer(Renderer):
         nodelist = []
 
         for item in self.data_object.content_:
-            renderer = self.renderer_factory.create_renderer(item)
+            renderer = self.renderer_factory.create_renderer(self.data_object, item)
             nodelist.extend(renderer.render())
 
         for item in self.data_object.para:
-            renderer = self.renderer_factory.create_renderer(item)
+            renderer = self.renderer_factory.create_renderer(self.data_object, item)
             nodelist.extend(renderer.render())
 
         refid = "%s%s" % (self.project_info.name(), self.data_object.refid)
@@ -412,16 +417,16 @@ class DocParaTypeSubRenderer(Renderer):
 
         nodelist = []
         for item in self.data_object.content:              # Description
-            renderer = self.renderer_factory.create_renderer(item)
+            renderer = self.renderer_factory.create_renderer(self.data_object, item)
             nodelist.extend(renderer.render())
 
         field_nodes = []
         for entry in self.data_object.parameterlist:        # Parameters/Exceptions
-            renderer = self.renderer_factory.create_renderer(entry)
+            renderer = self.renderer_factory.create_renderer(self.data_object, entry)
             field_nodes.extend(renderer.render())
 
         for item in self.data_object.simplesects:           # Returns
-            renderer = self.renderer_factory.create_renderer(item)
+            renderer = self.renderer_factory.create_renderer(self.data_object, item)
             field_nodes.extend(renderer.render())
 
         if field_nodes:
@@ -448,7 +453,7 @@ class DocMarkupTypeSubRenderer(Renderer):
         nodelist = []
 
         for item in self.data_object.content_:
-            renderer = self.renderer_factory.create_renderer(item)
+            renderer = self.renderer_factory.create_renderer(self.data_object, item)
             nodelist.extend(renderer.render())
 
         return [self.creator("", *nodelist)]
@@ -468,7 +473,7 @@ class DocParamListTypeSubRenderer(Renderer):
 
         nodelist = []
         for entry in self.data_object.parameteritem:
-            renderer = self.renderer_factory.create_renderer(entry)
+            renderer = self.renderer_factory.create_renderer(self.data_object, entry)
             nodelist.extend(renderer.render())
 
         # Fild list entry
@@ -489,7 +494,7 @@ class DocParamListItemSubRenderer(Renderer):
 
         nodelist = []
         for entry in self.data_object.parameternamelist:
-            renderer = self.renderer_factory.create_renderer(entry)
+            renderer = self.renderer_factory.create_renderer(self.data_object, entry)
             nodelist.extend(renderer.render())
 
         term = self.node_factory.literal("","", *nodelist)
@@ -499,7 +504,7 @@ class DocParamListItemSubRenderer(Renderer):
         nodelist = []
 
         if self.data_object.parameterdescription:
-            renderer = self.renderer_factory.create_renderer(self.data_object.parameterdescription)
+            renderer = self.renderer_factory.create_renderer(self.data_object, self.data_object.parameterdescription)
             nodelist.extend(renderer.render())
 
         return [self.node_factory.list_item("", term, separator, *nodelist)]
@@ -511,7 +516,7 @@ class DocParamNameListSubRenderer(Renderer):
 
         nodelist = []
         for entry in self.data_object.parametername:
-            renderer = self.renderer_factory.create_renderer(entry)
+            renderer = self.renderer_factory.create_renderer(self.data_object, entry)
             nodelist.extend(renderer.render())
 
         return nodelist
@@ -522,7 +527,7 @@ class DocParamNameSubRenderer(Renderer):
 
         nodelist = []
         for item in self.data_object.content_:
-            renderer = self.renderer_factory.create_renderer(item)
+            renderer = self.renderer_factory.create_renderer(self.data_object, item)
             nodelist.extend(renderer.render())
 
         return nodelist
@@ -548,7 +553,7 @@ class DocSimpleSectTypeSubRenderer(Renderer):
 
         nodelist = []
         for item in self.data_object.para:
-            renderer = self.renderer_factory.create_renderer(item)
+            renderer = self.renderer_factory.create_renderer(self.data_object, item)
             nodelist.append(self.node_factory.paragraph("", "", *renderer.render()))
 
         field_name = self.node_factory.field_name("", self.node_factory.Text(self.data_object.kind.capitalize()))
@@ -561,7 +566,7 @@ class ParDocSimpleSectTypeSubRenderer(DocSimpleSectTypeSubRenderer):
 
     def title(self):
 
-        renderer = self.renderer_factory.create_renderer(self.data_object.title)
+        renderer = self.renderer_factory.create_renderer(self.data_object, self.data_object.title)
         emphasis = self.node_factory.emphasis("", *renderer.render())
 
         return [emphasis]
@@ -574,11 +579,55 @@ class DocTitleTypeSubRenderer(Renderer):
         nodelist = []
 
         for item in self.data_object.content_:
-            renderer = self.renderer_factory.create_renderer(item)
+            renderer = self.renderer_factory.create_renderer(self.data_object, item)
             nodelist.extend(renderer.render())
 
         return nodelist
 
+
+class RefTypeSubRenderer(Renderer):
+
+    ref_types = {
+            "innerclass" : "class"
+            }
+
+    def __init__(self, compound_parser, *args):
+        Renderer.__init__(self, *args)
+
+        self.compound_parser = compound_parser
+
+    def render(self):
+
+        nodelist = []
+
+        refid = "%s%s" % (self.project_info.name(), self.data_object.refid)
+        nodelist = self.target_handler.create_target(refid)
+
+        # Set up the title and a reference for it (refid)
+        type_ = self.ref_types[self.data_object.node_name]
+        kind = self.node_factory.emphasis(text=type_)
+
+        name_text = self.data_object.content_[0].getValue()
+        name = self.node_factory.strong(text=name_text)
+
+        nodelist.append(
+                self.node_factory.paragraph(
+                    "",
+                    "",
+                    kind,
+                    self.node_factory.Text(" "),
+                    name,
+                    ids=[refid]
+                    )
+            )
+
+        # Read in the corresponding xml file and process
+        file_data = self.compound_parser.parse(self.data_object.refid)
+        data_renderer = self.renderer_factory.create_renderer(self.data_object, file_data)
+
+        nodelist.extend(data_renderer.render())
+
+        return nodelist
 
 class VerbatimTypeSubRenderer(Renderer):
 
@@ -613,11 +662,7 @@ class MixedContainerRenderer(Renderer):
 
     def render(self):
 
-        renderer = self.renderer_factory.create_renderer(self.data_object.getValue())
+        renderer = self.renderer_factory.create_renderer(self.data_object, self.data_object.getValue())
         return renderer.render()
-
-
-
-
 
 

@@ -119,7 +119,7 @@ class DoxygenItemFinderFactory(object):
 
     def create_finder(self, data_object):
 
-        return self.finders[data_object.node_name](self.project_info, data_object, self)
+        return self.finders[data_object.node_type](self.project_info, data_object, self)
 
 
 class DoxygenItemFinderFactoryCreator(object):

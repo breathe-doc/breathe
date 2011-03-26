@@ -10,6 +10,7 @@ Directives & Config Variables
    class
    enum
    typedef
+   file
 
 The available directives are shown below. In each case the ``project``,
 ``path``, ``no-link`` and ``outline`` options have the following meaning:  
@@ -150,6 +151,19 @@ standard ``project``, ``path``, ``outline`` and ``no-link`` options and additona
 
 Checkout the :ref:`example <class-example>` to see it in action.
 
+doxygenfile Directive
+~~~~~~~~~~~~~~~~~~~~~
+
+This directive generates the appropriate output for the contents of a source
+file.
+
+::
+
+   .. doxygenfile:: <filename>
+      :project: ...
+      :path: ...
+
+Checkout the :ref:`example <file-example>` to see it in action.
 
 Config Values
 -------------
