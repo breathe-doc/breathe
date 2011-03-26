@@ -210,6 +210,7 @@ class DoxygenBaseDirective(BaseDirective):
     option_spec = {
             "path" : unchanged_required,
             "project" : unchanged_required,
+            "no-link": flag,
             "outline": flag,
             }
     has_content = False
