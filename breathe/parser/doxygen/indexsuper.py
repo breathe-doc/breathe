@@ -130,40 +130,6 @@ class MixedContainer:
         return self.value
     def getName(self):
         return self.name
-    def export(self, outfile, level, name, namespace):
-        if self.category == MixedContainer.CategoryText:
-            outfile.write(self.value)
-        elif self.category == MixedContainer.CategorySimple:
-            self.exportSimple(outfile, level, name)
-        else:    # category == MixedContainer.CategoryComplex
-            self.value.export(outfile, level, namespace,name)
-    def exportSimple(self, outfile, level, name):
-        if self.content_type == MixedContainer.TypeString:
-            outfile.write('<%s>%s</%s>' % (self.name, self.value, self.name))
-        elif self.content_type == MixedContainer.TypeInteger or \
-                self.content_type == MixedContainer.TypeBoolean:
-            outfile.write('<%s>%d</%s>' % (self.name, self.value, self.name))
-        elif self.content_type == MixedContainer.TypeFloat or \
-                self.content_type == MixedContainer.TypeDecimal:
-            outfile.write('<%s>%f</%s>' % (self.name, self.value, self.name))
-        elif self.content_type == MixedContainer.TypeDouble:
-            outfile.write('<%s>%g</%s>' % (self.name, self.value, self.name))
-    def exportLiteral(self, outfile, level, name):
-        if self.category == MixedContainer.CategoryText:
-            showIndent(outfile, level)
-            outfile.write('MixedContainer(%d, %d, "%s", "%s"),\n' % \
-                (self.category, self.content_type, self.name, self.value))
-        elif self.category == MixedContainer.CategorySimple:
-            showIndent(outfile, level)
-            outfile.write('MixedContainer(%d, %d, "%s", "%s"),\n' % \
-                (self.category, self.content_type, self.name, self.value))
-        else:    # category == MixedContainer.CategoryComplex
-            showIndent(outfile, level)
-            outfile.write('MixedContainer(%d, %d, "%s",\n' % \
-                (self.category, self.content_type, self.name,))
-            self.value.exportLiteral(outfile, level + 1)
-            showIndent(outfile, level)
-            outfile.write(')\n')
 
 
 class _MemberSpec(object):
@@ -204,22 +170,6 @@ class DoxygenType(GeneratedsSuper):
     def insert_compound(self, index, value): self.compound[index] = value
     def get_version(self): return self.version
     def set_version(self, version): self.version = version
-    def export(self, outfile, level, namespace_='', name_='DoxygenType', namespacedef_=''):
-        showIndent(outfile, level)
-        outfile.write('<%s%s %s' % (namespace_, name_, namespacedef_, ))
-        self.exportAttributes(outfile, level, namespace_, name_='DoxygenType')
-        if self.hasContent_():
-            outfile.write('>\n')
-            self.exportChildren(outfile, level + 1, namespace_, name_)
-            showIndent(outfile, level)
-            outfile.write('</%s%s>\n' % (namespace_, name_))
-        else:
-            outfile.write(' />\n')
-    def exportAttributes(self, outfile, level, namespace_='', name_='DoxygenType'):
-        outfile.write(' version=%s' % (self.format_string(quote_attrib(self.version).encode(ExternalEncoding), input_name='version'), ))
-    def exportChildren(self, outfile, level, namespace_='', name_='DoxygenType'):
-        for compound_ in self.compound:
-            compound_.export(outfile, level, namespace_, name_='compound')
     def hasContent_(self):
         if (
             self.compound is not None
@@ -227,28 +177,6 @@ class DoxygenType(GeneratedsSuper):
             return True
         else:
             return False
-    def exportLiteral(self, outfile, level, name_='DoxygenType'):
-        level += 1
-        self.exportLiteralAttributes(outfile, level, name_)
-        if self.hasContent_():
-            self.exportLiteralChildren(outfile, level, name_)
-    def exportLiteralAttributes(self, outfile, level, name_):
-        if self.version is not None:
-            showIndent(outfile, level)
-            outfile.write('version = %s,\n' % (self.version,))
-    def exportLiteralChildren(self, outfile, level, name_):
-        showIndent(outfile, level)
-        outfile.write('compound=[\n')
-        level += 1
-        for compound in self.compound:
-            showIndent(outfile, level)
-            outfile.write('model_.compound(\n')
-            compound.exportLiteral(outfile, level, name_='compound')
-            showIndent(outfile, level)
-            outfile.write('),\n')
-        level -= 1
-        showIndent(outfile, level)
-        outfile.write('],\n')
     def build(self, node_):
         attrs = node_.attributes
         self.buildAttributes(attrs)
@@ -294,61 +222,6 @@ class CompoundType(GeneratedsSuper):
     def set_kind(self, kind): self.kind = kind
     def get_refid(self): return self.refid
     def set_refid(self, refid): self.refid = refid
-    def export(self, outfile, level, namespace_='', name_='CompoundType', namespacedef_=''):
-        showIndent(outfile, level)
-        outfile.write('<%s%s %s' % (namespace_, name_, namespacedef_, ))
-        self.exportAttributes(outfile, level, namespace_, name_='CompoundType')
-        if self.hasContent_():
-            outfile.write('>\n')
-            self.exportChildren(outfile, level + 1, namespace_, name_)
-            showIndent(outfile, level)
-            outfile.write('</%s%s>\n' % (namespace_, name_))
-        else:
-            outfile.write(' />\n')
-    def exportAttributes(self, outfile, level, namespace_='', name_='CompoundType'):
-        outfile.write(' kind=%s' % (quote_attrib(self.kind), ))
-        outfile.write(' refid=%s' % (self.format_string(quote_attrib(self.refid).encode(ExternalEncoding), input_name='refid'), ))
-    def exportChildren(self, outfile, level, namespace_='', name_='CompoundType'):
-        if self.name is not None:
-            showIndent(outfile, level)
-            outfile.write('<%sname>%s</%sname>\n' % (namespace_, self.format_string(quote_xml(self.name).encode(ExternalEncoding), input_name='name'), namespace_))
-        for member_ in self.member:
-            member_.export(outfile, level, namespace_, name_='member')
-    def hasContent_(self):
-        if (
-            self.name is not None or
-            self.member is not None
-            ):
-            return True
-        else:
-            return False
-    def exportLiteral(self, outfile, level, name_='CompoundType'):
-        level += 1
-        self.exportLiteralAttributes(outfile, level, name_)
-        if self.hasContent_():
-            self.exportLiteralChildren(outfile, level, name_)
-    def exportLiteralAttributes(self, outfile, level, name_):
-        if self.kind is not None:
-            showIndent(outfile, level)
-            outfile.write('kind = "%s",\n' % (self.kind,))
-        if self.refid is not None:
-            showIndent(outfile, level)
-            outfile.write('refid = %s,\n' % (self.refid,))
-    def exportLiteralChildren(self, outfile, level, name_):
-        showIndent(outfile, level)
-        outfile.write('name=%s,\n' % quote_python(self.name).encode(ExternalEncoding))
-        showIndent(outfile, level)
-        outfile.write('member=[\n')
-        level += 1
-        for member in self.member:
-            showIndent(outfile, level)
-            outfile.write('model_.member(\n')
-            member.exportLiteral(outfile, level, name_='member')
-            showIndent(outfile, level)
-            outfile.write('),\n')
-        level -= 1
-        showIndent(outfile, level)
-        outfile.write('],\n')
     def build(self, node_):
         attrs = node_.attributes
         self.buildAttributes(attrs)
@@ -394,24 +267,6 @@ class MemberType(GeneratedsSuper):
     def set_kind(self, kind): self.kind = kind
     def get_refid(self): return self.refid
     def set_refid(self, refid): self.refid = refid
-    def export(self, outfile, level, namespace_='', name_='MemberType', namespacedef_=''):
-        showIndent(outfile, level)
-        outfile.write('<%s%s %s' % (namespace_, name_, namespacedef_, ))
-        self.exportAttributes(outfile, level, namespace_, name_='MemberType')
-        if self.hasContent_():
-            outfile.write('>\n')
-            self.exportChildren(outfile, level + 1, namespace_, name_)
-            showIndent(outfile, level)
-            outfile.write('</%s%s>\n' % (namespace_, name_))
-        else:
-            outfile.write(' />\n')
-    def exportAttributes(self, outfile, level, namespace_='', name_='MemberType'):
-        outfile.write(' kind=%s' % (quote_attrib(self.kind), ))
-        outfile.write(' refid=%s' % (self.format_string(quote_attrib(self.refid).encode(ExternalEncoding), input_name='refid'), ))
-    def exportChildren(self, outfile, level, namespace_='', name_='MemberType'):
-        if self.name is not None:
-            showIndent(outfile, level)
-            outfile.write('<%sname>%s</%sname>\n' % (namespace_, self.format_string(quote_xml(self.name).encode(ExternalEncoding), input_name='name'), namespace_))
     def hasContent_(self):
         if (
             self.name is not None
@@ -419,21 +274,6 @@ class MemberType(GeneratedsSuper):
             return True
         else:
             return False
-    def exportLiteral(self, outfile, level, name_='MemberType'):
-        level += 1
-        self.exportLiteralAttributes(outfile, level, name_)
-        if self.hasContent_():
-            self.exportLiteralChildren(outfile, level, name_)
-    def exportLiteralAttributes(self, outfile, level, name_):
-        if self.kind is not None:
-            showIndent(outfile, level)
-            outfile.write('kind = "%s",\n' % (self.kind,))
-        if self.refid is not None:
-            showIndent(outfile, level)
-            outfile.write('refid = %s,\n' % (self.refid,))
-    def exportLiteralChildren(self, outfile, level, name_):
-        showIndent(outfile, level)
-        outfile.write('name=%s,\n' % quote_python(self.name).encode(ExternalEncoding))
     def build(self, node_):
         attrs = node_.attributes
         self.buildAttributes(attrs)
