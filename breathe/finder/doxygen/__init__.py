@@ -119,7 +119,7 @@ class DoxygenItemFinderFactory(object):
 
     def create_finder(self, data_object):
 
-        return self.finders[data_object.__class__](self.project_info, data_object, self)
+        return self.finders[data_object.node_name](self.project_info, data_object, self)
 
 
 class DoxygenItemFinderFactoryCreator(object):
@@ -132,13 +132,13 @@ class DoxygenItemFinderFactoryCreator(object):
     def create_factory(self, project_info):
 
         finders = {
-            index.DoxygenTypeSub : indexfinder.DoxygenTypeSubItemFinder,
-            index.CompoundTypeSub : CreateCompoundTypeSubFinder(self.parser_factory, self.matcher_factory),
-            index.MemberTypeSub : indexfinder.MemberTypeSubItemFinder,
-            compound.DoxygenTypeSub : compoundfinder.DoxygenTypeSubItemFinder,
-            compound.compounddefTypeSub : compoundfinder.CompoundDefTypeSubItemFinder,
-            compound.sectiondefTypeSub : compoundfinder.SectionDefTypeSubItemFinder,
-            compound.memberdefTypeSub : compoundfinder.MemberDefTypeSubItemFinder,
+            "doxygen" : indexfinder.DoxygenTypeSubItemFinder,
+            "compound" : CreateCompoundTypeSubFinder(self.parser_factory, self.matcher_factory),
+            "member" : indexfinder.MemberTypeSubItemFinder,
+            "doxygendef" : compoundfinder.DoxygenTypeSubItemFinder,
+            "compounddef" : compoundfinder.CompoundDefTypeSubItemFinder,
+            "sectiondef" : compoundfinder.SectionDefTypeSubItemFinder,
+            "memberdef" : compoundfinder.MemberDefTypeSubItemFinder,
             }
 
         return DoxygenItemFinderFactory(finders, project_info)

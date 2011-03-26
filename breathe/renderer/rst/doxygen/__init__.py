@@ -91,8 +91,6 @@ class DoxygenToRstRendererFactory(object):
 
         child_renderer_factory = self.renderer_factory_creator.create_child_factory(data_object, self)
 
-        Renderer = self.renderers[data_object.__class__]
-
         try:
             node_name = data_object.node_name
         except AttributeError, e:
@@ -104,6 +102,7 @@ class DoxygenToRstRendererFactory(object):
             else:
                 raise e
 
+        Renderer = self.renderers[node_name]
 
         if node_name == "docmarkup":
 
@@ -215,29 +214,29 @@ class DoxygenToRstRendererFactoryCreator(object):
     def create_factory(self, project_info, state, document, filter_, target_handler):
 
         renderers = {
-            index.DoxygenTypeSub : indexrenderer.DoxygenTypeSubRenderer,
-            index.CompoundTypeSub : CreateCompoundTypeSubRenderer(self.parser_factory),
-            compound.DoxygenTypeSub : compoundrenderer.DoxygenTypeSubRenderer,
-            compound.compounddefTypeSub : compoundrenderer.CompoundDefTypeSubRenderer,
-            compound.sectiondefTypeSub : compoundrenderer.SectionDefTypeSubRenderer,
-            compound.memberdefTypeSub : compoundrenderer.MemberDefTypeSubRenderer,
-            compound.enumvalueTypeSub : compoundrenderer.EnumvalueTypeSubRenderer,
-            compound.linkedTextTypeSub : compoundrenderer.LinkedTextTypeSubRenderer,
-            compound.descriptionTypeSub : compoundrenderer.DescriptionTypeSubRenderer,
-            compound.paramTypeSub : compoundrenderer.ParamTypeSubRenderer,
-            compound.docRefTextTypeSub : compoundrenderer.DocRefTextTypeSubRenderer,
-            compound.docParaTypeSub : compoundrenderer.DocParaTypeSubRenderer,
-            compound.docMarkupTypeSub : compoundrenderer.DocMarkupTypeSubRenderer,
-            compound.docParamListTypeSub : compoundrenderer.DocParamListTypeSubRenderer,
-            compound.docParamListItemSub : compoundrenderer.DocParamListItemSubRenderer,
-            compound.docParamNameListSub : compoundrenderer.DocParamNameListSubRenderer,
-            compound.docParamNameSub : compoundrenderer.DocParamNameSubRenderer,
-            compound.docSect1TypeSub : compoundrenderer.DocSect1TypeSubRenderer,
-            compound.docSimpleSectTypeSub : compoundrenderer.DocSimpleSectTypeSubRenderer,
-            compound.docTitleTypeSub : compoundrenderer.DocTitleTypeSubRenderer,
-            compound.verbatimTypeSub : compoundrenderer.VerbatimTypeSubRenderer,
-            compoundsuper.MixedContainer : compoundrenderer.MixedContainerRenderer,
-            unicode : UnicodeRenderer,
+            "doxygen" : indexrenderer.DoxygenTypeSubRenderer,
+            "compound" : CreateCompoundTypeSubRenderer(self.parser_factory),
+            "doxygendef" : compoundrenderer.DoxygenTypeSubRenderer,
+            "compounddef" : compoundrenderer.CompoundDefTypeSubRenderer,
+            "sectiondef" : compoundrenderer.SectionDefTypeSubRenderer,
+            "memberdef" : compoundrenderer.MemberDefTypeSubRenderer,
+            "enumvalue" : compoundrenderer.EnumvalueTypeSubRenderer,
+            "linkedtext" : compoundrenderer.LinkedTextTypeSubRenderer,
+            "description" : compoundrenderer.DescriptionTypeSubRenderer,
+            "param" : compoundrenderer.ParamTypeSubRenderer,
+            "docreftext" : compoundrenderer.DocRefTextTypeSubRenderer,
+            "docpara" : compoundrenderer.DocParaTypeSubRenderer,
+            "docmarkup" : compoundrenderer.DocMarkupTypeSubRenderer,
+            "docparamlist" : compoundrenderer.DocParamListTypeSubRenderer,
+            "docparamlistitem" : compoundrenderer.DocParamListItemSubRenderer,
+            "docparamnamelist" : compoundrenderer.DocParamNameListSubRenderer,
+            "docparamname" : compoundrenderer.DocParamNameSubRenderer,
+            "docsect1" : compoundrenderer.DocSect1TypeSubRenderer,
+            "docsimplesect" : compoundrenderer.DocSimpleSectTypeSubRenderer,
+            "doctitle" : compoundrenderer.DocTitleTypeSubRenderer,
+            "verbatim" : compoundrenderer.VerbatimTypeSubRenderer,
+            "mixedcontainer" : compoundrenderer.MixedContainerRenderer,
+            "unicode" : UnicodeRenderer,
             }
 
         domain_handler_factory = self.domain_handler_factory_creator.create(
