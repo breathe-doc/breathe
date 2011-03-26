@@ -62,6 +62,7 @@ class DoxygenIndexDirective(BaseDirective):
             "path" : unchanged_required,
             "project" : unchanged_required,
             "outline": flag,
+            "no-link": flag,
             }
     has_content = False
 
@@ -101,6 +102,7 @@ class DoxygenFunctionDirective(BaseDirective):
     option_spec = {
             "path" : unchanged_required,
             "project" : unchanged_required,
+            "no-link": flag,
             }
     has_content = False
 
@@ -157,8 +159,8 @@ class DoxygenClassDirective(BaseDirective):
             "path" : unchanged_required,
             "project" : unchanged_required,
             "members" : unchanged,
-            "no-link" : flag,
             "outline": flag,
+            "no-link" : flag,
             }
     has_content = False
 
@@ -210,8 +212,8 @@ class DoxygenBaseDirective(BaseDirective):
     option_spec = {
             "path" : unchanged_required,
             "project" : unchanged_required,
-            "no-link": flag,
             "outline": flag,
+            "no-link": flag,
             }
     has_content = False
 
