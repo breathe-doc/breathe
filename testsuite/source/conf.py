@@ -99,6 +99,7 @@ breathe_projects = {
     "restypedef":"../examples/doxygen/restypedef/xml/",
     "nutshell":"../examples/specific/nutshell/xml/",
     "rst":"../examples/specific/rst/xml/",
+    "c_file":"../examples/specific/c_file/xml/",
     "namespacefile":"../examples/specific/namespacefile/xml/",
     }
 
