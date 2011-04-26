@@ -99,6 +99,7 @@ breathe_projects = {
     "restypedef":"../examples/doxygen/restypedef/xml/",
     "nutshell":"../examples/specific/nutshell/xml/",
     "rst":"../examples/specific/rst/xml/",
+    "namespacefile":"../examples/specific/namespacefile/xml/",
     }
 
 breathe_default_project = "tinyxml"

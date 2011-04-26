@@ -588,7 +588,7 @@ class DocTitleTypeSubRenderer(Renderer):
 class RefTypeSubRenderer(Renderer):
 
     ref_types = {
-            "innerclass" : "class"
+            "innerclass" : "class",
             }
 
     def __init__(self, compound_parser, *args):
