@@ -17,6 +17,20 @@ It produces this output:
 .. doxygentypedef:: UINT32
   :project: structcmd
 
+Example with Namespace
+----------------------
+
+This should work::
+
+   .. doxygentypedef:: foo::ns::MyInt
+      :project: namespacefile
+
+It produces this output:
+
+.. doxygentypedef:: foo::ns::MyInt
+   :project: namespacefile
+   :no-link:
+
 Failing Example
 ---------------
 

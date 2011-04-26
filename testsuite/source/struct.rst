@@ -34,6 +34,19 @@ It produces this output:
    :outline:
    :no-link:
 
+Example with Namespace
+----------------------
+
+This should work::
+
+   .. doxygenstruct:: foo::ns::FooStruct
+      :project: namespacefile
+
+It produces this output:
+
+.. doxygenstruct:: foo::ns::FooStruct
+   :project: namespacefile
+   :no-link:
 
 Failing Example
 ---------------
