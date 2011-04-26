@@ -131,7 +131,9 @@ class DoxygenFunctionDirective(BaseDirective):
         try:
             data_object = finder.find_one(matcher_stack)
         except NoMatchesError, e:
-            warning = 'doxygenfunction: Cannot find function "%s%s" in doxygen xml output' % (namespace, function_name)
+            warning = ( 'doxygenfunction: Cannot find function "%s%s" in doxygen xml output '
+                    'for project "%s" from directory: %s'
+                    % (namespace, function_name, project_info.name(), project_info.path()) )
             return [ docutils.nodes.warning( "", docutils.nodes.paragraph("", "", docutils.nodes.Text(warning))),
                     self.state.document.reporter.warning( warning, line=self.lineno) ]
 
@@ -186,7 +188,8 @@ class DoxygenClassDirective(BaseDirective):
         try:
             data_object = finder.find_one(matcher_stack)
         except NoMatchesError, e:
-            warning = 'doxygen%s: Cannot find %s "%s" in doxygen xml output' % (self.kind, self.kind, name)
+            warning = ( 'doxygen%s: Cannot find %s "%s" in doxygen xml output for project "%s" from directory: %s'
+                    % (self.kind, self.kind, name, project_info.name(), project_info.path()) )
             return [ docutils.nodes.warning( "", docutils.nodes.paragraph("", "", docutils.nodes.Text(warning))),
                     self.state.document.reporter.warning( warning, line=self.lineno) ]
 
@@ -238,7 +241,8 @@ class DoxygenFileDirective(BaseDirective):
         try:
             data_object = finder.find_one(matcher_stack)
         except NoMatchesError, e:
-            warning = 'doxygen%s: Cannot find %s "%s" in doxygen xml output' % (self.kind, self.kind, name)
+            warning = ( 'doxygen%s: Cannot find %s "%s" in doxygen xml output for project "%s" from directory: %s'
+                    % (self.kind, self.kind, name, project_info.name(), project_info.path()) )
             return [ docutils.nodes.warning( "", docutils.nodes.paragraph("", "", docutils.nodes.Text(warning))),
                     self.state.document.reporter.warning( warning, line=self.lineno) ]
 
@@ -272,18 +276,23 @@ class DoxygenBaseDirective(BaseDirective):
 
     def run(self):
 
-        name = self.arguments[0]
+        try:
+            (namespace, name) = self.arguments[0].rsplit("::", 1)
+        except ValueError:
+            (namespace, name) = "", self.arguments[0]
 
         project_info = self.project_info_factory.create_project_info(self.options)
 
         finder = self.finder_factory.create_finder(project_info)
 
-        matcher_stack = self.create_matcher_stack(name)
+        matcher_stack = self.create_matcher_stack(namespace, name)
 
         try:
             data_object = finder.find_one(matcher_stack)
         except NoMatchesError, e:
-            warning = 'doxygen%s: Cannot find %s "%s" in doxygen xml output' % (self.kind, self.kind, name)
+            display_name = "%s::%s" % (namespace, name) if namespace else name
+            warning = ( 'doxygen%s: Cannot find %s "%s" in doxygen xml output for project "%s" from directory: %s'
+                    % (self.kind, self.kind, display_name, project_info.name(), project_info.path()) )
             return [ docutils.nodes.warning( "", docutils.nodes.paragraph("", "", docutils.nodes.Text(warning))),
                     self.state.document.reporter.warning( warning, line=self.lineno) ]
 
@@ -307,11 +316,17 @@ class DoxygenStructDirective(DoxygenBaseDirective):
 
     kind = "struct"
 
-    def create_matcher_stack(self, name):
+    def create_matcher_stack(self, namespace, name):
+
+        # Structs are stored in the xml file with their fully namespaced name
+        # We're using C++ namespaces here, it might be best to make this file
+        # type dependent
+        # 
+        xml_name = "%s::%s" % (namespace, name) if namespace else name
 
         return self.matcher_factory.create_matcher_stack(
                 {
-                    "compound" : self.matcher_factory.create_name_type_matcher(name, self.kind)
+                    "compound" : self.matcher_factory.create_name_type_matcher(xml_name, self.kind)
                 },
                 "compound"
             )
@@ -322,11 +337,11 @@ class DoxygenEnumDirective(DoxygenBaseDirective):
 
     kind = "enum"
 
-    def create_matcher_stack(self, name):
+    def create_matcher_stack(self, namespace, name):
 
         return self.matcher_factory.create_matcher_stack(
                 {
-                    "compound" : self.matcher_factory.create_name_matcher(""),
+                    "compound" : self.matcher_factory.create_name_matcher(namespace),
                     "member" : self.matcher_factory.create_name_type_matcher(name, self.kind)
                 },
                 "member"
@@ -336,11 +351,11 @@ class DoxygenTypedefDirective(DoxygenBaseDirective):
 
     kind = "typedef"
 
-    def create_matcher_stack(self, name):
+    def create_matcher_stack(self, namespace, name):
 
         return self.matcher_factory.create_matcher_stack(
                 {
-                    "compound" : self.matcher_factory.create_name_matcher(""),
+                    "compound" : self.matcher_factory.create_name_matcher(namespace),
                     "member" : self.matcher_factory.create_name_type_matcher(name, self.kind)
                 },
                 "member"

@@ -24,10 +24,12 @@ all: typedef/xml/index.xml \
 	alias/xml/index.xml \
 	rst/xml/index.xml \
 	inline/xml/index.xml \
-	members/xml/index.xml
+	members/xml/index.xml \
+	namespacefile/xml/index.xml
 
 clean:
-	rm -rf typedef class nutshell alias rst inline
+	rm -rf typedef class nutshell alias rst inline namespacefile \
+		members
            
 typedef/xml/index.xml: typedef.h typedef.cfg
 	$(DOXYGEN) typedef.cfg
@@ -49,3 +51,7 @@ inline/xml/index.xml: inline.h inline.cfg
 
 members/xml/index.xml: members.h members.cfg
 	$(DOXYGEN) members.cfg
+
+namespacefile/xml/index.xml: namespacefile.h namespacefile.cfg
+	$(DOXYGEN) namespacefile.cfg
+
