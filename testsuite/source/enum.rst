@@ -17,6 +17,20 @@ It produces this output:
 .. doxygenenum:: NodeType
   :project: tinyxml
 
+Example with Namespace
+----------------------
+
+This should work::
+
+   .. doxygenenum:: foo::ns::Letters
+      :project: namespacefile
+
+It produces this output:
+
+.. doxygenenum:: foo::ns::Letters
+   :project: namespacefile
+   :no-link:
+
 Failing Example
 ---------------
 
