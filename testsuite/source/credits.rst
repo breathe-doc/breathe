@@ -4,9 +4,11 @@ Credits
 
 Thank you to:
 
-- `nijel <http://github.com/nijel>`_
-- `sebastianschaetz <http://github.com/sebastianschaetz>`_
-- `mbolivar <http://github.com/mbolivar>`_
+- `nijel <https://github.com/nijel>`_
+- `sebastianschaetz <https://github.com/sebastianschaetz>`_
+- `mbolivar <https://github.com/mbolivar>`_
+- `queezythegreat <https://github.com/queezythegreat>`_
+- `abingham <https://github.com/abingham>`_
 
 For their contributions; reporting bugs, suggesting features, improving the code
 and working on the documentation. And thanks to:
