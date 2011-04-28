@@ -18,7 +18,7 @@ from breathe.parser import DoxygenParserFactory, DoxygenIndexParser, ParserError
 from breathe.renderer.rst.doxygen import DoxygenToRstRendererFactoryCreator, RstContentCreator
 from breathe.renderer.rst.doxygen.domain import DomainHandlerFactoryCreator, NullDomainHandler
 from breathe.renderer.rst.doxygen.domain import CppDomainHelper, CDomainHelper
-from breathe.renderer.rst.doxygen.filter import FilterFactory, GlobFactory
+from breathe.renderer.rst.doxygen.filter import FilterFactory, GlobFactory, PathHandler
 from breathe.renderer.rst.doxygen.target import TargetHandlerFactory
 from breathe.finder.doxygen import DoxygenItemFinderFactoryCreator, ItemMatcherFactory
 
@@ -231,18 +231,20 @@ class DoxygenFileDirective(BaseDirective):
 
         finder = self.finder_factory.create_finder(project_info)
 
-        matcher_stack = self.matcher_factory.create_matcher_stack(
-                {
-                    "compound" : self.matcher_factory.create_name_type_matcher(name, self.kind)
-                },
-                "compound"
-            )
+        finder_filter = self.filter_factory.create_file_finder_filter(name)
 
-        try:
-            data_object = finder.find_one(matcher_stack)
-        except NoMatchesError, e:
-            warning = ( 'doxygen%s: Cannot find %s "%s" in doxygen xml output for project "%s" from directory: %s'
-                    % (self.kind, self.kind, name, project_info.name(), project_info.path()) )
+        matches = []
+        finder.filter_(finder_filter, matches)
+
+        if len(matches) > 1:
+            warning = ( 'doxygenfile: Found multiple matches for file "%s" in doxygen xml output for project "%s" '
+                    'from directory: %s' % (name, project_info.name(), project_info.path()) )
+            return [ docutils.nodes.warning( "", docutils.nodes.paragraph("", "", docutils.nodes.Text(warning))),
+                    self.state.document.reporter.warning( warning, line=self.lineno) ]
+
+        elif not matches:
+            warning = ( 'doxygenfile: Cannot find file "%s" in doxygen xml output for project "%s" from directory: %s'
+                    % (name, project_info.name(), project_info.path()) )
             return [ docutils.nodes.warning( "", docutils.nodes.paragraph("", "", docutils.nodes.Text(warning))),
                     self.state.document.reporter.warning( warning, line=self.lineno) ]
 
@@ -256,9 +258,11 @@ class DoxygenFileDirective(BaseDirective):
                 filter_,
                 target_handler,
                 )
-        object_renderer = renderer_factory.create_renderer(self.root_data_object, data_object)
 
-        nodes = object_renderer.render()
+        nodes = []
+        for data_object in matches:
+            object_renderer = renderer_factory.create_renderer(self.root_data_object, data_object)
+            nodes.extend(object_renderer.render())
 
         return nodes
 
@@ -630,7 +634,8 @@ def setup(app):
 
     project_info_factory = ProjectInfoFactory(fnmatch.fnmatch)
     glob_factory = GlobFactory(fnmatch.fnmatch)
-    filter_factory = FilterFactory(glob_factory)
+    path_handler = PathHandler(os.sep, os.path.basename)
+    filter_factory = FilterFactory(glob_factory, path_handler)
     target_handler_factory = TargetHandlerFactory(node_factory)
 
     root_data_object = RootDataObject()

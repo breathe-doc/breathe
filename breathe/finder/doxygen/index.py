@@ -17,6 +17,15 @@ class DoxygenTypeSubItemFinder(ItemFinder):
 
         return results
 
+
+    def filter_(self, filter_, matches):
+
+        compounds = self.data_object.get_compound()
+
+        for compound in compounds:
+            compound_finder = self.item_finder_factory.create_finder(compound)
+            compound_finder.filter_(self.data_object, filter_, matches)
+
 class CompoundTypeSubItemFinder(ItemFinder):
 
     def __init__(self, matcher_factory, compound_parser, *args):
@@ -54,6 +63,14 @@ class CompoundTypeSubItemFinder(ItemFinder):
             results.append(self.data_object)
 
         return results
+
+
+    def filter_(self, parent, filter_, matches):
+
+        file_data = self.compound_parser.parse(self.data_object.refid)
+        finder = self.item_finder_factory.create_finder(file_data)
+
+        finder.filter_(self.data_object, filter_, matches)
 
 class MemberTypeSubItemFinder(ItemFinder):
 

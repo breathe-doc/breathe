@@ -49,6 +49,16 @@ class KindAccessor(Accessor):
     def __call__(self, parent_data_object, child_data_object):
         return self.selecter(parent_data_object, child_data_object).kind
 
+class LambdaAccessor(Accessor):
+
+    def __init__(self, selecter, func):
+        Accessor.__init__(self, selecter)
+
+        self.func = func
+
+    def __call__(self, parent_data_object, child_data_object):
+        return self.func(self.selecter(parent_data_object, child_data_object))
+
 class NameFilter(object):
 
     def __init__(self, accessor, members):
@@ -72,6 +82,35 @@ class GlobFilter(object):
 
         text = self.accessor(parent_data_object, child_data_object)
         return self.glob.match(text)
+
+
+class FilePathFilter(object):
+
+    def __init__(self, accessor, target_file, path_handler):
+
+        self.accessor = accessor
+        self.target_file = target_file
+        self.path_handler = path_handler
+
+    def allow(self, parent_data_object, child_data_object):
+
+        location = self.accessor(parent_data_object, child_data_object).file
+
+        if self.path_handler.includes_directory(self.target_file):
+            # If the target_file contains directory separators then
+            # match against the same length at the ned of the location
+            #
+            location_match = location[-len(self.target_file):]
+            return location_match == self.target_file
+
+        else:
+            # If there are not separators, match against the whole filename
+            # at the end of the location
+            # 
+            # This is to prevent "Util.cpp" matching "PathUtil.cpp"
+            #
+            location_basename = self.path_handler.basename(location)
+            return location_basename == self.target_file
 
 
 class OpenFilter(object):
@@ -140,12 +179,23 @@ class GlobFactory(object):
 
         return Glob(self.method, pattern)
 
+class PathHandler(object):
+
+    def __init__(self, sep, basename):
+
+        self.sep = sep
+        self.basename = basename
+
+    def includes_directory(self, file_path):
+
+        return bool( file_path.count( self.sep ) )
 
 class FilterFactory(object):
 
-    def __init__(self, globber_factory):
+    def __init__(self, globber_factory, path_handler):
 
         self.globber_factory = globber_factory
+        self.path_handler = path_handler
 
     def create_class_filter(self, options):
 
@@ -227,4 +277,16 @@ class FilterFactory(object):
     def create_open_filter(self):
 
         return OpenFilter()
+
+    def create_file_finder_filter(self, filename):
+
+        filter_ = AndFilter(
+                AndFilter(
+                    NameFilter(NodeTypeAccessor(Child()), ["compounddef"]),
+                    NameFilter(KindAccessor(Child()), ["file"]),
+                    ),
+                FilePathFilter(LambdaAccessor(Child(), lambda x: x.location), filename, self.path_handler)
+                )
+
+        return filter_
 
