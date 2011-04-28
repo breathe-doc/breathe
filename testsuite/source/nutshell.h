@@ -1,5 +1,8 @@
+/**
+    \file nutshell.h
+    An overly extended example of how to use breathe
+*/
 
-//! An overly extended example of how to use breathe
 /*!
     With a little bit of a elaboration, should you feel it necessary.
 */
