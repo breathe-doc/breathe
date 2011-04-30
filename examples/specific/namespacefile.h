@@ -2,7 +2,11 @@
 namespace foo {
 
     /** This appears in the documentation */
-    class Bar {};
+    class Bar {
+
+        class InnerBar {};
+    
+    };
     
     /** This does not */
     int baz();
@@ -15,6 +19,12 @@ namespace foo {
 
         /** Documentation here */
         struct FooStruct {};
+
+        class FooClass {
+
+            class InnerFoo {};
+
+        }
     }
 
 }

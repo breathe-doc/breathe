@@ -281,9 +281,9 @@ class DoxygenBaseDirective(BaseDirective):
     def run(self):
 
         try:
-            (namespace, name) = self.arguments[0].rsplit("::", 1)
+            namespace, name = self.arguments[0].rsplit("::", 1)
         except ValueError:
-            (namespace, name) = "", self.arguments[0]
+            namespace, name = "", self.arguments[0]
 
         project_info = self.project_info_factory.create_project_info(self.options)
 

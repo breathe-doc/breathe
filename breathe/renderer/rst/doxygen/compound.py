@@ -91,6 +91,10 @@ class CompoundDefTypeSubRenderer(Renderer):
             renderer = self.renderer_factory.create_renderer(self.data_object, innerclass)
             nodelist.append(self.node_factory.paragraph("", "", *renderer.render()))
 
+        for innernamespace in self.data_object.innernamespace:
+            renderer = self.renderer_factory.create_renderer(self.data_object, innernamespace)
+            nodelist.append(self.node_factory.paragraph("", "", *renderer.render()))
+
         return [self.node_factory.block_quote("", *nodelist)]
 
 
@@ -589,6 +593,7 @@ class RefTypeSubRenderer(Renderer):
 
     ref_types = {
             "innerclass" : "class",
+            "innernamespace" : "namespace",
             }
 
     def __init__(self, compound_parser, *args):
@@ -608,6 +613,7 @@ class RefTypeSubRenderer(Renderer):
         kind = self.node_factory.emphasis(text=type_)
 
         name_text = self.data_object.content_[0].getValue()
+        name_text = name_text.rsplit("::", 1)[-1]
         name = self.node_factory.strong(text=name_text)
 
         nodelist.append(
