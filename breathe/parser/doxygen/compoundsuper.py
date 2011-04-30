@@ -256,6 +256,7 @@ class compounddefType(GeneratedsSuper):
         self.programlisting = programlisting
         self.location = location
         self.listofallmembers = listofallmembers
+        self.namespaces = []
     def factory(*args_, **kwargs_):
         if compounddefType.subclass:
             return compounddefType.subclass(*args_, **kwargs_)
@@ -435,11 +436,13 @@ class compounddefType(GeneratedsSuper):
             obj_ = refType.factory(nodeName_)
             obj_.build(child_)
             self.innerclass.append(obj_)
+            self.namespaces.append(obj_.content_[0].getValue())
         elif child_.nodeType == Node.ELEMENT_NODE and \
             nodeName_ == 'innernamespace':
             obj_ = refType.factory(nodeName_)
             obj_.build(child_)
             self.innernamespace.append(obj_)
+            self.namespaces.append(obj_.content_[0].getValue())
         elif child_.nodeType == Node.ELEMENT_NODE and \
             nodeName_ == 'innerpage':
             obj_ = refType.factory(nodeName_)

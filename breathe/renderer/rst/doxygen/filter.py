@@ -59,6 +59,11 @@ class LambdaAccessor(Accessor):
     def __call__(self, parent_data_object, child_data_object):
         return self.func(self.selecter(parent_data_object, child_data_object))
 
+class NamespaceAccessor(Accessor):
+
+    def __call__(self, parent_data_object, child_data_object):
+        return self.selecter(parent_data_object, child_data_object).namespaces
+
 class NameFilter(object):
 
     def __init__(self, accessor, members):
@@ -112,6 +117,24 @@ class FilePathFilter(object):
             location_basename = self.path_handler.basename(location)
             return location_basename == self.target_file
 
+class NamespaceFilter(object):
+
+    def __init__(self, namespace_accessor, name_accessor):
+        
+        self.namespace_accessor = namespace_accessor
+        self.name_accessor = name_accessor
+
+    def allow(self, parent_data_object, child_data_object):
+
+        namespaces = self.namespace_accessor(parent_data_object, child_data_object)
+        name = self.name_accessor(parent_data_object, child_data_object)
+
+        try:
+            namespace, name = name.rsplit("::", 1)
+        except ValueError:
+            namespace, name = "", name
+
+        return namespace in namespaces
 
 class OpenFilter(object):
 
@@ -239,15 +262,18 @@ class FilterFactory(object):
 
         filter_ = OrFilter(
                 NotFilter(
-                    AndFilter(
-                        NameFilter(NodeTypeAccessor(Parent()), ["compounddef"]),
-                        NameFilter(KindAccessor(Parent()), ["class"]),
-                        )
+                    NameFilter(NodeTypeAccessor(Parent()), ["compounddef"]),
                     ),
                 NotFilter(
                     AndFilter(
-                        NameFilter(NodeTypeAccessor(Child()),["ref"]),
-                        NameFilter(NodeNameAccessor(Child()),["innerclass"])
+                        AndFilter(
+                            NameFilter(NodeTypeAccessor(Child()),["ref"]),
+                            NameFilter(NodeNameAccessor(Child()),["innerclass", "innernamespace"])
+                            ),
+                        NamespaceFilter(
+                            NamespaceAccessor(Parent()),
+                            LambdaAccessor(Child(), lambda x: x.content_[0].getValue())
+                            )
                         )
                     )
                 )
