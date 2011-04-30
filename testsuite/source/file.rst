@@ -17,6 +17,20 @@ It produces this output:
 .. doxygenfile:: nutshell.h
    :project: nutshell
 
+Example with Nested Namespaces
+------------------------------
+
+This should work::
+
+   .. doxygenfile:: namespacefile.h
+      :project: namespacefile
+
+It produces this output:
+
+.. doxygenfile:: namespacefile.h
+   :project: namespacefile
+
+
 Example for Multiple Files
 --------------------------
 

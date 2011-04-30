@@ -4,13 +4,15 @@ namespace foo {
     /** This appears in the documentation */
     class Bar {
 
+        /** This appears as a sub class */
         class InnerBar {};
-    
+
     };
-    
-    /** This does not */
+
+    /** This also appears */
     int baz();
 
+    /** More examples in a nested namespace */
     namespace ns {
 
         typedef int MyInt;
