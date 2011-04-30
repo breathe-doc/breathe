@@ -285,15 +285,30 @@ class FilterFactory(object):
 
     def create_index_filter(self, options):
 
-        filter_ = OrFilter(
-                NotFilter(NameFilter(NodeTypeAccessor(Parent()), ["compounddef"])),
+        filter_ = AndFilter(
                 NotFilter(
                     AndFilter(
-                        NameFilter(NodeTypeAccessor(Child()),["ref"]),
-                        NameFilter(NodeNameAccessor(Child()),["innerclass"])
+                        NameFilter(NodeTypeAccessor(Parent()), ["compounddef"]),
+                        AndFilter(
+                            NameFilter(NodeTypeAccessor(Child()),["ref"]),
+                            NameFilter(NodeNameAccessor(Child()),["innerclass", "innernamespace"])
+                            )
+                        )
+                    ),
+                NotFilter(
+                    AndFilter(
+                        AndFilter(
+                            NameFilter(NodeTypeAccessor(Parent()), ["compounddef"]),
+                            NameFilter(KindAccessor(Parent()), ["group"])
+                            ),
+                        AndFilter(
+                            NameFilter(NodeTypeAccessor(Child()),["sectiondef"]),
+                            NameFilter(KindAccessor(Child()),["func"])
+                            )
                         )
                     )
                 )
+
 
         return AndFilter(
                 self.create_outline_filter(options),
