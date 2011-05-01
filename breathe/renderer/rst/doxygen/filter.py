@@ -258,21 +258,57 @@ class FilterFactory(object):
         else:
             return OpenFilter()
 
-    def create_file_filter(self, options):
+    def create_file_filter(self, filename, options):
 
-        filter_ = OrFilter(
+        filter_ = AndFilter(
                 NotFilter(
-                    NameFilter(NodeTypeAccessor(Parent()), ["compounddef"]),
-                    ),
-                NotFilter(
+                    # Ignore innerclasses and innernamespaces that are inside a
+                    # namespace that is going to be rendered as they will be
+                    # rendered with that namespace and we don't want them twice
                     AndFilter(
+                        NameFilter(NodeTypeAccessor(Parent()), ["compounddef"]),
                         AndFilter(
-                            NameFilter(NodeTypeAccessor(Child()),["ref"]),
-                            NameFilter(NodeNameAccessor(Child()),["innerclass", "innernamespace"])
-                            ),
-                        NamespaceFilter(
-                            NamespaceAccessor(Parent()),
-                            LambdaAccessor(Child(), lambda x: x.content_[0].getValue())
+                            AndFilter(
+                                NameFilter(NodeTypeAccessor(Child()),["ref"]),
+                                NameFilter(NodeNameAccessor(Child()),["innerclass", "innernamespace"])
+                                ),
+                            NamespaceFilter(
+                                NamespaceAccessor(Parent()),
+                                LambdaAccessor(Child(), lambda x: x.content_[0].getValue())
+                                )
+                            )
+                        )
+                    ),
+                AndFilter(
+                    NotFilter(
+                        # Ignore memberdefs from files which are different to
+                        # the one we're rendering. This happens when we have to
+                        # cross into a namespace xml file which has entries
+                        # from multiple files in it
+                        AndFilter(
+                            NameFilter(NodeTypeAccessor(Child()), ["memberdef"]),
+                            NotFilter(
+                                FilePathFilter(LambdaAccessor(Child(), lambda x: x.location), filename, self.path_handler)
+                                )
+                            )
+                        ),
+                    NotFilter(
+                        # Ignore compounddefs which are from another file
+                        # (normally means classes and structs which are in a
+                        # namespace that we have other interests in) but only
+                        # check it if the compounddef is not a namespace
+                        # itself, as for some reason compounddefs for
+                        # namespaces are registered with just a single file
+                        # location even if they namespace is spread over
+                        # multiple files
+                        AndFilter(
+                            AndFilter(
+                                NameFilter(NodeTypeAccessor(Child()), ["compounddef"]),
+                                NotFilter(NameFilter(KindAccessor(Child()), ["namespace"]))
+                                ),
+                            NotFilter(
+                                FilePathFilter(LambdaAccessor(Child(), lambda x: x.location), filename, self.path_handler)
+                                )
                             )
                         )
                     )

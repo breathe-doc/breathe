@@ -249,7 +249,7 @@ class DoxygenFileDirective(BaseDirective):
                     self.state.document.reporter.warning( warning, line=self.lineno) ]
 
         target_handler = self.target_handler_factory.create(self.options, project_info, self.state.document)
-        filter_ = self.filter_factory.create_file_filter(self.options)
+        filter_ = self.filter_factory.create_file_filter(name, self.options)
 
         renderer_factory = self.renderer_factory_creator.create_factory(
                 project_info,

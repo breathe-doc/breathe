@@ -603,37 +603,45 @@ class RefTypeSubRenderer(Renderer):
 
     def render(self):
 
-        nodelist = []
-
-        refid = "%s%s" % (self.project_info.name(), self.data_object.refid)
-        nodelist = self.target_handler.create_target(refid)
-
-        # Set up the title and a reference for it (refid)
-        type_ = self.ref_types[self.data_object.node_name]
-        kind = self.node_factory.emphasis(text=type_)
-
-        name_text = self.data_object.content_[0].getValue()
-        name_text = name_text.rsplit("::", 1)[-1]
-        name = self.node_factory.strong(text=name_text)
-
-        nodelist.append(
-                self.node_factory.paragraph(
-                    "",
-                    "",
-                    kind,
-                    self.node_factory.Text(" "),
-                    name,
-                    ids=[refid]
-                    )
-            )
-
         # Read in the corresponding xml file and process
         file_data = self.compound_parser.parse(self.data_object.refid)
         data_renderer = self.renderer_factory.create_renderer(self.data_object, file_data)
 
-        nodelist.extend(data_renderer.render())
+        child_nodes = data_renderer.render()
 
-        return nodelist
+        # Only render the header with refs if we've definitely got content to
+        # put underneath it. Otherwise return an empty list
+        if child_nodes:
+
+            refid = "%s%s" % (self.project_info.name(), self.data_object.refid)
+            nodelist = self.target_handler.create_target(refid)
+
+            # Set up the title and a reference for it (refid)
+            type_ = self.ref_types[self.data_object.node_name]
+            kind = self.node_factory.emphasis(text=type_)
+
+            name_text = self.data_object.content_[0].getValue()
+            name_text = name_text.rsplit("::", 1)[-1]
+            name = self.node_factory.strong(text=name_text)
+
+            nodelist = []
+
+            nodelist.append(
+                    self.node_factory.paragraph(
+                        "",
+                        "",
+                        kind,
+                        self.node_factory.Text(" "),
+                        name,
+                        ids=[refid]
+                        )
+                )
+
+            nodelist.extend(child_nodes)
+
+            return nodelist
+
+        return []
 
 class VerbatimTypeSubRenderer(Renderer):
 
