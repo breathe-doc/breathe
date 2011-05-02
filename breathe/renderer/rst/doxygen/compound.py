@@ -89,11 +89,15 @@ class CompoundDefTypeSubRenderer(Renderer):
         # Take care of innerclasses
         for innerclass in self.data_object.innerclass:
             renderer = self.renderer_factory.create_renderer(self.data_object, innerclass)
-            nodelist.append(self.node_factory.paragraph("", "", *renderer.render()))
+            class_nodes = renderer.render()
+            if class_nodes: 
+                nodelist.append(self.node_factory.paragraph("", "", *class_nodes))
 
         for innernamespace in self.data_object.innernamespace:
             renderer = self.renderer_factory.create_renderer(self.data_object, innernamespace)
-            nodelist.append(self.node_factory.paragraph("", "", *renderer.render()))
+            namespace_nodes = renderer.render() 
+            if namespace_nodes:
+                nodelist.append(self.node_factory.paragraph("", "", *namespace_nodes))
 
         return [self.node_factory.block_quote("", *nodelist)]
 
