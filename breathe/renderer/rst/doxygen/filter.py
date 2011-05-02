@@ -74,6 +74,7 @@ class NameFilter(object):
     def allow(self, parent_data_object, child_data_object):
 
         name = self.accessor(parent_data_object, child_data_object)
+
         return name in self.members
 
 class GlobFilter(object):
@@ -202,6 +203,20 @@ class GlobFactory(object):
 
         return Glob(self.method, pattern)
 
+class Gather(object):
+
+    def __init__(self, accessor, names):
+
+        self.accessor = accessor
+        self.names = names
+
+    def allow(self, parent_data_object, child_data_object):
+
+        self.names.extend( self.accessor(parent_data_object, child_data_object) )
+
+        return False
+
+
 class PathHandler(object):
 
     def __init__(self, sep, basename):
@@ -260,25 +275,74 @@ class FilterFactory(object):
 
     def create_file_filter(self, filename, options):
 
+        valid_names = []
+
         filter_ = AndFilter(
-                NotFilter(
-                    # Ignore innerclasses and innernamespaces that are inside a
-                    # namespace that is going to be rendered as they will be
-                    # rendered with that namespace and we don't want them twice
+                AndFilter(
                     AndFilter(
-                        NameFilter(NodeTypeAccessor(Parent()), ["compounddef"]),
-                        AndFilter(
+                        NotFilter(
+                            # Gather the "namespaces" attribute from the
+                            # compounddef for the file we're rendering and
+                            # store the information in the "valid_names" list
+                            #
+                            # Gather always returns false, so, combined with
+                            # the NotFilter this chunk always returns true and
+                            # so does not affect the result of the filtering
                             AndFilter(
-                                NameFilter(NodeTypeAccessor(Child()),["ref"]),
-                                NameFilter(NodeNameAccessor(Child()),["innerclass", "innernamespace"])
-                                ),
-                            NamespaceFilter(
-                                NamespaceAccessor(Parent()),
-                                LambdaAccessor(Child(), lambda x: x.content_[0].getValue())
+                                AndFilter(
+                                    AndFilter(
+                                        NameFilter(NodeTypeAccessor(Child()), ["compounddef"]),
+                                        NameFilter(KindAccessor(Child()), ["file"])
+                                    ),
+                                    FilePathFilter(
+                                        LambdaAccessor(Child(), lambda x: x.location), filename, self.path_handler
+                                        )
+                                    ),
+                                Gather(LambdaAccessor(Child(), lambda x: x.namespaces), valid_names)
+                                )
+                            ),
+                        NotFilter(
+                            # Take the valid_names and everytime we handle an
+                            # innerclass or innernamespace, check that its name
+                            # was one of those initial valid names so that we
+                            # never end up rendering a namespace or class that
+                            # wasn't in the initial file. Notably this is
+                            # required as the location attribute for the
+                            # namespace in the xml is unreliable.
+                            AndFilter(
+                                NameFilter(NodeTypeAccessor(Parent()), ["compounddef"]),
+                                AndFilter(
+                                    AndFilter(
+                                        NameFilter(NodeTypeAccessor(Child()),["ref"]),
+                                        NameFilter(NodeNameAccessor(Child()),["innerclass", "innernamespace"])
+                                        ),
+                                    NotFilter(NameFilter(
+                                        LambdaAccessor(Child(), lambda x: x.content_[0].getValue()),
+                                        valid_names
+                                        ))
+                                    )
                                 )
                             )
-                        )
-                    ),
+                        ),
+                 NotFilter(
+                     # Ignore innerclasses and innernamespaces that are inside a
+                     # namespace that is going to be rendered as they will be
+                     # rendered with that namespace and we don't want them twice
+                     AndFilter(
+                         NameFilter(NodeTypeAccessor(Parent()), ["compounddef"]),
+                         AndFilter(
+                             AndFilter(
+                                 NameFilter(NodeTypeAccessor(Child()),["ref"]),
+                                 NameFilter(NodeNameAccessor(Child()),["innerclass", "innernamespace"])
+                                 ),
+                             NamespaceFilter(
+                                 NamespaceAccessor(Parent()),
+                                 LambdaAccessor(Child(), lambda x: x.content_[0].getValue())
+                                 )
+                             )
+                         )
+                     ),
+                ),
                 AndFilter(
                     NotFilter(
                         # Ignore memberdefs from files which are different to
