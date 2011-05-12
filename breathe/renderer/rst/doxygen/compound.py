@@ -248,6 +248,18 @@ class FuncMemberDefTypeSubRenderer(MemberDefTypeSubRenderer):
         return args
 
 
+class DefineMemberDefTypeSubRenderer(MemberDefTypeSubRenderer):
+
+    def title(self):
+
+        name = self.node_factory.strong(text=self.data_object.name)
+        return [name]
+
+    def description(self):
+
+        return MemberDefTypeSubRenderer.description(self)
+
+
 class EnumMemberDefTypeSubRenderer(MemberDefTypeSubRenderer):
 
     def title(self):

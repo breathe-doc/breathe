@@ -6,3 +6,6 @@ nutshell
 rst
 typedef
 members
+*/xml/*.xml
+*/xml/*.xsd
+*/xml/*.xslt
