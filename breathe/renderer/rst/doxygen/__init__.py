@@ -159,6 +159,8 @@ class DoxygenToRstRendererFactory(object):
                 Renderer = compoundrenderer.TypedefMemberDefTypeSubRenderer
             elif data_object.kind == "variable":
                 Renderer = compoundrenderer.VariableMemberDefTypeSubRenderer
+            elif data_object.kind == "define":
+                Renderer = compoundrenderer.DefineMemberDefTypeSubRenderer
 
         if node_type == "docsimplesect":
             if data_object.kind == "par":

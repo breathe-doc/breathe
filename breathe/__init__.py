@@ -335,7 +335,19 @@ class DoxygenStructDirective(DoxygenBaseDirective):
                 "compound"
             )
 
+class DoxygenDefineDirective(DoxygenBaseDirective):
 
+    kind = "define"
+
+    def create_matcher_stack(self, namespace, name):
+
+        return self.matcher_factory.create_matcher_stack(
+                {
+                    "compound" : self.matcher_factory.create_name_matcher(namespace),
+                    "member" : self.matcher_factory.create_name_type_matcher(name, self.kind)
+                },
+                "member"
+            )
 
 class DoxygenEnumDirective(DoxygenBaseDirective):
 
@@ -516,6 +528,7 @@ class DoxygenDirectiveFactory(object):
             "doxygenfunction" : DoxygenFunctionDirective,
             "doxygenstruct" : DoxygenStructDirective,
             "doxygenclass" : DoxygenClassDirective,
+            "doxygendefine" : DoxygenDefineDirective,
             "doxygenenum" : DoxygenEnumDirective,
             "doxygentypedef" : DoxygenTypedefDirective,
             "doxygenfile" : DoxygenFileDirective,
@@ -559,6 +572,9 @@ class DoxygenDirectiveFactory(object):
 
     def create_file_directive_container(self):
         return self.create_directive_container("doxygenfile")
+
+    def create_define_directive_container(self):
+        return self.create_directive_container("doxygendefine")
 
     def create_directive_container(self, type_):
 
@@ -683,6 +699,11 @@ def setup(app):
     app.add_directive(
             "doxygenfile",
             directive_factory.create_file_directive_container(),
+            )
+
+    app.add_directive(
+            "doxygendefine",
+            directive_factory.create_define_directive_container(),
             )
 
     app.add_config_value("breathe_projects", {}, True)
