@@ -10,6 +10,7 @@ Directives & Config Variables
    class
    enum
    typedef
+   define
    file
 
 The available directives are shown below. In each case the ``project``,
@@ -119,6 +120,22 @@ the same as the doxygenstruct directive.
       :no-link:
 
 Checkout the :ref:`example <typedef-example>` to see it in action.
+
+doxygendefine Directive
+~~~~~~~~~~~~~~~~~~~~~~~
+
+This directive generates the appropriate output for a single preprocessor define. It behaves
+the same as the doxygenstruct directive.
+
+::
+
+   .. doxygendefine:: <define name>
+      :project: ...
+      :path: ...
+      :outline:
+      :no-link:
+
+Checkout the :ref:`example <define-example>` to see it in action.
 
 .. _doxygenclass:
 
