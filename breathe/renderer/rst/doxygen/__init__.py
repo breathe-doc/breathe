@@ -274,7 +274,28 @@ class DoxygenToRstRendererFactoryCreator(object):
             "unicode" : UnicodeRenderer,
             }
 
+        try:
+            node_type = data_object.node_type
+        except AttributeError, e:
+
+            # Horrible hack to silence errors on filtering unicode objects
+            # until we fix the parsing
+            if type(data_object) == unicode:
+                node_type = "unicode"
+            else:
+                raise e
+
         success, domain_handler, type_ = self.get_domain(data_object, self.default_domain_handler)
+
+        if not success and node_type == "compound":
+
+            compound_parser = self.parser_factory.create_compound_parser(self.project_info)
+            file_data = compound_parser.parse(data_object.refid)
+
+            success, domain_handler, type_ = self.get_domain(
+                    file_data.compounddef,
+                    domain_handler
+                    )
 
         return DoxygenToRstRendererFactory(
                 "root",
