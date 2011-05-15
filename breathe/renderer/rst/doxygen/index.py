@@ -22,10 +22,20 @@ class CompoundTypeSubRenderer(Renderer):
 
         self.compound_parser = compound_parser
 
+    def create_target(self, refid):
+
+        return self.target_handler.create_target(refid)
+
+    def create_domain_id(self):
+
+        return ""
+
     def render(self):
-         
+
         refid = "%s%s" % (self.project_info.name(), self.data_object.refid)
-        nodelist = self.target_handler.create_target(refid)
+        nodelist = self.create_target(refid)
+
+        domain_id = self.create_domain_id()
 
         # Set up the title and a reference for it (refid)
         kind = self.node_factory.emphasis(text=self.data_object.kind)
@@ -37,7 +47,7 @@ class CompoundTypeSubRenderer(Renderer):
                     kind,
                     self.node_factory.Text(" "),
                     name,
-                    ids=[refid]
+                    ids=[domain_id, refid]
                     )
             )
 
@@ -49,4 +59,15 @@ class CompoundTypeSubRenderer(Renderer):
 
         return nodelist
 
+
+class ClassCompoundTypeSubRenderer(CompoundTypeSubRenderer):
+
+    def create_target(self, refid):
+
+        self.domain_handler.create_class_target(self.data_object)
+        return CompoundTypeSubRenderer.create_target(self, refid)
+
+    def create_domain_id(self):
+
+        return self.domain_handler.create_class_id(self.data_object)
 

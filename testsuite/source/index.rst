@@ -24,8 +24,8 @@ Features
 * **Allows embedded restructured text in doxygen markup** - some extra doxygen
   aliases allow you to add ``\rst`` - ``\endrst`` blocks to your comments and have
   the contents interpreted as restructured text.
-* **Plays well with Sphinx domains** - Link to entries in the breathe output with
-  standard Sphinx domain references, like, ``:c:func:<my_function>``.
+* **Basic support for Sphinx domains** - Link to functions in the breathe output
+  with a standard Sphinx domain reference.
 
 Contents
 --------
@@ -36,6 +36,7 @@ Contents
    quickstart
    directives
    markups
+   domains
    contributing
    codeguide
    testpages
