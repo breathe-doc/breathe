@@ -16,6 +16,7 @@ It produces this output:
 
 .. doxygenfile:: nutshell.h
    :project: nutshell
+   :no-link:
 
 Example with Nested Namespaces
 ------------------------------
