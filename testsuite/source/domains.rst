@@ -1,44 +1,51 @@
 
-Domain Tests
-============
+Domains
+=======
 
-.. doxygenfunction:: testnamespace::NamespacedClassTest::function
-   :path: ../examples/specific/class/xml
+Breathe has some limited support for Sphinx domains. It tries to output targets
+that the Sphinx domain references expect. This should allow you to use Sphinx
+domain roles like ``:c:func:`foo``` to link to output from Breathe.
 
-.. doxygenfunction:: frob_foos
-   :path: ../examples/specific/alias/xml
+.. note:: This is currently only supported for C & C++ functions. 
 
-Domain Reference
-----------------
+Examples
+--------
 
-Through Breathe
-~~~~~~~~~~~~~~~
+Given the following Breathe directives::
 
-Sphinx domains linking to Breathe output.
+   .. doxygenfunction:: testnamespace::NamespacedClassTest::function
+      :path: ../examples/specific/class/xml
 
-This is a reference to a c func: :c:func:`frob_foos()`.
+   .. doxygenfunction:: frob_foos
+      :path: ../examples/specific/alias/xml
 
-This is :c:func:`another reference <frob_foos()>` to a c func.
+Which create formatted output like:
 
-This is a reference to a c++ func: :cpp:func:`testnamespace::NamespacedClassTest::function()`.
+   .. doxygenfunction:: testnamespace::NamespacedClassTest::function
+      :path: ../examples/specific/class/xml
 
-This is :cpp:func:`another reference <testnamespace::NamespacedClassTest::function()>` to a cpp func.
+   .. doxygenfunction:: frob_foos
+      :path: ../examples/specific/alias/xml
 
+We can refer to **function** using:: 
 
-Through Sphinx
-~~~~~~~~~~~~~~
+   :cpp:func:`testnamespace::NamespacedClassTest::function()`
+   
+which renders as :cpp:func:`testnamespace::NamespacedClassTest::function()`, or using::
 
-Pure Sphinx functionality.
+   :cpp:func:`another reference <testnamespace::NamespacedClassTest::function()>`
+   
+which renders as: :cpp:func:`another reference <testnamespace::NamespacedClassTest::function()>`.
+Note the use of the **cpp** domain.
 
-.. c:function:: void* c_function(int)
+And we can refer to **frob_foos** using:: 
+   
+   :c:func:`frob_foos()`
 
-This is :c:func:`c_function()` to a c func.
+which renders as: :c:func:`frob_foos()`, or using::
 
-This is :c:func:`another reference <c_function()>` to a c func.
+   :c:func:`another reference <frob_foos()>` 
+   
+which renders as: :c:func:`another reference <frob_foos()>`. Note the use of the **c** domain.
 
-.. cpp:function:: void* mynamespace::MyClass::cppFunction(int param)
-
-This is a reference to a c++ func: :cpp:func:`mynamespace::MyClass::cppFunction()`.
-
-This is :cpp:func:`another reference <mynamespace::MyClass::cppFunction()>` to a cpp func.
 

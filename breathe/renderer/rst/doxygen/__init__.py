@@ -90,7 +90,11 @@ class DoxygenToRstRendererFactory(object):
         if not self.filter_.allow(parent_data_object, data_object):
             return NullRenderer()
 
-        child_renderer_factory = self.renderer_factory_creator.create_child_factory(data_object, self)
+        child_renderer_factory = self.renderer_factory_creator.create_child_factory(
+                self.project_info,
+                data_object,
+                self
+                )
 
         try:
             node_type = data_object.node_type
@@ -162,6 +166,27 @@ class DoxygenToRstRendererFactory(object):
             elif data_object.kind == "define":
                 Renderer = compoundrenderer.DefineMemberDefTypeSubRenderer
 
+        if node_type == "compound":
+
+            class_ = indexrenderer.CompoundTypeSubRenderer
+
+            if data_object.kind == "class":
+                class_ = indexrenderer.ClassCompoundTypeSubRenderer
+
+            # For compound node types Renderer is CreateCompoundTypeSubRenderer
+            # as defined below. This could be cleaner
+            return Renderer(
+                    class_,
+                    self.project_info,
+                    data_object,
+                    child_renderer_factory,
+                    self.node_factory,
+                    self.state,
+                    self.document,
+                    self.domain_handler,
+                    self.target_handler
+                    )
+
         if node_type == "docsimplesect":
             if data_object.kind == "par":
                 Renderer = compoundrenderer.ParDocSimpleSectTypeSubRenderer
@@ -177,22 +202,16 @@ class DoxygenToRstRendererFactory(object):
                 self.target_handler
                 )
 
-class DomainRendererFactory(DoxygenToRstRendererFactory):
-
-    def create_renderer(self, data_object):
-
-        return self.create_renderer_with_factory(data_object, self, self.domain_handler)
-
 class CreateCompoundTypeSubRenderer(object):
 
     def __init__(self, parser_factory):
 
         self.parser_factory = parser_factory
 
-    def __call__(self, project_info, *args):
+    def __call__(self, class_, project_info, *args):
 
         compound_parser = self.parser_factory.create_compound_parser(project_info)
-        return indexrenderer.CompoundTypeSubRenderer(compound_parser, project_info, *args)
+        return class_(compound_parser, project_info, *args)
 
 
 class CreateRefTypeSubRenderer(object):
@@ -214,17 +233,19 @@ class DoxygenToRstRendererFactoryCreator(object):
             node_factory,
             parser_factory,
             default_domain_handler,
-            domain_handler_factory_creator,
-            rst_content_creator
+            rst_content_creator,
+            domain_handler_factory,
+            project_info
             ):
 
         self.node_factory = node_factory
         self.parser_factory = parser_factory
         self.default_domain_handler = default_domain_handler
-        self.domain_handler_factory_creator = domain_handler_factory_creator
         self.rst_content_creator = rst_content_creator
+        self.domain_handler_factory = domain_handler_factory
+        self.project_info = project_info
 
-    def create_factory(self, project_info, state, document, filter_, target_handler):
+    def create_factory(self, data_object, state, document, filter_, target_handler):
 
         renderers = {
             "doxygen" : indexrenderer.DoxygenTypeSubRenderer,
@@ -253,49 +274,27 @@ class DoxygenToRstRendererFactoryCreator(object):
             "unicode" : UnicodeRenderer,
             }
 
-        domain_handler_factory = self.domain_handler_factory_creator.create(
-                project_info,
-                document,
-                document.settings.env
-                )
+        success, domain_handler, type_ = self.get_domain(data_object, self.default_domain_handler)
 
         return DoxygenToRstRendererFactory(
                 "root",
-                "basic",
+                type_,
                 renderers,
                 self,
                 self.node_factory,
-                project_info,
+                self.project_info,
                 state,
                 document,
-                domain_handler_factory,
-                self.default_domain_handler,
+                self.domain_handler_factory,
+                domain_handler,
                 self.rst_content_creator,
                 filter_,
                 target_handler
                 )
 
-    def create_child_factory( self, data_object, parent_renderer_factory ):
+    def create_child_factory( self, project_info, data_object, parent_renderer_factory ):
 
         domain_handler = parent_renderer_factory.domain_handler
-
-        if parent_renderer_factory.type_ == "basic":
-
-            location = ""
-
-            try:
-                location = data_object.location.file
-                renderer_factory_class = DomainRendererFactory
-                type_ = "domain"
-                domain_handler = self.domain_handler_factory.create_domain_handler( location )
-            except AttributeError:
-                # No location attribute
-                type_ = "basic"
-                renderer_factory_class = DoxygenToRstRendererFactory
-
-        else:
-            type_ = "domain"
-            renderer_factory_class = DomainRendererFactory
 
         try:
             node_type = data_object.node_type
@@ -308,7 +307,24 @@ class DoxygenToRstRendererFactoryCreator(object):
             else:
                 raise e
 
-        return renderer_factory_class(
+        if parent_renderer_factory.type_ == "basic":
+
+            success, domain_handler, type_ = self.get_domain(data_object, domain_handler)
+
+            if not success and node_type == "compound":
+
+                compound_parser = self.parser_factory.create_compound_parser(project_info)
+                file_data = compound_parser.parse(data_object.refid)
+
+                success, domain_handler, type_ = self.get_domain(
+                        file_data.compounddef,
+                        domain_handler
+                        )
+
+        else:
+            type_ = "domain"
+
+        return DoxygenToRstRendererFactory(
                     node_type,
                     type_,
                     parent_renderer_factory.renderers,
@@ -323,4 +339,50 @@ class DoxygenToRstRendererFactoryCreator(object):
                     parent_renderer_factory.filter_,
                     parent_renderer_factory.target_handler
                     )
+
+
+    def get_domain(self, data_object, default_domain_handler):
+
+        try:
+            location = data_object.location.file
+        except AttributeError:
+            return False, default_domain_handler, "basic"
+
+        return True, self.domain_handler_factory.create_domain_handler( location ), "domain"
+
+
+# FactoryFactoryFactory. Ridiculous but necessary.
+class DoxygenToRstRendererFactoryCreatorConstructor(object):
+
+    def __init__(
+            self,
+            node_factory,
+            parser_factory,
+            default_domain_handler,
+            domain_handler_factory_creator,
+            rst_content_creator
+            ):
+
+        self.node_factory = node_factory
+        self.parser_factory = parser_factory
+        self.default_domain_handler = default_domain_handler
+        self.domain_handler_factory_creator = domain_handler_factory_creator
+        self.rst_content_creator = rst_content_creator
+
+    def create_factory_creator(self, project_info, document):
+
+        domain_handler_factory = self.domain_handler_factory_creator.create(
+                project_info,
+                document,
+                document.settings.env
+                )
+
+        return DoxygenToRstRendererFactoryCreator(
+                self.node_factory,
+                self.parser_factory,
+                self.default_domain_handler,
+                self.rst_content_creator,
+                domain_handler_factory,
+                project_info,
+                )
 

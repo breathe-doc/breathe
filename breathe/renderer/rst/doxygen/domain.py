@@ -63,6 +63,12 @@ class NullDomainHandler(DomainHandler):
     def create_function_target(self, data_object):
         pass
 
+    def create_class_id(self, data_object):
+        return ""
+
+    def create_class_target(self, data_object):
+        pass
+
 class CDomainHandler(DomainHandler):
 
     def create_function_id(self, data_object):
@@ -76,7 +82,8 @@ class CDomainHandler(DomainHandler):
         name = data_object.definition.split()[-1]
 
         if self.helper.is_duplicate(name):
-            print "Warning: Ignoring duplicate '%s'. As C does not support overloaded functions. Perhaps you should be using the cpp domain?" % name
+            print ( "Warning: Ignoring duplicate '%s'. As C does not support overloaded "
+                    "functions. Perhaps you should be using the cpp domain?" % name )
             return
 
         self.helper.remember(name)
@@ -99,6 +106,38 @@ class CDomainHandler(DomainHandler):
 
 
 class CppDomainHandler(DomainHandler):
+
+    def create_class_id(self, data_object):
+
+        def_ = data_object.name
+
+        parser = self.helper.definition_parser(def_)
+        sigobj = parser.parse_class()
+
+        return sigobj.get_id()
+
+    def create_class_target(self, data_object):
+
+        _id = self.create_function_id(data_object)
+
+        in_cache, project = self.helper.check_cache(_id)
+        if in_cache:
+            print "Warning: Ignoring duplicate domain reference '%s'. " \
+                  "First found in project '%s'" % (_id, project.reference())
+            return
+
+        self.helper.cache(_id, self.project_info)
+
+        signode = self.node_factory.desc_signature()
+
+        signode["names"].append(_id)
+        signode["ids"].append(_id)
+
+        name = data_object.definition.split()[-1]
+        self.document.settings.env.domaindata['cpp']['objects'].setdefault(name,
+                (self.document.settings.env.docname, "class", _id))
+
+        self.document.note_explicit_target(signode)
 
     def create_function_id(self, data_object):
 
