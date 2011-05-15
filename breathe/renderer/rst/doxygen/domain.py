@@ -118,7 +118,7 @@ class CppDomainHandler(DomainHandler):
 
     def create_class_target(self, data_object):
 
-        _id = self.create_function_id(data_object)
+        _id = self.create_class_id(data_object)
 
         in_cache, project = self.helper.check_cache(_id)
         if in_cache:
@@ -133,7 +133,7 @@ class CppDomainHandler(DomainHandler):
         signode["names"].append(_id)
         signode["ids"].append(_id)
 
-        name = data_object.definition.split()[-1]
+        name = data_object.name
         self.document.settings.env.domaindata['cpp']['objects'].setdefault(name,
                 (self.document.settings.env.docname, "class", _id))
 

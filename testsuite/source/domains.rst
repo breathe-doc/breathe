@@ -6,10 +6,37 @@ Breathe has some limited support for Sphinx domains. It tries to output targets
 that the Sphinx domain references expect. This should allow you to use Sphinx
 domain roles like ``:c:func:`foo``` to link to output from Breathe.
 
-.. note:: This is currently only supported for C & C++ functions. 
+The following targets are supported:
 
-Examples
---------
+* C & C++ functions
+* C++ classes
+
+
+Class Example
+-------------
+
+Given the following Breathe directives::
+
+   .. doxygenclass:: testnamespace::NamespacedClassTest
+      :path: ../examples/specific/class/xml
+
+Which create formatted output like:
+
+   .. doxygenclass:: testnamespace::NamespacedClassTest
+      :path: ../examples/specific/class/xml
+
+We can refer to **NamespacedClassTest** using:: 
+
+   :cpp:class:`testnamespace::NamespacedClassTest`
+   
+which renders as :cpp:class:`testnamespace::NamespacedClassTest`, or using::
+
+   :cpp:class:`another reference <testnamespace::NamespacedClassTest>`
+   
+which renders as: :cpp:class:`another reference <testnamespace::NamespacedClassTest>`.
+
+Function Examples
+-----------------
 
 Given the following Breathe directives::
 
