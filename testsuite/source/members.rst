@@ -8,6 +8,7 @@ All Members
 .. doxygenclass:: testnamespace::NamespacedClassTest
    :path: ../examples/specific/members/xml
    :members:
+   :no-link:
 
 
 Specific Members

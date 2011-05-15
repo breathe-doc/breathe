@@ -88,6 +88,7 @@ class DoxygenIndexDirective(BaseDirective):
         renderer_factory_creator = self.renderer_factory_creator_constructor.create_factory_creator(
                 project_info,
                 self.state.document,
+                self.options,
                 )
         renderer_factory = renderer_factory_creator.create_factory(
                 data_object,
@@ -148,6 +149,7 @@ class DoxygenFunctionDirective(BaseDirective):
         renderer_factory_creator = self.renderer_factory_creator_constructor.create_factory_creator(
                 project_info,
                 self.state.document,
+                self.options,
                 )
         renderer_factory = renderer_factory_creator.create_factory(
                 data_object,
@@ -206,6 +208,7 @@ class DoxygenClassDirective(BaseDirective):
         renderer_factory_creator = self.renderer_factory_creator_constructor.create_factory_creator(
                 project_info,
                 self.state.document,
+                self.options,
                 )
         renderer_factory = renderer_factory_creator.create_factory(
                 data_object,
@@ -230,6 +233,7 @@ class DoxygenFileDirective(BaseDirective):
     option_spec = {
             "path": unchanged_required,
             "project": unchanged_required,
+            "no-link": flag,
             }
     has_content = False
 
@@ -264,6 +268,7 @@ class DoxygenFileDirective(BaseDirective):
         renderer_factory_creator = self.renderer_factory_creator_constructor.create_factory_creator(
                 project_info,
                 self.state.document,
+                self.options,
                 )
         nodes = []
         for data_object in matches:
@@ -321,6 +326,7 @@ class DoxygenBaseDirective(BaseDirective):
         renderer_factory_creator = self.renderer_factory_creator_constructor.create_factory_creator(
                 project_info,
                 self.state.document,
+                self.options,
                 )
         renderer_factory = renderer_factory_creator.create_factory(
                 data_object,

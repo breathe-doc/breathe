@@ -214,6 +214,15 @@ class DomainHandlerFactory(object):
         except KeyError:
             return NullDomainHandler()
 
+class NullDomainHandlerFactory(object):
+
+    def create_null_domain_handler(self):
+
+        return NullDomainHandler()
+
+    def create_domain_handler(self, file_):
+
+        return NullDomainHandler()
 
 class DomainHandlerFactoryCreator(object):
 
@@ -222,7 +231,10 @@ class DomainHandlerFactoryCreator(object):
         self.node_factory = node_factory
         self.helpers = helpers
 
-    def create(self, project_info, document, env):
+    def create_domain_handler_factory(self, project_info, document, env, options):
+
+        if "no-link" in options:
+            return NullDomainHandlerFactory()
 
         return DomainHandlerFactory(project_info, self.node_factory, document, env, self.helpers)
 

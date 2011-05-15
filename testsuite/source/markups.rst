@@ -29,6 +29,7 @@ Will be rendered as:
 
 .. doxygenfunction:: TestClass::rawVerbatim
    :project: rst
+   :no-link:
 
 Aliases
 ~~~~~~~
@@ -66,5 +67,6 @@ Which will be rendered as:
 
 .. doxygenfunction:: TestClass::function
    :project: rst
+   :no-link:
 
 

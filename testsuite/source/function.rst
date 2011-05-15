@@ -16,6 +16,7 @@ It produces this output:
 
 .. doxygenfunction:: open
    :project: structcmd
+   :no-link:
 
 Failing Example
 ---------------
