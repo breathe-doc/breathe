@@ -11,6 +11,7 @@ Directives & Config Variables
    enum
    typedef
    define
+   variable
    file
 
 The available directives are shown below. In each case the ``project``,
@@ -136,6 +137,22 @@ the same as the doxygenstruct directive.
       :no-link:
 
 Checkout the :ref:`example <define-example>` to see it in action.
+
+doxygenvariable Directive
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+This directive generates the appropriate output for a single variable.
+It behaves the same as the doxygenstruct directive.
+
+::
+
+   .. doxygenvariable:: <variable name>
+      :project: ...
+      :path: ...
+      :outline:
+      :no-link:
+
+Checkout the :ref:`example <variable-example>` to see it in action.
 
 .. _doxygenclass:
 
