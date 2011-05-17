@@ -22,6 +22,9 @@ struct cache_tree {
 	struct cache_tree_sub **down;
 };
 
+/** Shared cache tree instance. */
+extern struct cache_tree global_cache_tree;
+
 struct cache_tree *cache_tree(void);
 void cache_tree_free(struct cache_tree **);
 void cache_tree_invalidate_path(struct cache_tree *, const char *);
