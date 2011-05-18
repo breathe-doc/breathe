@@ -362,6 +362,21 @@ class DoxygenStructDirective(DoxygenBaseDirective):
             )
 
 
+class DoxygenVariableDirective(DoxygenBaseDirective):
+
+    kind = "variable"
+
+    def create_matcher_stack(self, namespace, name):
+
+        return self.matcher_factory.create_matcher_stack(
+                {
+                    "compound": self.matcher_factory.create_name_matcher(namespace),
+                    "member": self.matcher_factory.create_name_type_matcher(name, self.kind)
+                },
+                "member"
+            )
+
+
 class DoxygenDefineDirective(DoxygenBaseDirective):
 
     kind = "define"
@@ -553,6 +568,7 @@ class DoxygenDirectiveFactory(object):
             "doxygenfunction": DoxygenFunctionDirective,
             "doxygenstruct": DoxygenStructDirective,
             "doxygenclass": DoxygenClassDirective,
+            "doxygenvariable": DoxygenVariableDirective,
             "doxygendefine": DoxygenDefineDirective,
             "doxygenenum": DoxygenEnumDirective,
             "doxygentypedef": DoxygenTypedefDirective,
@@ -597,6 +613,9 @@ class DoxygenDirectiveFactory(object):
 
     def create_file_directive_container(self):
         return self.create_directive_container("doxygenfile")
+
+    def create_variable_directive_container(self):
+        return self.create_directive_container("doxygenvariable")
 
     def create_define_directive_container(self):
         return self.create_directive_container("doxygendefine")
@@ -727,6 +746,11 @@ def setup(app):
     app.add_directive(
             "doxygenfile",
             directive_factory.create_file_directive_container(),
+            )
+
+    app.add_directive(
+            "doxygenvariable",
+            directive_factory.create_variable_directive_container(),
             )
 
     app.add_directive(
