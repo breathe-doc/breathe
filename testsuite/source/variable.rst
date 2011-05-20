@@ -28,5 +28,4 @@ This intentionally fails::
 
 It produces the following warning message:
 
-.. doxygenvariable:: made_up_variable
-   :project: define
+.. warning:: doxygenvariable: Cannot find variable “made_up_variable” in doxygen xml output for project “tinyxml” from directory: ../examples/tinyxml/tinyxml/xml/
