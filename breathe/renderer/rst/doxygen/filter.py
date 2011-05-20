@@ -217,16 +217,6 @@ class Gather(object):
         return False
 
 
-class PathHandler(object):
-
-    def __init__(self, sep, basename):
-
-        self.sep = sep
-        self.basename = basename
-
-    def includes_directory(self, file_path):
-
-        return bool( file_path.count( self.sep ) )
 
 class FilterFactory(object):
 
