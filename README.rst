@@ -25,7 +25,7 @@ Requirements
 
 Development is currently done with:
  
-- Python 2.5
+- Python 2.7
 - Docutils 0.7
 - Sphinx 1.0.7
 - Doxygen 1.7.2
