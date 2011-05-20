@@ -14,11 +14,11 @@ from docutils.statemachine import ViewList
 from sphinx.domains.cpp import DefinitionParser
 
 from breathe.finder import FinderFactory, NoMatchesError, MultipleMatchesError
-from breathe.parser import DoxygenParserFactory, DoxygenIndexParser, ParserError
+from breathe.parser import DoxygenParserFactory, CacheFactory, ParserError
 from breathe.renderer.rst.doxygen import DoxygenToRstRendererFactoryCreatorConstructor, RstContentCreator
 from breathe.renderer.rst.doxygen.domain import DomainHandlerFactoryCreator, NullDomainHandler
 from breathe.renderer.rst.doxygen.domain import CppDomainHelper, CDomainHelper
-from breathe.renderer.rst.doxygen.filter import FilterFactory, GlobFactory, PathHandler
+from breathe.renderer.rst.doxygen.filter import FilterFactory, GlobFactory
 from breathe.renderer.rst.doxygen.target import TargetHandlerFactory
 from breathe.finder.doxygen import DoxygenItemFinderFactoryCreator, ItemMatcherFactory
 
@@ -667,15 +667,31 @@ class RootDataObject(object):
     node_type = "root"
 
 
+class PathHandler(object):
+
+    def __init__(self, sep, basename, join):
+
+        self.sep = sep
+        self.basename = basename
+        self.join = join
+
+    def includes_directory(self, file_path):
+
+        return bool( file_path.count( self.sep ) )
+
+
 # Setup
 # -----
 
 def setup(app):
 
-    parser_factory = DoxygenParserFactory()
+    cache_factory = CacheFactory()
+    cache = cache_factory.create_cache()
+    path_handler = PathHandler(os.sep, os.path.basename, os.path.join)
+    parser_factory = DoxygenParserFactory(cache, path_handler)
     matcher_factory = ItemMatcherFactory()
     item_finder_factory_creator = DoxygenItemFinderFactoryCreator(parser_factory, matcher_factory)
-    index_parser = DoxygenIndexParser()
+    index_parser = parser_factory.create_index_parser()
     finder_factory = FinderFactory(index_parser, item_finder_factory_creator)
 
     node_factory = NodeFactory(docutils.nodes, sphinx.addnodes)
@@ -697,7 +713,6 @@ def setup(app):
 
     project_info_factory = ProjectInfoFactory(fnmatch.fnmatch)
     glob_factory = GlobFactory(fnmatch.fnmatch)
-    path_handler = PathHandler(os.sep, os.path.basename)
     filter_factory = FilterFactory(glob_factory, path_handler)
     target_handler_factory = TargetHandlerFactory(node_factory)
 
