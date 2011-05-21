@@ -21,9 +21,9 @@ Features
   just a function with different directives.
 * **Support for multiple doxygen projects** - set it up to be aware of different
   projects and refence them by name or path for each directive.
-* **Allows embedded restructured text in doxygen markup** - some extra doxygen
+* **Allows embedded reStructuredText in doxygen markup** - some extra doxygen
   aliases allow you to add ``\rst`` - ``\endrst`` blocks to your comments and have
-  the contents interpreted as restructured text.
+  the contents interpreted as reStructuredText.
 * **Basic support for Sphinx domains** - Link to functions in the breathe output
   with a standard Sphinx domain reference.
 

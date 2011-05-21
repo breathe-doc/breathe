@@ -16,7 +16,7 @@ Briefly:
       parser. Found in ``breathe.finder``.
 
    **renderers**
-      Responsible for producing restructured text nodes to represent the objects
+      Responsible for producing reStructuredText nodes to represent the objects
       that the finders have found. The renderers generally descend through the
       object hierarchies rendering the objects, their children, their children's
       children and so on. Found in ``breathe.renderer``.
@@ -169,14 +169,14 @@ If the **CompoundTypeSubItemFinder** fails to find any deeper levels to match
 against then it returns itself as it must be the target we're interested in.
 
 As stated, the job of the finder is to find a single node for the renderers to
-starting rendering to restructured text. That is all the finder does.
+starting rendering to reStructuredText. That is all the finder does.
 
 
 Renderers
 ---------
 
 Finally, the bit that really does something we care about. Rendering is the art
-of turning whatever object we've found in the hierarchy into restructured text
+of turning whatever object we've found in the hierarchy into reStructuredText
 nodes. This almost invariably means most of its children as well.
 
 Much like with the finder classes, we start off creating a renderer for a
@@ -187,12 +187,12 @@ for those and so on and so forth.
 
 The node we start at is determined by the finder and ultimately by the user. The
 whole process is kicked off by the ``Builder`` class, though it doesn't really
-do much. The aim of the renderers is to return a list of restructured text nodes
+do much. The aim of the renderers is to return a list of reStructuredText nodes
 which is passed back to Sphinx to render into whatever you're final output
 format is. 
 
 There are two complicated bits here. All the different renderers and all the
-different restructured text nodes.
+different reStructuredText nodes.
 
 Different Renderers
 ~~~~~~~~~~~~~~~~~~~
@@ -201,12 +201,12 @@ Just like with the parsers, there is one renderer per node type. In fact there
 is one renderer class per parser class and they are named almost the same and
 are designed to match up. The renderers look at the data on the instance
 of the corresponding parser class that they have been given and grab the
-interesting bits and return restructured text nodes.
+interesting bits and return reStructuredText nodes.
 
 For reference on what there is to render, you can look at the parser class
 definitions or at the raw xml to see what attributes there are to render.
 Sometimes if something isn't appearing in the final output, it is because the
-renderer isn't returning an restructured text representation of it so the
+renderer isn't returning an reStructuredText representation of it so the
 rendering code needs to be updated, and sometimes it is because the parser
 classes are not picking it up properly so both the parser and the renderer code
 needs to be updated.
@@ -216,10 +216,10 @@ the parser classes and the corresponding renderers to figure out where all the
 information is ending up.
 
 
-Restructured Text Nodes
-~~~~~~~~~~~~~~~~~~~~~~~
+reStructuredText Nodes
+~~~~~~~~~~~~~~~~~~~~~~
 
-We use the restructured text API as provided by the fabulous docutils project
+We use the reStructuredText API as provided by the fabulous docutils project
 and extended by Sphinx itself. For the most part, they are fairly straight
 forward and they are certainly well named.
 

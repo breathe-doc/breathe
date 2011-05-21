@@ -5,7 +5,7 @@ class TestClass
 public:
 
     /*!
-    Inserting additional restructured text information.
+    Inserting additional reStructuredText information.
 
     \rst
 
@@ -13,7 +13,7 @@ public:
 
     .. note::
         
-       This restructured text has been handled correctly.
+       This reStructuredText has been handled correctly.
     \endrst
 
     This is just a standard verbatim block with code:
@@ -27,11 +27,11 @@ public:
     virtual void function() const = 0;
 
     /*!
-    Inserting additional restructured text information.
+    Inserting additional reStructuredText information.
     \verbatim embed:rst
     .. note::
 
-       This restructured text has been handled correctly.
+       This reStructuredText has been handled correctly.
     \endverbatim
     */
     virtual void rawVerbatim() const = 0;
