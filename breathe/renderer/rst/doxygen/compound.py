@@ -560,14 +560,13 @@ class DocSect1TypeSubRenderer(Renderer):
 
 
 class DocSimpleSectTypeSubRenderer(Renderer):
-    """ Other Type documentation such as Warning, Note, Retuns..."""
+    "Other Type documentation such as Warning, Note, Returns, etc"
 
     def title(self):
 
         text = self.node_factory.Text(self.data_object.kind.capitalize())
-        emphasis = self.node_factory.emphasis("", text)
 
-        return [emphasis]
+        return [text]
 
     def render(self):
 
@@ -576,10 +575,10 @@ class DocSimpleSectTypeSubRenderer(Renderer):
             renderer = self.renderer_factory.create_renderer(self.data_object, item)
             nodelist.append(self.node_factory.paragraph("", "", *renderer.render()))
 
-        field_name = self.node_factory.field_name("", self.node_factory.Text(self.data_object.kind.capitalize()))
-        field_body = self.node_factory.field_body('', *nodelist)
+        field_name = self.node_factory.field_name("", *self.title())
+        field_body = self.node_factory.field_body("", *nodelist)
 
-        return [self.node_factory.field('', field_name, field_body)]
+        return [self.node_factory.field("", field_name, field_body)]
 
 
 class ParDocSimpleSectTypeSubRenderer(DocSimpleSectTypeSubRenderer):
@@ -587,9 +586,8 @@ class ParDocSimpleSectTypeSubRenderer(DocSimpleSectTypeSubRenderer):
     def title(self):
 
         renderer = self.renderer_factory.create_renderer(self.data_object, self.data_object.title)
-        emphasis = self.node_factory.emphasis("", *renderer.render())
 
-        return [emphasis]
+        return renderer.render()
 
 
 class DocTitleTypeSubRenderer(Renderer):
