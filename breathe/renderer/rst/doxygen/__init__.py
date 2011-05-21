@@ -153,19 +153,6 @@ class DoxygenToRstRendererFactory(object):
                     self.target_handler
                     )
 
-        if node_type == "memberdef":
-
-            if data_object.kind == "function":
-                Renderer = compoundrenderer.FuncMemberDefTypeSubRenderer
-            elif data_object.kind == "enum":
-                Renderer = compoundrenderer.EnumMemberDefTypeSubRenderer
-            elif data_object.kind == "typedef":
-                Renderer = compoundrenderer.TypedefMemberDefTypeSubRenderer
-            elif data_object.kind == "variable":
-                Renderer = compoundrenderer.VariableMemberDefTypeSubRenderer
-            elif data_object.kind == "define":
-                Renderer = compoundrenderer.DefineMemberDefTypeSubRenderer
-
         if node_type == "compound":
 
             class_ = indexrenderer.CompoundTypeSubRenderer
@@ -186,6 +173,20 @@ class DoxygenToRstRendererFactory(object):
                     self.domain_handler,
                     self.target_handler
                     )
+
+        if node_type == "memberdef":
+
+            if data_object.kind == "function":
+                Renderer = compoundrenderer.FuncMemberDefTypeSubRenderer
+            elif data_object.kind == "enum":
+                Renderer = compoundrenderer.EnumMemberDefTypeSubRenderer
+            elif data_object.kind == "typedef":
+                Renderer = compoundrenderer.TypedefMemberDefTypeSubRenderer
+            elif data_object.kind == "variable":
+                Renderer = compoundrenderer.VariableMemberDefTypeSubRenderer
+            elif data_object.kind == "define":
+                Renderer = compoundrenderer.DefineMemberDefTypeSubRenderer
+
 
         if node_type == "docsimplesect":
             if data_object.kind == "par":
