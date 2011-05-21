@@ -1,7 +1,7 @@
 Breathe
 =======
 
-This is an extension to restructured text and Sphinx to be able to read and
+This is an extension to reStructuredText and Sphinx to be able to read and
 render the Doxygen xml output.
 
 Documentation
@@ -58,5 +58,5 @@ For their contributions; improving the code and the documentation. And thanks to
 
 - Dimitri van Heesch for `Doxygen <http://www.stack.nl/~dimitri/doxygen/>`_.
 - Georg Brandl for `Sphinx <http://sphinx.pocoo.org>`_.
-- David Goodger for `Docutils <http://docutils.sourceforge.net/>`_ and Restructured Text. 
+- David Goodger for `Docutils <http://docutils.sourceforge.net/>`_ and reStructuredText. 
 
