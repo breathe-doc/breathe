@@ -245,7 +245,10 @@ class FilterFactory(object):
         if not text.strip():
             return OrFilter(
                     NotFilter(NameFilter(NodeTypeAccessor(Child()), ["sectiondef"])),
-                    GlobFilter(KindAccessor(Child()), self.globber_factory.create("public*"))
+                    OrFilter(
+                        GlobFilter(KindAccessor(Child()), self.globber_factory.create("public*")),
+                        NameFilter(KindAccessor(Child()), ["user-defined"])
+                        )
                     )
 
         # Matches sphinx-autodoc behaviour of comma separated values

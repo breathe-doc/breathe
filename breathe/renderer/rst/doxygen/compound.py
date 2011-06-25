@@ -80,7 +80,10 @@ class CompoundDefTypeSubRenderer(Renderer):
             kind = sectiondef.kind
             renderer = self.renderer_factory.create_renderer(self.data_object, sectiondef)
             subnodes = renderer.render()
-            section_nodelists[kind] = subnodes
+            if section_nodelists.has_key(kind):  # note: 'user-defined' can repeat
+                section_nodelists[kind] += subnodes
+            else:
+                section_nodelists[kind] = subnodes
 
         # Order the results in an appropriate manner
         for kind in self.section_titles:
@@ -152,7 +155,8 @@ class SectionDefTypeSubRenderer(Renderer):
             defs.extend(renderer.render())
 
         if defs:
-            text = self.section_titles[self.data_object.kind]
+            text = self.data_object.header if self.data_object.kind == 'user-defined' else \
+                   self.section_titles[self.data_object.kind]
             title = self.node_factory.emphasis(text=text)
             def_list = self.node_factory.definition_list("", *defs)
             return [title, self.node_factory.block_quote("", def_list)]
