@@ -8,7 +8,6 @@ Test Pages
    doxygen
    tinyxml
    specific
-   domains
    embeddedrst
    inline 
    members
