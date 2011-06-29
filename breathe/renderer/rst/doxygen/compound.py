@@ -49,18 +49,6 @@ class CompoundDefTypeSubRenderer(Renderer):
                 "var"
              ]
 
-
-    def extend_nodelist(self, nodelist, section, title, section_nodelists):
-
-        # Add title and contents if found
-        if section_nodelists.has_key(section):
-            nodes = section_nodelists[section]
-
-            if nodes:
-
-                nodelist.append(self.node_factory.emphasis(text=title))
-                nodelist.append(self.node_factory.block_quote("", *nodes))
-
     def render(self):
 
         nodelist = []    
@@ -80,9 +68,10 @@ class CompoundDefTypeSubRenderer(Renderer):
             kind = sectiondef.kind
             renderer = self.renderer_factory.create_renderer(self.data_object, sectiondef)
             subnodes = renderer.render()
-            if section_nodelists.has_key(kind):  # note: 'user-defined' can repeat
+            try:
+                # As "user-defined" can repeat
                 section_nodelists[kind] += subnodes
-            else:
+            except KeyError:
                 section_nodelists[kind] = subnodes
 
         # Order the results in an appropriate manner
@@ -147,18 +136,32 @@ class SectionDefTypeSubRenderer(Renderer):
 
     def render(self):
 
-        defs = []
+        node_list = []
+
+        if self.data_object.description:
+            renderer = self.renderer_factory.create_renderer(self.data_object, self.data_object.description)
+            node_list.append(self.node_factory.paragraph( "", "", *renderer.render()))
 
         # Get all the memberdef info
         for memberdef in self.data_object.memberdef:
             renderer = self.renderer_factory.create_renderer(self.data_object, memberdef)
-            defs.extend(renderer.render())
+            node_list.extend(renderer.render())
 
-        if defs:
-            text = self.data_object.header if self.data_object.kind == 'user-defined' else \
-                   self.section_titles[self.data_object.kind]
+        if node_list:
+
+            text = self.section_titles[self.data_object.kind]
+
+            # Override default name for user-defined sections. Use "Unnamed
+            # Group" if the user didn't name the section
+            # This is different to Doxygen which will track the groups and name
+            # them Group1, Group2, Group3, etc.
+            if self.data_object.kind == "user-defined":
+                if self.data_object.header:
+                    text = self.data_object.header
+                else:
+                    text = "Unnamed Group"
             title = self.node_factory.emphasis(text=text)
-            def_list = self.node_factory.definition_list("", *defs)
+            def_list = self.node_factory.definition_list("", *node_list)
             return [title, self.node_factory.block_quote("", def_list)]
 
         return []

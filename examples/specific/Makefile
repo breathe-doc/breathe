@@ -27,12 +27,13 @@ all: typedef/xml/index.xml \
 	members/xml/index.xml \
 	c_file/xml/index.xml \
 	namespacefile/xml/index.xml \
-	multifilexml/xml/index.xml
+	multifilexml/xml/index.xml \
+	userdefined/xml/index.xml
 	
 
 clean:
 	rm -rf typedef class nutshell alias rst inline namespacefile c_file \
-		members multifilexml
+		members multifilexml userdefined
            
 typedef/xml/index.xml: typedef.h typedef.cfg
 	$(DOXYGEN) typedef.cfg
@@ -63,4 +64,7 @@ namespacefile/xml/index.xml: namespacefile.h namespacefile.cfg
 	
 multifilexml/xml/index.xml: multifile/one/Util.h multifile/two/Util.h multifile.cfg
 	$(DOXYGEN) multifile.cfg
+
+userdefined/xml/index.xml: userdefined.h userdefined.cfg
+	$(DOXYGEN) userdefined.cfg
 
