@@ -37,6 +37,7 @@ Contents
    directives
    markups
    domains
+   groups
    contributing
    codeguide
    testpages
@@ -47,7 +48,7 @@ In a Nutshell
 
 You write code that looks a little like this:
 
-.. literalinclude:: nutshell.h
+.. literalinclude:: code/nutshell.h
    :language: cpp
 
 Then you run this::

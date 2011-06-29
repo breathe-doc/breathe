@@ -101,6 +101,7 @@ breathe_projects = {
     "rst":"../examples/specific/rst/xml/",
     "c_file":"../examples/specific/c_file/xml/",
     "namespacefile":"../examples/specific/namespacefile/xml/",
+    "userdefined":"../examples/specific/userdefined/xml/",
     }
 
 breathe_default_project = "tinyxml"
