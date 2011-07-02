@@ -196,6 +196,7 @@ file.
    .. doxygenfile:: <filename>
       :project: ...
       :path: ...
+      :no-link:
 
 Checkout the :ref:`example <file-example>` to see it in action.
 
