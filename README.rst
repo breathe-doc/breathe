@@ -53,6 +53,7 @@ Thank you to:
 - `mbolivar <https://github.com/mbolivar>`_
 - `queezythegreat <https://github.com/queezythegreat>`_
 - `abingham <https://github.com/abingham>`_
+- `davidm <https://github.com/davidm>`_
 
 For their contributions; improving the code and the documentation. And thanks to:
 
