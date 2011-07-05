@@ -98,9 +98,9 @@ class DoxygenIndexDirective(BaseDirective):
                 target_handler,
                 )
         object_renderer = renderer_factory.create_renderer(self.root_data_object, data_object)
-        nodes = object_renderer.render()
+        node_list = object_renderer.render()
 
-        return nodes
+        return node_list
 
 
 class DoxygenFunctionDirective(BaseDirective):
@@ -159,9 +159,12 @@ class DoxygenFunctionDirective(BaseDirective):
                 target_handler,
                 )
         object_renderer = renderer_factory.create_renderer(self.root_data_object, data_object)
-        nodes = object_renderer.render()
+        node_list = object_renderer.render()
 
-        return nodes
+        # Wrap the result in a definition_list as the MemberDefTypeSubRenderer,
+        # which is the base class for the function renderer, returns a
+        # definition list item
+        return [nodes.definition_list("", *node_list)]
 
 
 class DoxygenClassDirective(BaseDirective):
@@ -219,9 +222,9 @@ class DoxygenClassDirective(BaseDirective):
                 )
         object_renderer = renderer_factory.create_renderer(self.root_data_object, data_object)
 
-        nodes = object_renderer.render()
+        node_list = object_renderer.render()
 
-        return nodes
+        return node_list
 
 
 class DoxygenFileDirective(BaseDirective):
@@ -270,7 +273,7 @@ class DoxygenFileDirective(BaseDirective):
                 self.state.document,
                 self.options,
                 )
-        nodes = []
+        node_list = []
         for data_object in matches:
 
             renderer_factory = renderer_factory_creator.create_factory(
@@ -282,9 +285,9 @@ class DoxygenFileDirective(BaseDirective):
                     )
 
             object_renderer = renderer_factory.create_renderer(self.root_data_object, data_object)
-            nodes.extend(object_renderer.render())
+            node_list.extend(object_renderer.render())
 
-        return nodes
+        return node_list
 
 
 class DoxygenBaseDirective(BaseDirective):
@@ -337,9 +340,9 @@ class DoxygenBaseDirective(BaseDirective):
                 )
         object_renderer = renderer_factory.create_renderer(self.root_data_object, data_object)
 
-        nodes = object_renderer.render()
+        node_list = object_renderer.render()
 
-        return nodes
+        return node_list
 
 
 class DoxygenStructDirective(DoxygenBaseDirective):
@@ -362,7 +365,68 @@ class DoxygenStructDirective(DoxygenBaseDirective):
             )
 
 
-class DoxygenVariableDirective(DoxygenBaseDirective):
+# This class is the same as the DoxygenBaseDirective above, except that it
+# wraps the output in a definition_list before passing it back. This should be
+# abstracted in a far nicely way to avoid repeating so much code
+class DoxygenBaseItemDirective(BaseDirective):
+
+    required_arguments = 1
+    optional_arguments = 1
+    option_spec = {
+            "path": unchanged_required,
+            "project": unchanged_required,
+            "outline": flag,
+            "no-link": flag,
+            }
+    has_content = False
+
+    def run(self):
+
+        try:
+            namespace, name = self.arguments[0].rsplit("::", 1)
+        except ValueError:
+            namespace, name = "", self.arguments[0]
+
+        project_info = self.project_info_factory.create_project_info(self.options)
+
+        finder = self.finder_factory.create_finder(project_info)
+
+        matcher_stack = self.create_matcher_stack(namespace, name)
+
+        try:
+            data_object = finder.find_one(matcher_stack)
+        except NoMatchesError, e:
+            display_name = "%s::%s" % (namespace, name) if namespace else name
+            warning = ('doxygen%s: Cannot find %s "%s" in doxygen xml output for project "%s" from directory: %s'
+                    % (self.kind, self.kind, display_name, project_info.name(), project_info.path()))
+            return [docutils.nodes.warning("", docutils.nodes.paragraph("", "", docutils.nodes.Text(warning))),
+                    self.state.document.reporter.warning(warning, line=self.lineno)]
+
+        target_handler = self.target_handler_factory.create(self.options, project_info, self.state.document)
+        filter_ = self.filter_factory.create_outline_filter(self.options)
+        renderer_factory_creator = self.renderer_factory_creator_constructor.create_factory_creator(
+                project_info,
+                self.state.document,
+                self.options,
+                )
+        renderer_factory = renderer_factory_creator.create_factory(
+                data_object,
+                self.state,
+                self.state.document,
+                filter_,
+                target_handler,
+                )
+        object_renderer = renderer_factory.create_renderer(self.root_data_object, data_object)
+
+        node_list = object_renderer.render()
+
+        # Wrap the result in a definition_list as all the subclasses of this
+        # directive target renderers derived from MemberDefTypeSubRenderer and
+        # that returns a definition item
+        return [nodes.definition_list("", *node_list)]
+
+
+class DoxygenVariableDirective(DoxygenBaseItemDirective):
 
     kind = "variable"
 
@@ -376,8 +440,7 @@ class DoxygenVariableDirective(DoxygenBaseDirective):
                 "member"
             )
 
-
-class DoxygenDefineDirective(DoxygenBaseDirective):
+class DoxygenDefineDirective(DoxygenBaseItemDirective):
 
     kind = "define"
 
@@ -391,8 +454,7 @@ class DoxygenDefineDirective(DoxygenBaseDirective):
                 "member"
             )
 
-
-class DoxygenEnumDirective(DoxygenBaseDirective):
+class DoxygenEnumDirective(DoxygenBaseItemDirective):
 
     kind = "enum"
 
@@ -406,8 +468,7 @@ class DoxygenEnumDirective(DoxygenBaseDirective):
                 "member"
             )
 
-
-class DoxygenTypedefDirective(DoxygenBaseDirective):
+class DoxygenTypedefDirective(DoxygenBaseItemDirective):
 
     kind = "typedef"
 
@@ -420,8 +481,6 @@ class DoxygenTypedefDirective(DoxygenBaseDirective):
                 },
                 "member"
             )
-
-
 # Setup Administration
 # --------------------
 
