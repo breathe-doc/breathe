@@ -109,6 +109,17 @@ class DoxygenToRstRendererFactory(object):
 
         Renderer = self.renderers[node_type]
 
+        common_args = [
+                self.project_info,
+                data_object,
+                child_renderer_factory,
+                self.node_factory,
+                self.state,
+                self.document,
+                self.domain_handler,
+                self.target_handler
+                ]
+
         if node_type == "docmarkup":
 
             creator = self.node_factory.inline
@@ -129,28 +140,14 @@ class DoxygenToRstRendererFactory(object):
 
             return Renderer(
                     creator,
-                    self.project_info,
-                    data_object,
-                    child_renderer_factory,
-                    self.node_factory,
-                    self.state,
-                    self.document,
-                    self.domain_handler,
-                    self.target_handler
+                    *common_args
                     )
 
         if node_type == "verbatim":
 
             return Renderer(
                     self.rst_content_creator,
-                    self.project_info,
-                    data_object,
-                    child_renderer_factory,
-                    self.node_factory,
-                    self.state,
-                    self.document,
-                    self.domain_handler,
-                    self.target_handler
+                    *common_args
                     )
 
         if node_type == "compound":
@@ -164,14 +161,7 @@ class DoxygenToRstRendererFactory(object):
             # as defined below. This could be cleaner
             return Renderer(
                     class_,
-                    self.project_info,
-                    data_object,
-                    child_renderer_factory,
-                    self.node_factory,
-                    self.state,
-                    self.document,
-                    self.domain_handler,
-                    self.target_handler
+                    *common_args
                     )
 
         if node_type == "memberdef":
@@ -193,14 +183,7 @@ class DoxygenToRstRendererFactory(object):
                 Renderer = compoundrenderer.ParDocSimpleSectTypeSubRenderer
 
         return Renderer(
-                self.project_info,
-                data_object,
-                child_renderer_factory,
-                self.node_factory,
-                self.state,
-                self.document,
-                self.domain_handler,
-                self.target_handler
+                *common_args
                 )
 
 class CreateCompoundTypeSubRenderer(object):
