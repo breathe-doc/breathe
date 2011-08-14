@@ -28,6 +28,9 @@ all: typedef/xml/index.xml \
 	c_file/xml/index.xml \
 	namespacefile/xml/index.xml \
 	multifilexml/xml/index.xml \
+	template_class/xml/index.xml \
+	template_class_non_type/xml/index.xml \
+	template_function/xml/index.xml \
 	userdefined/xml/index.xml
 	
 
@@ -64,6 +67,15 @@ namespacefile/xml/index.xml: namespacefile.h namespacefile.cfg
 	
 multifilexml/xml/index.xml: multifile/one/Util.h multifile/two/Util.h multifile.cfg
 	$(DOXYGEN) multifile.cfg
+
+template_class/xml/index.xml: template_class.h template_class.cfg
+	$(DOXYGEN) template_class.cfg
+
+template_class_non_type/xml/index.xml: template_class_non_type.h template_class_non_type.cfg
+	$(DOXYGEN) template_class_non_type.cfg
+
+template_function/xml/index.xml: template_function.h template_function.cfg
+	$(DOXYGEN) template_function.cfg
 
 userdefined/xml/index.xml: userdefined.h userdefined.cfg
 	$(DOXYGEN) userdefined.cfg
