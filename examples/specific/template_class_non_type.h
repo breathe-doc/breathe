@@ -8,6 +8,7 @@
 template <typename T, typename U, int N>
 class templateclass
 {
+public:
   /// default constructor
   templateclass() {}
   
