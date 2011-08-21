@@ -18,7 +18,7 @@ public:
    * @param m1 first argument
    * @param m2 second argument
    */
-  anothertemplateclass(T const & m1, U const & m2) :
+  anothertemplateclass(T const & m1, U const & m2) : 
     member1(m1), member2(m2) {}
     
   /**
