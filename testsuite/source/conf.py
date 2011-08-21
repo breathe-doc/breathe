@@ -102,6 +102,10 @@ breathe_projects = {
     "c_file":"../examples/specific/c_file/xml/",
     "namespacefile":"../examples/specific/namespacefile/xml/",
     "userdefined":"../examples/specific/userdefined/xml/",
+    "template_function":"../examples/specific/template_function/xml/",
+    "template_class":"../examples/specific/template_class/xml/",
+    "template_class_non_type":
+        "../examples/specific/template_class_non_type/xml/",
     }
 
 breathe_default_project = "tinyxml"

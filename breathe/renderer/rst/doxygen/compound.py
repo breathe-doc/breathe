@@ -242,6 +242,31 @@ class FuncMemberDefTypeSubRenderer(MemberDefTypeSubRenderer):
 
     def title(self):
 
+        lines = []
+
+        # Handle any template information
+        if self.data_object.templateparamlist:
+            renderer = self.renderer_factory.create_renderer(
+                    self.data_object,
+                    self.data_object.templateparamlist
+                    )
+            template = [
+                    self.node_factory.Text("template < ")
+                ]
+            template.extend(renderer.render())
+            template.append(self.node_factory.Text(" >"))
+
+            # Add blank string at the start otherwise for some reason it renders
+            # the emphasis tags around the kind in plain text (same below)
+            lines.append(
+                    self.node_factory.line(
+                        "",
+                        self.node_factory.Text(""),
+                        *template
+                        )
+                    )
+
+        # Get the function type and name
         args = MemberDefTypeSubRenderer.title(self)
 
         # Get the function arguments
@@ -252,7 +277,21 @@ class FuncMemberDefTypeSubRenderer(MemberDefTypeSubRenderer):
             args.extend(renderer.render())
         args.append(self.node_factory.Text(")"))
 
-        return args
+        lines.append(
+                self.node_factory.line(
+                    "",
+                    self.node_factory.Text(""),
+                    *args
+                    )
+                )
+
+        # Setup the line block with gathered informationo
+        block = self.node_factory.line_block(
+                "",
+                *lines
+                )
+
+        return [block]
 
 
 class DefineMemberDefTypeSubRenderer(MemberDefTypeSubRenderer):
@@ -371,16 +410,26 @@ class LinkedTextTypeSubRenderer(Renderer):
         nodelist = []
 
         # Recursively process where possible
-        for i in self.data_object.content_:
-            renderer = self.renderer_factory.create_renderer(self.data_object, i)
+        for i, entry in enumerate(self.data_object.content_):
+            if i:
+                nodelist.append(self.node_factory.Text(" "))
+            renderer = self.renderer_factory.create_renderer(self.data_object, entry)
             nodelist.extend(renderer.render())
-            nodelist.append(self.node_factory.Text(" "))
-
 
         return nodelist
 
 
 class ParamTypeSubRenderer(Renderer):
+
+    def __init__(
+            self,
+            output_defname,
+            *args
+            ):
+
+        Renderer.__init__( self, *args )
+
+        self.output_defname = output_defname
 
     def render(self):
 
@@ -393,9 +442,11 @@ class ParamTypeSubRenderer(Renderer):
 
         # Parameter name
         if self.data_object.declname:
+            nodelist.append(self.node_factory.Text(" "))
             nodelist.append(self.node_factory.Text(self.data_object.declname))
 
-        if self.data_object.defname:
+        if self.output_defname and self.data_object.defname:
+            nodelist.append(self.node_factory.Text(" "))
             nodelist.append(self.node_factory.Text(self.data_object.defname))
 
         # Default value
@@ -605,6 +656,20 @@ class DocTitleTypeSubRenderer(Renderer):
 
         for item in self.data_object.content_:
             renderer = self.renderer_factory.create_renderer(self.data_object, item)
+            nodelist.extend(renderer.render())
+
+        return nodelist
+
+class TemplateParamListRenderer(Renderer):
+
+    def render(self):
+
+        nodelist = []
+
+        for i, param in enumerate(self.data_object.param):
+            if i:
+                nodelist.append(self.node_factory.Text(", "))
+            renderer = self.renderer_factory.create_renderer(self.data_object, param)
             nodelist.extend(renderer.render())
 
         return nodelist

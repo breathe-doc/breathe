@@ -6,6 +6,8 @@
 template <typename T>
 class templateclass
 {
+public:
+
   /// default constructor
   templateclass() {}
   
@@ -23,8 +25,8 @@ class templateclass
    * @return returns value of type T
    */
   T method(T const & t);
-  
-  private:
+
+private:
     /// a member with templated type
     T member;
 };
