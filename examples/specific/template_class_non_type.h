@@ -6,11 +6,11 @@
  * @tparam N this is the third template parameter, it is a non-type parameter
  */
 template <typename T, typename U, int N>
-class templateclass
+class anothertemplateclass
 {
 public:
   /// default constructor
-  templateclass() {}
+  anothertemplateclass() {}
   
   /**
    * @brief constructor with two template argument
@@ -18,7 +18,7 @@ public:
    * @param m1 first argument
    * @param m2 second argument
    */
-  templateclass(T const & m1, U const & m2) : 
+  anothertemplateclass(T const & m1, U const & m2) :
     member1(m1), member2(m2) {}
     
   /**
