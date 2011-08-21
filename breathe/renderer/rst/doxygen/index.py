@@ -37,24 +37,49 @@ class CompoundTypeSubRenderer(Renderer):
 
         domain_id = self.create_domain_id()
 
-        # Set up the title and a reference for it (refid)
-        kind = self.node_factory.emphasis(text=self.data_object.kind)
-        name = self.node_factory.strong(text=self.data_object.name)
-        nodelist.append(
-                self.node_factory.paragraph(
-                    "",
-                    "",
-                    kind,
-                    self.node_factory.Text(" "),
-                    name,
-                    ids=[domain_id, refid]
-                    )
-            )
 
         # Read in the corresponding xml file and process
         file_data = self.compound_parser.parse(self.data_object.refid)
-        data_renderer = self.renderer_factory.create_renderer(self.data_object, file_data)
 
+        lines = []
+
+        # Check if there is template information and format it as desired
+        if file_data.compounddef.templateparamlist:
+            renderer = self.renderer_factory.create_renderer(
+                    file_data.compounddef,
+                    file_data.compounddef.templateparamlist
+                    )
+            template = [
+                    self.node_factory.Text("template < ")
+                ]
+            template.extend(renderer.render())
+            template.append(self.node_factory.Text(" >"))
+            lines.append(self.node_factory.line("",*template))
+
+        # Set up the title and a reference for it (refid)
+        kind = self.node_factory.emphasis(text=self.data_object.kind)
+        name = self.node_factory.strong(text=self.data_object.name)
+
+        # Add blank string at the start otherwise for some reason it renders
+        # the emphasis tags around the kind in plain text
+        lines.append(
+                self.node_factory.line(
+                    "", 
+                    self.node_factory.Text(""),
+                    kind,
+                    self.node_factory.Text(" "),
+                    name
+                    )
+                )
+
+        nodelist.append(
+                self.node_factory.line_block(
+                    "",
+                    *lines
+                    )
+                )
+
+        data_renderer = self.renderer_factory.create_renderer(self.data_object, file_data)
         nodelist.extend(data_renderer.render())
 
         return nodelist
