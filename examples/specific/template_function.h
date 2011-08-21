@@ -7,7 +7,7 @@
  * 
  * @return return value of type T
  */
-template <typename T, typename U, int N>
+template <typename T>
 T function1(T arg1)
 {}
 
