@@ -38,6 +38,7 @@ Contents
    markups
    domains
    groups
+   template
    contributing
    codeguide
    testpages
