@@ -43,7 +43,7 @@ if sys.version_info < (2, 5):
 
 
 setup(
-    name='Breathe',
+    name='breathe',
     version=breathe.__version__,
     url='https://github.com/michaeljones/breathe',
     download_url='https://github.com/michaeljones/breathe',
