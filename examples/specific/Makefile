@@ -31,12 +31,13 @@ all: typedef/xml/index.xml \
 	template_class/xml/index.xml \
 	template_class_non_type/xml/index.xml \
 	template_function/xml/index.xml \
-	userdefined/xml/index.xml
+	userdefined/xml/index.xml \
+	fixedwidthfont/xml/index.xml
 	
 
 clean:
 	rm -rf typedef class nutshell alias rst inline namespacefile c_file \
-		members multifilexml userdefined
+		members multifilexml userdefined fixedwidthfont
            
 typedef/xml/index.xml: typedef.h typedef.cfg
 	$(DOXYGEN) typedef.cfg
@@ -79,4 +80,7 @@ template_function/xml/index.xml: template_function.h template_function.cfg
 
 userdefined/xml/index.xml: userdefined.h userdefined.cfg
 	$(DOXYGEN) userdefined.cfg
+
+fixedwidthfont/xml/index.xml: fixedwidthfont.h fixedwidthfont.cfg
+	$(DOXYGEN) fixedwidthfont.cfg
 

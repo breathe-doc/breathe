@@ -41,3 +41,12 @@ Alias Example
    :path: ../examples/specific/alias/xml
    :no-link:
 
+Fixed Width Font
+----------------
+
+.. doxygenclass:: Out
+   :path: ../examples/specific/fixedwidthfont/xml
+   :members:
+   :no-link:
+
+
