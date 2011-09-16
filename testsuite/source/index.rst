@@ -44,6 +44,20 @@ Contents
    testpages
    credits
 
+Download
+--------
+
+Breathe is available from:
+
+* `PyPI, the Python Package Index <http://pypi.python.org/pypi/breathe>`_
+* `Github <https://github.com/michaeljones/breathe>`_
+
+Licence
+-------
+
+Breathe is under the `BSD licence
+<https://github.com/michaeljones/breathe/blob/master/LICENCE>`_.
+
 In a Nutshell
 -------------
 
