@@ -86,7 +86,11 @@ With a ``conf.py`` setting like this::
        "nutshell":"../examples/specific/nutshell/xml/",
        }
 
-And you get something like this:
+And Breathe registered as an extension in ``conf.py`` like this::
+
+   extensions = [ "breathe" ]
+
+You get something like this:
 
 ----
 
