@@ -35,7 +35,12 @@ class UnicodeRenderer(Renderer):
         # Probably need a better way to do this as currently we're only doing
         # it skip whitespace between higher-level nodes, but this will also
         # skip any pure whitespace entries in actual content nodes
+        #
+        # We counter that second issue slightly by allowing through single white spaces
+        #
         if self.data_object.strip():
+            return [self.node_factory.Text(self.data_object)]
+        elif self.data_object == unicode(" "):
             return [self.node_factory.Text(self.data_object)]
         else:
             return []
