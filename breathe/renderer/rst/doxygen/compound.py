@@ -534,7 +534,7 @@ class DocMarkupTypeSubRenderer(Renderer):
             renderer = self.renderer_factory.create_renderer(self.data_object, item)
             nodelist.extend(renderer.render())
 
-        return [self.creator("", *nodelist)]
+        return [self.creator("", "", *nodelist)]
 
 
 class DocParamListTypeSubRenderer(Renderer):
