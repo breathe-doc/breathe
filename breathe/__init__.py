@@ -36,6 +36,7 @@ class BaseDirective(rst.Directive):
     def __init__(
             self,
             root_data_object,
+            node_factory,
             renderer_factory_creator_constructor,
             finder_factory,
             matcher_factory,
@@ -47,6 +48,7 @@ class BaseDirective(rst.Directive):
         rst.Directive.__init__(self, *args)
 
         self.root_data_object = root_data_object
+        self.node_factory = node_factory
         self.renderer_factory_creator_constructor = renderer_factory_creator_constructor
         self.finder_factory = finder_factory
         self.matcher_factory = matcher_factory
@@ -224,6 +226,62 @@ class DoxygenClassDirective(BaseDirective):
         object_renderer = renderer_factory.create_renderer(self.root_data_object, data_object)
 
         node_list = object_renderer.render()
+
+        return node_list
+
+
+class DoxygenDiagramDirective(BaseDirective):
+
+    kind = "diagram"
+
+    required_arguments = 1
+    optional_arguments = 1
+    option_spec = {
+            "path": unchanged_required,
+            "html-path": unchanged_required,
+            "project": unchanged_required,
+            "no-link": flag,
+            }
+    has_content = False
+
+    def __init__(
+            self,
+            path_handler,
+            *args
+            ):
+        BaseDirective.__init__(self, *args)
+
+        self.path_handler = path_handler
+
+    def run(self):
+
+        name = self.arguments[0]
+        html_path = self.options["html-path"]
+
+        project_info = self.project_info_factory.create_project_info(self.options)
+
+        finder = self.finder_factory.create_finder(project_info)
+
+        matcher_stack = self.matcher_factory.create_matcher_stack(
+                {
+                    "compound": self.matcher_factory.create_name_type_matcher(name, "class")
+                },
+                "compound"
+            )
+
+        try:
+            data_object = finder.find_one(matcher_stack)
+        except NoMatchesError, e:
+            warning = ('doxygen%s: Unable to find class "%s" in xml output' % (self.kind, name) )
+            return [docutils.nodes.warning("", docutils.nodes.paragraph("", "", docutils.nodes.Text(warning))),
+                    self.state.document.reporter.warning(warning, line=self.lineno)]
+
+        image_path = "%s%s%s.png" % (html_path, self.path_handler.sep, data_object.refid)
+        image_path = self.path_handler.abspath(image_path)
+
+        uri_path = "%s%s" % (self.path_handler.sep, image_path)
+
+        node_list = [self.node_factory.image("", uri=uri_path)]
 
         return node_list
 
@@ -485,32 +543,6 @@ class DoxygenTypedefDirective(DoxygenBaseItemDirective):
 # Setup Administration
 # --------------------
 
-class DirectiveContainer(object):
-
-    def __init__(
-            self,
-            directive,
-            *args
-            ):
-
-        self.directive = directive
-        self.args = args
-
-        # Required for sphinx to inspect
-        self.required_arguments = directive.required_arguments
-        self.optional_arguments = directive.optional_arguments
-        self.option_spec = directive.option_spec
-        self.has_content = directive.has_content
-
-    def __call__(self, *args):
-
-        call_args = []
-        call_args.extend(self.args)
-        call_args.extend(args)
-
-        return self.directive(*call_args)
-
-
 class ProjectInfo(object):
 
     def __init__(self, name, path, reference, domain_by_extension, domain_by_file_pattern, match):
@@ -620,6 +652,31 @@ class ProjectInfoFactory(object):
 
             return project_info
 
+class DirectiveContainer(object):
+
+    def __init__(
+            self,
+            directive,
+            *args
+            ):
+
+        self.directive = directive
+        self.args = args
+
+        # Required for sphinx to inspect
+        self.required_arguments = directive.required_arguments
+        self.optional_arguments = directive.optional_arguments
+        self.option_spec = directive.option_spec
+        self.has_content = directive.has_content
+
+    def __call__(self, *args):
+
+        call_args = []
+        call_args.extend(self.args)
+        call_args.extend(args)
+
+        return self.directive(*call_args)
+
 
 class DoxygenDirectiveFactory(object):
 
@@ -633,25 +690,30 @@ class DoxygenDirectiveFactory(object):
             "doxygenenum": DoxygenEnumDirective,
             "doxygentypedef": DoxygenTypedefDirective,
             "doxygenfile": DoxygenFileDirective,
+            "doxygendiagram": DoxygenDiagramDirective,
             }
 
     def __init__(
             self,
             root_data_object,
+            node_factory,
             renderer_factory_creator_constructor,
             finder_factory,
             matcher_factory,
             project_info_factory,
             filter_factory,
-            target_handler_factory
+            target_handler_factory,
+            path_handler,
             ):
         self.root_data_object = root_data_object
+        self.node_factory = node_factory
         self.renderer_factory_creator_constructor = renderer_factory_creator_constructor
         self.finder_factory = finder_factory
         self.matcher_factory = matcher_factory
         self.project_info_factory = project_info_factory
         self.filter_factory = filter_factory
         self.target_handler_factory = target_handler_factory
+        self.path_handler = path_handler
 
     def create_index_directive_container(self):
         return self.create_directive_container("doxygenindex")
@@ -680,17 +742,29 @@ class DoxygenDirectiveFactory(object):
     def create_define_directive_container(self):
         return self.create_directive_container("doxygendefine")
 
-    def create_directive_container(self, type_):
+    def create_define_diagram_container(self):
+        return self.create_directive_container("doxygendiagram", self.path_handler)
+
+    def create_directive_container(self, type_, *args):
+
+        call_args = []
+        call_args.extend(args)
+        call_args.extend(
+                [
+                    self.root_data_object,
+                    self.node_factory,
+                    self.renderer_factory_creator_constructor,
+                    self.finder_factory,
+                    self.matcher_factory,
+                    self.project_info_factory,
+                    self.filter_factory,
+                    self.target_handler_factory,
+                    ]
+                )
 
         return DirectiveContainer(
                 self.directives[type_],
-                self.root_data_object,
-                self.renderer_factory_creator_constructor,
-                self.finder_factory,
-                self.matcher_factory,
-                self.project_info_factory,
-                self.filter_factory,
-                self.target_handler_factory
+                *call_args
                 )
 
     def get_config_values(self, app):
@@ -729,11 +803,12 @@ class RootDataObject(object):
 
 class PathHandler(object):
 
-    def __init__(self, sep, basename, join):
+    def __init__(self, sep, basename, join, abspath):
 
         self.sep = sep
         self.basename = basename
         self.join = join
+        self.abspath = abspath
 
     def includes_directory(self, file_path):
 
@@ -747,7 +822,7 @@ def setup(app):
 
     cache_factory = CacheFactory()
     cache = cache_factory.create_cache()
-    path_handler = PathHandler(os.sep, os.path.basename, os.path.join)
+    path_handler = PathHandler(os.sep, os.path.basename, os.path.join, os.path.abspath)
     parser_factory = DoxygenParserFactory(cache, path_handler)
     matcher_factory = ItemMatcherFactory()
     item_finder_factory_creator = DoxygenItemFinderFactoryCreator(parser_factory, matcher_factory)
@@ -780,12 +855,14 @@ def setup(app):
 
     directive_factory = DoxygenDirectiveFactory(
             root_data_object,
+            node_factory,
             renderer_factory_creator_constructor,
             finder_factory,
             matcher_factory,
             project_info_factory,
             filter_factory,
-            target_handler_factory
+            target_handler_factory,
+            path_handler,
             )
 
     app.add_directive(
@@ -831,6 +908,11 @@ def setup(app):
     app.add_directive(
             "doxygendefine",
             directive_factory.create_define_directive_container(),
+            )
+
+    app.add_directive(
+            "doxygendiagram",
+            directive_factory.create_define_diagram_container(),
             )
 
     app.add_config_value("breathe_projects", {}, True)
