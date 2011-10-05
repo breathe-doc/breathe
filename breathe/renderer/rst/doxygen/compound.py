@@ -161,8 +161,7 @@ class SectionDefTypeSubRenderer(Renderer):
                 else:
                     text = "Unnamed Group"
             title = self.node_factory.emphasis(text=text)
-            def_list = self.node_factory.definition_list("", *node_list)
-            return [title, self.node_factory.block_quote("", def_list)]
+            return [title, self.node_factory.block_quote("", *node_list)]
 
         return []
 
@@ -180,7 +179,7 @@ class MemberDefTypeSubRenderer(Renderer):
     def title(self):
 
         kind = []
-        
+
         # Variable type or function return type
         if self.data_object.type_:
             renderer = self.renderer_factory.create_renderer(self.data_object, self.data_object.type_)
@@ -219,11 +218,9 @@ class MemberDefTypeSubRenderer(Renderer):
         title = self.title()
         target = self.create_target(refid)
         target.extend(title)
-        term = self.node_factory.term("","", ids=[domain_id,refid], *target )
-        definition = self.node_factory.definition("", *self.description())
-        entry = self.node_factory.definition_list_item("",term, definition)
-
-        return [entry]
+        term = self.node_factory.paragraph("", "", ids=[domain_id,refid], *target )
+        definition = self.node_factory.paragraph("", "", *self.description())
+        return [term, self.node_factory.block_quote("", definition)]
 
 
 class FuncMemberDefTypeSubRenderer(MemberDefTypeSubRenderer):
