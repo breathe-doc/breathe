@@ -6,7 +6,10 @@ class DoxygenTypeSubRenderer(Renderer):
     def render(self):
 
         compound_renderer = self.renderer_factory.create_renderer(self.data_object, self.data_object.compounddef)
-        return compound_renderer.render()
+        nodelist = compound_renderer.render()
+
+        return [self.node_factory.block_quote("", *nodelist)]
+
 
 
 class CompoundDefTypeSubRenderer(Renderer):
@@ -91,7 +94,7 @@ class CompoundDefTypeSubRenderer(Renderer):
             if namespace_nodes:
                 nodelist.append(self.node_factory.paragraph("", "", *namespace_nodes))
 
-        return [self.node_factory.block_quote("", *nodelist)]
+        return nodelist
 
 
 class SectionDefTypeSubRenderer(Renderer):
