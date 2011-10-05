@@ -162,10 +162,7 @@ class DoxygenFunctionDirective(BaseDirective):
         object_renderer = renderer_factory.create_renderer(self.root_data_object, data_object)
         node_list = object_renderer.render()
 
-        # Wrap the result in a definition_list as the MemberDefTypeSubRenderer,
-        # which is the base class for the function renderer, returns a
-        # definition list item
-        return [nodes.definition_list("", *node_list)]
+        return node_list
 
 
 class DoxygenClassDirective(BaseDirective):
@@ -366,9 +363,11 @@ class DoxygenStructDirective(DoxygenBaseDirective):
             )
 
 
-# This class is the same as the DoxygenBaseDirective above, except that it
+# This class was the same as the DoxygenBaseDirective above, except that it
 # wraps the output in a definition_list before passing it back. This should be
 # abstracted in a far nicely way to avoid repeating so much code
+#
+# Now we're removed the definition_list wrap so we really need to refactor this!
 class DoxygenBaseItemDirective(BaseDirective):
 
     required_arguments = 1
@@ -421,10 +420,7 @@ class DoxygenBaseItemDirective(BaseDirective):
 
         node_list = object_renderer.render()
 
-        # Wrap the result in a definition_list as all the subclasses of this
-        # directive target renderers derived from MemberDefTypeSubRenderer and
-        # that returns a definition item
-        return [nodes.definition_list("", *node_list)]
+        return node_list
 
 
 class DoxygenVariableDirective(DoxygenBaseItemDirective):
