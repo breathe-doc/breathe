@@ -94,9 +94,9 @@ You get something like this:
 
 ----
 
-   .. doxygenclass:: Nutshell
-      :project: nutshell
-      :members:
+.. doxygenclass:: Nutshell
+   :project: nutshell
+   :members:
 
 ----
 

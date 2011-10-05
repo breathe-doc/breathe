@@ -14,6 +14,8 @@ This should work::
 
 It produces this output:
 
+----
+
 .. doxygenfile:: nutshell.h
    :project: nutshell
    :no-link:
@@ -27,6 +29,8 @@ This should work::
       :project: namespacefile
 
 It produces this output:
+
+----
 
 .. doxygenfile:: namespacefile.h
    :project: namespacefile
