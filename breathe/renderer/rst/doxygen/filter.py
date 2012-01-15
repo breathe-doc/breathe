@@ -229,8 +229,28 @@ class FilterFactory(object):
 
         return AndFilter(
                 self.create_members_filter(options),
-                self.create_outline_filter(options),
+                AndFilter(
+                    self.create_outline_filter(options),
+                    self.create_show_filter(options),
+                    )
                 )
+
+    def create_show_filter(self, options):
+        """
+        Currently only handles the header-file entry
+        """
+
+        try:
+            text = options["show"]
+        except KeyError:
+            # Allow through everything except the header-file includes nodes
+            return OrFilter(
+                    NotFilter(NameFilter(NodeTypeAccessor(Parent()), ["compounddef"])),
+                    NotFilter(NameFilter(NodeTypeAccessor(Child()), ["inc"]))
+                    )
+
+        return OpenFilter()
+
 
     def create_members_filter(self, options):
 

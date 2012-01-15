@@ -674,6 +674,16 @@ class TemplateParamListRenderer(Renderer):
 
         return nodelist
 
+class IncTypeSubRenderer(Renderer):
+
+    def render(self):
+
+        if self.data_object.local == u"yes":
+            text = '#include "%s"' % self.data_object.content_[0].getValue()
+        else:
+            text = '#include <%s>' % self.data_object.content_[0].getValue()
+
+        return [self.node_factory.emphasis(text=text)]
 
 class RefTypeSubRenderer(Renderer):
 

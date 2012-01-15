@@ -54,7 +54,7 @@ class CompoundTypeSubRenderer(Renderer):
                 ]
             template.extend(renderer.render())
             template.append(self.node_factory.Text(" >"))
-            lines.append(self.node_factory.line("",*template))
+            lines.append(self.node_factory.line("", *template))
 
         # Set up the title and a reference for it (refid)
         kind = self.node_factory.emphasis(text=self.data_object.kind)
@@ -71,6 +71,23 @@ class CompoundTypeSubRenderer(Renderer):
                     name
                     )
                 )
+
+
+        if file_data.compounddef.includes:
+            for include in file_data.compounddef.includes:
+                renderer = self.renderer_factory.create_renderer(
+                        file_data.compounddef,
+                        include
+                        )
+                result = renderer.render()
+                if result:
+                    lines.append(
+                            self.node_factory.line(
+                                "",
+                                self.node_factory.Text(""),
+                                *result
+                                )
+                            )
 
         nodelist.append(
                 self.node_factory.line_block(
