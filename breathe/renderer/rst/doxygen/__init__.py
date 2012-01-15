@@ -188,7 +188,6 @@ class DoxygenToRstRendererFactory(object):
                     *common_args
                     )
 
-
         if node_type == "docsimplesect":
             if data_object.kind == "par":
                 Renderer = compoundrenderer.ParDocSimpleSectTypeSubRenderer
@@ -264,6 +263,7 @@ class DoxygenToRstRendererFactoryCreator(object):
             "docsimplesect" : compoundrenderer.DocSimpleSectTypeSubRenderer,
             "doctitle" : compoundrenderer.DocTitleTypeSubRenderer,
             "templateparamlist" : compoundrenderer.TemplateParamListRenderer,
+            "inc" : compoundrenderer.IncTypeSubRenderer,
             "ref" : CreateRefTypeSubRenderer(self.parser_factory),
             "verbatim" : compoundrenderer.VerbatimTypeSubRenderer,
             "mixedcontainer" : compoundrenderer.MixedContainerRenderer,
