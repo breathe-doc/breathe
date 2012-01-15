@@ -249,7 +249,15 @@ class FilterFactory(object):
                     NotFilter(NameFilter(NodeTypeAccessor(Child()), ["inc"]))
                     )
 
-        return OpenFilter()
+        if text == "header-file":
+            # Allow through everything, including header-file includes
+            return OpenFilter()
+
+        # Allow through everything except the header-file includes nodes
+        return OrFilter(
+                NotFilter(NameFilter(NodeTypeAccessor(Parent()), ["compounddef"])),
+                NotFilter(NameFilter(NodeTypeAccessor(Child()), ["inc"]))
+                )
 
 
     def create_members_filter(self, options):
