@@ -498,18 +498,18 @@ class DocParaTypeSubRenderer(Renderer):
             renderer = self.renderer_factory.create_renderer(self.data_object, item)
             nodelist.extend(renderer.render())
 
-        field_nodes = []
-        for entry in self.data_object.parameterlist:        # Parameters/Exceptions
-            renderer = self.renderer_factory.create_renderer(self.data_object, entry)
-            field_nodes.extend(renderer.render())
-
-        for item in self.data_object.simplesects:           # Returns
+        definition_nodes = []
+        for item in self.data_object.simplesects:          # Returns, user par's, etc
             renderer = self.renderer_factory.create_renderer(self.data_object, item)
-            field_nodes.extend(renderer.render())
+            definition_nodes.extend(renderer.render())
 
-        if field_nodes:
-            field_list = self.node_factory.field_list("", *field_nodes)
-            nodelist.append(field_list)
+        for entry in self.data_object.parameterlist:       # Parameters/Exceptions
+            renderer = self.renderer_factory.create_renderer(self.data_object, entry)
+            definition_nodes.extend(renderer.render())
+
+        if definition_nodes:
+            definition_list = self.node_factory.definition_list("", *definition_nodes)
+            nodelist.append(definition_list)
 
         return [self.node_factory.paragraph("", "", *nodelist)]
 
@@ -557,11 +557,11 @@ class DocParamListTypeSubRenderer(Renderer):
         # Fild list entry
         nodelist_list = self.node_factory.bullet_list("", classes=["breatheparameterlist"], *nodelist)
 
-        field_name = self.lookup[self.data_object.kind]
-        field_name = self.node_factory.field_name("", field_name)
-        field_body = self.node_factory.field_body('', nodelist_list)
+        term_text = self.lookup[self.data_object.kind]
+        term = self.node_factory.term("", "", self.node_factory.strong( "", term_text ) )
+        definition = self.node_factory.definition('', nodelist_list)
 
-        return [self.node_factory.field('', field_name, field_body)]
+        return [self.node_factory.definition_list_item('', term, definition)]
 
 
 
@@ -624,7 +624,7 @@ class DocSimpleSectTypeSubRenderer(Renderer):
 
         text = self.node_factory.Text(self.data_object.kind.capitalize())
 
-        return [text]
+        return [self.node_factory.strong( "", text )]
 
     def render(self):
 
@@ -633,10 +633,10 @@ class DocSimpleSectTypeSubRenderer(Renderer):
             renderer = self.renderer_factory.create_renderer(self.data_object, item)
             nodelist.append(self.node_factory.paragraph("", "", *renderer.render()))
 
-        field_name = self.node_factory.field_name("", *self.title())
-        field_body = self.node_factory.field_body("", *nodelist)
+        term = self.node_factory.term("", "", *self.title())
+        definition = self.node_factory.definition("", *nodelist)
 
-        return [self.node_factory.field("", field_name, field_body)]
+        return [self.node_factory.definition_list_item("", term, definition)]
 
 
 class ParDocSimpleSectTypeSubRenderer(DocSimpleSectTypeSubRenderer):
@@ -645,7 +645,7 @@ class ParDocSimpleSectTypeSubRenderer(DocSimpleSectTypeSubRenderer):
 
         renderer = self.renderer_factory.create_renderer(self.data_object, self.data_object.title)
 
-        return renderer.render()
+        return [self.node_factory.strong( "", *renderer.render() )]
 
 
 class DocTitleTypeSubRenderer(Renderer):
