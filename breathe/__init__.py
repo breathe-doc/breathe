@@ -29,7 +29,7 @@ import sphinx.addnodes
 import sphinx.domains.cpp
 sphinx.domains.cpp._identifier_re = re.compile(r'(~?\b[a-zA-Z_][a-zA-Z0-9_]*)\b')
 
-__version__ = '0.7.0'
+__version__ = '0.7.5'
 
 class BaseDirective(rst.Directive):
 
