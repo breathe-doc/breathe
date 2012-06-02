@@ -298,8 +298,19 @@ class DefineMemberDefTypeSubRenderer(MemberDefTypeSubRenderer):
 
     def title(self):
 
-        name = self.node_factory.strong(text=self.data_object.name)
-        return [name]
+        title = []
+
+        title.append(self.node_factory.strong(text=self.data_object.name))
+
+        if self.data_object.param:
+            title.append(self.node_factory.Text("("))
+            for i, parameter in enumerate(self.data_object.param):
+                if i: title.append(self.node_factory.Text(", "))
+                renderer = self.renderer_factory.create_renderer(self.data_object, parameter)
+                title.extend(renderer.render())
+            title.append(self.node_factory.Text(")"))
+
+        return title
 
     def description(self):
 
@@ -442,11 +453,11 @@ class ParamTypeSubRenderer(Renderer):
 
         # Parameter name
         if self.data_object.declname:
-            nodelist.append(self.node_factory.Text(" "))
+            if nodelist: nodelist.append(self.node_factory.Text(" "))
             nodelist.append(self.node_factory.Text(self.data_object.declname))
 
         if self.output_defname and self.data_object.defname:
-            nodelist.append(self.node_factory.Text(" "))
+            if nodelist: nodelist.append(self.node_factory.Text(" "))
             nodelist.append(self.node_factory.Text(self.data_object.defname))
 
         # Default value

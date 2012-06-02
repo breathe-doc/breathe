@@ -16,3 +16,6 @@
 #define MAX(x,y) ((x)>(y)?(x):(y))
 #define MIN(x,y) ((x)>(y)?(y):(x)) 
         /*!< Computes the minimum of \a x and \a y. */
+
+#define NOARGS (void*)
+        /*!< Define with no arguments */
