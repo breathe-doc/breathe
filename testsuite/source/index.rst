@@ -44,6 +44,20 @@ Contents
    testpages
    credits
 
+Download
+--------
+
+Breathe is available from:
+
+* `PyPI, the Python Package Index <http://pypi.python.org/pypi/breathe>`_
+* `Github <https://github.com/michaeljones/breathe>`_
+
+Licence
+-------
+
+Breathe is under the `BSD licence
+<https://github.com/michaeljones/breathe/blob/master/LICENCE>`_.
+
 In a Nutshell
 -------------
 
@@ -72,13 +86,17 @@ With a ``conf.py`` setting like this::
        "nutshell":"../examples/specific/nutshell/xml/",
        }
 
-And you get something like this:
+And Breathe registered as an extension in ``conf.py`` like this::
+
+   extensions = [ "breathe" ]
+
+You get something like this:
 
 ----
 
-   .. doxygenclass:: Nutshell
-      :project: nutshell
-      :members:
+.. doxygenclass:: Nutshell
+   :project: nutshell
+   :members:
 
 ----
 

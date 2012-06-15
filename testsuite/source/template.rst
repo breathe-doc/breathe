@@ -12,9 +12,9 @@ It renders as:
 
 ----
 
-   .. doxygenclass:: templateclass
-      :project: template_class
-      :members:
+.. doxygenclass:: templateclass
+   :project: template_class
+   :members:
 
 ----
 
@@ -22,9 +22,9 @@ With multiple template parameters it renders as:
 
 ----
 
-   .. doxygenclass:: anothertemplateclass
-      :project: template_class_non_type
-      :members:
+.. doxygenclass:: anothertemplateclass
+   :project: template_class_non_type
+   :members:
 
 ----
 
@@ -32,8 +32,8 @@ A function with single template parameter renders as:
 
 ----
 
-   .. doxygenfunction:: function1
-      :project: template_function
+.. doxygenfunction:: function1
+   :project: template_function
 
 ----
 
@@ -41,8 +41,8 @@ With multiple template parameters it renders as:
 
 ----
 
-   .. doxygenfunction:: function2
-      :project: template_function
+.. doxygenfunction:: function2
+   :project: template_function
 
 
 

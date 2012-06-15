@@ -816,6 +816,23 @@ class docMarkupTypeSub(supermod.docMarkupType):
     def __init__(self, valueOf_='', mixedclass_=None, content_=None):
         supermod.docMarkupType.__init__(self, valueOf_, mixedclass_, content_)
         self.type_ = None
+
+    def buildChildren(self, child_, nodeName_):
+        if child_.nodeType == Node.TEXT_NODE:
+            obj_ = self.mixedclass_(MixedContainer.CategoryText,
+                MixedContainer.TypeNone, '', child_.nodeValue)
+            self.content_.append(obj_)
+        elif child_.nodeType == Node.ELEMENT_NODE and \
+            nodeName_ == 'ref':
+            childobj_ = supermod.docRefTextType.factory()
+            childobj_.build(child_)
+            obj_ = self.mixedclass_(MixedContainer.CategoryComplex,
+                MixedContainer.TypeNone, 'ref', childobj_)
+            self.content_.append(obj_)
+        if child_.nodeType == Node.TEXT_NODE:
+            self.valueOf_ += child_.nodeValue
+        elif child_.nodeType == Node.CDATA_SECTION_NODE:
+            self.valueOf_ += '![CDATA['+child_.nodeValue+']]'
 supermod.docMarkupType.subclass = docMarkupTypeSub
 # end class docMarkupTypeSub
 

@@ -35,7 +35,12 @@ class UnicodeRenderer(Renderer):
         # Probably need a better way to do this as currently we're only doing
         # it skip whitespace between higher-level nodes, but this will also
         # skip any pure whitespace entries in actual content nodes
+        #
+        # We counter that second issue slightly by allowing through single white spaces
+        #
         if self.data_object.strip():
+            return [self.node_factory.Text(self.data_object)]
+        elif self.data_object == unicode(" "):
             return [self.node_factory.Text(self.data_object)]
         else:
             return []
@@ -183,7 +188,6 @@ class DoxygenToRstRendererFactory(object):
                     *common_args
                     )
 
-
         if node_type == "docsimplesect":
             if data_object.kind == "par":
                 Renderer = compoundrenderer.ParDocSimpleSectTypeSubRenderer
@@ -259,6 +263,7 @@ class DoxygenToRstRendererFactoryCreator(object):
             "docsimplesect" : compoundrenderer.DocSimpleSectTypeSubRenderer,
             "doctitle" : compoundrenderer.DocTitleTypeSubRenderer,
             "templateparamlist" : compoundrenderer.TemplateParamListRenderer,
+            "inc" : compoundrenderer.IncTypeSubRenderer,
             "ref" : CreateRefTypeSubRenderer(self.parser_factory),
             "verbatim" : compoundrenderer.VerbatimTypeSubRenderer,
             "mixedcontainer" : compoundrenderer.MixedContainerRenderer,
