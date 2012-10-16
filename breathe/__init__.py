@@ -8,6 +8,7 @@ import copy
 import fnmatch
 import re
 import textwrap
+import collections
 
 from docutils.parsers import rst
 from docutils.statemachine import ViewList
@@ -24,6 +25,7 @@ from breathe.finder.doxygen import DoxygenItemFinderFactoryCreator, ItemMatcherF
 
 import docutils.nodes
 import sphinx.addnodes
+import sphinx.ext.mathbase
 
 # Somewhat outrageously, reach in and fix a Sphinx regex
 import sphinx.domains.cpp
@@ -751,7 +753,12 @@ def setup(app):
     index_parser = parser_factory.create_index_parser()
     finder_factory = FinderFactory(index_parser, item_finder_factory_creator)
 
-    node_factory = NodeFactory(docutils.nodes, sphinx.addnodes)
+    # Create a math_nodes object with a displaymath member for the displaymath
+    # node so that we can treat it in the same way as the nodes & addnodes
+    # modules in the NodeFactory
+    math_nodes = collections.namedtuple("MathNodes", ["displaymath"])
+    math_nodes.displaymath = sphinx.ext.mathbase.displaymath
+    node_factory = NodeFactory(docutils.nodes, sphinx.addnodes, math_nodes)
 
     cpp_domain_helper = CppDomainHelper(DefinitionParser, re.sub)
     c_domain_helper = CDomainHelper()

@@ -671,6 +671,42 @@ class DocTitleTypeSubRenderer(Renderer):
 
         return nodelist
 
+
+class DocForumlaTypeSubRenderer(Renderer):
+
+    def render(self):
+
+        nodelist = []
+
+        for item in self.data_object.content_:
+
+            latex = item.getValue()
+
+            # Somewhat hacky if statements to strip out the doxygen markup that slips through
+
+            # Either single line
+            if latex.startswith("$") and latex.endswith("$"):
+                latex = latex[1:-1]
+
+            # Or multiline
+            if latex.startswith("\[") and latex.endswith("\]"):
+                latex = latex[2:-2:]
+
+            # Here we steal the core of the mathbase "math" directive handling code from:
+            #    sphinx.ext.mathbase
+            node = self.node_factory.displaymath()
+            node['latex'] = latex
+
+            # Required parameters which we don't have values for
+            node['label'] = None
+            node['nowrap'] = False
+            node['docname'] = self.state.document.settings.env.docname
+
+            nodelist.append(node)
+
+        return nodelist
+
+
 class TemplateParamListRenderer(Renderer):
 
     def render(self):

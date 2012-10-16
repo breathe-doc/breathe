@@ -28,7 +28,7 @@ sys.path.append( "../" )
 
 # Add any Sphinx extension module names here, as strings. They can be extensions
 # coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
-extensions = [ "breathe" ]
+extensions = [ "breathe", "sphinx.ext.mathjax" ]
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -106,6 +106,7 @@ breathe_projects = {
     "template_class":"../examples/specific/template_class/xml/",
     "template_class_non_type":
         "../examples/specific/template_class_non_type/xml/",
+    "latexmath":"../examples/specific/latexmath/xml/",
     }
 
 breathe_default_project = "tinyxml"

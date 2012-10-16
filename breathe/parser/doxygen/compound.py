@@ -804,6 +804,13 @@ class docParaTypeSub(supermod.docParaType):
             obj_ = self.mixedclass_(MixedContainer.CategoryComplex,
                 MixedContainer.TypeNone, 'verbatim', childobj_)
             self.content.append(obj_)
+        elif child_.nodeType == Node.ELEMENT_NODE and \
+            nodeName_ == 'formula':
+            childobj_ = docFormulaTypeSub.factory()
+            childobj_.build(child_)
+            obj_ = self.mixedclass_(MixedContainer.CategoryComplex,
+                MixedContainer.TypeNone, 'formula', childobj_)
+            self.content.append(obj_)
 
 supermod.docParaType.subclass = docParaTypeSub
 # end class docParaTypeSub
