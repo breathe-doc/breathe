@@ -39,6 +39,7 @@ Contents
    domains
    groups
    template
+   latexmath
    contributing
    codeguide
    testpages
