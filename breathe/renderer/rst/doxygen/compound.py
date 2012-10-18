@@ -684,9 +684,17 @@ class DocForumlaTypeSubRenderer(Renderer):
 
             # Somewhat hacky if statements to strip out the doxygen markup that slips through
 
-            # Either single line
+            node = None
+
+            # Either inline
             if latex.startswith("$") and latex.endswith("$"):
                 latex = latex[1:-1]
+
+                # If we're inline create a math node like the :math: role
+                node = self.node_factory.math()
+            else:
+                # Else we're multiline
+                node = self.node_factory.displaymath()
 
             # Or multiline
             if latex.startswith("\[") and latex.endswith("\]"):
@@ -694,13 +702,12 @@ class DocForumlaTypeSubRenderer(Renderer):
 
             # Here we steal the core of the mathbase "math" directive handling code from:
             #    sphinx.ext.mathbase
-            node = self.node_factory.displaymath()
-            node['latex'] = latex
+            node["latex"] = latex
 
             # Required parameters which we don't have values for
-            node['label'] = None
-            node['nowrap'] = False
-            node['docname'] = self.state.document.settings.env.docname
+            node["label"] = None
+            node["nowrap"] = False
+            node["docname"] = self.state.document.settings.env.docname
 
             nodelist.append(node)
 
