@@ -177,6 +177,7 @@ class DoxygenClassDirective(BaseDirective):
             "path": unchanged_required,
             "project": unchanged_required,
             "members": unchanged,
+            "sections": unchanged,
             "show": unchanged_required,
             "outline": flag,
             "no-link": flag,
