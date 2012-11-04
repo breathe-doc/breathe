@@ -160,8 +160,8 @@ doxygenclass Directive
 ~~~~~~~~~~~~~~~~~~~~~~
 
 This directive generates the appropriate output for a single class. It takes the
-standard ``project``, ``path``, ``outline`` and ``no-link`` options and additonally
-``members`` and ``sections`` option.
+standard ``project``, ``path``, ``outline`` and ``no-link`` options and
+additonally ``members`` and ``sections`` option.
 
 ``members``
    Designed to behavior in a similar manner to the ``members`` option for the
@@ -169,18 +169,20 @@ standard ``project``, ``path``, ``outline`` and ``no-link`` options and additona
 
    If you do not specify this option you will not get any information about the
    class members, just the general class documentation. If you provide it
-   without arguments, then Breathe adds all the public (or others - see
-   sections option below) members and their
-   documentation. If you specify it with **comma separated** arguments, then
+   without arguments, then Breathe adds all the public members and their
+   documentation.  If you specify it with **comma separated** arguments, then
    Breathe will treat the arguments as names of members and provide
    documentation for only those members that have been named.
 
-   If you don't add the 'sections' option, only the public members will be listed.
-   This is the same if you add the 'sections' option without further information.
-   Else, you can add a comma-separated list of information. Each element of this
-   list is a string desribing the section to display (wildcards allowed). For
-   instance, if you want to display the all protected and public members, attributes...
-   write ``:sections: public*,protected*
+   The default behaviour of adding the public members can be customised using
+   the ``sections`` option.
+
+``sections``
+   Designed to specialise the default behaviour of the ``members`` option.  You
+   can specify a comma-separated list of sections to be included if no specific
+   members are named.  The list can accept wildcards.  For instance, if you want
+   to display the all protected and public members, functions, etc, then specify
+   ``:sections: public*, protected*``
 
 ::
 
