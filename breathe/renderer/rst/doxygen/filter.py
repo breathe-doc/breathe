@@ -263,6 +263,29 @@ class FilterFactory(object):
     def create_members_filter(self, options):
 
         try:
+            section = options["sections"]
+        except KeyError:
+            section = ""
+
+        if not section.strip():
+            section_filter = GlobFilter(KindAccessor(Child()), self.globber_factory.create("public*"))
+        else:
+            sections = set([x.strip() for x in section.split(",")])
+
+            section_filter = GlobFilter(
+                    KindAccessor(Child()),
+                    self.globber_factory.create(sections.pop())
+                    )
+            while len(sections) > 0:
+                section_filter = OrFilter(
+                        section_filter,
+                        GlobFilter(
+                            KindAccessor(Child()),
+                            self.globber_factory.create(sections.pop())
+                            )
+                        )
+
+        try:
             text = options["members"]
         except KeyError:
             return OrFilter(
@@ -274,7 +297,7 @@ class FilterFactory(object):
             return OrFilter(
                     NotFilter(NameFilter(NodeTypeAccessor(Child()), ["sectiondef"])),
                     OrFilter(
-                        GlobFilter(KindAccessor(Child()), self.globber_factory.create("public*")),
+                        section_filter,
                         NameFilter(KindAccessor(Child()), ["user-defined"])
                         )
                     )

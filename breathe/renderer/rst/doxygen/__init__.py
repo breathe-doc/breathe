@@ -262,6 +262,7 @@ class DoxygenToRstRendererFactoryCreator(object):
             "docsect1" : compoundrenderer.DocSect1TypeSubRenderer,
             "docsimplesect" : compoundrenderer.DocSimpleSectTypeSubRenderer,
             "doctitle" : compoundrenderer.DocTitleTypeSubRenderer,
+            "docformula" : compoundrenderer.DocForumlaTypeSubRenderer,
             "templateparamlist" : compoundrenderer.TemplateParamListRenderer,
             "inc" : compoundrenderer.IncTypeSubRenderer,
             "ref" : CreateRefTypeSubRenderer(self.parser_factory),

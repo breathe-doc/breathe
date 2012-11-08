@@ -4,7 +4,6 @@
 Generated Mon Feb  9 19:08:05 2009 by generateDS.py.
 """
 
-from string import lower as str_lower
 from xml.dom import minidom
 from xml.dom import Node
 from docutils import nodes
@@ -803,6 +802,13 @@ class docParaTypeSub(supermod.docParaType):
             childobj_.build(child_)
             obj_ = self.mixedclass_(MixedContainer.CategoryComplex,
                 MixedContainer.TypeNone, 'verbatim', childobj_)
+            self.content.append(obj_)
+        elif child_.nodeType == Node.ELEMENT_NODE and \
+            nodeName_ == 'formula':
+            childobj_ = docFormulaTypeSub.factory()
+            childobj_.build(child_)
+            obj_ = self.mixedclass_(MixedContainer.CategoryComplex,
+                MixedContainer.TypeNone, 'formula', childobj_)
             self.content.append(obj_)
 
 supermod.docParaType.subclass = docParaTypeSub
