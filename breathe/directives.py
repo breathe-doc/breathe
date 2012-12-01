@@ -134,21 +134,26 @@ class AutoDoxygenIndexDirective(DoxygenIndexDirective):
     has_content = False
 
     def run(self):
+
         arg0split = self.arguments[0].rsplit("::", 1)
         if 2 == len(arg0split):
             (namespace, filename) = arg0split
         else:
             (namespace, filename) = "", self.arguments[0]
+
         fullname = os.path.split(filename)[1]
         partname = fullname.rsplit('.', 1)[0]
         project_info = self.project_info_factory.create_project_info(self.options)
         tempdir = tempfile.mkdtemp()
+
         cfgfile = partname + ".cfg"
         cfg = AUTOCFG_TEMPLATE.format(project_name=project_info.name(), output_dir='.',
                                       input=os.path.abspath(filename))
         with open(os.path.join(tempdir, cfgfile), 'w') as f:
             f.write(cfg)
+
         subprocess.check_call(['doxygen', cfgfile], cwd=tempdir)
+
         old_projects = self.project_info_factory.projects
         default_project = self.project_info_factory.default_project
         new_projects = dict(old_projects)
@@ -159,14 +164,18 @@ class AutoDoxygenIndexDirective(DoxygenIndexDirective):
             self.project_info_factory.domain_by_extension,
             self.project_info_factory.domain_by_file_pattern,
             )
+
         node_list = super(AutoDoxygenIndexDirective, self).run()
+
         self.project_info_factory.update(
             old_projects, 
             default_project,                            
             self.project_info_factory.domain_by_extension,
             self.project_info_factory.domain_by_file_pattern,
             )
+
         remove_tree(tempdir)
+
         return node_list
 
 class DoxygenFunctionDirective(BaseDirective):
