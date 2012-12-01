@@ -9,6 +9,7 @@ import fnmatch
 import re
 import textwrap
 import collections
+import subprocess
 
 from docutils.parsers import rst
 from docutils.statemachine import ViewList
@@ -103,6 +104,28 @@ class DoxygenIndexDirective(BaseDirective):
 
         return node_list
 
+class AutoDoxygenIndexDirective(DoxygenIndexDirective):
+
+    required_arguments = 1
+    optional_arguments = 1
+    option_spec = {
+            "path": unchanged_required,
+            "project": unchanged_required,
+            "outline": flag,
+            "no-link": flag,
+            }
+    has_content = False
+
+    def run(self):
+        arg0split = self.arguments[0].rsplit("::", 1)
+        if 2 == len(arg0split):
+            (namespace, filename) = arg0split
+        else:
+            (namespace, filename) = "", self.arguments[0]
+        fullname = os.path.split(filename)[1]
+        project_info = self.project_info_factory.create_project_info(self.options)
+        app = project_info.app()
+        return super(AutoDoxygenIndexDirective, self).run()
 
 class DoxygenFunctionDirective(BaseDirective):
 
@@ -511,7 +534,7 @@ class DirectiveContainer(object):
 
 class ProjectInfo(object):
 
-    def __init__(self, name, path, reference, domain_by_extension, domain_by_file_pattern, match):
+    def __init__(self, name, path, reference, domain_by_extension, domain_by_file_pattern, match, app):
 
         self._name = name
         self._path = path
@@ -519,6 +542,7 @@ class ProjectInfo(object):
         self._domain_by_extension = domain_by_extension
         self._domain_by_file_pattern = domain_by_file_pattern
         self._match = match
+        self._app = app
 
     def name(self):
         return self._name
@@ -545,12 +569,16 @@ class ProjectInfo(object):
 
         return domain
 
+    def app(self):
+        return self._app
+
 
 class ProjectInfoFactory(object):
 
-    def __init__(self, match):
+    def __init__(self, match, app):
 
         self.match = match
+        self.app = app
 
         self.projects = {}
         self.default_project = None
@@ -611,7 +639,8 @@ class ProjectInfoFactory(object):
                     reference,
                     self.domain_by_extension,
                     self.domain_by_file_pattern,
-                    self.match
+                    self.match, 
+                    self.app, 
                     )
 
             self.project_info_store[path] = project_info
@@ -623,6 +652,7 @@ class DoxygenDirectiveFactory(object):
 
     directives = {
             "doxygenindex": DoxygenIndexDirective,
+            "autodoxygenindex": AutoDoxygenIndexDirective,
             "doxygenfunction": DoxygenFunctionDirective,
             "doxygenstruct": DoxygenStructDirective,
             "doxygenclass": DoxygenClassDirective,
@@ -653,6 +683,9 @@ class DoxygenDirectiveFactory(object):
 
     def create_index_directive_container(self):
         return self.create_directive_container("doxygenindex")
+
+    def create_auto_index_directive_container(self):
+        return self.create_directive_container("autodoxygenindex")
 
     def create_function_directive_container(self):
         return self.create_directive_container("doxygenfunction")
@@ -774,7 +807,7 @@ def setup(app):
             rst_content_creator
             )
 
-    project_info_factory = ProjectInfoFactory(fnmatch.fnmatch)
+    project_info_factory = ProjectInfoFactory(fnmatch.fnmatch, app)
     glob_factory = GlobFactory(fnmatch.fnmatch)
     filter_factory = FilterFactory(glob_factory, path_handler)
     target_handler_factory = TargetHandlerFactory(node_factory)
@@ -794,6 +827,11 @@ def setup(app):
     app.add_directive(
             "doxygenindex",
             directive_factory.create_index_directive_container(),
+            )
+
+    app.add_directive(
+            "autodoxygenindex",
+            directive_factory.create_auto_index_directive_container(),
             )
 
     app.add_directive(
