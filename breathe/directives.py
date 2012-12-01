@@ -142,7 +142,6 @@ class AutoDoxygenIndexDirective(DoxygenIndexDirective):
         fullname = os.path.split(filename)[1]
         partname = fullname.rsplit('.', 1)[0]
         project_info = self.project_info_factory.create_project_info(self.options)
-        app = project_info.app()
         tempdir = tempfile.mkdtemp()
         cfgfile = partname + ".cfg"
         cfg = AUTOCFG_TEMPLATE.format(project_name=project_info.name(), output_dir='.',
@@ -577,7 +576,7 @@ class DirectiveContainer(object):
 
 class ProjectInfo(object):
 
-    def __init__(self, name, path, reference, domain_by_extension, domain_by_file_pattern, match, app):
+    def __init__(self, name, path, reference, domain_by_extension, domain_by_file_pattern, match):
 
         self._name = name
         self._path = path
@@ -585,7 +584,6 @@ class ProjectInfo(object):
         self._domain_by_extension = domain_by_extension
         self._domain_by_file_pattern = domain_by_file_pattern
         self._match = match
-        self._app = app
 
     def name(self):
         return self._name
@@ -612,16 +610,12 @@ class ProjectInfo(object):
 
         return domain
 
-    def app(self):
-        return self._app
-
 
 class ProjectInfoFactory(object):
 
-    def __init__(self, match, app):
+    def __init__(self, match):
 
         self.match = match
-        self.app = app
 
         self.projects = {}
         self.default_project = None
@@ -683,7 +677,6 @@ class ProjectInfoFactory(object):
                     self.domain_by_extension,
                     self.domain_by_file_pattern,
                     self.match, 
-                    self.app, 
                     )
 
             self.project_info_store[path] = project_info
@@ -850,7 +843,7 @@ def setup(app):
             rst_content_creator
             )
 
-    project_info_factory = ProjectInfoFactory(fnmatch.fnmatch, app)
+    project_info_factory = ProjectInfoFactory(fnmatch.fnmatch)
     glob_factory = GlobFactory(fnmatch.fnmatch)
     filter_factory = FilterFactory(glob_factory, path_handler)
     target_handler_factory = TargetHandlerFactory(node_factory)
