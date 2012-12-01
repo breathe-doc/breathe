@@ -11,6 +11,7 @@ import textwrap
 import collections
 import subprocess
 import tempfile
+from distutils.dir_util import remove_tree
 
 from docutils.parsers import rst
 from docutils.statemachine import ViewList
@@ -149,7 +150,24 @@ class AutoDoxygenIndexDirective(DoxygenIndexDirective):
         with open(os.path.join(tempdir, cfgfile), 'w') as f:
             f.write(cfg)
         subprocess.check_call(['doxygen', cfgfile], cwd=tempdir)
+        old_projects = self.project_info_factory.projects
+        default_project = self.project_info_factory.default_project
+        new_projects = dict(old_projects)
+        new_projects[default_project] = os.path.join(tempdir, 'xml', '')
+        self.project_info_factory.update(
+            new_projects, 
+            default_project,                            
+            self.project_info_factory.domain_by_extension,
+            self.project_info_factory.domain_by_file_pattern,
+            )
         node_list = super(AutoDoxygenIndexDirective, self).run()
+        self.project_info_factory.update(
+            old_projects, 
+            default_project,                            
+            self.project_info_factory.domain_by_extension,
+            self.project_info_factory.domain_by_file_pattern,
+            )
+        remove_tree(tempdir)
         return node_list
 
 class DoxygenFunctionDirective(BaseDirective):
