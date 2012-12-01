@@ -10,6 +10,7 @@ import re
 import textwrap
 import collections
 import subprocess
+import tempfile
 
 from docutils.parsers import rst
 from docutils.statemachine import ViewList
@@ -31,6 +32,21 @@ import sphinx.ext.mathbase
 # Somewhat outrageously, reach in and fix a Sphinx regex
 import sphinx.domains.cpp
 sphinx.domains.cpp._identifier_re = re.compile(r'(~?\b[a-zA-Z_][a-zA-Z0-9_]*)\b')
+
+
+AUTOCFG_TEMPLATE = """PROJECT_NAME     = "{project_name}"
+OUTPUT_DIRECTORY = {output_dir}
+GENERATE_LATEX   = NO
+GENERATE_MAN     = NO
+GENERATE_RTF     = NO
+CASE_SENSE_NAMES = NO
+INPUT            = {input}
+ENABLE_PREPROCESSING = YES
+QUIET            = YES
+JAVADOC_AUTOBRIEF = YES
+GENERATE_HTML = NO
+GENERATE_XML = YES
+"""
 
 class BaseDirective(rst.Directive):
 
@@ -123,9 +139,18 @@ class AutoDoxygenIndexDirective(DoxygenIndexDirective):
         else:
             (namespace, filename) = "", self.arguments[0]
         fullname = os.path.split(filename)[1]
+        partname = fullname.rsplit('.', 1)[0]
         project_info = self.project_info_factory.create_project_info(self.options)
         app = project_info.app()
-        return super(AutoDoxygenIndexDirective, self).run()
+        tempdir = tempfile.mkdtemp()
+        cfgfile = partname + ".cfg"
+        cfg = AUTOCFG_TEMPLATE.format(project_name=project_info.name(), output_dir='.',
+                                      input=os.path.abspath(filename))
+        with open(os.path.join(tempdir, cfgfile), 'w') as f:
+            f.write(cfg)
+        subprocess.check_call(['doxygen', cfgfile], cwd=tempdir)
+        node_list = super(AutoDoxygenIndexDirective, self).run()
+        return node_list
 
 class DoxygenFunctionDirective(BaseDirective):
 
