@@ -35,7 +35,7 @@ import sphinx.domains.cpp
 sphinx.domains.cpp._identifier_re = re.compile(r'(~?\b[a-zA-Z_][a-zA-Z0-9_]*)\b')
 
 
-AUTOCFG_TEMPLATE = """PROJECT_NAME     = "{project_name}"
+AUTOCFG_TEMPLATE = r"""PROJECT_NAME     = "{project_name}"
 OUTPUT_DIRECTORY = {output_dir}
 GENERATE_LATEX   = NO
 GENERATE_MAN     = NO
@@ -47,6 +47,8 @@ QUIET            = YES
 JAVADOC_AUTOBRIEF = YES
 GENERATE_HTML = NO
 GENERATE_XML = YES
+ALIASES = "rst=\verbatim embed:rst"
+ALIASES += "endrst=\endverbatim"
 """
 
 class BaseDirective(rst.Directive):
