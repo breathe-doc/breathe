@@ -150,7 +150,7 @@ class AutoDoxygenIndexDirective(DoxygenIndexDirective):
 
         cfgfile = partname + ".cfg"
         cfg = AUTOCFG_TEMPLATE.format(project_name=project_info.name(), output_dir='.',
-                                      input=os.path.abspath(filename))
+                                  input=" ".join(map(os.path.abspath, self.arguments)))
         with open(os.path.join(tempdir, cfgfile), 'w') as f:
             f.write(cfg)
 
