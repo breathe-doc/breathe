@@ -126,7 +126,7 @@ class DoxygenIndexDirective(BaseDirective):
 class AutoDoxygenIndexDirective(DoxygenIndexDirective):
 
     required_arguments = 1
-    optional_arguments = 1
+    optional_arguments = 999999
     option_spec = {
             "path": unchanged_required,
             "project": unchanged_required,
