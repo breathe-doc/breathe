@@ -68,7 +68,8 @@ class CompoundTypeSubRenderer(Renderer):
                     self.node_factory.Text(""),
                     kind,
                     self.node_factory.Text(" "),
-                    name
+                    name,
+                    ids=[domain_id, refid]
                     )
                 )
 
