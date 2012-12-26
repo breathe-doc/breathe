@@ -746,7 +746,7 @@ def setup(app):
     cache_factory = CacheFactory()
     cache = cache_factory.create_cache()
     path_handler = PathHandler(os.sep, os.path.basename, os.path.join)
-    parser_factory = DoxygenParserFactory(cache, path_handler)
+    parser_factory = DoxygenParserFactory(cache, path_handler, app)
     matcher_factory = ItemMatcherFactory()
     item_finder_factory_creator = DoxygenItemFinderFactoryCreator(parser_factory, matcher_factory)
     index_parser = parser_factory.create_index_parser()
@@ -844,4 +844,26 @@ def setup(app):
     app.add_stylesheet("breathe.css")
 
     app.connect("builder-inited", directive_factory.get_config_values)
+
+    def outdated(app, env, added, changed, removed):
+        stale = []
+        if hasattr(env, 'file_state'):
+            for filename, info in env.file_state.iteritems():
+                oldmtime, docnames = info
+                if os.path.getmtime(filename) > oldmtime:
+                    stale.extend(docnames)
+        return list(set(stale).difference(removed))
+    app.connect("env-get-outdated", outdated)
+
+    def purge_doc(app, env, docname):
+        if hasattr(env, 'file_state'):
+            toremove = []
+            for filename, info in env.file_state.iteritems():
+                _, docnames = info
+                docnames.discard(docname)
+                if not docnames:
+                    toremove.append(filename)
+            for filename in toremove:
+                del env.file_state[filename]
+    app.connect("env-purge-doc", purge_doc)
 
