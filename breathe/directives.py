@@ -127,6 +127,25 @@ class DoxygenFunctionDirective(BaseDirective):
 
         finder = self.finder_factory.create_finder(project_info)
 
+        # Extract arguments from the function name.
+        args = None
+        paren_index = function_name.find('(')
+        if paren_index != -1:
+            args = []
+            num_open_brackets = -1;
+            start = paren_index + 1
+            for i in range(paren_index, len(function_name)):
+                c = function_name[i]
+                if c == '(' or c == '<':
+                    num_open_brackets += 1
+                elif c == ')' or c == '>':
+                    num_open_brackets -= 1
+                elif c == ',' and num_open_brackets == 0:
+                    args.append(function_name[start:i])
+                    start = i + 1
+            args.append(function_name[start:-1])
+            function_name = function_name[:paren_index]
+
         matcher_stack = self.matcher_factory.create_matcher_stack(
                 {
                     "compound": self.matcher_factory.create_name_matcher(namespace),
@@ -135,9 +154,27 @@ class DoxygenFunctionDirective(BaseDirective):
                 "member"
             )
 
-        try:
-            data_object = finder.find_one(matcher_stack)
-        except NoMatchesError, e:
+        results = finder.find(matcher_stack)
+        data_object = None
+        if args:
+            # Resolve overloads.
+            for r in results:
+                if len(args) == len(r.param):
+                    equal = True
+                    for i in range(len(args)):
+                        param_type = r.param[i].type_.content_[0].value
+                        if not isinstance(param_type, unicode) :
+                            param_type = param_type.valueOf_
+                        if args[i] != param_type:
+                            equal = False
+                            break
+                    if equal:
+                        data_object = r
+                        break
+        elif len(results) > 0:
+            data_object = results[0]
+
+        if not data_object:
             warning = ('doxygenfunction: Cannot find function "%s%s" in doxygen xml output '
                     'for project "%s" from directory: %s'
                     % (namespace, function_name, project_info.name(), project_info.path()))
