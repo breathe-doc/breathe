@@ -62,6 +62,7 @@ Thank you to:
 - `davidm <https://github.com/davidm>`_
 - `hobu <https://github.com/hobu>`_
 - `magro11 <https://github.com/magro11>`_
+- `scopatz <https://github.com/scopatz>`_
 
 For their contributions; improving the code and the documentation. And thanks to:
 
