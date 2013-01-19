@@ -61,6 +61,7 @@ Thank you to:
 - `abingham <https://github.com/abingham>`_
 - `davidm <https://github.com/davidm>`_
 - `hobu <https://github.com/hobu>`_
+- `magro11 <https://github.com/magro11>`_
 
 For their contributions; improving the code and the documentation. And thanks to:
 
