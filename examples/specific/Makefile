@@ -33,7 +33,8 @@ all: typedef/xml/index.xml \
 	template_function/xml/index.xml \
 	userdefined/xml/index.xml \
 	fixedwidthfont/xml/index.xml \
-	latexmath/xml/index.xml
+	latexmath/xml/index.xml \
+	functionOverload/xml/index.xml
 	
 
 clean:
@@ -87,3 +88,8 @@ fixedwidthfont/xml/index.xml: fixedwidthfont.h fixedwidthfont.cfg
 
 latexmath/xml/index.xml: latexmath.h latexmath.cfg
 	$(DOXYGEN) latexmath.cfg
+
+functionOverload/xml/index.xml: functionOverload.h functionOverload.cfg
+	$(DOXYGEN) functionOverload.cfg
+
+

@@ -63,6 +63,7 @@ Thank you to:
 - `hobu <https://github.com/hobu>`_
 - `magro11 <https://github.com/magro11>`_
 - `scopatz <https://github.com/scopatz>`_
+- `vitaut <https://github.com/vitaut>`_
 
 For their contributions; improving the code and the documentation. And thanks to:
 
