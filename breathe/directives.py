@@ -31,6 +31,16 @@ import sphinx.ext.mathbase
 import sphinx.domains.cpp
 sphinx.domains.cpp._identifier_re = re.compile(r'(~?\b[a-zA-Z_][a-zA-Z0-9_]*)\b')
 
+class BreatheException(Exception):
+    pass
+
+class NoMatchingFunctionError(BreatheException):
+    pass
+
+class UnableToResolveFunctionError(BreatheException):
+    pass
+
+
 class BaseDirective(rst.Directive):
 
     def __init__(
@@ -107,7 +117,6 @@ class DoxygenIndexDirective(BaseDirective):
 class DoxygenFunctionDirective(BaseDirective):
 
     required_arguments = 1
-    optional_arguments = 1
     option_spec = {
             "path": unchanged_required,
             "project": unchanged_required,
@@ -115,36 +124,26 @@ class DoxygenFunctionDirective(BaseDirective):
             "no-link": flag,
             }
     has_content = False
+    final_argument_whitespace = True
 
     def run(self):
 
+        # Separate possible arguments (delimited by a "(") from the namespace::name
+        match = re.match( r"([^(]*)(.*)", self.arguments[0] )
+        namespaced_function, args = match.group(1), match.group(2)
+
+        # Split the namespace and the function name
         try:
-            (namespace, function_name) = self.arguments[0].rsplit("::", 1)
+            (namespace, function_name) = namespaced_function.rsplit( "::", 1 )
         except ValueError:
-            (namespace, function_name) = "", self.arguments[0]
+            (namespace, function_name) = "", namespaced_function
 
         project_info = self.project_info_factory.create_project_info(self.options)
 
         finder = self.finder_factory.create_finder(project_info)
 
         # Extract arguments from the function name.
-        args = None
-        paren_index = function_name.find('(')
-        if paren_index != -1:
-            args = []
-            num_open_brackets = -1;
-            start = paren_index + 1
-            for i in range(paren_index, len(function_name)):
-                c = function_name[i]
-                if c == '(' or c == '<':
-                    num_open_brackets += 1
-                elif c == ')' or c == '>':
-                    num_open_brackets -= 1
-                elif c == ',' and num_open_brackets == 0:
-                    args.append(function_name[start:i])
-                    start = i + 1
-            args.append(function_name[start:-1])
-            function_name = function_name[:paren_index]
+        args = self.parse_args(args)
 
         matcher_stack = self.matcher_factory.create_matcher_stack(
                 {
@@ -155,29 +154,19 @@ class DoxygenFunctionDirective(BaseDirective):
             )
 
         results = finder.find(matcher_stack)
-        data_object = None
-        if args:
-            # Resolve overloads.
-            for r in results:
-                if len(args) == len(r.param):
-                    equal = True
-                    for i in range(len(args)):
-                        param_type = r.param[i].type_.content_[0].value
-                        if not isinstance(param_type, unicode) :
-                            param_type = param_type.valueOf_
-                        if args[i] != param_type:
-                            equal = False
-                            break
-                    if equal:
-                        data_object = r
-                        break
-        elif len(results) > 0:
-            data_object = results[0]
 
-        if not data_object:
+        try:
+            data_object = self.resolve_function(results, args)
+        except NoMatchingFunctionError:
             warning = ('doxygenfunction: Cannot find function "%s%s" in doxygen xml output '
                     'for project "%s" from directory: %s'
                     % (namespace, function_name, project_info.name(), project_info.path()))
+            return [docutils.nodes.warning("", docutils.nodes.paragraph("", "", docutils.nodes.Text(warning))),
+                    self.state.document.reporter.warning(warning, line=self.lineno)]
+        except UnableToResolveFunctionError:
+            warning = ('doxygenfunction: Unable to resolve multiple matches for function "%s%s" with arguments (%s) in doxygen xml output '
+                    'for project "%s" from directory: %s.'
+                    % (namespace, function_name, ", ".join(args), project_info.name(), project_info.path()))
             return [docutils.nodes.warning("", docutils.nodes.paragraph("", "", docutils.nodes.Text(warning))),
                     self.state.document.reporter.warning(warning, line=self.lineno)]
 
@@ -200,6 +189,65 @@ class DoxygenFunctionDirective(BaseDirective):
         node_list = object_renderer.render()
 
         return node_list
+
+
+    def parse_args(self, function_description):
+
+        paren_index = function_description.find('(')
+        if paren_index == -1:
+            return []
+        else:
+            # Parse the function name string, eg. f(int, float) to
+            # extract the types so we can use them for matching
+            args = []
+            num_open_brackets = -1;
+            start = paren_index + 1
+            for i in range(paren_index, len(function_description)):
+                c = function_description[i]
+                if c == '(' or c == '<':
+                    num_open_brackets += 1
+                elif c == ')' or c == '>':
+                    num_open_brackets -= 1
+                elif c == ',' and num_open_brackets == 0:
+                    args.append(function_description[start:i].strip())
+                    start = i + 1
+            args.append(function_description[start:-1].strip())
+
+            return args
+
+
+    def resolve_function(self, matches, args):
+
+        if not matches:
+            raise NoMatchingFunctionError()
+
+        if len(matches) == 1:
+            return matches[0]
+
+        data_object = None
+
+        # Tries to match the args array agains the arguments listed in the
+        # doxygen data
+        # TODO: We don't have any doxygen xml dom accessing code at this level
+        # this might benefit from being abstracted away at some point
+        for entry in matches:
+            if len(args) == len(entry.param):
+                equal = True
+                for i in range(len(args)):
+                    param_type = entry.param[i].type_.content_[0].value
+                    if not isinstance(param_type, unicode) :
+                        param_type = param_type.valueOf_
+                    if args[i] != param_type:
+                        equal = False
+                        break
+                if equal:
+                    data_object = entry
+                    break
+
+        if not data_object:
+            raise UnableToResolveFunctionError()
+
+        return data_object
 
 
 class DoxygenClassDirective(BaseDirective):
@@ -536,6 +584,7 @@ class DirectiveContainer(object):
         self.optional_arguments = directive.optional_arguments
         self.option_spec = directive.option_spec
         self.has_content = directive.has_content
+        self.final_argument_whitespace = directive.final_argument_whitespace
 
     def __call__(self, *args):
 
