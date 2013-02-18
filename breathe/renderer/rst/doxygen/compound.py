@@ -109,7 +109,7 @@ class SectionDefTypeSubRenderer(Renderer):
                 "dcop-func":  "DCOP Function",
                 "property":  "Property",
                 "event":  "Event",
-                "public-static-func": "Public Static Functons",
+                "public-static-func": "Public Static Functions",
                 "public-static-attrib": "Public Static Attributes",
                 "protected-type":  "Protected Types",
                 "protected-func":  "Protected Functions",
