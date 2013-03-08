@@ -824,6 +824,73 @@ class PathHandler(object):
         return bool( file_path.count( self.sep ) )
 
 
+class MTimer(object):
+
+    def __init__(self, getmtime):
+        self.getmtime = getmtime
+
+    def get_mtime(self, filename):
+        return self.getmtime(filename)
+
+class FileStateCache(object):
+    """
+    Stores the modified time of the various doxygen xml files against the
+    reStructuredText file that they are referenced from so that we know which
+    reStructuredText files to rebuild if the doxygen xml is modified.
+
+    We store the information in the environment object so that it is pickled
+    down and stored between builds as Sphinx is designed to do.
+    """
+
+    def __init__(self, mtimer, app):
+
+        self.app = app
+        self.mtimer = mtimer
+
+    def update(self, source_file):
+
+        if not hasattr( self.app.env, "breathe_file_state" ):
+            self.app.env.breathe_file_state = {}
+
+        new_mtime = self.mtimer.get_mtime(source_file)
+
+        mtime, docnames = self.app.env.breathe_file_state.setdefault(source_file, (new_mtime, set()))
+
+        docnames.add(self.app.env.docname)
+
+        self.app.env.breathe_file_state[source_file] = (new_mtime, docnames)
+
+    def get_outdated(self, app, env, added, changed, removed):
+
+        if not hasattr( self.app.env, "breathe_file_state" ):
+            return []
+
+        stale = []
+
+        for filename, info in self.app.env.breathe_file_state.iteritems():
+            old_mtime, docnames = info
+            if self.mtimer.get_mtime(filename) > old_mtime:
+                stale.extend(docnames)
+
+        return list(set(stale).difference(removed))
+
+    def purge_doc(self, app, env, docname):
+
+        if not hasattr( self.app.env, "breathe_file_state" ):
+            return
+
+        toremove = []
+
+        for filename, info in self.app.env.breathe_file_state.iteritems():
+
+            _, docnames = info
+            docnames.discard(docname)
+            if not docnames:
+                toremove.append(filename)
+
+        for filename in toremove:
+            del self.app.env.breathe_file_state[filename]
+
 # Setup
 # -----
 
@@ -832,7 +899,9 @@ def setup(app):
     cache_factory = CacheFactory()
     cache = cache_factory.create_cache()
     path_handler = PathHandler(os.sep, os.path.basename, os.path.join)
-    parser_factory = DoxygenParserFactory(cache, path_handler, app)
+    mtimer = MTimer(os.path.getmtime)
+    file_state_cache = FileStateCache(mtimer, app)
+    parser_factory = DoxygenParserFactory(cache, path_handler, file_state_cache)
     matcher_factory = ItemMatcherFactory()
     item_finder_factory_creator = DoxygenItemFinderFactoryCreator(parser_factory, matcher_factory)
     index_parser = parser_factory.create_index_parser()
@@ -931,24 +1000,7 @@ def setup(app):
 
     app.connect("builder-inited", directive_factory.get_config_values)
 
-    def outdated(app, env, added, changed, removed):
-        stale = []
-        if hasattr(env, 'file_state'):
-            for filename, info in env.file_state.iteritems():
-                oldmtime, docnames = info
-                if os.path.getmtime(filename) > oldmtime:
-                    stale.extend(docnames)
-        return list(set(stale).difference(removed))
-    app.connect("env-get-outdated", outdated)
+    app.connect("env-get-outdated", file_state_cache.get_outdated)
 
-    def purge_doc(app, env, docname):
-        if hasattr(env, 'file_state'):
-            toremove = []
-            for filename, info in env.file_state.iteritems():
-                _, docnames = info
-                docnames.discard(docname)
-                if not docnames:
-                    toremove.append(filename)
-            for filename in toremove:
-                del env.file_state[filename]
-    app.connect("env-purge-doc", purge_doc)
+    app.connect("env-purge-doc", file_state_cache.purge_doc)
+
