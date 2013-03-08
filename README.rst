@@ -65,6 +65,7 @@ Thank you to:
 - `scopatz <https://github.com/scopatz>`_
 - `vitaut <https://github.com/vitaut>`_
 - `vonj <https://github.com/vonj>`_
+- `jmnas <https://github.com/jmnas>`_
 
 For their contributions; improving the code and the documentation. And thanks to:
 
