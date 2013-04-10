@@ -40,6 +40,9 @@ class NoMatchingFunctionError(BreatheException):
 class UnableToResolveFunctionError(BreatheException):
     pass
 
+class NoDefaultProjectError(BreatheException):
+    pass
+
 
 class BaseDirective(rst.Directive):
 
@@ -82,7 +85,12 @@ class DoxygenIndexDirective(BaseDirective):
 
     def run(self):
 
-        project_info = self.project_info_factory.create_project_info(self.options)
+        try:
+            project_info = self.project_info_factory.create_project_info(self.options)
+        except NoDefaultProjectError, e:
+            warning = 'doxygenindex: %s' % e
+            return [docutils.nodes.warning("", docutils.nodes.paragraph("", "", docutils.nodes.Text(warning))),
+                    self.state.document.reporter.warning(warning, line=self.lineno)]
 
         try:
             finder = self.finder_factory.create_finder(project_info)
@@ -138,7 +146,12 @@ class DoxygenFunctionDirective(BaseDirective):
         except ValueError:
             (namespace, function_name) = "", namespaced_function
 
-        project_info = self.project_info_factory.create_project_info(self.options)
+        try:
+            project_info = self.project_info_factory.create_project_info(self.options)
+        except NoDefaultProjectError, e:
+            warning = 'doxygenfunction: %s' % e
+            return [docutils.nodes.warning("", docutils.nodes.paragraph("", "", docutils.nodes.Text(warning))),
+                    self.state.document.reporter.warning(warning, line=self.lineno)]
 
         finder = self.finder_factory.create_finder(project_info)
 
@@ -271,7 +284,12 @@ class DoxygenClassDirective(BaseDirective):
 
         name = self.arguments[0]
 
-        project_info = self.project_info_factory.create_project_info(self.options)
+        try:
+            project_info = self.project_info_factory.create_project_info(self.options)
+        except NoDefaultProjectError, e:
+            warning = 'doxygen%s: %s' % (self.kind, e)
+            return [docutils.nodes.warning("", docutils.nodes.paragraph("", "", docutils.nodes.Text(warning))),
+                    self.state.document.reporter.warning(warning, line=self.lineno)]
 
         finder = self.finder_factory.create_finder(project_info)
 
@@ -329,7 +347,12 @@ class DoxygenFileDirective(BaseDirective):
 
         name = self.arguments[0]
 
-        project_info = self.project_info_factory.create_project_info(self.options)
+        try:
+            project_info = self.project_info_factory.create_project_info(self.options)
+        except NoDefaultProjectError, e:
+            warning = 'doxygenfile: %s' % e
+            return [docutils.nodes.warning("", docutils.nodes.paragraph("", "", docutils.nodes.Text(warning))),
+                    self.state.document.reporter.warning(warning, line=self.lineno)]
 
         finder = self.finder_factory.create_finder(project_info)
 
@@ -394,7 +417,12 @@ class DoxygenBaseDirective(BaseDirective):
         except ValueError:
             namespace, name = "", self.arguments[0]
 
-        project_info = self.project_info_factory.create_project_info(self.options)
+        try:
+            project_info = self.project_info_factory.create_project_info(self.options)
+        except NoDefaultProjectError, e:
+            warning = 'doxygen%s: %s' % (self.kind, e)
+            return [docutils.nodes.warning("", docutils.nodes.paragraph("", "", docutils.nodes.Text(warning))),
+                    self.state.document.reporter.warning(warning, line=self.lineno)]
 
         finder = self.finder_factory.create_finder(project_info)
 
@@ -474,7 +502,12 @@ class DoxygenBaseItemDirective(BaseDirective):
         except ValueError:
             namespace, name = "", self.arguments[0]
 
-        project_info = self.project_info_factory.create_project_info(self.options)
+        try:
+            project_info = self.project_info_factory.create_project_info(self.options)
+        except NoDefaultProjectError, e:
+            warning = 'doxygen%s: %s' % (self.kind, e)
+            return [docutils.nodes.warning("", docutils.nodes.paragraph("", "", docutils.nodes.Text(warning))),
+                    self.state.document.reporter.warning(warning, line=self.lineno)]
 
         finder = self.finder_factory.create_finder(project_info)
 
@@ -661,12 +694,17 @@ class ProjectInfoFactory(object):
 
     def default_path(self):
 
+        if not self.default_project:
+            raise NoDefaultProjectError(
+                    "No breathe_default_project config setting to fall back on "
+                    "for directive with no 'project' or 'path' specified."
+                    )
+
         return self.projects[self.default_project]
 
     def create_project_info(self, options):
 
         name = ""
-        path = self.default_path()
 
         if "project" in options:
             try:
@@ -677,8 +715,11 @@ class ProjectInfoFactory(object):
                         "Unable to find project '%s' in breathe_projects dictionary" % options["project"]
                         )
 
-        if "path" in options:
+        elif "path" in options:
             path = options["path"]
+
+        else:
+            path = self.default_path()
 
         try:
             return self.project_info_store[path]
