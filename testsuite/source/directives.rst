@@ -39,6 +39,9 @@ The available directives are shown below. In each case the ``project``,
    Results in Breathe only outputting the raw code definitions without
    any additional description information.
 
+If neither project nor path are provided on the directive then breathe will
+expect the :ref:`breathe_default_project <default_project>` config value to be
+set.
 
 .. _doxygenindex:
 
@@ -218,6 +221,8 @@ Config Values
 
    This should be a dictionary in which the keys are project names and the values are
    paths to the folder containing the doxygen output for that project.
+
+.. _default_project:
 
 .. confval:: breathe_default_project
 
