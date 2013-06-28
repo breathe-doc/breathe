@@ -36,6 +36,19 @@ public:
     */
     virtual void rawVerbatim() const = 0;
 
+   /*!
+    * Inserting additional reStructuredText information.
+    *
+    * \verbatim embed:rst:leading-asterisk
+    *     Some example code::
+    *
+    *        int example(int x) {
+    *            return x * 2;
+    *        }
+    * \endverbatim
+    */
+    virtual void rawLeadingAsteriskVerbatim() const = 0;
+
     //! Brief desc
     virtual void testFunction() const {};
 };
