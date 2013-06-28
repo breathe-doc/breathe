@@ -8,7 +8,7 @@ tags, such as ``\b`` for adding bold text, this information appears in the xml
 output and Breathe attempts to reproduce it accurately.
 
 In addition to this, is it possible to add reStructuredText into your comments
-within appropriately demarcated sections. 
+within appropriately demarcated sections.
 
 reStructuredText
 ----------------
@@ -31,14 +31,68 @@ Will be rendered as:
    :project: rst
    :no-link:
 
+Handling Leading Asterisks
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Note that doxygen captures **all** content in a **verbatim** block.  This can
+be rather an annoyance if you use a leading-asterisk style of comment block
+such as the following::
+
+   /*!
+    * Inserting additional reStructuredText information.
+    *
+    * \verbatim embed:rst
+    *     Some example code::
+    *
+    *        int example(int x) {
+    *            return x * 2;
+    *        }
+    * \endverbatim
+    */
+
+As the leading asterisks are captured in the **verbatim** block this will
+appear to be an incorrectly formatted bullet list.  Due to the syntantical
+problems sphinx will issue warnings and the block will render as:
+
+.. doxygenfunction:: TestClass::rawBadAsteriskVerbatim
+   :project: rst
+   :no-link:
+
+To prevent this, use an **embed:rst:leading-asterisk** tag::
+
+   /*!
+    * Inserting additional reStructuredText information.
+    *
+    * \verbatim embed:rst:leading-asterisk
+    *     Some example code::
+    *
+    *        int example(int x) {
+    *            return x * 2;
+    *        }
+    * \endverbatim
+    */
+
+As the leading asterisks are captured in the **verbatim** block this will
+appear to be an incorrectly formatted bullet list.  Due to the syntantical
+problems sphinx will issue warnings and the block will render as:
+
+.. doxygenfunction:: TestClass::rawLeadingAsteriskVerbatim
+   :project: rst
+   :no-link:
+
 Aliases
 ~~~~~~~
 
 To make these blocks appears as more appropriate doxygen-like markup in your
-comments you can add the following aliases to your doxygen cofiguration file::
+comments you can add the following aliases to your doxygen configuration file::
 
    ALIASES = "rst=\verbatim embed:rst"
    ALIASES += "endrst=\endverbatim"
+
+And, if you use leading asterisks then perhaps::
+
+   ALIASES += "rststar=\verbatim embed:rst:leading-asterisk"
+   ALIASES += "endrststar=\endverbatim"
 
 Which allow you to write comments like::
 
