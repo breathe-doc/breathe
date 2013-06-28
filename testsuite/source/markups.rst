@@ -52,11 +52,19 @@ such as the following::
 
 As the leading asterisks are captured in the **verbatim** block this will
 appear to be an incorrectly formatted bullet list.  Due to the syntantical
-problems sphinx will issue warnings and the block will render as:
+problems Sphinx will issue warnings and the block will render as:
 
-.. doxygenfunction:: TestClass::rawBadAsteriskVerbatim
-   :project: rst
-   :no-link:
+.. Here we fake the bad output without actually using a bad example otherwise
+   we'll get warnings in the build output.
+
+void **rawBadAsteriskVerbatim**\ ()
+
+   Inserting additional reStructuredText information.
+
+   - Some example code:
+   - int example(int x) {
+   - return x \* 2;
+   - }
 
 To prevent this, use an **embed:rst:leading-asterisk** tag::
 
@@ -72,9 +80,7 @@ To prevent this, use an **embed:rst:leading-asterisk** tag::
     * \endverbatim
     */
 
-As the leading asterisks are captured in the **verbatim** block this will
-appear to be an incorrectly formatted bullet list.  Due to the syntantical
-problems sphinx will issue warnings and the block will render as:
+This will appropriately handle the leading asterisks and render as:
 
 .. doxygenfunction:: TestClass::rawLeadingAsteriskVerbatim
    :project: rst

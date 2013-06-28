@@ -815,12 +815,12 @@ class VerbatimTypeSubRenderer(Renderer):
         #   consisting of a simple bullet list.
         #   For now we just look for an extended embed tag
         if self.data_object.text.strip().startswith("embed:rst:leading-asterisk"):
-            # we treat a leading '*' like whitespace
-            self.data_object.text = "\n".join([( (' ' + line[1:])
-                                                 if (line and line[0] == '*')
-                                                 else '')
-                                               for line in self.data_object.text.splitlines()])
-                                               
+
+            lines = self.data_object.text.splitlines()
+            # Replace the first * on each line with a blank space
+            lines = map( lambda text: text.replace( "*", " ", 1 ), lines )
+            self.data_object.text = "\n".join( lines )
+
         rst = self.content_creator(self.data_object.text)
 
         # Parent node for the generated node subtree
