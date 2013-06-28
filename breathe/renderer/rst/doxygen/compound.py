@@ -1,4 +1,3 @@
-
 from breathe.renderer.rst.doxygen.base import Renderer
 
 class DoxygenTypeSubRenderer(Renderer):
@@ -809,6 +808,18 @@ class VerbatimTypeSubRenderer(Renderer):
 
             # Handle has a preformatted text
             return [self.node_factory.literal_block(text, text)]
+
+        # do we need to strip leading asterisks?
+        # NOTE: We could choose to guess this based on every line starting with '*'.
+        #   However This would have a side-effect for any users who have an rst-block
+        #   consisting of a simple bullet list.
+        #   For now we just look for an extended embed tag
+        if self.data_object.text.strip().startswith("embed:rst:leading-asterisk"):
+
+            lines = self.data_object.text.splitlines()
+            # Replace the first * on each line with a blank space
+            lines = map( lambda text: text.replace( "*", " ", 1 ), lines )
+            self.data_object.text = "\n".join( lines )
 
         rst = self.content_creator(self.data_object.text)
 
