@@ -61,6 +61,12 @@ Thank you to:
 - `abingham <https://github.com/abingham>`_
 - `davidm <https://github.com/davidm>`_
 - `hobu <https://github.com/hobu>`_
+- `magro11 <https://github.com/magro11>`_
+- `scopatz <https://github.com/scopatz>`_
+- `vitaut <https://github.com/vitaut>`_
+- `vonj <https://github.com/vonj>`_
+- `jmnas <https://github.com/jmnas>`_
+- `donkopotamus <https://github.com/donkopotamus>`_
 
 For their contributions; improving the code and the documentation. And thanks to:
 

@@ -31,6 +31,19 @@ import sphinx.ext.mathbase
 import sphinx.domains.cpp
 sphinx.domains.cpp._identifier_re = re.compile(r'(~?\b[a-zA-Z_][a-zA-Z0-9_]*)\b')
 
+class BreatheException(Exception):
+    pass
+
+class NoMatchingFunctionError(BreatheException):
+    pass
+
+class UnableToResolveFunctionError(BreatheException):
+    pass
+
+class NoDefaultProjectError(BreatheException):
+    pass
+
+
 class BaseDirective(rst.Directive):
 
     def __init__(
@@ -72,7 +85,12 @@ class DoxygenIndexDirective(BaseDirective):
 
     def run(self):
 
-        project_info = self.project_info_factory.create_project_info(self.options)
+        try:
+            project_info = self.project_info_factory.create_project_info(self.options)
+        except NoDefaultProjectError, e:
+            warning = 'doxygenindex: %s' % e
+            return [docutils.nodes.warning("", docutils.nodes.paragraph("", "", docutils.nodes.Text(warning))),
+                    self.state.document.reporter.warning(warning, line=self.lineno)]
 
         try:
             finder = self.finder_factory.create_finder(project_info)
@@ -107,7 +125,6 @@ class DoxygenIndexDirective(BaseDirective):
 class DoxygenFunctionDirective(BaseDirective):
 
     required_arguments = 1
-    optional_arguments = 1
     option_spec = {
             "path": unchanged_required,
             "project": unchanged_required,
@@ -115,17 +132,31 @@ class DoxygenFunctionDirective(BaseDirective):
             "no-link": flag,
             }
     has_content = False
+    final_argument_whitespace = True
 
     def run(self):
 
-        try:
-            (namespace, function_name) = self.arguments[0].rsplit("::", 1)
-        except ValueError:
-            (namespace, function_name) = "", self.arguments[0]
+        # Separate possible arguments (delimited by a "(") from the namespace::name
+        match = re.match( r"([^(]*)(.*)", self.arguments[0] )
+        namespaced_function, args = match.group(1), match.group(2)
 
-        project_info = self.project_info_factory.create_project_info(self.options)
+        # Split the namespace and the function name
+        try:
+            (namespace, function_name) = namespaced_function.rsplit( "::", 1 )
+        except ValueError:
+            (namespace, function_name) = "", namespaced_function
+
+        try:
+            project_info = self.project_info_factory.create_project_info(self.options)
+        except NoDefaultProjectError, e:
+            warning = 'doxygenfunction: %s' % e
+            return [docutils.nodes.warning("", docutils.nodes.paragraph("", "", docutils.nodes.Text(warning))),
+                    self.state.document.reporter.warning(warning, line=self.lineno)]
 
         finder = self.finder_factory.create_finder(project_info)
+
+        # Extract arguments from the function name.
+        args = self.parse_args(args)
 
         matcher_stack = self.matcher_factory.create_matcher_stack(
                 {
@@ -135,12 +166,20 @@ class DoxygenFunctionDirective(BaseDirective):
                 "member"
             )
 
+        results = finder.find(matcher_stack)
+
         try:
-            data_object = finder.find_one(matcher_stack)
-        except NoMatchesError, e:
+            data_object = self.resolve_function(results, args)
+        except NoMatchingFunctionError:
             warning = ('doxygenfunction: Cannot find function "%s%s" in doxygen xml output '
                     'for project "%s" from directory: %s'
                     % (namespace, function_name, project_info.name(), project_info.path()))
+            return [docutils.nodes.warning("", docutils.nodes.paragraph("", "", docutils.nodes.Text(warning))),
+                    self.state.document.reporter.warning(warning, line=self.lineno)]
+        except UnableToResolveFunctionError:
+            warning = ('doxygenfunction: Unable to resolve multiple matches for function "%s%s" with arguments (%s) in doxygen xml output '
+                    'for project "%s" from directory: %s.'
+                    % (namespace, function_name, ", ".join(args), project_info.name(), project_info.path()))
             return [docutils.nodes.warning("", docutils.nodes.paragraph("", "", docutils.nodes.Text(warning))),
                     self.state.document.reporter.warning(warning, line=self.lineno)]
 
@@ -165,6 +204,65 @@ class DoxygenFunctionDirective(BaseDirective):
         return node_list
 
 
+    def parse_args(self, function_description):
+
+        paren_index = function_description.find('(')
+        if paren_index == -1:
+            return []
+        else:
+            # Parse the function name string, eg. f(int, float) to
+            # extract the types so we can use them for matching
+            args = []
+            num_open_brackets = -1;
+            start = paren_index + 1
+            for i in range(paren_index, len(function_description)):
+                c = function_description[i]
+                if c == '(' or c == '<':
+                    num_open_brackets += 1
+                elif c == ')' or c == '>':
+                    num_open_brackets -= 1
+                elif c == ',' and num_open_brackets == 0:
+                    args.append(function_description[start:i].strip())
+                    start = i + 1
+            args.append(function_description[start:-1].strip())
+
+            return args
+
+
+    def resolve_function(self, matches, args):
+
+        if not matches:
+            raise NoMatchingFunctionError()
+
+        if len(matches) == 1:
+            return matches[0]
+
+        data_object = None
+
+        # Tries to match the args array agains the arguments listed in the
+        # doxygen data
+        # TODO: We don't have any doxygen xml dom accessing code at this level
+        # this might benefit from being abstracted away at some point
+        for entry in matches:
+            if len(args) == len(entry.param):
+                equal = True
+                for i in range(len(args)):
+                    param_type = entry.param[i].type_.content_[0].value
+                    if not isinstance(param_type, unicode) :
+                        param_type = param_type.valueOf_
+                    if args[i] != param_type:
+                        equal = False
+                        break
+                if equal:
+                    data_object = entry
+                    break
+
+        if not data_object:
+            raise UnableToResolveFunctionError()
+
+        return data_object
+
+
 class DoxygenClassDirective(BaseDirective):
 
     kind = "class"
@@ -186,7 +284,12 @@ class DoxygenClassDirective(BaseDirective):
 
         name = self.arguments[0]
 
-        project_info = self.project_info_factory.create_project_info(self.options)
+        try:
+            project_info = self.project_info_factory.create_project_info(self.options)
+        except NoDefaultProjectError, e:
+            warning = 'doxygen%s: %s' % (self.kind, e)
+            return [docutils.nodes.warning("", docutils.nodes.paragraph("", "", docutils.nodes.Text(warning))),
+                    self.state.document.reporter.warning(warning, line=self.lineno)]
 
         finder = self.finder_factory.create_finder(project_info)
 
@@ -244,7 +347,12 @@ class DoxygenFileDirective(BaseDirective):
 
         name = self.arguments[0]
 
-        project_info = self.project_info_factory.create_project_info(self.options)
+        try:
+            project_info = self.project_info_factory.create_project_info(self.options)
+        except NoDefaultProjectError, e:
+            warning = 'doxygenfile: %s' % e
+            return [docutils.nodes.warning("", docutils.nodes.paragraph("", "", docutils.nodes.Text(warning))),
+                    self.state.document.reporter.warning(warning, line=self.lineno)]
 
         finder = self.finder_factory.create_finder(project_info)
 
@@ -309,7 +417,12 @@ class DoxygenBaseDirective(BaseDirective):
         except ValueError:
             namespace, name = "", self.arguments[0]
 
-        project_info = self.project_info_factory.create_project_info(self.options)
+        try:
+            project_info = self.project_info_factory.create_project_info(self.options)
+        except NoDefaultProjectError, e:
+            warning = 'doxygen%s: %s' % (self.kind, e)
+            return [docutils.nodes.warning("", docutils.nodes.paragraph("", "", docutils.nodes.Text(warning))),
+                    self.state.document.reporter.warning(warning, line=self.lineno)]
 
         finder = self.finder_factory.create_finder(project_info)
 
@@ -389,7 +502,12 @@ class DoxygenBaseItemDirective(BaseDirective):
         except ValueError:
             namespace, name = "", self.arguments[0]
 
-        project_info = self.project_info_factory.create_project_info(self.options)
+        try:
+            project_info = self.project_info_factory.create_project_info(self.options)
+        except NoDefaultProjectError, e:
+            warning = 'doxygen%s: %s' % (self.kind, e)
+            return [docutils.nodes.warning("", docutils.nodes.paragraph("", "", docutils.nodes.Text(warning))),
+                    self.state.document.reporter.warning(warning, line=self.lineno)]
 
         finder = self.finder_factory.create_finder(project_info)
 
@@ -499,6 +617,7 @@ class DirectiveContainer(object):
         self.optional_arguments = directive.optional_arguments
         self.option_spec = directive.option_spec
         self.has_content = directive.has_content
+        self.final_argument_whitespace = directive.final_argument_whitespace
 
     def __call__(self, *args):
 
@@ -575,12 +694,17 @@ class ProjectInfoFactory(object):
 
     def default_path(self):
 
+        if not self.default_project:
+            raise NoDefaultProjectError(
+                    "No breathe_default_project config setting to fall back on "
+                    "for directive with no 'project' or 'path' specified."
+                    )
+
         return self.projects[self.default_project]
 
     def create_project_info(self, options):
 
         name = ""
-        path = self.default_path()
 
         if "project" in options:
             try:
@@ -591,8 +715,11 @@ class ProjectInfoFactory(object):
                         "Unable to find project '%s' in breathe_projects dictionary" % options["project"]
                         )
 
-        if "path" in options:
+        elif "path" in options:
             path = options["path"]
+
+        else:
+            path = self.default_path()
 
         try:
             return self.project_info_store[path]
@@ -738,6 +865,73 @@ class PathHandler(object):
         return bool( file_path.count( self.sep ) )
 
 
+class MTimer(object):
+
+    def __init__(self, getmtime):
+        self.getmtime = getmtime
+
+    def get_mtime(self, filename):
+        return self.getmtime(filename)
+
+class FileStateCache(object):
+    """
+    Stores the modified time of the various doxygen xml files against the
+    reStructuredText file that they are referenced from so that we know which
+    reStructuredText files to rebuild if the doxygen xml is modified.
+
+    We store the information in the environment object so that it is pickled
+    down and stored between builds as Sphinx is designed to do.
+    """
+
+    def __init__(self, mtimer, app):
+
+        self.app = app
+        self.mtimer = mtimer
+
+    def update(self, source_file):
+
+        if not hasattr( self.app.env, "breathe_file_state" ):
+            self.app.env.breathe_file_state = {}
+
+        new_mtime = self.mtimer.get_mtime(source_file)
+
+        mtime, docnames = self.app.env.breathe_file_state.setdefault(source_file, (new_mtime, set()))
+
+        docnames.add(self.app.env.docname)
+
+        self.app.env.breathe_file_state[source_file] = (new_mtime, docnames)
+
+    def get_outdated(self, app, env, added, changed, removed):
+
+        if not hasattr( self.app.env, "breathe_file_state" ):
+            return []
+
+        stale = []
+
+        for filename, info in self.app.env.breathe_file_state.iteritems():
+            old_mtime, docnames = info
+            if self.mtimer.get_mtime(filename) > old_mtime:
+                stale.extend(docnames)
+
+        return list(set(stale).difference(removed))
+
+    def purge_doc(self, app, env, docname):
+
+        if not hasattr( self.app.env, "breathe_file_state" ):
+            return
+
+        toremove = []
+
+        for filename, info in self.app.env.breathe_file_state.iteritems():
+
+            _, docnames = info
+            docnames.discard(docname)
+            if not docnames:
+                toremove.append(filename)
+
+        for filename in toremove:
+            del self.app.env.breathe_file_state[filename]
+
 # Setup
 # -----
 
@@ -746,7 +940,9 @@ def setup(app):
     cache_factory = CacheFactory()
     cache = cache_factory.create_cache()
     path_handler = PathHandler(os.sep, os.path.basename, os.path.join)
-    parser_factory = DoxygenParserFactory(cache, path_handler)
+    mtimer = MTimer(os.path.getmtime)
+    file_state_cache = FileStateCache(mtimer, app)
+    parser_factory = DoxygenParserFactory(cache, path_handler, file_state_cache)
     matcher_factory = ItemMatcherFactory()
     item_finder_factory_creator = DoxygenItemFinderFactoryCreator(parser_factory, matcher_factory)
     index_parser = parser_factory.create_index_parser()
@@ -844,4 +1040,8 @@ def setup(app):
     app.add_stylesheet("breathe.css")
 
     app.connect("builder-inited", directive_factory.get_config_values)
+
+    app.connect("env-get-outdated", file_state_cache.get_outdated)
+
+    app.connect("env-purge-doc", file_state_cache.purge_doc)
 
