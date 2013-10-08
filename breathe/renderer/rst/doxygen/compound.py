@@ -284,7 +284,7 @@ class FuncMemberDefTypeSubRenderer(MemberDefTypeSubRenderer):
                     )
                 )
 
-        # Setup the line block with gathered informationo
+        # Setup the line block with gathered information
         block = self.node_factory.line_block(
                 "",
                 *lines
@@ -508,6 +508,10 @@ class DocParaTypeSubRenderer(Renderer):
             renderer = self.renderer_factory.create_renderer(self.data_object, item)
             nodelist.extend(renderer.render())
 
+        for item in self.data_object.programlisting:       # Program listings
+            renderer = self.renderer_factory.create_renderer(self.data_object, item)
+            nodelist.extend(renderer.render())
+
         definition_nodes = []
         for item in self.data_object.simplesects:          # Returns, user par's, etc
             renderer = self.renderer_factory.create_renderer(self.data_object, item)
@@ -548,7 +552,7 @@ class DocMarkupTypeSubRenderer(Renderer):
 
 
 class DocParamListTypeSubRenderer(Renderer):
-    """ Parameter/Exectpion documentation """
+    "Parameter/Exception documentation"
 
     lookup = {
             "param" : "Parameters",
@@ -712,6 +716,55 @@ class DocForumlaTypeSubRenderer(Renderer):
 
         return nodelist
 
+
+class ListingTypeSubRenderer(Renderer):
+
+    def render(self):
+
+        lines = []
+        for entry in self.data_object.codeline:
+            renderer = self.renderer_factory.create_renderer(self.data_object, entry)
+
+            # Add blank string at the start otherwise for some reason it renders
+            # the emphasis tags around the kind in plain text (same below)
+            lines.append(
+                    self.node_factory.line(
+                        "",
+                        self.node_factory.Text(""),
+                        *renderer.render()
+                        )
+                    )
+
+        # Setup the line block with gathered information
+        block = self.node_factory.line_block(
+                "",
+                *lines,
+                classes=["highlight", "breatheprogramlisting"]
+                )
+
+        return [block]
+
+class CodeLineTypeSubRenderer(Renderer):
+
+    def render(self):
+
+        nodelist = []
+        for entry in self.data_object.highlight:
+            renderer = self.renderer_factory.create_renderer(self.data_object, entry)
+            nodelist.extend(renderer.render())
+
+        return nodelist
+
+class HighlightTypeSubRenderer(Renderer):
+
+    def render(self):
+
+        nodelist = []
+        for entry in self.data_object.content_:
+            renderer = self.renderer_factory.create_renderer(self.data_object, entry)
+            nodelist.extend(renderer.render())
+
+        return nodelist
 
 class TemplateParamListRenderer(Renderer):
 
