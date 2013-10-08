@@ -722,24 +722,20 @@ class ListingTypeSubRenderer(Renderer):
     def render(self):
 
         lines = []
-        for entry in self.data_object.codeline:
+        nodelist = []
+        for i, entry in enumerate(self.data_object.codeline):
+            # Put new lines between the lines. There must be a more pythonic way of doing this
+            if i:
+                nodelist.append(self.node_factory.Text("\n"))
             renderer = self.renderer_factory.create_renderer(self.data_object, entry)
+            nodelist.extend(renderer.render())
 
-            # Add blank string at the start otherwise for some reason it renders
-            # the emphasis tags around the kind in plain text (same below)
-            lines.append(
-                    self.node_factory.line(
-                        "",
-                        self.node_factory.Text(""),
-                        *renderer.render()
-                        )
-                    )
-
-        # Setup the line block with gathered information
-        block = self.node_factory.line_block(
+        # Add blank string at the start otherwise for some reason it renders
+        # the pending_xref tags around the kind in plain text
+        block = self.node_factory.literal_block(
                 "",
-                *lines,
-                classes=["highlight", "breatheprogramlisting"]
+                "",
+                *nodelist
                 )
 
         return [block]
