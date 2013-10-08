@@ -34,7 +34,8 @@ all: typedef/xml/index.xml \
 	userdefined/xml/index.xml \
 	fixedwidthfont/xml/index.xml \
 	latexmath/xml/index.xml \
-	functionOverload/xml/index.xml
+	functionOverload/xml/index.xml \
+	programlisting/xml/index.xml
 	
 
 clean:
@@ -92,4 +93,6 @@ latexmath/xml/index.xml: latexmath.h latexmath.cfg
 functionOverload/xml/index.xml: functionOverload.h functionOverload.cfg
 	$(DOXYGEN) functionOverload.cfg
 
+programlisting/xml/index.xml: programlisting.h programlisting.cfg programlistinginclude.txt
+	$(DOXYGEN) programlisting.cfg
 
