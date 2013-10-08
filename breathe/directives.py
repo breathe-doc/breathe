@@ -31,16 +31,19 @@ import sphinx.ext.mathbase
 import sphinx.domains.cpp
 sphinx.domains.cpp._identifier_re = re.compile(r'(~?\b[a-zA-Z_][a-zA-Z0-9_]*)\b')
 
-class BreatheException(Exception):
+class BreatheError(Exception):
     pass
 
-class NoMatchingFunctionError(BreatheException):
+class NoMatchingFunctionError(BreatheError):
     pass
 
-class UnableToResolveFunctionError(BreatheException):
+class UnableToResolveFunctionError(BreatheError):
     pass
 
-class NoDefaultProjectError(BreatheException):
+class ProjectError(BreatheError):
+    pass
+
+class NoDefaultProjectError(ProjectError):
     pass
 
 
@@ -87,7 +90,7 @@ class DoxygenIndexDirective(BaseDirective):
 
         try:
             project_info = self.project_info_factory.create_project_info(self.options)
-        except NoDefaultProjectError, e:
+        except ProjectError, e:
             warning = 'doxygenindex: %s' % e
             return [docutils.nodes.warning("", docutils.nodes.paragraph("", "", docutils.nodes.Text(warning))),
                     self.state.document.reporter.warning(warning, line=self.lineno)]
@@ -148,7 +151,7 @@ class DoxygenFunctionDirective(BaseDirective):
 
         try:
             project_info = self.project_info_factory.create_project_info(self.options)
-        except NoDefaultProjectError, e:
+        except ProjectError, e:
             warning = 'doxygenfunction: %s' % e
             return [docutils.nodes.warning("", docutils.nodes.paragraph("", "", docutils.nodes.Text(warning))),
                     self.state.document.reporter.warning(warning, line=self.lineno)]
@@ -286,7 +289,7 @@ class DoxygenClassDirective(BaseDirective):
 
         try:
             project_info = self.project_info_factory.create_project_info(self.options)
-        except NoDefaultProjectError, e:
+        except ProjectError, e:
             warning = 'doxygen%s: %s' % (self.kind, e)
             return [docutils.nodes.warning("", docutils.nodes.paragraph("", "", docutils.nodes.Text(warning))),
                     self.state.document.reporter.warning(warning, line=self.lineno)]
@@ -349,7 +352,7 @@ class DoxygenFileDirective(BaseDirective):
 
         try:
             project_info = self.project_info_factory.create_project_info(self.options)
-        except NoDefaultProjectError, e:
+        except ProjectError, e:
             warning = 'doxygenfile: %s' % e
             return [docutils.nodes.warning("", docutils.nodes.paragraph("", "", docutils.nodes.Text(warning))),
                     self.state.document.reporter.warning(warning, line=self.lineno)]
@@ -419,7 +422,7 @@ class DoxygenBaseDirective(BaseDirective):
 
         try:
             project_info = self.project_info_factory.create_project_info(self.options)
-        except NoDefaultProjectError, e:
+        except ProjectError, e:
             warning = 'doxygen%s: %s' % (self.kind, e)
             return [docutils.nodes.warning("", docutils.nodes.paragraph("", "", docutils.nodes.Text(warning))),
                     self.state.document.reporter.warning(warning, line=self.lineno)]
@@ -504,7 +507,7 @@ class DoxygenBaseItemDirective(BaseDirective):
 
         try:
             project_info = self.project_info_factory.create_project_info(self.options)
-        except NoDefaultProjectError, e:
+        except ProjectError, e:
             warning = 'doxygen%s: %s' % (self.kind, e)
             return [docutils.nodes.warning("", docutils.nodes.paragraph("", "", docutils.nodes.Text(warning))),
                     self.state.document.reporter.warning(warning, line=self.lineno)]
@@ -711,9 +714,7 @@ class ProjectInfoFactory(object):
                 path = self.projects[options["project"]]
                 name = options["project"]
             except KeyError, e:
-                sys.stderr.write(
-                        "Unable to find project '%s' in breathe_projects dictionary" % options["project"]
-                        )
+                raise ProjectError( "Unable to find project '%s' in breathe_projects dictionary" % options["project"] )
 
         elif "path" in options:
             path = options["path"]
