@@ -108,6 +108,7 @@ breathe_projects = {
         "../examples/specific/template_class_non_type/xml/",
     "latexmath":"../examples/specific/latexmath/xml/",
     "functionOverload":"../examples/specific/functionOverload/xml/",
+    "programlisting":"../examples/specific/programlisting/xml/",
     }
 
 breathe_default_project = "tinyxml"
