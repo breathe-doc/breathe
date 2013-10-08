@@ -11,3 +11,17 @@
 	display: inline;
 }
 
+/* Designed to mimic the Sphinx default "pre" styling as we're finding it hard
+ * to output a genuine pre block for the program listings. So instead we have a
+ * standard div with this class attached */
+.breatheprogramlisting {
+    padding: 5px;
+    line-height: 120%;
+    border: 1px solid #ac9;
+    border-left: none;
+    border-right: none;
+
+    margin: 1em 0px;
+
+    font-family: monospace;
+}
