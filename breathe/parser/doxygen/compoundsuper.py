@@ -2601,7 +2601,9 @@ class highlightType(GeneratedsSuper):
             value_ = []
             for text_ in child_.childNodes:
                 value_.append(text_.nodeValue)
-            valuestr_ = ''.join(value_)
+            # We make this unicode so that our unicode renderer catch-all picks it up
+            # otherwise it would go through as 'str' and we'd have to pick it up too
+            valuestr_ = u' '
             obj_ = self.mixedclass_(MixedContainer.CategorySimple,
                 MixedContainer.TypeString, 'sp', valuestr_)
             self.content_.append(obj_)

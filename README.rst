@@ -67,6 +67,7 @@ Thank you to:
 - `vonj <https://github.com/vonj>`_
 - `jmnas <https://github.com/jmnas>`_
 - `donkopotamus <https://github.com/donkopotamus>`_
+- `jo3w4rd <https://github.com/jo3w4rd>`_
 
 For their contributions; improving the code and the documentation. And thanks to:
 
