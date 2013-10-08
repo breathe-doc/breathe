@@ -76,5 +76,8 @@ Function Overloads
 Program Listing
 ---------------
 
+.. doxygenclass:: Vector
+   :project: programlisting
+
 .. doxygenfunction:: center
    :project: programlisting

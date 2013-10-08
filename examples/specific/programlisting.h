@@ -1,4 +1,8 @@
-/**
+
+/*! Vector class */
+class Vector {};
+
+/*!
  * The center of the InteractionBox in device coordinates (millimeters). This point
  * is equidistant from all sides of the box.
  *
