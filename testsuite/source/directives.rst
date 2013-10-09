@@ -1,4 +1,3 @@
-
 Directives & Config Variables
 =============================
 
@@ -185,7 +184,11 @@ additonally ``members`` and ``sections`` option.
    can specify a comma-separated list of sections to be included if no specific
    members are named.  The list can accept wildcards.  For instance, if you want
    to display the all protected and public members, functions, etc, then specify
-   ``:sections: public*, protected*``
+   ``:sections: public*, protected*`` By default, breathe specifies ``public*``.
+   Note that if your Doxygen project uses properties, these are excluded by default.
+   Specify ``:sections: public*, property`` to include both public members and 
+   properties. (The section names correspond to the values of the ``kind`` attribute 
+   of the Doxygen XML ``sectiondef`` elements.)
 
 ::
 
