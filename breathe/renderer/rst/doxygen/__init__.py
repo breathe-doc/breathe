@@ -162,6 +162,9 @@ class DoxygenToRstRendererFactory(object):
             if data_object.kind == "class":
                 class_ = indexrenderer.ClassCompoundTypeSubRenderer
 
+            if data_object.kind == "category": #jw support for categories
+                class_ = indexrenderer.ClassCompoundTypeSubRenderer
+
             # For compound node types Renderer is CreateCompoundTypeSubRenderer
             # as defined below. This could be cleaner
             return Renderer(
