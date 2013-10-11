@@ -19,19 +19,19 @@ The documentation path should contain a folder :file:`source` containing the
 
 The following steps are required to integrate breathe functionality:
 
-#. add the breathe path to your conf.py by adding the following line::
+#. Add the breathe path to your conf.py by adding the following line::
 
     sys.path.append( "/home/me/docproj/ext/breathe/" )
 
-#. add breathe as an extension the line could look like this::
+#. Add breathe as an extension the line could look like this::
 
     extensions = ['sphinx.ext.pngmath', 'sphinx.ext.todo', 'breathe' ]
 
-#. tell breathe about the projects::
+#. Tell breathe about the projects::
 
     breathe_projects = { "myproject": "/home/me/docproj/doxyxml/" }
 
-#. specify a default project::
+#. Specify a default project::
 
     breathe_default_project = "myproject"
 
