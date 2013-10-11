@@ -703,7 +703,13 @@ class ProjectInfoFactory(object):
                     "for directive with no 'project' or 'path' specified."
                     )
 
-        return self.projects[self.default_project]
+        try:
+            return self.projects[self.default_project]
+        except KeyError:
+            raise ProjectError(
+                    ( "breathe_default_project value '%s' does not seem to be a valid key for the "
+                      "breathe_projects dictionary" ) % self.default_project
+                    )
 
     def create_project_info(self, options):
 
