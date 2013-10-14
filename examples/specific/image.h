@@ -1,20 +1,11 @@
 /**
-* The InteractionBox class represents a box-shaped region completely
-* within the field of view of the Leap Motion controller.
-*
-* The interaction box is an axis-aligned rectangular prism and provides normalized
-* coordinates for hands, fingers, and tools within this box. The InteractionBox class
-* can make it easier to map positions in the Leap Motion coordinate system to 2D or
-* 3D coordinate systems used for application drawing.
+* This is a class with an image in the description. It renders like this:
 *
 * \image html imageExample.png
 *
-* The InteractionBox region is defined by a center and dimensions along the x, y,
-* and z axes.
-*
-* Get an InteractionBox object from a Frame object.
-* @since 1.0
+* Breathe & Sphinx should automatically copy the image from the doxygen output directory into the
+* _images folder of the Sphinx output.
 */
-class InteractionBox : public Interface {}
+class ImageClass : public Image {}
 
 
