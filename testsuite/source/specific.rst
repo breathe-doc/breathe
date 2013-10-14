@@ -81,3 +81,10 @@ Program Listing
 
 .. doxygenfunction:: center
    :project: programlisting
+
+Image
+-----
+
+.. doxygenclass:: ImageClass
+   :project: image
+
