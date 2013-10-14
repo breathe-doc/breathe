@@ -660,13 +660,27 @@ class ProjectInfo(object):
 
     def relative_path_to_file(self, file_):
         """
-        Returns relative path from Sphinx documentation source directory to the specified file
-        assuming that the specified file is a path relative to the doxygen xml output directory
+        Returns relative path from Sphinx documentation top-level source directory to the specified
+        file assuming that the specified file is a path relative to the doxygen xml output directory.
         """
+        if os.path.isabs(self._path):
+            full_xml_project_path = self._path
+        else:
+            full_xml_project_path = os.path.realpath(self._path)
+
         return os.path.relpath(
-                os.path.join(self._path, file_),
+                os.path.join(full_xml_project_path, file_),
                 self._source_dir
                 )
+
+    def sphinx_abs_path_to_file(self, file_):
+        """
+        Prepends os.path.sep to the value returned by relative_path_to_file.
+
+        This is to match Sphinx's concept of an absolute path which starts from the top-level source
+        directory of the project.
+        """
+        return os.path.sep + self.relative_path_to_file(file_)
 
     def reference(self):
         return self._reference

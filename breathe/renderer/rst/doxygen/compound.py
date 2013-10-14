@@ -543,9 +543,11 @@ class DocImageTypeSubRenderer(Renderer):
 
     def render(self):
 
-        options = {
-                "uri" : self.project_info.relative_path_to_file(self.data_object.name),
-                }
+        path_to_image = self.project_info.sphinx_abs_path_to_file(
+                self.data_object.name
+                )
+
+        options = { "uri" : path_to_image }
 
         return [self.node_factory.image("", **options)]
 
