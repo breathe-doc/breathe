@@ -633,11 +633,21 @@ class DirectiveContainer(object):
 
 class ProjectInfo(object):
 
-    def __init__(self, name, path, reference, domain_by_extension, domain_by_file_pattern, match):
+    def __init__(
+            self,
+            name,
+            path,
+            reference,
+            source_dir,
+            domain_by_extension,
+            domain_by_file_pattern,
+            match
+            ):
 
         self._name = name
         self._path = path
         self._reference = reference
+        self._source_dir = source_dir
         self._domain_by_extension = domain_by_extension
         self._domain_by_file_pattern = domain_by_file_pattern
         self._match = match
@@ -647,6 +657,16 @@ class ProjectInfo(object):
 
     def path(self):
         return self._path
+
+    def relative_path_to_file(self, file_):
+        """
+        Returns relative path from Sphinx documentation source directory to the specified file
+        assuming that the specified file is a path relative to the doxygen xml output directory
+        """
+        return os.path.relpath(
+                os.path.join(self._path, file_),
+                self._source_dir
+                )
 
     def reference(self):
         return self._reference
@@ -670,8 +690,9 @@ class ProjectInfo(object):
 
 class ProjectInfoFactory(object):
 
-    def __init__(self, match):
+    def __init__(self, source_dir, match):
 
+        self.source_dir = source_dir
         self.match = match
 
         self.projects = {}
@@ -743,6 +764,7 @@ class ProjectInfoFactory(object):
                     name,
                     path,
                     reference,
+                    self.source_dir,
                     self.domain_by_extension,
                     self.domain_by_file_pattern,
                     self.match
@@ -977,7 +999,7 @@ def setup(app):
             rst_content_creator
             )
 
-    project_info_factory = ProjectInfoFactory(fnmatch.fnmatch)
+    project_info_factory = ProjectInfoFactory(app.srcdir, fnmatch.fnmatch)
     glob_factory = GlobFactory(fnmatch.fnmatch)
     filter_factory = FilterFactory(glob_factory, path_handler)
     target_handler_factory = TargetHandlerFactory(node_factory)
