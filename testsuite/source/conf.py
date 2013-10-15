@@ -109,6 +109,7 @@ breathe_projects = {
     "latexmath":"../examples/specific/latexmath/xml/",
     "functionOverload":"../examples/specific/functionOverload/xml/",
     "programlisting":"../examples/specific/programlisting/xml/",
+    "category":"../examples/specific/category/xml/",
     }
 
 breathe_default_project = "tinyxml"
