@@ -7,6 +7,7 @@ Directives & Config Variables
    function
    struct
    class
+   category
    enum
    typedef
    define
@@ -204,6 +205,24 @@ additonally ``members`` and ``sections`` option.
       :no-link:
 
 Checkout the :ref:`example <class-example>` to see it in action.
+
+doxygencategory Directive
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+This directive generates class-like output for Objective-C Category definitions. Uses the same
+options as the doxygenclass directive.
+
+::
+
+   .. doxygencategory:: <category name>
+      :project: ...
+      :path: ...
+      :members: [...]
+      :sections: [...]
+      :outline:
+      :no-link:
+
+Checkout the :ref:`example <category-example>` to see it in action.
 
 doxygenfile Directive
 ~~~~~~~~~~~~~~~~~~~~~
