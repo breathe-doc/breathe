@@ -262,10 +262,7 @@ class FilterFactory(object):
 
     def create_members_filter(self, options):
 
-        try:
-            section = options["sections"]
-        except KeyError:
-            section = ""
+        section = options.get("sections", "")
 
         if not section.strip():
             section_filter = GlobFilter(KindAccessor(Child()), self.globber_factory.create("public*"))
@@ -285,14 +282,13 @@ class FilterFactory(object):
                             )
                         )
 
-        try:
-            text = options["members"]
-        except KeyError:
+        if "members" not in options:
             return OrFilter(
                     NotFilter(NameFilter(NodeTypeAccessor(Parent()), ["sectiondef"])),
                     NotFilter(NameFilter(NodeTypeAccessor(Child()), ["memberdef"]))
                     )
 
+        text = options["members"]
         if not text.strip():
             return OrFilter(
                     NotFilter(NameFilter(NodeTypeAccessor(Child()), ["sectiondef"])),
@@ -305,6 +301,8 @@ class FilterFactory(object):
         # Matches sphinx-autodoc behaviour of comma separated values
         members = set([x.strip() for x in text.split(",")])
 
+        # Accept any nodes which don't have a "sectiondef" as a parent or, if they do, only accept
+        # them if their names are in the members list
         return OrFilter(
                 NotFilter(NameFilter(NodeTypeAccessor(Parent()),["sectiondef"])),
                 NameFilter(NameAccessor(Child()), members)
