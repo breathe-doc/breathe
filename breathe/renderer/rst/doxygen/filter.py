@@ -302,10 +302,14 @@ class FilterFactory(object):
         members = set([x.strip() for x in text.split(",")])
 
         # Accept any nodes which don't have a "sectiondef" as a parent or, if they do, only accept
-        # them if their names are in the members list
+        # them if their names are in the members list or they are of type description. This accounts
+        # for the actual description of the sectiondef
         return OrFilter(
                 NotFilter(NameFilter(NodeTypeAccessor(Parent()),["sectiondef"])),
-                NameFilter(NameAccessor(Child()), members)
+                OrFilter(
+                    NameFilter(NodeTypeAccessor(Child()), ["description"]),
+                    NameFilter(NameAccessor(Child()), members),
+                    )
                 )
 
     def create_outline_filter(self, options):
