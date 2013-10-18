@@ -500,6 +500,12 @@ class DocRefTextTypeSubRenderer(Renderer):
 
 
 class DocParaTypeSubRenderer(Renderer):
+    """
+    <para> tags in the Doxygen output tend to contain either text or a single other tag of interest.
+    So whilst it looks like we're combined descriptions and program listings and other things, in
+    the end we generally only deal with one per para tag. Multiple neighbouring instances of these
+    things tend to each be in a separate neighbouring para tag.
+    """
 
     def render(self):
 
@@ -509,6 +515,10 @@ class DocParaTypeSubRenderer(Renderer):
             nodelist.extend(renderer.render())
 
         for item in self.data_object.programlisting:       # Program listings
+            renderer = self.renderer_factory.create_renderer(self.data_object, item)
+            nodelist.extend(renderer.render())
+
+        for item in self.data_object.images:               # Images
             renderer = self.renderer_factory.create_renderer(self.data_object, item)
             nodelist.extend(renderer.render())
 
@@ -527,6 +537,19 @@ class DocParaTypeSubRenderer(Renderer):
 
         return [self.node_factory.paragraph("", "", *nodelist)]
 
+
+class DocImageTypeSubRenderer(Renderer):
+    "Output docutils image node using name attribute from xml as the uri"
+
+    def render(self):
+
+        path_to_image = self.project_info.sphinx_abs_path_to_file(
+                self.data_object.name
+                )
+
+        options = { "uri" : path_to_image }
+
+        return [self.node_factory.image("", **options)]
 
 class DocMarkupTypeSubRenderer(Renderer):
 
