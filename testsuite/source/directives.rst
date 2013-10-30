@@ -76,6 +76,9 @@ that it handles the doxygen xml generation for you. As a result you need to
 provide the paths to the files that you would like to be processed. The final
 generated output will contain all the content from those files.
 
+Thank you to `Scopatz <https://github.com/scopatz>`_ for the idea and initial
+implementation.
+
 ::
 
    .. autodoxygenindex:: <filename> [<filename> [...]]
