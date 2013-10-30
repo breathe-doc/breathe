@@ -5,9 +5,6 @@ from docutils import nodes
 from breathe.parser import ParserError
 from breathe.nodes import DoxygenNode, DoxygenAutoNode
 
-import subprocess
-import os
-
 class IndexHandler(object):
     """
     Replaces a DoxygenNode with the rendered contents of the doxygen xml's index.xml file
@@ -57,34 +54,22 @@ class IndexHandler(object):
         node.replace_self(node_list)
 
 
-AUTOCFG_TEMPLATE = r"""PROJECT_NAME     = "{project_name}"
-OUTPUT_DIRECTORY = {output_dir}
-GENERATE_LATEX   = NO
-GENERATE_MAN     = NO
-GENERATE_RTF     = NO
-CASE_SENSE_NAMES = NO
-INPUT            = {input}
-ENABLE_PREPROCESSING = YES
-QUIET            = YES
-JAVADOC_AUTOBRIEF = YES
-JAVADOC_AUTOBRIEF = NO
-GENERATE_HTML = NO
-GENERATE_XML = YES
-ALIASES = "rst=\verbatim embed:rst"
-ALIASES += "endrst=\endverbatim"
-"""
-
 class ProjectData(object):
     "Simple handler for the files and project_info for each project"
 
-    def __init__(self, project_info, files):
+    def __init__(self, auto_project_info, files):
 
-        self.project_info = project_info
+        self.auto_project_info = auto_project_info
         self.files = files
 
 class DoxygenAutoTransform(Transform):
 
     default_priority = 209
+
+    def __init__(self, doxygen_handle, *args, **kwargs):
+        Transform.__init__(self, *args, **kwargs)
+
+        self.doxygen_handle = doxygen_handle
 
     def apply(self):
         """
@@ -102,33 +87,20 @@ class DoxygenAutoTransform(Transform):
         # First collect together all the files which need to be doxygen processed for each project
         for node in self.document.traverse(DoxygenAutoNode):
             try:
-                project_files[node.project_info.name()].files.extend(node.files)
+                project_files[node.auto_project_info.name()].files.extend(node.files)
             except KeyError:
-                project_files[node.project_info.name()] = ProjectData(node.project_info, node.files)
+                project_files[node.auto_project_info.name()] = ProjectData(node.auto_project_info, node.files)
 
+        per_project_project_info = {}
+        
         # Iterate over the projects and generate doxygen xml output for the files for each one into
         # a directory in the Sphinx build area 
         for project_name, data in project_files.items():
 
-            dir_ = "build/breathe/doxygen"
+            project_path = self.doxygen_handle.process(data.auto_project_info, data.files) 
 
-            cfgfile = "%s.cfg" % project_name
-            cfg = AUTOCFG_TEMPLATE.format(
-                    project_name=project_name,
-                    output_dir=project_name,
-                    input=" ".join(map(lambda x: data.project_info.abs_path_to_source_file(x), data.files))
-                    )
-
-            if not os.path.exists(dir_):
-                os.makedirs(dir_)
-
-            with open(os.path.join(dir_, cfgfile), 'w') as f:
-                f.write(cfg)
-
-            subprocess.check_call(['doxygen', cfgfile], cwd=dir_)
-
-            # TODO: Should be a factory creation
-            data.project_info.set_project_path(os.path.join(os.path.abspath(dir_), project_name, "xml"))
+            project_info = data.auto_project_info.create_project_info(project_path)
+            per_project_project_info[data.auto_project_info.name()] = project_info
 
         # Replace each DoxygenAutoNode in the document with a properly prepared DoxygenNode which
         # can then be processed by the DoxygenTransform just as if it had come from a standard
@@ -137,7 +109,7 @@ class DoxygenAutoTransform(Transform):
 
             handler = IndexHandler(
                     "autodoxygenindex",
-                    node.project_info,
+                    per_project_project_info[node.auto_project_info.name()],
                     node.options,
                     node.state,
                     node.factories
@@ -157,4 +129,19 @@ class DoxygenTransform(Transform):
         for node in self.document.traverse(DoxygenNode):
             handler = node.handler
             handler.handle(node)
+
+
+class TransformWrapper(object):
+
+    def __init__(self, transform, doxygen_handle):
+
+        self.transform = transform
+        self.doxygen_handle = doxygen_handle
+
+        # Set up default_priority so sphinx/docutils can read it from this instance
+        self.default_priority = transform.default_priority
+
+    def __call__(self, *args, **kwargs):
+
+        return self.transform(self.doxygen_handle, *args, **kwargs)
 

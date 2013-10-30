@@ -9,6 +9,7 @@ import fnmatch
 import re
 import textwrap
 import collections
+import subprocess
 
 from docutils.parsers import rst
 from docutils.statemachine import ViewList
@@ -22,9 +23,9 @@ from breathe.renderer.rst.doxygen.domain import CppDomainHelper, CDomainHelper
 from breathe.renderer.rst.doxygen.filter import FilterFactory, GlobFactory
 from breathe.renderer.rst.doxygen.target import TargetHandlerFactory
 from breathe.finder.doxygen import DoxygenItemFinderFactoryCreator, ItemMatcherFactory
-from breathe.transforms import DoxygenTransform, DoxygenAutoTransform
-from breathe.transforms import IndexHandler
+from breathe.transforms import DoxygenTransform, DoxygenAutoTransform, TransformWrapper, IndexHandler
 from breathe.nodes import DoxygenNode, DoxygenAutoNode
+from breathe.process import DoxygenProcessHandle
 
 import docutils.nodes
 import sphinx.addnodes
@@ -640,6 +641,56 @@ class DirectiveContainer(object):
         return self.directive(*call_args)
 
 
+class AutoProjectInfo(object):
+
+    def __init__(
+            self,
+            name,
+            source_path,
+            reference,
+            source_dir,
+            domain_by_extension,
+            domain_by_file_pattern,
+            match
+            ):
+
+        self._name = name
+        self._source_path = source_path
+        self._reference = reference
+        self._source_dir = source_dir
+        self._domain_by_extension = domain_by_extension
+        self._domain_by_file_pattern = domain_by_file_pattern
+        self._match = match
+
+    def name(self):
+        return self._name
+
+    def abs_path_to_source_file(self, file_):
+        """
+        Returns full path to the provide file assuming that the provide path is relative to the
+        projects source directory as specified in the breathe_projects_source config variable.
+        """
+
+        if os.path.isabs(self._source_path):
+            full_source_path = self._source_path
+        else:
+            full_source_path = os.path.realpath(self._source_path)
+
+        return os.path.join(full_source_path, file_)
+
+    def create_project_info(self, project_path):
+
+        return ProjectInfo(
+            self._name,
+            project_path,
+            self._source_path,
+            self._reference,
+            self._source_dir,
+            self._domain_by_extension,
+            self._domain_by_file_pattern,
+            self._match
+            )
+
 class ProjectInfo(object):
 
     def __init__(
@@ -690,15 +741,6 @@ class ProjectInfo(object):
                 self._source_dir
                 )
 
-    def abs_path_to_source_file(self, file_):
-
-        if os.path.isabs(self._source_path):
-            full_source_path = self._source_path
-        else:
-            full_source_path = os.path.realpath(self._source_path)
-
-        return os.path.join(full_source_path, file_)
-
     def sphinx_abs_path_to_file(self, file_):
         """
         Prepends os.path.sep to the value returned by relative_path_to_file.
@@ -742,6 +784,7 @@ class ProjectInfoFactory(object):
 
         self.project_count = 0
         self.project_info_store = {}
+        self.auto_project_info_store = {}
 
     def update(
             self,
@@ -835,7 +878,7 @@ class ProjectInfoFactory(object):
             raise ProjectError( "Unable to find either :project: or :path: specified" )
 
         try:
-            return self.project_info_store[source_path]
+            return self.auto_project_info_store[source_path]
         except KeyError:
 
             reference = name
@@ -845,9 +888,8 @@ class ProjectInfoFactory(object):
                 reference = source_path
                 self.project_count += 1
 
-            project_info = ProjectInfo(
+            auto_project_info = AutoProjectInfo(
                     name,
-                    "NoProjectPath",
                     source_path,
                     reference,
                     self.source_dir,
@@ -856,9 +898,9 @@ class ProjectInfoFactory(object):
                     self.match
                     )
 
-            self.project_info_store[source_path] = project_info
+            self.auto_project_info_store[source_path] = auto_project_info
 
-            return project_info
+            return auto_project_info
 
 class DoxygenDirectiveFactory(object):
 
@@ -983,6 +1025,15 @@ class PathHandler(object):
 
         return bool( file_path.count( self.sep ) )
 
+def write_file(directory, filename, content):
+
+    # Check the directory exists
+    if not os.path.exists(directory):
+        os.makedirs(directory)
+
+    # Write the file with the provided contents
+    with open(os.path.join(directory, filename), "w") as f:
+        f.write(content)
 
 class MTimer(object):
 
@@ -1156,7 +1207,9 @@ def setup(app):
             directive_factory.create_auto_index_directive_container(),
             )
 
-    app.add_transform(DoxygenAutoTransform)
+    doxygen_handle = DoxygenProcessHandle(path_handler, subprocess.check_call, write_file)
+    app.add_transform(TransformWrapper(DoxygenAutoTransform, doxygen_handle))
+
     app.add_transform(DoxygenTransform)
 
     app.add_node(DoxygenNode)
