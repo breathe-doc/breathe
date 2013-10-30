@@ -4,6 +4,7 @@ Directives & Config Variables
 .. toctree::
    :hidden:
 
+   autoindex
    function
    struct
    class
@@ -17,13 +18,21 @@ The available directives are shown below. In each case the ``project``,
 ``path``, ``no-link`` and ``outline`` options have the following meaning:  
 
 ``project``
-   Specifies which project, as defined in the breathe_projects config value,
+   Specifies which project, as defined in the ``breathe_projects`` config value,
    should be used for this directive. This overrides the default project if one
    has been specified.
+
+   This is not used by the ``autodoxygenindex`` directive. Use ``source``
+   instead to specify the entry in the ``breathe_projects_source`` config value
+   to use.
 
 ``path``
    Directly specifies the path to the folder with the doxygen output. This
    overrides the project and default project if they have been specified.
+
+   This is not used by the ``autodoxygenindex`` directive. Use ``source-path``
+   instead to specify the root path to the sources files which are to be
+   processed.
 
 ``no-link``
    Instructs Breathe to not attempt to generate any document targets for the
@@ -59,6 +68,23 @@ referenced by it.
       :outline:
       :no-link:
 
+autodoxygenindex Directive
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+This directive performs a similar role to the ``doxygenindex`` directive except
+that it handles the doxygen xml generation for you. As a result you need to
+provide the paths to the files that you would like to be processed. The final
+generated output will contain all the content from those files.
+
+::
+
+   .. autodoxygenindex:: <filename> [<filename> [...]]
+      :source: ...
+      :source-path: ...
+      :outline:
+      :no-link:
+
+Checkout the :ref:`example <autodoxygenindex-example>` to see it in action.
 
 doxygenfunction Directive
 ~~~~~~~~~~~~~~~~~~~~~~~~~
