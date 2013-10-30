@@ -1,4 +1,3 @@
-
 Directives & Config Variables
 =============================
 
@@ -39,6 +38,9 @@ The available directives are shown below. In each case the ``project``,
    Results in Breathe only outputting the raw code definitions without
    any additional description information.
 
+If neither project nor path are provided on the directive then breathe will
+expect the :ref:`breathe_default_project <default_project>` config value to be
+set.
 
 .. _doxygenindex:
 
@@ -182,7 +184,14 @@ additonally ``members`` and ``sections`` option.
    can specify a comma-separated list of sections to be included if no specific
    members are named.  The list can accept wildcards.  For instance, if you want
    to display the all protected and public members, functions, etc, then specify
-   ``:sections: public*, protected*``
+   ``:sections: public*, protected*``.
+   
+   By default, breathe specifies ``public*``.
+
+   Note that if your Doxygen project uses properties, these are excluded by
+   default.  Specify ``:sections: public*, property`` to include both public
+   members and properties. (The section names correspond to the values of the
+   ``kind`` attribute of the Doxygen XML ``sectiondef`` elements.)
 
 ::
 
@@ -218,6 +227,8 @@ Config Values
 
    This should be a dictionary in which the keys are project names and the values are
    paths to the folder containing the doxygen output for that project.
+
+.. _default_project:
 
 .. confval:: breathe_default_project
 

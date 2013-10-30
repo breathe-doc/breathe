@@ -14,7 +14,7 @@ class RstContentCreator(object):
 
     def __call__(self, text):
 
-        # Remove the first line
+        # Remove the first line which is "embed:rst[:leading-asterisk]"
         text = "\n".join(text.split(u"\n")[1:])
 
         # Remove starting whitespace
@@ -263,6 +263,10 @@ class DoxygenToRstRendererFactoryCreator(object):
             "docsimplesect" : compoundrenderer.DocSimpleSectTypeSubRenderer,
             "doctitle" : compoundrenderer.DocTitleTypeSubRenderer,
             "docformula" : compoundrenderer.DocForumlaTypeSubRenderer,
+            "docimage" : compoundrenderer.DocImageTypeSubRenderer,
+            "listing" : compoundrenderer.ListingTypeSubRenderer,
+            "codeline" : compoundrenderer.CodeLineTypeSubRenderer,
+            "highlight" : compoundrenderer.HighlightTypeSubRenderer,
             "templateparamlist" : compoundrenderer.TemplateParamListRenderer,
             "inc" : compoundrenderer.IncTypeSubRenderer,
             "ref" : CreateRefTypeSubRenderer(self.parser_factory),

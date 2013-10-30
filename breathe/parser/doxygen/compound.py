@@ -761,6 +761,8 @@ class docParaTypeSub(supermod.docParaType):
         self.parameterlist = []
         self.simplesects = []
         self.content = []
+        self.programlisting =[]
+        self.images =[]
 
     def buildChildren(self, child_, nodeName_):
         supermod.docParaType.buildChildren(self, child_, nodeName_)
@@ -784,6 +786,16 @@ class docParaTypeSub(supermod.docParaType):
             obj_ = supermod.docSimpleSectType.factory()
             obj_.build(child_)
             self.simplesects.append(obj_)
+        elif child_.nodeType == Node.ELEMENT_NODE and \
+                nodeName_ == 'programlisting':
+            obj_ = supermod.listingType.factory()
+            obj_.build(child_)
+            self.programlisting.append(obj_)
+        elif child_.nodeType == Node.ELEMENT_NODE and \
+                nodeName_ == 'image':
+            obj_ = supermod.docImageType.factory()
+            obj_.build(child_)
+            self.images.append(obj_)
         elif child_.nodeType == Node.ELEMENT_NODE and (
                 nodeName_ == 'bold' or
                 nodeName_ == 'emphasis' or

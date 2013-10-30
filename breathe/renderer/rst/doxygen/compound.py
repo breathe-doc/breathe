@@ -1,4 +1,3 @@
-
 from breathe.renderer.rst.doxygen.base import Renderer
 
 class DoxygenTypeSubRenderer(Renderer):
@@ -109,7 +108,7 @@ class SectionDefTypeSubRenderer(Renderer):
                 "dcop-func":  "DCOP Function",
                 "property":  "Property",
                 "event":  "Event",
-                "public-static-func": "Public Static Functons",
+                "public-static-func": "Public Static Functions",
                 "public-static-attrib": "Public Static Attributes",
                 "protected-type":  "Protected Types",
                 "protected-func":  "Protected Functions",
@@ -285,7 +284,7 @@ class FuncMemberDefTypeSubRenderer(MemberDefTypeSubRenderer):
                     )
                 )
 
-        # Setup the line block with gathered informationo
+        # Setup the line block with gathered information
         block = self.node_factory.line_block(
                 "",
                 *lines
@@ -501,11 +500,25 @@ class DocRefTextTypeSubRenderer(Renderer):
 
 
 class DocParaTypeSubRenderer(Renderer):
+    """
+    <para> tags in the Doxygen output tend to contain either text or a single other tag of interest.
+    So whilst it looks like we're combined descriptions and program listings and other things, in
+    the end we generally only deal with one per para tag. Multiple neighbouring instances of these
+    things tend to each be in a separate neighbouring para tag.
+    """
 
     def render(self):
 
         nodelist = []
         for item in self.data_object.content:              # Description
+            renderer = self.renderer_factory.create_renderer(self.data_object, item)
+            nodelist.extend(renderer.render())
+
+        for item in self.data_object.programlisting:       # Program listings
+            renderer = self.renderer_factory.create_renderer(self.data_object, item)
+            nodelist.extend(renderer.render())
+
+        for item in self.data_object.images:               # Images
             renderer = self.renderer_factory.create_renderer(self.data_object, item)
             nodelist.extend(renderer.render())
 
@@ -524,6 +537,19 @@ class DocParaTypeSubRenderer(Renderer):
 
         return [self.node_factory.paragraph("", "", *nodelist)]
 
+
+class DocImageTypeSubRenderer(Renderer):
+    "Output docutils image node using name attribute from xml as the uri"
+
+    def render(self):
+
+        path_to_image = self.project_info.sphinx_abs_path_to_file(
+                self.data_object.name
+                )
+
+        options = { "uri" : path_to_image }
+
+        return [self.node_factory.image("", **options)]
 
 class DocMarkupTypeSubRenderer(Renderer):
 
@@ -549,7 +575,7 @@ class DocMarkupTypeSubRenderer(Renderer):
 
 
 class DocParamListTypeSubRenderer(Renderer):
-    """ Parameter/Exectpion documentation """
+    "Parameter/Exception documentation"
 
     lookup = {
             "param" : "Parameters",
@@ -714,6 +740,51 @@ class DocForumlaTypeSubRenderer(Renderer):
         return nodelist
 
 
+class ListingTypeSubRenderer(Renderer):
+
+    def render(self):
+
+        lines = []
+        nodelist = []
+        for i, entry in enumerate(self.data_object.codeline):
+            # Put new lines between the lines. There must be a more pythonic way of doing this
+            if i:
+                nodelist.append(self.node_factory.Text("\n"))
+            renderer = self.renderer_factory.create_renderer(self.data_object, entry)
+            nodelist.extend(renderer.render())
+
+        # Add blank string at the start otherwise for some reason it renders
+        # the pending_xref tags around the kind in plain text
+        block = self.node_factory.literal_block(
+                "",
+                "",
+                *nodelist
+                )
+
+        return [block]
+
+class CodeLineTypeSubRenderer(Renderer):
+
+    def render(self):
+
+        nodelist = []
+        for entry in self.data_object.highlight:
+            renderer = self.renderer_factory.create_renderer(self.data_object, entry)
+            nodelist.extend(renderer.render())
+
+        return nodelist
+
+class HighlightTypeSubRenderer(Renderer):
+
+    def render(self):
+
+        nodelist = []
+        for entry in self.data_object.content_:
+            renderer = self.renderer_factory.create_renderer(self.data_object, entry)
+            nodelist.extend(renderer.render())
+
+        return nodelist
+
 class TemplateParamListRenderer(Renderer):
 
     def render(self):
@@ -809,6 +880,18 @@ class VerbatimTypeSubRenderer(Renderer):
 
             # Handle has a preformatted text
             return [self.node_factory.literal_block(text, text)]
+
+        # do we need to strip leading asterisks?
+        # NOTE: We could choose to guess this based on every line starting with '*'.
+        #   However This would have a side-effect for any users who have an rst-block
+        #   consisting of a simple bullet list.
+        #   For now we just look for an extended embed tag
+        if self.data_object.text.strip().startswith("embed:rst:leading-asterisk"):
+
+            lines = self.data_object.text.splitlines()
+            # Replace the first * on each line with a blank space
+            lines = map( lambda text: text.replace( "*", " ", 1 ), lines )
+            self.data_object.text = "\n".join( lines )
 
         rst = self.content_creator(self.data_object.text)
 
