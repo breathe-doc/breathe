@@ -22,6 +22,8 @@ from breathe.renderer.rst.doxygen.domain import CppDomainHelper, CDomainHelper
 from breathe.renderer.rst.doxygen.filter import FilterFactory, GlobFactory
 from breathe.renderer.rst.doxygen.target import TargetHandlerFactory
 from breathe.finder.doxygen import DoxygenItemFinderFactoryCreator, ItemMatcherFactory
+from breathe.transforms import DoxygenTransform
+from breathe.nodes import DoxygenNode
 
 import docutils.nodes
 import sphinx.addnodes
@@ -1074,6 +1076,10 @@ def setup(app):
             "doxygendefine",
             directive_factory.create_define_directive_container(),
             )
+
+    app.add_transform(DoxygenTransform)
+
+    app.add_node(DoxygenNode)
 
     app.add_config_value("breathe_projects", {}, True)
     app.add_config_value("breathe_default_project", "", True)
