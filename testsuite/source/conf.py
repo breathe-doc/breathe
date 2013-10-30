@@ -112,6 +112,10 @@ breathe_projects = {
     "image":"../examples/specific/image/xml/",
     }
 
+breathe_projects_source = {
+    "class" : "../examples/doxygen"
+    }
+
 breathe_default_project = "tinyxml"
 
 breathe_domain_by_extension = {

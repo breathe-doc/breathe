@@ -9,6 +9,7 @@ import fnmatch
 import re
 import textwrap
 import collections
+import subprocess
 
 from docutils.parsers import rst
 from docutils.statemachine import ViewList
@@ -22,6 +23,9 @@ from breathe.renderer.rst.doxygen.domain import CppDomainHelper, CDomainHelper
 from breathe.renderer.rst.doxygen.filter import FilterFactory, GlobFactory
 from breathe.renderer.rst.doxygen.target import TargetHandlerFactory
 from breathe.finder.doxygen import DoxygenItemFinderFactoryCreator, ItemMatcherFactory
+from breathe.transforms import DoxygenTransform, DoxygenAutoTransform, TransformWrapper, IndexHandler
+from breathe.nodes import DoxygenNode, DoxygenAutoNode
+from breathe.process import DoxygenProcessHandle
 
 import docutils.nodes
 import sphinx.addnodes
@@ -95,34 +99,40 @@ class DoxygenIndexDirective(BaseDirective):
             return [docutils.nodes.warning("", docutils.nodes.paragraph("", "", docutils.nodes.Text(warning))),
                     self.state.document.reporter.warning(warning, line=self.lineno)]
 
+        handler = IndexHandler(
+                "doxygenindex",
+                project_info,
+                self.options,
+                self.state,
+                self
+                )
+
+        return [DoxygenNode(handler)]
+
+class AutoDoxygenIndexDirective(BaseDirective):
+
+    required_arguments = 1
+    final_argument_whitespace = True
+    option_spec = {
+            "source-path": unchanged_required,
+            "source": unchanged_required,
+            "outline": flag,
+            "no-link": flag,
+            }
+    has_content = False
+
+    def run(self):
+
+        files = self.arguments[0].split()
+
         try:
-            finder = self.finder_factory.create_finder(project_info)
-        except ParserError, e:
-            warning = 'doxygenindex: Unable to parse file "%s"' % e
+            project_info = self.project_info_factory.create_auto_project_info(self.options)
+        except ProjectError, e:
+            warning = 'autodoxygenindex: %s' % e
             return [docutils.nodes.warning("", docutils.nodes.paragraph("", "", docutils.nodes.Text(warning))),
                     self.state.document.reporter.warning(warning, line=self.lineno)]
 
-        data_object = finder.root()
-
-        target_handler = self.target_handler_factory.create(self.options, project_info, self.state.document)
-        filter_ = self.filter_factory.create_index_filter(self.options)
-
-        renderer_factory_creator = self.renderer_factory_creator_constructor.create_factory_creator(
-                project_info,
-                self.state.document,
-                self.options,
-                )
-        renderer_factory = renderer_factory_creator.create_factory(
-                data_object,
-                self.state,
-                self.state.document,
-                filter_,
-                target_handler,
-                )
-        object_renderer = renderer_factory.create_renderer(self.root_data_object, data_object)
-        node_list = object_renderer.render()
-
-        return node_list
+        return [DoxygenAutoNode(project_info, files, self.options, self, self.state)]
 
 
 class DoxygenFunctionDirective(BaseDirective):
@@ -631,12 +641,13 @@ class DirectiveContainer(object):
         return self.directive(*call_args)
 
 
-class ProjectInfo(object):
+class AutoProjectInfo(object):
 
     def __init__(
             self,
             name,
-            path,
+            source_path,
+            build_dir,
             reference,
             source_dir,
             domain_by_extension,
@@ -645,7 +656,8 @@ class ProjectInfo(object):
             ):
 
         self._name = name
-        self._path = path
+        self._source_path = source_path
+        self._build_dir = build_dir
         self._reference = reference
         self._source_dir = source_dir
         self._domain_by_extension = domain_by_extension
@@ -655,18 +667,79 @@ class ProjectInfo(object):
     def name(self):
         return self._name
 
-    def path(self):
-        return self._path
+    def build_dir(self):
+        return self._build_dir
 
-    def relative_path_to_file(self, file_):
+    def abs_path_to_source_file(self, file_):
+        """
+        Returns full path to the provide file assuming that the provide path is relative to the
+        projects source directory as specified in the breathe_projects_source config variable.
+        """
+
+        if os.path.isabs(self._source_path):
+            full_source_path = self._source_path
+        else:
+            full_source_path = os.path.realpath(self._source_path)
+
+        return os.path.join(full_source_path, file_)
+
+    def create_project_info(self, project_path):
+
+        return ProjectInfo(
+            self._name,
+            project_path,
+            self._source_path,
+            self._reference,
+            self._source_dir,
+            self._domain_by_extension,
+            self._domain_by_file_pattern,
+            self._match
+            )
+
+class ProjectInfo(object):
+
+    def __init__(
+            self,
+            name,
+            path,
+            source_path,
+            reference,
+            source_dir,
+            domain_by_extension,
+            domain_by_file_pattern,
+            match
+            ):
+
+        self._name = name
+        self._project_path = path
+        self._source_path = source_path
+        self._reference = reference
+        self._source_dir = source_dir
+        self._domain_by_extension = domain_by_extension
+        self._domain_by_file_pattern = domain_by_file_pattern
+        self._match = match
+
+    def name(self):
+        return self._name
+
+    def project_path(self):
+        return self._project_path
+
+    def set_project_path(self, path):
+        self._project_path = path
+
+    def source_path(self):
+        return self._source_path
+
+    def relative_path_to_xml_file(self, file_):
         """
         Returns relative path from Sphinx documentation top-level source directory to the specified
         file assuming that the specified file is a path relative to the doxygen xml output directory.
         """
-        if os.path.isabs(self._path):
-            full_xml_project_path = self._path
+        if os.path.isabs(self._project_path):
+            full_xml_project_path = self._project_path
         else:
-            full_xml_project_path = os.path.realpath(self._path)
+            full_xml_project_path = os.path.realpath(self._project_path)
 
         return os.path.relpath(
                 os.path.join(full_xml_project_path, file_),
@@ -680,7 +753,7 @@ class ProjectInfo(object):
         This is to match Sphinx's concept of an absolute path which starts from the top-level source
         directory of the project.
         """
-        return os.path.sep + self.relative_path_to_file(file_)
+        return os.path.sep + self.relative_path_to_xml_file(file_)
 
     def reference(self):
         return self._reference
@@ -704,9 +777,10 @@ class ProjectInfo(object):
 
 class ProjectInfoFactory(object):
 
-    def __init__(self, source_dir, match):
+    def __init__(self, source_dir, build_dir, match):
 
         self.source_dir = source_dir
+        self.build_dir = build_dir
         self.match = match
 
         self.projects = {}
@@ -716,6 +790,7 @@ class ProjectInfoFactory(object):
 
         self.project_count = 0
         self.project_info_store = {}
+        self.auto_project_info_store = {}
 
     def update(
             self,
@@ -723,12 +798,20 @@ class ProjectInfoFactory(object):
             default_project,
             domain_by_extension,
             domain_by_file_pattern,
+            projects_source,
+            build_dir
             ):
 
         self.projects = projects
         self.default_project = default_project
         self.domain_by_extension = domain_by_extension
         self.domain_by_file_pattern = domain_by_file_pattern
+        self.projects_source = projects_source
+
+        # If the breathe config values has a non-empty value for build_dir then use that otherwise
+        # stick with the default
+        if build_dir:
+            self.build_dir = build_dir
 
     def default_path(self):
 
@@ -777,6 +860,7 @@ class ProjectInfoFactory(object):
             project_info = ProjectInfo(
                     name,
                     path,
+                    "NoSourcePath",
                     reference,
                     self.source_dir,
                     self.domain_by_extension,
@@ -788,6 +872,48 @@ class ProjectInfoFactory(object):
 
             return project_info
 
+    def create_auto_project_info(self, options):
+
+        name = ""
+
+        if "source" in options:
+            try:
+                source_path = self.projects_source[options["source"]]
+                name = options["source"]
+            except KeyError, e:
+                raise ProjectError( "Unable to find project '%s' in breathe_projects_source dictionary" % options["source"] )
+
+        elif "source-path" in options:
+            source_path = options["source-path"]
+
+        else:
+            raise ProjectError( "Unable to find either :project: or :path: specified" )
+
+        try:
+            return self.auto_project_info_store[source_path]
+        except KeyError:
+
+            reference = name
+
+            if not name:
+                name = "project%s" % self.project_count
+                reference = source_path
+                self.project_count += 1
+
+            auto_project_info = AutoProjectInfo(
+                    name,
+                    source_path,
+                    self.build_dir,
+                    reference,
+                    self.source_dir,
+                    self.domain_by_extension,
+                    self.domain_by_file_pattern,
+                    self.match
+                    )
+
+            self.auto_project_info_store[source_path] = auto_project_info
+
+            return auto_project_info
 
 class DoxygenDirectiveFactory(object):
 
@@ -801,6 +927,7 @@ class DoxygenDirectiveFactory(object):
             "doxygenenum": DoxygenEnumDirective,
             "doxygentypedef": DoxygenTypedefDirective,
             "doxygenfile": DoxygenFileDirective,
+            "autodoxygenindex": AutoDoxygenIndexDirective,
             }
 
     def __init__(
@@ -848,6 +975,9 @@ class DoxygenDirectiveFactory(object):
     def create_define_directive_container(self):
         return self.create_directive_container("doxygendefine")
 
+    def create_auto_index_directive_container(self):
+        return self.create_directive_container("autodoxygenindex")
+
     def create_directive_container(self, type_):
 
         return DirectiveContainer(
@@ -870,6 +1000,8 @@ class DoxygenDirectiveFactory(object):
                 app.config.breathe_default_project,
                 app.config.breathe_domain_by_extension,
                 app.config.breathe_domain_by_file_pattern,
+                app.config.breathe_projects_source,
+                app.config.breathe_build_directory
                 )
 
 
@@ -907,6 +1039,15 @@ class PathHandler(object):
 
         return bool( file_path.count( self.sep ) )
 
+def write_file(directory, filename, content):
+
+    # Check the directory exists
+    if not os.path.exists(directory):
+        os.makedirs(directory)
+
+    # Write the file with the provided contents
+    with open(os.path.join(directory, filename), "w") as f:
+        f.write(content)
 
 class MTimer(object):
 
@@ -1013,7 +1154,11 @@ def setup(app):
             rst_content_creator
             )
 
-    project_info_factory = ProjectInfoFactory(app.srcdir, fnmatch.fnmatch)
+    # Assume general build directory is the doctree directory without the last component. We strip
+    # off any trailing slashes so that dirname correctly drops the last part. This can be overriden
+    # with the breathe_build_directory config variable
+    build_dir = os.path.dirname(app.doctreedir.rstrip(os.sep))
+    project_info_factory = ProjectInfoFactory(app.srcdir, build_dir, fnmatch.fnmatch)
     glob_factory = GlobFactory(fnmatch.fnmatch)
     filter_factory = FilterFactory(glob_factory, path_handler)
     target_handler_factory = TargetHandlerFactory(node_factory)
@@ -1075,10 +1220,24 @@ def setup(app):
             directive_factory.create_define_directive_container(),
             )
 
+    app.add_directive(
+            "autodoxygenindex",
+            directive_factory.create_auto_index_directive_container(),
+            )
+
+    doxygen_handle = DoxygenProcessHandle(path_handler, subprocess.check_call, write_file)
+    app.add_transform(TransformWrapper(DoxygenAutoTransform, doxygen_handle))
+
+    app.add_transform(DoxygenTransform)
+
+    app.add_node(DoxygenNode)
+
     app.add_config_value("breathe_projects", {}, True)
     app.add_config_value("breathe_default_project", "", True)
     app.add_config_value("breathe_domain_by_extension", {}, True)
     app.add_config_value("breathe_domain_by_file_pattern", {}, True)
+    app.add_config_value("breathe_projects_source", {}, True)
+    app.add_config_value("breathe_build_directory", '', True)
 
     app.add_stylesheet("breathe.css")
 

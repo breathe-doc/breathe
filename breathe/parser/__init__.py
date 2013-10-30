@@ -20,7 +20,7 @@ class DoxygenIndexParser(Parser):
 
     def parse(self, project_info):
 
-        filename = self.path_handler.join(project_info.path(), "index.xml")
+        filename = self.path_handler.join(project_info.project_path(), "index.xml")
 
         self.file_state_cache.update(filename)
 
@@ -46,7 +46,7 @@ class DoxygenCompoundParser(Parser):
 
     def parse(self, refid):
 
-        filename = self.path_handler.join(self.project_info.path(), "%s.xml" % refid)
+        filename = self.path_handler.join(self.project_info.project_path(), "%s.xml" % refid)
 
         self.file_state_cache.update(filename)
 
