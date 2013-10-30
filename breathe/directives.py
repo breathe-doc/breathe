@@ -22,7 +22,7 @@ from breathe.renderer.rst.doxygen.domain import CppDomainHelper, CDomainHelper
 from breathe.renderer.rst.doxygen.filter import FilterFactory, GlobFactory
 from breathe.renderer.rst.doxygen.target import TargetHandlerFactory
 from breathe.finder.doxygen import DoxygenItemFinderFactoryCreator, ItemMatcherFactory
-from breathe.transforms import DoxygenTransform
+from breathe.transforms import DoxygenTransform, IndexHandler
 from breathe.nodes import DoxygenNode
 
 import docutils.nodes
@@ -97,34 +97,16 @@ class DoxygenIndexDirective(BaseDirective):
             return [docutils.nodes.warning("", docutils.nodes.paragraph("", "", docutils.nodes.Text(warning))),
                     self.state.document.reporter.warning(warning, line=self.lineno)]
 
-        try:
-            finder = self.finder_factory.create_finder(project_info)
-        except ParserError, e:
-            warning = 'doxygenindex: Unable to parse file "%s"' % e
-            return [docutils.nodes.warning("", docutils.nodes.paragraph("", "", docutils.nodes.Text(warning))),
-                    self.state.document.reporter.warning(warning, line=self.lineno)]
-
-        data_object = finder.root()
-
-        target_handler = self.target_handler_factory.create(self.options, project_info, self.state.document)
-        filter_ = self.filter_factory.create_index_filter(self.options)
-
-        renderer_factory_creator = self.renderer_factory_creator_constructor.create_factory_creator(
+        handler = IndexHandler(
+                "",
                 project_info,
-                self.state.document,
                 self.options,
-                )
-        renderer_factory = renderer_factory_creator.create_factory(
-                data_object,
                 self.state,
-                self.state.document,
-                filter_,
-                target_handler,
+                self
                 )
-        object_renderer = renderer_factory.create_renderer(self.root_data_object, data_object)
-        node_list = object_renderer.render()
 
-        return node_list
+        return [DoxygenNode(handler)]
+
 
 
 class DoxygenFunctionDirective(BaseDirective):
