@@ -115,7 +115,7 @@ class AutoDoxygenIndexDirective(BaseDirective):
     final_argument_whitespace = True
     option_spec = {
             "path": unchanged_required,
-            "project": unchanged_required,
+            "source": unchanged_required,
             "outline": flag,
             "no-link": flag,
             }
@@ -864,12 +864,12 @@ class ProjectInfoFactory(object):
 
         name = ""
 
-        if "project" in options:
+        if "source" in options:
             try:
-                source_path = self.projects_source[options["project"]]
-                name = options["project"]
+                source_path = self.projects_source[options["source"]]
+                name = options["source"]
             except KeyError, e:
-                raise ProjectError( "Unable to find project '%s' in breathe_projects_source dictionary" % options["project"] )
+                raise ProjectError( "Unable to find project '%s' in breathe_projects_source dictionary" % options["source"] )
 
         elif "path" in options:
             source_path = options["path"]
