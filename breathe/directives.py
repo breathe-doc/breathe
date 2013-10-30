@@ -22,8 +22,9 @@ from breathe.renderer.rst.doxygen.domain import CppDomainHelper, CDomainHelper
 from breathe.renderer.rst.doxygen.filter import FilterFactory, GlobFactory
 from breathe.renderer.rst.doxygen.target import TargetHandlerFactory
 from breathe.finder.doxygen import DoxygenItemFinderFactoryCreator, ItemMatcherFactory
-from breathe.transforms import DoxygenTransform, IndexHandler
-from breathe.nodes import DoxygenNode
+from breathe.transforms import DoxygenTransform, DoxygenAutoTransform
+from breathe.transforms import IndexHandler
+from breathe.nodes import DoxygenNode, DoxygenAutoNode
 
 import docutils.nodes
 import sphinx.addnodes
@@ -107,6 +108,30 @@ class DoxygenIndexDirective(BaseDirective):
 
         return [DoxygenNode(handler)]
 
+class AutoDoxygenIndexDirective(BaseDirective):
+
+    required_arguments = 1
+    final_argument_whitespace = True
+    option_spec = {
+            "path": unchanged_required,
+            "project": unchanged_required,
+            "outline": flag,
+            "no-link": flag,
+            }
+    has_content = False
+
+    def run(self):
+
+        files = self.arguments[0].split()
+
+        try:
+            project_info = self.project_info_factory.create_auto_project_info(self.options)
+        except ProjectError, e:
+            warning = 'autodoxygenindex: %s' % e
+            return [docutils.nodes.warning("", docutils.nodes.paragraph("", "", docutils.nodes.Text(warning))),
+                    self.state.document.reporter.warning(warning, line=self.lineno)]
+
+        return [DoxygenAutoNode(project_info, files, self.options, self, self.state)]
 
 
 class DoxygenFunctionDirective(BaseDirective):
@@ -792,6 +817,48 @@ class ProjectInfoFactory(object):
 
             return project_info
 
+    def create_auto_project_info(self, options):
+
+        name = ""
+
+        if "project" in options:
+            try:
+                source_path = self.projects_source[options["project"]]
+                name = options["project"]
+            except KeyError, e:
+                raise ProjectError( "Unable to find project '%s' in breathe_projects_source dictionary" % options["project"] )
+
+        elif "path" in options:
+            source_path = options["path"]
+
+        else:
+            raise ProjectError( "Unable to find either :project: or :path: specified" )
+
+        try:
+            return self.project_info_store[source_path]
+        except KeyError:
+
+            reference = name
+
+            if not name:
+                name = "project%s" % self.project_count
+                reference = source_path
+                self.project_count += 1
+
+            project_info = ProjectInfo(
+                    name,
+                    "NoProjectPath",
+                    source_path,
+                    reference,
+                    self.source_dir,
+                    self.domain_by_extension,
+                    self.domain_by_file_pattern,
+                    self.match
+                    )
+
+            self.project_info_store[source_path] = project_info
+
+            return project_info
 
 class DoxygenDirectiveFactory(object):
 
@@ -805,6 +872,7 @@ class DoxygenDirectiveFactory(object):
             "doxygenenum": DoxygenEnumDirective,
             "doxygentypedef": DoxygenTypedefDirective,
             "doxygenfile": DoxygenFileDirective,
+            "autodoxygenindex": AutoDoxygenIndexDirective,
             }
 
     def __init__(
@@ -851,6 +919,9 @@ class DoxygenDirectiveFactory(object):
 
     def create_define_directive_container(self):
         return self.create_directive_container("doxygendefine")
+
+    def create_auto_index_directive_container(self):
+        return self.create_directive_container("autodoxygenindex")
 
     def create_directive_container(self, type_):
 
@@ -1080,6 +1151,12 @@ def setup(app):
             directive_factory.create_define_directive_container(),
             )
 
+    app.add_directive(
+            "autodoxygenindex",
+            directive_factory.create_auto_index_directive_container(),
+            )
+
+    app.add_transform(DoxygenAutoTransform)
     app.add_transform(DoxygenTransform)
 
     app.add_node(DoxygenNode)
