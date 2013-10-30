@@ -8,7 +8,13 @@ from breathe.nodes import DoxygenNode, DoxygenAutoNode
 import subprocess
 import os
 
-class TransformHandler(object):
+class IndexHandler(object):
+    """
+    Replaces a DoxygenNode with the rendered contents of the doxygen xml's index.xml file
+
+    This used to be carried out in the doxygenindex directive implementation but we have this level
+    of indirection to support the autodoxygenindex directive and share the code.
+    """
 
     def __init__(self, name, project_info, options, state, factories):
 
@@ -18,14 +24,12 @@ class TransformHandler(object):
         self.state = state
         self.factories = factories
 
-class IndexHandler(TransformHandler):
-
     def handle(self, node):
 
         try:
             finder = self.factories.finder_factory.create_finder(self.project_info)
         except ParserError, e:
-            warning = 'autodoxygenindex: Unable to parse file "%s"' % e
+            warning = '%s: Unable to parse file "%s"' % (self.name, e)
             return [nodes.warning("", nodes.paragraph("", "", nodes.Text(warning))),
                     self.state.document.reporter.warning(warning, line=self.lineno)]
 
@@ -52,6 +56,7 @@ class IndexHandler(TransformHandler):
         # Replaces "node" in document with the contents of node_list
         node.replace_self(node_list)
 
+
 AUTOCFG_TEMPLATE = r"""PROJECT_NAME     = "{project_name}"
 OUTPUT_DIRECTORY = {output_dir}
 GENERATE_LATEX   = NO
@@ -70,6 +75,7 @@ ALIASES += "endrst=\endverbatim"
 """
 
 class ProjectData(object):
+    "Simple handler for the files and project_info for each project"
 
     def __init__(self, project_info, files):
 
@@ -77,27 +83,31 @@ class ProjectData(object):
         self.files = files
 
 class DoxygenAutoTransform(Transform):
-    """
-    Iterate over all the DoxygenAutoNodes and:
-
-    - Collect the information from them regarding what files need to be processed by doxygen and in
-      what projects
-    - Process those files with doxygen
-    - Replace the nodes with DoxygenNodes which can be picked up by the standard rendering mechanism
-    """
 
     default_priority = 209
 
     def apply(self):
+        """
+        Iterate over all the DoxygenAutoNodes and:
+
+        - Collect the information from them regarding what files need to be processed by doxygen and
+          in what projects
+        - Process those files with doxygen
+        - Replace the nodes with DoxygenNodes which can be picked up by the standard rendering
+          mechanism
+        """
 
         project_files = {}
 
+        # First collect together all the files which need to be doxygen processed for each project
         for node in self.document.traverse(DoxygenAutoNode):
             try:
                 project_files[node.project_info.name()].files.extend(node.files)
             except KeyError:
                 project_files[node.project_info.name()] = ProjectData(node.project_info, node.files)
 
+        # Iterate over the projects and generate doxygen xml output for the files for each one into
+        # a directory in the Sphinx build area 
         for project_name, data in project_files.items():
 
             dir_ = "build/breathe/doxygen"
@@ -120,10 +130,13 @@ class DoxygenAutoTransform(Transform):
             # TODO: Should be a factory creation
             data.project_info.set_project_path(os.path.join(os.path.abspath(dir_), project_name, "xml"))
 
+        # Replace each DoxygenAutoNode in the document with a properly prepared DoxygenNode which
+        # can then be processed by the DoxygenTransform just as if it had come from a standard
+        # doxygenindex directive
         for node in self.document.traverse(DoxygenAutoNode):
 
             handler = IndexHandler(
-                    "",
+                    "autodoxygenindex",
                     node.project_info,
                     node.options,
                     node.state,
@@ -139,6 +152,7 @@ class DoxygenTransform(Transform):
     default_priority = 210
 
     def apply(self):
+        "Iterate over all DoxygenNodes in the document and extract their handlers to replace them"
 
         for node in self.document.traverse(DoxygenNode):
             handler = node.handler

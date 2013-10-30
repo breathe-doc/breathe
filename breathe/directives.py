@@ -99,7 +99,7 @@ class DoxygenIndexDirective(BaseDirective):
                     self.state.document.reporter.warning(warning, line=self.lineno)]
 
         handler = IndexHandler(
-                "",
+                "doxygenindex",
                 project_info,
                 self.options,
                 self.state,
