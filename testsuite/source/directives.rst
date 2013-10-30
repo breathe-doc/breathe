@@ -294,3 +294,36 @@ Config Values
    **c** domain then you can override as above.
 
 
+.. confval:: breathe_projects_source
+
+   A dictionary in which the keys are project names and the values are the root
+   paths of the source code for those projects that you would like to be
+   automatically processed with doxygen. This saves repetition of long paths
+   when using the ``autodoxygenindex`` directive. If you have some files in::
+
+      /some/long/path/to/myproject/file.c
+      /some/long/path/to/myproject/subfolder/otherfile.c
+
+   Then you can set::
+
+      breathe_projects_source = {
+         "myprojectsource" : "/some/long/path/to/myproject"
+         }
+
+   Then your ``autodoxygenindex`` usage can look like this::
+
+      .. autodoxygenindex:: file.c subfolder/otherfile.c
+         :source: myprojectsource
+
+.. confval:: breathe_build_directory
+
+   In order to process the ``autodoxygenindex`` Breathe has to run ``doxygen``
+   to create the xml files for processing. This config value specifies the root
+   directory that these files should be created in. By default, this is set to
+   the parent directory of the ``doctrees`` output folder which is the normal
+   build directory. You can change it with this setting if you have a custom
+   set up.
+
+   Breathe will take the final value and append ``breathe/doxygen/<project
+   name>`` to the path to mimise conflicts.
+
