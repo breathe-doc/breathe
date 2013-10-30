@@ -647,6 +647,7 @@ class AutoProjectInfo(object):
             self,
             name,
             source_path,
+            build_dir,
             reference,
             source_dir,
             domain_by_extension,
@@ -656,6 +657,7 @@ class AutoProjectInfo(object):
 
         self._name = name
         self._source_path = source_path
+        self._build_dir = build_dir
         self._reference = reference
         self._source_dir = source_dir
         self._domain_by_extension = domain_by_extension
@@ -664,6 +666,9 @@ class AutoProjectInfo(object):
 
     def name(self):
         return self._name
+
+    def build_dir(self):
+        return self._build_dir
 
     def abs_path_to_source_file(self, file_):
         """
@@ -772,9 +777,10 @@ class ProjectInfo(object):
 
 class ProjectInfoFactory(object):
 
-    def __init__(self, source_dir, match):
+    def __init__(self, source_dir, build_dir, match):
 
         self.source_dir = source_dir
+        self.build_dir = build_dir
         self.match = match
 
         self.projects = {}
@@ -792,7 +798,8 @@ class ProjectInfoFactory(object):
             default_project,
             domain_by_extension,
             domain_by_file_pattern,
-            projects_source
+            projects_source,
+            build_dir
             ):
 
         self.projects = projects
@@ -800,6 +807,11 @@ class ProjectInfoFactory(object):
         self.domain_by_extension = domain_by_extension
         self.domain_by_file_pattern = domain_by_file_pattern
         self.projects_source = projects_source
+
+        # If the breathe config values has a non-empty value for build_dir then use that otherwise
+        # stick with the default
+        if build_dir:
+            self.build_dir = build_dir
 
     def default_path(self):
 
@@ -891,6 +903,7 @@ class ProjectInfoFactory(object):
             auto_project_info = AutoProjectInfo(
                     name,
                     source_path,
+                    self.build_dir,
                     reference,
                     self.source_dir,
                     self.domain_by_extension,
@@ -988,6 +1001,7 @@ class DoxygenDirectiveFactory(object):
                 app.config.breathe_domain_by_extension,
                 app.config.breathe_domain_by_file_pattern,
                 app.config.breathe_projects_source,
+                app.config.breathe_build_directory
                 )
 
 
@@ -1140,7 +1154,11 @@ def setup(app):
             rst_content_creator
             )
 
-    project_info_factory = ProjectInfoFactory(app.srcdir, fnmatch.fnmatch)
+    # Assume general build directory is the doctree directory without the last component. We strip
+    # off any trailing slashes so that dirname correctly drops the last part. This can be overriden
+    # with the breathe_build_directory config variable
+    build_dir = os.path.dirname(app.doctreedir.rstrip(os.sep))
+    project_info_factory = ProjectInfoFactory(app.srcdir, build_dir, fnmatch.fnmatch)
     glob_factory = GlobFactory(fnmatch.fnmatch)
     filter_factory = FilterFactory(glob_factory, path_handler)
     target_handler_factory = TargetHandlerFactory(node_factory)
@@ -1219,6 +1237,7 @@ def setup(app):
     app.add_config_value("breathe_domain_by_extension", {}, True)
     app.add_config_value("breathe_domain_by_file_pattern", {}, True)
     app.add_config_value("breathe_projects_source", {}, True)
+    app.add_config_value("breathe_build_directory", '', True)
 
     app.add_stylesheet("breathe.css")
 

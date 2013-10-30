@@ -25,12 +25,12 @@ class DoxygenProcessHandle(object):
         self.run_process = run_process
         self.write_file = write_file
 
-    def process(self, project_info, files):
+    def process(self, auto_project_info, files):
 
-        name = project_info.name()
+        name = auto_project_info.name()
         cfgfile = "%s.cfg" % name
 
-        full_paths = map(lambda x: project_info.abs_path_to_source_file(x), files)
+        full_paths = map(lambda x: auto_project_info.abs_path_to_source_file(x), files)
 
         cfg = AUTOCFG_TEMPLATE.format(
                 project_name=name,
@@ -38,10 +38,15 @@ class DoxygenProcessHandle(object):
                 input=" ".join(full_paths)
                 )
 
-        dir_ = "build/breathe/doxygen"
-        self.write_file(dir_, cfgfile, cfg)
+        build_dir = self.path_handler.join(
+                auto_project_info.build_dir(),
+                "breathe",
+                "doxygen"
+                )
 
-        self.run_process(['doxygen', cfgfile], cwd=dir_)
+        self.write_file(build_dir, cfgfile, cfg)
 
-        return self.path_handler.join(dir_, name, "xml")
+        self.run_process(['doxygen', cfgfile], cwd=build_dir)
+
+        return self.path_handler.join(build_dir, name, "xml")
 
