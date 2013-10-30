@@ -9,6 +9,9 @@ import fnmatch
 import re
 import textwrap
 import collections
+import subprocess
+import tempfile
+from distutils.dir_util import remove_tree
 
 from docutils.parsers import rst
 from docutils.statemachine import ViewList
@@ -124,6 +127,62 @@ class DoxygenIndexDirective(BaseDirective):
 
         return node_list
 
+class AutoDoxygenIndexDirective(DoxygenIndexDirective):
+
+    required_arguments = 1
+    optional_arguments = 999999
+    option_spec = {
+            "path": unchanged_required,
+            "project": unchanged_required,
+            "outline": flag,
+            "no-link": flag,
+            }
+    has_content = False
+
+    def run(self):
+
+        arg0split = self.arguments[0].rsplit("::", 1)
+        if 2 == len(arg0split):
+            (namespace, filename) = arg0split
+        else:
+            (namespace, filename) = "", self.arguments[0]
+
+        fullname = os.path.split(filename)[1]
+        partname = fullname.rsplit('.', 1)[0]
+        project_info = self.project_info_factory.create_project_info(self.options)
+        tempdir = tempfile.mkdtemp()
+
+        cfgfile = partname + ".cfg"
+        cfg = AUTOCFG_TEMPLATE.format(project_name=project_info.name(), output_dir='.',
+                                  input=" ".join(map(os.path.abspath, self.arguments)))
+        with open(os.path.join(tempdir, cfgfile), 'w') as f:
+            f.write(cfg)
+
+        subprocess.check_call(['doxygen', cfgfile], cwd=tempdir)
+
+        old_projects = self.project_info_factory.projects
+        default_project = self.project_info_factory.default_project
+        new_projects = dict(old_projects)
+        new_projects[default_project] = os.path.join(tempdir, 'xml', '')
+        self.project_info_factory.update(
+            new_projects, 
+            default_project,                            
+            self.project_info_factory.domain_by_extension,
+            self.project_info_factory.domain_by_file_pattern,
+            )
+
+        node_list = super(AutoDoxygenIndexDirective, self).run()
+
+        self.project_info_factory.update(
+            old_projects, 
+            default_project,                            
+            self.project_info_factory.domain_by_extension,
+            self.project_info_factory.domain_by_file_pattern,
+            )
+
+        remove_tree(tempdir)
+
+        return node_list
 
 class DoxygenFunctionDirective(BaseDirective):
 
@@ -781,7 +840,7 @@ class ProjectInfoFactory(object):
                     self.source_dir,
                     self.domain_by_extension,
                     self.domain_by_file_pattern,
-                    self.match
+                    self.match, 
                     )
 
             self.project_info_store[path] = project_info
@@ -793,6 +852,7 @@ class DoxygenDirectiveFactory(object):
 
     directives = {
             "doxygenindex": DoxygenIndexDirective,
+            "autodoxygenindex": AutoDoxygenIndexDirective,
             "doxygenfunction": DoxygenFunctionDirective,
             "doxygenstruct": DoxygenStructDirective,
             "doxygenclass": DoxygenClassDirective,
@@ -823,6 +883,9 @@ class DoxygenDirectiveFactory(object):
 
     def create_index_directive_container(self):
         return self.create_directive_container("doxygenindex")
+
+    def create_auto_index_directive_container(self):
+        return self.create_directive_container("autodoxygenindex")
 
     def create_function_directive_container(self):
         return self.create_directive_container("doxygenfunction")
@@ -1033,6 +1096,11 @@ def setup(app):
     app.add_directive(
             "doxygenindex",
             directive_factory.create_index_directive_container(),
+            )
+
+    app.add_directive(
+            "autodoxygenindex",
+            directive_factory.create_auto_index_directive_container(),
             )
 
     app.add_directive(
