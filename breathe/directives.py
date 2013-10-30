@@ -621,6 +621,7 @@ class ProjectInfo(object):
             self,
             name,
             path,
+            source_path,
             reference,
             source_dir,
             domain_by_extension,
@@ -629,7 +630,8 @@ class ProjectInfo(object):
             ):
 
         self._name = name
-        self._path = path
+        self._project_path = path
+        self._source_path = source_path
         self._reference = reference
         self._source_dir = source_dir
         self._domain_by_extension = domain_by_extension
@@ -639,23 +641,38 @@ class ProjectInfo(object):
     def name(self):
         return self._name
 
-    def path(self):
-        return self._path
+    def project_path(self):
+        return self._project_path
 
-    def relative_path_to_file(self, file_):
+    def set_project_path(self, path):
+        self._project_path = path
+
+    def source_path(self):
+        return self._source_path
+
+    def relative_path_to_xml_file(self, file_):
         """
         Returns relative path from Sphinx documentation top-level source directory to the specified
         file assuming that the specified file is a path relative to the doxygen xml output directory.
         """
-        if os.path.isabs(self._path):
-            full_xml_project_path = self._path
+        if os.path.isabs(self._project_path):
+            full_xml_project_path = self._project_path
         else:
-            full_xml_project_path = os.path.realpath(self._path)
+            full_xml_project_path = os.path.realpath(self._project_path)
 
         return os.path.relpath(
                 os.path.join(full_xml_project_path, file_),
                 self._source_dir
                 )
+
+    def abs_path_to_source_file(self, file_):
+
+        if os.path.isabs(self._source_path):
+            full_source_path = self._source_path
+        else:
+            full_source_path = os.path.realpath(self._source_path)
+
+        return os.path.join(full_source_path, file_)
 
     def sphinx_abs_path_to_file(self, file_):
         """
@@ -664,7 +681,7 @@ class ProjectInfo(object):
         This is to match Sphinx's concept of an absolute path which starts from the top-level source
         directory of the project.
         """
-        return os.path.sep + self.relative_path_to_file(file_)
+        return os.path.sep + self.relative_path_to_xml_file(file_)
 
     def reference(self):
         return self._reference
@@ -707,12 +724,14 @@ class ProjectInfoFactory(object):
             default_project,
             domain_by_extension,
             domain_by_file_pattern,
+            projects_source
             ):
 
         self.projects = projects
         self.default_project = default_project
         self.domain_by_extension = domain_by_extension
         self.domain_by_file_pattern = domain_by_file_pattern
+        self.projects_source = projects_source
 
     def default_path(self):
 
@@ -761,6 +780,7 @@ class ProjectInfoFactory(object):
             project_info = ProjectInfo(
                     name,
                     path,
+                    "NoSourcePath",
                     reference,
                     self.source_dir,
                     self.domain_by_extension,
@@ -854,6 +874,7 @@ class DoxygenDirectiveFactory(object):
                 app.config.breathe_default_project,
                 app.config.breathe_domain_by_extension,
                 app.config.breathe_domain_by_file_pattern,
+                app.config.breathe_projects_source,
                 )
 
 
@@ -1067,6 +1088,7 @@ def setup(app):
     app.add_config_value("breathe_default_project", "", True)
     app.add_config_value("breathe_domain_by_extension", {}, True)
     app.add_config_value("breathe_domain_by_file_pattern", {}, True)
+    app.add_config_value("breathe_projects_source", {}, True)
 
     app.add_stylesheet("breathe.css")
 
