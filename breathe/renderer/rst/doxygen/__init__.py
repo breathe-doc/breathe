@@ -5,6 +5,9 @@ from breathe.renderer.rst.doxygen import compound as compoundrenderer
 
 from breathe.parser.doxygen import index, compound, compoundsuper
 
+from docutils import nodes
+import textwrap
+
 class RstContentCreator(object):
 
     def __init__(self, list_type, dedent):
@@ -409,3 +412,25 @@ class DoxygenToRstRendererFactoryCreatorConstructor(object):
                 project_info,
                 )
 
+
+def format_parser_error(name, error, filename, state, lineno, do_unicode_warning):
+
+    warning = '%s: Unable to parse xml file "%s". ' % (name, filename)
+    explanation = 'Reported error: %s. ' % error
+
+    unicode_explanation_text = ""
+    unicode_explanation = []
+    if do_unicode_warning:
+        unicode_explanation_text = textwrap.dedent("""
+        Parsing errors are often due to unicode errors associated with the encoding of the original
+        source files. Doxygen propagates invalid characters from the input source files to the
+        output xml.""").strip().replace("\n", " ")
+        unicode_explanation = [nodes.paragraph("", "", nodes.Text(unicode_explanation_text))]
+
+    return [nodes.warning("",
+                nodes.paragraph("", "", nodes.Text(warning)),
+                nodes.paragraph("", "", nodes.Text(explanation)),
+                *unicode_explanation
+                ),
+            state.document.reporter.warning(warning + explanation + unicode_explanation_text, line=lineno)
+            ]

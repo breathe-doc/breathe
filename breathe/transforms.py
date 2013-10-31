@@ -4,30 +4,9 @@ from docutils import nodes
 
 from breathe.parser import ParserError, FileIOError
 from breathe.nodes import DoxygenNode, DoxygenAutoNode
+from breathe.renderer.rst.doxygen import format_parser_error
 
 import textwrap
-
-def format_error(name, error, filename, state, lineno, do_unicode_warning):
-
-    warning = '%s: Unable to parse xml file "%s". ' % (name, filename)
-    explanation = 'Reported error: %s. ' % error
-
-    unicode_explanation_text = ""
-    unicode_explanation = []
-    if do_unicode_warning:
-        unicode_explanation_text = textwrap.dedent("""
-        Parsing errors are often due to unicode errors associated with the encoding of the original
-        source files. Doxygen propagates invalid characters from the input source files to the
-        output xml.""").strip().replace("\n", " ")
-        unicode_explanation = [nodes.paragraph("", "", nodes.Text(unicode_explanation_text))]
-
-    return [nodes.warning("",
-                nodes.paragraph("", "", nodes.Text(warning)),
-                nodes.paragraph("", "", nodes.Text(explanation)),
-                *unicode_explanation
-                ),
-            state.document.reporter.warning(warning + explanation + unicode_explanation_text, line=lineno)
-            ]
 
 class IndexHandler(object):
     """
@@ -51,9 +30,9 @@ class IndexHandler(object):
         try:
             finder = self.factories.finder_factory.create_finder(self.project_info)
         except ParserError, e:
-            return format_error(self.name, e.error, e.filename, self.state, self.lineno, True)
+            return format_parser_error(self.name, e.error, e.filename, self.state, self.lineno, True)
         except FileIOError, e:
-            return format_error(self.name, e.error, e.filename, self.state, self.lineno)
+            return format_parser_error(self.name, e.error, e.filename, self.state, self.lineno)
 
         data_object = finder.root()
 
@@ -77,9 +56,9 @@ class IndexHandler(object):
         try:
             node_list = object_renderer.render()
         except ParserError, e:
-            return format_error(self.name, e.error, e.filename, self.state, self.lineno, True)
+            return format_parser_error(self.name, e.error, e.filename, self.state, self.lineno, True)
         except FileIOError, e:
-            return format_error(self.name, e.error, e.filename, self.state, self.lineno)
+            return format_parser_error(self.name, e.error, e.filename, self.state, self.lineno)
 
         return node_list
 
