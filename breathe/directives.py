@@ -18,6 +18,7 @@ from sphinx.domains.cpp import DefinitionParser
 from breathe.finder import FinderFactory, NoMatchesError, MultipleMatchesError
 from breathe.parser import DoxygenParserFactory, CacheFactory, ParserError
 from breathe.renderer.rst.doxygen import DoxygenToRstRendererFactoryCreatorConstructor, RstContentCreator
+from breathe.renderer.rst.doxygen import format_parser_error
 from breathe.renderer.rst.doxygen.domain import DomainHandlerFactoryCreator, NullDomainHandler
 from breathe.renderer.rst.doxygen.domain import CppDomainHelper, CDomainHelper
 from breathe.renderer.rst.doxygen.filter import FilterFactory, GlobFactory
@@ -205,13 +206,20 @@ class DoxygenFunctionDirective(BaseDirective):
                 self.state.document,
                 self.options,
                 )
-        renderer_factory = renderer_factory_creator.create_factory(
-                data_object,
-                self.state,
-                self.state.document,
-                filter_,
-                target_handler,
-                )
+
+        try:
+            renderer_factory = renderer_factory_creator.create_factory(
+                    data_object,
+                    self.state,
+                    self.state.document,
+                    filter_,
+                    target_handler,
+                    )
+        except ParserError, e:
+            return format_parser_error("doxygenclass", e.error, e.filename, self.state, self.lineno, True)
+        except FileIOError, e:
+            return format_parser_error("doxygenclass", e.error, e.filename, self.state, self.lineno)
+
         object_renderer = renderer_factory.create_renderer(self.root_data_object, data_object)
         node_list = object_renderer.render()
 
@@ -330,13 +338,20 @@ class DoxygenClassDirective(BaseDirective):
                 self.state.document,
                 self.options,
                 )
-        renderer_factory = renderer_factory_creator.create_factory(
-                data_object,
-                self.state,
-                self.state.document,
-                filter_,
-                target_handler,
-                )
+
+        try:
+            renderer_factory = renderer_factory_creator.create_factory(
+                    data_object,
+                    self.state,
+                    self.state.document,
+                    filter_,
+                    target_handler,
+                    )
+        except ParserError, e:
+            return format_parser_error("doxygenclass", e.error, e.filename, self.state, self.lineno, True)
+        except FileIOError, e:
+            return format_parser_error("doxygenclass", e.error, e.filename, self.state, self.lineno)
+
         object_renderer = renderer_factory.create_renderer(self.root_data_object, data_object)
 
         node_list = object_renderer.render()
