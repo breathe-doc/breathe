@@ -104,6 +104,7 @@ class DoxygenIndexDirective(BaseDirective):
                 project_info,
                 self.options,
                 self.state,
+                self.lineno,
                 self
                 )
 
@@ -132,7 +133,7 @@ class AutoDoxygenIndexDirective(BaseDirective):
             return [docutils.nodes.warning("", docutils.nodes.paragraph("", "", docutils.nodes.Text(warning))),
                     self.state.document.reporter.warning(warning, line=self.lineno)]
 
-        return [DoxygenAutoNode(project_info, files, self.options, self, self.state)]
+        return [DoxygenAutoNode(project_info, files, self.options, self, self.state, self.lineno)]
 
 
 class DoxygenFunctionDirective(BaseDirective):
