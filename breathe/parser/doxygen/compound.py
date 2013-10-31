@@ -6,6 +6,7 @@ Generated Mon Feb  9 19:08:05 2009 by generateDS.py.
 
 from xml.dom import minidom
 from xml.dom import Node
+from xml.parsers.expat import ExpatError
 from docutils import nodes
 
 
@@ -873,8 +874,8 @@ def parse(inFilename):
 
     try:
         doc = minidom.parse(inFilename)
-    except IOError, e:
-        print e
+    except (IOError, ExpatError), e:
+        print inFilename, e
         raise ParseError(inFilename)
        
     rootNode = doc.documentElement
