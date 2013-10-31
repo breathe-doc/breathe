@@ -75,6 +75,32 @@ class BaseDirective(rst.Directive):
         self.filter_factory = filter_factory
         self.target_handler_factory = target_handler_factory
 
+    def render(self, data_object, project_info, filter_, target_handler):
+        "Standard render process used by subclasses"
+
+        renderer_factory_creator = self.renderer_factory_creator_constructor.create_factory_creator(
+                project_info,
+                self.state.document,
+                self.options,
+                )
+
+        try:
+            renderer_factory = renderer_factory_creator.create_factory(
+                    data_object,
+                    self.state,
+                    self.state.document,
+                    filter_,
+                    target_handler,
+                    )
+        except ParserError, e:
+            return format_parser_error("doxygenclass", e.error, e.filename, self.state, self.lineno, True)
+        except FileIOError, e:
+            return format_parser_error("doxygenclass", e.error, e.filename, self.state, self.lineno)
+
+        object_renderer = renderer_factory.create_renderer(self.root_data_object, data_object)
+        node_list = object_renderer.render()
+
+        return node_list
 
 # Directives
 # ----------
@@ -201,29 +227,7 @@ class DoxygenFunctionDirective(BaseDirective):
         target_handler = self.target_handler_factory.create(self.options, project_info, self.state.document)
         filter_ = self.filter_factory.create_outline_filter(self.options)
 
-        renderer_factory_creator = self.renderer_factory_creator_constructor.create_factory_creator(
-                project_info,
-                self.state.document,
-                self.options,
-                )
-
-        try:
-            renderer_factory = renderer_factory_creator.create_factory(
-                    data_object,
-                    self.state,
-                    self.state.document,
-                    filter_,
-                    target_handler,
-                    )
-        except ParserError, e:
-            return format_parser_error("doxygenclass", e.error, e.filename, self.state, self.lineno, True)
-        except FileIOError, e:
-            return format_parser_error("doxygenclass", e.error, e.filename, self.state, self.lineno)
-
-        object_renderer = renderer_factory.create_renderer(self.root_data_object, data_object)
-        node_list = object_renderer.render()
-
-        return node_list
+        return self.render(data_object, project_info, filter_, target_handler)
 
 
     def parse_args(self, function_description):
@@ -333,30 +337,7 @@ class DoxygenClassDirective(BaseDirective):
         target_handler = self.target_handler_factory.create(self.options, project_info, self.state.document)
         filter_ = self.filter_factory.create_class_filter(self.options)
 
-        renderer_factory_creator = self.renderer_factory_creator_constructor.create_factory_creator(
-                project_info,
-                self.state.document,
-                self.options,
-                )
-
-        try:
-            renderer_factory = renderer_factory_creator.create_factory(
-                    data_object,
-                    self.state,
-                    self.state.document,
-                    filter_,
-                    target_handler,
-                    )
-        except ParserError, e:
-            return format_parser_error("doxygenclass", e.error, e.filename, self.state, self.lineno, True)
-        except FileIOError, e:
-            return format_parser_error("doxygenclass", e.error, e.filename, self.state, self.lineno)
-
-        object_renderer = renderer_factory.create_renderer(self.root_data_object, data_object)
-
-        node_list = object_renderer.render()
-
-        return node_list
+        return self.render(data_object, project_info, filter_, target_handler)
 
 
 class DoxygenFileDirective(BaseDirective):
@@ -468,23 +449,8 @@ class DoxygenBaseDirective(BaseDirective):
 
         target_handler = self.target_handler_factory.create(self.options, project_info, self.state.document)
         filter_ = self.filter_factory.create_outline_filter(self.options)
-        renderer_factory_creator = self.renderer_factory_creator_constructor.create_factory_creator(
-                project_info,
-                self.state.document,
-                self.options,
-                )
-        renderer_factory = renderer_factory_creator.create_factory(
-                data_object,
-                self.state,
-                self.state.document,
-                filter_,
-                target_handler,
-                )
-        object_renderer = renderer_factory.create_renderer(self.root_data_object, data_object)
 
-        node_list = object_renderer.render()
-
-        return node_list
+        return self.render(data_object, project_info, filter_, target_handler)
 
 
 class DoxygenStructDirective(DoxygenBaseDirective):
@@ -553,23 +519,8 @@ class DoxygenBaseItemDirective(BaseDirective):
 
         target_handler = self.target_handler_factory.create(self.options, project_info, self.state.document)
         filter_ = self.filter_factory.create_outline_filter(self.options)
-        renderer_factory_creator = self.renderer_factory_creator_constructor.create_factory_creator(
-                project_info,
-                self.state.document,
-                self.options,
-                )
-        renderer_factory = renderer_factory_creator.create_factory(
-                data_object,
-                self.state,
-                self.state.document,
-                filter_,
-                target_handler,
-                )
-        object_renderer = renderer_factory.create_renderer(self.root_data_object, data_object)
 
-        node_list = object_renderer.render()
-
-        return node_list
+        return self.render(data_object, project_info, filter_, target_handler)
 
 
 class DoxygenVariableDirective(DoxygenBaseItemDirective):

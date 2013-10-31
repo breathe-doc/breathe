@@ -434,3 +434,5 @@ def format_parser_error(name, error, filename, state, lineno, do_unicode_warning
                 ),
             state.document.reporter.warning(warning + explanation + unicode_explanation_text, line=lineno)
             ]
+
+
