@@ -42,13 +42,18 @@ supermod.MemberType.subclass = MemberTypeSub
 class ParseError(Exception):
     pass
 
+class FileIOError(Exception):
+    pass
+
 def parse(inFilename):
 
     try:
         doc = minidom.parse(inFilename)
     except IOError, e:
-        raise ParseError(inFilename)
-       
+        raise FileIOError(e)
+    except ExpatError, e:
+        raise ParseError(e)
+
     rootNode = doc.documentElement
     rootObj = supermod.DoxygenType.factory()
     rootObj.build(rootNode)
