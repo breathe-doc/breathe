@@ -6,10 +6,9 @@ Generated Mon Feb  9 19:08:05 2009 by generateDS.py.
 
 from xml.dom import minidom
 from xml.dom import Node
+from xml.parsers.expat import ExpatError
+
 from docutils import nodes
-
-
-import sys
 
 import compoundsuper as supermod
 from compoundsuper import MixedContainer
@@ -869,14 +868,18 @@ supermod.docTitleType.subclass = docTitleTypeSub
 class ParseError(Exception):
     pass
 
+class FileIOError(Exception):
+    pass
+
 def parse(inFilename):
 
     try:
         doc = minidom.parse(inFilename)
     except IOError, e:
-        print e
-        raise ParseError(inFilename)
-       
+        raise FileIOError(e)
+    except ExpatError, e:
+        raise ParseError(e)
+
     rootNode = doc.documentElement
     rootObj = supermod.DoxygenType.factory()
     rootObj.build(rootNode)

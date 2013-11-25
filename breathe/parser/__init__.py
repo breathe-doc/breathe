@@ -3,7 +3,20 @@ import breathe.parser.doxygen.index
 import breathe.parser.doxygen.compound
 
 class ParserError(Exception):
-    pass
+
+    def __init__(self, error, filename):
+        Exception.__init__(self, error)
+
+        self.error = error
+        self.filename = filename
+
+class FileIOError(Exception):
+
+    def __init__(self, error, filename):
+        Exception.__init__(self, error)
+
+        self.error = error
+        self.filename = filename
 
 class Parser(object):
 
@@ -34,8 +47,10 @@ class DoxygenIndexParser(Parser):
                 result = breathe.parser.doxygen.index.parse(filename)
                 self.cache[filename] = result
                 return result
-            except breathe.parser.doxygen.index.ParseError:
-                raise ParserError(filename)
+            except breathe.parser.doxygen.index.ParseError, e:
+                raise ParserError(e, filename)
+            except breathe.parser.doxygen.index.FileIOError, e:
+                raise FileIOError(e, filename)
 
 class DoxygenCompoundParser(Parser):
 
@@ -60,8 +75,10 @@ class DoxygenCompoundParser(Parser):
                 result = breathe.parser.doxygen.compound.parse(filename)
                 self.cache[filename] = result
                 return result
-            except breathe.parser.doxygen.compound.ParseError:
-                raise ParserError(filename)
+            except breathe.parser.doxygen.compound.ParseError, e:
+                raise ParserError(e, filename)
+            except breathe.parser.doxygen.compound.FileIOError, e:
+                raise FileIOError(e, filename)
 
 class CacheFactory(object):
 

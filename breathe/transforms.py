@@ -2,8 +2,11 @@
 from docutils.transforms import Transform
 from docutils import nodes
 
-from breathe.parser import ParserError
+from breathe.parser import ParserError, FileIOError
 from breathe.nodes import DoxygenNode, DoxygenAutoNode
+from breathe.renderer.rst.doxygen import format_parser_error
+
+import textwrap
 
 class IndexHandler(object):
     """
@@ -13,22 +16,23 @@ class IndexHandler(object):
     of indirection to support the autodoxygenindex directive and share the code.
     """
 
-    def __init__(self, name, project_info, options, state, factories):
+    def __init__(self, name, project_info, options, state, lineno, factories):
 
         self.name = name
         self.project_info = project_info
         self.options = options
         self.state = state
+        self.lineno = lineno
         self.factories = factories
 
-    def handle(self, node):
+    def render(self):
 
         try:
             finder = self.factories.finder_factory.create_finder(self.project_info)
         except ParserError, e:
-            warning = '%s: Unable to parse file "%s"' % (self.name, e)
-            return [nodes.warning("", nodes.paragraph("", "", nodes.Text(warning))),
-                    self.state.document.reporter.warning(warning, line=self.lineno)]
+            return format_parser_error(self.name, e.error, e.filename, self.state, self.lineno, True)
+        except FileIOError, e:
+            return format_parser_error(self.name, e.error, e.filename, self.state, self.lineno)
 
         data_object = finder.root()
 
@@ -48,10 +52,15 @@ class IndexHandler(object):
                 target_handler,
                 )
         object_renderer = renderer_factory.create_renderer(self.factories.root_data_object, data_object)
-        node_list = object_renderer.render()
 
-        # Replaces "node" in document with the contents of node_list
-        node.replace_self(node_list)
+        try:
+            node_list = object_renderer.render()
+        except ParserError, e:
+            return format_parser_error(self.name, e.error, e.filename, self.state, self.lineno, True)
+        except FileIOError, e:
+            return format_parser_error(self.name, e.error, e.filename, self.state, self.lineno)
+
+        return node_list
 
 
 class ProjectData(object):
@@ -112,6 +121,7 @@ class DoxygenAutoTransform(Transform):
                     per_project_project_info[node.auto_project_info.name()],
                     node.options,
                     node.state,
+                    node.lineno,
                     node.factories
                     )
 
@@ -128,7 +138,9 @@ class DoxygenTransform(Transform):
 
         for node in self.document.traverse(DoxygenNode):
             handler = node.handler
-            handler.handle(node)
+
+            # Replaces "node" in document with the renderer contents
+            node.replace_self(handler.render())
 
 
 class TransformWrapper(object):
