@@ -22,21 +22,31 @@ class CompoundTypeSubRenderer(Renderer):
 
         self.compound_parser = compound_parser
 
-    def create_target(self, refid):
+    def create_doxygen_target(self):
+        """Can be overridden to create a target node which uses the doxygen refid information
+        which can be used for creating links between internal doxygen elements.
 
+        The default implementation should suffice most of the time.
+        """
+
+        refid = "%s%s" % (self.project_info.name(), self.data_object.refid)
         return self.target_handler.create_target(refid)
 
-    def create_domain_id(self):
+    def create_domain_target(self):
+        """Should be overridden to create a target node which uses the Sphinx domain information so
+        that it can be linked to from Sphinx domain roles like cpp:func:`myFunc`
 
-        return ""
+        Returns a list so that if there is no domain active then we simply return an empty list
+        instead of some kind of special null node value"""
+
+        return []
+
 
     def render(self):
 
-        refid = "%s%s" % (self.project_info.name(), self.data_object.refid)
-        nodelist = self.create_target(refid)
-
-        domain_id = self.create_domain_id()
-
+        # Build targets for linking
+        nodelist = self.create_domain_target()
+        nodelist.extend(self.create_doxygen_target())
 
         # Read in the corresponding xml file and process
         file_data = self.compound_parser.parse(self.data_object.refid)
@@ -68,8 +78,7 @@ class CompoundTypeSubRenderer(Renderer):
                     self.node_factory.Text(""),
                     kind,
                     self.node_factory.Text(" "),
-                    name,
-                    ids=[domain_id, refid]
+                    name
                     )
                 )
 
@@ -105,12 +114,7 @@ class CompoundTypeSubRenderer(Renderer):
 
 class ClassCompoundTypeSubRenderer(CompoundTypeSubRenderer):
 
-    def create_target(self, refid):
+    def create_domain_target(self):
 
-        self.domain_handler.create_class_target(self.data_object)
-        return CompoundTypeSubRenderer.create_target(self, refid)
-
-    def create_domain_id(self):
-
-        return self.domain_handler.create_class_id(self.data_object)
+        return self.domain_handler.create_class_target(self.data_object)
 
