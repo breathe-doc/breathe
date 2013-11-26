@@ -394,13 +394,14 @@ class DoxygenToRstRendererFactoryCreatorConstructor(object):
         self.domain_handler_factory_creator = domain_handler_factory_creator
         self.rst_content_creator = rst_content_creator
 
-    def create_factory_creator(self, project_info, document, options):
+    def create_factory_creator(self, project_info, document, options, target_handler):
 
         domain_handler_factory = self.domain_handler_factory_creator.create_domain_handler_factory(
                 project_info,
                 document,
                 document.settings.env,
                 options,
+                target_handler
                 )
 
         return DoxygenToRstRendererFactoryCreator(

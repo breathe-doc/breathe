@@ -69,8 +69,10 @@ Thank you to:
 - `donkopotamus <https://github.com/donkopotamus>`_
 - `jo3w4rd <https://github.com/jo3w4rd>`_
 - `Anthony Truchet <https://github.com/AnthonyTruchet>`_
+- `Daniel Matz <https://github.com/danielmatz>`_
 
-For their contributions; improving the code and the documentation. And thanks to:
+For their contributions; reporting issues and improving the code and
+documentation. And thanks to:
 
 - Dimitri van Heesch for `Doxygen <http://www.stack.nl/~dimitri/doxygen/>`_.
 - Georg Brandl for `Sphinx <http://sphinx.pocoo.org>`_.
