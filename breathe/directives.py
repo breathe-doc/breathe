@@ -224,7 +224,7 @@ class DoxygenFunctionDirective(BaseDirective):
             return [docutils.nodes.warning("", docutils.nodes.paragraph("", "", docutils.nodes.Text(warning))),
                     self.state.document.reporter.warning(warning, line=self.lineno)]
 
-        target_handler = self.target_handler_factory.create(self.options, project_info, self.state.document)
+        target_handler = self.target_handler_factory.create_target_handler(self.options, project_info, self.state.document)
         filter_ = self.filter_factory.create_outline_filter(self.options)
 
         return self.render(data_object, project_info, filter_, target_handler)
@@ -334,7 +334,7 @@ class DoxygenClassDirective(BaseDirective):
             return [docutils.nodes.warning("", docutils.nodes.paragraph("", "", docutils.nodes.Text(warning))),
                     self.state.document.reporter.warning(warning, line=self.lineno)]
 
-        target_handler = self.target_handler_factory.create(self.options, project_info, self.state.document)
+        target_handler = self.target_handler_factory.create_target_handler(self.options, project_info, self.state.document)
         filter_ = self.filter_factory.create_class_filter(self.options)
 
         return self.render(data_object, project_info, filter_, target_handler)
@@ -383,7 +383,7 @@ class DoxygenFileDirective(BaseDirective):
             return [docutils.nodes.warning("", docutils.nodes.paragraph("", "", docutils.nodes.Text(warning))),
                     self.state.document.reporter.warning(warning, line=self.lineno)]
 
-        target_handler = self.target_handler_factory.create(self.options, project_info, self.state.document)
+        target_handler = self.target_handler_factory.create_target_handler(self.options, project_info, self.state.document)
         filter_ = self.filter_factory.create_file_filter(name, self.options)
 
         renderer_factory_creator = self.renderer_factory_creator_constructor.create_factory_creator(
@@ -447,7 +447,7 @@ class DoxygenBaseDirective(BaseDirective):
             return [docutils.nodes.warning("", docutils.nodes.paragraph("", "", docutils.nodes.Text(warning))),
                     self.state.document.reporter.warning(warning, line=self.lineno)]
 
-        target_handler = self.target_handler_factory.create(self.options, project_info, self.state.document)
+        target_handler = self.target_handler_factory.create_target_handler(self.options, project_info, self.state.document)
         filter_ = self.filter_factory.create_outline_filter(self.options)
 
         return self.render(data_object, project_info, filter_, target_handler)
@@ -517,7 +517,7 @@ class DoxygenBaseItemDirective(BaseDirective):
             return [docutils.nodes.warning("", docutils.nodes.paragraph("", "", docutils.nodes.Text(warning))),
                     self.state.document.reporter.warning(warning, line=self.lineno)]
 
-        target_handler = self.target_handler_factory.create(self.options, project_info, self.state.document)
+        target_handler = self.target_handler_factory.create_target_handler(self.options, project_info, self.state.document)
         filter_ = self.filter_factory.create_outline_filter(self.options)
 
         return self.render(data_object, project_info, filter_, target_handler)
