@@ -18,6 +18,8 @@ Thank you to:
 - `jmnas <https://github.com/jmnas>`_
 - `donkopotamus <https://github.com/donkopotamus>`_
 - `jo3w4rd <https://github.com/jo3w4rd>`_
+- `Anthony Truchet <https://github.com/AnthonyTruchet>`_
+- `Daniel Matz <https://github.com/danielmatz>`_
 
 For their contributions; reporting bugs, suggesting features, improving the code
 and working on the documentation. And thanks to:

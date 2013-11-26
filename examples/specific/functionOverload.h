@@ -1,4 +1,7 @@
 
+//! Non overloaded function
+void simplefunc();
+
 //! Function which takes two int arguments
 void f(int, int);
 

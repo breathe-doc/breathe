@@ -7,15 +7,16 @@ class TargetHandler(object):
         self.node_factory = node_factory
         self.document = document
 
-    def create_target(self, refid):
+    def create_target(self, id_):
+        """Creates a target node and registers it with the document and returns it in a list"""
 
-        target = self.node_factory.target(refid=refid, ids=[refid], names=[refid])
+        target = self.node_factory.target(ids=[id_], names=[id_])
 
-        # Tell the document about our target
         try:
             self.document.note_explicit_target(target)
-        except Exception, e:
-            print "Failed to register id: %s. This is a seemingly harmless bug." % refid
+        except Exception:
+            # TODO: We should really return a docutils warning node here
+            print "Duplicate target detected: %s" % id_
 
         return [target]
 
@@ -24,14 +25,13 @@ class NullTargetHandler(object):
     def create_target(self, refid):
         return []
 
-
 class TargetHandlerFactory(object):
 
     def __init__(self, node_factory):
 
         self.node_factory = node_factory
 
-    def create(self, options, project_info, document):
+    def create_target_handler(self, options, project_info, document):
 
         if options.has_key("no-link"):
             return NullTargetHandler()

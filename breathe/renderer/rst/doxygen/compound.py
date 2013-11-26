@@ -170,13 +170,24 @@ class SectionDefTypeSubRenderer(Renderer):
 
 class MemberDefTypeSubRenderer(Renderer):
 
-    def create_target(self, refid):
+    def create_doxygen_target(self):
+        """Can be overridden to create a target node which uses the doxygen refid information
+        which can be used for creating links between internal doxygen elements.
 
+        The default implementation should suffice most of the time.
+        """
+
+        refid = "%s%s" % (self.project_info.name(), self.data_object.id)
         return self.target_handler.create_target(refid)
 
-    def create_domain_id(self):
+    def create_domain_target(self):
+        """Should be overridden to create a target node which uses the Sphinx domain information so
+        that it can be linked to from Sphinx domain roles like cpp:func:`myFunc`
 
-        return ""
+        Returns a list so that if there is no domain active then we simply return an empty list
+        instead of some kind of special null node value"""
+
+        return []
 
     def title(self):
 
@@ -195,7 +206,6 @@ class MemberDefTypeSubRenderer(Renderer):
 
         return args
 
-
     def description(self):
 
         description_nodes = []
@@ -213,31 +223,25 @@ class MemberDefTypeSubRenderer(Renderer):
 
     def render(self):
 
-        refid = "%s%s" % (self.project_info.name(), self.data_object.id)
+        # Build targets for linking
+        term_nodes = self.create_domain_target()
+        term_nodes.extend(self.create_doxygen_target())
 
-        domain_id = self.create_domain_id()
+        # Build title nodes
+        term_nodes.extend(self.title())
+        term = self.node_factory.paragraph("", "", *term_nodes )
 
-        title = self.title()
-        target = self.create_target(refid)
-        target.extend(title)
-        term = self.node_factory.paragraph("", "", ids=[domain_id,refid], *target )
+        # Build description nodes
         definition = self.node_factory.paragraph("", "", *self.description())
+
         return [term, self.node_factory.block_quote("", definition)]
 
 
 class FuncMemberDefTypeSubRenderer(MemberDefTypeSubRenderer):
 
-    def create_target(self, refid):
+    def create_domain_target(self):
 
-        self.domain_handler.create_function_target(self.data_object)
-
-        return MemberDefTypeSubRenderer.create_target(self, refid)
-
-
-    def create_domain_id(self):
-
-        return self.domain_handler.create_function_id(self.data_object)
-
+        return self.domain_handler.create_function_target(self.data_object)
 
     def title(self):
 
