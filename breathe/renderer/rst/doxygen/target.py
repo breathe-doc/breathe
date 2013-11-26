@@ -31,7 +31,7 @@ class TargetHandlerFactory(object):
 
         self.node_factory = node_factory
 
-    def create(self, options, project_info, document):
+    def create_target_handler(self, options, project_info, document):
 
         if options.has_key("no-link"):
             return NullTargetHandler()
