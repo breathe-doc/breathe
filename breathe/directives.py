@@ -82,6 +82,7 @@ class BaseDirective(rst.Directive):
                 project_info,
                 self.state.document,
                 self.options,
+                target_handler
                 )
 
         try:
@@ -390,6 +391,7 @@ class DoxygenFileDirective(BaseDirective):
                 project_info,
                 self.state.document,
                 self.options,
+                target_handler
                 )
         node_list = []
         for data_object in matches:

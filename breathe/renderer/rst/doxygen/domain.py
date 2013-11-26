@@ -44,13 +44,14 @@ class CDomainHelper(DomainHelper):
 
 class DomainHandler(object):
 
-    def __init__(self, node_factory, document, env, helper, project_info):
+    def __init__(self, node_factory, document, env, helper, project_info, target_handler):
 
         self.node_factory = node_factory
         self.document = document
         self.env = env
         self.helper = helper
         self.project_info = project_info
+        self.target_handler = target_handler
 
 class NullDomainHandler(DomainHandler):
 
@@ -61,13 +62,13 @@ class NullDomainHandler(DomainHandler):
         return ""
 
     def create_function_target(self, data_object):
-        pass
+        return []
 
     def create_class_id(self, data_object):
         return ""
 
     def create_class_target(self, data_object):
-        pass
+        return []
 
 class CDomainHandler(DomainHandler):
 
@@ -81,6 +82,10 @@ class CDomainHandler(DomainHandler):
 
         name = data_object.definition.split()[-1]
 
+        return self._create_target(name, "function")
+
+    def _create_target(self, name, type_):
+
         if self.helper.is_duplicate(name):
             print ( "Warning: Ignoring duplicate '%s'. As C does not support overloaded "
                     "functions. Perhaps you should be using the cpp domain?" % name )
@@ -88,12 +93,9 @@ class CDomainHandler(DomainHandler):
 
         self.helper.remember(name)
 
-        signode = self.node_factory.desc_signature()
-
-        signode["names"].append(name)
-        signode["ids"].append(name)
-
-        self.document.note_explicit_target(signode)
+        # Create target node. This is required for LaTeX output as target nodes are converted to the
+        # appropriate \phantomsection & \label for in document LaTeX links
+        (target,) = self.target_handler.create_target(name)
 
         inv = self.env.domaindata['c']['objects']
         if name in inv:
@@ -103,6 +105,8 @@ class CDomainHandler(DomainHandler):
                 'other instance in ' + self.env.doc2path(inv[name][0]),
                 self.lineno)
         inv[name] = (self.env.docname, "function")
+
+        return [target]
 
 
 class CppDomainHandler(DomainHandler):
@@ -159,36 +163,46 @@ class CppDomainHandler(DomainHandler):
 
     def create_function_target(self, data_object):
 
-        _id = self.create_function_id(data_object)
-
-        in_cache, project = self.helper.check_cache(_id)
-        if in_cache:
-            print "Warning: Ignoring duplicate domain reference '%s'. " \
-                  "First found in project '%s'" % (_id, project.reference())
-            return
-
-        self.helper.cache(_id, self.project_info)
-
-        signode = self.node_factory.desc_signature()
-
-        signode["names"].append(_id)
-        signode["ids"].append(_id)
+        id_ = self.create_function_id(data_object)
 
         name = data_object.definition.split()[-1]
-        self.document.settings.env.domaindata['cpp']['objects'].setdefault(name,
-                (self.document.settings.env.docname, "function", _id))
 
-        self.document.note_explicit_target(signode)
+        return self._create_target(name, "function", id_)
+
+    def _create_target(self, name, type_, id_):
+        """Creates a target node and registers it with the appropriate domain
+        object list in a style which matches Sphinx's behaviour for the domain
+        directives like cpp:function"""
+
+        # Check if we've already got this id
+        in_cache, project = self.helper.check_cache(id_)
+        if in_cache:
+            print "Warning: Ignoring duplicate domain reference '%s'. " \
+                  "First found in project '%s'" % (id_, project.reference())
+            return []
+
+        self.helper.cache(id_, self.project_info)
+
+        # Create target node. This is required for LaTeX output as target nodes are converted to the
+        # appropriate \phantomsection & \label for in document LaTeX links
+        (target,) = self.target_handler.create_target(id_)
+
+        # Register object with the sphinx objects registry
+        self.document.settings.env.domaindata['cpp']['objects'].setdefault(name,
+                (self.document.settings.env.docname, type_, id_))
+
+        return [target]
 
 
 class DomainHandlerFactory(object):
 
-    def __init__(self, project_info, node_factory, document, env, helpers):
+    def __init__(self, project_info, node_factory, document, env, target_handler, helpers):
 
         self.project_info = project_info
         self.node_factory = node_factory
         self.document = document
         self.env = env
+        self.target_handler = target_handler
         self.domain_helpers = helpers
 
     def create_null_domain_handler(self):
@@ -210,7 +224,8 @@ class DomainHandlerFactory(object):
             helper = NullDomainHelper()
 
         try:
-            return domains_handlers[domain](self.node_factory, self.document, self.env, helper, self.project_info)
+            return domains_handlers[domain](self.node_factory, self.document, self.env, helper,
+                    self.project_info, self.target_handler)
         except KeyError:
             return NullDomainHandler()
 
@@ -231,10 +246,17 @@ class DomainHandlerFactoryCreator(object):
         self.node_factory = node_factory
         self.helpers = helpers
 
-    def create_domain_handler_factory(self, project_info, document, env, options):
+    def create_domain_handler_factory(self, project_info, document, env, options, target_handler):
 
         if "no-link" in options:
             return NullDomainHandlerFactory()
 
-        return DomainHandlerFactory(project_info, self.node_factory, document, env, self.helpers)
+        return DomainHandlerFactory(
+                project_info,
+                self.node_factory,
+                document,
+                env,
+                target_handler,
+                self.helpers
+                )
 
