@@ -122,26 +122,10 @@ class CppDomainHandler(DomainHandler):
 
     def create_class_target(self, data_object):
 
-        _id = self.create_class_id(data_object)
-
-        in_cache, project = self.helper.check_cache(_id)
-        if in_cache:
-            print "Warning: Ignoring duplicate domain reference '%s'. " \
-                  "First found in project '%s'" % (_id, project.reference())
-            return
-
-        self.helper.cache(_id, self.project_info)
-
-        signode = self.node_factory.desc_signature()
-
-        signode["names"].append(_id)
-        signode["ids"].append(_id)
-
+        id_ = self.create_class_id(data_object)
         name = data_object.name
-        self.document.settings.env.domaindata['cpp']['objects'].setdefault(name,
-                (self.document.settings.env.docname, "class", _id))
 
-        self.document.note_explicit_target(signode)
+        return self._create_target(name, "class", id_)
 
     def create_function_id(self, data_object):
 
