@@ -36,13 +36,14 @@ class IndexHandler(object):
 
         data_object = finder.root()
 
-        target_handler = self.factories.target_handler_factory.create(self.options, self.project_info, self.state.document)
+        target_handler = self.factories.target_handler_factory.create_target_handler(self.options, self.project_info, self.state.document)
         filter_ = self.factories.filter_factory.create_index_filter(self.options)
 
         renderer_factory_creator = self.factories.renderer_factory_creator_constructor.create_factory_creator(
                 self.project_info,
                 self.state.document,
                 self.options,
+                target_handler
                 )
         renderer_factory = renderer_factory_creator.create_factory(
                 data_object,
