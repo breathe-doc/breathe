@@ -123,6 +123,7 @@ class SectionDefTypeSubRenderer(Renderer):
                 "private-type": "Private Types",
                 "private-func": "Private Functions",
                 "private-attrib": "Private Members",
+                "package-func": "Package Functions",
                 "private-slot":  "Private Slots",
                 "private-static-func": "Private Static Functions",
                 "private-static-attrib":  "Private Static Attributes",
