@@ -70,6 +70,7 @@ Thank you to:
 - `jo3w4rd <https://github.com/jo3w4rd>`_
 - `Anthony Truchet <https://github.com/AnthonyTruchet>`_
 - `Daniel Matz <https://github.com/danielmatz>`_
+- `Andrew Hundt <https://github.com/ahundt>`_
 
 For their contributions; reporting issues and improving the code and
 documentation. And thanks to:
