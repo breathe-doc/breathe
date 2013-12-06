@@ -13,43 +13,47 @@ class DoxygenTypeSubRenderer(Renderer):
 
 class CompoundDefTypeSubRenderer(Renderer):
 
-    section_titles = [
-                "user-defined",
-                "public-type",
-                "public-func",
-                "public-attrib",
-                "public-slot",
-                "signal",
-                "dcop-func",
-                "property",
-                "event",
-                "public-static-func",
-                "public-static-attrib",
-                "protected-type",
-                "protected-func",
-                "protected-attrib",
-                "protected-slot",
-                "protected-static-func",
-                "protected-static-attrib",
-                "package-type",
-                "package-attrib",
-                "package-static-func",
-                "package-static-attrib",
-                "private-type",
-                "private-func",
-                "private-attrib",
-                "private-slot",
-                "private-static-func",
-                "private-static-attrib",
-                "friend",
-                "related",
-                "define",
-                "prototype",
-                "typedef",
-                "enum",
-                "func",
-                "var"
-             ]
+    # We store both the identified and appropriate title text here as we want to define the order
+    # here and the titles for the SectionDefTypeSubRenderer but we don't want the repetition of
+    # having two lists in case they fall out of sync
+    sections = [
+                ("user-defined", "User Defined"),
+                ("public-type", "Public Type"),
+                ("public-func", "Public Functions"),
+                ("public-attrib", "Public Members"),
+                ("public-slot", "Public Slot"),
+                ("signal", "Signal"),
+                ("dcop-func",  "DCOP Function"),
+                ("property",  "Property"),
+                ("event",  "Event"),
+                ("public-static-func", "Public Static Functions"),
+                ("public-static-attrib", "Public Static Attributes"),
+                ("protected-type",  "Protected Types"),
+                ("protected-func",  "Protected Functions"),
+                ("protected-attrib",  "Protected Attributes"),
+                ("protected-slot",  "Protected Slots"),
+                ("protected-static-func",  "Protected Static Functions"),
+                ("protected-static-attrib",  "Protected Static Attributes"),
+                ("package-type",  "Package Types"),
+                ("package-func", "Package Functions"),
+                ("package-attrib", "Package Attributes"),
+                ("package-static-func", "Package Static Functions"),
+                ("package-static-attrib", "Package Static Attributes"),
+                ("private-type", "Private Types"),
+                ("private-func", "Private Functions"),
+                ("private-attrib", "Private Members"),
+                ("private-slot",  "Private Slots"),
+                ("private-static-func", "Private Static Functions"),
+                ("private-static-attrib",  "Private Static Attributes"),
+                ("friend",  "Friends"),
+                ("related",  "Related"),
+                ("define",  "Defines"),
+                ("prototype",  "Prototypes"),
+                ("typedef",  "Typedefs"),
+                ("enum",  "Enums"),
+                ("func",  "Functions"),
+                ("var",  "Variables"),
+                ]
 
     def render(self):
 
@@ -77,7 +81,7 @@ class CompoundDefTypeSubRenderer(Renderer):
                 section_nodelists[kind] = subnodes
 
         # Order the results in an appropriate manner
-        for kind in self.section_titles:
+        for kind, _ in self.sections:
             nodelist.extend(section_nodelists.get(kind, []))
 
         # Take care of innerclasses
@@ -98,43 +102,7 @@ class CompoundDefTypeSubRenderer(Renderer):
 
 class SectionDefTypeSubRenderer(Renderer):
 
-    section_titles = {
-                "user-defined": "User Defined",
-                "public-type": "Public Type",
-                "public-func": "Public Functions",
-                "public-attrib": "Public Members",
-                "public-slot": "Public Slot",
-                "signal": "Signal",
-                "dcop-func":  "DCOP Function",
-                "property":  "Property",
-                "event":  "Event",
-                "public-static-func": "Public Static Functions",
-                "public-static-attrib": "Public Static Attributes",
-                "protected-type":  "Protected Types",
-                "protected-func":  "Protected Functions",
-                "protected-attrib":  "Protected Attributes",
-                "protected-slot":  "Protected Slots",
-                "protected-static-func":  "Protected Static Functions",
-                "protected-static-attrib":  "Protected Static Attributes",
-                "package-type":  "Package Types",
-                "package-attrib": "Package Attributes",
-                "package-static-func": "Package Static Functions",
-                "package-static-attrib": "Package Static Attributes",
-                "private-type": "Private Types",
-                "private-func": "Private Functions",
-                "private-attrib": "Private Members",
-                "private-slot":  "Private Slots",
-                "private-static-func": "Private Static Functions",
-                "private-static-attrib":  "Private Static Attributes",
-                "friend":  "Friends",
-                "related":  "Related",
-                "define":  "Defines",
-                "prototype":  "Prototypes",
-                "typedef":  "Typedefs",
-                "enum":  "Enums",
-                "func":  "Functions",
-                "var":  "Variables",
-                }
+    section_titles = dict(CompoundDefTypeSubRenderer.sections)
 
     def render(self):
 
