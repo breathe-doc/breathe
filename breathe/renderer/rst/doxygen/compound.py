@@ -114,8 +114,18 @@ class SectionDefTypeSubRenderer(Renderer):
 
         # Get all the memberdef info
         for memberdef in self.data_object.memberdef:
-            renderer = self.renderer_factory.create_renderer(self.data_object, memberdef)
-            node_list.extend(renderer.render())
+            try:
+                memberdef.prot 
+                # import pdb;pdb.set_trace()
+                if memberdef.prot == 'private':
+                    keep = False
+                else:
+                    keep = True
+            except AttributeError:
+                keep = True
+            if keep:
+                renderer = self.renderer_factory.create_renderer(self.data_object, memberdef)
+                node_list.extend(renderer.render())
 
         if node_list:
 
