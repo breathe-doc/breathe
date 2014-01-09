@@ -13,6 +13,7 @@ Directives & Config Variables
    define
    variable
    file
+   group
 
 The available directives are shown below. In each case the ``project``,
 ``path``, ``no-link`` and ``outline`` options have the following meaning:  
@@ -248,6 +249,24 @@ file.
       :no-link:
 
 Checkout the :ref:`example <file-example>` to see it in action.
+
+doxygengroup
+~~~~~~~~~~~~
+
+This directive generates the appropriate output for the contents of a doxygen
+group. A doxygen group can be declared with specific doxygen markup in the
+source comments as cover in the `doxygen documentation`_.
+
+::
+
+   .. doxygengroup:: <group name>
+      :project: ...
+      :path: ...
+      :no-link:
+
+Checkout the :ref:`example <group-example>` to see it in action.
+
+.. _doxygen documentation: http://www.stack.nl/~dimitri/doxygen/manual/grouping.html
 
 Config Values
 -------------

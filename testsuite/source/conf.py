@@ -110,6 +110,7 @@ breathe_projects = {
     "functionOverload":"../examples/specific/functionOverload/xml/",
     "programlisting":"../examples/specific/programlisting/xml/",
     "image":"../examples/specific/image/xml/",
+    "group":"../examples/specific/group/xml/",
     }
 
 breathe_projects_source = {
