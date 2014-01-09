@@ -15,6 +15,11 @@ Directives & Config Variables
    file
    group
 
+.. contents:: Table of Contents
+
+Directives
+----------
+
 The available directives are shown below. In each case the ``project``,
 ``path``, ``no-link`` and ``outline`` options have the following meaning:  
 
@@ -54,8 +59,8 @@ set.
 
 .. _doxygenindex:
 
-doxygenindex Directive
-~~~~~~~~~~~~~~~~~~~~~~
+doxygenindex
+~~~~~~~~~~~~
 
 This directive processes and produces output for everything described by the
 Doxygen xml output. It reads the ``index.xml`` file and process everything
@@ -69,8 +74,8 @@ referenced by it.
       :outline:
       :no-link:
 
-autodoxygenindex Directive
-~~~~~~~~~~~~~~~~~~~~~~~~~~
+autodoxygenindex
+~~~~~~~~~~~~~~~~
 
 This directive performs a similar role to the ``doxygenindex`` directive except
 that it handles the doxygen xml generation for you. As a result you need to
@@ -90,8 +95,8 @@ implementation.
 
 Checkout the :ref:`example <autodoxygenindex-example>` to see it in action.
 
-doxygenfunction Directive
-~~~~~~~~~~~~~~~~~~~~~~~~~
+doxygenfunction
+~~~~~~~~~~~~~~~
 
 This directive generates the appropriate output for a single function. The
 function name is required to be unique in the project.
@@ -106,8 +111,8 @@ function name is required to be unique in the project.
 
 Checkout the :ref:`example <function-example>` to see it in action.
 
-doxygenstruct Directive
-~~~~~~~~~~~~~~~~~~~~~~~
+doxygenstruct
+~~~~~~~~~~~~~
 
 This directive generates the appropriate output for a single struct. The struct
 name is required to be unique in the project.
@@ -122,8 +127,8 @@ name is required to be unique in the project.
 
 Checkout the :ref:`example <struct-example>` to see it in action.
 
-doxygenenum Directive
-~~~~~~~~~~~~~~~~~~~~~~~
+doxygenenum
+~~~~~~~~~~~
 
 This directive generates the appropriate output for a single enum. It behaves
 the same as the doxygenstruct directive.
@@ -138,8 +143,8 @@ the same as the doxygenstruct directive.
 
 Checkout the :ref:`example <enum-example>` to see it in action.
 
-doxygentypedef Directive
-~~~~~~~~~~~~~~~~~~~~~~~~
+doxygentypedef
+~~~~~~~~~~~~~~
 
 This directive generates the appropriate output for a single typedef. It behaves
 the same as the doxygenstruct directive.
@@ -154,8 +159,8 @@ the same as the doxygenstruct directive.
 
 Checkout the :ref:`example <typedef-example>` to see it in action.
 
-doxygendefine Directive
-~~~~~~~~~~~~~~~~~~~~~~~
+doxygendefine
+~~~~~~~~~~~~~
 
 This directive generates the appropriate output for a single preprocessor define. It behaves
 the same as the doxygenstruct directive.
@@ -170,8 +175,8 @@ the same as the doxygenstruct directive.
 
 Checkout the :ref:`example <define-example>` to see it in action.
 
-doxygenvariable Directive
-~~~~~~~~~~~~~~~~~~~~~~~~~
+doxygenvariable
+~~~~~~~~~~~~~~~
 
 This directive generates the appropriate output for a single variable.
 It behaves the same as the doxygenstruct directive.
@@ -188,8 +193,8 @@ Checkout the :ref:`example <variable-example>` to see it in action.
 
 .. _doxygenclass:
 
-doxygenclass Directive
-~~~~~~~~~~~~~~~~~~~~~~
+doxygenclass
+~~~~~~~~~~~~
 
 This directive generates the appropriate output for a single class. It takes the
 standard ``project``, ``path``, ``outline`` and ``no-link`` options and
@@ -235,8 +240,8 @@ additonally ``members`` and ``sections`` option.
 
 Checkout the :ref:`example <class-example>` to see it in action.
 
-doxygenfile Directive
-~~~~~~~~~~~~~~~~~~~~~
+doxygenfile
+~~~~~~~~~~~
 
 This directive generates the appropriate output for the contents of a source
 file.
