@@ -121,7 +121,7 @@ class FilePathFilter(object):
 class NamespaceFilter(object):
 
     def __init__(self, namespace_accessor, name_accessor):
-        
+
         self.namespace_accessor = namespace_accessor
         self.name_accessor = name_accessor
 
@@ -462,6 +462,7 @@ class FilterFactory(object):
                 )
 
     def create_open_filter(self):
+        """Returns a completely open filter which matches everything"""
 
         return OpenFilter()
 
@@ -477,3 +478,19 @@ class FilterFactory(object):
 
         return filter_
 
+    def create_group_finder_filter(self, name):
+        """Returns a filter which looks for the compound node from the index which is a group node
+        (kind=group) and has the appropriate name
+
+        The compound node should reference the group file which we can parse for the group
+        contents."""
+
+        filter_ = AndFilter(
+                AndFilter(
+                    NameFilter(NodeTypeAccessor(Child()), ["compound"]),
+                    NameFilter(KindAccessor(Child()), ["group"])
+                    ),
+                NameFilter(NameAccessor(Child()), [name])
+                )
+
+        return filter_

@@ -19,10 +19,12 @@ class DoxygenTypeSubItemFinder(ItemFinder):
 
 
     def filter_(self, filter_, matches):
+        "Find nodes which match the filter. Doesn't test this node, only its children"
 
         compounds = self.data_object.get_compound()
 
         for compound in compounds:
+
             compound_finder = self.item_finder_factory.create_finder(compound)
             compound_finder.filter_(self.data_object, filter_, matches)
 
@@ -66,6 +68,15 @@ class CompoundTypeSubItemFinder(ItemFinder):
 
 
     def filter_(self, parent, filter_, matches):
+        """Finds nodes which match the filter and continues checks to children
+
+        Requires parsing the xml files referenced by the children for which we use the compound
+        parser and continue at the top level of that pretending that this node is the parent of the
+        top level node of the compound file.
+        """
+
+        if filter_.allow(parent, self.data_object):
+            matches.append(self.data_object)
 
         file_data = self.compound_parser.parse(self.data_object.refid)
         finder = self.item_finder_factory.create_finder(file_data)

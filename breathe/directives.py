@@ -396,18 +396,93 @@ class DoxygenFileDirective(BaseDirective):
                 target_handler
                 )
         node_list = []
-        for data_object in matches:
 
-            renderer_factory = renderer_factory_creator.create_factory(
-                    data_object,
-                    self.state,
-                    self.state.document,
-                    filter_,
-                    target_handler,
-                    )
+        # Unpack the single entry in the matches list and render it
+        (data_object,) = matches
+        renderer_factory = renderer_factory_creator.create_factory(
+                data_object,
+                self.state,
+                self.state.document,
+                filter_,
+                target_handler,
+                )
 
-            object_renderer = renderer_factory.create_renderer(self.root_data_object, data_object)
-            node_list.extend(object_renderer.render())
+        object_renderer = renderer_factory.create_renderer(self.root_data_object, data_object)
+        node_list.extend(object_renderer.render())
+
+        return node_list
+
+
+
+class DoxygenGroupDirective(BaseDirective):
+
+    kind = "group"
+
+    required_arguments = 1
+    optional_arguments = 1
+    option_spec = {
+            "path": unchanged_required,
+            "project": unchanged_required,
+            "no-link": flag,
+            }
+    has_content = False
+
+    def run(self):
+
+        name = self.arguments[0]
+
+        try:
+            project_info = self.project_info_factory.create_project_info(self.options)
+        except ProjectError, e:
+            warning = 'doxygengroup: %s' % e
+            return [docutils.nodes.warning("", docutils.nodes.paragraph("", "", docutils.nodes.Text(warning))),
+                    self.state.document.reporter.warning(warning, line=self.lineno)]
+
+        finder = self.finder_factory.create_finder(project_info)
+
+        finder_filter = self.filter_factory.create_group_finder_filter(name)
+
+        matches = []
+        finder.filter_(finder_filter, matches)
+
+        if len(matches) > 1:
+            warning = ('doxygengroup: Found multiple matches for group "%s" in doxygen xml output for project "%s" '
+                    'from directory: %s' % (name, project_info.name(), project_info.project_path()))
+            return [docutils.nodes.warning("", docutils.nodes.paragraph("", "", docutils.nodes.Text(warning))),
+                    self.state.document.reporter.warning(warning, line=self.lineno)]
+
+        elif not matches:
+            warning = ('doxygengroup: Cannot find group "%s" in doxygen xml output for project "%s" from directory: %s'
+                    % (name, project_info.name(), project_info.project_path()))
+            return [docutils.nodes.warning("", docutils.nodes.paragraph("", "", docutils.nodes.Text(warning))),
+                    self.state.document.reporter.warning(warning, line=self.lineno)]
+
+        target_handler = self.target_handler_factory.create_target_handler(self.options, project_info, self.state.document)
+
+        # Render everything in the compound node which represents the group
+        filter_ = self.filter_factory.create_open_filter()
+
+        renderer_factory_creator = self.renderer_factory_creator_constructor.create_factory_creator(
+                project_info,
+                self.state.document,
+                self.options,
+                target_handler
+                )
+        node_list = []
+
+        # Unpack the single entry in the matches list and render it
+        (data_object,) = matches
+
+        renderer_factory = renderer_factory_creator.create_factory(
+                data_object,
+                self.state,
+                self.state.document,
+                filter_,
+                target_handler,
+                )
+
+        object_renderer = renderer_factory.create_renderer(self.root_data_object, data_object)
+        node_list.extend(object_renderer.render())
 
         return node_list
 
@@ -905,6 +980,7 @@ class DoxygenDirectiveFactory(object):
             "doxygenenum": DoxygenEnumDirective,
             "doxygentypedef": DoxygenTypedefDirective,
             "doxygenfile": DoxygenFileDirective,
+            "doxygengroup": DoxygenGroupDirective,
             "autodoxygenindex": AutoDoxygenIndexDirective,
             }
 
@@ -946,6 +1022,9 @@ class DoxygenDirectiveFactory(object):
 
     def create_file_directive_container(self):
         return self.create_directive_container("doxygenfile")
+
+    def create_group_directive_container(self):
+        return self.create_directive_container("doxygengroup")
 
     def create_variable_directive_container(self):
         return self.create_directive_container("doxygenvariable")
@@ -1186,6 +1265,11 @@ def setup(app):
     app.add_directive(
             "doxygenfile",
             directive_factory.create_file_directive_container(),
+            )
+
+    app.add_directive(
+            "doxygengroup",
+            directive_factory.create_group_directive_container(),
             )
 
     app.add_directive(
