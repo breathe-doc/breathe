@@ -22,6 +22,7 @@ class Finder(object):
         return item_finder.find(matcher_stack)
 
     def filter_(self, filter_, matches):
+        "Adds all nodes which match the filter into the matches list"
 
         item_finder = self.item_finder_factory.create_finder(self._root)
         item_finder.filter_(filter_, matches)
