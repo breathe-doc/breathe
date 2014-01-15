@@ -18,7 +18,7 @@ class DoxygenTypeSubItemFinder(ItemFinder):
         return results
 
 
-    def filter_(self, filter_, matches):
+    def filter_(self, parent, filter_, matches):
         "Find nodes which match the filter. Doesn't test this node, only its children"
 
         compounds = self.data_object.get_compound()
