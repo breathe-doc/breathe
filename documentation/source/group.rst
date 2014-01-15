@@ -23,6 +23,27 @@ It produces this output:
    :project: group
    :no-link:
 
+---- 
+
+The directive also accepts a ``:content-only:`` option which changes the output
+to only include the content of the group and not the group name or description.
+So this::
+
+   .. doxygengroup:: mygroup
+      :project: group
+      :content-only:
+
+Produces this output:
+
+----
+
+.. doxygengroup:: mygroup
+   :project: group
+   :content-only:
+   :no-link:
+
+
+
 Failing Example
 ---------------
 

@@ -139,6 +139,7 @@ class DoxygenItemFinderFactoryCreator(object):
             "compounddef" : compoundfinder.CompoundDefTypeSubItemFinder,
             "sectiondef" : compoundfinder.SectionDefTypeSubItemFinder,
             "memberdef" : compoundfinder.MemberDefTypeSubItemFinder,
+            "ref" : compoundfinder.RefTypeSubItemFinder,
             }
 
         return DoxygenItemFinderFactory(finders, project_info)

@@ -24,6 +24,10 @@ class NameAccessor(Accessor):
         return self.selecter(parent_data_object, child_data_object).name
 
 class NodeNameAccessor(Accessor):
+    """Check the .node_name member which is declared on refTypeSub nodes
+
+    It distinguishes between innerclass, innernamespace, etc.
+    """
 
     def __call__(self, parent_data_object, child_data_object):
         return self.selecter(parent_data_object, child_data_object).node_name
@@ -171,6 +175,7 @@ class AndFilter(object):
                 and self.second_filter.allow(parent_data_object, child_data_object)
 
 class OrFilter(object):
+    "Provides a short-cutted 'or' operation between two filters"
 
     def __init__(self, first_filter, second_filter):
 
@@ -427,6 +432,24 @@ class FilterFactory(object):
         return AndFilter(
                 self.create_outline_filter(options),
                 filter_
+                )
+
+    def create_group_content_filter(self):
+        """Returns a filter which matches the contents of the group but not the group name or
+        description.
+
+        This allows the groups to be used to structure sections of the documentation rather than to
+        structure and further document groups of documentation
+        """
+
+        # Display the contents of the sectiondef nodes and any innerclass or innernamespace
+        # references
+        return OrFilter(
+                NameFilter(NodeTypeAccessor(Parent()), ["sectiondef"]),
+                AndFilter(
+                    NameFilter(NodeTypeAccessor(Child()), ["ref"]),
+                    NameFilter(NodeNameAccessor(Child()), ["innerclass", "innernamespace"]),
+                    )
                 )
 
     def create_index_filter(self, options):
