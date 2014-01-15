@@ -37,6 +37,10 @@ class CompoundDefTypeSubItemFinder(ItemFinder):
             finder = self.item_finder_factory.create_finder(sectiondef)
             finder.filter_(self.data_object, filter_, matches)
 
+        for innerclass in self.data_object.innerclass:
+            finder = self.item_finder_factory.create_finder(innerclass)
+            finder.filter_(self.data_object, filter_, matches)
+
 class SectionDefTypeSubItemFinder(ItemFinder):
 
     def find(self, matcher_stack):
@@ -52,9 +56,13 @@ class SectionDefTypeSubItemFinder(ItemFinder):
     def filter_(self, parent, filter_, matches):
         "Find nodes which match the filter. Doesn't test this node, only its children"
 
+        if filter_.allow(parent, self.data_object):
+            matches.append(self.data_object)
+
         for memberdef in self.data_object.memberdef:
             finder = self.item_finder_factory.create_finder(memberdef)
             finder.filter_(self.data_object, filter_, matches)
+
 
 class MemberDefTypeSubItemFinder(ItemFinder):
 
@@ -68,4 +76,14 @@ class MemberDefTypeSubItemFinder(ItemFinder):
 
     def filter_(self, parent, filter_, matches):
 
-        pass
+        if filter_.allow(parent, self.data_object):
+            matches.append(self.data_object)
+
+
+class RefTypeSubItemFinder(ItemFinder):
+
+    def filter_(self, parent, filter_, matches):
+
+        if filter_.allow(parent, self.data_object):
+            matches.append(self.data_object)
+

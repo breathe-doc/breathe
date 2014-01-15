@@ -421,6 +421,7 @@ class DoxygenGroupDirective(BaseDirective):
     option_spec = {
             "path": unchanged_required,
             "project": unchanged_required,
+            "display": unchanged_required,
             "no-link": flag,
             }
     has_content = False
@@ -455,9 +456,26 @@ class DoxygenGroupDirective(BaseDirective):
             return [docutils.nodes.warning("", docutils.nodes.paragraph("", "", docutils.nodes.Text(warning))),
                     self.state.document.reporter.warning(warning, line=self.lineno)]
 
-        target_handler = self.target_handler_factory.create_target_handler(self.options, project_info, self.state.document)
+        if self.options.get("display", "") == "content":
+            # Unpack the single entry in the matches list
+            (data_object,) = matches
 
-        # Render everything in the compound node which represents the group
+            print "Data objecT", data_object
+
+            filter_ = self.filter_factory.create_group_content_filter()
+
+            # Having found the compound node for the group in the index we want to grab the contents
+            # of
+            contents_finder = self.finder_factory.create_finder_from_root(data_object, project_info)
+            contents = []
+            contents_finder.filter_(filter_, contents)
+
+            print contents
+
+            # Replaces matches with our new starting points
+            matches = contents
+
+        target_handler = self.target_handler_factory.create_target_handler(self.options, project_info, self.state.document)
         filter_ = self.filter_factory.create_open_filter()
 
         renderer_factory_creator = self.renderer_factory_creator_constructor.create_factory_creator(
@@ -468,19 +486,17 @@ class DoxygenGroupDirective(BaseDirective):
                 )
         node_list = []
 
-        # Unpack the single entry in the matches list and render it
-        (data_object,) = matches
+        for data_object in matches:
+            renderer_factory = renderer_factory_creator.create_factory(
+                    data_object,
+                    self.state,
+                    self.state.document,
+                    filter_,
+                    target_handler,
+                    )
 
-        renderer_factory = renderer_factory_creator.create_factory(
-                data_object,
-                self.state,
-                self.state.document,
-                filter_,
-                target_handler,
-                )
-
-        object_renderer = renderer_factory.create_renderer(self.root_data_object, data_object)
-        node_list.extend(object_renderer.render())
+            object_renderer = renderer_factory.create_renderer(self.root_data_object, data_object)
+            node_list.extend(object_renderer.render())
 
         return node_list
 

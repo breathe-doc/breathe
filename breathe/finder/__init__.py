@@ -8,6 +8,10 @@ class MultipleMatchesError(FinderError):
 class NoMatchesError(FinderError):
     pass
 
+class FakeParentNode(object):
+    
+    node_type = "fakeparent"
+
 class Finder(object):
 
     def __init__(self, root, item_finder_factory):
@@ -25,7 +29,7 @@ class Finder(object):
         "Adds all nodes which match the filter into the matches list"
 
         item_finder = self.item_finder_factory.create_finder(self._root)
-        item_finder.filter_(filter_, matches)
+        item_finder.filter_(FakeParentNode(), filter_, matches)
 
     def find_one(self, matcher_stack):
 
@@ -58,6 +62,12 @@ class FinderFactory(object):
     def create_finder(self, project_info):
 
         root = self.parser.parse(project_info)
+        item_finder_factory = self.item_finder_factory_creator.create_factory(project_info)
+
+        return Finder(root, item_finder_factory)
+
+    def create_finder_from_root(self, root, project_info):
+
         item_finder_factory = self.item_finder_factory_creator.create_factory(project_info)
 
         return Finder(root, item_finder_factory)
