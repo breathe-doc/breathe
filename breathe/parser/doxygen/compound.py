@@ -497,8 +497,11 @@ supermod.docIndexEntryType.subclass = docIndexEntryTypeSub
 class docListTypeSub(supermod.docListType):
 
     node_type = "doclist"
+    node_subtype = "itemized"
 
-    def __init__(self, listitem=None):
+    def __init__(self, subType='', listitem=None):
+        if subType is not '':
+            self.node_subtype = subType
         supermod.docListType.__init__(self, listitem)
 supermod.docListType.subclass = docListTypeSub
 # end class docListTypeSub
@@ -820,6 +823,16 @@ class docParaTypeSub(supermod.docParaType):
             childobj_.build(child_)
             obj_ = self.mixedclass_(MixedContainer.CategoryComplex,
                 MixedContainer.TypeNone, 'formula', childobj_)
+            self.content.append(obj_)
+        elif child_.nodeType == Node.ELEMENT_NODE and \
+                nodeName_ == "itemizedlist":
+            obj_ = supermod.docListType.factory("itemized")
+            obj_.build(child_)
+            self.content.append(obj_)
+        elif child_.nodeType == Node.ELEMENT_NODE and \
+            nodeName_ == "orderedlist":
+            obj_ = supermod.docListType.factory("ordered")
+            obj_.build(child_)
             self.content.append(obj_)
 
 supermod.docParaType.subclass = docParaTypeSub
