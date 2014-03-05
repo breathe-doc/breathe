@@ -276,6 +276,8 @@ class DoxygenToRstRendererFactoryCreator(object):
             "verbatim" : compoundrenderer.VerbatimTypeSubRenderer,
             "mixedcontainer" : compoundrenderer.MixedContainerRenderer,
             "unicode" : UnicodeRenderer,
+            "doclist": compoundrenderer.DocListTypeSubRenderer,
+            "doclistitem": compoundrenderer.DocListItemTypeSubRenderer,
             }
 
         try:

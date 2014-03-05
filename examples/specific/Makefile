@@ -38,8 +38,8 @@ all: typedef/xml/index.xml \
 	programlisting/xml/index.xml \
 	image/xml/index.xml \
 	auto/xml/index.xml \
-	name/xml/index.xml
-	
+	name/xml/index.xml \
+	lists/xml/index.xml
 
 clean:
 	rm -rf typedef class nutshell alias rst inline namespacefile c_file \
@@ -108,3 +108,6 @@ auto/xml/index.xml: auto_class.h auto_function.h auto.cfg
 
 name/xml/index.xml: name.h name.cfg
 	$(DOXYGEN) name.cfg
+
+lists/xml/index.xml: lists.h lists.cfg
+	$(DOXYGEN) lists.cfg
