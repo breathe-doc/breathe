@@ -885,3 +885,32 @@ class MixedContainerRenderer(Renderer):
         return renderer.render()
 
 
+class DocListTypeSubRenderer(Renderer):
+
+    def render(self):
+        nodelist = []
+        for entry in self.data_object.listitem:
+            renderer = self.renderer_factory.create_renderer(self.data_object, entry)
+            nodelist.extend(renderer.render())
+
+        nodelist_list = None
+        if self.data_object.node_subtype is "itemized":
+            nodelist_list = self.node_factory.bullet_list("", *nodelist)
+        elif self.data_object.node_subtype is "ordered":
+            nodelist_list = self.node_factory.enumerated_list("", *nodelist)
+            nodelist_list['enumtype'] = 'arabic'
+            nodelist_list['start'] = 1
+            nodelist_list['prefix'] = ''
+            nodelist_list['suffix'] = '.'
+
+        return [nodelist_list]
+
+
+class DocListItemTypeSubRenderer(Renderer):
+
+    def render(self):
+        nodelist = []
+        for entry in self.data_object.para:
+            renderer = self.renderer_factory.create_renderer(self.data_object, entry)
+            nodelist.extend(renderer.render())
+        return [self.node_factory.list_item("", *nodelist)]
