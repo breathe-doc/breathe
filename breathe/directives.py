@@ -16,7 +16,7 @@ from docutils.statemachine import ViewList
 from sphinx.domains.cpp import DefinitionParser
 
 from breathe.finder import FinderFactory, NoMatchesError, MultipleMatchesError
-from breathe.parser import DoxygenParserFactory, CacheFactory, ParserError
+from breathe.parser import DoxygenParserFactory, CacheFactory, ParserError, FileIOError
 from breathe.renderer.rst.doxygen import DoxygenToRstRendererFactoryCreatorConstructor, RstContentCreator
 from breathe.renderer.rst.doxygen import format_parser_error
 from breathe.renderer.rst.doxygen.domain import DomainHandlerFactoryCreator, NullDomainHandler
@@ -51,6 +51,8 @@ class ProjectError(BreatheError):
 class NoDefaultProjectError(ProjectError):
     pass
 
+class NodeNotFoundError(BreatheError):
+    pass
 
 class BaseDirective(rst.Directive):
 
