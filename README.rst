@@ -71,6 +71,7 @@ Thank you to:
 - `Anthony Truchet <https://github.com/AnthonyTruchet>`_
 - `Daniel Matz <https://github.com/danielmatz>`_
 - `Andrew Hundt <https://github.com/ahundt>`_
+- `sebastinas <https://github.com/sebastinas>`_
 
 For their contributions; reporting issues and improving the code and
 documentation. And thanks to:
