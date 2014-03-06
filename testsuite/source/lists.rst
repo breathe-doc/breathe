@@ -124,4 +124,16 @@ renders as:
 .. doxygenclass:: NestedLists_4
    :project: lists
 
+----
 
+Documentation looking like this:
+
+.. literalinclude:: code/nested_list_5.h
+   :language: cpp
+
+renders as:
+
+----
+
+.. doxygenclass:: NestedLists_5
+   :project: lists

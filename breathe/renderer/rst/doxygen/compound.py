@@ -885,32 +885,88 @@ class MixedContainerRenderer(Renderer):
         return renderer.render()
 
 
-class DocListTypeSubRenderer(Renderer):
+class DocListNestedRenderer(object):
+    """
+        Decorator for the list type renderer.
 
+        Creates the proper docutils node based on the sub-type
+        of the underlying data object. Takes care of proper numbering
+        for deeply nested enumerated lists.
+    """
+
+    numeral_kind = ['arabic', 'loweralpha', 'lowerroman', 'upperalpha', 'upperroman']
+
+    def __init__(self, f):
+        self.__render = f
+        self.__nesting_level = 0
+
+    def __get__(self, obj, objtype):
+        """ Support instance methods. """
+        import functools
+        return functools.partial(self.__call__, obj)
+
+    def __call__(self, rend_self):
+        """ Call the wrapped render function. Update the nesting level for the enumerated lists. """
+        rend_instance = rend_self
+        if rend_instance.data_object.node_subtype is "itemized":
+            val = self.__render(rend_instance)
+            return DocListNestedRenderer.render_unordered(rend_instance, children=val)
+        elif rend_instance.data_object.node_subtype is "ordered":
+            self.__nesting_level += 1
+            val = self.__render(rend_instance)
+            self.__nesting_level -= 1
+            return DocListNestedRenderer.render_enumerated(rend_instance, children=val,
+                                                           nesting_level=self.__nesting_level)
+
+        return []
+
+    @staticmethod
+    def render_unordered(renderer, children):
+        nodelist_list = renderer.node_factory.bullet_list("", *children)
+
+        return [nodelist_list]
+
+    @staticmethod
+    def render_enumerated(renderer, children, nesting_level):
+        nodelist_list = renderer.node_factory.enumerated_list("", *children)
+        idx = nesting_level % len(DocListNestedRenderer.numeral_kind)
+        nodelist_list['enumtype'] = DocListNestedRenderer.numeral_kind[idx]
+        nodelist_list['prefix'] = ''
+        nodelist_list['suffix'] = '.'
+
+        return [nodelist_list]
+
+
+class DocListTypeSubRenderer(Renderer):
+    """
+        List renderer.
+        The specifics of the actual list rendering are handled by the
+        decorator around the generic render function.
+    """
+
+    @DocListNestedRenderer
     def render(self):
+        """ Render all the children depth-first. """
         nodelist = []
         for entry in self.data_object.listitem:
             renderer = self.renderer_factory.create_renderer(self.data_object, entry)
             nodelist.extend(renderer.render())
 
-        nodelist_list = None
-        if self.data_object.node_subtype is "itemized":
-            nodelist_list = self.node_factory.bullet_list("", *nodelist)
-        elif self.data_object.node_subtype is "ordered":
-            nodelist_list = self.node_factory.enumerated_list("", *nodelist)
-            nodelist_list['enumtype'] = 'arabic'
-            nodelist_list['start'] = 1
-            nodelist_list['prefix'] = ''
-            nodelist_list['suffix'] = '.'
-
-        return [nodelist_list]
+        return nodelist
 
 
 class DocListItemTypeSubRenderer(Renderer):
+    """
+        List item renderer.
+    """
 
     def render(self):
+        """ Render all the children depth-first.
+            Upon return expand the children node list into a docutils list-item.
+        """
         nodelist = []
         for entry in self.data_object.para:
             renderer = self.renderer_factory.create_renderer(self.data_object, entry)
             nodelist.extend(renderer.render())
+
         return [self.node_factory.list_item("", *nodelist)]
