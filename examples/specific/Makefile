@@ -37,7 +37,8 @@ all: typedef/xml/index.xml \
 	functionOverload/xml/index.xml \
 	programlisting/xml/index.xml \
 	image/xml/index.xml \
-	name/xml/index.xml
+	name/xml/index.xml \
+	lists/xml/index.xml
 	
 
 clean:
@@ -104,3 +105,6 @@ image/xml/index.xml: image.h image.cfg
 
 name/xml/index.xml: name.h name.cfg
 	$(DOXYGEN) name.cfg
+
+lists/xml/index.xml: lists.h lists.cfg
+	$(DOXYGEN) lists.cfg

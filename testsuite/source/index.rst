@@ -39,6 +39,7 @@ Contents
    domains
    customcss
    groups
+   lists
    template
    latexmath
    contributing
