@@ -9,7 +9,7 @@ Working Example
 
 This should work::
 
-   .. autodoxygen:: class.h
+   .. autodoxygenindex:: class.h
       :source: class
 
 With the following config value::
