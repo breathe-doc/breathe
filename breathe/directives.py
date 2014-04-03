@@ -857,8 +857,18 @@ class ProjectInfoFactory(object):
         else:
             raise ProjectError( "Unable to find either :project: or :path: specified" )
 
+        # Key off the name concenated with the source path so that users can force separate projects
+        # by specifying different source names for different directives even if they have the same
+        # source path. This allows the autodoxygenindex directive to be used to represent specific
+        # parts of a project by providing the relevant files and then declaring a source name which
+        # is different to other autodoxygenindex directives which might be using the same
+        # source_path.
+        key = source_path
+        if name:
+            key = "%s:%s" % (name, source_path)
+
         try:
-            return self.auto_project_info_store[source_path]
+            return self.auto_project_info_store[key]
         except KeyError:
 
             reference = name
@@ -879,7 +889,7 @@ class ProjectInfoFactory(object):
                     self.match
                     )
 
-            self.auto_project_info_store[source_path] = auto_project_info
+            self.auto_project_info_store[key] = auto_project_info
 
             return auto_project_info
 
