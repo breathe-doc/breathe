@@ -15,6 +15,7 @@ Directives & Config Variables
    variable
    file
    group
+   autofile
 
 .. contents:: Table of Contents
 
@@ -272,6 +273,22 @@ file.
 
 Checkout the :ref:`example <file-example>` to see it in action.
 
+autodoxygenfile Directive
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+This directive is this ``auto`` version of the doxygenfile directive above.
+It handles the doxygen xml generation for you like the other auto directives.
+
+::
+
+   .. autodoxygenfile:: <filename>
+      :source: ...
+      :source-path: ...
+      :outline:
+      :no-link:
+
+Checkout the :ref:`example <autodoxygenfile-example>` to see it in action.
+
 doxygengroup
 ~~~~~~~~~~~~
 
@@ -299,6 +316,7 @@ and additionally the ``content-only`` option.
 Checkout the :ref:`example <group-example>` to see it in action.
 
 .. _doxygen documentation: http://www.stack.nl/~dimitri/doxygen/manual/grouping.html
+
 
 Config Values
 -------------
