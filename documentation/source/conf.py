@@ -113,7 +113,8 @@ breathe_projects = {
     }
 
 breathe_projects_source = {
-    "class" : "../examples/doxygen"
+    "class" : "../examples/doxygen",
+    "auto" : "../examples/specific"
     }
 
 breathe_default_project = "tinyxml"
