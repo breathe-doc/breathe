@@ -1,6 +1,6 @@
 
 all: data
-	$(MAKE) -C testsuite html
+	$(MAKE) -C documentation html
 	
 data:
 	$(MAKE) -C examples/doxygen all
@@ -8,7 +8,7 @@ data:
 	$(MAKE) -C examples/specific all
 
 distclean: clean
-	$(MAKE) -C testsuite clean
+	$(MAKE) -C documentation clean
 
 clean:
 	$(MAKE) -C examples/doxygen $@
