@@ -11,7 +11,6 @@ import textwrap
 import collections
 import subprocess
 
-from docutils.parsers import rst
 from docutils.statemachine import ViewList
 from sphinx.domains.cpp import DefinitionParser
 
@@ -24,8 +23,11 @@ from breathe.renderer.rst.doxygen.domain import CppDomainHelper, CDomainHelper
 from breathe.renderer.rst.doxygen.filter import FilterFactory, GlobFactory
 from breathe.renderer.rst.doxygen.target import TargetHandlerFactory
 from breathe.finder.doxygen import DoxygenItemFinderFactoryCreator, ItemMatcherFactory
-from breathe.transforms import DoxygenTransform, DoxygenAutoTransform, TransformWrapper, IndexHandler
-from breathe.nodes import DoxygenNode, DoxygenAutoNode
+from breathe.transforms import DoxygenTransform, TransformWrapper
+from breathe.directive.base import BaseDirective, DoxygenBaseDirective
+from breathe.directive.index import DoxygenAutoIndexTransform, IndexHandler, \
+        DoxygenIndexDirective, AutoDoxygenIndexDirective, DoxygenAutoIndexNode
+from breathe.nodes import DoxygenNode
 from breathe.process import DoxygenProcessHandle
 
 import docutils.nodes
@@ -54,117 +56,9 @@ class NoDefaultProjectError(ProjectError):
 class NodeNotFoundError(BreatheError):
     pass
 
-class BaseDirective(rst.Directive):
-
-    def __init__(
-            self,
-            root_data_object,
-            renderer_factory_creator_constructor,
-            finder_factory,
-            matcher_factory,
-            project_info_factory,
-            filter_factory,
-            target_handler_factory,
-            *args
-            ):
-        rst.Directive.__init__(self, *args)
-
-        self.root_data_object = root_data_object
-        self.renderer_factory_creator_constructor = renderer_factory_creator_constructor
-        self.finder_factory = finder_factory
-        self.matcher_factory = matcher_factory
-        self.project_info_factory = project_info_factory
-        self.filter_factory = filter_factory
-        self.target_handler_factory = target_handler_factory
-
-    def render(self, data_object, project_info, filter_, target_handler):
-        "Standard render process used by subclasses"
-
-        renderer_factory_creator = self.renderer_factory_creator_constructor.create_factory_creator(
-                project_info,
-                self.state.document,
-                self.options,
-                target_handler
-                )
-
-        try:
-            renderer_factory = renderer_factory_creator.create_factory(
-                    data_object,
-                    self.state,
-                    self.state.document,
-                    filter_,
-                    target_handler,
-                    )
-        except ParserError, e:
-            return format_parser_error("doxygenclass", e.error, e.filename, self.state, self.lineno, True)
-        except FileIOError, e:
-            return format_parser_error("doxygenclass", e.error, e.filename, self.state, self.lineno)
-
-        object_renderer = renderer_factory.create_renderer(self.root_data_object, data_object)
-        node_list = object_renderer.render()
-
-        return node_list
 
 # Directives
 # ----------
-
-class DoxygenIndexDirective(BaseDirective):
-
-    required_arguments = 0
-    optional_arguments = 2
-    option_spec = {
-            "path": unchanged_required,
-            "project": unchanged_required,
-            "outline": flag,
-            "no-link": flag,
-            }
-    has_content = False
-
-    def run(self):
-
-        try:
-            project_info = self.project_info_factory.create_project_info(self.options)
-        except ProjectError, e:
-            warning = 'doxygenindex: %s' % e
-            return [docutils.nodes.warning("", docutils.nodes.paragraph("", "", docutils.nodes.Text(warning))),
-                    self.state.document.reporter.warning(warning, line=self.lineno)]
-
-        handler = IndexHandler(
-                "doxygenindex",
-                project_info,
-                self.options,
-                self.state,
-                self.lineno,
-                self
-                )
-
-        return [DoxygenNode(handler)]
-
-class AutoDoxygenIndexDirective(BaseDirective):
-
-    required_arguments = 1
-    final_argument_whitespace = True
-    option_spec = {
-            "source-path": unchanged_required,
-            "source": unchanged_required,
-            "outline": flag,
-            "no-link": flag,
-            }
-    has_content = False
-
-    def run(self):
-
-        files = self.arguments[0].split()
-
-        try:
-            project_info = self.project_info_factory.create_auto_project_info(self.options)
-        except ProjectError, e:
-            warning = 'autodoxygenindex: %s' % e
-            return [docutils.nodes.warning("", docutils.nodes.paragraph("", "", docutils.nodes.Text(warning))),
-                    self.state.document.reporter.warning(warning, line=self.lineno)]
-
-        return [DoxygenAutoNode(project_info, files, self.options, self, self.state, self.lineno)]
-
 
 class DoxygenFunctionDirective(BaseDirective):
 
@@ -410,51 +304,6 @@ class DoxygenFileDirective(BaseDirective):
             node_list.extend(object_renderer.render())
 
         return node_list
-
-
-class DoxygenBaseDirective(BaseDirective):
-
-    required_arguments = 1
-    optional_arguments = 1
-    option_spec = {
-            "path": unchanged_required,
-            "project": unchanged_required,
-            "outline": flag,
-            "no-link": flag,
-            }
-    has_content = False
-
-    def run(self):
-
-        try:
-            namespace, name = self.arguments[0].rsplit("::", 1)
-        except ValueError:
-            namespace, name = "", self.arguments[0]
-
-        try:
-            project_info = self.project_info_factory.create_project_info(self.options)
-        except ProjectError, e:
-            warning = 'doxygen%s: %s' % (self.kind, e)
-            return [docutils.nodes.warning("", docutils.nodes.paragraph("", "", docutils.nodes.Text(warning))),
-                    self.state.document.reporter.warning(warning, line=self.lineno)]
-
-        finder = self.finder_factory.create_finder(project_info)
-
-        matcher_stack = self.create_matcher_stack(namespace, name)
-
-        try:
-            data_object = finder.find_one(matcher_stack)
-        except NoMatchesError, e:
-            display_name = "%s::%s" % (namespace, name) if namespace else name
-            warning = ('doxygen%s: Cannot find %s "%s" in doxygen xml output for project "%s" from directory: %s'
-                    % (self.kind, self.kind, display_name, project_info.name(), project_info.project_path()))
-            return [docutils.nodes.warning("", docutils.nodes.paragraph("", "", docutils.nodes.Text(warning))),
-                    self.state.document.reporter.warning(warning, line=self.lineno)]
-
-        target_handler = self.target_handler_factory.create_target_handler(self.options, project_info, self.state.document)
-        filter_ = self.filter_factory.create_outline_filter(self.options)
-
-        return self.render(data_object, project_info, filter_, target_handler)
 
 
 class DoxygenStructDirective(DoxygenBaseDirective):
@@ -897,6 +746,7 @@ class DoxygenDirectiveFactory(object):
 
     directives = {
             "doxygenindex": DoxygenIndexDirective,
+            "autodoxygenindex": AutoDoxygenIndexDirective,
             "doxygenfunction": DoxygenFunctionDirective,
             "doxygenstruct": DoxygenStructDirective,
             "doxygenclass": DoxygenClassDirective,
@@ -905,7 +755,6 @@ class DoxygenDirectiveFactory(object):
             "doxygenenum": DoxygenEnumDirective,
             "doxygentypedef": DoxygenTypedefDirective,
             "doxygenfile": DoxygenFileDirective,
-            "autodoxygenindex": AutoDoxygenIndexDirective,
             }
 
     def __init__(
@@ -926,6 +775,8 @@ class DoxygenDirectiveFactory(object):
         self.filter_factory = filter_factory
         self.target_handler_factory = target_handler_factory
 
+    # TODO: This methods should be scrapped as they are only called in one place. We should just
+    # inline the code at the call site
     def create_index_directive_container(self):
         return self.create_directive_container("doxygenindex")
 
@@ -1204,7 +1055,7 @@ def setup(app):
             )
 
     doxygen_handle = DoxygenProcessHandle(path_handler, subprocess.check_call, write_file)
-    app.add_transform(TransformWrapper(DoxygenAutoTransform, doxygen_handle))
+    app.add_transform(TransformWrapper(DoxygenAutoIndexTransform, doxygen_handle))
 
     app.add_transform(DoxygenTransform)
 
