@@ -13,6 +13,7 @@ Directives & Config Variables
    define
    variable
    file
+   autofile
 
 The available directives are shown below. In each case the ``project``,
 ``path``, ``no-link`` and ``outline`` options have the following meaning:  
@@ -248,6 +249,23 @@ file.
       :no-link:
 
 Checkout the :ref:`example <file-example>` to see it in action.
+
+
+autodoxygenfile Directive
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+This directive is this ``auto`` version of the doxygenfile directive above.
+It handles the doxygen xml generation for you like the other auto directives.
+
+::
+
+   .. autodoxygenfile:: <filename>
+      :source: ...
+      :source-path: ...
+      :outline:
+      :no-link:
+
+Checkout the :ref:`example <autodoxygenfile-example>` to see it in action.
 
 Config Values
 -------------
