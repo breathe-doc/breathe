@@ -10,3 +10,17 @@ class DoxygenNode(nodes.Element):
 
         self.handler = handler
 
+class DoxygenAutoNode(nodes.Element):
+
+    def __init__(self, kind, data, auto_project_info, files, options, factories, state, lineno):
+
+        nodes.Element.__init__(self, rawsource='', children=[], attributes={})
+
+        self.kind = kind
+        self.data = data
+        self.auto_project_info = auto_project_info
+        self.files = files
+        self.options = options
+        self.factories = factories
+        self.state = state
+        self.lineno = lineno
