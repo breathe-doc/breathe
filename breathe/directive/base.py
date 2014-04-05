@@ -1,6 +1,12 @@
 
+from breathe.renderer.rst.doxygen import format_parser_error
+from breathe.parser import ParserError, FileIOError
+from breathe.project import ProjectError
+from breathe.finder import NoMatchesError
+
 from docutils.parsers import rst
-from docutils.parsers.rst.directives import unchanged_required, unchanged, flag
+from docutils.parsers.rst.directives import unchanged_required, flag
+from docutils import nodes
 
 class BaseDirective(rst.Directive):
 
@@ -76,7 +82,7 @@ class DoxygenBaseDirective(BaseDirective):
             project_info = self.project_info_factory.create_project_info(self.options)
         except ProjectError, e:
             warning = 'doxygen%s: %s' % (self.kind, e)
-            return [docutils.nodes.warning("", docutils.nodes.paragraph("", "", docutils.nodes.Text(warning))),
+            return [nodes.warning("", nodes.paragraph("", "", nodes.Text(warning))),
                     self.state.document.reporter.warning(warning, line=self.lineno)]
 
         finder = self.finder_factory.create_finder(project_info)
@@ -89,7 +95,7 @@ class DoxygenBaseDirective(BaseDirective):
             display_name = "%s::%s" % (namespace, name) if namespace else name
             warning = ('doxygen%s: Cannot find %s "%s" in doxygen xml output for project "%s" from directory: %s'
                     % (self.kind, self.kind, display_name, project_info.name(), project_info.project_path()))
-            return [docutils.nodes.warning("", docutils.nodes.paragraph("", "", docutils.nodes.Text(warning))),
+            return [nodes.warning("", nodes.paragraph("", "", nodes.Text(warning))),
                     self.state.document.reporter.warning(warning, line=self.lineno)]
 
         target_handler = self.target_handler_factory.create_target_handler(self.options, project_info, self.state.document)
