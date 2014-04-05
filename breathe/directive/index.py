@@ -1,5 +1,5 @@
 
-from breathe.directive.base import BaseDirective, BaseHandler
+from breathe.directive.base import BaseDirective, BaseNodeHandler
 from breathe.nodes import DoxygenNode, DoxygenAutoNode
 
 from docutils.parsers.rst.directives import unchanged_required, unchanged, flag
@@ -7,7 +7,7 @@ from docutils.transforms import Transform
 from docutils import nodes
 
 
-class IndexHandler(BaseHandler):
+class IndexNodeHandler(BaseNodeHandler):
     """
     Replaces a DoxygenNode with the rendered contents of the doxygen xml's index.xml file
 
@@ -75,7 +75,7 @@ class DoxygenIndexDirective(BaseDirective):
             return [docutils.nodes.warning("", docutils.nodes.paragraph("", "", docutils.nodes.Text(warning))),
                     self.state.document.reporter.warning(warning, line=self.lineno)]
 
-        handler = IndexHandler(
+        handler = IndexNodeHandler(
                 "doxygenindex",
                 None,               # No data required for doxygenindex
                 project_info,
