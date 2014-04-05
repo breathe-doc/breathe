@@ -1,16 +1,4 @@
 
-from docutils.parsers.rst.directives import unchanged_required, unchanged, flag
-
-import os
-import fnmatch
-import re
-import textwrap
-import collections
-import subprocess
-
-from docutils.statemachine import ViewList
-from sphinx.domains.cpp import DefinitionParser
-
 from breathe.finder import FinderFactory, NoMatchesError
 from breathe.parser import DoxygenParserFactory, CacheFactory
 from breathe.renderer.rst.doxygen import DoxygenToRstRendererFactoryCreatorConstructor, RstContentCreator
@@ -30,9 +18,20 @@ from breathe.process import DoxygenProcessHandle
 from breathe.exception import BreatheError
 from breathe.project import ProjectInfoFactory, ProjectError
 
+from docutils.parsers.rst.directives import unchanged_required, unchanged, flag
+from docutils.statemachine import ViewList
+from sphinx.domains.cpp import DefinitionParser
+
 import docutils.nodes
 import sphinx.addnodes
 import sphinx.ext.mathbase
+
+import os
+import fnmatch
+import re
+import textwrap
+import collections
+import subprocess
 
 # Somewhat outrageously, reach in and fix a Sphinx regex
 import sphinx.domains.cpp
