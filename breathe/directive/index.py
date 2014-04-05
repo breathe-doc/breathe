@@ -1,9 +1,11 @@
 
+from breathe.renderer.rst.doxygen import format_parser_error
 from breathe.directive.base import BaseDirective, BaseNodeHandler
+from breathe.project import ProjectError
+from breathe.parser import ParserError, FileIOError
 from breathe.nodes import DoxygenNode, DoxygenAutoNode
 
-from docutils.parsers.rst.directives import unchanged_required, unchanged, flag
-from docutils.transforms import Transform
+from docutils.parsers.rst.directives import unchanged_required, flag
 from docutils import nodes
 
 
@@ -72,7 +74,7 @@ class DoxygenIndexDirective(BaseDirective):
             project_info = self.project_info_factory.create_project_info(self.options)
         except ProjectError, e:
             warning = 'doxygenindex: %s' % e
-            return [docutils.nodes.warning("", docutils.nodes.paragraph("", "", docutils.nodes.Text(warning))),
+            return [nodes.warning("", nodes.paragraph("", "", nodes.Text(warning))),
                     self.state.document.reporter.warning(warning, line=self.lineno)]
 
         handler = IndexNodeHandler(
@@ -108,7 +110,7 @@ class AutoDoxygenIndexDirective(BaseDirective):
             project_info = self.project_info_factory.create_auto_project_info(self.options)
         except ProjectError, e:
             warning = 'autodoxygenindex: %s' % e
-            return [docutils.nodes.warning("", docutils.nodes.paragraph("", "", docutils.nodes.Text(warning))),
+            return [nodes.warning("", nodes.paragraph("", "", nodes.Text(warning))),
                     self.state.document.reporter.warning(warning, line=self.lineno)]
 
         node = DoxygenAutoNode(

@@ -3,8 +3,7 @@ from breathe.directive.base import BaseDirective, BaseNodeHandler
 from breathe.project import ProjectError
 from breathe.nodes import DoxygenNode, DoxygenAutoNode
 
-from docutils.parsers.rst.directives import unchanged_required, unchanged, flag
-from docutils.transforms import Transform
+from docutils.parsers.rst.directives import unchanged_required, flag
 from docutils import nodes
 
 class FileNodeHandler(BaseNodeHandler):
@@ -29,13 +28,13 @@ class FileNodeHandler(BaseNodeHandler):
         if len(matches) > 1:
             warning = ('doxygenfile: Found multiple matches for file "%s" in doxygen xml output for project "%s" '
                     'from directory: %s' % (file_, self.project_info.name(), self.project_info.project_path()))
-            return [docutils.nodes.warning("", docutils.nodes.paragraph("", "", docutils.nodes.Text(warning))),
+            return [nodes.warning("", nodes.paragraph("", "", nodes.Text(warning))),
                     self.state.document.reporter.warning(warning, line=self.lineno)]
 
         elif not matches:
             warning = ('doxygenfile: Cannot find file "%s" in doxygen xml output for project "%s" from directory: %s'
                     % (file_, self.project_info.name(), self.project_info.project_path()))
-            return [docutils.nodes.warning("", docutils.nodes.paragraph("", "", docutils.nodes.Text(warning))),
+            return [nodes.warning("", nodes.paragraph("", "", nodes.Text(warning))),
                     self.state.document.reporter.warning(warning, line=self.lineno)]
 
         target_handler = self.factories.target_handler_factory.create_target_handler(self.options,

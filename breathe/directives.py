@@ -711,6 +711,7 @@ def setup(app):
     app.add_transform(TransformWrapper(DoxygenAutoTransform, doxygen_handle, node_handler_factory))
     app.add_transform(DoxygenTransform)
 
+    app.add_node(DoxygenAutoNode)
     app.add_node(DoxygenNode)
 
     app.add_config_value("breathe_projects", {}, True)
