@@ -1,5 +1,5 @@
 
-from breathe.directive.base import BaseDirective, BaseHandler
+from breathe.directive.base import BaseDirective, BaseNodeHandler
 from breathe.project import ProjectError
 from breathe.nodes import DoxygenNode, DoxygenAutoNode
 
@@ -7,7 +7,7 @@ from docutils.parsers.rst.directives import unchanged_required, unchanged, flag
 from docutils.transforms import Transform
 from docutils import nodes
 
-class FileHandler(BaseHandler):
+class FileNodeHandler(BaseNodeHandler):
     """
     Replaces a DoxygenNode with the rendered contents of the doxygen xml's index.xml file
 
@@ -97,7 +97,7 @@ class DoxygenFileDirective(BaseDirective):
             return [nodes.warning("", nodes.paragraph("", "", nodes.Text(warning))),
                     self.state.document.reporter.warning(warning, line=self.lineno)]
 
-        handler = FileHandler(
+        handler = FileNodeHandler(
                 "doxygenfile",
                 file_,
                 project_info,

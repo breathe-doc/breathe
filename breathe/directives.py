@@ -7,11 +7,10 @@ from breathe.renderer.rst.doxygen.domain import CppDomainHelper, CDomainHelper
 from breathe.renderer.rst.doxygen.filter import FilterFactory, GlobFactory
 from breathe.renderer.rst.doxygen.target import TargetHandlerFactory
 from breathe.finder.doxygen import DoxygenItemFinderFactoryCreator, ItemMatcherFactory
-from breathe.transforms import DoxygenTransform, DoxygenAutoTransform, TransformWrapper, \
-        HandlerFactory
-from breathe.directive.base import BaseDirective, DoxygenBaseDirective
-from breathe.directive.index import DoxygenIndexDirective, AutoDoxygenIndexDirective, IndexHandler
-from breathe.directive.file import DoxygenFileDirective, AutoDoxygenFileDirective, FileHandler
+from breathe.transforms import DoxygenTransform, DoxygenAutoTransform, TransformWrapper
+from breathe.directive.base import BaseDirective, DoxygenBaseDirective, NodeHandlerFactory
+from breathe.directive.index import DoxygenIndexDirective, AutoDoxygenIndexDirective, IndexNodeHandler
+from breathe.directive.file import DoxygenFileDirective, AutoDoxygenFileDirective, FileNodeHandler
 from breathe.nodes import DoxygenNode, DoxygenAutoNode
 from breathe.process import DoxygenProcessHandle
 from breathe.exception import BreatheError
@@ -705,11 +704,11 @@ def setup(app):
     doxygen_handle = DoxygenProcessHandle(path_handler, subprocess.check_call, write_file)
 
     lookup = {
-            "autodoxygenindex" : IndexHandler,
-            "autodoxygenfile" : FileHandler
+            "autodoxygenindex" : IndexNodeHandler,
+            "autodoxygenfile" : FileNodeHandler
             }
-    handler_factory = HandlerFactory(lookup)
-    app.add_transform(TransformWrapper(DoxygenAutoTransform, doxygen_handle, handler_factory))
+    node_handler_factory = NodeHandlerFactory(lookup)
+    app.add_transform(TransformWrapper(DoxygenAutoTransform, doxygen_handle, node_handler_factory))
     app.add_transform(DoxygenTransform)
 
     app.add_node(DoxygenNode)

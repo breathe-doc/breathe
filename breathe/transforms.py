@@ -25,23 +25,15 @@ class ProjectData(object):
         self.auto_project_info = auto_project_info
         self.files = files
 
-class HandlerFactory(object):
-
-    def __init__(self, lookup):
-        self.lookup = lookup
-
-    def create(self, kind, *args):
-        return self.lookup[kind](kind, *args)
-
 class DoxygenAutoTransform(Transform):
 
     default_priority = 209
 
-    def __init__(self, doxygen_handle, handler_factory, *args, **kwargs):
+    def __init__(self, doxygen_handle, node_handler_factory, *args, **kwargs):
         Transform.__init__(self, *args, **kwargs)
 
         self.doxygen_handle = doxygen_handle
-        self.handler_factory = handler_factory
+        self.node_handler_factory = node_handler_factory
 
     def apply(self):
         """
@@ -79,7 +71,7 @@ class DoxygenAutoTransform(Transform):
         # directive
         for node in self.document.traverse(DoxygenAutoNode):
 
-            handler = self.handler_factory.create(
+            handler = self.node_handler_factory.create(
                     node.kind,
                     node.data,
                     per_project_project_info[node.auto_project_info.name()],
@@ -96,16 +88,16 @@ class DoxygenAutoTransform(Transform):
 
 class TransformWrapper(object):
 
-    def __init__(self, transform, doxygen_handle, handler_factory):
+    def __init__(self, transform, doxygen_handle, node_handler_factory):
 
         self.transform = transform
         self.doxygen_handle = doxygen_handle
-        self.handler_factory = handler_factory
+        self.node_handler_factory = node_handler_factory
 
         # Set up default_priority so sphinx/docutils can read it from this instance
         self.default_priority = transform.default_priority
 
     def __call__(self, *args, **kwargs):
 
-        return self.transform(self.doxygen_handle, self.handler_factory, *args, **kwargs)
+        return self.transform(self.doxygen_handle, self.node_handler_factory, *args, **kwargs)
 
