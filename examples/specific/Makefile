@@ -33,12 +33,17 @@ all: typedef/xml/index.xml \
 	template_function/xml/index.xml \
 	userdefined/xml/index.xml \
 	fixedwidthfont/xml/index.xml \
-	latexmath/xml/index.xml
+	latexmath/xml/index.xml \
+	functionOverload/xml/index.xml \
+	programlisting/xml/index.xml \
+	image/xml/index.xml \
+	name/xml/index.xml
 	
 
 clean:
 	rm -rf typedef class nutshell alias rst inline namespacefile c_file \
-		members multifilexml userdefined fixedwidthfont latexmath
+		members multifilexml userdefined fixedwidthfont latexmath functionOverload \
+		programlisting image name
            
 typedef/xml/index.xml: typedef.h typedef.cfg
 	$(DOXYGEN) typedef.cfg
@@ -87,3 +92,15 @@ fixedwidthfont/xml/index.xml: fixedwidthfont.h fixedwidthfont.cfg
 
 latexmath/xml/index.xml: latexmath.h latexmath.cfg
 	$(DOXYGEN) latexmath.cfg
+
+functionOverload/xml/index.xml: functionOverload.h functionOverload.cfg
+	$(DOXYGEN) functionOverload.cfg
+
+programlisting/xml/index.xml: programlisting.h programlisting.cfg programlistinginclude.txt
+	$(DOXYGEN) programlisting.cfg
+
+image/xml/index.xml: image.h image.cfg
+	$(DOXYGEN) image.cfg
+
+name/xml/index.xml: name.h name.cfg
+	$(DOXYGEN) name.cfg

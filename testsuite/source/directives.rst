@@ -1,10 +1,10 @@
-
 Directives & Config Variables
 =============================
 
 .. toctree::
    :hidden:
 
+   autoindex
    function
    struct
    class
@@ -18,13 +18,21 @@ The available directives are shown below. In each case the ``project``,
 ``path``, ``no-link`` and ``outline`` options have the following meaning:  
 
 ``project``
-   Specifies which project, as defined in the breathe_projects config value,
+   Specifies which project, as defined in the ``breathe_projects`` config value,
    should be used for this directive. This overrides the default project if one
    has been specified.
+
+   This is not used by the ``autodoxygenindex`` directive. Use ``source``
+   instead to specify the entry in the ``breathe_projects_source`` config value
+   to use.
 
 ``path``
    Directly specifies the path to the folder with the doxygen output. This
    overrides the project and default project if they have been specified.
+
+   This is not used by the ``autodoxygenindex`` directive. Use ``source-path``
+   instead to specify the root path to the sources files which are to be
+   processed.
 
 ``no-link``
    Instructs Breathe to not attempt to generate any document targets for the
@@ -39,6 +47,9 @@ The available directives are shown below. In each case the ``project``,
    Results in Breathe only outputting the raw code definitions without
    any additional description information.
 
+If neither project nor path are provided on the directive then breathe will
+expect the :ref:`breathe_default_project <default_project>` config value to be
+set.
 
 .. _doxygenindex:
 
@@ -57,6 +68,26 @@ referenced by it.
       :outline:
       :no-link:
 
+autodoxygenindex Directive
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+This directive performs a similar role to the ``doxygenindex`` directive except
+that it handles the doxygen xml generation for you. As a result you need to
+provide the paths to the files that you would like to be processed. The final
+generated output will contain all the content from those files.
+
+Thank you to `Scopatz <https://github.com/scopatz>`_ for the idea and initial
+implementation.
+
+::
+
+   .. autodoxygenindex:: <filename> [<filename> [...]]
+      :source: ...
+      :source-path: ...
+      :outline:
+      :no-link:
+
+Checkout the :ref:`example <autodoxygenindex-example>` to see it in action.
 
 doxygenfunction Directive
 ~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -182,7 +213,14 @@ additonally ``members`` and ``sections`` option.
    can specify a comma-separated list of sections to be included if no specific
    members are named.  The list can accept wildcards.  For instance, if you want
    to display the all protected and public members, functions, etc, then specify
-   ``:sections: public*, protected*``
+   ``:sections: public*, protected*``.
+   
+   By default, breathe specifies ``public*``.
+
+   Note that if your Doxygen project uses properties, these are excluded by
+   default.  Specify ``:sections: public*, property`` to include both public
+   members and properties. (The section names correspond to the values of the
+   ``kind`` attribute of the Doxygen XML ``sectiondef`` elements.)
 
 ::
 
@@ -219,6 +257,8 @@ Config Values
    This should be a dictionary in which the keys are project names and the values are
    paths to the folder containing the doxygen output for that project.
 
+.. _default_project:
+
 .. confval:: breathe_default_project
 
    This should match one of the keys in the :confval:`breathe_projects` dictionary and
@@ -253,4 +293,37 @@ Config Values
    above. But if you had one ``.h`` file that should be treated as being in the
    **c** domain then you can override as above.
 
+
+.. confval:: breathe_projects_source
+
+   A dictionary in which the keys are project names and the values are the root
+   paths of the source code for those projects that you would like to be
+   automatically processed with doxygen. This saves repetition of long paths
+   when using the ``autodoxygenindex`` directive. If you have some files in::
+
+      /some/long/path/to/myproject/file.c
+      /some/long/path/to/myproject/subfolder/otherfile.c
+
+   Then you can set::
+
+      breathe_projects_source = {
+         "myprojectsource" : "/some/long/path/to/myproject"
+         }
+
+   Then your ``autodoxygenindex`` usage can look like this::
+
+      .. autodoxygenindex:: file.c subfolder/otherfile.c
+         :source: myprojectsource
+
+.. confval:: breathe_build_directory
+
+   In order to process the ``autodoxygenindex`` Breathe has to run ``doxygen``
+   to create the xml files for processing. This config value specifies the root
+   directory that these files should be created in. By default, this is set to
+   the parent directory of the ``doctrees`` output folder which is the normal
+   build directory. You can change it with this setting if you have a custom
+   set up.
+
+   Breathe will take the final value and append ``breathe/doxygen/<project
+   name>`` to the path to mimise conflicts.
 

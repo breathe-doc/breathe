@@ -1,4 +1,3 @@
-
 from breathe.renderer.rst.doxygen.base import Renderer
 
 class DoxygenTypeSubRenderer(Renderer):
@@ -14,43 +13,47 @@ class DoxygenTypeSubRenderer(Renderer):
 
 class CompoundDefTypeSubRenderer(Renderer):
 
-    section_titles = [
-                "user-defined",
-                "public-type",
-                "public-func",
-                "public-attrib",
-                "public-slot",
-                "signal",
-                "dcop-func",
-                "property",
-                "event",
-                "public-static-func",
-                "public-static-attrib",
-                "protected-type",
-                "protected-func",
-                "protected-attrib",
-                "protected-slot",
-                "protected-static-func",
-                "protected-static-attrib",
-                "package-type",
-                "package-attrib",
-                "package-static-func",
-                "package-static-attrib",
-                "private-type",
-                "private-func",
-                "private-attrib",
-                "private-slot",
-                "private-static-func",
-                "private-static-attrib",
-                "friend",
-                "related",
-                "define",
-                "prototype",
-                "typedef",
-                "enum",
-                "func",
-                "var"
-             ]
+    # We store both the identified and appropriate title text here as we want to define the order
+    # here and the titles for the SectionDefTypeSubRenderer but we don't want the repetition of
+    # having two lists in case they fall out of sync
+    sections = [
+                ("user-defined", "User Defined"),
+                ("public-type", "Public Type"),
+                ("public-func", "Public Functions"),
+                ("public-attrib", "Public Members"),
+                ("public-slot", "Public Slot"),
+                ("signal", "Signal"),
+                ("dcop-func",  "DCOP Function"),
+                ("property",  "Property"),
+                ("event",  "Event"),
+                ("public-static-func", "Public Static Functions"),
+                ("public-static-attrib", "Public Static Attributes"),
+                ("protected-type",  "Protected Types"),
+                ("protected-func",  "Protected Functions"),
+                ("protected-attrib",  "Protected Attributes"),
+                ("protected-slot",  "Protected Slots"),
+                ("protected-static-func",  "Protected Static Functions"),
+                ("protected-static-attrib",  "Protected Static Attributes"),
+                ("package-type",  "Package Types"),
+                ("package-func", "Package Functions"),
+                ("package-attrib", "Package Attributes"),
+                ("package-static-func", "Package Static Functions"),
+                ("package-static-attrib", "Package Static Attributes"),
+                ("private-type", "Private Types"),
+                ("private-func", "Private Functions"),
+                ("private-attrib", "Private Members"),
+                ("private-slot",  "Private Slots"),
+                ("private-static-func", "Private Static Functions"),
+                ("private-static-attrib",  "Private Static Attributes"),
+                ("friend",  "Friends"),
+                ("related",  "Related"),
+                ("define",  "Defines"),
+                ("prototype",  "Prototypes"),
+                ("typedef",  "Typedefs"),
+                ("enum",  "Enums"),
+                ("func",  "Functions"),
+                ("var",  "Variables"),
+                ]
 
     def render(self):
 
@@ -78,7 +81,7 @@ class CompoundDefTypeSubRenderer(Renderer):
                 section_nodelists[kind] = subnodes
 
         # Order the results in an appropriate manner
-        for kind in self.section_titles:
+        for kind, _ in self.sections:
             nodelist.extend(section_nodelists.get(kind, []))
 
         # Take care of innerclasses
@@ -101,43 +104,7 @@ class CompoundDefTypeSubRenderer(Renderer):
 
 class SectionDefTypeSubRenderer(Renderer):
 
-    section_titles = {
-                "user-defined": "User Defined",
-                "public-type": "Public Type",
-                "public-func": "Public Functions",
-                "public-attrib": "Public Members",
-                "public-slot": "Public Slot",
-                "signal": "Signal",
-                "dcop-func":  "DCOP Function",
-                "property":  "Property",
-                "event":  "Event",
-                "public-static-func": "Public Static Functons",
-                "public-static-attrib": "Public Static Attributes",
-                "protected-type":  "Protected Types",
-                "protected-func":  "Protected Functions",
-                "protected-attrib":  "Protected Attributes",
-                "protected-slot":  "Protected Slots",
-                "protected-static-func":  "Protected Static Functions",
-                "protected-static-attrib":  "Protected Static Attributes",
-                "package-type":  "Package Types",
-                "package-attrib": "Package Attributes",
-                "package-static-func": "Package Static Functions",
-                "package-static-attrib": "Package Static Attributes",
-                "private-type": "Private Types",
-                "private-func": "Private Functions",
-                "private-attrib": "Private Members",
-                "private-slot":  "Private Slots",
-                "private-static-func": "Private Static Functions",
-                "private-static-attrib":  "Private Static Attributes",
-                "friend":  "Friends",
-                "related":  "Related",
-                "define":  "Defines",
-                "prototype":  "Prototypes",
-                "typedef":  "Typedefs",
-                "enum":  "Enums",
-                "func":  "Functions",
-                "var":  "Variables",
-                }
+    section_titles = dict(CompoundDefTypeSubRenderer.sections)
 
     def render(self):
 
@@ -173,13 +140,24 @@ class SectionDefTypeSubRenderer(Renderer):
 
 class MemberDefTypeSubRenderer(Renderer):
 
-    def create_target(self, refid):
+    def create_doxygen_target(self):
+        """Can be overridden to create a target node which uses the doxygen refid information
+        which can be used for creating links between internal doxygen elements.
 
+        The default implementation should suffice most of the time.
+        """
+
+        refid = "%s%s" % (self.project_info.name(), self.data_object.id)
         return self.target_handler.create_target(refid)
 
-    def create_domain_id(self):
+    def create_domain_target(self):
+        """Should be overridden to create a target node which uses the Sphinx domain information so
+        that it can be linked to from Sphinx domain roles like cpp:func:`myFunc`
 
-        return ""
+        Returns a list so that if there is no domain active then we simply return an empty list
+        instead of some kind of special null node value"""
+
+        return []
 
     def title(self):
 
@@ -198,7 +176,6 @@ class MemberDefTypeSubRenderer(Renderer):
 
         return args
 
-
     def description(self):
 
         description_nodes = []
@@ -216,31 +193,25 @@ class MemberDefTypeSubRenderer(Renderer):
 
     def render(self):
 
-        refid = "%s%s" % (self.project_info.name(), self.data_object.id)
+        # Build targets for linking
+        term_nodes = self.create_domain_target()
+        term_nodes.extend(self.create_doxygen_target())
 
-        domain_id = self.create_domain_id()
+        # Build title nodes
+        term_nodes.extend(self.title())
+        term = self.node_factory.paragraph("", "", *term_nodes )
 
-        title = self.title()
-        target = self.create_target(refid)
-        target.extend(title)
-        term = self.node_factory.paragraph("", "", ids=[domain_id,refid], *target )
+        # Build description nodes
         definition = self.node_factory.paragraph("", "", *self.description())
+
         return [term, self.node_factory.block_quote("", definition)]
 
 
 class FuncMemberDefTypeSubRenderer(MemberDefTypeSubRenderer):
 
-    def create_target(self, refid):
+    def create_domain_target(self):
 
-        self.domain_handler.create_function_target(self.data_object)
-
-        return MemberDefTypeSubRenderer.create_target(self, refid)
-
-
-    def create_domain_id(self):
-
-        return self.domain_handler.create_function_id(self.data_object)
-
+        return self.domain_handler.create_function_target(self.data_object)
 
     def title(self):
 
@@ -287,7 +258,7 @@ class FuncMemberDefTypeSubRenderer(MemberDefTypeSubRenderer):
                     )
                 )
 
-        # Setup the line block with gathered informationo
+        # Setup the line block with gathered information
         block = self.node_factory.line_block(
                 "",
                 *lines
@@ -503,11 +474,25 @@ class DocRefTextTypeSubRenderer(Renderer):
 
 
 class DocParaTypeSubRenderer(Renderer):
+    """
+    <para> tags in the Doxygen output tend to contain either text or a single other tag of interest.
+    So whilst it looks like we're combined descriptions and program listings and other things, in
+    the end we generally only deal with one per para tag. Multiple neighbouring instances of these
+    things tend to each be in a separate neighbouring para tag.
+    """
 
     def render(self):
 
         nodelist = []
         for item in self.data_object.content:              # Description
+            renderer = self.renderer_factory.create_renderer(self.data_object, item)
+            nodelist.extend(renderer.render())
+
+        for item in self.data_object.programlisting:       # Program listings
+            renderer = self.renderer_factory.create_renderer(self.data_object, item)
+            nodelist.extend(renderer.render())
+
+        for item in self.data_object.images:               # Images
             renderer = self.renderer_factory.create_renderer(self.data_object, item)
             nodelist.extend(renderer.render())
 
@@ -526,6 +511,19 @@ class DocParaTypeSubRenderer(Renderer):
 
         return [self.node_factory.paragraph("", "", *nodelist)]
 
+
+class DocImageTypeSubRenderer(Renderer):
+    "Output docutils image node using name attribute from xml as the uri"
+
+    def render(self):
+
+        path_to_image = self.project_info.sphinx_abs_path_to_file(
+                self.data_object.name
+                )
+
+        options = { "uri" : path_to_image }
+
+        return [self.node_factory.image("", **options)]
 
 class DocMarkupTypeSubRenderer(Renderer):
 
@@ -551,7 +549,7 @@ class DocMarkupTypeSubRenderer(Renderer):
 
 
 class DocParamListTypeSubRenderer(Renderer):
-    """ Parameter/Exectpion documentation """
+    "Parameter/Exception documentation"
 
     lookup = {
             "param" : "Parameters",
@@ -716,6 +714,51 @@ class DocForumlaTypeSubRenderer(Renderer):
         return nodelist
 
 
+class ListingTypeSubRenderer(Renderer):
+
+    def render(self):
+
+        lines = []
+        nodelist = []
+        for i, entry in enumerate(self.data_object.codeline):
+            # Put new lines between the lines. There must be a more pythonic way of doing this
+            if i:
+                nodelist.append(self.node_factory.Text("\n"))
+            renderer = self.renderer_factory.create_renderer(self.data_object, entry)
+            nodelist.extend(renderer.render())
+
+        # Add blank string at the start otherwise for some reason it renders
+        # the pending_xref tags around the kind in plain text
+        block = self.node_factory.literal_block(
+                "",
+                "",
+                *nodelist
+                )
+
+        return [block]
+
+class CodeLineTypeSubRenderer(Renderer):
+
+    def render(self):
+
+        nodelist = []
+        for entry in self.data_object.highlight:
+            renderer = self.renderer_factory.create_renderer(self.data_object, entry)
+            nodelist.extend(renderer.render())
+
+        return nodelist
+
+class HighlightTypeSubRenderer(Renderer):
+
+    def render(self):
+
+        nodelist = []
+        for entry in self.data_object.content_:
+            renderer = self.renderer_factory.create_renderer(self.data_object, entry)
+            nodelist.extend(renderer.render())
+
+        return nodelist
+
 class TemplateParamListRenderer(Renderer):
 
     def render(self):
@@ -811,6 +854,18 @@ class VerbatimTypeSubRenderer(Renderer):
 
             # Handle has a preformatted text
             return [self.node_factory.literal_block(text, text)]
+
+        # do we need to strip leading asterisks?
+        # NOTE: We could choose to guess this based on every line starting with '*'.
+        #   However This would have a side-effect for any users who have an rst-block
+        #   consisting of a simple bullet list.
+        #   For now we just look for an extended embed tag
+        if self.data_object.text.strip().startswith("embed:rst:leading-asterisk"):
+
+            lines = self.data_object.text.splitlines()
+            # Replace the first * on each line with a blank space
+            lines = map( lambda text: text.replace( "*", " ", 1 ), lines )
+            self.data_object.text = "\n".join( lines )
 
         rst = self.content_creator(self.data_object.text)
 
