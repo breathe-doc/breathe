@@ -45,13 +45,12 @@ class CompoundTypeSubRenderer(Renderer):
     def render(self):
 
         # Build targets for linking
-        nodelist = self.create_domain_target()
-        nodelist.extend(self.create_doxygen_target())
+        signode = self.node_factory.desc_signature()
+        signode.extend(self.create_domain_target())
+        signode.extend(self.create_doxygen_target())
 
         # Read in the corresponding xml file and process
         file_data = self.compound_parser.parse(self.data_object.refid)
-
-        lines = []
 
         # Check if there is template information and format it as desired
         if file_data.compounddef.templateparamlist:
@@ -59,29 +58,18 @@ class CompoundTypeSubRenderer(Renderer):
                     file_data.compounddef,
                     file_data.compounddef.templateparamlist
                     )
-            template = [
-                    self.node_factory.Text("template < ")
-                ]
-            template.extend(renderer.render())
-            template.append(self.node_factory.Text(" >"))
-            lines.append(self.node_factory.line("", *template))
+            template_nodes = []
+            template_nodes.append(self.node_factory.Text("template <"))
+            template_nodes.extend(renderer.render())
+            template_nodes.append(self.node_factory.Text(">"))
+            signode.append(self.node_factory.line("", *template_nodes))
 
         # Set up the title and a reference for it (refid)
-        kind = self.node_factory.emphasis(text=self.data_object.kind)
-        name = self.node_factory.strong(text=self.data_object.name)
+        signode.append(self.node_factory.emphasis(text=self.data_object.kind))
+        signode.append(self.node_factory.Text(" "))
+        signode.append(self.node_factory.desc_name(text=self.data_object.name))
 
-        # Add blank string at the start otherwise for some reason it renders
-        # the emphasis tags around the kind in plain text
-        lines.append(
-                self.node_factory.line(
-                    "", 
-                    self.node_factory.Text(""),
-                    kind,
-                    self.node_factory.Text(" "),
-                    name
-                    )
-                )
-
+        contentnode = self.node_factory.desc_content()
 
         if file_data.compounddef.includes:
             for include in file_data.compounddef.includes:
@@ -89,27 +77,18 @@ class CompoundTypeSubRenderer(Renderer):
                         file_data.compounddef,
                         include
                         )
-                result = renderer.render()
-                if result:
-                    lines.append(
-                            self.node_factory.line(
-                                "",
-                                self.node_factory.Text(""),
-                                *result
-                                )
-                            )
-
-        nodelist.append(
-                self.node_factory.line_block(
-                    "",
-                    *lines
-                    )
-                )
+                contentnode.extend(renderer.render())
 
         data_renderer = self.renderer_factory.create_renderer(self.data_object, file_data)
-        nodelist.extend(data_renderer.render())
+        contentnode.extend(data_renderer.render())
 
-        return nodelist
+        node = self.node_factory.desc()
+        node.document = self.state.document
+        node['objtype'] = self.data_object.kind
+        node.append(signode)
+        node.append(contentnode)
+
+        return [node]
 
 
 class ClassCompoundTypeSubRenderer(CompoundTypeSubRenderer):
