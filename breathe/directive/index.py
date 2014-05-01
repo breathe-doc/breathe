@@ -10,6 +10,12 @@ from docutils import nodes
 
 
 class BaseIndexDirective(BaseDirective):
+    """Base class handle the main work when given the appropriate project info to work from.
+    """
+
+    # We use inheritance here rather than a separate object and composition, because so much
+    # information is present in the Directive class from the docutils framework that we'd have to
+    # pass way too much stuff to a helper object to be reasonable.
 
     def handle_contents(self, project_info):
 
@@ -63,6 +69,7 @@ class DoxygenIndexDirective(BaseIndexDirective):
     has_content = False
 
     def run(self):
+        """Extract the project info and pass it to the helper method"""
 
         try:
             project_info = self.project_info_factory.create_project_info(self.options)
@@ -86,6 +93,9 @@ class AutoDoxygenIndexDirective(BaseIndexDirective):
     has_content = False
 
     def run(self):
+        """Extract the project info from the auto project info store and pass it to the helper
+        method
+        """
 
         try:
             project_info = self.project_info_factory.retrieve_project_info_for_auto(self.options)

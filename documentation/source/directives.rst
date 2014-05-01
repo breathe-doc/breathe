@@ -73,18 +73,20 @@ autodoxygenindex Directive
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 This directive performs a similar role to the ``doxygenindex`` directive except
-that it handles the doxygen xml generation for you. As a result you need to
-provide the paths to the files that you would like to be processed. The final
-generated output will contain all the content from those files.
+that it handles the doxygen xml generation for you. It uses the
+``breathe_projects_source`` configuration dictionary to judge which code source
+files should have doxygen xml generated for them. The ``project`` directive
+option associates the directive with a particular project in the
+``breathe_projects_source`` dictionary. All the files references by the entry in
+the ``breathe_projects_source`` will be included in the output.
 
 Thank you to `Scopatz <https://github.com/scopatz>`_ for the idea and initial
 implementation.
 
 ::
 
-   .. autodoxygenindex:: <filename> [<filename> [...]]
-      :source: ...
-      :source-path: ...
+   .. autodoxygenindex::
+      :project: ...
       :outline:
       :no-link:
 
@@ -260,8 +262,7 @@ It handles the doxygen xml generation for you like the other auto directives.
 ::
 
    .. autodoxygenfile:: <filename>
-      :source: ...
-      :source-path: ...
+      :project: ...
       :outline:
       :no-link:
 
@@ -314,10 +315,10 @@ Config Values
 
 .. confval:: breathe_projects_source
 
-   A dictionary in which the keys are project names and the values are the root
-   paths of the source code for those projects that you would like to be
-   automatically processed with doxygen. This saves repetition of long paths
-   when using the ``autodoxygenindex`` directive. If you have some files in::
+   A dictionary in which the keys are project names and the values are a tuple
+   of the directory and a list of file names of the source code for those
+   projects that you would like to be automatically processed with doxygen.
+   If you have some files in::
 
       /some/long/path/to/myproject/file.c
       /some/long/path/to/myproject/subfolder/otherfile.c
@@ -325,13 +326,17 @@ Config Values
    Then you can set::
 
       breathe_projects_source = {
-         "myprojectsource" : "/some/long/path/to/myproject"
+         "myprojectsource" :
+             ( "/some/long/path/to/myproject", [ "file.c", "subfolder/otherfile.c" ] )
          }
 
-   Then your ``autodoxygenindex`` usage can look like this::
+   Then your ``autodoxygenfile`` usage can look like this::
 
-      .. autodoxygenindex:: file.c subfolder/otherfile.c
+      .. autodoxygenfile:: file.c
          :source: myprojectsource
+
+   The directory entry in the tuple can be an empty string if the entries in the
+   list are full paths.
 
 .. confval:: breathe_build_directory
 

@@ -15,12 +15,12 @@ This should work::
 With the following config value::
 
    breathe_projects_source = {
-        "auto" : "../examples/auto"
+        "auto" : ( "../examples/specific", ["auto_class.h"] )
         }
 
 It produces this output:
 
 .. autodoxygenfile:: auto_class.h
-   :source: auto
+   :project: auto
    :no-link:
 

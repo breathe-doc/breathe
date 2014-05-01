@@ -9,18 +9,18 @@ Working Example
 
 This should work::
 
-   .. autodoxygenindex:: class.h
-      :source: class
+   .. autodoxygenindex::
+      :project: auto
 
 With the following config value::
 
    breathe_projects_source = {
-        "class" : "../examples/doxygen"
+        "auto" : ( "../examples/specific", ["auto_function.h", "auto_class.h"] )
         }
 
 It produces this output:
 
-.. autodoxygenindex:: class.h
-   :source: class
+.. autodoxygenindex::
+   :project: auto
    :no-link:
 

@@ -10,6 +10,7 @@ class NoDefaultProjectError(ProjectError):
     pass
 
 class AutoProjectInfo(object):
+    """Created as a temporary step in the automatic xml generation process"""
 
     def __init__(
             self,
@@ -52,6 +53,7 @@ class AutoProjectInfo(object):
         return os.path.join(full_source_path, file_)
 
     def create_project_info(self, project_path):
+        """Creates a proper ProjectInfo object based on the information in this AutoProjectInfo"""
 
         return ProjectInfo(
             self._name,
@@ -239,10 +241,20 @@ class ProjectInfoFactory(object):
             return project_info
 
     def store_project_info_for_auto(self, name, project_info):
+        """Stores the project info by name for later extraction by the auto directives.
+
+        Stored separately to the non-auto project info objects as they should never overlap.
+        """
 
         self.project_info_for_auto_store[name] = project_info
 
     def retrieve_project_info_for_auto(self, options):
+        """Retrieves the project info by name for later extraction by the auto directives.
+
+        Looks for the 'project' entry in the options dictionary. This is a less than ideal API but
+        it is designed to match the use of 'create_project_info' above for which it makes much more
+        sense.
+        """
 
         name = options['project']
 
