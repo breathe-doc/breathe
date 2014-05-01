@@ -141,8 +141,7 @@ breathe_projects = {
     }
 
 breathe_projects_source = {
-    "class" : "../../examples/doxygen",
-    "auto" : "../../examples/specific"
+    "auto" : ( "../../examples/specific", [ "auto_function.h", "auto_class.h" ] )
     }
 
 breathe_default_project = "tinyxml"
