@@ -6,6 +6,13 @@ from docutils.parsers.rst.directives import unchanged_required, flag
 from docutils import nodes
 
 class BaseFileDirective(BaseDirective):
+    """Base class handle the main work when given the appropriate file and project info to work
+    from.
+    """
+
+    # We use inheritance here rather than a separate object and composition, because so much
+    # information is present in the Directive class from the docutils framework that we'd have to
+    # pass way too much stuff to a helper object to be reasonable.
 
     def handle_contents(self, file_, project_info):
 
@@ -68,6 +75,7 @@ class DoxygenFileDirective(BaseFileDirective):
     has_content = False
 
     def run(self):
+        """Get the file from the argument and the project info from the factory."""
 
         file_ = self.arguments[0]
 
@@ -92,6 +100,9 @@ class AutoDoxygenFileDirective(BaseFileDirective):
     has_content = False
 
     def run(self):
+        """Get the file from the argument and extract the associated project info for the named
+        project given that it is an auto-project.
+        """
 
         file_ = self.arguments[0]
 
