@@ -8,26 +8,6 @@ from docutils.parsers import rst
 from docutils.parsers.rst.directives import unchanged_required, flag
 from docutils import nodes
 
-class BaseNodeHandler(object):
-
-    def __init__(self, kind, data, project_info, options, state, lineno, factories):
-
-        self.kind = kind
-        self.data = data
-        self.project_info = project_info
-        self.options = options
-        self.state = state
-        self.lineno = lineno
-        self.factories = factories
-
-class NodeHandlerFactory(object):
-
-    def __init__(self, lookup):
-        self.lookup = lookup
-
-    def create(self, kind, *args):
-        return self.lookup[kind](kind, *args)
-
 class BaseDirective(rst.Directive):
 
     def __init__(

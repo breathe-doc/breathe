@@ -156,6 +156,7 @@ class ProjectInfoFactory(object):
 
         self.project_count = 0
         self.project_info_store = {}
+        self.project_info_for_auto_store = {}
         self.auto_project_info_store = {}
 
     def update(
@@ -239,32 +240,19 @@ class ProjectInfoFactory(object):
 
             return project_info
 
-    def create_auto_project_info(self, options):
+    def store_project_info_for_auto(self, name, project_info):
 
-        name = ""
+        self.project_info_for_auto_store[name] = project_info
 
-        if "source" in options:
-            try:
-                source_path = self.projects_source[options["source"]]
-                name = options["source"]
-            except KeyError:
-                raise ProjectError( "Unable to find project '%s' in breathe_projects_source dictionary" % options["source"] )
+    def retrieve_project_info_for_auto(self, options):
 
-        elif "source-path" in options:
-            source_path = options["source-path"]
+        name = options['project']
 
-        else:
-            raise ProjectError( "Unable to find either :project: or :path: specified" )
+        return self.project_info_for_auto_store[name]
 
-        # Key off the name concenated with the source path so that users can force separate projects
-        # by specifying different source names for different directives even if they have the same
-        # source path. This allows the autodoxygenindex directive to be used to represent specific
-        # parts of a project by providing the relevant files and then declaring a source name which
-        # is different to other autodoxygenindex directives which might be using the same
-        # source_path.
+    def create_auto_project_info(self, name, source_path):
+
         key = source_path
-        if name:
-            key = "%s:%s" % (name, source_path)
 
         try:
             return self.auto_project_info_store[key]

@@ -8,12 +8,10 @@ from breathe.renderer.rst.doxygen.filter import FilterFactory, GlobFactory
 from breathe.renderer.rst.doxygen.target import TargetHandlerFactory
 from breathe.finder.doxygen.core import DoxygenItemFinderFactoryCreator
 from breathe.finder.doxygen.matcher import ItemMatcherFactory
-from breathe.transforms import DoxygenTransform, DoxygenAutoTransform, TransformWrapper
-from breathe.directive.base import BaseDirective, DoxygenBaseDirective, NodeHandlerFactory
-from breathe.directive.index import DoxygenIndexDirective, AutoDoxygenIndexDirective, IndexNodeHandler
-from breathe.directive.file import DoxygenFileDirective, AutoDoxygenFileDirective, FileNodeHandler
-from breathe.nodes import DoxygenNode, DoxygenAutoNode
-from breathe.process import DoxygenProcessHandle
+from breathe.directive.base import BaseDirective, DoxygenBaseDirective
+from breathe.directive.index import DoxygenIndexDirective, AutoDoxygenIndexDirective
+from breathe.directive.file import DoxygenFileDirective, AutoDoxygenFileDirective
+from breathe.process import AutoDoxygenProcessHandle
 from breathe.exception import BreatheError
 from breathe.project import ProjectInfoFactory, ProjectError
 
@@ -907,19 +905,6 @@ def setup(app):
         directive_factory.create_auto_file_directive_container(),
         )
 
-    doxygen_handle = DoxygenProcessHandle(path_handler, subprocess.check_call, write_file)
-
-    lookup = {
-            "autodoxygenindex" : IndexNodeHandler,
-            "autodoxygenfile" : FileNodeHandler
-            }
-    node_handler_factory = NodeHandlerFactory(lookup)
-    app.add_transform(TransformWrapper(DoxygenAutoTransform, doxygen_handle, node_handler_factory))
-    app.add_transform(DoxygenTransform)
-
-    app.add_node(DoxygenAutoNode)
-    app.add_node(DoxygenNode)
-
     app.add_config_value("breathe_projects", {}, True)
     app.add_config_value("breathe_default_project", "", True)
     app.add_config_value("breathe_domain_by_extension", {}, True)
@@ -928,6 +913,15 @@ def setup(app):
     app.add_config_value("breathe_build_directory", '', True)
 
     app.add_stylesheet("breathe.css")
+
+    doxygen_handle = AutoDoxygenProcessHandle(
+            path_handler,
+            subprocess.check_call,
+            write_file,
+            project_info_factory
+            )
+
+    app.connect("builder-inited", doxygen_handle.generate_xml)
 
     app.connect("builder-inited", directive_factory.get_config_values)
 
