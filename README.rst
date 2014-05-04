@@ -13,28 +13,32 @@ Breathe is available from github and `PyPI, the Python Package Index
 Documentation
 -------------
 
-Documentation is available in the ``testsuite`` folder and up in full `here
+Documentation is available in the ``documentation`` folder and up in full `here
 <http://michaeljones.github.com/breathe>`_.
 
-Running Testsuite
------------------
+Testing
+-------
 
-Run ``make`` in the root of the project. 
+Breathe doesn't have a set of tests at the moment. The documentation does a good
+job of running the different parts of the Breathe functionality but there is
+nothing to check that the output is appropriate.
+
+To build the documentation, run ``make`` in the root of the project. 
 
 This will run doxygen over the example code and then run the Breathe
-documentation/testsuite. View the results at::
+documentation. View the results at::
 
-   testsuite/build/html/index.html
+   documentation/build/html/index.html
 
 Requirements
 ------------
 
 Development is currently done with:
  
-- Python 2.7
-- Docutils 0.7
-- Sphinx 1.0.7
-- Doxygen 1.7.2
+- Python 2.7.4
+- Docutils 0.11
+- Sphinx 1.2.2
+- Doxygen 1.8.4
 
 Doxygen 1.5.1 seems to produce xml with repeated sections which causes Breathe
 some confusion. Not sure when this was resolved but it might be best to go for
@@ -77,6 +81,6 @@ For their contributions; reporting issues and improving the code and
 documentation. And thanks to:
 
 - Dimitri van Heesch for `Doxygen <http://www.stack.nl/~dimitri/doxygen/>`_.
-- Georg Brandl for `Sphinx <http://sphinx.pocoo.org>`_.
+- Georg Brandl for `Sphinx <http://sphinx-doc.org>`_.
 - David Goodger for `Docutils <http://docutils.sourceforge.net/>`_ and reStructuredText. 
 
