@@ -15,6 +15,64 @@ class DoxygenTypeSubRenderer(Renderer):
         return nodelist
 
 
+# Used below in CompoundTypeSubRenderer and in RefTypeSubRenderer in compound.py so we have split it
+# out in a helper function. This feels fairly ugly due to the number of arguments. A forced
+# refactoring for the sake of refactoring rather than a beautiful reuse of code.
+def render_compound(
+    name,
+    kind,
+    file_data,
+    rendered_data,
+    renderer_factory,
+    node_factory,
+    domain_target,
+    doxygen_target,
+    document
+    ):
+
+    # Build targets for linking
+    signode = node_factory.desc_signature()
+    signode.extend(domain_target)
+    signode.extend(doxygen_target)
+
+    # Check if there is template information and format it as desired
+    if file_data.compounddef.templateparamlist:
+        renderer = renderer_factory.create_renderer(
+                file_data.compounddef,
+                file_data.compounddef.templateparamlist
+                )
+        template_nodes = []
+        template_nodes.append(node_factory.Text("template <"))
+        template_nodes.extend(renderer.render())
+        template_nodes.append(node_factory.Text(">"))
+        signode.append(node_factory.line("", *template_nodes))
+
+    # Set up the title and a reference for it (refid)
+    signode.append(node_factory.emphasis(text=kind))
+    signode.append(node_factory.Text(" "))
+    signode.append(node_factory.desc_name(text=name))
+
+    contentnode = node_factory.desc_content()
+
+    if file_data.compounddef.includes:
+        for include in file_data.compounddef.includes:
+            renderer = renderer_factory.create_renderer(
+                    file_data.compounddef,
+                    include
+                    )
+            contentnode.extend(renderer.render())
+
+    contentnode.extend(rendered_data)
+
+    node = node_factory.desc()
+    node.document = document
+    node['objtype'] = name
+    node.append(signode)
+    node.append(contentnode)
+
+    return [node]
+
+
 class CompoundTypeSubRenderer(Renderer):
 
     def __init__(self, compound_parser, *args):
@@ -44,51 +102,23 @@ class CompoundTypeSubRenderer(Renderer):
 
     def render(self):
 
-        # Build targets for linking
-        signode = self.node_factory.desc_signature()
-        signode.extend(self.create_domain_target())
-        signode.extend(self.create_doxygen_target())
-
         # Read in the corresponding xml file and process
         file_data = self.compound_parser.parse(self.data_object.refid)
 
-        # Check if there is template information and format it as desired
-        if file_data.compounddef.templateparamlist:
-            renderer = self.renderer_factory.create_renderer(
-                    file_data.compounddef,
-                    file_data.compounddef.templateparamlist
-                    )
-            template_nodes = []
-            template_nodes.append(self.node_factory.Text("template <"))
-            template_nodes.extend(renderer.render())
-            template_nodes.append(self.node_factory.Text(">"))
-            signode.append(self.node_factory.line("", *template_nodes))
-
-        # Set up the title and a reference for it (refid)
-        signode.append(self.node_factory.emphasis(text=self.data_object.kind))
-        signode.append(self.node_factory.Text(" "))
-        signode.append(self.node_factory.desc_name(text=self.data_object.name))
-
-        contentnode = self.node_factory.desc_content()
-
-        if file_data.compounddef.includes:
-            for include in file_data.compounddef.includes:
-                renderer = self.renderer_factory.create_renderer(
-                        file_data.compounddef,
-                        include
-                        )
-                contentnode.extend(renderer.render())
-
         data_renderer = self.renderer_factory.create_renderer(self.data_object, file_data)
-        contentnode.extend(data_renderer.render())
 
-        node = self.node_factory.desc()
-        node.document = self.state.document
-        node['objtype'] = self.data_object.kind
-        node.append(signode)
-        node.append(contentnode)
-
-        return [node]
+        # Defer to function for details
+        return render_compound(
+                self.data_object.name,
+                self.data_object.kind,
+                file_data,
+                data_renderer.render(),
+                self.renderer_factory,
+                self.node_factory,
+                self.create_domain_target(),
+                self.create_doxygen_target(),
+                self.state.document
+                )
 
 
 class ClassCompoundTypeSubRenderer(CompoundTypeSubRenderer):
