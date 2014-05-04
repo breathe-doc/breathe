@@ -768,11 +768,6 @@ class IncTypeSubRenderer(Renderer):
 
 class RefTypeSubRenderer(Renderer):
 
-    ref_types = {
-            "innerclass" : "class",
-            "innernamespace" : "namespace",
-            }
-
     def __init__(self, compound_parser, *args):
         Renderer.__init__(self, *args)
 
@@ -790,33 +785,28 @@ class RefTypeSubRenderer(Renderer):
         # put underneath it. Otherwise return an empty list
         if child_nodes:
 
-            refid = "%s%s" % (self.project_info.name(), self.data_object.refid)
-            nodelist = self.target_handler.create_target(refid)
-
-            # Set up the title and a reference for it (refid)
-            type_ = self.ref_types[self.data_object.node_name]
-            kind = self.node_factory.emphasis(text=type_)
-
             name_text = self.data_object.content_[0].getValue()
             name_text = name_text.rsplit("::", 1)[-1]
-            name = self.node_factory.strong(text=name_text)
+            kind = file_data.compounddef.kind
 
-            nodelist = []
+            refid = "%s%s" % (self.project_info.name(), self.data_object.refid)
 
-            nodelist.append(
-                    self.node_factory.paragraph(
-                        "",
-                        "",
-                        kind,
-                        self.node_factory.Text(" "),
-                        name,
-                        ids=[refid]
-                        )
-                )
+            signode = self.node_factory.desc_signature()
+            signode.extend(self.target_handler.create_target(refid))
+            signode.append(self.node_factory.emphasis(text=kind))
+            signode.append(self.node_factory.Text(" "))
+            signode.append(self.node_factory.desc_name(text=name_text))
 
-            nodelist.extend(child_nodes)
+            contentnode = self.node_factory.desc_content()
+            contentnode.extend(child_nodes)
 
-            return nodelist
+            node = self.node_factory.desc()
+            node.document = self.state.document
+            node['objtype'] = kind
+            node.append(signode)
+            node.append(contentnode)
+
+            return [node]
 
         return []
 
