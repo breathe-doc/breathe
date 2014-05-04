@@ -1,4 +1,6 @@
-from breathe.renderer.rst.doxygen.base import Renderer
+
+from .base import Renderer
+from .index import render_compound
 
 class DoxygenTypeSubRenderer(Renderer):
 
@@ -777,38 +779,31 @@ class RefTypeSubRenderer(Renderer):
 
         # Read in the corresponding xml file and process
         file_data = self.compound_parser.parse(self.data_object.refid)
-        data_renderer = self.renderer_factory.create_renderer(self.data_object, file_data)
 
+        data_renderer = self.renderer_factory.create_renderer(self.data_object, file_data)
         child_nodes = data_renderer.render()
 
-        # Only render the header with refs if we've definitely got content to
-        # put underneath it. Otherwise return an empty list
-        if child_nodes:
+        if not child_nodes:
+            return []
 
-            name_text = self.data_object.content_[0].getValue()
-            name_text = name_text.rsplit("::", 1)[-1]
-            kind = file_data.compounddef.kind
+        refid = "%s%s" % (self.project_info.name(), self.data_object.refid)
 
-            refid = "%s%s" % (self.project_info.name(), self.data_object.refid)
+        name = self.data_object.content_[0].getValue()
+        name = name.rsplit("::", 1)[-1]
 
-            signode = self.node_factory.desc_signature()
-            signode.extend(self.target_handler.create_target(refid))
-            signode.append(self.node_factory.emphasis(text=kind))
-            signode.append(self.node_factory.Text(" "))
-            signode.append(self.node_factory.desc_name(text=name_text))
+        # Defer to function for details
+        return render_compound(
+                name,
+                file_data.compounddef.kind,
+                file_data,
+                child_nodes,
+                self.renderer_factory,
+                self.node_factory,
+                [], # No domain reference
+                self.target_handler.create_target(refid),
+                self.state.document
+                )
 
-            contentnode = self.node_factory.desc_content()
-            contentnode.extend(child_nodes)
-
-            node = self.node_factory.desc()
-            node.document = self.state.document
-            node['objtype'] = kind
-            node.append(signode)
-            node.append(contentnode)
-
-            return [node]
-
-        return []
 
 class VerbatimTypeSubRenderer(Renderer):
 
