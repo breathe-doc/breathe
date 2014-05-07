@@ -15,7 +15,7 @@ from docutils.parsers import rst
 from docutils.statemachine import ViewList
 from sphinx.domains.cpp import DefinitionParser
 
-from breathe.finder import FinderFactory, NoMatchesError, MultipleMatchesError
+from breathe.finder.core import FinderFactory, NoMatchesError, MultipleMatchesError
 from breathe.parser import DoxygenParserFactory, CacheFactory, ParserError, FileIOError
 from breathe.renderer.rst.doxygen import DoxygenToRstRendererFactoryCreatorConstructor, RstContentCreator
 from breathe.renderer.rst.doxygen import format_parser_error
