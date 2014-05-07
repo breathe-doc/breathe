@@ -23,7 +23,8 @@ from breathe.renderer.rst.doxygen.domain import DomainHandlerFactoryCreator, Nul
 from breathe.renderer.rst.doxygen.domain import CppDomainHelper, CDomainHelper
 from breathe.renderer.rst.doxygen.filter import FilterFactory, GlobFactory
 from breathe.renderer.rst.doxygen.target import TargetHandlerFactory
-from breathe.finder.doxygen import DoxygenItemFinderFactoryCreator, ItemMatcherFactory
+from breathe.finder.doxygen.core import DoxygenItemFinderFactoryCreator
+from breathe.finder.doxygen.matcher import ItemMatcherFactory
 from breathe.transforms import DoxygenTransform, DoxygenAutoTransform, TransformWrapper, IndexHandler
 from breathe.nodes import DoxygenNode, DoxygenAutoNode
 from breathe.process import DoxygenProcessHandle
