@@ -112,6 +112,7 @@ breathe_projects = {
     "image":"../examples/specific/image/xml/",
     "lists":"../examples/specific/lists/xml/",
     "group":"../examples/specific/group/xml/",
+    "union":"../examples/specific/union/xml/",
     }
 
 breathe_projects_source = {
