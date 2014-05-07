@@ -24,6 +24,10 @@ class NameAccessor(Accessor):
         return self.selecter(parent_data_object, child_data_object).name
 
 class NodeNameAccessor(Accessor):
+    """Check the .node_name member which is declared on refTypeSub nodes
+
+    It distinguishes between innerclass, innernamespace, etc.
+    """
 
     def __call__(self, parent_data_object, child_data_object):
         return self.selecter(parent_data_object, child_data_object).node_name
@@ -121,7 +125,7 @@ class FilePathFilter(object):
 class NamespaceFilter(object):
 
     def __init__(self, namespace_accessor, name_accessor):
-        
+
         self.namespace_accessor = namespace_accessor
         self.name_accessor = name_accessor
 
@@ -171,6 +175,7 @@ class AndFilter(object):
                 and self.second_filter.allow(parent_data_object, child_data_object)
 
 class OrFilter(object):
+    "Provides a short-cutted 'or' operation between two filters"
 
     def __init__(self, first_filter, second_filter):
 
@@ -429,6 +434,24 @@ class FilterFactory(object):
                 filter_
                 )
 
+    def create_group_content_filter(self):
+        """Returns a filter which matches the contents of the group but not the group name or
+        description.
+
+        This allows the groups to be used to structure sections of the documentation rather than to
+        structure and further document groups of documentation
+        """
+
+        # Display the contents of the sectiondef nodes and any innerclass or innernamespace
+        # references
+        return OrFilter(
+                NameFilter(NodeTypeAccessor(Parent()), ["sectiondef"]),
+                AndFilter(
+                    NameFilter(NodeTypeAccessor(Child()), ["ref"]),
+                    NameFilter(NodeNameAccessor(Child()), ["innerclass", "innernamespace"]),
+                    )
+                )
+
     def create_index_filter(self, options):
 
         filter_ = AndFilter(
@@ -462,6 +485,7 @@ class FilterFactory(object):
                 )
 
     def create_open_filter(self):
+        """Returns a completely open filter which matches everything"""
 
         return OpenFilter()
 
@@ -477,3 +501,19 @@ class FilterFactory(object):
 
         return filter_
 
+    def create_group_finder_filter(self, name):
+        """Returns a filter which looks for the compound node from the index which is a group node
+        (kind=group) and has the appropriate name
+
+        The compound node should reference the group file which we can parse for the group
+        contents."""
+
+        filter_ = AndFilter(
+                AndFilter(
+                    NameFilter(NodeTypeAccessor(Child()), ["compound"]),
+                    NameFilter(KindAccessor(Child()), ["group"])
+                    ),
+                NameFilter(NameAccessor(Child()), [name])
+                )
+
+        return filter_
