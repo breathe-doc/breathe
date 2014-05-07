@@ -7,6 +7,18 @@ union SeparateUnion
     float depth;  ///< How deep it is
 };
 
+
+namespace foo {
+
+/// A union of two values
+union MyUnion
+{
+    int someInt;      ///< The int of it all
+    float someFloat;  ///< The float side of things
+};
+
+}
+
 /// A class with a union
 class ClassWithUnion
 {
