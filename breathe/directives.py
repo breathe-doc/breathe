@@ -15,7 +15,7 @@ from docutils.parsers import rst
 from docutils.statemachine import ViewList
 from sphinx.domains.cpp import DefinitionParser
 
-from breathe.finder import FinderFactory, NoMatchesError, MultipleMatchesError
+from breathe.finder.core import FinderFactory, NoMatchesError, MultipleMatchesError
 from breathe.parser import DoxygenParserFactory, CacheFactory, ParserError, FileIOError
 from breathe.renderer.rst.doxygen import DoxygenToRstRendererFactoryCreatorConstructor, RstContentCreator
 from breathe.renderer.rst.doxygen import format_parser_error
@@ -23,7 +23,8 @@ from breathe.renderer.rst.doxygen.domain import DomainHandlerFactoryCreator, Nul
 from breathe.renderer.rst.doxygen.domain import CppDomainHelper, CDomainHelper
 from breathe.renderer.rst.doxygen.filter import FilterFactory, GlobFactory
 from breathe.renderer.rst.doxygen.target import TargetHandlerFactory
-from breathe.finder.doxygen import DoxygenItemFinderFactoryCreator, ItemMatcherFactory
+from breathe.finder.doxygen.core import DoxygenItemFinderFactoryCreator
+from breathe.finder.doxygen.matcher import ItemMatcherFactory
 from breathe.transforms import DoxygenTransform, DoxygenAutoTransform, TransformWrapper, IndexHandler
 from breathe.nodes import DoxygenNode, DoxygenAutoNode
 from breathe.process import DoxygenProcessHandle
@@ -670,6 +671,27 @@ class DoxygenTypedefDirective(DoxygenBaseItemDirective):
                 },
                 "member"
             )
+
+class DoxygenUnionDirective(DoxygenBaseItemDirective):
+
+    kind = "union"
+
+    def create_matcher_stack(self, namespace, name):
+
+        # Unions are stored in the xml file with their fully namespaced name
+        # We're using C++ namespaces here, it might be best to make this file
+        # type dependent
+        #
+        xml_name = "%s::%s" % (namespace, name) if namespace else name
+
+        return self.matcher_factory.create_matcher_stack(
+                {
+                    "compound": self.matcher_factory.create_name_type_matcher(xml_name, self.kind)
+                },
+                "compound"
+            )
+
+
 # Setup Administration
 # --------------------
 
@@ -992,6 +1014,7 @@ class DoxygenDirectiveFactory(object):
             "doxygendefine": DoxygenDefineDirective,
             "doxygenenum": DoxygenEnumDirective,
             "doxygentypedef": DoxygenTypedefDirective,
+            "doxygenunion": DoxygenUnionDirective,
             "doxygenfile": DoxygenFileDirective,
             "doxygengroup": DoxygenGroupDirective,
             "autodoxygenindex": AutoDoxygenIndexDirective,
@@ -1029,6 +1052,9 @@ class DoxygenDirectiveFactory(object):
 
     def create_typedef_directive_container(self):
         return self.create_directive_container("doxygentypedef")
+
+    def create_union_directive_container(self):
+        return self.create_directive_container("doxygenunion")
 
     def create_class_directive_container(self):
         return self.create_directive_container("doxygenclass")
@@ -1268,6 +1294,11 @@ def setup(app):
     app.add_directive(
             "doxygentypedef",
             directive_factory.create_typedef_directive_container(),
+            )
+
+    app.add_directive(
+            "doxygenunion",
+            directive_factory.create_union_directive_container(),
             )
 
     app.add_directive(
