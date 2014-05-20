@@ -10,6 +10,7 @@ Directives & Config Variables
    class
    enum
    typedef
+   union
    define
    variable
    file
@@ -158,6 +159,22 @@ the same as the doxygenstruct directive.
       :no-link:
 
 Checkout the :ref:`example <typedef-example>` to see it in action.
+
+doxygenunion
+~~~~~~~~~~~~~~
+
+This directive generates the appropriate output for a single union. It behaves
+the same as the doxygenstruct directive.
+
+::
+
+   .. doxygenunion:: <union name>
+      :project: ...
+      :path: ...
+      :outline:
+      :no-link:
+
+Checkout the :ref:`example <union-example>` to see it in action.
 
 doxygendefine
 ~~~~~~~~~~~~~
