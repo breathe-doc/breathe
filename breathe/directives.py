@@ -243,7 +243,7 @@ class DoxygenFunctionDirective(BaseDirective):
             # Parse the function name string, eg. f(int, float) to
             # extract the types so we can use them for matching
             args = []
-            num_open_brackets = -1;
+            num_open_brackets = -1
             start = paren_index + 1
             for i in range(paren_index, len(function_description)):
                 c = function_description[i]
