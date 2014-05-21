@@ -4,13 +4,13 @@ from breathe.finder.doxygen.base import ItemFinder
 class DoxygenTypeSubItemFinder(ItemFinder):
 
     def find(self, matcher_stack):
-        "Search with MatcherStack functionality - deprecated in favour of the filter approach"
+        """Search with MatcherStack functionality - deprecated in favour of the filter approach"""
 
         compound_finder = self.item_finder_factory.create_finder(self.data_object.compounddef)
         return compound_finder.find(matcher_stack)
 
     def filter_(self, parent, filter_, matches):
-        "Find nodes which match the filter. Doesn't test this node, only its children"
+        """Find nodes which match the filter. Doesn't test this node, only its children"""
 
         compound_finder = self.item_finder_factory.create_finder(self.data_object.compounddef)
         compound_finder.filter_(self.data_object, filter_, matches)
@@ -19,7 +19,7 @@ class DoxygenTypeSubItemFinder(ItemFinder):
 class CompoundDefTypeSubItemFinder(ItemFinder):
 
     def find(self, matcher_stack):
-        "Search with MatcherStack functionality - deprecated in favour of the filter approach"
+        """Search with MatcherStack functionality - deprecated in favour of the filter approach"""
 
         results = []
         for sectiondef in self.data_object.sectiondef:
@@ -29,7 +29,7 @@ class CompoundDefTypeSubItemFinder(ItemFinder):
         return results
 
     def filter_(self, parent, filter_, matches):
-        "Finds nodes which match the filter and continues checks to children"
+        """Finds nodes which match the filter and continues checks to children"""
 
         if filter_.allow(parent, self.data_object):
             matches.append(self.data_object)
@@ -45,7 +45,7 @@ class CompoundDefTypeSubItemFinder(ItemFinder):
 class SectionDefTypeSubItemFinder(ItemFinder):
 
     def find(self, matcher_stack):
-        "Search with MatcherStack functionality - deprecated in favour of the filter approach"
+        """Search with MatcherStack functionality - deprecated in favour of the filter approach"""
 
         results = []
         for memberdef in self.data_object.memberdef:
@@ -55,7 +55,7 @@ class SectionDefTypeSubItemFinder(ItemFinder):
         return results
 
     def filter_(self, parent, filter_, matches):
-        "Find nodes which match the filter. Doesn't test this node, only its children"
+        """Find nodes which match the filter. Doesn't test this node, only its children"""
 
         if filter_.allow(parent, self.data_object):
             matches.append(self.data_object)
@@ -68,7 +68,7 @@ class SectionDefTypeSubItemFinder(ItemFinder):
 class MemberDefTypeSubItemFinder(ItemFinder):
 
     def find(self, matcher_stack):
-        "Search with MatcherStack functionality - deprecated in favour of the filter approach"
+        """Search with MatcherStack functionality - deprecated in favour of the filter approach"""
 
         if matcher_stack.match("member", self.data_object):
             return [self.data_object]

@@ -497,7 +497,7 @@ class DocParaTypeSubRenderer(Renderer):
 
 
 class DocImageTypeSubRenderer(Renderer):
-    "Output docutils image node using name attribute from xml as the uri"
+    """Output docutils image node using name attribute from xml as the uri"""
 
     def render(self):
 
@@ -533,7 +533,7 @@ class DocMarkupTypeSubRenderer(Renderer):
 
 
 class DocParamListTypeSubRenderer(Renderer):
-    "Parameter/Exception documentation"
+    """Parameter/Exception documentation"""
 
     lookup = {
             "param" : "Parameters",
@@ -613,7 +613,7 @@ class DocSect1TypeSubRenderer(Renderer):
 
 
 class DocSimpleSectTypeSubRenderer(Renderer):
-    "Other Type documentation such as Warning, Note, Returns, etc"
+    """Other Type documentation such as Warning, Note, Returns, etc"""
 
     def title(self):
 
