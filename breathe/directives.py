@@ -79,7 +79,7 @@ class BaseDirective(rst.Directive):
         self.target_handler_factory = target_handler_factory
 
     def render(self, data_object, project_info, filter_, target_handler):
-        "Standard render process used by subclasses"
+        """Standard render process used by subclasses"""
 
         renderer_factory_creator = self.renderer_factory_creator_constructor.create_factory_creator(
                 project_info,

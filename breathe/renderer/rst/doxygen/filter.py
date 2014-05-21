@@ -175,7 +175,7 @@ class AndFilter(object):
                 and self.second_filter.allow(parent_data_object, child_data_object)
 
 class OrFilter(object):
-    "Provides a short-cutted 'or' operation between two filters"
+    """Provides a short-cutted 'or' operation between two filters"""
 
     def __init__(self, first_filter, second_filter):
 
