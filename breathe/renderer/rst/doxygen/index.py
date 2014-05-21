@@ -41,10 +41,8 @@ def render_compound(
                 file_data.compounddef,
                 file_data.compounddef.templateparamlist
                 )
-        template_nodes = []
-        template_nodes.append(node_factory.Text("template <"))
+        template_nodes = [node_factory.Text("template <"), node_factory.Text(">")]
         template_nodes.extend(renderer.render())
-        template_nodes.append(node_factory.Text(">"))
         signode.append(node_factory.line("", *template_nodes))
 
     # Set up the title and a reference for it (refid)
