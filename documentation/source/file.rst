@@ -64,4 +64,4 @@ This intentionally fails::
 
 It produces the following warning message:
 
-.. warning:: Cannot find file "made_up_file.h" in doxygen xml output for project "nutshell" from directory: ../examples/specific/nutshell/xml/
+.. warning:: Cannot find file "made_up_file.h" in doxygen xml output for project "nutshell" from directory: ../../examples/specific/nutshell/xml/

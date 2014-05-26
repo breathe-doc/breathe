@@ -86,7 +86,7 @@ Then in your Sphinx documentation, you add something like this::
 With a ``conf.py`` setting like this::
 
    breathe_projects = {
-       "nutshell":"../examples/specific/nutshell/xml/",
+       "nutshell":"../../examples/specific/nutshell/xml/",
        }
 
 And Breathe registered as an extension in ``conf.py`` like this::

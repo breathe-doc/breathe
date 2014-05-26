@@ -93,30 +93,30 @@ pygments_style = 'sphinx'
 # -----------------------------
 
 breathe_projects = {
-    "class":"../examples/doxygen/class/xml/",
-    "structcmd":"../examples/doxygen/structcmd/xml/",
-    "tinyxml":"../examples/tinyxml/tinyxml/xml/",
-    "restypedef":"../examples/doxygen/restypedef/xml/",
-    "nutshell":"../examples/specific/nutshell/xml/",
-    "rst":"../examples/specific/rst/xml/",
-    "c_file":"../examples/specific/c_file/xml/",
-    "namespacefile":"../examples/specific/namespacefile/xml/",
-    "userdefined":"../examples/specific/userdefined/xml/",
-    "template_function":"../examples/specific/template_function/xml/",
-    "template_class":"../examples/specific/template_class/xml/",
+    "class":"../../examples/doxygen/class/xml/",
+    "structcmd":"../../examples/doxygen/structcmd/xml/",
+    "tinyxml":"../../examples/tinyxml/tinyxml/xml/",
+    "restypedef":"../../examples/doxygen/restypedef/xml/",
+    "nutshell":"../../examples/specific/nutshell/xml/",
+    "rst":"../../examples/specific/rst/xml/",
+    "c_file":"../../examples/specific/c_file/xml/",
+    "namespacefile":"../../examples/specific/namespacefile/xml/",
+    "userdefined":"../../examples/specific/userdefined/xml/",
+    "template_function":"../../examples/specific/template_function/xml/",
+    "template_class":"../../examples/specific/template_class/xml/",
     "template_class_non_type":
-        "../examples/specific/template_class_non_type/xml/",
-    "latexmath":"../examples/specific/latexmath/xml/",
-    "functionOverload":"../examples/specific/functionOverload/xml/",
-    "programlisting":"../examples/specific/programlisting/xml/",
-    "image":"../examples/specific/image/xml/",
-    "lists":"../examples/specific/lists/xml/",
-    "group":"../examples/specific/group/xml/",
-    "union":"../examples/specific/union/xml/",
+        "../../examples/specific/template_class_non_type/xml/",
+    "latexmath":"../../examples/specific/latexmath/xml/",
+    "functionOverload":"../../examples/specific/functionOverload/xml/",
+    "programlisting":"../../examples/specific/programlisting/xml/",
+    "image":"../../examples/specific/image/xml/",
+    "lists":"../../examples/specific/lists/xml/",
+    "group":"../../examples/specific/group/xml/",
+    "union":"../../examples/specific/union/xml/",
     }
 
 breathe_projects_source = {
-    "class" : "../examples/doxygen"
+    "class" : "../../examples/doxygen"
     }
 
 breathe_default_project = "tinyxml"
