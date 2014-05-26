@@ -15,7 +15,7 @@ Example
 
 
 .. doxygenindex:: 
-   :path: ../examples/specific/inline/xml
+   :path: ../../examples/specific/inline/xml
    :no-link:
 
 

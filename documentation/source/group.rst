@@ -55,4 +55,4 @@ This intentionally fails::
 It produces the following warning message:
 
 .. warning:: Cannot find file "madeupgroup" in doxygen xml output for project
-             "group" from directory: ../examples/specific/group/xml/
+             "group" from directory: ../../examples/specific/group/xml/
