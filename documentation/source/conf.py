@@ -24,7 +24,24 @@ import sys, os
 # General configuration
 # ---------------------
 
-sys.path.append( "../" )
+read_the_docs_build = os.environ.get('READTHEDOCS', None) == 'True'
+
+if read_the_docs_build:
+
+    # Attempt to build the doxygen files on the RTD server. Explicitly override the path/name used
+    # for executing doxygen to simply be 'doxygen' to stop the makefiles looking for the executable.
+    # This is because the `which doxygen` effort seemed to fail when tested on the RTD server.
+    os.system('cd ../../examples/doxygen; make DOXYGEN=doxygen')
+    os.system('cd ../../examples/specific; make DOXYGEN=doxygen')
+    os.system('cd ../../examples/tinyxml; make DOXYGEN=doxygen')
+
+    # On RTD we'll be in the 'source' directory
+    sys.path.append("../../")
+
+else:
+
+    # For our usual dev build we'll be in the 'documentation' directory
+    sys.path.append("../")
 
 # Add any Sphinx extension module names here, as strings. They can be extensions
 # coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
