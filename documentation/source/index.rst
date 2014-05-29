@@ -42,6 +42,7 @@ Contents
    lists
    template
    latexmath
+   readthedocs
    contributing
    codeguide
    testpages
