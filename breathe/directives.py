@@ -731,6 +731,7 @@ class AutoProjectInfo(object):
             build_dir,
             reference,
             source_dir,
+            config_dir,
             domain_by_extension,
             domain_by_file_pattern,
             match
@@ -741,6 +742,7 @@ class AutoProjectInfo(object):
         self._build_dir = build_dir
         self._reference = reference
         self._source_dir = source_dir
+        self._config_dir = config_dir
         self._domain_by_extension = domain_by_extension
         self._domain_by_file_pattern = domain_by_file_pattern
         self._match = match
@@ -753,16 +755,12 @@ class AutoProjectInfo(object):
 
     def abs_path_to_source_file(self, file_):
         """
-        Returns full path to the provide file assuming that the provide path is relative to the
-        projects source directory as specified in the breathe_projects_source config variable.
+        Returns full path to the provide file assuming that the provided path is relative to the
+        projects conf.py directory as specified in the breathe_projects_source config variable.
         """
 
-        if os.path.isabs(self._source_path):
-            full_source_path = self._source_path
-        else:
-            full_source_path = os.path.realpath(self._source_path)
-
-        return os.path.join(full_source_path, file_)
+        # os.path.join does the appropriate handling if _source_path is an absolute path
+        return os.path.join(self._config_dir, self._source_path, file_)
 
     def create_project_info(self, project_path):
 
@@ -772,6 +770,7 @@ class AutoProjectInfo(object):
             self._source_path,
             self._reference,
             self._source_dir,
+            self._config_dir,
             self._domain_by_extension,
             self._domain_by_file_pattern,
             self._match
@@ -786,6 +785,7 @@ class ProjectInfo(object):
             source_path,
             reference,
             source_dir,
+            config_dir,
             domain_by_extension,
             domain_by_file_pattern,
             match
@@ -796,6 +796,7 @@ class ProjectInfo(object):
         self._source_path = source_path
         self._reference = reference
         self._source_dir = source_dir
+        self._config_dir = config_dir
         self._domain_by_extension = domain_by_extension
         self._domain_by_file_pattern = domain_by_file_pattern
         self._match = match
@@ -814,13 +815,12 @@ class ProjectInfo(object):
         Returns relative path from Sphinx documentation top-level source directory to the specified
         file assuming that the specified file is a path relative to the doxygen xml output directory.
         """
-        if os.path.isabs(self._project_path):
-            full_xml_project_path = self._project_path
-        else:
-            full_xml_project_path = os.path.realpath(self._project_path)
+
+        # os.path.join does the appropriate handling if _project_path is an absolute path
+        full_xml_project_path = os.path.join(self._config_dir, self._project_path, file_)
 
         return os.path.relpath(
-                os.path.join(full_xml_project_path, file_),
+                full_xml_project_path,
                 self._source_dir
                 )
 
@@ -855,10 +855,11 @@ class ProjectInfo(object):
 
 class ProjectInfoFactory(object):
 
-    def __init__(self, source_dir, build_dir, match):
+    def __init__(self, source_dir, build_dir, config_dir, match):
 
         self.source_dir = source_dir
         self.build_dir = build_dir
+        self.config_dir = config_dir
         self.match = match
 
         self.projects = {}
@@ -941,6 +942,7 @@ class ProjectInfoFactory(object):
                     "NoSourcePath",
                     reference,
                     self.source_dir,
+                    self.config_dir,
                     self.domain_by_extension,
                     self.domain_by_file_pattern,
                     self.match
@@ -994,6 +996,7 @@ class ProjectInfoFactory(object):
                     self.build_dir,
                     reference,
                     self.source_dir,
+                    self.config_dir,
                     self.domain_by_extension,
                     self.domain_by_file_pattern,
                     self.match
@@ -1125,7 +1128,9 @@ class RootDataObject(object):
 
 class PathHandler(object):
 
-    def __init__(self, sep, basename, join):
+    def __init__(self, config_directory, sep, basename, join):
+
+        self.config_directory = config_directory
 
         self.sep = sep
         self.basename = basename
@@ -1134,6 +1139,14 @@ class PathHandler(object):
     def includes_directory(self, file_path):
 
         return bool( file_path.count( self.sep ) )
+
+    def resolve_path(self, directory, filename):
+        """Returns a full path to the filename in the given directory assuming that if the directory
+        path is relative, then it is relative to the conf.py directory.
+        """
+
+        # os.path.join does the appropriate handling if _project_path is an absolute path
+        return self.join(self.config_directory, directory, filename)
 
 def write_file(directory, filename, content):
 
@@ -1219,7 +1232,7 @@ def setup(app):
 
     cache_factory = CacheFactory()
     cache = cache_factory.create_cache()
-    path_handler = PathHandler(os.sep, os.path.basename, os.path.join)
+    path_handler = PathHandler(app.confdir, os.sep, os.path.basename, os.path.join)
     mtimer = MTimer(os.path.getmtime)
     file_state_cache = FileStateCache(mtimer, app)
     parser_factory = DoxygenParserFactory(cache, path_handler, file_state_cache)
@@ -1254,7 +1267,7 @@ def setup(app):
     # off any trailing slashes so that dirname correctly drops the last part. This can be overriden
     # with the breathe_build_directory config variable
     build_dir = os.path.dirname(app.doctreedir.rstrip(os.sep))
-    project_info_factory = ProjectInfoFactory(app.srcdir, build_dir, fnmatch.fnmatch)
+    project_info_factory = ProjectInfoFactory(app.srcdir, build_dir, app.confdir, fnmatch.fnmatch)
     glob_factory = GlobFactory(fnmatch.fnmatch)
     filter_factory = FilterFactory(glob_factory, path_handler)
     target_handler_factory = TargetHandlerFactory(node_factory)

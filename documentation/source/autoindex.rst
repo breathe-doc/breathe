@@ -15,7 +15,7 @@ This should work::
 With the following config value::
 
    breathe_projects_source = {
-        "class" : "../examples/doxygen"
+        "class" : "../../examples/doxygen"
         }
 
 It produces this output:

@@ -24,7 +24,24 @@ import sys, os
 # General configuration
 # ---------------------
 
-sys.path.append( "../" )
+read_the_docs_build = os.environ.get('READTHEDOCS', None) == 'True'
+
+if read_the_docs_build:
+
+    # Attempt to build the doxygen files on the RTD server. Explicitly override the path/name used
+    # for executing doxygen to simply be 'doxygen' to stop the makefiles looking for the executable.
+    # This is because the `which doxygen` effort seemed to fail when tested on the RTD server.
+    os.system('cd ../../examples/doxygen; make DOXYGEN=doxygen')
+    os.system('cd ../../examples/specific; make DOXYGEN=doxygen')
+    os.system('cd ../../examples/tinyxml; make DOXYGEN=doxygen')
+
+    # On RTD we'll be in the 'source' directory
+    sys.path.append("../../")
+
+else:
+
+    # For our usual dev build we'll be in the 'documentation' directory
+    sys.path.append("../")
 
 # Add any Sphinx extension module names here, as strings. They can be extensions
 # coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
@@ -93,30 +110,30 @@ pygments_style = 'sphinx'
 # -----------------------------
 
 breathe_projects = {
-    "class":"../examples/doxygen/class/xml/",
-    "structcmd":"../examples/doxygen/structcmd/xml/",
-    "tinyxml":"../examples/tinyxml/tinyxml/xml/",
-    "restypedef":"../examples/doxygen/restypedef/xml/",
-    "nutshell":"../examples/specific/nutshell/xml/",
-    "rst":"../examples/specific/rst/xml/",
-    "c_file":"../examples/specific/c_file/xml/",
-    "namespacefile":"../examples/specific/namespacefile/xml/",
-    "userdefined":"../examples/specific/userdefined/xml/",
-    "template_function":"../examples/specific/template_function/xml/",
-    "template_class":"../examples/specific/template_class/xml/",
+    "class":"../../examples/doxygen/class/xml/",
+    "structcmd":"../../examples/doxygen/structcmd/xml/",
+    "tinyxml":"../../examples/tinyxml/tinyxml/xml/",
+    "restypedef":"../../examples/doxygen/restypedef/xml/",
+    "nutshell":"../../examples/specific/nutshell/xml/",
+    "rst":"../../examples/specific/rst/xml/",
+    "c_file":"../../examples/specific/c_file/xml/",
+    "namespacefile":"../../examples/specific/namespacefile/xml/",
+    "userdefined":"../../examples/specific/userdefined/xml/",
+    "template_function":"../../examples/specific/template_function/xml/",
+    "template_class":"../../examples/specific/template_class/xml/",
     "template_class_non_type":
-        "../examples/specific/template_class_non_type/xml/",
-    "latexmath":"../examples/specific/latexmath/xml/",
-    "functionOverload":"../examples/specific/functionOverload/xml/",
-    "programlisting":"../examples/specific/programlisting/xml/",
-    "image":"../examples/specific/image/xml/",
-    "lists":"../examples/specific/lists/xml/",
-    "group":"../examples/specific/group/xml/",
-    "union":"../examples/specific/union/xml/",
+        "../../examples/specific/template_class_non_type/xml/",
+    "latexmath":"../../examples/specific/latexmath/xml/",
+    "functionOverload":"../../examples/specific/functionOverload/xml/",
+    "programlisting":"../../examples/specific/programlisting/xml/",
+    "image":"../../examples/specific/image/xml/",
+    "lists":"../../examples/specific/lists/xml/",
+    "group":"../../examples/specific/group/xml/",
+    "union":"../../examples/specific/union/xml/",
     }
 
 breathe_projects_source = {
-    "class" : "../examples/doxygen"
+    "class" : "../../examples/doxygen"
     }
 
 breathe_default_project = "tinyxml"
