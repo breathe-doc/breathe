@@ -18,12 +18,12 @@ Class Example
 Given the following Breathe directives::
 
    .. doxygenclass:: testnamespace::NamespacedClassTest
-      :path: ../examples/specific/class/xml
+      :path: ../../examples/specific/class/xml
 
 Which create formatted output like:
 
    .. doxygenclass:: testnamespace::NamespacedClassTest
-      :path: ../examples/specific/class/xml
+      :path: ../../examples/specific/class/xml
 
 We can refer to **NamespacedClassTest** using:: 
 
@@ -41,18 +41,18 @@ Function Examples
 Given the following Breathe directives::
 
    .. doxygenfunction:: testnamespace::NamespacedClassTest::function
-      :path: ../examples/specific/class/xml
+      :path: ../../examples/specific/class/xml
 
    .. doxygenfunction:: frob_foos
-      :path: ../examples/specific/alias/xml
+      :path: ../../examples/specific/alias/xml
 
 Which create formatted output like:
 
    .. doxygenfunction:: testnamespace::NamespacedClassTest::function
-      :path: ../examples/specific/class/xml
+      :path: ../../examples/specific/class/xml
 
    .. doxygenfunction:: frob_foos
-      :path: ../examples/specific/alias/xml
+      :path: ../../examples/specific/alias/xml
 
 We can refer to **function** using:: 
 
