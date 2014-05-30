@@ -14,7 +14,7 @@
 # All configuration values have a default; values that are commented out
 # serve to show the default.
 
-import sys, os
+import sys, os, subprocess
 
 # If your extensions are in another directory, add it here. If the directory
 # is relative to the documentation root, use os.path.abspath to make it
@@ -27,13 +27,6 @@ import sys, os
 read_the_docs_build = os.environ.get('READTHEDOCS', None) == 'True'
 
 if read_the_docs_build:
-
-    # Attempt to build the doxygen files on the RTD server. Explicitly override the path/name used
-    # for executing doxygen to simply be 'doxygen' to stop the makefiles looking for the executable.
-    # This is because the `which doxygen` effort seemed to fail when tested on the RTD server.
-    os.system('cd ../../examples/doxygen; make DOXYGEN=doxygen')
-    os.system('cd ../../examples/specific; make DOXYGEN=doxygen')
-    os.system('cd ../../examples/tinyxml; make DOXYGEN=doxygen')
 
     # On RTD we'll be in the 'source' directory
     sys.path.append("../../")
@@ -251,10 +244,42 @@ latex_documents = [
 # If false, no module index is generated.
 #latex_use_modindex = True
 
-# *Cough*, ahem, borrowed from the Sphinx docs
-def setup(app):
-    app.add_object_type('confval', 'confval',
-                             objname='configuration value',
-                             indextemplate='pair: %s; configuration value')
+def run_doxygen(folder):
+    """Run the doxygen make command in the designated folder"""
 
+    try:
+        retcode = subprocess.call("cd %s; make DOXYGEN=doxygen" % folder, shell=True)
+        if retcode < 0:
+            sys.stderr.write("doxygen terminated by signal %s" % (-retcode))
+    except OSError as e:
+        sys.stderr.write("doxygen execution failed: %s" % e)
+
+
+def generate_doxygen_xml(app):
+    """Run the doxygen make commands if we're on the ReadTheDocs server"""
+
+    read_the_docs_build = os.environ.get('READTHEDOCS', None) == 'True'
+
+    if read_the_docs_build:
+
+        # Attempt to build the doxygen files on the RTD server. Explicitly override the path/name used
+        # for executing doxygen to simply be 'doxygen' to stop the makefiles looking for the executable.
+        # This is because the `which doxygen` effort seemed to fail when tested on the RTD server.
+        run_doxygen("../../examples/doxygen")
+        run_doxygen("../../examples/specific")
+        run_doxygen("../../examples/tinyxml")
+
+
+def setup(app):
+
+    # Approach borrowed from the Sphinx docs
+    app.add_object_type(
+            'confval',
+            'confval',
+            objname='configuration value',
+            indextemplate='pair: %s; configuration value'
+            )
+
+    # Add hook for building doxygen xml when needed
+    app.connect("builder-inited", generate_doxygen_xml)
 
