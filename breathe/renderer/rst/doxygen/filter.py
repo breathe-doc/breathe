@@ -39,7 +39,7 @@ class NodeTypeAccessor(Accessor):
         data_object = self.selecter(parent_data_object, child_data_object)
         try:
             return data_object.node_type
-        except AttributeError, e:
+        except AttributeError as e:
 
             # Horrible hack to silence errors on filtering unicode objects
             # until we fix the parsing

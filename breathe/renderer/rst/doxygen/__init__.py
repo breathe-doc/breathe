@@ -106,7 +106,7 @@ class DoxygenToRstRendererFactory(object):
 
         try:
             node_type = data_object.node_type
-        except AttributeError, e:
+        except AttributeError as e:
 
             # Horrible hack to silence errors on filtering unicode objects
             # until we fix the parsing
@@ -282,7 +282,7 @@ class DoxygenToRstRendererFactoryCreator(object):
 
         try:
             node_type = data_object.node_type
-        except AttributeError, e:
+        except AttributeError as e:
 
             # Horrible hack to silence errors on filtering unicode objects
             # until we fix the parsing
@@ -325,7 +325,7 @@ class DoxygenToRstRendererFactoryCreator(object):
 
         try:
             node_type = data_object.node_type
-        except AttributeError, e:
+        except AttributeError as e:
 
             # Horrible hack to silence errors on filtering unicode objects
             # until we fix the parsing
