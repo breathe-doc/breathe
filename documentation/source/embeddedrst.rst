@@ -1,8 +1,6 @@
 
-
-Embedded Rst
-============
-
+Embedded ReStructuredText
+=========================
 
 .. doxygenindex:: 
    :path: ../../examples/specific/rst/xml

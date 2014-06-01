@@ -10,7 +10,7 @@ class Nutshell
 {
 public:
 
-    //! Our toolset
+    //! Our tool set
     /*! The various tools we can opt to use to crack this particular nut */
     enum Tool
     {

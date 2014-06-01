@@ -1,4 +1,7 @@
 
+.. spelling:: attributeB
+
+
 TinyXML Test Suite
 ==================
 

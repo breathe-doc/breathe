@@ -1,4 +1,5 @@
 
+.. spelling:: xml
 
 .. _define-example:
 

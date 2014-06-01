@@ -2,7 +2,7 @@
  *  \brief Windows Nice Try.
  *  \author Bill Gates
  *  \author Several species of small furry animals gathered together 
- *          in a cave and grooving with a pict.
+ *          in a cave and grooving with a picture.
  *  \version 4.0
  *  \date    1996-1998
  *  \bug It crashes a lot and requires huge amounts of memory.

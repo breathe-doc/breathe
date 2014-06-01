@@ -215,7 +215,7 @@ doxygenclass
 
 This directive generates the appropriate output for a single class. It takes the
 standard ``project``, ``path``, ``outline`` and ``no-link`` options and
-additonally ``members`` and ``sections`` option.
+additionally ``members`` and ``sections`` option.
 
 ``members``
    Designed to behavior in a similar manner to the ``members`` option for the
@@ -228,11 +228,11 @@ additonally ``members`` and ``sections`` option.
    Breathe will treat the arguments as names of members and provide
    documentation for only those members that have been named.
 
-   The default behaviour of adding the public members can be customised using
+   The default behavior of adding the public members can be customized using
    the ``sections`` option.
 
 ``sections``
-   Designed to specialise the default behaviour of the ``members`` option.  You
+   Designed to specialize the default behavior of the ``members`` option.  You
    can specify a comma-separated list of sections to be included if no specific
    members are named.  The list can accept wildcards.  For instance, if you want
    to display the all protected and public members, functions, etc, then specify
@@ -280,12 +280,12 @@ group. A doxygen group can be declared with specific doxygen markup in the
 source comments as cover in the `doxygen documentation`_.
 
 It takes the standard ``project``, ``path``, ``outline`` and ``no-link`` options
-and additonally the ``content-only`` option.
+and additionally the ``content-only`` option.
 
 ``content-only``
    If this flag is specified, then the directive does not output the name of the
    group or the group description and instead outputs the contents of the group.
-   This can be useful if the groups are only used for organisational purposes
+   This can be useful if the groups are only used for organizational purposes
    and not to provide additional information.
 
 ::
@@ -376,5 +376,5 @@ Config Values
    set up.
 
    Breathe will take the final value and append ``breathe/doxygen/<project
-   name>`` to the path to mimise conflicts.
+   name>`` to the path to minimize conflicts.
 
