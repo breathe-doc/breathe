@@ -2,15 +2,19 @@
 class FinderError(Exception):
     pass
 
+
 class MultipleMatchesError(FinderError):
     pass
+
 
 class NoMatchesError(FinderError):
     pass
 
+
 class FakeParentNode(object):
 
     node_type = "fakeparent"
+
 
 class Finder(object):
 
@@ -45,7 +49,6 @@ class Finder(object):
         elif count < 1:
             raise NoMatchesError(matcher_stack)
 
-
     def root(self):
 
         return self._root
@@ -57,7 +60,6 @@ class FinderFactory(object):
 
         self.parser = parser
         self.item_finder_factory_creator = item_finder_factory_creator
-
 
     def create_finder(self, project_info):
 
