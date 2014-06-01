@@ -2,7 +2,6 @@
 from breathe.finder.doxygen import index as indexfinder
 from breathe.finder.doxygen import compound as compoundfinder
 
-from breathe.parser.doxygen import index, compound
 
 class CreateCompoundTypeSubFinder(object):
 
@@ -14,7 +13,8 @@ class CreateCompoundTypeSubFinder(object):
     def __call__(self, project_info, *args):
 
         compound_parser = self.parser_factory.create_compound_parser(project_info)
-        return indexfinder.CompoundTypeSubItemFinder(self.matcher_factory, compound_parser, project_info, *args)
+        return indexfinder.CompoundTypeSubItemFinder(self.matcher_factory, compound_parser,
+                                                     project_info, *args)
 
 
 class DoxygenItemFinderFactory(object):
@@ -39,14 +39,14 @@ class DoxygenItemFinderFactoryCreator(object):
     def create_factory(self, project_info):
 
         finders = {
-            "doxygen" : indexfinder.DoxygenTypeSubItemFinder,
-            "compound" : CreateCompoundTypeSubFinder(self.parser_factory, self.matcher_factory),
-            "member" : indexfinder.MemberTypeSubItemFinder,
-            "doxygendef" : compoundfinder.DoxygenTypeSubItemFinder,
-            "compounddef" : compoundfinder.CompoundDefTypeSubItemFinder,
-            "sectiondef" : compoundfinder.SectionDefTypeSubItemFinder,
-            "memberdef" : compoundfinder.MemberDefTypeSubItemFinder,
-            "ref" : compoundfinder.RefTypeSubItemFinder,
+            "doxygen": indexfinder.DoxygenTypeSubItemFinder,
+            "compound": CreateCompoundTypeSubFinder(self.parser_factory, self.matcher_factory),
+            "member": indexfinder.MemberTypeSubItemFinder,
+            "doxygendef": compoundfinder.DoxygenTypeSubItemFinder,
+            "compounddef": compoundfinder.CompoundDefTypeSubItemFinder,
+            "sectiondef": compoundfinder.SectionDefTypeSubItemFinder,
+            "memberdef": compoundfinder.MemberDefTypeSubItemFinder,
+            "ref": compoundfinder.RefTypeSubItemFinder,
             }
 
         return DoxygenItemFinderFactory(finders, project_info)

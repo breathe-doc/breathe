@@ -2,8 +2,10 @@
 class MissingLevelError(Exception):
     pass
 
+
 class Matcher(object):
     pass
+
 
 class ItemMatcher(Matcher):
 
@@ -16,6 +18,7 @@ class ItemMatcher(Matcher):
 
     def __repr__(self):
         return "<ItemMatcher - name:%s, type_:%s>" % (self.name, self.type_)
+
 
 class NameMatcher(Matcher):
 
@@ -34,6 +37,7 @@ class RefMatcher(Matcher):
 
     def match(self, data_object):
         return self.refid == data_object.refid
+
 
 class AnyMatcher(Matcher):
 
@@ -84,10 +88,9 @@ class ItemMatcherFactory(Matcher):
     def create_ref_matcher_stack(self, class_, ref):
 
         matchers = {
-                "compound" : ItemMatcher(class_, "class") if class_ else AnyMatcher(),
-                "member" : RefMatcher(ref),
-                }
+            "compound": ItemMatcher(class_, "class") if class_ else AnyMatcher(),
+            "member": RefMatcher(ref),
+            }
 
         return MatcherStack(matchers, "member")
-
 

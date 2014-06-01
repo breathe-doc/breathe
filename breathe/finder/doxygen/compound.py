@@ -1,5 +1,6 @@
 
-from breathe.finder.doxygen.base import ItemFinder 
+from breathe.finder.doxygen.base import ItemFinder
+
 
 class DoxygenTypeSubItemFinder(ItemFinder):
 
@@ -41,6 +42,7 @@ class CompoundDefTypeSubItemFinder(ItemFinder):
         for innerclass in self.data_object.innerclass:
             finder = self.item_finder_factory.create_finder(innerclass)
             finder.filter_(self.data_object, filter_, matches)
+
 
 class SectionDefTypeSubItemFinder(ItemFinder):
 
