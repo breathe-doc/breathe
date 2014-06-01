@@ -1,6 +1,7 @@
 
 __version__ = '1.2.0'
 
+
 def setup(app):
 
     # We can't do the import at the module scope as setup.py has to be able to
