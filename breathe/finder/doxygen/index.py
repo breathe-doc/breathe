@@ -58,9 +58,6 @@ class CompoundTypeSubItemFinder(ItemFinder):
             finder = self.item_finder_factory.create_finder(file_data)
 
             for member_data in member_results:
-                ref_matcher_stack = self.matcher_factory.create_ref_matcher_stack(
-                    "", member_data.refid)
-                # TODO: Fix this! Should be ref_matcher_stack!
                 results.extend(finder.find(matcher_stack))
 
         elif matcher_stack.full_match("compound", self.data_object):
