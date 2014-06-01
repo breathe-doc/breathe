@@ -888,9 +888,9 @@ def parse(inFilename):
 
     try:
         doc = minidom.parse(inFilename)
-    except IOError, e:
+    except IOError as e:
         raise FileIOError(e)
-    except ExpatError, e:
+    except ExpatError as e:
         raise ParseError(e)
 
     rootNode = doc.documentElement

@@ -96,9 +96,9 @@ class BaseDirective(rst.Directive):
                     filter_,
                     target_handler,
                     )
-        except ParserError, e:
+        except ParserError as e:
             return format_parser_error("doxygenclass", e.error, e.filename, self.state, self.lineno, True)
-        except FileIOError, e:
+        except FileIOError as e:
             return format_parser_error("doxygenclass", e.error, e.filename, self.state, self.lineno)
 
         object_renderer = renderer_factory.create_renderer(self.root_data_object, data_object)
@@ -125,7 +125,7 @@ class DoxygenIndexDirective(BaseDirective):
 
         try:
             project_info = self.project_info_factory.create_project_info(self.options)
-        except ProjectError, e:
+        except ProjectError as e:
             warning = 'doxygenindex: %s' % e
             return [docutils.nodes.warning("", docutils.nodes.paragraph("", "", docutils.nodes.Text(warning))),
                     self.state.document.reporter.warning(warning, line=self.lineno)]
@@ -159,7 +159,7 @@ class AutoDoxygenIndexDirective(BaseDirective):
 
         try:
             project_info = self.project_info_factory.create_auto_project_info(self.options)
-        except ProjectError, e:
+        except ProjectError as e:
             warning = 'autodoxygenindex: %s' % e
             return [docutils.nodes.warning("", docutils.nodes.paragraph("", "", docutils.nodes.Text(warning))),
                     self.state.document.reporter.warning(warning, line=self.lineno)]
@@ -193,7 +193,7 @@ class DoxygenFunctionDirective(BaseDirective):
 
         try:
             project_info = self.project_info_factory.create_project_info(self.options)
-        except ProjectError, e:
+        except ProjectError as e:
             warning = 'doxygenfunction: %s' % e
             return [docutils.nodes.warning("", docutils.nodes.paragraph("", "", docutils.nodes.Text(warning))),
                     self.state.document.reporter.warning(warning, line=self.lineno)]
@@ -316,7 +316,7 @@ class DoxygenClassDirective(BaseDirective):
 
         try:
             project_info = self.project_info_factory.create_project_info(self.options)
-        except ProjectError, e:
+        except ProjectError as e:
             warning = 'doxygen%s: %s' % (self.kind, e)
             return [docutils.nodes.warning("", docutils.nodes.paragraph("", "", docutils.nodes.Text(warning))),
                     self.state.document.reporter.warning(warning, line=self.lineno)]
@@ -332,7 +332,7 @@ class DoxygenClassDirective(BaseDirective):
 
         try:
             data_object = finder.find_one(matcher_stack)
-        except NoMatchesError, e:
+        except NoMatchesError as e:
             warning = ('doxygen%s: Cannot find %s "%s" in doxygen xml output for project "%s" from directory: %s'
                     % (self.kind, self.kind, name, project_info.name(), project_info.project_path()))
             return [docutils.nodes.warning("", docutils.nodes.paragraph("", "", docutils.nodes.Text(warning))),
@@ -363,7 +363,7 @@ class DoxygenFileDirective(BaseDirective):
 
         try:
             project_info = self.project_info_factory.create_project_info(self.options)
-        except ProjectError, e:
+        except ProjectError as e:
             warning = 'doxygenfile: %s' % e
             return [docutils.nodes.warning("", docutils.nodes.paragraph("", "", docutils.nodes.Text(warning))),
                     self.state.document.reporter.warning(warning, line=self.lineno)]
@@ -435,7 +435,7 @@ class DoxygenGroupDirective(BaseDirective):
 
         try:
             project_info = self.project_info_factory.create_project_info(self.options)
-        except ProjectError, e:
+        except ProjectError as e:
             warning = 'doxygengroup: %s' % e
             return [docutils.nodes.warning("", docutils.nodes.paragraph("", "", docutils.nodes.Text(warning))),
                     self.state.document.reporter.warning(warning, line=self.lineno)]
@@ -522,7 +522,7 @@ class DoxygenBaseDirective(BaseDirective):
 
         try:
             project_info = self.project_info_factory.create_project_info(self.options)
-        except ProjectError, e:
+        except ProjectError as e:
             warning = 'doxygen%s: %s' % (self.kind, e)
             return [docutils.nodes.warning("", docutils.nodes.paragraph("", "", docutils.nodes.Text(warning))),
                     self.state.document.reporter.warning(warning, line=self.lineno)]
@@ -533,7 +533,7 @@ class DoxygenBaseDirective(BaseDirective):
 
         try:
             data_object = finder.find_one(matcher_stack)
-        except NoMatchesError, e:
+        except NoMatchesError as e:
             display_name = "%s::%s" % (namespace, name) if namespace else name
             warning = ('doxygen%s: Cannot find %s "%s" in doxygen xml output for project "%s" from directory: %s'
                     % (self.kind, self.kind, display_name, project_info.name(), project_info.project_path()))
@@ -592,7 +592,7 @@ class DoxygenBaseItemDirective(BaseDirective):
 
         try:
             project_info = self.project_info_factory.create_project_info(self.options)
-        except ProjectError, e:
+        except ProjectError as e:
             warning = 'doxygen%s: %s' % (self.kind, e)
             return [docutils.nodes.warning("", docutils.nodes.paragraph("", "", docutils.nodes.Text(warning))),
                     self.state.document.reporter.warning(warning, line=self.lineno)]
@@ -603,7 +603,7 @@ class DoxygenBaseItemDirective(BaseDirective):
 
         try:
             data_object = finder.find_one(matcher_stack)
-        except NoMatchesError, e:
+        except NoMatchesError as e:
             display_name = "%s::%s" % (namespace, name) if namespace else name
             warning = ('doxygen%s: Cannot find %s "%s" in doxygen xml output for project "%s" from directory: %s'
                     % (self.kind, self.kind, display_name, project_info.name(), project_info.project_path()))
@@ -916,7 +916,7 @@ class ProjectInfoFactory(object):
             try:
                 path = self.projects[options["project"]]
                 name = options["project"]
-            except KeyError, e:
+            except KeyError as e:
                 raise ProjectError( "Unable to find project '%s' in breathe_projects dictionary" % options["project"] )
 
         elif "path" in options:
@@ -960,7 +960,7 @@ class ProjectInfoFactory(object):
             try:
                 source_path = self.projects_source[options["source"]]
                 name = options["source"]
-            except KeyError, e:
+            except KeyError as e:
                 raise ProjectError( "Unable to find project '%s' in breathe_projects_source dictionary" % options["source"] )
 
         elif "source-path" in options:
