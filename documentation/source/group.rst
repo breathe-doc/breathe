@@ -1,6 +1,4 @@
 
-.. spelling:: xml
-
 .. _group-example:
 
 doxygengroup Directive Example

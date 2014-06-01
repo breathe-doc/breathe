@@ -1,6 +1,4 @@
 
-.. spelling:: xml
-
 .. _union-example:
 
 doxygenunion Directive Example

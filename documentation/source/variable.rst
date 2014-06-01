@@ -1,6 +1,4 @@
 
-.. spelling:: xml
-
 .. _variable-example:
 
 doxygenvariable Directive Example

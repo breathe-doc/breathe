@@ -1,6 +1,4 @@
 
-.. spelling:: xml
-
 .. _define-example:
 
 doxygendefine Directive Example

@@ -1,6 +1,4 @@
 
-.. spelling:: xml
-
 .. _file-example:
 
 doxygenfile Directive Example

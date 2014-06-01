@@ -1,12 +1,4 @@
 
-.. spelling::
-
-   Func
-   Memgrp
-   Docstring
-   Autolink
-   GVal
-
 Doxygen Test Suite
 ==================
 
