@@ -230,8 +230,9 @@ class FuncMemberDefTypeSubRenderer(MemberDefTypeSubRenderer):
                     self.data_object,
                     self.data_object.templateparamlist
                     )
-            template_nodes = [self.node_factory.Text("template <"), self.node_factory.Text("> ")]
+            template_nodes = [self.node_factory.Text("template <")]
             template_nodes.extend(renderer.render())
+            template_nodes.append(self.node_factory.Text("> "))
             nodes.append(self.node_factory.line("", *template_nodes))
 
         # Get the function type and name
