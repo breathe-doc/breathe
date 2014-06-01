@@ -24,6 +24,10 @@ import sys, os, subprocess
 # General configuration
 # ---------------------
 
+# Add any Sphinx extension module names here, as strings. They can be extensions
+# coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
+extensions = [ 'breathe', 'sphinx.ext.mathjax' ]
+
 read_the_docs_build = os.environ.get('READTHEDOCS', None) == 'True'
 
 if read_the_docs_build:
@@ -36,9 +40,16 @@ else:
     # For our usual dev build we'll be in the 'documentation' directory
     sys.path.append('../')
 
-# Add any Sphinx extension module names here, as strings. They can be extensions
-# coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
-extensions = [ 'breathe', 'sphinx.ext.mathjax', 'sphinxcontrib.spelling']
+
+# Only add spelling extension if it is available. We don't know if it is installed as we don't want
+# to put it in the setup.py file as a dependency as we don't want Breathe to be dependent on it as
+# people should be able to use Breathe without 'spelling'. There might be a better way to handle
+# this.
+try:
+    import sphinxcontrib.spelling
+    extensions.append('sphinxcontrib.spelling')
+except ImportError:
+    pass
 
 # Configuration for spelling extension
 spelling_word_list_filename='spelling_wordlist.txt'
