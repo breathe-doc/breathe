@@ -65,7 +65,7 @@ class IndexHandler(object):
 
 
 class ProjectData(object):
-    "Simple handler for the files and project_info for each project"
+    """Simple handler for the files and project_info for each project"""
 
     def __init__(self, auto_project_info, files):
 
@@ -135,7 +135,7 @@ class DoxygenTransform(Transform):
     default_priority = 210
 
     def apply(self):
-        "Iterate over all DoxygenNodes in the document and extract their handlers to replace them"
+        """Iterate over all DoxygenNodes in the document and extract their handlers to replace them"""
 
         for node in self.document.traverse(DoxygenNode):
             handler = node.handler

@@ -79,7 +79,7 @@ class BaseDirective(rst.Directive):
         self.target_handler_factory = target_handler_factory
 
     def render(self, data_object, project_info, filter_, target_handler):
-        "Standard render process used by subclasses"
+        """Standard render process used by subclasses"""
 
         renderer_factory_creator = self.renderer_factory_creator_constructor.create_factory_creator(
                 project_info,
@@ -243,7 +243,7 @@ class DoxygenFunctionDirective(BaseDirective):
             # Parse the function name string, eg. f(int, float) to
             # extract the types so we can use them for matching
             args = []
-            num_open_brackets = -1;
+            num_open_brackets = -1
             start = paren_index + 1
             for i in range(paren_index, len(function_description)):
                 c = function_description[i]
