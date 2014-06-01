@@ -1,4 +1,6 @@
 
+.. spelling:: xml
+
 .. _union-example:
 
 doxygenunion Directive Example
@@ -42,6 +44,6 @@ This intentionally fails::
 
 It produces the following warning message:
 
-.. warning:: doxygenunion: Cannot find union "made_up_union" in doxygen xml
+.. warning:: doxygenunion: Cannot find union "made_up_union" in doxygen XML
    output for project "union" from directory: ../../examples/specific/union/xml/
 

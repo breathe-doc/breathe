@@ -118,7 +118,7 @@ struct TiXmlCursor
 	All flavors of Visit methods have a default implementation that returns 'true' (continue 
 	visiting). You need to only override methods that are interesting to you.
 
-	Generally Accept() is called on the TiXmlDocument, although all nodes suppert Visiting.
+	Generally Accept() is called on the TiXmlDocument, although all nodes support Visiting.
 
 	You should never change the document from a callback.
 
@@ -145,7 +145,7 @@ public:
 	virtual bool Visit( const TiXmlText&  )						{ return true; }
 	/// Visit a comment node
 	virtual bool Visit( const TiXmlComment&  )				{ return true; }
-	/// Visit an unknow node
+	/// Visit an unknown node
 	virtual bool Visit( const TiXmlUnknown&  )				{ return true; }
 };
 
@@ -200,7 +200,7 @@ public:
 	TiXmlBase()	:	userData(0)		{}
 	virtual ~TiXmlBase()			{}
 
-	/**	All TinyXml classes can print themselves to a filestream
+	/**	All TinyXml classes can print themselves to a file stream
 		or the string class (TiXmlString in non-STL mode, std::string
 		in STL mode.) Either or both cfile and str can be null.
 		
@@ -359,7 +359,7 @@ protected:
 	static void PutString( const TIXML_STRING& str, TIXML_STRING* out );
 
 	// Return true if the next characters in the stream are any of the endTag sequences.
-	// Ignore case only works for english, and should only be relied on when comparing
+	// Ignore case only works for English, and should only be relied on when comparing
 	// to English words: StringEqual( p, "version", true ) is fine.
 	static bool StringEqual(	const char* p,
 								const char* endTag,
@@ -572,7 +572,7 @@ public:
 	#endif
 
 	/** Add a new node related to this. Adds a child past the LastChild.
-		Returns a pointer to the new object or NULL if an error occured.
+		Returns a pointer to the new object or NULL if an error occurred.
 	*/
 	TiXmlNode* InsertEndChild( const TiXmlNode& addThis );
 
@@ -589,17 +589,17 @@ public:
 	TiXmlNode* LinkEndChild( TiXmlNode* addThis );
 
 	/** Add a new node related to this. Adds a child before the specified child.
-		Returns a pointer to the new object or NULL if an error occured.
+		Returns a pointer to the new object or NULL if an error occurred.
 	*/
 	TiXmlNode* InsertBeforeChild( TiXmlNode* beforeThis, const TiXmlNode& addThis );
 
 	/** Add a new node related to this. Adds a child after the specified child.
-		Returns a pointer to the new object or NULL if an error occured.
+		Returns a pointer to the new object or NULL if an error occurred.
 	*/
 	TiXmlNode* InsertAfterChild(  TiXmlNode* afterThis, const TiXmlNode& addThis );
 
 	/** Replace a child of this node.
-		Returns a pointer to the new object or NULL if an error occured.
+		Returns a pointer to the new object or NULL if an error occurred.
 	*/
 	TiXmlNode* ReplaceChild( TiXmlNode* replaceThis, const TiXmlNode& withThis );
 
@@ -709,7 +709,7 @@ public:
 	*/
 	virtual TiXmlNode* Clone() const = 0;
 
-	/** Accept a hierchical visit the nodes in the TinyXML DOM. Every node in the 
+	/** Accept a hierarchical visit the nodes in the TinyXML DOM. Every node in the 
 		XML tree will be conditionally visited and the host will be called back
 		via the TiXmlVisitor interface.
 
@@ -1432,7 +1432,7 @@ public:
 	*/	
 	bool Error() const						{ return error; }
 
-	/// Contains a textual (english) description of the error if one occurs.
+	/// Contains a textual (English) description of the error if one occurs.
 	const char * ErrorDesc() const	{ return errorDesc.c_str (); }
 
 	/** Generally, you probably want the error string ( ErrorDesc() ). But if you
@@ -1448,7 +1448,7 @@ public:
 		@sa SetTabSize, Row, Column
 	*/
 	int ErrorRow() const	{ return errorLocation.row+1; }
-	int ErrorCol() const	{ return errorLocation.col+1; }	///< The column where the error occured. See ErrorRow()
+	int ErrorCol() const	{ return errorLocation.col+1; }	///< The column where the error occurred. See ErrorRow()
 
 	/** SetTabSize() allows the error reporting functions (ErrorRow() and ErrorCol())
 		to report the correct values for row and column. It does not change the output
@@ -1543,7 +1543,7 @@ private:
 	<Document>
 	@endverbatim
 
-	Assuming you want the value of "attributeB" in the 2nd "Child" element, it's very 
+	Assuming you want the value of "attributeB" in the second "Child" element, it's very 
 	easy to write a *lot* of code that looks like:
 
 	@verbatim
@@ -1732,14 +1732,14 @@ public:
 	const char* Indent()							{ return indent.c_str(); }
 	/** Set the line breaking string. By default set to newline (\n). 
 		Some operating systems prefer other characters, or can be
-		set to the null/empty string for no indenation.
+		set to the null/empty string for no indentation.
 	*/
 	void SetLineBreak( const char* _lineBreak )		{ lineBreak = _lineBreak ? _lineBreak : ""; }
 	/// Query the current line breaking string.
 	const char* LineBreak()							{ return lineBreak.c_str(); }
 
 	/** Switch over to "stream printing" which is the most dense formatting without 
-		linebreaks. Common when the XML is needed for network transmission.
+		line breaks. Common when the XML is needed for network transmission.
 	*/
 	void SetStreamPrinting()						{ indent = "";
 													  lineBreak = "";

@@ -29,16 +29,20 @@ read_the_docs_build = os.environ.get('READTHEDOCS', None) == 'True'
 if read_the_docs_build:
 
     # On RTD we'll be in the 'source' directory
-    sys.path.append("../../")
+    sys.path.append('../../')
 
 else:
 
     # For our usual dev build we'll be in the 'documentation' directory
-    sys.path.append("../")
+    sys.path.append('../')
 
 # Add any Sphinx extension module names here, as strings. They can be extensions
 # coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
-extensions = [ "breathe", "sphinx.ext.mathjax" ]
+extensions = [ 'breathe', 'sphinx.ext.mathjax', 'sphinxcontrib.spelling']
+
+# Configuration for spelling extension
+spelling_word_list_filename='spelling_wordlist.txt'
+spelling_lang='en_US'
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']

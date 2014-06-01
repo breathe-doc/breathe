@@ -37,7 +37,7 @@
 */
 
 /*! \fn size_t write(int fd,const char *buf, size_t count)
-    \brief Writes \a count bytes from \a buf to the filedescriptor \a fd.
+    \brief Writes \a count bytes from \a buf to the file descriptor \a fd.
     \param fd The descriptor to write to.
     \param buf The data buffer to write.
     \param count The number of bytes to write.

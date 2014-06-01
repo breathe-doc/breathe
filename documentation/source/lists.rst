@@ -36,7 +36,7 @@ Unordered lists with list items prefixed with **\*** render as:
 
 ----
 
-Unordered lists defined using html tags **<ul><li>** render as:
+Unordered lists defined using HTML tags **<ul><li>** render as:
 
 ----
 
@@ -45,7 +45,7 @@ Unordered lists defined using html tags **<ul><li>** render as:
 
 ----
 
-Autonumbered lists with list items prefixed with **-#** render as:
+Auto-numbered lists with list items prefixed with **-#** render as:
 
 ----
 
@@ -54,7 +54,7 @@ Autonumbered lists with list items prefixed with **-#** render as:
 
 ----
 
-Numbered lists with list items prefixed with arabic numerals **1. 2. ...** render as:
+Numbered lists with list items prefixed with Arabic numerals **1. 2. ...** render as:
 
 ----
 
@@ -63,11 +63,11 @@ Numbered lists with list items prefixed with arabic numerals **1. 2. ...** rende
 
 ----
 
-.. note:: Numbered lists support for the moment only arabic numerals.
+.. note:: Numbered lists support for the moment only Arabic numerals.
 
    
 Nested lists are supported in all combinations, as long as they are valid doxygen markup.
-Below ar a couple of examples of different nested lists documentation and their corresponding 
+Below are a couple of examples of different nested lists documentation and their corresponding 
 breathe output.
 
 Documentation looking like this:

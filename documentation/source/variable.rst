@@ -1,4 +1,5 @@
 
+.. spelling:: xml
 
 .. _variable-example:
 
@@ -28,4 +29,4 @@ This intentionally fails::
 
 It produces the following warning message:
 
-.. warning:: doxygenvariable: Cannot find variable “made_up_variable” in doxygen xml output for project “tinyxml” from directory: ../../examples/tinyxml/tinyxml/xml/
+.. warning:: doxygenvariable: Cannot find variable “made_up_variable” in doxygen XML output for project “tinyxml” from directory: ../../examples/tinyxml/tinyxml/xml/

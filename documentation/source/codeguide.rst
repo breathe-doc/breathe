@@ -28,7 +28,7 @@ Parser
 The parsers job is to parse the doxygen xml output and create a hierarchy of
 Python objects to represent the xml data.
 
-Doxygen Xml Output
+Doxygen XML Output
 ~~~~~~~~~~~~~~~~~~
 
 The xml output from doxygen comes in multiple files. There is always an
