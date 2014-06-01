@@ -27,10 +27,10 @@ class IndexHandler(object):
 
         try:
             finder = self.factories.finder_factory.create_finder(self.project_info)
-        except ParserError, e:
+        except ParserError as e:
             return format_parser_error(self.name, e.error, e.filename, self.state,
                                        self.lineno, True)
-        except FileIOError, e:
+        except FileIOError as e:
             return format_parser_error(self.name, e.error, e.filename, self.state, self.lineno)
 
         data_object = finder.root()
@@ -58,10 +58,10 @@ class IndexHandler(object):
 
         try:
             node_list = object_renderer.render()
-        except ParserError, e:
+        except ParserError as e:
             return format_parser_error(self.name, e.error, e.filename, self.state,
                                        self.lineno, True)
-        except FileIOError, e:
+        except FileIOError as e:
             return format_parser_error(self.name, e.error, e.filename, self.state, self.lineno)
 
         return node_list

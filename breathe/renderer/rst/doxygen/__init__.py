@@ -106,7 +106,7 @@ class DoxygenToRstRendererFactory(object):
 
         try:
             node_type = data_object.node_type
-        except AttributeError, e:
+        except AttributeError as e:
 
             # Horrible hack to silence errors on filtering unicode objects
             # until we fix the parsing
@@ -142,9 +142,9 @@ class DoxygenToRstRendererFactory(object):
             elif data_object.type_ == "subscript":
                 creator = self.node_factory.subscript
             elif data_object.type_ == "center":
-                print "Warning: does not currently handle 'center' text display"
+                print("Warning: does not currently handle 'center' text display")
             elif data_object.type_ == "small":
-                print "Warning: does not currently handle 'small' text display"
+                print("Warning: does not currently handle 'small' text display")
 
             return Renderer(
                     creator,
@@ -282,7 +282,7 @@ class DoxygenToRstRendererFactoryCreator(object):
 
         try:
             node_type = data_object.node_type
-        except AttributeError, e:
+        except AttributeError as e:
 
             # Horrible hack to silence errors on filtering unicode objects
             # until we fix the parsing
@@ -325,7 +325,7 @@ class DoxygenToRstRendererFactoryCreator(object):
 
         try:
             node_type = data_object.node_type
-        except AttributeError, e:
+        except AttributeError as e:
 
             # Horrible hack to silence errors on filtering unicode objects
             # until we fix the parsing
