@@ -1,12 +1,10 @@
 
 from docutils.transforms import Transform
-from docutils import nodes
 
 from breathe.parser import ParserError, FileIOError
 from breathe.nodes import DoxygenNode, DoxygenAutoNode
 from breathe.renderer.rst.doxygen import format_parser_error
 
-import textwrap
 
 class IndexHandler(object):
     """
@@ -30,34 +28,39 @@ class IndexHandler(object):
         try:
             finder = self.factories.finder_factory.create_finder(self.project_info)
         except ParserError, e:
-            return format_parser_error(self.name, e.error, e.filename, self.state, self.lineno, True)
+            return format_parser_error(self.name, e.error, e.filename, self.state,
+                                       self.lineno, True)
         except FileIOError, e:
             return format_parser_error(self.name, e.error, e.filename, self.state, self.lineno)
 
         data_object = finder.root()
 
-        target_handler = self.factories.target_handler_factory.create_target_handler(self.options, self.project_info, self.state.document)
+        target_handler = self.factories.target_handler_factory.create_target_handler(
+            self.options, self.project_info, self.state.document)
         filter_ = self.factories.filter_factory.create_index_filter(self.options)
 
-        renderer_factory_creator = self.factories.renderer_factory_creator_constructor.create_factory_creator(
+        renderer_factory_creator = \
+            self.factories.renderer_factory_creator_constructor.create_factory_creator(
                 self.project_info,
                 self.state.document,
                 self.options,
                 target_handler
                 )
         renderer_factory = renderer_factory_creator.create_factory(
-                data_object,
-                self.state,
-                self.state.document,
-                filter_,
-                target_handler,
-                )
-        object_renderer = renderer_factory.create_renderer(self.factories.root_data_object, data_object)
+            data_object,
+            self.state,
+            self.state.document,
+            filter_,
+            target_handler,
+            )
+        object_renderer = renderer_factory.create_renderer(self.factories.root_data_object,
+                                                           data_object)
 
         try:
             node_list = object_renderer.render()
         except ParserError, e:
-            return format_parser_error(self.name, e.error, e.filename, self.state, self.lineno, True)
+            return format_parser_error(self.name, e.error, e.filename, self.state,
+                                       self.lineno, True)
         except FileIOError, e:
             return format_parser_error(self.name, e.error, e.filename, self.state, self.lineno)
 
@@ -71,6 +74,7 @@ class ProjectData(object):
 
         self.auto_project_info = auto_project_info
         self.files = files
+
 
 class DoxygenAutoTransform(Transform):
 
@@ -99,15 +103,16 @@ class DoxygenAutoTransform(Transform):
             try:
                 project_files[node.auto_project_info.name()].files.extend(node.files)
             except KeyError:
-                project_files[node.auto_project_info.name()] = ProjectData(node.auto_project_info, node.files)
+                project_files[node.auto_project_info.name()] = ProjectData(node.auto_project_info,
+                                                                           node.files)
 
         per_project_project_info = {}
-        
+
         # Iterate over the projects and generate doxygen xml output for the files for each one into
-        # a directory in the Sphinx build area 
+        # a directory in the Sphinx build area
         for project_name, data in project_files.items():
 
-            project_path = self.doxygen_handle.process(data.auto_project_info, data.files) 
+            project_path = self.doxygen_handle.process(data.auto_project_info, data.files)
 
             project_info = data.auto_project_info.create_project_info(project_path)
             per_project_project_info[data.auto_project_info.name()] = project_info
@@ -118,24 +123,27 @@ class DoxygenAutoTransform(Transform):
         for node in self.document.traverse(DoxygenAutoNode):
 
             handler = IndexHandler(
-                    "autodoxygenindex",
-                    per_project_project_info[node.auto_project_info.name()],
-                    node.options,
-                    node.state,
-                    node.lineno,
-                    node.factories
-                    )
+                "autodoxygenindex",
+                per_project_project_info[node.auto_project_info.name()],
+                node.options,
+                node.state,
+                node.lineno,
+                node.factories
+                )
 
             standard_index_node = DoxygenNode(handler)
 
             node.replace_self(standard_index_node)
+
 
 class DoxygenTransform(Transform):
 
     default_priority = 210
 
     def apply(self):
-        """Iterate over all DoxygenNodes in the document and extract their handlers to replace them"""
+        """Iterate over all DoxygenNodes in the document and extract their handlers
+        to replace them.
+        """
 
         for node in self.document.traverse(DoxygenNode):
             handler = node.handler

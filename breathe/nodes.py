@@ -1,6 +1,7 @@
 
 from docutils import nodes
 
+
 class DoxygenNode(nodes.Element):
 
     def __init__(self, handler):
@@ -8,6 +9,7 @@ class DoxygenNode(nodes.Element):
         nodes.Element.__init__(self, rawsource='', children=[], attributes={})
 
         self.handler = handler
+
 
 class DoxygenAutoNode(nodes.Element):
 
