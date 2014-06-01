@@ -5,6 +5,7 @@ from breathe.project import ProjectError
 from docutils.parsers.rst.directives import unchanged_required, flag
 from docutils import nodes
 
+
 class BaseFileDirective(BaseDirective):
     """Base class handle the main work when given the appropriate file and project info to work
     from.
@@ -24,37 +25,43 @@ class BaseFileDirective(BaseDirective):
         finder.filter_(finder_filter, matches)
 
         if len(matches) > 1:
-            warning = ('doxygenfile: Found multiple matches for file "%s" in doxygen xml output for project "%s" '
-                    'from directory: %s' % (file_, project_info.name(), project_info.project_path()))
+            warning = (
+                'doxygenfile: Found multiple matches for file "%s" in doxygen xml output for '
+                'project "%s" from directory: %s' % (
+                    file_, project_info.name(), project_info.project_path()
+                    )
+                )
             return [nodes.warning("", nodes.paragraph("", "", nodes.Text(warning))),
                     self.state.document.reporter.warning(warning, line=self.lineno)]
 
         elif not matches:
-            warning = ('doxygenfile: Cannot find file "%s" in doxygen xml output for project "%s" from directory: %s'
-                    % (file_, project_info.name(), project_info.project_path()))
+            warning = (
+                'doxygenfile: Cannot find file "%s" in doxygen xml output for project "%s" from '
+                'directory: %s' % (file_, project_info.name(), project_info.project_path())
+                )
             return [nodes.warning("", nodes.paragraph("", "", nodes.Text(warning))),
                     self.state.document.reporter.warning(warning, line=self.lineno)]
 
-        target_handler = self.target_handler_factory.create_target_handler(self.options,
-                project_info, self.state.document)
+        target_handler = self.target_handler_factory.create_target_handler(
+            self.options, project_info, self.state.document)
         filter_ = self.filter_factory.create_file_filter(file_, self.options)
 
         renderer_factory_creator = self.renderer_factory_creator_constructor.create_factory_creator(
-                project_info,
-                self.state.document,
-                self.options,
-                target_handler
-                )
+            project_info,
+            self.state.document,
+            self.options,
+            target_handler
+            )
         node_list = []
         for data_object in matches:
 
             renderer_factory = renderer_factory_creator.create_factory(
-                    data_object,
-                    self.state,
-                    self.state.document,
-                    filter_,
-                    target_handler,
-                    )
+                data_object,
+                self.state,
+                self.state.document,
+                filter_,
+                target_handler,
+                )
 
             object_renderer = renderer_factory.create_renderer(self.root_data_object, data_object)
             node_list.extend(object_renderer.render())
@@ -67,11 +74,11 @@ class DoxygenFileDirective(BaseFileDirective):
     required_arguments = 0
     optional_arguments = 2
     option_spec = {
-            "path": unchanged_required,
-            "project": unchanged_required,
-            "outline": flag,
-            "no-link": flag,
-            }
+        "path": unchanged_required,
+        "project": unchanged_required,
+        "outline": flag,
+        "no-link": flag,
+        }
     has_content = False
 
     def run(self):
@@ -93,10 +100,10 @@ class AutoDoxygenFileDirective(BaseFileDirective):
 
     required_arguments = 1
     option_spec = {
-            "project": unchanged_required,
-            "outline": flag,
-            "no-link": flag,
-            }
+        "project": unchanged_required,
+        "outline": flag,
+        "no-link": flag,
+        }
     has_content = False
 
     def run(self):

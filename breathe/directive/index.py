@@ -3,7 +3,6 @@ from breathe.renderer.rst.doxygen import format_parser_error
 from breathe.directive.base import BaseDirective
 from breathe.project import ProjectError
 from breathe.parser import ParserError, FileIOError
-from breathe.nodes import DoxygenNode, DoxygenAutoNode
 
 from docutils.parsers.rst.directives import unchanged_required, flag
 from docutils import nodes
@@ -22,34 +21,37 @@ class BaseIndexDirective(BaseDirective):
         try:
             finder = self.finder_factory.create_finder(project_info)
         except ParserError, e:
-            return format_parser_error(self.name, e.error, e.filename, self.state, self.lineno, True)
+            return format_parser_error(self.name, e.error, e.filename, self.state,
+                                       self.lineno, True)
         except FileIOError, e:
             return format_parser_error(self.name, e.error, e.filename, self.state, self.lineno)
 
         data_object = finder.root()
 
-        target_handler = self.target_handler_factory.create_target_handler(self.options, project_info, self.state.document)
+        target_handler = self.target_handler_factory.create_target_handler(
+            self.options, project_info, self.state.document)
         filter_ = self.filter_factory.create_index_filter(self.options)
 
         renderer_factory_creator = self.renderer_factory_creator_constructor.create_factory_creator(
-                project_info,
-                self.state.document,
-                self.options,
-                target_handler
-                )
+            project_info,
+            self.state.document,
+            self.options,
+            target_handler
+            )
         renderer_factory = renderer_factory_creator.create_factory(
-                data_object,
-                self.state,
-                self.state.document,
-                filter_,
-                target_handler,
-                )
+            data_object,
+            self.state,
+            self.state.document,
+            filter_,
+            target_handler,
+            )
         object_renderer = renderer_factory.create_renderer(self.root_data_object, data_object)
 
         try:
             node_list = object_renderer.render()
         except ParserError, e:
-            return format_parser_error(self.name, e.error, e.filename, self.state, self.lineno, True)
+            return format_parser_error(self.name, e.error, e.filename, self.state,
+                                       self.lineno, True)
         except FileIOError, e:
             return format_parser_error(self.name, e.error, e.filename, self.state, self.lineno)
 
@@ -61,11 +63,11 @@ class DoxygenIndexDirective(BaseIndexDirective):
     required_arguments = 0
     optional_arguments = 2
     option_spec = {
-            "path": unchanged_required,
-            "project": unchanged_required,
-            "outline": flag,
-            "no-link": flag,
-            }
+        "path": unchanged_required,
+        "project": unchanged_required,
+        "outline": flag,
+        "no-link": flag,
+        }
     has_content = False
 
     def run(self):
@@ -86,10 +88,10 @@ class AutoDoxygenIndexDirective(BaseIndexDirective):
     required_arguments = 0
     final_argument_whitespace = True
     option_spec = {
-            "project": unchanged_required,
-            "outline": flag,
-            "no-link": flag,
-            }
+        "project": unchanged_required,
+        "outline": flag,
+        "no-link": flag,
+        }
     has_content = False
 
     def run(self):

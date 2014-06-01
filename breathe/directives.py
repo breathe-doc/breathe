@@ -1,7 +1,8 @@
 
 from breathe.finder.core import FinderFactory, NoMatchesError
 from breathe.parser import DoxygenParserFactory, CacheFactory
-from breathe.renderer.rst.doxygen import DoxygenToRstRendererFactoryCreatorConstructor, RstContentCreator
+from breathe.renderer.rst.doxygen import DoxygenToRstRendererFactoryCreatorConstructor, \
+    RstContentCreator
 from breathe.renderer.rst.doxygen.domain import DomainHandlerFactoryCreator, NullDomainHandler
 from breathe.renderer.rst.doxygen.domain import CppDomainHelper, CDomainHelper
 from breathe.renderer.rst.doxygen.filter import FilterFactory, GlobFactory
@@ -915,11 +916,11 @@ def setup(app):
     app.add_stylesheet("breathe.css")
 
     doxygen_handle = AutoDoxygenProcessHandle(
-            path_handler,
-            subprocess.check_call,
-            write_file,
-            project_info_factory
-            )
+        path_handler,
+        subprocess.check_call,
+        write_file,
+        project_info_factory
+        )
 
     app.connect("builder-inited", doxygen_handle.generate_xml)
 
