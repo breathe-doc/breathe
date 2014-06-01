@@ -17,6 +17,7 @@ ALIASES = "rst=\verbatim embed:rst"
 ALIASES += "endrst=\endverbatim"
 """.strip()
 
+
 class DoxygenProcessHandle(object):
 
     def __init__(self, path_handler, run_process, write_file):
@@ -33,16 +34,16 @@ class DoxygenProcessHandle(object):
         full_paths = map(lambda x: auto_project_info.abs_path_to_source_file(x), files)
 
         cfg = AUTOCFG_TEMPLATE.format(
-                project_name=name,
-                output_dir=name,
-                input=" ".join(full_paths)
-                )
+            project_name=name,
+            output_dir=name,
+            input=" ".join(full_paths)
+            )
 
         build_dir = self.path_handler.join(
-                auto_project_info.build_dir(),
-                "breathe",
-                "doxygen"
-                )
+            auto_project_info.build_dir(),
+            "breathe",
+            "doxygen"
+            )
 
         self.write_file(build_dir, cfgfile, cfg)
 

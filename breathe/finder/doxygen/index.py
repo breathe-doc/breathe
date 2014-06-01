@@ -1,5 +1,6 @@
 
-from breathe.finder.doxygen.base import ItemFinder 
+from breathe.finder.doxygen.base import ItemFinder
+
 
 class DoxygenTypeSubItemFinder(ItemFinder):
 
@@ -17,7 +18,6 @@ class DoxygenTypeSubItemFinder(ItemFinder):
 
         return results
 
-
     def filter_(self, parent, filter_, matches):
         """Find nodes which match the filter. Doesn't test this node, only its children"""
 
@@ -27,6 +27,7 @@ class DoxygenTypeSubItemFinder(ItemFinder):
 
             compound_finder = self.item_finder_factory.create_finder(compound)
             compound_finder.filter_(self.data_object, filter_, matches)
+
 
 class CompoundTypeSubItemFinder(ItemFinder):
 
@@ -49,7 +50,7 @@ class CompoundTypeSubItemFinder(ItemFinder):
 
         results = []
 
-        # If there are members in this compound that match the criteria 
+        # If there are members in this compound that match the criteria
         # then load up the file for this compound and get the member data objects
         if member_results:
 
@@ -57,7 +58,8 @@ class CompoundTypeSubItemFinder(ItemFinder):
             finder = self.item_finder_factory.create_finder(file_data)
 
             for member_data in member_results:
-                ref_matcher_stack = self.matcher_factory.create_ref_matcher_stack("", member_data.refid)
+                ref_matcher_stack = self.matcher_factory.create_ref_matcher_stack(
+                    "", member_data.refid)
                 # TODO: Fix this! Should be ref_matcher_stack!
                 results.extend(finder.find(matcher_stack))
 
@@ -65,7 +67,6 @@ class CompoundTypeSubItemFinder(ItemFinder):
             results.append(self.data_object)
 
         return results
-
 
     def filter_(self, parent, filter_, matches):
         """Finds nodes which match the filter and continues checks to children
@@ -82,6 +83,7 @@ class CompoundTypeSubItemFinder(ItemFinder):
         finder = self.item_finder_factory.create_finder(file_data)
 
         finder.filter_(self.data_object, filter_, matches)
+
 
 class MemberTypeSubItemFinder(ItemFinder):
 

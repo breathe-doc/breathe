@@ -7,4 +7,3 @@ class ItemFinder(object):
         self.item_finder_factory = item_finder_factory
         self.project_info = project_info
 
-
