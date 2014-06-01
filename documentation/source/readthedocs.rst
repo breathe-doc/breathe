@@ -31,11 +31,13 @@ One simple way of achieving this is to add the following code to your
 
 .. code-block:: python
 
+   import subprocess, os
+
    read_the_docs_build = os.environ.get('READTHEDOCS', None) == 'True'
 
    if read_the_docs_build:
 
-       os.system('cd ../doxygen; doxygen')
+       subprocess.call('cd ../doxygen; doxygen', shell=True)
 
 The first line uses the ``READTHEDOCS`` environment variable to determine
 whether or not we are building on the Read the Docs servers. Read the Docs
@@ -49,11 +51,47 @@ for the Breathe documentation.
 As this is then executed right at the start of the ``sphinx-build`` process then
 all your doxygen XML files will be in place for the build.
 
-.. note:: ``os.system`` is pretty basic but it does the job as the standard
-          error and output from the command will make through to the
-          Read the Docs build log so you can see any problems that may have
-          occurred.
+A More Involved Setup
+---------------------
 
+If you'd rather do something more involved then you can run ``doxygen`` as part
+of a ``builder-inited`` event hook which you can install from your ``conf.py``
+file by adding a ``setup`` function as shown below.
+
+This is an approximation of the code that Breathe has in its ``conf.py`` in
+order to run ``doxygen`` on the Read the Docs server.
+
+.. code-block:: python
+
+   import subprocess, sys
+
+   def run_doxygen(folder):
+       """Run the doxygen make command in the designated folder"""
+
+       try:
+           retcode = subprocess.call("cd %s; make" % folder, shell=True)
+           if retcode < 0:
+               sys.stderr.write("doxygen terminated by signal %s" % (-retcode))
+       except OSError as e:
+           sys.stderr.write("doxygen execution failed: %s" % e)
+
+
+   def generate_doxygen_xml(app):
+       """Run the doxygen make commands if we're on the ReadTheDocs server"""
+
+       read_the_docs_build = os.environ.get('READTHEDOCS', None) == 'True'
+
+       if read_the_docs_build:
+
+           run_doxygen("../../examples/doxygen")
+           run_doxygen("../../examples/specific")
+           run_doxygen("../../examples/tinyxml")
+
+
+   def setup(app):
+
+       # Add hook for building doxygen xml when needed
+       app.connect("builder-inited", generate_doxygen_xml)
 
 .. _Read the Docs: https://readthedocs.org/
 .. _Github: https://github.com
