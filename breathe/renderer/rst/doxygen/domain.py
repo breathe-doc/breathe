@@ -161,8 +161,8 @@ class CppDomainHandler(DomainHandler):
         # Check if we've already got this id
         in_cache, project = self.helper.check_cache(id_)
         if in_cache:
-            print "Warning: Ignoring duplicate domain reference '%s'. " \
-                  "First found in project '%s'" % (id_, project.reference())
+            print("Warning: Ignoring duplicate domain reference '%s'. "
+                  "First found in project '%s'" % (id_, project.reference()))
             return []
 
         self.helper.cache(id_, self.project_info)
