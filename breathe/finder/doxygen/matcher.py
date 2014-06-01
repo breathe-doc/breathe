@@ -66,6 +66,9 @@ class MatcherStack(object):
         except KeyError:
             raise MissingLevelError(level)
 
+    def __repr__(self):
+        return '<MatcherStack matchers="%s">' % self.matchers
+
 
 class ItemMatcherFactory(Matcher):
 
