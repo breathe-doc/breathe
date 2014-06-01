@@ -46,7 +46,7 @@ class SimpleList_3
 /**
  * \brief This is a list example.
  *
- * Following is an autonumbered list:
+ * Following is an auto-numbered list:
  *      -# One item.
  *      -# Two items.
  *      -# Three items.
@@ -76,7 +76,7 @@ class SimpleList_5
 /**
  * \brief This is a list example.
  *
- * Following is an unordered list using 'html' tags:
+ * Following is an unordered list using 'HTML' tags:
  *      <ul><li> One item.
  *      <li> Two items.
  *      <li> Three items.

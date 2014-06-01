@@ -1,5 +1,4 @@
 
-
 .. _define-example:
 
 doxygendefine Directive Example

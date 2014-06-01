@@ -1,7 +1,7 @@
-Quickstart
-==========
+Quick Start
+===========
 
-For this quickstart we assume the following prerequisites:
+For this quick start we assume the following prerequisites:
 
 * breathe was downloaded and extracted somewhere
 * doxygen was installed and doxygen output (XML format) was generated for the

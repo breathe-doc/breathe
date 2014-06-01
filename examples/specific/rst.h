@@ -9,7 +9,7 @@ public:
 
     \rst
 
-    This is some funky non-xml compliant text: <& !><
+    This is some funky non-XML compliant text: <& !><
 
     .. note::
         
@@ -49,6 +49,6 @@ public:
     */
     virtual void rawLeadingAsteriskVerbatim() const = 0;
 
-    //! Brief desc
+    //! Brief description
     virtual void testFunction() const {};
 };
