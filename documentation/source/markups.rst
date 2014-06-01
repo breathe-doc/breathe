@@ -51,7 +51,7 @@ such as the following::
     */
 
 As the leading asterisks are captured in the **verbatim** block this will
-appear to be an incorrectly formatted bullet list.  Due to the syntantical
+appear to be an incorrectly formatted bullet list.  Due to the syntactical
 problems Sphinx will issue warnings and the block will render as:
 
 .. Here we fake the bad output without actually using a bad example otherwise

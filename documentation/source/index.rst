@@ -20,7 +20,7 @@ Features
 * **High and low level directives** - reference the whole project, just a class or
   just a function with different directives.
 * **Support for multiple doxygen projects** - set it up to be aware of different
-  projects and refence them by name or path for each directive.
+  projects and reference them by name or path for each directive.
 * **Allows embedded reStructuredText in doxygen markup** - some extra doxygen
   aliases allow you to add ``\rst`` - ``\endrst`` blocks to your comments and have
   the contents interpreted as reStructuredText.
