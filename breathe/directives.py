@@ -51,6 +51,38 @@ class NodeNotFoundError(BreatheError):
 # Directives
 # ----------
 
+class WarningHandler(object):
+
+    def __init__(self, state, context):
+        self.state = state
+        self.context = context
+
+    def warn(self, text):
+        result = text.format(**self.context)
+        return [
+            docutils.nodes.warning("", docutils.nodes.paragraph("", "", docutils.nodes.Text(result))),
+            self.state.document.reporter.warning(result, line=self.context['lineno'])
+            ]
+
+
+def create_warning(project_info, state, lineno, **kwargs):
+
+    tail = ''
+    if project_info:
+        tail = 'in doxygen xml output for project "{project}" from directory: {path}'.format(
+            project=project_info.name(),
+            path=project_info.project_path()
+            )
+
+    context = dict(
+        lineno=lineno,
+        tail=tail,
+        **kwargs
+        )
+
+    return WarningHandler(state, context)
+
+
 class DoxygenFunctionDirective(BaseDirective):
 
     required_arguments = 1
@@ -78,15 +110,14 @@ class DoxygenFunctionDirective(BaseDirective):
         try:
             project_info = self.project_info_factory.create_project_info(self.options)
         except ProjectError as e:
-            warning = 'doxygenfunction: %s' % e
-            return [
-                docutils.nodes.warning(
-                    "", docutils.nodes.paragraph("", "", docutils.nodes.Text(warning))
-                    ),
-                self.state.document.reporter.warning(warning, line=self.lineno)
-                ]
+            warning = create_warning(None, self.state, self.lineno)
+            return warning.warn('doxygenfunction: %s' % e)
 
-        finder = self.finder_factory.create_finder(project_info)
+        try:
+            finder = self.finder_factory.create_finder(project_info)
+        except MTimerError as e:
+            warning = create_warning(None, self.state, self.lineno)
+            return warning.warn('doxygenfunction: %s' % e)
 
         # Extract arguments from the function name.
         args = self.parse_args(args)
@@ -101,33 +132,25 @@ class DoxygenFunctionDirective(BaseDirective):
 
         results = finder.find(matcher_stack)
 
+        # Create it ahead of time as it is cheap and it is ugly to declare it for both exception
+        # clauses below
+        warning = create_warning(
+            project_info,
+            self.state,
+            self.lineno,
+            namespace='%s::' % namespace if namespace else '',
+            function=function_name,
+            args=', '.join(args)
+            )
+
         try:
             data_object = self.resolve_function(results, args)
         except NoMatchingFunctionError:
-            warning = (
-                'doxygenfunction: Cannot find function "%s%s" in doxygen xml output for project '
-                '"%s" from directory: %s' % (
-                    namespace, function_name, project_info.name(), project_info.project_path()
-                    )
-                )
-            return [
-                docutils.nodes.warning(
-                    "", docutils.nodes.paragraph("", "", docutils.nodes.Text(warning))
-                    ),
-                self.state.document.reporter.warning(warning, line=self.lineno)
-                ]
+            return warning.warn('doxygenfunction: Cannot find function "{namespace}{function}" '
+                                '{tail}')
         except UnableToResolveFunctionError:
-            warning = (
-                'doxygenfunction: Unable to resolve multiple matches for function "%s%s" with '
-                'arguments (%s) in doxygen xml output for project "%s" from directory: %s.'
-                % (namespace, function_name, ", ".join(args), project_info.name(),
-                   project_info.project_path())
-                )
-            return [
-                docutils.nodes.warning(
-                    "", docutils.nodes.paragraph("", "", docutils.nodes.Text(warning))),
-                self.state.document.reporter.warning(warning, line=self.lineno)
-                ]
+            return warning.warn('doxygenfunction: Unable to resolve multiple matches for function '
+                                '"{namespace}{function}" with arguments ({args}) {tail}')
 
         target_handler = self.target_handler_factory.create_target_handler(
             self.options, project_info, self.state.document
@@ -218,15 +241,14 @@ class DoxygenClassDirective(BaseDirective):
         try:
             project_info = self.project_info_factory.create_project_info(self.options)
         except ProjectError as e:
-            warning = 'doxygen%s: %s' % (self.kind, e)
-            return [
-                docutils.nodes.warning(
-                    "", docutils.nodes.paragraph("", "", docutils.nodes.Text(warning))
-                    ),
-                self.state.document.reporter.warning(warning, line=self.lineno)
-                ]
+            warning = create_warning(None, self.state, self.lineno)
+            return warning.warn('doxygenclass: %s' % e)
 
-        finder = self.finder_factory.create_finder(project_info)
+        try:
+            finder = self.finder_factory.create_finder(project_info)
+        except MTimerError as e:
+            warning = create_warning(None, self.state, self.lineno)
+            return warning.warn('doxygenclass: %s' % e)
 
         matcher_stack = self.matcher_factory.create_matcher_stack(
             {
@@ -238,18 +260,8 @@ class DoxygenClassDirective(BaseDirective):
         try:
             data_object = finder.find_one(matcher_stack)
         except NoMatchesError as e:
-            warning = (
-                'doxygen%s: Cannot find %s "%s" in doxygen xml output for project "%s" from '
-                'directory: %s' % (
-                    self.kind, self.kind, name, project_info.name(), project_info.project_path()
-                    )
-                )
-            return [
-                docutils.nodes.warning(
-                    "", docutils.nodes.paragraph("", "", docutils.nodes.Text(warning))
-                    ),
-                self.state.document.reporter.warning(warning, line=self.lineno)
-                ]
+            warning = create_warning(project_info, self.state, self.lineno, name=name)
+            return warning.warn('doxygenclass: Cannot find class "{name}" {tail}')
 
         target_handler = self.target_handler_factory.create_target_handler(
             self.options, project_info, self.state.document
@@ -280,48 +292,25 @@ class DoxygenGroupDirective(BaseDirective):
         try:
             project_info = self.project_info_factory.create_project_info(self.options)
         except ProjectError as e:
-            warning = 'doxygengroup: %s' % e
-            return [
-                docutils.nodes.warning(
-                    "", docutils.nodes.paragraph("", "", docutils.nodes.Text(warning))
-                    ),
-                self.state.document.reporter.warning(warning, line=self.lineno)
-                ]
+            warning = create_warning(None, self.state, self.lineno)
+            return warning.warn('doxygengroup: %s' % e)
 
-        finder = self.finder_factory.create_finder(project_info)
+        try:
+            finder = self.finder_factory.create_finder(project_info)
+        except MTimerError as e:
+            warning = create_warning(None, self.state, self.lineno)
+            return warning.warn('doxygengroup: %s' % e)
 
         finder_filter = self.filter_factory.create_group_finder_filter(name)
 
         matches = []
         finder.filter_(finder_filter, matches)
 
-        if len(matches) > 1:
-            warning = (
-                'doxygengroup: Found multiple matches for group "%s" in doxygen xml output for '
-                'project "%s" from directory: %s' % (
-                    name, project_info.name(), project_info.project_path()
-                    )
-                )
-            return [
-                docutils.nodes.warning(
-                    "", docutils.nodes.paragraph("", "", docutils.nodes.Text(warning))
-                    ),
-                self.state.document.reporter.warning(warning, line=self.lineno)
-                ]
-
-        elif not matches:
-            warning = (
-                'doxygengroup: Cannot find group "%s" in doxygen xml output for project "%s" from '
-                'directory: %s' % (
-                    name, project_info.name(), project_info.project_path()
-                    )
-                )
-            return [
-                docutils.nodes.warning(
-                    "", docutils.nodes.paragraph("", "", docutils.nodes.Text(warning))
-                    ),
-                self.state.document.reporter.warning(warning, line=self.lineno)
-                ]
+        # It shouldn't be possible to have too many matches as groups in their nature are merged
+        # together if there are multiple declarations, so we only check for no matches
+        if not matches:
+            warning = create_warning(project_info, self.state, self.lineno, name=name)
+            return warning.warn('doxygengroup: Cannot find group "{name}" {tail}')
 
         if 'content-only' in self.options:
 
@@ -414,15 +403,15 @@ class DoxygenBaseItemDirective(BaseDirective):
         try:
             project_info = self.project_info_factory.create_project_info(self.options)
         except ProjectError as e:
-            warning = 'doxygen%s: %s' % (self.kind, e)
-            return [
-                docutils.nodes.warning(
-                    "", docutils.nodes.paragraph("", "", docutils.nodes.Text(warning))
-                    ),
-                self.state.document.reporter.warning(warning, line=self.lineno)
-                ]
+            warning = create_warning(None, self.state, self.lineno, kind=self.kind)
+            return warning.warn('doxygen{kind}: %s' % e)
 
-        finder = self.finder_factory.create_finder(project_info)
+        try:
+            finder = self.finder_factory.create_finder(project_info)
+        except MTimerError as e:
+            warning = create_warning(None, self.state, self.lineno, kind=self.kind)
+            return warning.warn('doxygen{kind}: %s' % e)
+
 
         matcher_stack = self.create_matcher_stack(namespace, name)
 
@@ -430,19 +419,9 @@ class DoxygenBaseItemDirective(BaseDirective):
             data_object = finder.find_one(matcher_stack)
         except NoMatchesError as e:
             display_name = "%s::%s" % (namespace, name) if namespace else name
-            warning = (
-                'doxygen%s: Cannot find %s "%s" in doxygen xml output for project "%s" from '
-                'directory: %s' % (
-                    self.kind, self.kind, display_name, project_info.name(),
-                    project_info.project_path()
-                    )
-                )
-            return [
-                docutils.nodes.warning(
-                    "", docutils.nodes.paragraph("", "", docutils.nodes.Text(warning))
-                    ),
-                self.state.document.reporter.warning(warning, line=self.lineno)
-                ]
+            warning = create_warning(project_info, self.state, self.lineno, kind=self.kind,
+                                     name=display_name)
+            return warning.warn('doxygen{kind}: Cannot find {kind} "{display_name}" {tail}')
 
         target_handler = self.target_handler_factory.create_target_handler(
             self.options, project_info, self.state.document
@@ -711,13 +690,21 @@ def write_file(directory, filename, content):
         f.write(content)
 
 
+class MTimerError(Exception):
+    pass
+
+
 class MTimer(object):
 
     def __init__(self, getmtime):
         self.getmtime = getmtime
 
     def get_mtime(self, filename):
-        return self.getmtime(filename)
+
+        try:
+            return self.getmtime(filename)
+        except OSError:
+            raise MTimerError('Cannot find file: %s' % os.path.realpath(filename))
 
 
 class FileStateCache(object):
