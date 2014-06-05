@@ -113,7 +113,11 @@ class DoxygenFunctionDirective(BaseDirective):
             warning = create_warning(None, self.state, self.lineno)
             return warning.warn('doxygenfunction: %s' % e)
 
-        finder = self.finder_factory.create_finder(project_info)
+        try:
+            finder = self.finder_factory.create_finder(project_info)
+        except MTimerError as e:
+            warning = create_warning(None, self.state, self.lineno)
+            return warning.warn('doxygenfunction: %s' % e)
 
         # Extract arguments from the function name.
         args = self.parse_args(args)
@@ -240,7 +244,11 @@ class DoxygenClassDirective(BaseDirective):
             warning = create_warning(None, self.state, self.lineno)
             return warning.warn('doxygenclass: %s' % e)
 
-        finder = self.finder_factory.create_finder(project_info)
+        try:
+            finder = self.finder_factory.create_finder(project_info)
+        except MTimerError as e:
+            warning = create_warning(None, self.state, self.lineno)
+            return warning.warn('doxygenclass: %s' % e)
 
         matcher_stack = self.matcher_factory.create_matcher_stack(
             {
@@ -287,7 +295,11 @@ class DoxygenGroupDirective(BaseDirective):
             warning = create_warning(None, self.state, self.lineno)
             return warning.warn('doxygengroup: %s' % e)
 
-        finder = self.finder_factory.create_finder(project_info)
+        try:
+            finder = self.finder_factory.create_finder(project_info)
+        except MTimerError as e:
+            warning = create_warning(None, self.state, self.lineno)
+            return warning.warn('doxygengroup: %s' % e)
 
         finder_filter = self.filter_factory.create_group_finder_filter(name)
 
@@ -394,7 +406,12 @@ class DoxygenBaseItemDirective(BaseDirective):
             warning = create_warning(None, self.state, self.lineno, kind=self.kind)
             return warning.warn('doxygen{kind}: %s' % e)
 
-        finder = self.finder_factory.create_finder(project_info)
+        try:
+            finder = self.finder_factory.create_finder(project_info)
+        except MTimerError as e:
+            warning = create_warning(None, self.state, self.lineno, kind=self.kind)
+            return warning.warn('doxygen{kind}: %s' % e)
+
 
         matcher_stack = self.create_matcher_stack(namespace, name)
 
@@ -673,13 +690,21 @@ def write_file(directory, filename, content):
         f.write(content)
 
 
+class MTimerError(Exception):
+    pass
+
+
 class MTimer(object):
 
     def __init__(self, getmtime):
         self.getmtime = getmtime
 
     def get_mtime(self, filename):
-        return self.getmtime(filename)
+
+        try:
+            return self.getmtime(filename)
+        except OSError:
+            raise MTimerError('Cannot find file: %s' % os.path.realpath(filename))
 
 
 class FileStateCache(object):
