@@ -275,8 +275,8 @@ file.
 
 Checkout the :ref:`example <file-example>` to see it in action.
 
-autodoxygenfile Directive
-~~~~~~~~~~~~~~~~~~~~~~~~~
+autodoxygenfile
+~~~~~~~~~~~~~~~
 
 This directive is this ``auto`` version of the doxygenfile directive above.
 It handles the doxygen xml generation for you like the other auto directives.
