@@ -1,13 +1,13 @@
 
-class Selecter(object):
+class Selector(object):
     pass
 
-class Parent(Selecter):
+class Parent(Selector):
 
     def __call__(self, parent_data_object, child_data_object):
         return parent_data_object
 
-class Child(Selecter):
+class Child(Selector):
 
     def __call__(self, parent_data_object, child_data_object):
         return child_data_object
@@ -15,13 +15,13 @@ class Child(Selecter):
 
 class Accessor(object):
 
-    def __init__(self, selecter):
-        self.selecter = selecter
+    def __init__(self, selector):
+        self.selector = selector
 
 class NameAccessor(Accessor):
 
     def __call__(self, parent_data_object, child_data_object):
-        return self.selecter(parent_data_object, child_data_object).name
+        return self.selector(parent_data_object, child_data_object).name
 
 class NodeNameAccessor(Accessor):
     """Check the .node_name member which is declared on refTypeSub nodes
@@ -30,13 +30,13 @@ class NodeNameAccessor(Accessor):
     """
 
     def __call__(self, parent_data_object, child_data_object):
-        return self.selecter(parent_data_object, child_data_object).node_name
+        return self.selector(parent_data_object, child_data_object).node_name
 
 class NodeTypeAccessor(Accessor):
 
     def __call__(self, parent_data_object, child_data_object):
 
-        data_object = self.selecter(parent_data_object, child_data_object)
+        data_object = self.selector(parent_data_object, child_data_object)
         try:
             return data_object.node_type
         except AttributeError as e:
@@ -51,22 +51,22 @@ class NodeTypeAccessor(Accessor):
 class KindAccessor(Accessor):
 
     def __call__(self, parent_data_object, child_data_object):
-        return self.selecter(parent_data_object, child_data_object).kind
+        return self.selector(parent_data_object, child_data_object).kind
 
 class LambdaAccessor(Accessor):
 
-    def __init__(self, selecter, func):
-        Accessor.__init__(self, selecter)
+    def __init__(self, selector, func):
+        Accessor.__init__(self, selector)
 
         self.func = func
 
     def __call__(self, parent_data_object, child_data_object):
-        return self.func(self.selecter(parent_data_object, child_data_object))
+        return self.func(self.selector(parent_data_object, child_data_object))
 
 class NamespaceAccessor(Accessor):
 
     def __call__(self, parent_data_object, child_data_object):
-        return self.selecter(parent_data_object, child_data_object).namespaces
+        return self.selector(parent_data_object, child_data_object).namespaces
 
 class NameFilter(object):
 
@@ -517,3 +517,4 @@ class FilterFactory(object):
                 )
 
         return filter_
+
