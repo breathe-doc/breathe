@@ -347,92 +347,86 @@ class FilterFactory(object):
         valid_names = []
 
         filter_ = AndFilter(
-            AndFilter(
+            NotFilter(
+                # Gather the "namespaces" attribute from the
+                # compounddef for the file we're rendering and
+                # store the information in the "valid_names" list
+                #
+                # Gather always returns false, so, combined with
+                # the NotFilter this chunk always returns true and
+                # so does not affect the result of the filtering
                 AndFilter(
-                    NotFilter(
-                        # Gather the "namespaces" attribute from the
-                        # compounddef for the file we're rendering and
-                        # store the information in the "valid_names" list
-                        #
-                        # Gather always returns false, so, combined with
-                        # the NotFilter this chunk always returns true and
-                        # so does not affect the result of the filtering
-                        AndFilter(
-                            NameFilter(NodeTypeAccessor(Child()), ["compounddef"]),
-                            NameFilter(KindAccessor(Child()), ["file"]),
-                            FilePathFilter(
-                                LambdaAccessor(Child(), lambda x: x.location),
-                                filename, self.path_handler
-                                ),
-                            Gather(LambdaAccessor(Child(), lambda x: x.namespaces), valid_names)
-                            )
+                    NameFilter(NodeTypeAccessor(Child()), ["compounddef"]),
+                    NameFilter(KindAccessor(Child()), ["file"]),
+                    FilePathFilter(
+                        LambdaAccessor(Child(), lambda x: x.location),
+                        filename, self.path_handler
                         ),
-                    NotFilter(
-                        # Take the valid_names and everytime we handle an
-                        # innerclass or innernamespace, check that its name
-                        # was one of those initial valid names so that we
-                        # never end up rendering a namespace or class that
-                        # wasn't in the initial file. Notably this is
-                        # required as the location attribute for the
-                        # namespace in the xml is unreliable.
-                        AndFilter(
-                            NameFilter(NodeTypeAccessor(Parent()), ["compounddef"]),
-                            NameFilter(NodeTypeAccessor(Child()), ["ref"]),
-                            NameFilter(NodeNameAccessor(Child()), ["innerclass", "innernamespace"]),
-                            NotFilter(
-                                NameFilter(
-                                    LambdaAccessor(Child(), lambda x: x.content_[0].getValue()),
-                                    valid_names
-                                    )
-                                )
-                            )
-                        )
-                    ),
-                NotFilter(
-                    # Ignore innerclasses and innernamespaces that are inside a
-                    # namespace that is going to be rendered as they will be
-                    # rendered with that namespace and we don't want them twice
-                    AndFilter(
-                        NameFilter(NodeTypeAccessor(Parent()), ["compounddef"]),
-                        NameFilter(NodeTypeAccessor(Child()), ["ref"]),
-                        NameFilter(NodeNameAccessor(Child()), ["innerclass", "innernamespace"]),
-                        NamespaceFilter(
-                            NamespaceAccessor(Parent()),
-                            LambdaAccessor(Child(), lambda x: x.content_[0].getValue())
-                            )
-                        )
-                    ),
+                    Gather(LambdaAccessor(Child(), lambda x: x.namespaces), valid_names)
+                    )
                 ),
-            AndFilter(
-                NotFilter(
-                    # Ignore memberdefs from files which are different to
-                    # the one we're rendering. This happens when we have to
-                    # cross into a namespace xml file which has entries
-                    # from multiple files in it
-                    AndFilter(
-                        NameFilter(NodeTypeAccessor(Child()), ["memberdef"]),
-                        NotFilter(
-                            FilePathFilter(LambdaAccessor(Child(), lambda x: x.location),
-                                           filename, self.path_handler)
+            NotFilter(
+                # Take the valid_names and everytime we handle an
+                # innerclass or innernamespace, check that its name
+                # was one of those initial valid names so that we
+                # never end up rendering a namespace or class that
+                # wasn't in the initial file. Notably this is
+                # required as the location attribute for the
+                # namespace in the xml is unreliable.
+                AndFilter(
+                    NameFilter(NodeTypeAccessor(Parent()), ["compounddef"]),
+                    NameFilter(NodeTypeAccessor(Child()), ["ref"]),
+                    NameFilter(NodeNameAccessor(Child()), ["innerclass", "innernamespace"]),
+                    NotFilter(
+                        NameFilter(
+                            LambdaAccessor(Child(), lambda x: x.content_[0].getValue()),
+                            valid_names
                             )
                         )
-                    ),
-                NotFilter(
-                    # Ignore compounddefs which are from another file
-                    # (normally means classes and structs which are in a
-                    # namespace that we have other interests in) but only
-                    # check it if the compounddef is not a namespace
-                    # itself, as for some reason compounddefs for
-                    # namespaces are registered with just a single file
-                    # location even if they namespace is spread over
-                    # multiple files
-                    AndFilter(
-                        NameFilter(NodeTypeAccessor(Child()), ["compounddef"]),
-                        NotFilter(NameFilter(KindAccessor(Child()), ["namespace"])),
-                        NotFilter(
-                            FilePathFilter(LambdaAccessor(Child(), lambda x: x.location),
-                                           filename, self.path_handler)
-                            )
+                    )
+                ),
+            NotFilter(
+                # Ignore innerclasses and innernamespaces that are inside a
+                # namespace that is going to be rendered as they will be
+                # rendered with that namespace and we don't want them twice
+                AndFilter(
+                    NameFilter(NodeTypeAccessor(Parent()), ["compounddef"]),
+                    NameFilter(NodeTypeAccessor(Child()), ["ref"]),
+                    NameFilter(NodeNameAccessor(Child()), ["innerclass", "innernamespace"]),
+                    NamespaceFilter(
+                        NamespaceAccessor(Parent()),
+                        LambdaAccessor(Child(), lambda x: x.content_[0].getValue())
+                        )
+                    )
+                ),
+            NotFilter(
+                # Ignore memberdefs from files which are different to
+                # the one we're rendering. This happens when we have to
+                # cross into a namespace xml file which has entries
+                # from multiple files in it
+                AndFilter(
+                    NameFilter(NodeTypeAccessor(Child()), ["memberdef"]),
+                    NotFilter(
+                        FilePathFilter(LambdaAccessor(Child(), lambda x: x.location),
+                                       filename, self.path_handler)
+                        )
+                    )
+                ),
+            NotFilter(
+                # Ignore compounddefs which are from another file
+                # (normally means classes and structs which are in a
+                # namespace that we have other interests in) but only
+                # check it if the compounddef is not a namespace
+                # itself, as for some reason compounddefs for
+                # namespaces are registered with just a single file
+                # location even if they namespace is spread over
+                # multiple files
+                AndFilter(
+                    NameFilter(NodeTypeAccessor(Child()), ["compounddef"]),
+                    NotFilter(NameFilter(KindAccessor(Child()), ["namespace"])),
+                    NotFilter(
+                        FilePathFilter(LambdaAccessor(Child(), lambda x: x.location),
+                                       filename, self.path_handler)
                         )
                     )
                 )
