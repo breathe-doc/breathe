@@ -3,16 +3,25 @@ class Selector(object):
     pass
 
 
+class Ancestor(Selector):
+
+    def __init__(self, generations):
+        self.generations = generations
+
+    def __call__(self, node_stack):
+        return node_stack[self.generations]
+
+
 class Parent(Selector):
 
-    def __call__(self, parent_data_object, child_data_object):
-        return parent_data_object
+    def __call__(self, node_stack):
+        return node_stack[1]
 
 
-class Child(Selector):
+class Node(Selector):
 
-    def __call__(self, parent_data_object, child_data_object):
-        return child_data_object
+    def __call__(self, node_stack):
+        return node_stack[0]
 
 
 class Accessor(object):
@@ -23,8 +32,8 @@ class Accessor(object):
 
 class NameAccessor(Accessor):
 
-    def __call__(self, parent_data_object, child_data_object):
-        return self.selector(parent_data_object, child_data_object).name
+    def __call__(self, node_stack):
+        return self.selector(node_stack).name
 
 
 class NodeNameAccessor(Accessor):
@@ -33,15 +42,15 @@ class NodeNameAccessor(Accessor):
     It distinguishes between innerclass, innernamespace, etc.
     """
 
-    def __call__(self, parent_data_object, child_data_object):
-        return self.selector(parent_data_object, child_data_object).node_name
+    def __call__(self, node_stack):
+        return self.selector(node_stack).node_name
 
 
 class NodeTypeAccessor(Accessor):
 
-    def __call__(self, parent_data_object, child_data_object):
+    def __call__(self, node_stack):
 
-        data_object = self.selector(parent_data_object, child_data_object)
+        data_object = self.selector(node_stack)
         try:
             return data_object.node_type
         except AttributeError as e:
@@ -56,8 +65,8 @@ class NodeTypeAccessor(Accessor):
 
 class KindAccessor(Accessor):
 
-    def __call__(self, parent_data_object, child_data_object):
-        return self.selector(parent_data_object, child_data_object).kind
+    def __call__(self, node_stack):
+        return self.selector(node_stack).kind
 
 
 class LambdaAccessor(Accessor):
@@ -67,14 +76,14 @@ class LambdaAccessor(Accessor):
 
         self.func = func
 
-    def __call__(self, parent_data_object, child_data_object):
-        return self.func(self.selector(parent_data_object, child_data_object))
+    def __call__(self, node_stack):
+        return self.func(self.selector(node_stack))
 
 
 class NamespaceAccessor(Accessor):
 
-    def __call__(self, parent_data_object, child_data_object):
-        return self.selector(parent_data_object, child_data_object).namespaces
+    def __call__(self, node_stack):
+        return self.selector(node_stack).namespaces
 
 
 class NameFilter(object):
@@ -84,9 +93,9 @@ class NameFilter(object):
         self.accessor = accessor
         self.members = members
 
-    def allow(self, parent_data_object, child_data_object):
+    def allow(self, node_stack):
 
-        name = self.accessor(parent_data_object, child_data_object)
+        name = self.accessor(node_stack)
 
         return name in self.members
 
@@ -98,9 +107,9 @@ class GlobFilter(object):
         self.accessor = accessor
         self.glob = glob
 
-    def allow(self, parent_data_object, child_data_object):
+    def allow(self, node_stack):
 
-        text = self.accessor(parent_data_object, child_data_object)
+        text = self.accessor(node_stack)
         return self.glob.match(text)
 
 
@@ -112,9 +121,9 @@ class FilePathFilter(object):
         self.target_file = target_file
         self.path_handler = path_handler
 
-    def allow(self, parent_data_object, child_data_object):
+    def allow(self, node_stack):
 
-        location = self.accessor(parent_data_object, child_data_object).file
+        location = self.accessor(node_stack).file
 
         if self.path_handler.includes_directory(self.target_file):
             # If the target_file contains directory separators then
@@ -140,10 +149,10 @@ class NamespaceFilter(object):
         self.namespace_accessor = namespace_accessor
         self.name_accessor = name_accessor
 
-    def allow(self, parent_data_object, child_data_object):
+    def allow(self, node_stack):
 
-        namespaces = self.namespace_accessor(parent_data_object, child_data_object)
-        name = self.name_accessor(parent_data_object, child_data_object)
+        namespaces = self.namespace_accessor(node_stack)
+        name = self.name_accessor(node_stack)
 
         try:
             namespace, name = name.rsplit("::", 1)
@@ -155,14 +164,14 @@ class NamespaceFilter(object):
 
 class OpenFilter(object):
 
-    def allow(self, parent_data_object, child_data_object):
+    def allow(self, node_stack):
 
         return True
 
 
 class ClosedFilter(object):
 
-    def allow(self, parent_data_object, child_data_object):
+    def allow(self, node_stack):
 
         return False
 
@@ -172,9 +181,9 @@ class NotFilter(object):
     def __init__(self, child_filter):
         self.child_filter = child_filter
 
-    def allow(self, parent_data_object, child_data_object):
+    def allow(self, node_stack):
 
-        return not self.child_filter.allow(parent_data_object, child_data_object)
+        return not self.child_filter.allow(node_stack)
 
 
 class AndFilter(object):
@@ -183,11 +192,11 @@ class AndFilter(object):
 
         self.filters = filters
 
-    def allow(self, parent_data_object, child_data_object):
+    def allow(self, node_stack):
 
         # If any filter returns False then return False
         for filter_ in self.filters:
-            if not filter_.allow(parent_data_object, child_data_object):
+            if not filter_.allow(node_stack):
                 return False
 
         return True
@@ -200,11 +209,11 @@ class OrFilter(object):
 
         self.filters = filters
 
-    def allow(self, parent_data_object, child_data_object):
+    def allow(self, node_stack):
 
         # If any filter returns True then return True
         for filter_ in self.filters:
-            if filter_.allow(parent_data_object, child_data_object):
+            if filter_.allow(node_stack):
                 return True
 
         return False
@@ -240,9 +249,9 @@ class Gather(object):
         self.accessor = accessor
         self.names = names
 
-    def allow(self, parent_data_object, child_data_object):
+    def allow(self, node_stack):
 
-        self.names.extend(self.accessor(parent_data_object, child_data_object))
+        self.names.extend(self.accessor(node_stack))
 
         return False
 
@@ -273,7 +282,7 @@ class FilterFactory(object):
             # Allow through everything except the header-file includes nodes
             return OrFilter(
                 NotFilter(NameFilter(NodeTypeAccessor(Parent()), ["compounddef"])),
-                NotFilter(NameFilter(NodeTypeAccessor(Child()), ["inc"]))
+                NotFilter(NameFilter(NodeTypeAccessor(Node()), ["inc"]))
                 )
 
         if text == "header-file":
@@ -283,7 +292,7 @@ class FilterFactory(object):
         # Allow through everything except the header-file includes nodes
         return OrFilter(
             NotFilter(NameFilter(NodeTypeAccessor(Parent()), ["compounddef"])),
-            NotFilter(NameFilter(NodeTypeAccessor(Child()), ["inc"]))
+            NotFilter(NameFilter(NodeTypeAccessor(Node()), ["inc"]))
             )
 
     def create_members_filter(self, options):
@@ -291,20 +300,20 @@ class FilterFactory(object):
         section = options.get("sections", "")
 
         if not section.strip():
-            section_filter = GlobFilter(KindAccessor(Child()),
+            section_filter = GlobFilter(KindAccessor(Node()),
                                         self.globber_factory.create("public*"))
         else:
             sections = set([x.strip() for x in section.split(",")])
 
             section_filter = GlobFilter(
-                KindAccessor(Child()),
+                KindAccessor(Node()),
                 self.globber_factory.create(sections.pop())
                 )
             while len(sections) > 0:
                 section_filter = OrFilter(
                     section_filter,
                     GlobFilter(
-                        KindAccessor(Child()),
+                        KindAccessor(Node()),
                         self.globber_factory.create(sections.pop())
                         )
                     )
@@ -312,15 +321,15 @@ class FilterFactory(object):
         if "members" not in options:
             return OrFilter(
                 NotFilter(NameFilter(NodeTypeAccessor(Parent()), ["sectiondef"])),
-                NotFilter(NameFilter(NodeTypeAccessor(Child()), ["memberdef"]))
+                NotFilter(NameFilter(NodeTypeAccessor(Node()), ["memberdef"]))
                 )
 
         text = options["members"]
         if not text.strip():
             return OrFilter(
-                NotFilter(NameFilter(NodeTypeAccessor(Child()), ["sectiondef"])),
+                NotFilter(NameFilter(NodeTypeAccessor(Node()), ["sectiondef"])),
                 section_filter,
-                NameFilter(KindAccessor(Child()), ["user-defined"])
+                NameFilter(KindAccessor(Node()), ["user-defined"])
                 )
 
         # Matches sphinx-autodoc behaviour of comma separated values
@@ -331,14 +340,14 @@ class FilterFactory(object):
         # for the actual description of the sectiondef
         return OrFilter(
             NotFilter(NameFilter(NodeTypeAccessor(Parent()), ["sectiondef"])),
-            NameFilter(NodeTypeAccessor(Child()), ["description"]),
-            NameFilter(NameAccessor(Child()), members),
+            NameFilter(NodeTypeAccessor(Node()), ["description"]),
+            NameFilter(NameAccessor(Node()), members),
             )
 
     def create_outline_filter(self, options):
 
         if 'outline' in options:
-            return NotFilter(NameFilter(NodeTypeAccessor(Child()), ["description"]))
+            return NotFilter(NameFilter(NodeTypeAccessor(Node()), ["description"]))
         else:
             return OpenFilter()
 
@@ -356,13 +365,13 @@ class FilterFactory(object):
                 # the NotFilter this chunk always returns true and
                 # so does not affect the result of the filtering
                 AndFilter(
-                    NameFilter(NodeTypeAccessor(Child()), ["compounddef"]),
-                    NameFilter(KindAccessor(Child()), ["file"]),
+                    NameFilter(NodeTypeAccessor(Node()), ["compounddef"]),
+                    NameFilter(KindAccessor(Node()), ["file"]),
                     FilePathFilter(
-                        LambdaAccessor(Child(), lambda x: x.location),
+                        LambdaAccessor(Node(), lambda x: x.location),
                         filename, self.path_handler
                         ),
-                    Gather(LambdaAccessor(Child(), lambda x: x.namespaces), valid_names)
+                    Gather(LambdaAccessor(Node(), lambda x: x.namespaces), valid_names)
                     )
                 ),
             NotFilter(
@@ -375,11 +384,11 @@ class FilterFactory(object):
                 # namespace in the xml is unreliable.
                 AndFilter(
                     NameFilter(NodeTypeAccessor(Parent()), ["compounddef"]),
-                    NameFilter(NodeTypeAccessor(Child()), ["ref"]),
-                    NameFilter(NodeNameAccessor(Child()), ["innerclass", "innernamespace"]),
+                    NameFilter(NodeTypeAccessor(Node()), ["ref"]),
+                    NameFilter(NodeNameAccessor(Node()), ["innerclass", "innernamespace"]),
                     NotFilter(
                         NameFilter(
-                            LambdaAccessor(Child(), lambda x: x.content_[0].getValue()),
+                            LambdaAccessor(Node(), lambda x: x.content_[0].getValue()),
                             valid_names
                             )
                         )
@@ -391,11 +400,11 @@ class FilterFactory(object):
                 # rendered with that namespace and we don't want them twice
                 AndFilter(
                     NameFilter(NodeTypeAccessor(Parent()), ["compounddef"]),
-                    NameFilter(NodeTypeAccessor(Child()), ["ref"]),
-                    NameFilter(NodeNameAccessor(Child()), ["innerclass", "innernamespace"]),
+                    NameFilter(NodeTypeAccessor(Node()), ["ref"]),
+                    NameFilter(NodeNameAccessor(Node()), ["innerclass", "innernamespace"]),
                     NamespaceFilter(
                         NamespaceAccessor(Parent()),
-                        LambdaAccessor(Child(), lambda x: x.content_[0].getValue())
+                        LambdaAccessor(Node(), lambda x: x.content_[0].getValue())
                         )
                     )
                 ),
@@ -405,9 +414,9 @@ class FilterFactory(object):
                 # cross into a namespace xml file which has entries
                 # from multiple files in it
                 AndFilter(
-                    NameFilter(NodeTypeAccessor(Child()), ["memberdef"]),
+                    NameFilter(NodeTypeAccessor(Node()), ["memberdef"]),
                     NotFilter(
-                        FilePathFilter(LambdaAccessor(Child(), lambda x: x.location),
+                        FilePathFilter(LambdaAccessor(Node(), lambda x: x.location),
                                        filename, self.path_handler)
                         )
                     )
@@ -422,10 +431,10 @@ class FilterFactory(object):
                 # location even if they namespace is spread over
                 # multiple files
                 AndFilter(
-                    NameFilter(NodeTypeAccessor(Child()), ["compounddef"]),
-                    NotFilter(NameFilter(KindAccessor(Child()), ["namespace"])),
+                    NameFilter(NodeTypeAccessor(Node()), ["compounddef"]),
+                    NotFilter(NameFilter(KindAccessor(Node()), ["namespace"])),
                     NotFilter(
-                        FilePathFilter(LambdaAccessor(Child(), lambda x: x.location),
+                        FilePathFilter(LambdaAccessor(Node(), lambda x: x.location),
                                        filename, self.path_handler)
                         )
                     )
@@ -450,8 +459,8 @@ class FilterFactory(object):
         return OrFilter(
             NameFilter(NodeTypeAccessor(Parent()), ["sectiondef"]),
             AndFilter(
-                NameFilter(NodeTypeAccessor(Child()), ["ref"]),
-                NameFilter(NodeNameAccessor(Child()), ["innerclass", "innernamespace"]),
+                NameFilter(NodeTypeAccessor(Node()), ["ref"]),
+                NameFilter(NodeNameAccessor(Node()), ["innerclass", "innernamespace"]),
                 )
             )
 
@@ -461,16 +470,16 @@ class FilterFactory(object):
             NotFilter(
                 AndFilter(
                     NameFilter(NodeTypeAccessor(Parent()), ["compounddef"]),
-                    NameFilter(NodeTypeAccessor(Child()), ["ref"]),
-                    NameFilter(NodeNameAccessor(Child()), ["innerclass", "innernamespace"])
+                    NameFilter(NodeTypeAccessor(Node()), ["ref"]),
+                    NameFilter(NodeNameAccessor(Node()), ["innerclass", "innernamespace"])
                     )
                 ),
             NotFilter(
                 AndFilter(
                     NameFilter(NodeTypeAccessor(Parent()), ["compounddef"]),
                     NameFilter(KindAccessor(Parent()), ["group"]),
-                    NameFilter(NodeTypeAccessor(Child()), ["sectiondef"]),
-                    NameFilter(KindAccessor(Child()), ["func"])
+                    NameFilter(NodeTypeAccessor(Node()), ["sectiondef"]),
+                    NameFilter(KindAccessor(Node()), ["func"])
                     )
                 )
             )
@@ -488,9 +497,9 @@ class FilterFactory(object):
     def create_file_finder_filter(self, filename):
 
         filter_ = AndFilter(
-            NameFilter(NodeTypeAccessor(Child()), ["compounddef"]),
-            NameFilter(KindAccessor(Child()), ["file"]),
-            FilePathFilter(LambdaAccessor(Child(), lambda x: x.location), filename,
+            NameFilter(NodeTypeAccessor(Node()), ["compounddef"]),
+            NameFilter(KindAccessor(Node()), ["file"]),
+            FilePathFilter(LambdaAccessor(Node(), lambda x: x.location), filename,
                            self.path_handler)
             )
 
@@ -504,9 +513,9 @@ class FilterFactory(object):
         contents."""
 
         filter_ = AndFilter(
-            NameFilter(NodeTypeAccessor(Child()), ["compound"]),
-            NameFilter(KindAccessor(Child()), ["group"]),
-            NameFilter(NameAccessor(Child()), [name])
+            NameFilter(NodeTypeAccessor(Node()), ["compound"]),
+            NameFilter(KindAccessor(Node()), ["group"]),
+            NameFilter(NameAccessor(Node()), [name])
             )
 
         return filter_

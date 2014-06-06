@@ -95,7 +95,7 @@ class DoxygenToRstRendererFactory(object):
             data_object
             ):
 
-        if not self.filter_.allow(parent_data_object, data_object):
+        if not self.filter_.allow([data_object, parent_data_object]):
             return NullRenderer()
 
         child_renderer_factory = self.renderer_factory_creator.create_child_factory(

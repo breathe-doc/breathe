@@ -1,5 +1,5 @@
 
-from breathe.finder.doxygen.base import ItemFinder
+from breathe.finder.doxygen.base import ItemFinder, stack
 
 
 class DoxygenTypeSubItemFinder(ItemFinder):
@@ -18,15 +18,17 @@ class DoxygenTypeSubItemFinder(ItemFinder):
 
         return results
 
-    def filter_(self, parent, filter_, matches):
+    def filter_(self, ancestors, filter_, matches):
         """Find nodes which match the filter. Doesn't test this node, only its children"""
 
         compounds = self.data_object.get_compound()
 
+        node_stack = stack(self.data_object, ancestors)
+
         for compound in compounds:
 
             compound_finder = self.item_finder_factory.create_finder(compound)
-            compound_finder.filter_(self.data_object, filter_, matches)
+            compound_finder.filter_(node_stack, filter_, matches)
 
 
 class CompoundTypeSubItemFinder(ItemFinder):
@@ -65,7 +67,7 @@ class CompoundTypeSubItemFinder(ItemFinder):
 
         return results
 
-    def filter_(self, parent, filter_, matches):
+    def filter_(self, ancestors, filter_, matches):
         """Finds nodes which match the filter and continues checks to children
 
         Requires parsing the xml files referenced by the children for which we use the compound
@@ -73,13 +75,15 @@ class CompoundTypeSubItemFinder(ItemFinder):
         top level node of the compound file.
         """
 
-        if filter_.allow(parent, self.data_object):
+        node_stack = stack(self.data_object, ancestors)
+
+        if filter_.allow(node_stack):
             matches.append(self.data_object)
 
         file_data = self.compound_parser.parse(self.data_object.refid)
         finder = self.item_finder_factory.create_finder(file_data)
 
-        finder.filter_(self.data_object, filter_, matches)
+        finder.filter_(node_stack, filter_, matches)
 
 
 class MemberTypeSubItemFinder(ItemFinder):
