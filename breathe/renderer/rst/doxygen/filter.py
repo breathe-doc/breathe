@@ -2,10 +2,12 @@
 class Selector(object):
     pass
 
+
 class Parent(Selector):
 
     def __call__(self, parent_data_object, child_data_object):
         return parent_data_object
+
 
 class Child(Selector):
 
@@ -18,10 +20,12 @@ class Accessor(object):
     def __init__(self, selector):
         self.selector = selector
 
+
 class NameAccessor(Accessor):
 
     def __call__(self, parent_data_object, child_data_object):
         return self.selector(parent_data_object, child_data_object).name
+
 
 class NodeNameAccessor(Accessor):
     """Check the .node_name member which is declared on refTypeSub nodes
@@ -31,6 +35,7 @@ class NodeNameAccessor(Accessor):
 
     def __call__(self, parent_data_object, child_data_object):
         return self.selector(parent_data_object, child_data_object).node_name
+
 
 class NodeTypeAccessor(Accessor):
 
@@ -48,10 +53,12 @@ class NodeTypeAccessor(Accessor):
             else:
                 raise e
 
+
 class KindAccessor(Accessor):
 
     def __call__(self, parent_data_object, child_data_object):
         return self.selector(parent_data_object, child_data_object).kind
+
 
 class LambdaAccessor(Accessor):
 
@@ -63,10 +70,12 @@ class LambdaAccessor(Accessor):
     def __call__(self, parent_data_object, child_data_object):
         return self.func(self.selector(parent_data_object, child_data_object))
 
+
 class NamespaceAccessor(Accessor):
 
     def __call__(self, parent_data_object, child_data_object):
         return self.selector(parent_data_object, child_data_object).namespaces
+
 
 class NameFilter(object):
 
@@ -80,6 +89,7 @@ class NameFilter(object):
         name = self.accessor(parent_data_object, child_data_object)
 
         return name in self.members
+
 
 class GlobFilter(object):
 
@@ -116,11 +126,12 @@ class FilePathFilter(object):
         else:
             # If there are not separators, match against the whole filename
             # at the end of the location
-            # 
+            #
             # This is to prevent "Util.cpp" matching "PathUtil.cpp"
             #
             location_basename = self.path_handler.basename(location)
             return location_basename == self.target_file
+
 
 class NamespaceFilter(object):
 
@@ -141,17 +152,20 @@ class NamespaceFilter(object):
 
         return namespace in namespaces
 
+
 class OpenFilter(object):
 
     def allow(self, parent_data_object, child_data_object):
 
         return True
 
+
 class ClosedFilter(object):
 
     def allow(self, parent_data_object, child_data_object):
 
         return False
+
 
 class NotFilter(object):
 
@@ -161,6 +175,7 @@ class NotFilter(object):
     def allow(self, parent_data_object, child_data_object):
 
         return not self.child_filter.allow(parent_data_object, child_data_object)
+
 
 class AndFilter(object):
 
@@ -206,6 +221,7 @@ class Glob(object):
 
         return self.method(name, self.pattern)
 
+
 class GlobFactory(object):
 
     def __init__(self, method):
@@ -226,7 +242,7 @@ class Gather(object):
 
     def allow(self, parent_data_object, child_data_object):
 
-        self.names.extend( self.accessor(parent_data_object, child_data_object) )
+        self.names.extend(self.accessor(parent_data_object, child_data_object))
 
         return False
 
@@ -241,10 +257,10 @@ class FilterFactory(object):
     def create_class_filter(self, options):
 
         return AndFilter(
-                self.create_members_filter(options),
-                self.create_outline_filter(options),
-                self.create_show_filter(options),
-                )
+            self.create_members_filter(options),
+            self.create_outline_filter(options),
+            self.create_show_filter(options),
+            )
 
     def create_show_filter(self, options):
         """
@@ -256,9 +272,9 @@ class FilterFactory(object):
         except KeyError:
             # Allow through everything except the header-file includes nodes
             return OrFilter(
-                    NotFilter(NameFilter(NodeTypeAccessor(Parent()), ["compounddef"])),
-                    NotFilter(NameFilter(NodeTypeAccessor(Child()), ["inc"]))
-                    )
+                NotFilter(NameFilter(NodeTypeAccessor(Parent()), ["compounddef"])),
+                NotFilter(NameFilter(NodeTypeAccessor(Child()), ["inc"]))
+                )
 
         if text == "header-file":
             # Allow through everything, including header-file includes
@@ -266,46 +282,46 @@ class FilterFactory(object):
 
         # Allow through everything except the header-file includes nodes
         return OrFilter(
-                NotFilter(NameFilter(NodeTypeAccessor(Parent()), ["compounddef"])),
-                NotFilter(NameFilter(NodeTypeAccessor(Child()), ["inc"]))
-                )
-
+            NotFilter(NameFilter(NodeTypeAccessor(Parent()), ["compounddef"])),
+            NotFilter(NameFilter(NodeTypeAccessor(Child()), ["inc"]))
+            )
 
     def create_members_filter(self, options):
 
         section = options.get("sections", "")
 
         if not section.strip():
-            section_filter = GlobFilter(KindAccessor(Child()), self.globber_factory.create("public*"))
+            section_filter = GlobFilter(KindAccessor(Child()),
+                                        self.globber_factory.create("public*"))
         else:
             sections = set([x.strip() for x in section.split(",")])
 
             section_filter = GlobFilter(
-                    KindAccessor(Child()),
-                    self.globber_factory.create(sections.pop())
-                    )
+                KindAccessor(Child()),
+                self.globber_factory.create(sections.pop())
+                )
             while len(sections) > 0:
                 section_filter = OrFilter(
-                        section_filter,
-                        GlobFilter(
-                            KindAccessor(Child()),
-                            self.globber_factory.create(sections.pop())
-                            )
+                    section_filter,
+                    GlobFilter(
+                        KindAccessor(Child()),
+                        self.globber_factory.create(sections.pop())
                         )
+                    )
 
         if "members" not in options:
             return OrFilter(
-                    NotFilter(NameFilter(NodeTypeAccessor(Parent()), ["sectiondef"])),
-                    NotFilter(NameFilter(NodeTypeAccessor(Child()), ["memberdef"]))
-                    )
+                NotFilter(NameFilter(NodeTypeAccessor(Parent()), ["sectiondef"])),
+                NotFilter(NameFilter(NodeTypeAccessor(Child()), ["memberdef"]))
+                )
 
         text = options["members"]
         if not text.strip():
             return OrFilter(
-                    NotFilter(NameFilter(NodeTypeAccessor(Child()), ["sectiondef"])),
-                    section_filter,
-                    NameFilter(KindAccessor(Child()), ["user-defined"])
-                    )
+                NotFilter(NameFilter(NodeTypeAccessor(Child()), ["sectiondef"])),
+                section_filter,
+                NameFilter(KindAccessor(Child()), ["user-defined"])
+                )
 
         # Matches sphinx-autodoc behaviour of comma separated values
         members = set([x.strip() for x in text.split(",")])
@@ -314,14 +330,14 @@ class FilterFactory(object):
         # them if their names are in the members list or they are of type description. This accounts
         # for the actual description of the sectiondef
         return OrFilter(
-                NotFilter(NameFilter(NodeTypeAccessor(Parent()),["sectiondef"])),
-                NameFilter(NodeTypeAccessor(Child()), ["description"]),
-                NameFilter(NameAccessor(Child()), members),
-                )
+            NotFilter(NameFilter(NodeTypeAccessor(Parent()), ["sectiondef"])),
+            NameFilter(NodeTypeAccessor(Child()), ["description"]),
+            NameFilter(NameAccessor(Child()), members),
+            )
 
     def create_outline_filter(self, options):
 
-        if options.has_key("outline"):
+        if 'outline' in options:
             return NotFilter(NameFilter(NodeTypeAccessor(Child()), ["description"]))
         else:
             return OpenFilter()
@@ -331,96 +347,101 @@ class FilterFactory(object):
         valid_names = []
 
         filter_ = AndFilter(
-                AndFilter(
-                    AndFilter(
-                        NotFilter(
-                            # Gather the "namespaces" attribute from the
-                            # compounddef for the file we're rendering and
-                            # store the information in the "valid_names" list
-                            #
-                            # Gather always returns false, so, combined with
-                            # the NotFilter this chunk always returns true and
-                            # so does not affect the result of the filtering
-                            AndFilter(
-                                NameFilter(NodeTypeAccessor(Child()), ["compounddef"]),
-                                NameFilter(KindAccessor(Child()), ["file"]),
-                                FilePathFilter(
-                                    LambdaAccessor(Child(), lambda x: x.location), filename, self.path_handler
-                                    ),
-                                Gather(LambdaAccessor(Child(), lambda x: x.namespaces), valid_names)
-                                )
-                            ),
-                        NotFilter(
-                            # Take the valid_names and everytime we handle an
-                            # innerclass or innernamespace, check that its name
-                            # was one of those initial valid names so that we
-                            # never end up rendering a namespace or class that
-                            # wasn't in the initial file. Notably this is
-                            # required as the location attribute for the
-                            # namespace in the xml is unreliable.
-                            AndFilter(
-                                NameFilter(NodeTypeAccessor(Parent()), ["compounddef"]),
-                                NameFilter(NodeTypeAccessor(Child()), ["ref"]),
-                                NameFilter(NodeNameAccessor(Child()), ["innerclass", "innernamespace"]),
-                                NotFilter(NameFilter(
-                                    LambdaAccessor(Child(), lambda x: x.content_[0].getValue()),
-                                    valid_names
-                                    ))
-                                )
-                            )
-                        ),
-                 NotFilter(
-                     # Ignore innerclasses and innernamespaces that are inside a
-                     # namespace that is going to be rendered as they will be
-                     # rendered with that namespace and we don't want them twice
-                     AndFilter(
-                         NameFilter(NodeTypeAccessor(Parent()), ["compounddef"]),
-                         NameFilter(NodeTypeAccessor(Child()),["ref"]),
-                         NameFilter(NodeNameAccessor(Child()),["innerclass", "innernamespace"]),
-                         NamespaceFilter(
-                             NamespaceAccessor(Parent()),
-                             LambdaAccessor(Child(), lambda x: x.content_[0].getValue())
-                             )
-                         )
-                     ),
-                ),
+            AndFilter(
                 AndFilter(
                     NotFilter(
-                        # Ignore memberdefs from files which are different to
-                        # the one we're rendering. This happens when we have to
-                        # cross into a namespace xml file which has entries
-                        # from multiple files in it
-                        AndFilter(
-                            NameFilter(NodeTypeAccessor(Child()), ["memberdef"]),
-                            NotFilter(
-                                FilePathFilter(LambdaAccessor(Child(), lambda x: x.location), filename, self.path_handler)
-                                )
-                            )
-                        ),
-                    NotFilter(
-                        # Ignore compounddefs which are from another file
-                        # (normally means classes and structs which are in a
-                        # namespace that we have other interests in) but only
-                        # check it if the compounddef is not a namespace
-                        # itself, as for some reason compounddefs for
-                        # namespaces are registered with just a single file
-                        # location even if they namespace is spread over
-                        # multiple files
+                        # Gather the "namespaces" attribute from the
+                        # compounddef for the file we're rendering and
+                        # store the information in the "valid_names" list
+                        #
+                        # Gather always returns false, so, combined with
+                        # the NotFilter this chunk always returns true and
+                        # so does not affect the result of the filtering
                         AndFilter(
                             NameFilter(NodeTypeAccessor(Child()), ["compounddef"]),
-                            NotFilter(NameFilter(KindAccessor(Child()), ["namespace"])),
+                            NameFilter(KindAccessor(Child()), ["file"]),
+                            FilePathFilter(
+                                LambdaAccessor(Child(), lambda x: x.location),
+                                filename, self.path_handler
+                                ),
+                            Gather(LambdaAccessor(Child(), lambda x: x.namespaces), valid_names)
+                            )
+                        ),
+                    NotFilter(
+                        # Take the valid_names and everytime we handle an
+                        # innerclass or innernamespace, check that its name
+                        # was one of those initial valid names so that we
+                        # never end up rendering a namespace or class that
+                        # wasn't in the initial file. Notably this is
+                        # required as the location attribute for the
+                        # namespace in the xml is unreliable.
+                        AndFilter(
+                            NameFilter(NodeTypeAccessor(Parent()), ["compounddef"]),
+                            NameFilter(NodeTypeAccessor(Child()), ["ref"]),
+                            NameFilter(NodeNameAccessor(Child()), ["innerclass", "innernamespace"]),
                             NotFilter(
-                                FilePathFilter(LambdaAccessor(Child(), lambda x: x.location), filename, self.path_handler)
+                                NameFilter(
+                                    LambdaAccessor(Child(), lambda x: x.content_[0].getValue()),
+                                    valid_names
+                                    )
                                 )
+                            )
+                        )
+                    ),
+                NotFilter(
+                    # Ignore innerclasses and innernamespaces that are inside a
+                    # namespace that is going to be rendered as they will be
+                    # rendered with that namespace and we don't want them twice
+                    AndFilter(
+                        NameFilter(NodeTypeAccessor(Parent()), ["compounddef"]),
+                        NameFilter(NodeTypeAccessor(Child()), ["ref"]),
+                        NameFilter(NodeNameAccessor(Child()), ["innerclass", "innernamespace"]),
+                        NamespaceFilter(
+                            NamespaceAccessor(Parent()),
+                            LambdaAccessor(Child(), lambda x: x.content_[0].getValue())
+                            )
+                        )
+                    ),
+                ),
+            AndFilter(
+                NotFilter(
+                    # Ignore memberdefs from files which are different to
+                    # the one we're rendering. This happens when we have to
+                    # cross into a namespace xml file which has entries
+                    # from multiple files in it
+                    AndFilter(
+                        NameFilter(NodeTypeAccessor(Child()), ["memberdef"]),
+                        NotFilter(
+                            FilePathFilter(LambdaAccessor(Child(), lambda x: x.location),
+                                           filename, self.path_handler)
+                            )
+                        )
+                    ),
+                NotFilter(
+                    # Ignore compounddefs which are from another file
+                    # (normally means classes and structs which are in a
+                    # namespace that we have other interests in) but only
+                    # check it if the compounddef is not a namespace
+                    # itself, as for some reason compounddefs for
+                    # namespaces are registered with just a single file
+                    # location even if they namespace is spread over
+                    # multiple files
+                    AndFilter(
+                        NameFilter(NodeTypeAccessor(Child()), ["compounddef"]),
+                        NotFilter(NameFilter(KindAccessor(Child()), ["namespace"])),
+                        NotFilter(
+                            FilePathFilter(LambdaAccessor(Child(), lambda x: x.location),
+                                           filename, self.path_handler)
                             )
                         )
                     )
                 )
+            )
 
         return AndFilter(
-                self.create_outline_filter(options),
-                filter_
-                )
+            self.create_outline_filter(options),
+            filter_
+            )
 
     def create_group_content_filter(self):
         """Returns a filter which matches the contents of the group but not the group name or
@@ -433,38 +454,37 @@ class FilterFactory(object):
         # Display the contents of the sectiondef nodes and any innerclass or innernamespace
         # references
         return OrFilter(
-                NameFilter(NodeTypeAccessor(Parent()), ["sectiondef"]),
-                AndFilter(
-                    NameFilter(NodeTypeAccessor(Child()), ["ref"]),
-                    NameFilter(NodeNameAccessor(Child()), ["innerclass", "innernamespace"]),
-                    )
+            NameFilter(NodeTypeAccessor(Parent()), ["sectiondef"]),
+            AndFilter(
+                NameFilter(NodeTypeAccessor(Child()), ["ref"]),
+                NameFilter(NodeNameAccessor(Child()), ["innerclass", "innernamespace"]),
                 )
+            )
 
     def create_index_filter(self, options):
 
         filter_ = AndFilter(
-                NotFilter(
-                    AndFilter(
-                        NameFilter(NodeTypeAccessor(Parent()), ["compounddef"]),
-                        NameFilter(NodeTypeAccessor(Child()),["ref"]),
-                        NameFilter(NodeNameAccessor(Child()),["innerclass", "innernamespace"])
-                        )
-                    ),
-                NotFilter(
-                    AndFilter(
-                        NameFilter(NodeTypeAccessor(Parent()), ["compounddef"]),
-                        NameFilter(KindAccessor(Parent()), ["group"]),
-                        NameFilter(NodeTypeAccessor(Child()),["sectiondef"]),
-                        NameFilter(KindAccessor(Child()),["func"])
-                        )
+            NotFilter(
+                AndFilter(
+                    NameFilter(NodeTypeAccessor(Parent()), ["compounddef"]),
+                    NameFilter(NodeTypeAccessor(Child()), ["ref"]),
+                    NameFilter(NodeNameAccessor(Child()), ["innerclass", "innernamespace"])
+                    )
+                ),
+            NotFilter(
+                AndFilter(
+                    NameFilter(NodeTypeAccessor(Parent()), ["compounddef"]),
+                    NameFilter(KindAccessor(Parent()), ["group"]),
+                    NameFilter(NodeTypeAccessor(Child()), ["sectiondef"]),
+                    NameFilter(KindAccessor(Child()), ["func"])
                     )
                 )
-
+            )
 
         return AndFilter(
-                self.create_outline_filter(options),
-                filter_
-                )
+            self.create_outline_filter(options),
+            filter_
+            )
 
     def create_open_filter(self):
         """Returns a completely open filter which matches everything"""
@@ -474,11 +494,11 @@ class FilterFactory(object):
     def create_file_finder_filter(self, filename):
 
         filter_ = AndFilter(
-                    NameFilter(NodeTypeAccessor(Child()), ["compounddef"]),
-                    NameFilter(KindAccessor(Child()), ["file"]),
-                    FilePathFilter(LambdaAccessor(Child(), lambda x: x.location), filename,
-                                   self.path_handler)
-                    )
+            NameFilter(NodeTypeAccessor(Child()), ["compounddef"]),
+            NameFilter(KindAccessor(Child()), ["file"]),
+            FilePathFilter(LambdaAccessor(Child(), lambda x: x.location), filename,
+                           self.path_handler)
+            )
 
         return filter_
 
@@ -490,10 +510,10 @@ class FilterFactory(object):
         contents."""
 
         filter_ = AndFilter(
-                    NameFilter(NodeTypeAccessor(Child()), ["compound"]),
-                    NameFilter(KindAccessor(Child()), ["group"]),
-                    NameFilter(NameAccessor(Child()), [name])
-                    )
+            NameFilter(NodeTypeAccessor(Child()), ["compound"]),
+            NameFilter(KindAccessor(Child()), ["group"]),
+            NameFilter(NameAccessor(Child()), [name])
+            )
 
         return filter_
 
