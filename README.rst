@@ -77,6 +77,7 @@ Thank you to:
 - `Andrew Hundt <https://github.com/ahundt>`_
 - `sebastinas <https://github.com/sebastinas>`_
 - `robo9k <https://github.com/robo9k>`_
+- `sieben <https://github.com/sieben>`_
 
 For their contributions; reporting issues and improving the code and
 documentation. And thanks to:
