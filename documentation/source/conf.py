@@ -51,9 +51,20 @@ try:
 except ImportError:
     pass
 
+
 # Configuration for spelling extension
 spelling_word_list_filename='spelling_wordlist.txt'
 spelling_lang='en_US'
+
+
+# Configuration for mathjax extension
+# 
+# Set path for mathjax js to a https URL as sometimes the Breathe docs are displayed under https
+# and we can't load an http mathjax file from an https view of the docs. So we change to a https
+# mathjax file which we can load from http or https. We break the url over two lines.
+mathjax_path = 'https://c328740.ssl.cf1.rackcdn.com/' \
+               'mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML'
+
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
