@@ -13,8 +13,12 @@ Breathe is available from github and `PyPI, the Python Package Index
 Documentation
 -------------
 
-Documentation is available in the ``documentation`` folder and up in full `here
-<http://michaeljones.github.com/breathe>`_.
+The documentation is available `here <http://breathe.readthedocs.org/>`_. Thank
+you to the people running `Read the Docs <http://readthedocs.org>`_ for such an
+excellent service.
+
+The source for the documentation is in the ``documentation`` folder if you want
+to built it and read it locally.
 
 Testing
 -------
