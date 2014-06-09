@@ -33,7 +33,7 @@ class Finder(object):
         """Adds all nodes which match the filter into the matches list"""
 
         item_finder = self.item_finder_factory.create_finder(self._root)
-        item_finder.filter_(FakeParentNode(), filter_, matches)
+        item_finder.filter_([FakeParentNode()], filter_, matches)
 
     def find_one(self, matcher_stack):
 
