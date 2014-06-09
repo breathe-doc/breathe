@@ -1,0 +1,36 @@
+#!/bin/sh
+
+first=$1
+second=$2
+
+firstdir=comparison/first
+seconddir=comparison/second
+
+# Make sure the output directory exists
+mkdir -p comparison
+
+# Remove any previous builds
+rm -fr $firstdir
+rm -fr $seconddir
+
+# Checkout the first target
+echo git checkout $1
+git checkout $1
+# Make sure the BUILDDIR variable can be overridden in the Makfile. Required for older commits
+sed -i 's/BUILDDIR      = build/BUILDDIR     ?= build/g' Makefile
+# Build into our first comparison directory
+make html BUILDDIR=$firstdir
+# Reset the Makefile to its state for this commit
+git checkout Makefile
+
+
+# Checkout the second target and repeat
+echo git checkout $2
+git checkout $2
+sed -i 's/BUILDDIR      = build/BUILDDIR     ?= build/g' Makefile
+make html BUILDDIR=$seconddir
+git checkout Makefile
+
+# Launch meld to compare the two html directories
+meld $firstdir/html $seconddir/html
+
