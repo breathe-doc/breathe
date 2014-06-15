@@ -265,6 +265,15 @@ class FilterFactory(object):
         self.globber_factory = globber_factory
         self.path_handler = path_handler
 
+    def create_group_render_filter(self, options):
+
+        # Allow if it is either not a sectiondef or, if it is, it is a sectiondef which matches our
+        # section filter
+        return OrFilter(
+            NotFilter(InFilter(NodeTypeAccessor(Node()), ["sectiondef"])),
+            self.create_section_filter(options)
+            )
+
     def create_class_filter(self, options):
 
         return AndFilter(
@@ -308,9 +317,11 @@ class FilterFactory(object):
             # Create a set of the sections
             sections = set([x.strip() for x in section.split(",")])
 
+            def create_filter(section):
+                return GlobFilter(KindAccessor(Node()), self.globber_factory.create(section))
+
             # Create a filter for each section
-            filters = map(lambda s: GlobFilter(KindAccessor(Node()), sel.globber_factory.create(s)),
-                          sections)
+            filters = map(create_filter, sections)
 
             # 'Or' all the section filters together
             section_filter = OrFilter(*filters)
