@@ -305,20 +305,15 @@ class FilterFactory(object):
             section_filter = GlobFilter(KindAccessor(Node()),
                                         self.globber_factory.create("public*"))
         else:
+            # Create a set of the sections
             sections = set([x.strip() for x in section.split(",")])
 
-            section_filter = GlobFilter(
-                KindAccessor(Node()),
-                self.globber_factory.create(sections.pop())
-                )
-            while len(sections) > 0:
-                section_filter = OrFilter(
-                    section_filter,
-                    GlobFilter(
-                        KindAccessor(Node()),
-                        self.globber_factory.create(sections.pop())
-                        )
-                    )
+            # Create a filter for each section
+            filters = map(lambda s: GlobFilter(KindAccessor(Node()), sel.globber_factory.create(s)),
+                          sections)
+
+            # 'Or' all the section filters together
+            section_filter = OrFilter(*filters)
 
         return section_filter
 
