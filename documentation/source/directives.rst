@@ -240,8 +240,8 @@ additionally ``members`` and ``sections`` option.
    members are named.  The list can accept wildcards.  For instance, if you want
    to display the all protected and public members, functions, etc, then specify
    ``:sections: public*, protected*``.
-   
-   By default, Breathe specifies ``public*``.
+
+   By default, Breathe specifies ``public*, func*``.
 
    Note that if your Doxygen project uses properties, these are excluded by
    default.  Specify ``:sections: public*, property`` to include both public

@@ -311,20 +311,19 @@ class FilterFactory(object):
         section = options.get("sections", "")
 
         if not section.strip():
-            section_filter = GlobFilter(KindAccessor(Node()),
-                                        self.globber_factory.create("public*"))
-        else:
-            # Create a set of the sections
-            sections = set([x.strip() for x in section.split(",")])
+            section = "public*, func*"
 
-            def create_filter(section):
-                return GlobFilter(KindAccessor(Node()), self.globber_factory.create(section))
+        # Create a set of the sections
+        sections = set([x.strip() for x in section.split(",")])
 
-            # Create a filter for each section
-            filters = map(create_filter, sections)
+        def create_filter(section):
+            return GlobFilter(KindAccessor(Node()), self.globber_factory.create(section))
 
-            # 'Or' all the section filters together
-            section_filter = OrFilter(*filters)
+        # Create a filter for each section
+        filters = map(create_filter, sections)
+
+        # 'Or' all the section filters together
+        section_filter = OrFilter(*filters)
 
         return section_filter
 
