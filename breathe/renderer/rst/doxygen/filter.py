@@ -265,6 +265,15 @@ class FilterFactory(object):
         self.globber_factory = globber_factory
         self.path_handler = path_handler
 
+    def create_group_render_filter(self, options):
+
+        # Allow if it is either not a sectiondef or, if it is, it is a sectiondef which matches our
+        # section filter
+        return OrFilter(
+            NotFilter(InFilter(NodeTypeAccessor(Node()), ["sectiondef"])),
+            self.create_section_filter(options)
+            )
+
     def create_class_filter(self, options):
 
         return AndFilter(
@@ -297,34 +306,36 @@ class FilterFactory(object):
             NotFilter(InFilter(NodeTypeAccessor(Node()), ["inc"]))
             )
 
-    def create_members_filter(self, options):
+    def create_section_filter(self, options):
 
         section = options.get("sections", "")
 
         if not section.strip():
-            section_filter = GlobFilter(KindAccessor(Node()),
-                                        self.globber_factory.create("public*"))
-        else:
-            sections = set([x.strip() for x in section.split(",")])
+            section = "public*, func*"
 
-            section_filter = GlobFilter(
-                KindAccessor(Node()),
-                self.globber_factory.create(sections.pop())
-                )
-            while len(sections) > 0:
-                section_filter = OrFilter(
-                    section_filter,
-                    GlobFilter(
-                        KindAccessor(Node()),
-                        self.globber_factory.create(sections.pop())
-                        )
-                    )
+        # Create a set of the sections
+        sections = set([x.strip() for x in section.split(",")])
+
+        def create_filter(section):
+            return GlobFilter(KindAccessor(Node()), self.globber_factory.create(section))
+
+        # Create a filter for each section
+        filters = map(create_filter, sections)
+
+        # 'Or' all the section filters together
+        section_filter = OrFilter(*filters)
+
+        return section_filter
+
+    def create_members_filter(self, options):
 
         if "members" not in options:
             return OrFilter(
                 NotFilter(InFilter(NodeTypeAccessor(Parent()), ["sectiondef"])),
                 NotFilter(InFilter(NodeTypeAccessor(Node()), ["memberdef"]))
                 )
+
+        section_filter = self.create_section_filter(options)
 
         text = options["members"]
         if not text.strip():

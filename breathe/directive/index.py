@@ -3,6 +3,7 @@ from breathe.renderer.rst.doxygen import format_parser_error
 from breathe.directive.base import BaseDirective
 from breathe.project import ProjectError
 from breathe.parser import ParserError, FileIOError
+from .base import WarningHandler, create_warning
 
 from docutils.parsers.rst.directives import unchanged_required, flag
 from docutils import nodes
@@ -76,9 +77,8 @@ class DoxygenIndexDirective(BaseIndexDirective):
         try:
             project_info = self.project_info_factory.create_project_info(self.options)
         except ProjectError, e:
-            warning = 'doxygenindex: %s' % e
-            return [nodes.warning("", nodes.paragraph("", "", nodes.Text(warning))),
-                    self.state.document.reporter.warning(warning, line=self.lineno)]
+            warning = create_warning(None, self.state, self.lineno)
+            return warning.warn('doxygenindex: %s' % e)
 
         return self.handle_contents(project_info)
 
@@ -102,9 +102,8 @@ class AutoDoxygenIndexDirective(BaseIndexDirective):
         try:
             project_info = self.project_info_factory.retrieve_project_info_for_auto(self.options)
         except ProjectError, e:
-            warning = 'autodoxygenindex: %s' % e
-            return [nodes.warning("", nodes.paragraph("", "", nodes.Text(warning))),
-                    self.state.document.reporter.warning(warning, line=self.lineno)]
+            warning = create_warning(None, self.state, self.lineno)
+            return warning.warn('autodoxygenindex: %s' % e)
 
         return self.handle_contents(project_info)
 

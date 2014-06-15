@@ -6,12 +6,17 @@ second=$2
 firstdir=comparison/first
 seconddir=comparison/second
 
+# Remember the branch we're on
+currentbranch=`git symbolic-ref --short HEAD`
+
 # Make sure the output directory exists
 mkdir -p comparison
 
 # Remove any previous builds
 rm -fr $firstdir
 rm -fr $seconddir
+
+export BREATHE_COMPARE=True
 
 # Checkout the first target
 echo git checkout $1
@@ -30,6 +35,10 @@ git checkout $2
 sed -i 's/BUILDDIR      = build/BUILDDIR     ?= build/g' Makefile
 make html BUILDDIR=$seconddir
 git checkout Makefile
+
+# Return to our current branch
+echo git checkout $currentbranch
+git checkout $currentbranch
 
 # Launch meld to compare the two html directories
 meld $firstdir/html $seconddir/html
