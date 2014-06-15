@@ -1,6 +1,7 @@
 
 from breathe.directive.base import BaseDirective
 from breathe.project import ProjectError
+from .base import WarningHandler, create_warning
 
 from docutils.parsers.rst.directives import unchanged_required, flag
 from docutils import nodes
@@ -25,22 +26,14 @@ class BaseFileDirective(BaseDirective):
         finder.filter_(finder_filter, matches)
 
         if len(matches) > 1:
-            warning = (
-                'doxygenfile: Found multiple matches for file "%s" in doxygen xml output for '
-                'project "%s" from directory: %s' % (
-                    file_, project_info.name(), project_info.project_path()
-                    )
-                )
-            return [nodes.warning("", nodes.paragraph("", "", nodes.Text(warning))),
-                    self.state.document.reporter.warning(warning, line=self.lineno)]
+            warning = create_warning(None, self.state, self.lineno, file=file_,
+                                     directivename=self.directive_name)
+            return warning.warn('{directivename}: Found multiple matches for file "{file} {tail}')
 
         elif not matches:
-            warning = (
-                'doxygenfile: Cannot find file "%s" in doxygen xml output for project "%s" from '
-                'directory: %s' % (file_, project_info.name(), project_info.project_path())
-                )
-            return [nodes.warning("", nodes.paragraph("", "", nodes.Text(warning))),
-                    self.state.document.reporter.warning(warning, line=self.lineno)]
+            warning = create_warning(None, self.state, self.lineno, file=file_,
+                                     directivename=self.directive_name)
+            return warning.warn('{directivename}: Cannot find file "{file} {tail}')
 
         target_handler = self.target_handler_factory.create_target_handler(
             self.options, project_info, self.state.document)
@@ -71,6 +64,8 @@ class BaseFileDirective(BaseDirective):
 
 class DoxygenFileDirective(BaseFileDirective):
 
+    directive_name = 'doxygenfile'
+
     required_arguments = 0
     optional_arguments = 2
     option_spec = {
@@ -89,14 +84,15 @@ class DoxygenFileDirective(BaseFileDirective):
         try:
             project_info = self.project_info_factory.create_project_info(self.options)
         except ProjectError, e:
-            warning = 'doxygenfile: %s' % e
-            return [nodes.warning("", nodes.paragraph("", "", nodes.Text(warning))),
-                    self.state.document.reporter.warning(warning, line=self.lineno)]
+            warning = create_warning(None, self.state, self.lineno)
+            return warning.warn('doxygenfile: %s' % e)
 
         return self.handle_contents(file_, project_info)
 
 
 class AutoDoxygenFileDirective(BaseFileDirective):
+
+    directive_name = 'autodoxygenfile'
 
     required_arguments = 1
     option_spec = {
@@ -116,8 +112,8 @@ class AutoDoxygenFileDirective(BaseFileDirective):
         try:
             project_info = self.project_info_factory.retrieve_project_info_for_auto(self.options)
         except ProjectError, e:
-            warning = 'autodoxygenfile: %s' % e
-            return [nodes.warning("", nodes.paragraph("", "", nodes.Text(warning))),
-                    self.state.document.reporter.warning(warning, line=self.lineno)]
+            warning = create_warning(None, self.state, self.lineno)
+            return warning.warn('autodoxygenfile: %s' % e)
 
         return self.handle_contents(file_, project_info)
+

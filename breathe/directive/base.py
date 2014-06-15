@@ -8,6 +8,37 @@ from docutils.parsers import rst
 from docutils.parsers.rst.directives import unchanged_required, flag
 from docutils import nodes
 
+class WarningHandler(object):
+
+    def __init__(self, state, context):
+        self.state = state
+        self.context = context
+
+    def warn(self, text):
+        result = text.format(**self.context)
+        return [
+            nodes.warning("", nodes.paragraph("", "", nodes.Text(result))),
+            self.state.document.reporter.warning(result, line=self.context['lineno'])
+            ]
+
+
+def create_warning(project_info, state, lineno, **kwargs):
+
+    tail = ''
+    if project_info:
+        tail = 'in doxygen xml output for project "{project}" from directory: {path}'.format(
+            project=project_info.name(),
+            path=project_info.project_path()
+            )
+
+    context = dict(
+        lineno=lineno,
+        tail=tail,
+        **kwargs
+        )
+
+    return WarningHandler(state, context)
+
 
 class BaseDirective(rst.Directive):
 
@@ -76,9 +107,8 @@ class DoxygenBaseDirective(BaseDirective):
         try:
             project_info = self.project_info_factory.create_project_info(self.options)
         except ProjectError, e:
-            warning = 'doxygen%s: %s' % (self.kind, e)
-            return [nodes.warning("", nodes.paragraph("", "", nodes.Text(warning))),
-                    self.state.document.reporter.warning(warning, line=self.lineno)]
+            warning = create_warning(None, self.state, self.lineno)
+            return warning.warn('doxygen%s: %s' % (self.kind, e))
 
         finder = self.finder_factory.create_finder(project_info)
 
@@ -88,18 +118,13 @@ class DoxygenBaseDirective(BaseDirective):
             data_object = finder.find_one(matcher_stack)
         except NoMatchesError, e:
             display_name = "%s::%s" % (namespace, name) if namespace else name
-            warning = (
-                'doxygen%s: Cannot find %s "%s" in doxygen xml output for project "%s" from '
-                'directory: %s' % (
-                    self.kind, self.kind, display_name, project_info.name(),
-                    project_info.project_path()
-                    )
-                )
-            return [nodes.warning("", nodes.paragraph("", "", nodes.Text(warning))),
-                    self.state.document.reporter.warning(warning, line=self.lineno)]
+            warning = create_warning(project_info, self.state, self.lineno, name=display_name,
+                                     kind=self.kind)
+            return warning.warn('doxygen{kind}: Cannot find {kind} "{name}" {tail}')
 
         target_handler = self.target_handler_factory.create_target_handler(
             self.options, project_info, self.state.document)
         filter_ = self.filter_factory.create_outline_filter(self.options)
 
         return self.render(data_object, project_info, filter_, target_handler)
+

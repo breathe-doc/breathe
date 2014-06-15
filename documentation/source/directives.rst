@@ -240,8 +240,8 @@ additionally ``members`` and ``sections`` option.
    members are named.  The list can accept wildcards.  For instance, if you want
    to display the all protected and public members, functions, etc, then specify
    ``:sections: public*, protected*``.
-   
-   By default, breathe specifies ``public*``.
+
+   By default, Breathe specifies ``public*, func*``.
 
    Note that if your Doxygen project uses properties, these are excluded by
    default.  Specify ``:sections: public*, property`` to include both public
@@ -298,13 +298,7 @@ group. A doxygen group can be declared with specific doxygen markup in the
 source comments as cover in the `doxygen documentation`_.
 
 It takes the standard ``project``, ``path``, ``outline`` and ``no-link`` options
-and additionally the ``content-only`` option.
-
-``content-only``
-   If this flag is specified, then the directive does not output the name of the
-   group or the group description and instead outputs the contents of the group.
-   This can be useful if the groups are only used for organizational purposes
-   and not to provide additional information.
+and additionally the ``content-only`` and ``sections`` options.
 
 ::
 
@@ -312,9 +306,11 @@ and additionally the ``content-only`` option.
       :project: ...
       :path: ...
       :content-only:
+      :sections: [...]
       :no-link:
 
-Checkout the :ref:`example <group-example>` to see it in action.
+Checkout the :ref:`doxygengroup documentation <group-example>` for more details
+and to see it in action.
 
 .. _doxygen documentation: http://www.stack.nl/~dimitri/doxygen/manual/grouping.html
 

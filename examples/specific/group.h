@@ -7,8 +7,17 @@
 //! \brief first class inside of namespace
 class GroupedClassTest {
 
+public:
     //! \brief namespaced class function
-    virtual void function() const = 0;
+    virtual void publicFunction() const = 0;
+
+private:
+
+    //! This is a private function
+    void privateFunction() const = 0;
+
+    //! This is another private function
+    void secondPrivateFunction() const = 0;
 };
 
 //! This function is in MyGroup
@@ -20,9 +29,16 @@ void groupedFunction();
 //! \brief second class inside of namespace
 class UngroupedClassTest {
 
+public:
     //! \brief second namespaced class function
     void function() {};
+
+private:
+
+    //! A private function
+    void ungroupedPrivateFunction() {};
 };
 
 //! Ungrouped function
 void ungroupedFunction();
+

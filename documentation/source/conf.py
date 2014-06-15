@@ -81,6 +81,14 @@ else:
     documentation_build = "development"
 
 
+# If we're doing a comparison then set the version & release to 'compare' so that they are always
+# the same otherwise they can come up as changes when we really don't care if they are different.
+comparison = os.environ.get('BREATHE_COMPARE', None) == 'True'
+
+if comparison:
+    version = 'compare'
+    release = 'compare'
+
 # Only add spelling extension if it is available. We don't know if it is installed as we don't want
 # to put it in the setup.py file as a dependency as we don't want Breathe to be dependent on it as
 # people should be able to use Breathe without 'spelling'. There might be a better way to handle
