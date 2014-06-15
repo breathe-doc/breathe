@@ -9,7 +9,8 @@ from breathe.renderer.rst.doxygen.filter import FilterFactory, GlobFactory
 from breathe.renderer.rst.doxygen.target import TargetHandlerFactory
 from breathe.finder.doxygen.core import DoxygenItemFinderFactoryCreator
 from breathe.finder.doxygen.matcher import ItemMatcherFactory
-from breathe.directive.base import BaseDirective, DoxygenBaseDirective
+from breathe.directive.base import BaseDirective, DoxygenBaseDirective, WarningHandler, \
+    create_warning
 from breathe.directive.index import DoxygenIndexDirective, AutoDoxygenIndexDirective
 from breathe.directive.file import DoxygenFileDirective, AutoDoxygenFileDirective
 from breathe.process import AutoDoxygenProcessHandle
@@ -50,38 +51,6 @@ class NodeNotFoundError(BreatheError):
 
 # Directives
 # ----------
-
-class WarningHandler(object):
-
-    def __init__(self, state, context):
-        self.state = state
-        self.context = context
-
-    def warn(self, text):
-        result = text.format(**self.context)
-        return [
-            docutils.nodes.warning("", docutils.nodes.paragraph("", "", docutils.nodes.Text(result))),
-            self.state.document.reporter.warning(result, line=self.context['lineno'])
-            ]
-
-
-def create_warning(project_info, state, lineno, **kwargs):
-
-    tail = ''
-    if project_info:
-        tail = 'in doxygen xml output for project "{project}" from directory: {path}'.format(
-            project=project_info.name(),
-            path=project_info.project_path()
-            )
-
-    context = dict(
-        lineno=lineno,
-        tail=tail,
-        **kwargs
-        )
-
-    return WarningHandler(state, context)
-
 
 class DoxygenFunctionDirective(BaseDirective):
 
