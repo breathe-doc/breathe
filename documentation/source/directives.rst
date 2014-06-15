@@ -241,7 +241,9 @@ additionally ``members`` and ``sections`` option.
    to display the all protected and public members, functions, etc, then specify
    ``:sections: public*, protected*``.
 
-   By default, Breathe specifies ``public*, func*``.
+   By default, Breathe specifies ``public*, func*``, however this can be
+   overridden in the ``conf.py`` with the :ref:`breathe_default_sections
+   <breathe-default-sections>` config variable.
 
    Note that if your Doxygen project uses properties, these are excluded by
    default.  Specify ``:sections: public*, property`` to include both public
@@ -396,4 +398,17 @@ Config Values
 
    Breathe will take the final value and append ``breathe/doxygen/<project
    name>`` to the path to minimize conflicts.
+
+.. _breathe-default-sections:
+
+.. confval:: breathe_default_sections
+
+   Provides the default value for the ``sections`` option for the directives
+   which have it. By default, this is set to ``('public*', 'func*')`` which
+   means that all top level functions and public class members & functions 
+   are included by default in the output. If you change this to::
+
+      breathe_default_sections = ('public*', 'private*', 'func*')
+
+   Then all private classes members and functions are also included.
 
