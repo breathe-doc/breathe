@@ -287,10 +287,10 @@ class DoxygenGroupDirective(BaseDirective):
             # Unpack the single entry in the matches list
             (data_object,) = matches
 
-            filter_ = self.filter_factory.create_group_content_filter()
+            filter_ = self.filter_factory.create_group_content_filter(self.options)
 
             # Having found the compound node for the group in the index we want to grab the contents
-            # of
+            # of the group which match the filter
             contents_finder = self.finder_factory.create_finder_from_root(data_object, project_info)
             contents = []
             contents_finder.filter_(filter_, contents)
@@ -869,6 +869,7 @@ def setup(app):
     app.add_config_value("breathe_domain_by_file_pattern", {}, True)
     app.add_config_value("breathe_projects_source", {}, True)
     app.add_config_value("breathe_build_directory", '', True)
+    app.add_config_value("breathe_default_sections", ('public*', 'func*'), True)
 
     app.add_stylesheet("breathe.css")
 
@@ -882,6 +883,8 @@ def setup(app):
     app.connect("builder-inited", doxygen_handle.generate_xml)
 
     app.connect("builder-inited", directive_factory.get_config_values)
+
+    app.connect("builder-inited", filter_factory.get_config_values)
 
     app.connect("env-get-outdated", file_state_cache.get_outdated)
 

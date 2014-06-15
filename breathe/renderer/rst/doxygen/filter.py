@@ -264,6 +264,7 @@ class FilterFactory(object):
 
         self.globber_factory = globber_factory
         self.path_handler = path_handler
+        self.default_sections = ()
 
     def create_group_render_filter(self, options):
 
@@ -310,11 +311,13 @@ class FilterFactory(object):
 
         section = options.get("sections", "")
 
-        if not section.strip():
-            section = "public*, func*"
-
         # Create a set of the sections
-        sections = set([x.strip() for x in section.split(",")])
+        if section.strip():
+            sections = set([x.strip() for x in section.split(",")])
+        else:
+            # If nothing has been specified then get the defaults
+            # which the user can set in the conf.py
+            sections = self.default_sections
 
         def create_filter(section):
             return GlobFilter(KindAccessor(Node()), self.globber_factory.create(section))
@@ -459,18 +462,23 @@ class FilterFactory(object):
             filter_
             )
 
-    def create_group_content_filter(self):
+    def create_group_content_filter(self, options):
         """Returns a filter which matches the contents of the group but not the group name or
         description.
 
         This allows the groups to be used to structure sections of the documentation rather than to
         structure and further document groups of documentation
+
+        Respects the :sections: setting in the options argument.
         """
 
-        # Display the contents of the sectiondef nodes and any innerclass or innernamespace
-        # references
+        # Display the contents of the sectiondef nodes which match the :sections: options and any
+        # innerclass or innernamespace references
         return OrFilter(
-            InFilter(NodeTypeAccessor(Parent()), ["sectiondef"]),
+            AndFilter(
+                InFilter(NodeTypeAccessor(Parent()), ["sectiondef"]),
+                self.create_section_filter(options)
+                ),
             AndFilter(
                 InFilter(NodeTypeAccessor(Node()), ["ref"]),
                 InFilter(NodeNameAccessor(Node()), ["innerclass", "innernamespace"]),
@@ -533,3 +541,9 @@ class FilterFactory(object):
 
         return filter_
 
+    def get_config_values(self, app):
+        """Extract the breathe_default_sections config value and store it.
+
+        This method is called on the 'builder-init' event in Sphinx"""
+
+        self.default_sections = app.config.breathe_default_sections
