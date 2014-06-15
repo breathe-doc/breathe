@@ -462,18 +462,23 @@ class FilterFactory(object):
             filter_
             )
 
-    def create_group_content_filter(self):
+    def create_group_content_filter(self, options):
         """Returns a filter which matches the contents of the group but not the group name or
         description.
 
         This allows the groups to be used to structure sections of the documentation rather than to
         structure and further document groups of documentation
+
+        Respects the :sections: setting in the options argument.
         """
 
-        # Display the contents of the sectiondef nodes and any innerclass or innernamespace
-        # references
+        # Display the contents of the sectiondef nodes which match the :sections: options and any
+        # innerclass or innernamespace references
         return OrFilter(
-            InFilter(NodeTypeAccessor(Parent()), ["sectiondef"]),
+            AndFilter(
+                InFilter(NodeTypeAccessor(Parent()), ["sectiondef"]),
+                self.create_section_filter(options)
+                ),
             AndFilter(
                 InFilter(NodeTypeAccessor(Node()), ["ref"]),
                 InFilter(NodeNameAccessor(Node()), ["innerclass", "innernamespace"]),
