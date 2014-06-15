@@ -4,8 +4,6 @@
 doxygengroup Directive
 ======================
 
-.. contents::
-
 This directive generates the appropriate output for the contents of a doxygen
 group. A doxygen group can be declared with specific doxygen markup in the
 source comments as cover in the `doxygen documentation`_.
@@ -28,7 +26,9 @@ and additionally the ``content-only`` and ``sections`` options.
    public members, functions, etc, then specify ``:sections: public*,
    protected*``.
 
-   By default, Breathe specifies ``public*, func*``.
+   By default, Breathe specifies ``public*, func*``, however this can be
+   overridden in the ``conf.py`` with the :ref:`breathe_default_sections
+   <breathe-default-sections>` config variable.
 
    Note that if your Doxygen project uses properties, these are excluded by
    default. Specify ``:sections: public*, property`` to include both public
@@ -104,7 +104,10 @@ Produces this output:
 ----
 
 In which the private functions are listed as well as the public ones due to the
-specification of ``private*`` for the ``sections`` option.
+specification of ``private*`` for the ``sections`` option, and the
+``void groupedFunction()`` is not listed as the ``sections`` option has
+overridden the global :ref:`breathe_default_sections <breathe-default-sections>`
+and removed the ``func*`` element.
 
 Failing Example
 ---------------
@@ -120,3 +123,4 @@ It produces the following warning message:
 
 .. warning:: Cannot find file "madeupgroup" in doxygen xml output for project
              "group" from directory: ../../examples/specific/group/xml/
+
