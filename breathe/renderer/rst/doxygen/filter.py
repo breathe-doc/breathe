@@ -297,7 +297,7 @@ class FilterFactory(object):
             NotFilter(InFilter(NodeTypeAccessor(Node()), ["inc"]))
             )
 
-    def create_members_filter(self, options):
+    def create_section_filter(self, options):
 
         section = options.get("sections", "")
 
@@ -320,11 +320,17 @@ class FilterFactory(object):
                         )
                     )
 
+        return section_filter
+
+    def create_members_filter(self, options):
+
         if "members" not in options:
             return OrFilter(
                 NotFilter(InFilter(NodeTypeAccessor(Parent()), ["sectiondef"])),
                 NotFilter(InFilter(NodeTypeAccessor(Node()), ["memberdef"]))
                 )
+
+        section_filter = self.create_section_filter(options)
 
         text = options["members"]
         if not text.strip():
