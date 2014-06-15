@@ -104,7 +104,10 @@ Produces this output:
 ----
 
 In which the private functions are listed as well as the public ones due to the
-specification of ``private*`` for the ``sections`` option.
+specification of ``private*`` for the ``sections`` option, and the
+``void groupedFunction()`` is not listed as the ``sections`` option has
+overridden the global :ref:`breathe_default_sections <breathe-default-sections>`
+and removed the ``func*`` element.
 
 Failing Example
 ---------------
@@ -120,3 +123,4 @@ It produces the following warning message:
 
 .. warning:: Cannot find file "madeupgroup" in doxygen xml output for project
              "group" from directory: ../../examples/specific/group/xml/
+

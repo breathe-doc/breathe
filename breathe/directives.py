@@ -287,10 +287,10 @@ class DoxygenGroupDirective(BaseDirective):
             # Unpack the single entry in the matches list
             (data_object,) = matches
 
-            filter_ = self.filter_factory.create_group_content_filter()
+            filter_ = self.filter_factory.create_group_content_filter(self.options)
 
             # Having found the compound node for the group in the index we want to grab the contents
-            # of
+            # of the group which match the filter
             contents_finder = self.finder_factory.create_finder_from_root(data_object, project_info)
             contents = []
             contents_finder.filter_(filter_, contents)
