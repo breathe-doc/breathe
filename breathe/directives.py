@@ -250,6 +250,7 @@ class DoxygenGroupDirective(BaseDirective):
         "path": unchanged_required,
         "project": unchanged_required,
         "content-only": flag,
+        "sections": unchanged,
         "no-link": flag,
         }
     has_content = False
@@ -300,7 +301,7 @@ class DoxygenGroupDirective(BaseDirective):
         target_handler = self.target_handler_factory.create_target_handler(
             self.options, project_info, self.state.document
             )
-        filter_ = self.filter_factory.create_open_filter()
+        filter_ = self.filter_factory.create_group_render_filter(self.options)
 
         renderer_factory_creator = self.renderer_factory_creator_constructor.create_factory_creator(
             project_info,
