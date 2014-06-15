@@ -4,8 +4,6 @@
 doxygengroup Directive
 ======================
 
-.. contents::
-
 This directive generates the appropriate output for the contents of a doxygen
 group. A doxygen group can be declared with specific doxygen markup in the
 source comments as cover in the `doxygen documentation`_.
@@ -28,7 +26,9 @@ and additionally the ``content-only`` and ``sections`` options.
    public members, functions, etc, then specify ``:sections: public*,
    protected*``.
 
-   By default, Breathe specifies ``public*, func*``.
+   By default, Breathe specifies ``public*, func*``, however this can be
+   overridden in the ``conf.py`` with the :ref:`breathe_default_sections
+   <breathe-default-sections>` config variable.
 
    Note that if your Doxygen project uses properties, these are excluded by
    default. Specify ``:sections: public*, property`` to include both public
