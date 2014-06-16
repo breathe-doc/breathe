@@ -88,6 +88,8 @@ class CompoundDefTypeSubRenderer(Renderer):
 
         # Take care of innerclasses
         for innerclass in self.data_object.innerclass:
+            if innerclass.prot == 'private':
+                continue
             renderer = self.renderer_factory.create_renderer(self.data_object, innerclass)
             nodelist.extend(renderer.render())
 
