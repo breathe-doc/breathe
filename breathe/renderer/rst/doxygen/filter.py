@@ -528,54 +528,25 @@ class FilterFactory(object):
         This allows the groups to be used to structure sections of the documentation rather than to
         structure and further document groups of documentation
 
-        Respects the :sections: setting in the options argument.
+        We don't need to pay attention to :members: or :private-members: as top level group members
+        can't be private and we want all the contents of the group, not specific members or no
+        members.
         """
 
-        # Display the contents of the sectiondef nodes which match the :sections: options and any
-        # innerclass or innernamespace references
-        public_filter = ClosedFilter()
-
-        if 'members' in options:
-
-            public_filter = OrFilter(
-                IfFilter(
-                    condition=InFilter(NodeTypeAccessor(Parent()), ['sectiondef']),
-                    if_true=InFilter(KindAccessor(Parent()), self.public_kinds),
-                    if_false=ClosedFilter(),
-                    ),
-                IfFilter(
-                    condition=AndFilter(
-                        InFilter(NodeTypeAccessor(Node()), ['ref']),
-                        InFilter(NodeNameAccessor(Node()), ['innerclass', 'innernamespace']),
-                        ),
-                    if_true=InFilter(AttributeAccessor(Node(), 'prot'), ['public']),
-                    if_false=ClosedFilter(),
-                    ),
-                )
-
-        private_filter = ClosedFilter()
-
-        if 'private-members' in options:
-
-            private_filter = OrFilter(
-                IfFilter(
-                    condition=InFilter(NodeTypeAccessor(Parent()), ['sectiondef']),
-                    if_true=InFilter(KindAccessor(Parent()), self.private_kinds),
-                    if_false=ClosedFilter(),
-                    ),
-                IfFilter(
-                    condition=AndFilter(
-                        InFilter(NodeTypeAccessor(Node()), ['ref']),
-                        InFilter(NodeNameAccessor(Node()), ['innerclass', 'innernamespace']),
-                        ),
-                    if_true=InFilter(AttributeAccessor(Node(), 'prot'), ['private']),
-                    if_false=ClosedFilter(),
-                    ),
-                )
-
         return OrFilter(
-            public_filter,
-            private_filter
+            IfFilter(
+                condition=InFilter(NodeTypeAccessor(Parent()), ['sectiondef']),
+                if_true=InFilter(KindAccessor(Parent()), self.public_kinds),
+                if_false=ClosedFilter(),
+                ),
+            IfFilter(
+                condition=AndFilter(
+                    InFilter(NodeTypeAccessor(Node()), ['ref']),
+                    InFilter(NodeNameAccessor(Node()), ['innerclass', 'innernamespace']),
+                    ),
+                if_true=InFilter(AttributeAccessor(Node(), 'prot'), ['public']),
+                if_false=ClosedFilter(),
+                ),
             )
 
     def create_index_filter(self, options):
