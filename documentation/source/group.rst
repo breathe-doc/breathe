@@ -98,7 +98,16 @@ Produces this output:
 .. doxygengroup:: mygroup
    :project: group
    :content-only:
-   :sections: public*, private*
+   :members:
+   :no-link:
+
+----
+
+.. doxygengroup:: mygroup
+   :project: group
+   :content-only:
+   :members:
+   :private-members:
    :no-link:
 
 ----
