@@ -8,6 +8,7 @@ Directives & Config Variables
    function
    struct
    class
+   namespace
    enum
    typedef
    union
@@ -261,6 +262,27 @@ additionally ``members`` and ``sections`` option.
       :no-link:
 
 Checkout the :ref:`example <class-example>` to see it in action.
+
+doxygennamespace
+~~~~~~~~~~~~~~~~
+
+This directive generates the appropriate output for the contents of a namespace.
+
+It takes the standard ``project``, ``path``, ``outline`` and ``no-link`` options
+and additionally the ``content-only`` and ``sections`` options. To address a
+nested namespace, the full path must be provided, e.g. ``root::nested``.
+
+::
+
+   .. doxygengroup:: <namespace>
+      :project: ...
+      :path: ...
+      :content-only:
+      :sections: [...]
+      :no-link:
+
+Checkout the :ref:`doxygennamespace documentation <namespace-example>` for more details
+and to see it in action.
 
 doxygenfile
 ~~~~~~~~~~~

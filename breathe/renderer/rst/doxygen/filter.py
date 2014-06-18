@@ -266,6 +266,15 @@ class FilterFactory(object):
         self.path_handler = path_handler
         self.default_sections = ()
 
+    def create_namespace_render_filter(self, options):
+
+        # Allow if it is either not a sectiondef or, if it is, it is a sectiondef which matches our
+        # section filter
+        return OrFilter(
+            NotFilter(InFilter(NodeTypeAccessor(Node()), ["sectiondef"])),
+            self.create_section_filter(options)
+            )
+
     def create_group_render_filter(self, options):
 
         # Allow if it is either not a sectiondef or, if it is, it is a sectiondef which matches our
@@ -462,6 +471,26 @@ class FilterFactory(object):
             filter_
             )
 
+    def create_namespace_content_filter(self, options):
+        """Returns a filter which matches the contents of the namespace but not the namespace name or
+        description.
+
+        Respects the :sections: setting in the options argument.
+        """
+
+        # Display the contents of the sectiondef nodes which match the :sections: options and any
+        # innerclass or innernamespace references
+        return OrFilter(
+            AndFilter(
+                InFilter(NodeTypeAccessor(Parent()), ["sectiondef"]),
+                self.create_section_filter(options)
+                ),
+            AndFilter(
+                InFilter(NodeTypeAccessor(Node()), ["ref"]),
+                InFilter(NodeNameAccessor(Node()), ["innerclass", "innernamespace"]),
+                )
+            )
+
     def create_group_content_filter(self, options):
         """Returns a filter which matches the contents of the group but not the group name or
         description.
@@ -522,6 +551,21 @@ class FilterFactory(object):
             InFilter(KindAccessor(Node()), ["file"]),
             FilePathFilter(LambdaAccessor(Node(), lambda x: x.location), filename,
                            self.path_handler)
+            )
+
+        return filter_
+
+    def create_namespace_finder_filter(self, name):
+        """Returns a filter which looks for the compound node from the index which is a namespace node
+        (kind=namespace) and has the appropriate name
+
+        The compound node should reference the namespace file which we can parse for the namespace
+        contents."""
+
+        filter_ = AndFilter(
+            InFilter(NodeTypeAccessor(Node()), ["compound"]),
+            InFilter(KindAccessor(Node()), ["namespace"]),
+            InFilter(NameAccessor(Node()), [name])
             )
 
         return filter_
