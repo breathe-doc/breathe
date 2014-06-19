@@ -271,7 +271,7 @@ group. A doxygen group can be declared with specific doxygen markup in the
 source comments as cover in the `doxygen documentation`_.
 
 It takes the standard ``project``, ``path``, ``outline`` and ``no-link`` options
-and additionally the ``content-only`` and ``sections`` options.
+and additionally the ``content-only`` and ``private-members`` options.
 
 ::
 
@@ -279,7 +279,7 @@ and additionally the ``content-only`` and ``sections`` options.
       :project: ...
       :path: ...
       :content-only:
-      :sections: [...]
+      :private-members:
       :no-link:
 
 Checkout the :ref:`doxygengroup documentation <group-example>` for more details
