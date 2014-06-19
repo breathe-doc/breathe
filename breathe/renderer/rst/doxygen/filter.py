@@ -356,8 +356,12 @@ class FilterFactory(object):
 
     def create_group_render_filter(self, options):
 
-        # Allow if it is either not a sectiondef or, if it is, it is a sectiondef which matches our
-        # section filter
+        # Act as if the group always has :members: specified so that we get the publicly viewable
+        # contents of the group.
+        options.update({
+            'members': u''
+            })
+
         return self.create_members_filter(options)
 
     def create_class_filter(self, options):
