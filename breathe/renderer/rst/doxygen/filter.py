@@ -404,6 +404,8 @@ class FilterFactory(object):
         parent_is_public = parent.kind.is_one_of(self.public_kinds)
         parent_is_private = parent.kind.is_one_of(self.private_kinds)
 
+        # Public Filter
+        # Nothing with a parent that's a sectiondef
         public_members_filter = ~ parent_is_sectiondef
 
         # If the user has specified the 'members' option with arguments then we only pay attention
@@ -420,33 +422,27 @@ class FilterFactory(object):
                 node_name_is_in_members = node.name.is_one_of(members)
 
                 # Accept any nodes which don't have a "sectiondef" as a parent or, if they do, only
-                # accept them if their names are in the members list or they are of type description.
-                # This accounts for the actual description of the sectiondef
-                public_members_filter = IfFilter(
-                    parent_is_sectiondef,
-                    node_name_is_in_members,
-                    OpenFilter()
-                    )
+                # accept them if their names are in the members list
+                public_members_filter = \
+                    (parent_is_sectiondef & node_name_is_in_members) | ~ parent_is_sectiondef
 
             else:
 
-                # If there is a sectiondef, let it through if its 'kind' is a public kind and let
-                # through the description itself.
-                public_members_filter = IfFilter(
-                    parent_is_sectiondef,
-                    parent_is_public,
-                    OpenFilter()
-                    )
+                # Select anything that doesn't have a parent which is a sectiondef, or, if it does,
+                # only select the public ones
+                public_members_filter = \
+                    (parent_is_sectiondef & parent_is_public) | ~ parent_is_sectiondef
 
+        # Private Filter
+        # Nothing with a parent that's a sectiondef
         private_members_filter = ~ parent_is_sectiondef
 
         if 'private-members' in options:
 
-            private_members_filter = IfFilter(
-                parent_is_sectiondef,
-                parent_is_private,
-                OpenFilter()
-                )
+            # Select anything that doesn't have a parent which is a sectiondef, or, if it does, only
+            # select the private ones
+            private_members_filter = \
+                (parent_is_sectiondef & parent_is_private) | ~ parent_is_sectiondef
 
         return public_members_filter | private_members_filter
 
