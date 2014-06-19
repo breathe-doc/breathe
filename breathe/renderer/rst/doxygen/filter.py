@@ -39,6 +39,14 @@ class Node(Selector):
     def name(self):
         return AttributeAccessor(self, 'name')
 
+    @property
+    def briefdescription(self):
+        return AttributeAccessor(self, 'briefdescription')
+
+    @property
+    def detaileddescription(self):
+        return AttributeAccessor(self, 'detaileddescription')
+
 
 class Accessor(object):
 
@@ -50,6 +58,9 @@ class Accessor(object):
 
     def is_one_of(self, collection):
         return InFilter(self, collection)
+
+    def has_content(self):
+        return HasContentFilter(self)
 
 
 class NameAccessor(Accessor):
@@ -133,6 +144,38 @@ class Filter(object):
 
     def __invert__(self):
         return NotFilter(self)
+
+
+class HasContentFilter(Filter):
+
+    def __init__(self, accessor):
+        self.accessor = accessor
+
+    def allow(self, node_stack):
+        """Detects if the node in questions has an empty .content_ property.
+        
+        This is tied to the implemented of the xml parsing code which generates arrays of
+        MixedContainer objects for tags like 'briefdescription' and due to the nature of the doxygen
+        xml leaving white space between the 'briefdescription' opening and closing tags, we end up
+        with an array of MixedContainer objects which has one entry with white space in it.  
+
+        So we have to test for that.
+
+        The descriptionType class has a 'hasContent_' method but it seems to be broken.
+        """
+
+        content = self.accessor(node_stack).content_
+
+        # Exit if the content actually is empty, though we don't expect this to be the case.
+        if not content:
+            return False
+
+        # Test for our annoying MixedContainer pattern. Category 1 is the
+        # Text category from the parsing code
+        if len(content) == 1 and content[0].category == 1:
+            return content[0].value.strip()
+
+        return True
 
 
 class InFilter(Filter):
@@ -402,6 +445,7 @@ class FilterFactory(object):
     def create_members_filter(self, options):
         """Content filter based on :members: and :private-members: classes"""
 
+        allow_all = OpenFilter()
         node = Node()
         node_is_description = node.node_type == 'description'
         parent = Parent()
@@ -459,7 +503,17 @@ class FilterFactory(object):
             private_members_filter = \
                 (parent_is_sectiondef & parent_is_private) | ~ parent_is_sectiondef
 
-        return public_members_filter | private_members_filter | description_filter
+        node_has_description = node.briefdescription.has_content() | node.detaileddescription.has_content()
+
+        undoc_members_filter = \
+            (parent_is_sectiondef & node_has_description) | ~ parent_is_sectiondef
+
+        if 'undoc-members' in options:
+
+            undoc_members_filter = allow_all
+
+        # Allow any public/private members which also fit the undoc filter and all the descriptions
+        return (( public_members_filter | private_members_filter ) & undoc_members_filter ) | description_filter
 
     def create_outline_filter(self, options):
 
