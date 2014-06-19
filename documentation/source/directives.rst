@@ -219,13 +219,15 @@ doxygenclass
 
 This directive generates the appropriate output for a single class. It takes the
 standard ``project``, ``path``, ``outline`` and ``no-link`` options and
-additionally ``members`` and ``private-members`` option::
+additionally the ``members``, ``private-members`` and ``undoc-members``
+options::
 
    .. doxygenclass:: <class name>
       :project: ...
       :path: ...
       :members: [...]
       :private-members:
+      :undoc-members:
       :outline:
       :no-link:
 
