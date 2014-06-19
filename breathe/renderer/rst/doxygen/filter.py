@@ -17,17 +17,32 @@ class Parent(Selector):
     def __call__(self, node_stack):
         return node_stack[1]
 
+    @property
+    def type(self):
+        return NodeTypeAccessor(self)
+
+    @property
+    def kind(self):
+        return AttributeAccessor(self, 'kind')
+
 
 class Node(Selector):
 
     def __call__(self, node_stack):
         return node_stack[0]
 
+    @property
+    def node_name(self):
+        return NodeNameAccessor(self)
+
 
 class Accessor(object):
 
     def __init__(self, selector):
         self.selector = selector
+
+    def __contains__(self, list_):
+        return InFilter(self, list_)
 
 
 class NameAccessor(Accessor):
@@ -101,7 +116,17 @@ class NamespaceAccessor(Accessor):
         return self.selector(node_stack).namespaces
 
 
-class InFilter(object):
+class Filter(object):
+
+    def __and__(self, other):
+
+        return AndFilter(self, other)
+
+    def __invert__(self):
+        return NotFilter(self)
+
+
+class InFilter(Filter):
     """Checks if what is returned from the accessor is 'in' in the members"""
 
     def __init__(self, accessor, members):
@@ -116,7 +141,7 @@ class InFilter(object):
         return name in self.members
 
 
-class GlobFilter(object):
+class GlobFilter(Filter):
 
     def __init__(self, accessor, glob):
 
@@ -129,7 +154,7 @@ class GlobFilter(object):
         return self.glob.match(text)
 
 
-class FilePathFilter(object):
+class FilePathFilter(Filter):
 
     def __init__(self, accessor, target_file, path_handler):
 
@@ -158,7 +183,7 @@ class FilePathFilter(object):
             return location_basename == self.target_file
 
 
-class NamespaceFilter(object):
+class NamespaceFilter(Filter):
 
     def __init__(self, namespace_accessor, name_accessor):
 
@@ -178,21 +203,21 @@ class NamespaceFilter(object):
         return namespace in namespaces
 
 
-class OpenFilter(object):
+class OpenFilter(Filter):
 
     def allow(self, node_stack):
 
         return True
 
 
-class ClosedFilter(object):
+class ClosedFilter(Filter):
 
     def allow(self, node_stack):
 
         return False
 
 
-class NotFilter(object):
+class NotFilter(Filter):
 
     def __init__(self, child_filter):
         self.child_filter = child_filter
@@ -203,7 +228,7 @@ class NotFilter(object):
 
 
 
-class AndFilter(object):
+class AndFilter(Filter):
 
     def __init__(self, *filters):
 
@@ -219,7 +244,7 @@ class AndFilter(object):
         return True
 
 
-class OrFilter(object):
+class OrFilter(Filter):
     """Provides a short-cutted 'or' operation between two filters"""
 
     def __init__(self, *filters):
@@ -236,7 +261,7 @@ class OrFilter(object):
         return False
 
 
-class IfFilter(object):
+class IfFilter(Filter):
 
     def __init__(self, condition, if_true, if_false):
         self.condition = condition
@@ -364,11 +389,13 @@ class FilterFactory(object):
     def create_members_filter(self, options):
         """Content filter based on :members: and :private-members: classes"""
 
-        public_members_filter = IfFilter(
-            condition=InFilter(NodeTypeAccessor(Parent()), ["sectiondef"]),
-            if_true=ClosedFilter(),
-            if_false=OpenFilter(),
-            )
+        node = Node()
+        parent = Parent()
+        parent_is_sectiondef = parent.type in ["sectiondef"]
+        parent_is_public = parent.kind in self.public_kinds
+        parent_is_private = parent.kind in self.private_kinds
+
+        public_members_filter = ~ parent_is_sectiondef
 
         # If the user has specified the 'members' option with arguments then we only pay attention
         # to that and not to any other member settings
@@ -381,13 +408,15 @@ class FilterFactory(object):
                 # Matches sphinx-autodoc behaviour of comma separated values
                 members = set([x.strip() for x in text.split(",")])
 
+                node_name_is_in_members = node.node_name in members
+
                 # Accept any nodes which don't have a "sectiondef" as a parent or, if they do, only
                 # accept them if their names are in the members list or they are of type description.
                 # This accounts for the actual description of the sectiondef
                 public_members_filter = IfFilter(
-                    condition=InFilter(NodeTypeAccessor(Parent()), ["sectiondef"]),
-                    if_true=InFilter(NameAccessor(Node()), members),
-                    if_false=ClosedFilter(),
+                    parent_is_sectiondef,
+                    node_name_is_in_members,
+                    OpenFilter()
                     )
 
             else:
@@ -395,29 +424,22 @@ class FilterFactory(object):
                 # If there is a sectiondef, let it through if its 'kind' is a public kind and let
                 # through the description itself.
                 public_members_filter = IfFilter(
-                    condition=InFilter(NodeTypeAccessor(Parent()), ["sectiondef"]),
-                    if_true=InFilter(KindAccessor(Parent()), self.public_kinds),
-                    if_false=ClosedFilter()
+                    parent_is_sectiondef,
+                    parent_is_public,
+                    OpenFilter()
                     )
 
-        private_members_filter = IfFilter(
-            condition=InFilter(NodeTypeAccessor(Parent()), ["sectiondef"]),
-            if_true=ClosedFilter(),
-            if_false=OpenFilter(),
-            )
+        private_members_filter = ~ parent_is_sectiondef
 
         if 'private-members' in options:
 
             private_members_filter = IfFilter(
-                condition=InFilter(NodeTypeAccessor(Parent()), ["sectiondef"]),
-                if_true=InFilter(KindAccessor(Parent()), self.private_kinds),
-                if_false=OpenFilter()
+                parent_is_sectiondef,
+                parent_is_private,
+                OpenFilter()
                 )
 
-        return OrFilter(
-            public_members_filter,
-            private_members_filter,
-            )
+        return public_members_filter | private_members_filter
 
     def create_outline_filter(self, options):
 
@@ -611,3 +633,4 @@ class FilterFactory(object):
         This method is called on the 'builder-init' event in Sphinx"""
 
         self.default_sections = app.config.breathe_default_sections
+

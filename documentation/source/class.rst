@@ -80,8 +80,10 @@ It produces this output:
 Private Members
 ---------------
 
-This display only the private members of the class. Normally this is combined
+This displays only the private members of the class. Normally this is combined
 with the ``:members:`` option to show the public members as well.
+
+::
 
    .. doxygenclass:: Nutshell
       :project: nutshell
