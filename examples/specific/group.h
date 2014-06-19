@@ -37,6 +37,8 @@ private:
 
     //! A private function
     void ungroupedPrivateFunction() {};
+
+    class PrivateClass {};
 };
 
 //! Ungrouped function

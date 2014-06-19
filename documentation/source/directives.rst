@@ -211,6 +211,7 @@ It behaves the same as the doxygenstruct directive.
 
 Checkout the :ref:`example <variable-example>` to see it in action.
 
+
 .. _doxygenclass:
 
 doxygenclass
@@ -218,49 +219,19 @@ doxygenclass
 
 This directive generates the appropriate output for a single class. It takes the
 standard ``project``, ``path``, ``outline`` and ``no-link`` options and
-additionally ``members`` and ``sections`` option.
-
-``members``
-   Designed to behavior in a similar manner to the ``members`` option for the
-   ``autoclass`` directive that comes with the Sphinx ``autodoc`` extension.
-
-   If you do not specify this option you will not get any information about the
-   class members, just the general class documentation. If you provide it
-   without arguments, then Breathe adds all the public members and their
-   documentation.  If you specify it with **comma separated** arguments, then
-   Breathe will treat the arguments as names of members and provide
-   documentation for only those members that have been named.
-
-   The default behavior of adding the public members can be customized using
-   the ``sections`` option.
-
-``sections``
-   Designed to specialize the default behavior of the ``members`` option.  You
-   can specify a comma-separated list of sections to be included if no specific
-   members are named.  The list can accept wildcards.  For instance, if you want
-   to display the all protected and public members, functions, etc, then specify
-   ``:sections: public*, protected*``.
-
-   By default, Breathe specifies ``public*, func*``, however this can be
-   overridden in the ``conf.py`` with the :ref:`breathe_default_sections
-   <breathe-default-sections>` config variable.
-
-   Note that if your Doxygen project uses properties, these are excluded by
-   default.  Specify ``:sections: public*, property`` to include both public
-   members and properties. (The section names correspond to the values of the
-   ``kind`` attribute of the Doxygen XML ``sectiondef`` elements.)
-
-::
+additionally ``members`` and ``private-members`` option::
 
    .. doxygenclass:: <class name>
       :project: ...
       :path: ...
       :members: [...]
-      :sections: [...]
+      :private-members:
       :outline:
       :no-link:
 
-Checkout the :ref:`example <class-example>` to see it in action.
+Checkout the :ref:`doxygenclass documentation <class-example>` for more details
+and to see it in action.
+
 
 doxygenfile
 ~~~~~~~~~~~

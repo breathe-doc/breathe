@@ -1,13 +1,35 @@
 
 .. _class-example:
 
-doxygenclass Directive Example
-==============================
+doxygenclass Directive
+======================
 
-Example without Members
------------------------
+This directive generates the appropriate output for a single class. It takes the
+standard ``project``, ``path``, ``outline`` and ``no-link`` options and
+additionally ``members`` and ``private-members`` option.
 
-This should work::
+``members``
+   Designed to behavior in a similar manner to the ``members`` option for the
+   ``autoclass`` directive that comes with the Sphinx ``autodoc`` extension.
+
+   If you do not specify this option you will not get any information about the
+   class members, just the general class documentation. If you provide it
+   without arguments, then Breathe adds all the public members and their
+   documentation.  If you specify it with **comma separated** arguments, then
+   Breathe will treat the arguments as names of members and provide
+   documentation for only those members that have been named.
+
+``private-members``
+   If specified, the private members of the class will be displayed.
+
+
+.. contents::
+
+
+Basic Example
+-------------
+
+This displays the class documentation without any members::
 
    .. doxygenclass:: Nutshell
       :project: nutshell
@@ -19,10 +41,11 @@ It produces this output:
    :no-link:
 
 
-Example with Members
---------------------
+Members Example
+---------------
 
-This should work::
+This directive call will display the class documentation with all the public
+members::
 
    .. doxygenclass:: Nutshell
       :project: nutshell
@@ -36,10 +59,11 @@ It produces this output:
    :no-link:
 
 
-Working Example with Specific Members
--------------------------------------
+Specific Members Example
+------------------------
 
-This should work::
+This displays the class documentation with only the members listed in the
+``:members:`` option::
 
    .. doxygenclass:: Nutshell
       :project: nutshell
@@ -53,22 +77,46 @@ It produces this output:
    :no-link:
 
 
-Example as Outline
-------------------
+Private Members
+---------------
 
-This should work::
+This displays only the private members of the class. Normally this is combined
+with the ``:members:`` option to show the public members as well.
+
+::
 
    .. doxygenclass:: Nutshell
       :project: nutshell
-      :outline:
-      :members:
+      :private-members:
 
 It produces this output:
 
 .. doxygenclass:: Nutshell
    :project: nutshell
-   :outline:
+   :private-members:
+   :no-link:
+
+
+Outline Example
+---------------
+
+This displays only the names of the class members and not their
+documentation. The ``:members:`` and ``:private-members:`` options determine
+which members are displayed.
+
+::
+
+   .. doxygenclass:: Nutshell
+      :project: nutshell
+      :members:
+      :outline:
+
+It produces this output:
+
+.. doxygenclass:: Nutshell
+   :project: nutshell
    :members:
+   :outline:
    :no-link:
 
 
@@ -83,6 +131,7 @@ This intentionally fails::
 
 It produces the following warning message:
 
-.. warning:: doxygenclass: Cannot find class "made_up_class" in doxygen xml output
+.. warning:: doxygenclass: Cannot find class “made_up_class” in doxygen xml
+   output for project “class” from directory: ../../examples/doxygen/class/xml/
 
 

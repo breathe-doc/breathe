@@ -196,7 +196,7 @@ class DoxygenClassDirective(BaseDirective):
         "path": unchanged_required,
         "project": unchanged_required,
         "members": unchanged,
-        "sections": unchanged,
+        "private-members": flag,
         "show": unchanged_required,
         "outline": flag,
         "no-link": flag,
@@ -250,7 +250,7 @@ class DoxygenGroupDirective(BaseDirective):
         "path": unchanged_required,
         "project": unchanged_required,
         "content-only": flag,
-        "sections": unchanged,
+        "private-members": flag,
         "no-link": flag,
         }
     has_content = False
