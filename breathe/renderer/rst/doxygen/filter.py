@@ -409,13 +409,13 @@ class FilterFactory(object):
             'members': u''
             })
 
-        return self.create_members_filter(options)
+        return self.create_class_member_filter(options)
 
     def create_class_filter(self, options):
         """Content filter for classes based on various directive options"""
 
         return AndFilter(
-            self.create_members_filter(options),
+            self.create_class_member_filter(options),
             self.create_outline_filter(options),
             self.create_show_filter(options),
             )
@@ -442,18 +442,13 @@ class FilterFactory(object):
             NotFilter(InFilter(NodeTypeAccessor(Node()), ["inc"]))
             )
 
-    def create_members_filter(self, options):
-        """Content filter based on :members: and :private-members: classes"""
+    def _create_description_filter(self, options):
 
-        allow_all = OpenFilter()
         node = Node()
         node_is_description = node.node_type == 'description'
         parent = Parent()
         parent_is_sectiondef = parent.node_type == "sectiondef"
-        parent_is_public = parent.kind.is_one_of(self.public_kinds)
-        parent_is_private = parent.kind.is_one_of(self.private_kinds)
 
-        # Description Filter
         # Nothing with a parent that's a sectiondef
         description_filter = ~ parent_is_sectiondef
 
@@ -463,7 +458,15 @@ class FilterFactory(object):
             description_filter = \
                 (parent_is_sectiondef & node_is_description) | ~ parent_is_sectiondef
 
-        # Public Filter
+        return description_filter
+
+    def _create_public_members_filter(self, options):
+
+        node = Node()
+        parent = Parent()
+        parent_is_sectiondef = parent.node_type == "sectiondef"
+        parent_is_public = parent.kind.is_one_of(self.public_kinds)
+
         # Nothing with a parent that's a sectiondef
         public_members_filter = ~ parent_is_sectiondef
 
@@ -492,7 +495,14 @@ class FilterFactory(object):
                 public_members_filter = \
                     (parent_is_sectiondef & parent_is_public) | ~ parent_is_sectiondef
 
-        # Private Filter
+        return public_members_filter
+
+    def _create_private_members_filter(self, options):
+
+        parent = Parent()
+        parent_is_sectiondef = parent.node_type == "sectiondef"
+        parent_is_private = parent.kind.is_one_of(self.private_kinds)
+
         # Nothing with a parent that's a sectiondef
         private_members_filter = ~ parent_is_sectiondef
 
@@ -503,6 +513,14 @@ class FilterFactory(object):
             private_members_filter = \
                 (parent_is_sectiondef & parent_is_private) | ~ parent_is_sectiondef
 
+        return private_members_filter
+
+    def _create_undoc_members_filter(self, options):
+
+        node = Node()
+        parent = Parent()
+        parent_is_sectiondef = parent.node_type == "sectiondef"
+
         node_has_description = node.briefdescription.has_content() | node.detaileddescription.has_content()
 
         undoc_members_filter = \
@@ -510,7 +528,21 @@ class FilterFactory(object):
 
         if 'undoc-members' in options:
 
-            undoc_members_filter = allow_all
+            undoc_members_filter = OpenFilter()
+
+        return undoc_members_filter
+
+    def create_class_member_filter(self, options):
+        """Content filter based on :members: and :private-members: classes"""
+
+        # Create all necessary filters and combine them
+        description_filter = self._create_description_filter(options)
+
+        public_members_filter = self._create_public_members_filter(options)
+
+        private_members_filter = self._create_private_members_filter(options)
+
+        undoc_members_filter = self._create_undoc_members_filter(options)
 
         # Allow any public/private members which also fit the undoc filter and all the descriptions
         return (( public_members_filter | private_members_filter ) & undoc_members_filter ) | description_filter
