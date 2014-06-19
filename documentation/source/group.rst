@@ -9,7 +9,7 @@ group. A doxygen group can be declared with specific doxygen markup in the
 source comments as cover in the `doxygen documentation`_.
 
 It takes the standard ``project``, ``path``, ``outline`` and ``no-link`` options
-and additionally the ``content-only`` and ``sections`` options.
+and additionally the ``content-only`` and ``private-members`` options.
 
 ``content-only``
    If this flag is specified, then the directive does not output the name of the
@@ -17,23 +17,9 @@ and additionally the ``content-only`` and ``sections`` options.
    This can be useful if the groups are only used for organizational purposes
    and not to provide additional information.
 
-``sections``
-   This option can be used to determine the Doxygen XML ``sections`` which are
-   allowed in the output for the group. The terminology here is a little coarse
-   as it based on the names used in the Doxygen XML. The clearest application of
-   this option is to determine whether to output private members from classes
-   within the group.  For instance, if you want to display the all protected and
-   public members, functions, etc, then specify ``:sections: public*,
-   protected*``.
-
-   By default, Breathe specifies ``public*, func*``, however this can be
-   overridden in the ``conf.py`` with the :ref:`breathe_default_sections
-   <breathe-default-sections>` config variable.
-
-   Note that if your Doxygen project uses properties, these are excluded by
-   default. Specify ``:sections: public*, property`` to include both public
-   members and properties. (The section names correspond to the values of the
-   ``kind`` attribute of the Doxygen XML ``sectiondef`` elements.)
+``private-members``
+   If specified, the private members of any classes in the group output will be
+   displayed.
 
 .. _doxygen documentation: http://www.stack.nl/~dimitri/doxygen/manual/grouping.html
 
@@ -41,7 +27,7 @@ and additionally the ``content-only`` and ``sections`` options.
 Basic Example
 -------------
 
-This should work:
+The plain ``doxygengroup`` directive will output the group name and description:
 
 .. code-block:: rst
 
@@ -50,12 +36,9 @@ This should work:
 
 It produces this output:
 
-----
-
 .. doxygengroup:: mygroup
    :project: group
    :no-link:
-
 
 Content-Only Example
 --------------------
@@ -71,43 +54,34 @@ the group and not the group name or description. So this:
 
 Produces this output:
 
-----
-
 .. doxygengroup:: mygroup
    :project: group
    :content-only:
    :no-link:
 
-Sections Example
-----------------
 
-The ``sections`` option changes the output of public, protected and private
-content as well as properties. For example:
+Private-Members Example
+-----------------------
+
+The ``private-members`` option changes the output to only include the private
+members of any classes as well as the public members. The output for any class
+in the group should be the same as if it had be produced by the
+:ref:`doxygenclass directive <class-example>` with the ``members`` and
+``private-members`` options specified.
 
 .. code-block:: rst
 
    .. doxygengroup:: mygroup
       :project: group
-      :content-only:
-      :sections: public*, private*
+      :private-members:
 
 Produces this output:
 
-----
-
 .. doxygengroup:: mygroup
    :project: group
-   :content-only:
-   :sections: public*, private*
+   :private-members:
    :no-link:
 
-----
-
-In which the private functions are listed as well as the public ones due to the
-specification of ``private*`` for the ``sections`` option, and the
-``void groupedFunction()`` is not listed as the ``sections`` option has
-overridden the global :ref:`breathe_default_sections <breathe-default-sections>`
-and removed the ``func*`` element.
 
 Failing Example
 ---------------

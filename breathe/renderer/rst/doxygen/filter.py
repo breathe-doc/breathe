@@ -17,17 +17,39 @@ class Parent(Selector):
     def __call__(self, node_stack):
         return node_stack[1]
 
+    @property
+    def node_type(self):
+        return NodeTypeAccessor(self)
+
+    @property
+    def kind(self):
+        return AttributeAccessor(self, 'kind')
+
 
 class Node(Selector):
 
     def __call__(self, node_stack):
         return node_stack[0]
 
+    @property
+    def node_type(self):
+        return NodeTypeAccessor(self)
+
+    @property
+    def name(self):
+        return AttributeAccessor(self, 'name')
+
 
 class Accessor(object):
 
     def __init__(self, selector):
         self.selector = selector
+
+    def __eq__(self, value):
+        return InFilter(self, [value])
+
+    def is_one_of(self, collection):
+        return InFilter(self, collection)
 
 
 class NameAccessor(Accessor):
@@ -69,6 +91,21 @@ class KindAccessor(Accessor):
         return self.selector(node_stack).kind
 
 
+class AttributeAccessor(Accessor):
+    """Returns the value of a particular attribute on the selected node.
+
+    AttributeAccessor(Node(), 'name') returns the value of ``node.name``.
+    """
+
+    def __init__(self, selector, attribute_name):
+        Accessor.__init__(self, selector)
+
+        self.attribute_name = attribute_name
+
+    def __call__(self, node_stack):
+        return getattr(self.selector(node_stack), self.attribute_name)
+
+
 class LambdaAccessor(Accessor):
 
     def __init__(self, selector, func):
@@ -86,7 +123,19 @@ class NamespaceAccessor(Accessor):
         return self.selector(node_stack).namespaces
 
 
-class InFilter(object):
+class Filter(object):
+
+    def __and__(self, other):
+        return AndFilter(self, other)
+
+    def __or__(self, other):
+        return OrFilter(self, other)
+
+    def __invert__(self):
+        return NotFilter(self)
+
+
+class InFilter(Filter):
     """Checks if what is returned from the accessor is 'in' in the members"""
 
     def __init__(self, accessor, members):
@@ -101,7 +150,7 @@ class InFilter(object):
         return name in self.members
 
 
-class GlobFilter(object):
+class GlobFilter(Filter):
 
     def __init__(self, accessor, glob):
 
@@ -114,7 +163,7 @@ class GlobFilter(object):
         return self.glob.match(text)
 
 
-class FilePathFilter(object):
+class FilePathFilter(Filter):
 
     def __init__(self, accessor, target_file, path_handler):
 
@@ -143,7 +192,7 @@ class FilePathFilter(object):
             return location_basename == self.target_file
 
 
-class NamespaceFilter(object):
+class NamespaceFilter(Filter):
 
     def __init__(self, namespace_accessor, name_accessor):
 
@@ -163,21 +212,21 @@ class NamespaceFilter(object):
         return namespace in namespaces
 
 
-class OpenFilter(object):
+class OpenFilter(Filter):
 
     def allow(self, node_stack):
 
         return True
 
 
-class ClosedFilter(object):
+class ClosedFilter(Filter):
 
     def allow(self, node_stack):
 
         return False
 
 
-class NotFilter(object):
+class NotFilter(Filter):
 
     def __init__(self, child_filter):
         self.child_filter = child_filter
@@ -188,7 +237,7 @@ class NotFilter(object):
 
 
 
-class AndFilter(object):
+class AndFilter(Filter):
 
     def __init__(self, *filters):
 
@@ -204,7 +253,7 @@ class AndFilter(object):
         return True
 
 
-class OrFilter(object):
+class OrFilter(Filter):
     """Provides a short-cutted 'or' operation between two filters"""
 
     def __init__(self, *filters):
@@ -219,6 +268,21 @@ class OrFilter(object):
                 return True
 
         return False
+
+
+class IfFilter(Filter):
+
+    def __init__(self, condition, if_true, if_false):
+        self.condition = condition
+        self.if_true = if_true
+        self.if_false = if_false
+
+    def allow(self, node_stack):
+
+        if self.condition.allow(node_stack):
+            return self.if_true.allow(node_stack)
+        else:
+            return self.if_false.allow(node_stack)
 
 
 class Glob(object):
@@ -260,6 +324,34 @@ class Gather(object):
 
 class FilterFactory(object):
 
+    public_kinds = set([
+            # C++ style public entries
+            "public-type",
+            "public-func",
+            "public-attrib",
+            "public-slot",
+            "public-static-func",
+            "public-static-attrib",
+            # C style top level entries
+            "friend",
+            "related",
+            "define",
+            "prototype",
+            "typedef",
+            "enum",
+            "func",
+            "var",
+            ])
+
+    private_kinds = set([
+            "private-type",
+            "private-func",
+            "private-attrib",
+            "private-slot",
+            "private-static-func",
+            "private-static-attrib",
+            ])
+
     def __init__(self, globber_factory, path_handler):
 
         self.globber_factory = globber_factory
@@ -268,14 +360,16 @@ class FilterFactory(object):
 
     def create_group_render_filter(self, options):
 
-        # Allow if it is either not a sectiondef or, if it is, it is a sectiondef which matches our
-        # section filter
-        return OrFilter(
-            NotFilter(InFilter(NodeTypeAccessor(Node()), ["sectiondef"])),
-            self.create_section_filter(options)
-            )
+        # Act as if the group always has :members: specified so that we get the publicly viewable
+        # contents of the group.
+        options.update({
+            'members': u''
+            })
+
+        return self.create_members_filter(options)
 
     def create_class_filter(self, options):
+        """Content filter for classes based on various directive options"""
 
         return AndFilter(
             self.create_members_filter(options),
@@ -284,9 +378,7 @@ class FilterFactory(object):
             )
 
     def create_show_filter(self, options):
-        """
-        Currently only handles the header-file entry
-        """
+        """Currently only handles the header-file entry"""
 
         try:
             text = options["show"]
@@ -307,58 +399,67 @@ class FilterFactory(object):
             NotFilter(InFilter(NodeTypeAccessor(Node()), ["inc"]))
             )
 
-    def create_section_filter(self, options):
-
-        section = options.get("sections", "")
-
-        # Create a set of the sections
-        if section.strip():
-            sections = set([x.strip() for x in section.split(",")])
-        else:
-            # If nothing has been specified then get the defaults
-            # which the user can set in the conf.py
-            sections = self.default_sections
-
-        def create_filter(section):
-            return GlobFilter(KindAccessor(Node()), self.globber_factory.create(section))
-
-        # Create a filter for each section
-        filters = map(create_filter, sections)
-
-        # 'Or' all the section filters together
-        section_filter = OrFilter(*filters)
-
-        return section_filter
-
     def create_members_filter(self, options):
+        """Content filter based on :members: and :private-members: classes"""
 
-        if "members" not in options:
-            return OrFilter(
-                NotFilter(InFilter(NodeTypeAccessor(Parent()), ["sectiondef"])),
-                NotFilter(InFilter(NodeTypeAccessor(Node()), ["memberdef"]))
-                )
+        node = Node()
+        node_is_description = node.node_type == 'description'
+        parent = Parent()
+        parent_is_sectiondef = parent.node_type == "sectiondef"
+        parent_is_public = parent.kind.is_one_of(self.public_kinds)
+        parent_is_private = parent.kind.is_one_of(self.private_kinds)
 
-        section_filter = self.create_section_filter(options)
+        # Description Filter
+        # Nothing with a parent that's a sectiondef
+        description_filter = ~ parent_is_sectiondef
 
-        text = options["members"]
-        if not text.strip():
-            return OrFilter(
-                NotFilter(InFilter(NodeTypeAccessor(Node()), ["sectiondef"])),
-                section_filter,
-                InFilter(KindAccessor(Node()), ["user-defined"])
-                )
+        # Let through any description children of sectiondefs if we output any kind members
+        if 'members' in options or 'private-members' in options:
 
-        # Matches sphinx-autodoc behaviour of comma separated values
-        members = set([x.strip() for x in text.split(",")])
+            description_filter = \
+                (parent_is_sectiondef & node_is_description) | ~ parent_is_sectiondef
 
-        # Accept any nodes which don't have a "sectiondef" as a parent or, if they do, only accept
-        # them if their names are in the members list or they are of type description. This accounts
-        # for the actual description of the sectiondef
-        return OrFilter(
-            NotFilter(InFilter(NodeTypeAccessor(Parent()), ["sectiondef"])),
-            InFilter(NodeTypeAccessor(Node()), ["description"]),
-            InFilter(NameAccessor(Node()), members),
-            )
+        # Public Filter
+        # Nothing with a parent that's a sectiondef
+        public_members_filter = ~ parent_is_sectiondef
+
+        # If the user has specified the 'members' option with arguments then we only pay attention
+        # to that and not to any other member settings
+        if "members" in options:
+
+            if options['members'].strip():
+
+                text = options["members"]
+
+                # Matches sphinx-autodoc behaviour of comma separated values
+                members = set([x.strip() for x in text.split(",")])
+
+                node_name_is_in_members = node.name.is_one_of(members)
+
+                # Accept any nodes which don't have a "sectiondef" as a parent or, if they do, only
+                # accept them if their names are in the members list
+                public_members_filter = \
+                    (parent_is_sectiondef & node_name_is_in_members) | ~ parent_is_sectiondef
+
+            else:
+
+                # Select anything that doesn't have a parent which is a sectiondef, or, if it does,
+                # only select the public ones
+                public_members_filter = \
+                    (parent_is_sectiondef & parent_is_public) | ~ parent_is_sectiondef
+
+        # Private Filter
+        # Nothing with a parent that's a sectiondef
+        private_members_filter = ~ parent_is_sectiondef
+
+        if 'private-members' in options:
+
+            # Select anything that doesn't have a parent which is a sectiondef, or, if it does, only
+            # select the private ones
+            private_members_filter = \
+                (parent_is_sectiondef & parent_is_private) | ~ parent_is_sectiondef
+
+        return public_members_filter | private_members_filter | description_filter
 
     def create_outline_filter(self, options):
 
@@ -469,20 +570,25 @@ class FilterFactory(object):
         This allows the groups to be used to structure sections of the documentation rather than to
         structure and further document groups of documentation
 
-        Respects the :sections: setting in the options argument.
+        We don't need to pay attention to :members: or :private-members: as top level group members
+        can't be private and we want all the contents of the group, not specific members or no
+        members.
         """
 
-        # Display the contents of the sectiondef nodes which match the :sections: options and any
-        # innerclass or innernamespace references
         return OrFilter(
-            AndFilter(
-                InFilter(NodeTypeAccessor(Parent()), ["sectiondef"]),
-                self.create_section_filter(options)
+            IfFilter(
+                condition=InFilter(NodeTypeAccessor(Parent()), ['sectiondef']),
+                if_true=InFilter(KindAccessor(Parent()), self.public_kinds),
+                if_false=ClosedFilter(),
                 ),
-            AndFilter(
-                InFilter(NodeTypeAccessor(Node()), ["ref"]),
-                InFilter(NodeNameAccessor(Node()), ["innerclass", "innernamespace"]),
-                )
+            IfFilter(
+                condition=AndFilter(
+                    InFilter(NodeTypeAccessor(Node()), ['ref']),
+                    InFilter(NodeNameAccessor(Node()), ['innerclass', 'innernamespace']),
+                    ),
+                if_true=InFilter(AttributeAccessor(Node(), 'prot'), ['public']),
+                if_false=ClosedFilter(),
+                ),
             )
 
     def create_index_filter(self, options):
@@ -547,3 +653,4 @@ class FilterFactory(object):
         This method is called on the 'builder-init' event in Sphinx"""
 
         self.default_sections = app.config.breathe_default_sections
+
