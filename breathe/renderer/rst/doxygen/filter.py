@@ -18,7 +18,7 @@ class Parent(Selector):
         return node_stack[1]
 
     @property
-    def type(self):
+    def node_type(self):
         return NodeTypeAccessor(self)
 
     @property
@@ -32,8 +32,8 @@ class Node(Selector):
         return node_stack[0]
 
     @property
-    def node_name(self):
-        return NodeNameAccessor(self)
+    def name(self):
+        return AttributeAccessor(self, 'name')
 
 
 class Accessor(object):
@@ -400,7 +400,7 @@ class FilterFactory(object):
 
         node = Node()
         parent = Parent()
-        parent_is_sectiondef = parent.type == "sectiondef"
+        parent_is_sectiondef = parent.node_type == "sectiondef"
         parent_is_public = parent.kind.is_one_of(self.public_kinds)
         parent_is_private = parent.kind.is_one_of(self.private_kinds)
 
@@ -417,7 +417,7 @@ class FilterFactory(object):
                 # Matches sphinx-autodoc behaviour of comma separated values
                 members = set([x.strip() for x in text.split(",")])
 
-                node_name_is_in_members = node.node_name.is_one_of(members)
+                node_name_is_in_members = node.name.is_one_of(members)
 
                 # Accept any nodes which don't have a "sectiondef" as a parent or, if they do, only
                 # accept them if their names are in the members list or they are of type description.
