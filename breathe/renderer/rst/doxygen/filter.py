@@ -41,8 +41,11 @@ class Accessor(object):
     def __init__(self, selector):
         self.selector = selector
 
-    def __contains__(self, list_):
-        return InFilter(self, list_)
+    def __eq__(self, value):
+        return InFilter(self, [value])
+
+    def is_one_of(self, collection):
+        return InFilter(self, collection)
 
 
 class NameAccessor(Accessor):
@@ -119,8 +122,10 @@ class NamespaceAccessor(Accessor):
 class Filter(object):
 
     def __and__(self, other):
-
         return AndFilter(self, other)
+
+    def __or__(self, other):
+        return OrFilter(self, other)
 
     def __invert__(self):
         return NotFilter(self)
@@ -391,9 +396,9 @@ class FilterFactory(object):
 
         node = Node()
         parent = Parent()
-        parent_is_sectiondef = parent.type in ["sectiondef"]
-        parent_is_public = parent.kind in self.public_kinds
-        parent_is_private = parent.kind in self.private_kinds
+        parent_is_sectiondef = parent.type == "sectiondef"
+        parent_is_public = parent.kind.is_one_of(self.public_kinds)
+        parent_is_private = parent.kind.is_one_of(self.private_kinds)
 
         public_members_filter = ~ parent_is_sectiondef
 
@@ -408,7 +413,7 @@ class FilterFactory(object):
                 # Matches sphinx-autodoc behaviour of comma separated values
                 members = set([x.strip() for x in text.split(",")])
 
-                node_name_is_in_members = node.node_name in members
+                node_name_is_in_members = node.node_name.is_one_of(members)
 
                 # Accept any nodes which don't have a "sectiondef" as a parent or, if they do, only
                 # accept them if their names are in the members list or they are of type description.
