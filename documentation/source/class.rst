@@ -25,6 +25,11 @@ additionally the ``members``, ``private-members`` and ``undoc-members`` options.
 ``undoc-members``
    If specified, the undocumented members of the class will be displayed.
 
+If you would like to always specify some combination of ``members``,
+``private-members`` and ``undoc-members`` then you can use the
+:ref:`breathe_default_members <breathe-default-members>` configuration variable
+to set it in the ``conf.py``.
+
 .. contents::
 
 

@@ -399,25 +399,37 @@ class FilterFactory(object):
 
         self.globber_factory = globber_factory
         self.path_handler = path_handler
-        self.default_sections = ()
+        self.default_members = ()
 
     def create_group_render_filter(self, options):
 
+        # Generate new dictionary from defaults
+        filter_options = dict((entry, u'') for entry in self.default_members)
+
+        # Update from the actual options
+        filter_options.update(options)
+
         # Act as if the group always has :members: specified so that we get the publicly viewable
         # contents of the group.
-        options.update({
+        filter_options.update({
             'members': u''
             })
 
-        return self.create_class_member_filter(options)
+        return self.create_class_member_filter(filter_options)
 
     def create_class_filter(self, options):
         """Content filter for classes based on various directive options"""
 
+        # Generate new dictionary from defaults
+        filter_options = dict((entry, u'') for entry in self.default_members)
+
+        # Update from the actual options
+        filter_options.update(options)
+
         return AndFilter(
-            self.create_class_member_filter(options),
-            self.create_outline_filter(options),
-            self.create_show_filter(options),
+            self.create_class_member_filter(filter_options),
+            self.create_outline_filter(filter_options),
+            self.create_show_filter(filter_options),
             )
 
     def create_show_filter(self, options):
@@ -734,9 +746,9 @@ class FilterFactory(object):
         return filter_
 
     def get_config_values(self, app):
-        """Extract the breathe_default_sections config value and store it.
+        """Extract the breathe_default_members config value and store it.
 
         This method is called on the 'builder-init' event in Sphinx"""
 
-        self.default_sections = app.config.breathe_default_sections
+        self.default_members = app.config.breathe_default_members
 

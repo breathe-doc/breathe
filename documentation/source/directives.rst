@@ -384,16 +384,15 @@ Config Values
    Breathe will take the final value and append ``breathe/doxygen/<project
    name>`` to the path to minimize conflicts.
 
-.. _breathe-default-sections:
+.. _breathe-default-members:
 
-.. confval:: breathe_default_sections
+.. confval:: breathe_default_members
 
-   Provides the default value for the ``sections`` option for the directives
-   which have it. By default, this is set to ``('public*', 'func*')`` which
-   means that all top level functions and public class members & functions 
-   are included by default in the output. If you change this to::
+   Provides the directive flags that should be applied to all directives which
+   take ``:members:``, ``:private-members:`` and ``:undoc-members:`` options.
+   By default, this is set to an empty list, which means no members are
+   displayed. If you'd like to always display the public and public,
+   undocumented members then you could set it like this::
 
-      breathe_default_sections = ('public*', 'private*', 'func*')
-
-   Then all private classes members and functions are also included.
+      breathe_default_members = ('members', 'undoc-members')
 
