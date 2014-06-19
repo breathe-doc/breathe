@@ -197,6 +197,7 @@ class DoxygenClassDirective(BaseDirective):
         "project": unchanged_required,
         "members": unchanged,
         "private-members": flag,
+        "undoc-members": flag,
         "show": unchanged_required,
         "outline": flag,
         "no-link": flag,
