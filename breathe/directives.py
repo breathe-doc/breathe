@@ -870,7 +870,7 @@ def setup(app):
     app.add_config_value("breathe_domain_by_file_pattern", {}, True)
     app.add_config_value("breathe_projects_source", {}, True)
     app.add_config_value("breathe_build_directory", '', True)
-    app.add_config_value("breathe_default_sections", ('public*', 'func*'), True)
+    app.add_config_value("breathe_default_members", (), True)
 
     app.add_stylesheet("breathe.css")
 
