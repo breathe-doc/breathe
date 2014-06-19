@@ -250,7 +250,6 @@ class DoxygenGroupDirective(BaseDirective):
         "path": unchanged_required,
         "project": unchanged_required,
         "content-only": flag,
-        "members": unchanged,
         "private-members": flag,
         "no-link": flag,
         }
