@@ -59,158 +59,6 @@ If neither project nor path are provided on the directive then breathe will
 expect the :ref:`breathe_default_project <default_project>` config value to be
 set.
 
-.. _doxygenindex:
-
-doxygenindex
-~~~~~~~~~~~~
-
-This directive processes and produces output for everything described by the
-Doxygen xml output. It reads the ``index.xml`` file and process everything
-referenced by it.
-
-::
-
-   .. doxygenindex::
-      :project: ...
-      :path: ...
-      :outline:
-      :no-link:
-
-autodoxygenindex
-~~~~~~~~~~~~~~~~
-
-This directive performs a similar role to the ``doxygenindex`` directive except
-that it handles the doxygen xml generation for you. It uses the
-``breathe_projects_source`` configuration dictionary to judge which code source
-files should have doxygen xml generated for them. The ``project`` directive
-option associates the directive with a particular project in the
-``breathe_projects_source`` dictionary. All the files references by the entry in
-the ``breathe_projects_source`` will be included in the output.
-
-Thank you to `Scopatz <https://github.com/scopatz>`_ for the idea and initial
-implementation.
-
-::
-
-   .. autodoxygenindex::
-      :project: ...
-      :outline:
-      :no-link:
-
-Checkout the :ref:`example <autodoxygenindex-example>` to see it in action.
-
-doxygenfunction
-~~~~~~~~~~~~~~~
-
-This directive generates the appropriate output for a single function. The
-function name is required to be unique in the project.
-
-::
-
-   .. doxygenfunction:: <function name>
-      :project: ...
-      :path: ...
-      :outline:
-      :no-link:
-
-Checkout the :ref:`example <function-example>` to see it in action.
-
-doxygenstruct
-~~~~~~~~~~~~~
-
-This directive generates the appropriate output for a single struct. The struct
-name is required to be unique in the project.
-
-::
-
-   .. doxygenstruct:: <struct name>
-      :project: ...
-      :path: ...
-      :outline:
-      :no-link:
-
-Checkout the :ref:`example <struct-example>` to see it in action.
-
-doxygenenum
-~~~~~~~~~~~
-
-This directive generates the appropriate output for a single enum. It behaves
-the same as the doxygenstruct directive.
-
-::
-
-   .. doxygenenum:: <enum name>
-      :project: ...
-      :path: ...
-      :outline:
-      :no-link:
-
-Checkout the :ref:`example <enum-example>` to see it in action.
-
-doxygentypedef
-~~~~~~~~~~~~~~
-
-This directive generates the appropriate output for a single typedef. It behaves
-the same as the doxygenstruct directive.
-
-::
-
-   .. doxygentypedef:: <typedef name>
-      :project: ...
-      :path: ...
-      :outline:
-      :no-link:
-
-Checkout the :ref:`example <typedef-example>` to see it in action.
-
-doxygenunion
-~~~~~~~~~~~~~~
-
-This directive generates the appropriate output for a single union. It behaves
-the same as the doxygenstruct directive.
-
-::
-
-   .. doxygenunion:: <union name>
-      :project: ...
-      :path: ...
-      :outline:
-      :no-link:
-
-Checkout the :ref:`example <union-example>` to see it in action.
-
-doxygendefine
-~~~~~~~~~~~~~
-
-This directive generates the appropriate output for a single preprocessor define. It behaves
-the same as the doxygenstruct directive.
-
-::
-
-   .. doxygendefine:: <define name>
-      :project: ...
-      :path: ...
-      :outline:
-      :no-link:
-
-Checkout the :ref:`example <define-example>` to see it in action.
-
-doxygenvariable
-~~~~~~~~~~~~~~~
-
-This directive generates the appropriate output for a single variable.
-It behaves the same as the doxygenstruct directive.
-
-::
-
-   .. doxygenvariable:: <variable name>
-      :project: ...
-      :path: ...
-      :outline:
-      :no-link:
-
-Checkout the :ref:`example <variable-example>` to see it in action.
-
 
 .. _doxygenclass:
 
@@ -235,6 +83,40 @@ Checkout the :ref:`doxygenclass documentation <class-example>` for more details
 and to see it in action.
 
 
+doxygendefine
+~~~~~~~~~~~~~
+
+This directive generates the appropriate output for a single preprocessor
+define. It behaves the same as the doxygenstruct directive.
+
+::
+
+   .. doxygendefine:: <define name>
+      :project: ...
+      :path: ...
+      :outline:
+      :no-link:
+
+Checkout the :ref:`example <define-example>` to see it in action.
+
+
+doxygenenum
+~~~~~~~~~~~
+
+This directive generates the appropriate output for a single enum. It behaves
+the same as the doxygenstruct directive.
+
+::
+
+   .. doxygenenum:: <enum name>
+      :project: ...
+      :path: ...
+      :outline:
+      :no-link:
+
+Checkout the :ref:`example <enum-example>` to see it in action.
+
+
 doxygenfile
 ~~~~~~~~~~~
 
@@ -250,6 +132,7 @@ file.
 
 Checkout the :ref:`example <file-example>` to see it in action.
 
+
 autodoxygenfile
 ~~~~~~~~~~~~~~~
 
@@ -264,6 +147,24 @@ It handles the doxygen xml generation for you like the other auto directives.
       :no-link:
 
 Checkout the :ref:`example <autodoxygenfile-example>` to see it in action.
+
+
+doxygenfunction
+~~~~~~~~~~~~~~~
+
+This directive generates the appropriate output for a single function. The
+function name is required to be unique in the project.
+
+::
+
+   .. doxygenfunction:: <function name>
+      :project: ...
+      :path: ...
+      :outline:
+      :no-link:
+
+Checkout the :ref:`example <function-example>` to see it in action.
+
 
 doxygengroup
 ~~~~~~~~~~~~
@@ -288,6 +189,117 @@ Checkout the :ref:`doxygengroup documentation <group-example>` for more details
 and to see it in action.
 
 .. _doxygen documentation: http://www.stack.nl/~dimitri/doxygen/manual/grouping.html
+
+
+
+.. _doxygenindex:
+
+doxygenindex
+~~~~~~~~~~~~
+
+This directive processes and produces output for everything described by the
+Doxygen xml output. It reads the ``index.xml`` file and process everything
+referenced by it.
+
+::
+
+   .. doxygenindex::
+      :project: ...
+      :path: ...
+      :outline:
+      :no-link:
+
+
+autodoxygenindex
+~~~~~~~~~~~~~~~~
+
+This directive performs a similar role to the ``doxygenindex`` directive except
+that it handles the doxygen xml generation for you. It uses the
+``breathe_projects_source`` configuration dictionary to judge which code source
+files should have doxygen xml generated for them. The ``project`` directive
+option associates the directive with a particular project in the
+``breathe_projects_source`` dictionary. All the files references by the entry in
+the ``breathe_projects_source`` will be included in the output.
+
+Thank you to `Scopatz <https://github.com/scopatz>`_ for the idea and initial
+implementation.
+
+::
+
+   .. autodoxygenindex::
+      :project: ...
+      :outline:
+      :no-link:
+
+Checkout the :ref:`example <autodoxygenindex-example>` to see it in action.
+
+
+doxygenstruct
+~~~~~~~~~~~~~
+
+This directive generates the appropriate output for a single struct. The struct
+name is required to be unique in the project.
+
+::
+
+   .. doxygenstruct:: <struct name>
+      :project: ...
+      :path: ...
+      :outline:
+      :no-link:
+
+Checkout the :ref:`example <struct-example>` to see it in action.
+
+
+doxygentypedef
+~~~~~~~~~~~~~~
+
+This directive generates the appropriate output for a single typedef. It behaves
+the same as the doxygenstruct directive.
+
+::
+
+   .. doxygentypedef:: <typedef name>
+      :project: ...
+      :path: ...
+      :outline:
+      :no-link:
+
+Checkout the :ref:`example <typedef-example>` to see it in action.
+
+doxygenunion
+~~~~~~~~~~~~
+
+This directive generates the appropriate output for a single union. It behaves
+the same as the doxygenstruct directive.
+
+::
+
+   .. doxygenunion:: <union name>
+      :project: ...
+      :path: ...
+      :outline:
+      :no-link:
+
+Checkout the :ref:`example <union-example>` to see it in action.
+
+
+doxygenvariable
+~~~~~~~~~~~~~~~
+
+This directive generates the appropriate output for a single variable.
+It behaves the same as the doxygenstruct directive.
+
+::
+
+   .. doxygenvariable:: <variable name>
+      :project: ...
+      :path: ...
+      :outline:
+      :no-link:
+
+Checkout the :ref:`example <variable-example>` to see it in action.
+
 
 
 Config Values
