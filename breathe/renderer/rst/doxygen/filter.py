@@ -32,6 +32,10 @@ class Node(Selector):
         return node_stack[0]
 
     @property
+    def node_type(self):
+        return NodeTypeAccessor(self)
+
+    @property
     def name(self):
         return AttributeAccessor(self, 'name')
 
@@ -399,10 +403,21 @@ class FilterFactory(object):
         """Content filter based on :members: and :private-members: classes"""
 
         node = Node()
+        node_is_description = node.node_type == 'description'
         parent = Parent()
         parent_is_sectiondef = parent.node_type == "sectiondef"
         parent_is_public = parent.kind.is_one_of(self.public_kinds)
         parent_is_private = parent.kind.is_one_of(self.private_kinds)
+
+        # Description Filter
+        # Nothing with a parent that's a sectiondef
+        description_filter = ~ parent_is_sectiondef
+
+        # Let through any description children of sectiondefs if we output any kind members
+        if 'members' in options or 'private-members' in options:
+
+            description_filter = \
+                (parent_is_sectiondef & node_is_description) | ~ parent_is_sectiondef
 
         # Public Filter
         # Nothing with a parent that's a sectiondef
@@ -444,7 +459,7 @@ class FilterFactory(object):
             private_members_filter = \
                 (parent_is_sectiondef & parent_is_private) | ~ parent_is_sectiondef
 
-        return public_members_filter | private_members_filter
+        return public_members_filter | private_members_filter | description_filter
 
     def create_outline_filter(self, options):
 
