@@ -39,7 +39,9 @@ variable to set it in the ``conf.py``.
 Basic Example
 -------------
 
-This displays the class documentation without any members::
+This displays the class documentation without any members:
+
+.. code-block:: rst
 
    .. doxygenclass:: Nutshell
       :project: nutshell
@@ -55,7 +57,9 @@ Members Example
 ---------------
 
 This directive call will display the class documentation with all the public
-members::
+members:
+
+.. code-block:: rst
 
    .. doxygenclass:: Nutshell
       :project: nutshell
@@ -73,7 +77,9 @@ Specific Members Example
 ------------------------
 
 This displays the class documentation with only the members listed in the
-``:members:`` option::
+``:members:`` option:
+
+.. code-block:: rst
 
    .. doxygenclass:: Nutshell
       :project: nutshell
@@ -93,7 +99,7 @@ Protected Members
 This displays only the protected members of the class. Normally this is combined
 with the ``:members:`` option to show the public members as well.
 
-::
+.. code-block:: rst
 
    .. doxygenclass:: GroupedClassTest
       :project: group
@@ -113,7 +119,7 @@ Private Members
 This displays only the private members of the class. Normally this is combined
 with the ``:members:`` option to show the public members as well.
 
-::
+.. code-block:: rst
 
    .. doxygenclass:: Nutshell
       :project: nutshell
@@ -134,7 +140,7 @@ default. Undocumented public members are only shown if the ``:members:`` option
 is also used. The same goes for the undocumented private members and the
 ``private-members`` option.
 
-::
+.. code-block:: rst
 
    .. doxygenclass:: ClassTest
       :project: class
@@ -151,6 +157,11 @@ It produces this output:
    :undoc-members:
    :no-link:
 
+.. note::
+
+   Undocumented classes are still not shown in the output due to an implementation
+   issue. Please post an issue on github if you would like this resolved.
+
 Outline Example
 ---------------
 
@@ -158,7 +169,7 @@ This displays only the names of the class members and not their
 documentation. The ``:members:`` and ``:private-members:`` options determine
 which members are displayed.
 
-::
+.. code-block:: rst
 
    .. doxygenclass:: Nutshell
       :project: nutshell
@@ -177,7 +188,9 @@ It produces this output:
 Failing Example
 ---------------
 
-This intentionally fails::
+This intentionally fails:
+
+.. code-block:: rst
 
    .. doxygenclass:: made_up_class
       :project: class
