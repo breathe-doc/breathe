@@ -9,7 +9,7 @@ group. A doxygen group can be declared with specific doxygen markup in the
 source comments as cover in the `doxygen documentation`_.
 
 It takes the standard ``project``, ``path``, ``outline`` and ``no-link`` options
-and additionally the ``content-only``, ``private-members`` and
+and additionally the ``content-only``, ``members``, ``private-members`` and
 ``undoc-members`` options.
 
 ``content-only``
@@ -17,6 +17,12 @@ and additionally the ``content-only``, ``private-members`` and
    group or the group description and instead outputs the contents of the group.
    This can be useful if the groups are only used for organizational purposes
    and not to provide additional information.
+
+``members``
+   If specified, the public members of any classes in the group output will be
+   displayed. Unlike the ``doxygenclass`` ``members`` option, this does not
+   optionally take a list of member names to display as this will be applied
+   across multiple classes within the group.
 
 ``private-members``
    If specified, the private members of any classes in the group output will be

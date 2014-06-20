@@ -367,15 +367,8 @@ class Gather(object):
 
 class FilterFactory(object):
 
-    public_kinds = set([
-            # C++ style public entries
-            "public-type",
-            "public-func",
-            "public-attrib",
-            "public-slot",
-            "public-static-func",
-            "public-static-attrib",
-            # C style top level entries
+    # C style top level entries
+    c_kinds = set([
             "friend",
             "related",
             "define",
@@ -384,6 +377,16 @@ class FilterFactory(object):
             "enum",
             "func",
             "var",
+            ])
+
+    # C++ style public entries
+    public_kinds = set([
+            "public-type",
+            "public-func",
+            "public-attrib",
+            "public-slot",
+            "public-static-func",
+            "public-static-attrib",
             ])
 
     private_kinds = set([
@@ -401,6 +404,18 @@ class FilterFactory(object):
         self.path_handler = path_handler
         self.default_members = ()
 
+
+    def _create_c_kinds_filter(self, options):
+
+        parent = Parent()
+        parent_is_sectiondef = parent.node_type == "sectiondef"
+        parent_is_c = parent.kind.is_one_of(self.c_kinds)
+
+        c_kinds_filter = \
+            (parent_is_sectiondef & parent_is_c) | ~ parent_is_sectiondef
+
+        return c_kinds_filter
+
     def create_group_render_filter(self, options):
 
         # Generate new dictionary from defaults
@@ -409,13 +424,14 @@ class FilterFactory(object):
         # Update from the actual options
         filter_options.update(options)
 
-        # Act as if the group always has :members: specified so that we get the publicly viewable
-        # contents of the group.
-        filter_options.update({
-            'members': u''
-            })
+        # Convert the doxygengroup members flag (which just stores None as the value) to an empty
+        # string to allow the create_class_member_filter to process it properly
+        if 'members' in filter_options:
+            filter_options['members'] = u''
 
-        return self.create_class_member_filter(filter_options)
+        c_kinds_filter = self._create_c_kinds_filter(options)
+
+        return self.create_class_member_filter(filter_options) | c_kinds_filter
 
     def create_class_filter(self, options):
         """Content filter for classes based on various directive options"""

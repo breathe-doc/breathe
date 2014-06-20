@@ -174,7 +174,7 @@ group. A doxygen group can be declared with specific doxygen markup in the
 source comments as cover in the `doxygen documentation`_.
 
 It takes the standard ``project``, ``path``, ``outline`` and ``no-link`` options
-and additionally the ``content-only``, ``private-members`` and
+and additionally the ``content-only``, ``members``, ``private-members`` and
 ``undoc-members`` options.
 
 ::
@@ -183,6 +183,7 @@ and additionally the ``content-only``, ``private-members`` and
       :project: ...
       :path: ...
       :content-only:
+      :members:
       :private-members:
       :undoc-members:
       :no-link:
