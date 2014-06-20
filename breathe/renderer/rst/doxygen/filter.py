@@ -403,18 +403,6 @@ class FilterFactory(object):
         self.path_handler = path_handler
         self.default_members = ()
 
-
-    def _create_c_kinds_filter(self, options):
-
-        parent = Parent()
-        parent_is_sectiondef = parent.node_type == "sectiondef"
-        parent_is_c = parent.kind.is_one_of(self.c_kinds)
-
-        c_kinds_filter = \
-            (parent_is_sectiondef & parent_is_c) | ~ parent_is_sectiondef
-
-        return c_kinds_filter
-
     def create_group_render_filter(self, options):
 
         # Generate new dictionary from defaults
@@ -428,9 +416,7 @@ class FilterFactory(object):
         if 'members' in filter_options:
             filter_options['members'] = u''
 
-        c_kinds_filter = self._create_c_kinds_filter(options)
-
-        return ( self.create_class_member_filter(filter_options) | c_kinds_filter ) \
+        return self.create_class_member_filter(filter_options) \
             & self.create_innerclass_filter(filter_options)
 
     def create_class_filter(self, options):
