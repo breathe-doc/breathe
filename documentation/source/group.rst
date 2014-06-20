@@ -44,6 +44,8 @@ variable to set it in the ``conf.py``.
 
 .. _doxygen documentation: http://www.stack.nl/~dimitri/doxygen/manual/grouping.html
 
+.. contents::
+
 
 Basic Example
 -------------
@@ -126,6 +128,33 @@ Produces this output:
    :private-members:
    :no-link:
 
+
+Undocumented Members Example
+----------------------------
+
+The ``undoc-members`` option changes the output to only undocumentated members
+from the sections (public, protected, private) that are being displayed for the
+classes in the group output.
+
+.. code-block:: rst
+
+   .. doxygengroup:: mygroup
+      :project: group
+      :private-members:
+      :undoc-members:
+
+Produces this output:
+
+.. doxygengroup:: mygroup
+   :project: group
+   :private-members:
+   :undoc-members:
+   :no-link:
+
+.. note::
+
+   Undocumented classes are still not shown in the output due to an implementation
+   issue. Please post an issue on github if you would like this resolved.
 
 Failing Example
 ---------------
