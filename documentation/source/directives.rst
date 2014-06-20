@@ -59,6 +59,141 @@ If neither project nor path are provided on the directive then breathe will
 expect the :ref:`breathe_default_project <default_project>` config value to be
 set.
 
+
+.. _doxygenclass:
+
+doxygenclass
+~~~~~~~~~~~~
+
+This directive generates the appropriate output for a single class. It takes the
+standard ``project``, ``path``, ``outline`` and ``no-link`` options and
+additionally the ``members``, ``private-members`` and ``undoc-members``
+options::
+
+   .. doxygenclass:: <class name>
+      :project: ...
+      :path: ...
+      :members: [...]
+      :private-members:
+      :undoc-members:
+      :outline:
+      :no-link:
+
+Checkout the :ref:`doxygenclass documentation <class-example>` for more details
+and to see it in action.
+
+
+doxygendefine
+~~~~~~~~~~~~~
+
+This directive generates the appropriate output for a single preprocessor
+define. It behaves the same as the doxygenstruct directive.
+
+::
+
+   .. doxygendefine:: <define name>
+      :project: ...
+      :path: ...
+      :outline:
+      :no-link:
+
+Checkout the :ref:`example <define-example>` to see it in action.
+
+
+doxygenenum
+~~~~~~~~~~~
+
+This directive generates the appropriate output for a single enum. It behaves
+the same as the doxygenstruct directive.
+
+::
+
+   .. doxygenenum:: <enum name>
+      :project: ...
+      :path: ...
+      :outline:
+      :no-link:
+
+Checkout the :ref:`example <enum-example>` to see it in action.
+
+
+doxygenfile
+~~~~~~~~~~~
+
+This directive generates the appropriate output for the contents of a source
+file.
+
+::
+
+   .. doxygenfile:: <filename>
+      :project: ...
+      :path: ...
+      :no-link:
+
+Checkout the :ref:`example <file-example>` to see it in action.
+
+
+autodoxygenfile
+~~~~~~~~~~~~~~~
+
+This directive is this ``auto`` version of the doxygenfile directive above.
+It handles the doxygen xml generation for you like the other auto directives.
+
+::
+
+   .. autodoxygenfile:: <filename>
+      :project: ...
+      :outline:
+      :no-link:
+
+Checkout the :ref:`example <autodoxygenfile-example>` to see it in action.
+
+
+doxygenfunction
+~~~~~~~~~~~~~~~
+
+This directive generates the appropriate output for a single function. The
+function name is required to be unique in the project.
+
+::
+
+   .. doxygenfunction:: <function name>
+      :project: ...
+      :path: ...
+      :outline:
+      :no-link:
+
+Checkout the :ref:`example <function-example>` to see it in action.
+
+
+doxygengroup
+~~~~~~~~~~~~
+
+This directive generates the appropriate output for the contents of a doxygen
+group. A doxygen group can be declared with specific doxygen markup in the
+source comments as cover in the `doxygen documentation`_.
+
+It takes the standard ``project``, ``path``, ``outline`` and ``no-link`` options
+and additionally the ``content-only``, ``members``, ``private-members`` and
+``undoc-members`` options.
+
+::
+
+   .. doxygengroup:: <group name>
+      :project: ...
+      :path: ...
+      :content-only:
+      :members:
+      :private-members:
+      :undoc-members:
+      :no-link:
+
+Checkout the :ref:`doxygengroup documentation <group-example>` for more details
+and to see it in action.
+
+.. _doxygen documentation: http://www.stack.nl/~dimitri/doxygen/manual/grouping.html
+
+
 .. _doxygenindex:
 
 doxygenindex
@@ -75,6 +210,7 @@ referenced by it.
       :path: ...
       :outline:
       :no-link:
+
 
 autodoxygenindex
 ~~~~~~~~~~~~~~~~
@@ -99,21 +235,6 @@ implementation.
 
 Checkout the :ref:`example <autodoxygenindex-example>` to see it in action.
 
-doxygenfunction
-~~~~~~~~~~~~~~~
-
-This directive generates the appropriate output for a single function. The
-function name is required to be unique in the project.
-
-::
-
-   .. doxygenfunction:: <function name>
-      :project: ...
-      :path: ...
-      :outline:
-      :no-link:
-
-Checkout the :ref:`example <function-example>` to see it in action.
 
 doxygenstruct
 ~~~~~~~~~~~~~
@@ -131,21 +252,6 @@ name is required to be unique in the project.
 
 Checkout the :ref:`example <struct-example>` to see it in action.
 
-doxygenenum
-~~~~~~~~~~~
-
-This directive generates the appropriate output for a single enum. It behaves
-the same as the doxygenstruct directive.
-
-::
-
-   .. doxygenenum:: <enum name>
-      :project: ...
-      :path: ...
-      :outline:
-      :no-link:
-
-Checkout the :ref:`example <enum-example>` to see it in action.
 
 doxygentypedef
 ~~~~~~~~~~~~~~
@@ -164,7 +270,7 @@ the same as the doxygenstruct directive.
 Checkout the :ref:`example <typedef-example>` to see it in action.
 
 doxygenunion
-~~~~~~~~~~~~~~
+~~~~~~~~~~~~
 
 This directive generates the appropriate output for a single union. It behaves
 the same as the doxygenstruct directive.
@@ -179,21 +285,6 @@ the same as the doxygenstruct directive.
 
 Checkout the :ref:`example <union-example>` to see it in action.
 
-doxygendefine
-~~~~~~~~~~~~~
-
-This directive generates the appropriate output for a single preprocessor define. It behaves
-the same as the doxygenstruct directive.
-
-::
-
-   .. doxygendefine:: <define name>
-      :project: ...
-      :path: ...
-      :outline:
-      :no-link:
-
-Checkout the :ref:`example <define-example>` to see it in action.
 
 doxygenvariable
 ~~~~~~~~~~~~~~~
@@ -211,81 +302,6 @@ It behaves the same as the doxygenstruct directive.
 
 Checkout the :ref:`example <variable-example>` to see it in action.
 
-
-.. _doxygenclass:
-
-doxygenclass
-~~~~~~~~~~~~
-
-This directive generates the appropriate output for a single class. It takes the
-standard ``project``, ``path``, ``outline`` and ``no-link`` options and
-additionally ``members`` and ``private-members`` option::
-
-   .. doxygenclass:: <class name>
-      :project: ...
-      :path: ...
-      :members: [...]
-      :private-members:
-      :outline:
-      :no-link:
-
-Checkout the :ref:`doxygenclass documentation <class-example>` for more details
-and to see it in action.
-
-
-doxygenfile
-~~~~~~~~~~~
-
-This directive generates the appropriate output for the contents of a source
-file.
-
-::
-
-   .. doxygenfile:: <filename>
-      :project: ...
-      :path: ...
-      :no-link:
-
-Checkout the :ref:`example <file-example>` to see it in action.
-
-autodoxygenfile
-~~~~~~~~~~~~~~~
-
-This directive is this ``auto`` version of the doxygenfile directive above.
-It handles the doxygen xml generation for you like the other auto directives.
-
-::
-
-   .. autodoxygenfile:: <filename>
-      :project: ...
-      :outline:
-      :no-link:
-
-Checkout the :ref:`example <autodoxygenfile-example>` to see it in action.
-
-doxygengroup
-~~~~~~~~~~~~
-
-This directive generates the appropriate output for the contents of a doxygen
-group. A doxygen group can be declared with specific doxygen markup in the
-source comments as cover in the `doxygen documentation`_.
-
-It takes the standard ``project``, ``path``, ``outline`` and ``no-link`` options
-and additionally the ``content-only`` and ``sections`` options.
-
-::
-
-   .. doxygengroup:: <group name>
-      :project: ...
-      :path: ...
-      :content-only:
-      :sections: [...]
-      :no-link:
-
-Checkout the :ref:`doxygengroup documentation <group-example>` for more details
-and to see it in action.
-
-.. _doxygen documentation: http://www.stack.nl/~dimitri/doxygen/manual/grouping.html
 
 
 Config Values
@@ -370,16 +386,15 @@ Config Values
    Breathe will take the final value and append ``breathe/doxygen/<project
    name>`` to the path to minimize conflicts.
 
-.. _breathe-default-sections:
+.. _breathe-default-members:
 
-.. confval:: breathe_default_sections
+.. confval:: breathe_default_members
 
-   Provides the default value for the ``sections`` option for the directives
-   which have it. By default, this is set to ``('public*', 'func*')`` which
-   means that all top level functions and public class members & functions 
-   are included by default in the output. If you change this to::
+   Provides the directive flags that should be applied to all directives which
+   take ``:members:``, ``:private-members:`` and ``:undoc-members:`` options.
+   By default, this is set to an empty list, which means no members are
+   displayed. If you'd like to always display the public and public,
+   undocumented members then you could set it like this::
 
-      breathe_default_sections = ('public*', 'private*', 'func*')
-
-   Then all private classes members and functions are also included.
+      breathe_default_members = ('members', 'undoc-members')
 
