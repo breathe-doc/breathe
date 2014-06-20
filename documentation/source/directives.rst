@@ -67,13 +67,14 @@ doxygenclass
 
 This directive generates the appropriate output for a single class. It takes the
 standard ``project``, ``path``, ``outline`` and ``no-link`` options and
-additionally the ``members``, ``private-members`` and ``undoc-members``
-options::
+additionally the ``members``, ``protected-members``, ``private-members`` and
+``undoc-members`` options::
 
    .. doxygenclass:: <class name>
       :project: ...
       :path: ...
       :members: [...]
+      :protected-members:
       :private-members:
       :undoc-members:
       :outline:
@@ -174,8 +175,8 @@ group. A doxygen group can be declared with specific doxygen markup in the
 source comments as cover in the `doxygen documentation`_.
 
 It takes the standard ``project``, ``path``, ``outline`` and ``no-link`` options
-and additionally the ``content-only``, ``members``, ``private-members`` and
-``undoc-members`` options.
+and additionally the ``content-only``, ``members``, ``protected-members``,
+``private-members`` and ``undoc-members`` options.
 
 ::
 
@@ -184,6 +185,7 @@ and additionally the ``content-only``, ``members``, ``private-members`` and
       :path: ...
       :content-only:
       :members:
+      :protected-members:
       :private-members:
       :undoc-members:
       :no-link:
