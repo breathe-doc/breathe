@@ -36,6 +36,7 @@ Will be renderer as:
 .. doxygenclass:: MathHelper
    :project: latexmath
    :members:
+   :undoc-members:
    :no-link:
 
 
