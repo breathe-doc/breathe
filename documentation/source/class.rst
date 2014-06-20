@@ -19,6 +19,9 @@ additionally the ``members``, ``private-members`` and ``undoc-members`` options.
    Breathe will treat the arguments as names of members and provide
    documentation for only those members that have been named.
 
+``protected-members``
+   If specified, the protected members of the class will be displayed.
+
 ``private-members``
    If specified, the private members of the class will be displayed.
 
@@ -26,9 +29,9 @@ additionally the ``members``, ``private-members`` and ``undoc-members`` options.
    If specified, the undocumented members of the class will be displayed.
 
 If you would like to always specify some combination of ``members``,
-``private-members`` and ``undoc-members`` then you can use the
-:ref:`breathe_default_members <breathe-default-members>` configuration variable
-to set it in the ``conf.py``.
+``protected-members``, ``private-members`` and ``undoc-members`` then you can
+use the :ref:`breathe_default_members <breathe-default-members>` configuration
+variable to set it in the ``conf.py``.
 
 .. contents::
 
@@ -81,6 +84,26 @@ It produces this output:
 .. doxygenclass:: Nutshell
    :project: nutshell
    :members: crack, isCracked
+   :no-link:
+
+
+Protected Members
+-----------------
+
+This displays only the protected members of the class. Normally this is combined
+with the ``:members:`` option to show the public members as well.
+
+::
+
+   .. doxygenclass:: GroupedClassTest
+      :project: group
+      :protected-members:
+
+It produces this output:
+
+.. doxygenclass:: GroupedClassTest
+   :project: group
+   :protected-members:
    :no-link:
 
 
