@@ -36,6 +36,10 @@ class Node(Selector):
         return NodeTypeAccessor(self)
 
     @property
+    def node_name(self):
+        return AttributeAccessor(self, 'node_name')
+
+    @property
     def name(self):
         return AttributeAccessor(self, 'name')
 
@@ -46,6 +50,10 @@ class Node(Selector):
     @property
     def detaileddescription(self):
         return AttributeAccessor(self, 'detaileddescription')
+
+    @property
+    def prot(self):
+        return AttributeAccessor(self, 'prot')
 
 
 class Accessor(object):
@@ -389,6 +397,15 @@ class FilterFactory(object):
             "public-static-attrib",
             ])
 
+    protected_kinds = set([
+            "protected-type",
+            "protected-func",
+            "protected-attrib",
+            "protected-slot",
+            "protected-static-func",
+            "protected-static-attrib",
+            ])
+
     private_kinds = set([
             "private-type",
             "private-func",
@@ -431,7 +448,8 @@ class FilterFactory(object):
 
         c_kinds_filter = self._create_c_kinds_filter(options)
 
-        return self.create_class_member_filter(filter_options) | c_kinds_filter
+        return ( self.create_class_member_filter(filter_options) | c_kinds_filter ) \
+            & self.create_innerclass_filter(filter_options)
 
     def create_class_filter(self, options):
         """Content filter for classes based on various directive options"""
@@ -444,9 +462,41 @@ class FilterFactory(object):
 
         return AndFilter(
             self.create_class_member_filter(filter_options),
+            self.create_innerclass_filter(filter_options),
             self.create_outline_filter(filter_options),
             self.create_show_filter(filter_options),
             )
+
+    def create_innerclass_filter(self, options):
+
+        node = Node()
+        node_is_innerclass = (node.node_type == "ref") & (node.node_name == "innerclass")
+
+        parent = Parent()
+        parent_is_compounddef = parent.node_type == 'compounddef'
+        parent_is_class = parent.kind == 'class'
+
+        allowed = set()
+        all_options = {
+            'members': 'public',
+            'protected-members': 'protected',
+            'private-members': 'private',
+            }
+
+        for option, scope in all_options.iteritems():
+            if option in options:
+                allowed.add(scope)
+
+        node_is_in_allowed_scope = node.prot.is_one_of(allowed)
+
+        node_is_innerclass_in_class = parent_is_compounddef & parent_is_class & node_is_innerclass
+        innerclass = ( node_is_innerclass_in_class & node_is_in_allowed_scope ) \
+            | ~ node_is_innerclass_in_class
+        description = self._create_description_filter(True, 'compounddef', options)
+
+        # Put parent check last as we only want to check parents of innerclass's otherwise we have
+        # to check the parent's type as well
+        return innerclass | description
 
     def create_show_filter(self, options):
         """Currently only handles the header-file entry"""
@@ -470,21 +520,24 @@ class FilterFactory(object):
             NotFilter(InFilter(NodeTypeAccessor(Node()), ["inc"]))
             )
 
-    def _create_description_filter(self, options):
+    def _create_description_filter(self, allow, level, options):
+        """Whether or not we allow descriptions is determined by the calling function and we just do
+        whatever the 'allow' function parameter tells us.
+        """
 
         node = Node()
         node_is_description = node.node_type == 'description'
         parent = Parent()
-        parent_is_sectiondef = parent.node_type == "sectiondef"
+        parent_is_level = parent.node_type == level
 
         # Nothing with a parent that's a sectiondef
-        description_filter = ~ parent_is_sectiondef
+        description_filter = ~ parent_is_level
 
         # Let through any description children of sectiondefs if we output any kind members
-        if 'members' in options or 'private-members' in options:
+        if allow:
 
             description_filter = \
-                (parent_is_sectiondef & node_is_description) | ~ parent_is_sectiondef
+                (parent_is_level & node_is_description) | ~ parent_is_level
 
         return description_filter
 
@@ -525,23 +578,23 @@ class FilterFactory(object):
 
         return public_members_filter
 
-    def _create_private_members_filter(self, options):
+    def _create_non_public_members_filter(self, option_name, kinds, options):
 
         parent = Parent()
         parent_is_sectiondef = parent.node_type == "sectiondef"
-        parent_is_private = parent.kind.is_one_of(self.private_kinds)
+        parent_is_protected = parent.kind.is_one_of(kinds)
 
         # Nothing with a parent that's a sectiondef
-        private_members_filter = ~ parent_is_sectiondef
+        filter_ = ~ parent_is_sectiondef
 
-        if 'private-members' in options:
+        if option_name in options:
 
             # Select anything that doesn't have a parent which is a sectiondef, or, if it does, only
-            # select the private ones
-            private_members_filter = \
-                (parent_is_sectiondef & parent_is_private) | ~ parent_is_sectiondef
+            # select the protected ones
+            filter_ = \
+                (parent_is_sectiondef & parent_is_protected) | ~ parent_is_sectiondef
 
-        return private_members_filter
+        return filter_
 
     def _create_undoc_members_filter(self, options):
 
@@ -549,7 +602,8 @@ class FilterFactory(object):
         parent = Parent()
         parent_is_sectiondef = parent.node_type == "sectiondef"
 
-        node_has_description = node.briefdescription.has_content() | node.detaileddescription.has_content()
+        node_has_description = node.briefdescription.has_content() \
+            | node.detaileddescription.has_content()
 
         undoc_members_filter = \
             (parent_is_sectiondef & node_has_description) | ~ parent_is_sectiondef
@@ -563,17 +617,36 @@ class FilterFactory(object):
     def create_class_member_filter(self, options):
         """Content filter based on :members: and :private-members: classes"""
 
+        # I can't fully explain the filtering of descriptions here. More testing needed to figure
+        # out when it is needed. This approach reflects the old code that was here but it wasn't
+        # commented (my fault.) I wonder if maybe the public and private declarations themselves can
+        # be documented and we need to let them through. Not sure.
+        allow = 'members' in options \
+            or 'protected-members' in options \
+            or 'private-members' in options
+
+        description = self._create_description_filter(allow, 'sectiondef', options)
+
         # Create all necessary filters and combine them
-        description_filter = self._create_description_filter(options)
+        public_members = self._create_public_members_filter(options)
 
-        public_members_filter = self._create_public_members_filter(options)
+        protected_members = self._create_non_public_members_filter(
+            'protected-members',
+            self.protected_kinds,
+            options
+            )
 
-        private_members_filter = self._create_private_members_filter(options)
+        private_members = self._create_non_public_members_filter(
+            'private-members',
+            self.private_kinds,
+            options
+            )
 
-        undoc_members_filter = self._create_undoc_members_filter(options)
+        undoc_members = self._create_undoc_members_filter(options)
 
         # Allow any public/private members which also fit the undoc filter and all the descriptions
-        return (( public_members_filter | private_members_filter ) & undoc_members_filter ) | description_filter
+        allowed_members = ( public_members | protected_members | private_members ) & undoc_members
+        return allowed_members | description
 
     def create_outline_filter(self, options):
 

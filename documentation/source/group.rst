@@ -24,6 +24,10 @@ and additionally the ``content-only``, ``members``, ``private-members`` and
    optionally take a list of member names to display as this will be applied
    across multiple classes within the group.
 
+``protected-members``
+   If specified, the protected members of any classes in the group output will
+   be displayed.
+
 ``private-members``
    If specified, the private members of any classes in the group output will be
    displayed.
@@ -34,9 +38,9 @@ and additionally the ``content-only``, ``members``, ``private-members`` and
    options are specified as well.
 
 If you would like to always specify some combination of ``members``,
-``private-members`` and ``undoc-members`` then you can use the
-:ref:`breathe_default_members <breathe-default-members>` configuration variable
-to set it in the ``conf.py``.
+``protected-members``, ``private-members`` and ``undoc-members`` then you can
+use the :ref:`breathe_default_members <breathe-default-members>` configuration
+variable to set it in the ``conf.py``.
 
 .. _doxygen documentation: http://www.stack.nl/~dimitri/doxygen/manual/grouping.html
 
@@ -77,14 +81,37 @@ Produces this output:
    :no-link:
 
 
+Protected Members
+-----------------
+
+The ``protected-members`` option changes the output to only include the private
+members of any classes as well as the public members. The output for any class
+in the group should be the same as if it had be produced by the
+:ref:`doxygenclass directive <class-example>` with the ``protected-members``
+option specified.
+
+::
+
+   .. doxygenclass:: GroupedClassTest
+      :project: group
+      :protected-members:
+
+It produces this output:
+
+.. doxygenclass:: GroupedClassTest
+   :project: group
+   :protected-members:
+   :no-link:
+
+
 Private-Members Example
 -----------------------
 
 The ``private-members`` option changes the output to only include the private
 members of any classes as well as the public members. The output for any class
 in the group should be the same as if it had be produced by the
-:ref:`doxygenclass directive <class-example>` with the ``members`` and
-``private-members`` options specified.
+:ref:`doxygenclass directive <class-example>` with the ``private-members``
+option specified.
 
 .. code-block:: rst
 
