@@ -13,6 +13,11 @@ public:
 
     virtual void undocumentedPublicFunction() const = 0;
 
+    //! A protected class
+    class PublicClass {};
+
+    class UndocumentedPublicClass {};
+
 protected:
 
     //! A protected function
