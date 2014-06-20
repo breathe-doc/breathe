@@ -39,6 +39,14 @@ class Node(Selector):
     def name(self):
         return AttributeAccessor(self, 'name')
 
+    @property
+    def briefdescription(self):
+        return AttributeAccessor(self, 'briefdescription')
+
+    @property
+    def detaileddescription(self):
+        return AttributeAccessor(self, 'detaileddescription')
+
 
 class Accessor(object):
 
@@ -50,6 +58,9 @@ class Accessor(object):
 
     def is_one_of(self, collection):
         return InFilter(self, collection)
+
+    def has_content(self):
+        return HasContentFilter(self)
 
 
 class NameAccessor(Accessor):
@@ -133,6 +144,38 @@ class Filter(object):
 
     def __invert__(self):
         return NotFilter(self)
+
+
+class HasContentFilter(Filter):
+
+    def __init__(self, accessor):
+        self.accessor = accessor
+
+    def allow(self, node_stack):
+        """Detects if the node in questions has an empty .content_ property.
+        
+        This is tied to the implemented of the xml parsing code which generates arrays of
+        MixedContainer objects for tags like 'briefdescription' and due to the nature of the doxygen
+        xml leaving white space between the 'briefdescription' opening and closing tags, we end up
+        with an array of MixedContainer objects which has one entry with white space in it.  
+
+        So we have to test for that.
+
+        The descriptionType class has a 'hasContent_' method but it seems to be broken.
+        """
+
+        content = self.accessor(node_stack).content_
+
+        # Exit if the content actually is empty, though we don't expect this to be the case.
+        if not content:
+            return False
+
+        # Test for our annoying MixedContainer pattern. Category 1 is the
+        # Text category from the parsing code
+        if len(content) == 1 and content[0].category == 1:
+            return content[0].value.strip()
+
+        return True
 
 
 class InFilter(Filter):
@@ -324,15 +367,8 @@ class Gather(object):
 
 class FilterFactory(object):
 
-    public_kinds = set([
-            # C++ style public entries
-            "public-type",
-            "public-func",
-            "public-attrib",
-            "public-slot",
-            "public-static-func",
-            "public-static-attrib",
-            # C style top level entries
+    # C style top level entries
+    c_kinds = set([
             "friend",
             "related",
             "define",
@@ -341,6 +377,16 @@ class FilterFactory(object):
             "enum",
             "func",
             "var",
+            ])
+
+    # C++ style public entries
+    public_kinds = set([
+            "public-type",
+            "public-func",
+            "public-attrib",
+            "public-slot",
+            "public-static-func",
+            "public-static-attrib",
             ])
 
     private_kinds = set([
@@ -356,25 +402,50 @@ class FilterFactory(object):
 
         self.globber_factory = globber_factory
         self.path_handler = path_handler
-        self.default_sections = ()
+        self.default_members = ()
+
+
+    def _create_c_kinds_filter(self, options):
+
+        parent = Parent()
+        parent_is_sectiondef = parent.node_type == "sectiondef"
+        parent_is_c = parent.kind.is_one_of(self.c_kinds)
+
+        c_kinds_filter = \
+            (parent_is_sectiondef & parent_is_c) | ~ parent_is_sectiondef
+
+        return c_kinds_filter
 
     def create_group_render_filter(self, options):
 
-        # Act as if the group always has :members: specified so that we get the publicly viewable
-        # contents of the group.
-        options.update({
-            'members': u''
-            })
+        # Generate new dictionary from defaults
+        filter_options = dict((entry, u'') for entry in self.default_members)
 
-        return self.create_members_filter(options)
+        # Update from the actual options
+        filter_options.update(options)
+
+        # Convert the doxygengroup members flag (which just stores None as the value) to an empty
+        # string to allow the create_class_member_filter to process it properly
+        if 'members' in filter_options:
+            filter_options['members'] = u''
+
+        c_kinds_filter = self._create_c_kinds_filter(options)
+
+        return self.create_class_member_filter(filter_options) | c_kinds_filter
 
     def create_class_filter(self, options):
         """Content filter for classes based on various directive options"""
 
+        # Generate new dictionary from defaults
+        filter_options = dict((entry, u'') for entry in self.default_members)
+
+        # Update from the actual options
+        filter_options.update(options)
+
         return AndFilter(
-            self.create_members_filter(options),
-            self.create_outline_filter(options),
-            self.create_show_filter(options),
+            self.create_class_member_filter(filter_options),
+            self.create_outline_filter(filter_options),
+            self.create_show_filter(filter_options),
             )
 
     def create_show_filter(self, options):
@@ -399,17 +470,13 @@ class FilterFactory(object):
             NotFilter(InFilter(NodeTypeAccessor(Node()), ["inc"]))
             )
 
-    def create_members_filter(self, options):
-        """Content filter based on :members: and :private-members: classes"""
+    def _create_description_filter(self, options):
 
         node = Node()
         node_is_description = node.node_type == 'description'
         parent = Parent()
         parent_is_sectiondef = parent.node_type == "sectiondef"
-        parent_is_public = parent.kind.is_one_of(self.public_kinds)
-        parent_is_private = parent.kind.is_one_of(self.private_kinds)
 
-        # Description Filter
         # Nothing with a parent that's a sectiondef
         description_filter = ~ parent_is_sectiondef
 
@@ -419,7 +486,15 @@ class FilterFactory(object):
             description_filter = \
                 (parent_is_sectiondef & node_is_description) | ~ parent_is_sectiondef
 
-        # Public Filter
+        return description_filter
+
+    def _create_public_members_filter(self, options):
+
+        node = Node()
+        parent = Parent()
+        parent_is_sectiondef = parent.node_type == "sectiondef"
+        parent_is_public = parent.kind.is_one_of(self.public_kinds)
+
         # Nothing with a parent that's a sectiondef
         public_members_filter = ~ parent_is_sectiondef
 
@@ -448,7 +523,14 @@ class FilterFactory(object):
                 public_members_filter = \
                     (parent_is_sectiondef & parent_is_public) | ~ parent_is_sectiondef
 
-        # Private Filter
+        return public_members_filter
+
+    def _create_private_members_filter(self, options):
+
+        parent = Parent()
+        parent_is_sectiondef = parent.node_type == "sectiondef"
+        parent_is_private = parent.kind.is_one_of(self.private_kinds)
+
         # Nothing with a parent that's a sectiondef
         private_members_filter = ~ parent_is_sectiondef
 
@@ -459,7 +541,39 @@ class FilterFactory(object):
             private_members_filter = \
                 (parent_is_sectiondef & parent_is_private) | ~ parent_is_sectiondef
 
-        return public_members_filter | private_members_filter | description_filter
+        return private_members_filter
+
+    def _create_undoc_members_filter(self, options):
+
+        node = Node()
+        parent = Parent()
+        parent_is_sectiondef = parent.node_type == "sectiondef"
+
+        node_has_description = node.briefdescription.has_content() | node.detaileddescription.has_content()
+
+        undoc_members_filter = \
+            (parent_is_sectiondef & node_has_description) | ~ parent_is_sectiondef
+
+        if 'undoc-members' in options:
+
+            undoc_members_filter = OpenFilter()
+
+        return undoc_members_filter
+
+    def create_class_member_filter(self, options):
+        """Content filter based on :members: and :private-members: classes"""
+
+        # Create all necessary filters and combine them
+        description_filter = self._create_description_filter(options)
+
+        public_members_filter = self._create_public_members_filter(options)
+
+        private_members_filter = self._create_private_members_filter(options)
+
+        undoc_members_filter = self._create_undoc_members_filter(options)
+
+        # Allow any public/private members which also fit the undoc filter and all the descriptions
+        return (( public_members_filter | private_members_filter ) & undoc_members_filter ) | description_filter
 
     def create_outline_filter(self, options):
 
@@ -648,9 +762,9 @@ class FilterFactory(object):
         return filter_
 
     def get_config_values(self, app):
-        """Extract the breathe_default_sections config value and store it.
+        """Extract the breathe_default_members config value and store it.
 
         This method is called on the 'builder-init' event in Sphinx"""
 
-        self.default_sections = app.config.breathe_default_sections
+        self.default_members = app.config.breathe_default_members
 

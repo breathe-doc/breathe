@@ -170,6 +170,7 @@ pygments_style = 'sphinx'
 
 breathe_projects = {
     "class":"../../examples/doxygen/class/xml/",
+    "classtest":"../../examples/specific/class/xml/",
     "structcmd":"../../examples/doxygen/structcmd/xml/",
     "tinyxml":"../../examples/tinyxml/tinyxml/xml/",
     "restypedef":"../../examples/doxygen/restypedef/xml/",

@@ -9,7 +9,8 @@ group. A doxygen group can be declared with specific doxygen markup in the
 source comments as cover in the `doxygen documentation`_.
 
 It takes the standard ``project``, ``path``, ``outline`` and ``no-link`` options
-and additionally the ``content-only`` and ``private-members`` options.
+and additionally the ``content-only``, ``members``, ``private-members`` and
+``undoc-members`` options.
 
 ``content-only``
    If this flag is specified, then the directive does not output the name of the
@@ -17,9 +18,25 @@ and additionally the ``content-only`` and ``private-members`` options.
    This can be useful if the groups are only used for organizational purposes
    and not to provide additional information.
 
+``members``
+   If specified, the public members of any classes in the group output will be
+   displayed. Unlike the ``doxygenclass`` ``members`` option, this does not
+   optionally take a list of member names to display as this will be applied
+   across multiple classes within the group.
+
 ``private-members``
    If specified, the private members of any classes in the group output will be
    displayed.
+
+``undoc-members``
+   If specified, the undocumented members of any classes in the group output
+   will be displayed provided the appropriate ``members`` or ``private-members``
+   options are specified as well.
+
+If you would like to always specify some combination of ``members``,
+``private-members`` and ``undoc-members`` then you can use the
+:ref:`breathe_default_members <breathe-default-members>` configuration variable
+to set it in the ``conf.py``.
 
 .. _doxygen documentation: http://www.stack.nl/~dimitri/doxygen/manual/grouping.html
 

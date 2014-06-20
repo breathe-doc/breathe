@@ -6,7 +6,7 @@ doxygenclass Directive
 
 This directive generates the appropriate output for a single class. It takes the
 standard ``project``, ``path``, ``outline`` and ``no-link`` options and
-additionally ``members`` and ``private-members`` option.
+additionally the ``members``, ``private-members`` and ``undoc-members`` options.
 
 ``members``
    Designed to behavior in a similar manner to the ``members`` option for the
@@ -22,6 +22,13 @@ additionally ``members`` and ``private-members`` option.
 ``private-members``
    If specified, the private members of the class will be displayed.
 
+``undoc-members``
+   If specified, the undocumented members of the class will be displayed.
+
+If you would like to always specify some combination of ``members``,
+``private-members`` and ``undoc-members`` then you can use the
+:ref:`breathe_default_members <breathe-default-members>` configuration variable
+to set it in the ``conf.py``.
 
 .. contents::
 
@@ -96,6 +103,30 @@ It produces this output:
    :private-members:
    :no-link:
 
+Undocumented Members
+--------------------
+
+This displays the undocumented members of the class which are suppressed by
+default. Undocumented public members are only shown if the ``:members:`` option
+is also used. The same goes for the undocumented private members and the
+``private-members`` option.
+
+::
+
+   .. doxygenclass:: ClassTest
+      :project: class
+      :members:
+      :private-members:
+      :undoc-members:
+
+It produces this output:
+
+.. doxygenclass:: ClassTest
+   :project: classtest
+   :members:
+   :private-members:
+   :undoc-members:
+   :no-link:
 
 Outline Example
 ---------------
