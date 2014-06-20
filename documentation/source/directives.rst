@@ -174,7 +174,8 @@ group. A doxygen group can be declared with specific doxygen markup in the
 source comments as cover in the `doxygen documentation`_.
 
 It takes the standard ``project``, ``path``, ``outline`` and ``no-link`` options
-and additionally the ``content-only`` and ``private-members`` options.
+and additionally the ``content-only``, ``private-members`` and
+``undoc-members`` options.
 
 ::
 
@@ -183,13 +184,13 @@ and additionally the ``content-only`` and ``private-members`` options.
       :path: ...
       :content-only:
       :private-members:
+      :undoc-members:
       :no-link:
 
 Checkout the :ref:`doxygengroup documentation <group-example>` for more details
 and to see it in action.
 
 .. _doxygen documentation: http://www.stack.nl/~dimitri/doxygen/manual/grouping.html
-
 
 
 .. _doxygenindex:
