@@ -11,13 +11,31 @@ public:
     //! \brief namespaced class function
     virtual void publicFunction() const = 0;
 
+    virtual void undocumentedPublicFunction() const = 0;
+
+protected:
+
+    //! A protected function
+    void protectedFunction() {};
+
+    void undocumentedProtectedFunction() {};
+
+    //! A protected class
+    class ProtectedClass {};
+
+    class UndocumentedProtectedClass {};
+
 private:
 
     //! This is a private function
     void privateFunction() const = 0;
 
-    //! This is another private function
-    void secondPrivateFunction() const = 0;
+    void undocumentedPrivateFunction() const = 0;
+
+    //! A private class
+    class PrivateClass {};
+
+    class UndocumentedPrivateClass {};
 };
 
 //! This function is in MyGroup

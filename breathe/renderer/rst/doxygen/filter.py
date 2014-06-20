@@ -389,6 +389,15 @@ class FilterFactory(object):
             "public-static-attrib",
             ])
 
+    protected_kinds = set([
+            "protected-type",
+            "protected-func",
+            "protected-attrib",
+            "protected-slot",
+            "protected-static-func",
+            "protected-static-attrib",
+            ])
+
     private_kinds = set([
             "private-type",
             "private-func",
@@ -525,23 +534,23 @@ class FilterFactory(object):
 
         return public_members_filter
 
-    def _create_private_members_filter(self, options):
+    def _create_non_public_members_filter(self, option_name, kinds, options):
 
         parent = Parent()
         parent_is_sectiondef = parent.node_type == "sectiondef"
-        parent_is_private = parent.kind.is_one_of(self.private_kinds)
+        parent_is_protected = parent.kind.is_one_of(kinds)
 
         # Nothing with a parent that's a sectiondef
-        private_members_filter = ~ parent_is_sectiondef
+        filter_ = ~ parent_is_sectiondef
 
-        if 'private-members' in options:
+        if option_name in options:
 
             # Select anything that doesn't have a parent which is a sectiondef, or, if it does, only
-            # select the private ones
-            private_members_filter = \
-                (parent_is_sectiondef & parent_is_private) | ~ parent_is_sectiondef
+            # select the protected ones
+            filter_ = \
+                (parent_is_sectiondef & parent_is_protected) | ~ parent_is_sectiondef
 
-        return private_members_filter
+        return filter_
 
     def _create_undoc_members_filter(self, options):
 
@@ -564,16 +573,23 @@ class FilterFactory(object):
         """Content filter based on :members: and :private-members: classes"""
 
         # Create all necessary filters and combine them
-        description_filter = self._create_description_filter(options)
+        description = self._create_description_filter(options)
 
-        public_members_filter = self._create_public_members_filter(options)
+        public_members = self._create_public_members_filter(options)
 
-        private_members_filter = self._create_private_members_filter(options)
+        protected_members = self._create_non_public_members_filter('protected-members',
+                                                                          self.protected_kinds,
+                                                                          options)
 
-        undoc_members_filter = self._create_undoc_members_filter(options)
+        private_members = self._create_non_public_members_filter('private-members',
+                                                                        self.private_kinds,
+                                                                        options)
+
+        undoc_members = self._create_undoc_members_filter(options)
 
         # Allow any public/private members which also fit the undoc filter and all the descriptions
-        return (( public_members_filter | private_members_filter ) & undoc_members_filter ) | description_filter
+        allowed_members = ( public_members | protected_members | private_members ) & undoc_members
+        return allowed_members | description
 
     def create_outline_filter(self, options):
 
