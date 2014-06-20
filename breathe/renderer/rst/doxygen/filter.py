@@ -397,24 +397,6 @@ class FilterFactory(object):
             "public-static-attrib",
             ])
 
-    protected_kinds = set([
-            "protected-type",
-            "protected-func",
-            "protected-attrib",
-            "protected-slot",
-            "protected-static-func",
-            "protected-static-attrib",
-            ])
-
-    private_kinds = set([
-            "private-type",
-            "private-func",
-            "private-attrib",
-            "private-slot",
-            "private-static-func",
-            "private-static-attrib",
-            ])
-
     def __init__(self, globber_factory, path_handler):
 
         self.globber_factory = globber_factory
@@ -544,12 +526,15 @@ class FilterFactory(object):
     def _create_public_members_filter(self, options):
 
         node = Node()
+        node_is_memberdef = node.node_type == "memberdef"
+        node_is_public = node.prot == "public"
+
         parent = Parent()
         parent_is_sectiondef = parent.node_type == "sectiondef"
-        parent_is_public = parent.kind.is_one_of(self.public_kinds)
 
         # Nothing with a parent that's a sectiondef
-        public_members_filter = ~ parent_is_sectiondef
+        is_memberdef = parent_is_sectiondef & node_is_memberdef
+        public_members_filter = ~ is_memberdef
 
         # If the user has specified the 'members' option with arguments then we only pay attention
         # to that and not to any other member settings
@@ -574,39 +559,43 @@ class FilterFactory(object):
                 # Select anything that doesn't have a parent which is a sectiondef, or, if it does,
                 # only select the public ones
                 public_members_filter = \
-                    (parent_is_sectiondef & parent_is_public) | ~ parent_is_sectiondef
+                    (is_memberdef & node_is_public) | ~ is_memberdef
 
         return public_members_filter
 
-    def _create_non_public_members_filter(self, option_name, kinds, options):
+    def _create_non_public_members_filter(self, prot, option_name, options):
+        """'prot' is the doxygen xml term for 'public', 'protected' and 'private' categories."""
+
+        node = Node()
+        node_is_memberdef = node.node_type == "memberdef"
+        node_is_public = node.prot == prot
 
         parent = Parent()
         parent_is_sectiondef = parent.node_type == "sectiondef"
-        parent_is_protected = parent.kind.is_one_of(kinds)
 
         # Nothing with a parent that's a sectiondef
-        filter_ = ~ parent_is_sectiondef
+        is_memberdef = parent_is_sectiondef & node_is_memberdef
+        filter_ = ~ is_memberdef
 
         if option_name in options:
 
             # Select anything that doesn't have a parent which is a sectiondef, or, if it does, only
             # select the protected ones
             filter_ = \
-                (parent_is_sectiondef & parent_is_protected) | ~ parent_is_sectiondef
+                (is_memberdef & node_is_public) | ~ is_memberdef
 
         return filter_
 
     def _create_undoc_members_filter(self, options):
 
         node = Node()
-        parent = Parent()
-        parent_is_sectiondef = parent.node_type == "sectiondef"
+        node_is_memberdef = node.node_type == 'memberdef'
 
         node_has_description = node.briefdescription.has_content() \
             | node.detaileddescription.has_content()
 
         undoc_members_filter = \
-            (parent_is_sectiondef & node_has_description) | ~ parent_is_sectiondef
+            (node_is_memberdef & node_has_description) | ~ node_is_memberdef
 
         if 'undoc-members' in options:
 
@@ -631,14 +620,14 @@ class FilterFactory(object):
         public_members = self._create_public_members_filter(options)
 
         protected_members = self._create_non_public_members_filter(
+            'protected',
             'protected-members',
-            self.protected_kinds,
             options
             )
 
         private_members = self._create_non_public_members_filter(
+            'private',
             'private-members',
-            self.private_kinds,
             options
             )
 
