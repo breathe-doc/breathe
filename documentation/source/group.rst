@@ -50,7 +50,8 @@ variable to set it in the ``conf.py``.
 Basic Example
 -------------
 
-The plain ``doxygengroup`` directive will output the group name and description:
+The plain ``doxygengroup`` directive will output the group name and description
+and any top level publicly visible members of the group.
 
 .. code-block:: rst
 
@@ -99,15 +100,15 @@ be produced by the :ref:`doxygenclass directive <class-example>` with the
 
 ::
 
-   .. doxygenclass:: GroupedClassTest
+   .. doxygengroup:: mygroup
       :project: group
-      :protected-members:
+      :members:
 
 It produces this output:
 
-.. doxygenclass:: GroupedClassTest
+.. doxygengroup:: mygroup
    :project: group
-   :protected-members:
+   :members:
    :no-link:
 
 
@@ -121,13 +122,13 @@ with the ``protected-members`` option specified.
 
 ::
 
-   .. doxygenclass:: GroupedClassTest
+   .. doxygengroup:: mygroup
       :project: group
       :protected-members:
 
 It produces this output:
 
-.. doxygenclass:: GroupedClassTest
+.. doxygengroup:: mygroup
    :project: group
    :protected-members:
    :no-link:
