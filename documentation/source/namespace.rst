@@ -1,12 +1,11 @@
 
-.. _group-example:
+.. _namespace-example:
 
-doxygengroup Directive
-======================
+doxygennamespace Directive
+==========================
 
-This directive generates the appropriate output for the contents of a doxygen
-group. A doxygen group can be declared with specific doxygen markup in the
-source comments as cover in the `doxygen documentation`_.
+This directive generates the appropriate output for the contents of a
+namespace.
 
 It takes the standard ``project``, ``path``, ``outline`` and ``no-link`` options
 and additionally the ``content-only``, ``members``, ``private-members`` and
@@ -14,26 +13,26 @@ and additionally the ``content-only``, ``members``, ``private-members`` and
 
 ``content-only``
    If this flag is specified, then the directive does not output the name of the
-   group or the group description and instead outputs the contents of the group.
-   This can be useful if the groups are only used for organizational purposes
-   and not to provide additional information.
+   namespace or the namespace description and instead outputs the contents of
+   the namespace. This can be useful for structuring your documentation but
+   leaving out the namespace declaration itself which is often undocumented.
 
 ``members``
-   If specified, the public members of any classes in the group output will be
+   If specified, the public members of any classes in the namespace output will be
    displayed. Unlike the ``doxygenclass`` ``members`` option, this does not
    optionally take a list of member names to display as this will be applied
-   across multiple classes within the group.
+   across multiple classes within the namespace.
 
 ``protected-members``
-   If specified, the protected members of any classes in the group output will
+   If specified, the protected members of any classes in the namespace output will
    be displayed.
 
 ``private-members``
-   If specified, the private members of any classes in the group output will be
+   If specified, the private members of any classes in the namespace output will be
    displayed.
 
 ``undoc-members``
-   If specified, the undocumented members of any classes in the group output
+   If specified, the undocumented members of any classes in the namespace output
    will be displayed provided the appropriate ``members`` or ``private-members``
    options are specified as well.
 
@@ -50,36 +49,36 @@ variable to set it in the ``conf.py``.
 Basic Example
 -------------
 
-The plain ``doxygengroup`` directive will output the group name and description
-and any top level publicly visible members of the group.
+The plain ``doxygennamespace`` directive will output the namespace name and
+description and any top level publicly visible members of the namespace.
 
 .. code-block:: rst
 
-   .. doxygengroup:: mygroup
-      :project: group
+   .. doxygennamespace:: foo
+      :project: namespace
 
 It produces this output:
 
-.. doxygengroup:: mygroup
-   :project: group
+.. doxygennamespace:: foo
+   :project: namespace
    :no-link:
 
 Content-Only Example
 --------------------
 
 The ``content-only`` option changes the output to only include the content of
-the group and not the group name or description. So this:
+the namespace and not the namespace name or description. So this:
 
 .. code-block:: rst
 
-   .. doxygengroup:: mygroup
-      :project: group
+   .. doxygennamespace:: foo
+      :project: namespace
       :content-only:
 
 Produces this output:
 
-.. doxygengroup:: mygroup
-   :project: group
+.. doxygennamespace:: foo
+   :project: namespace
    :content-only:
    :no-link:
 
@@ -94,20 +93,20 @@ Members Example
 ---------------
 
 The ``members`` option changes the output to include the public members of any
-classes. The output for any class in the group should be the same as if it had
+classes. The output for any class in the namespace should be the same as if it had
 be produced by the :ref:`doxygenclass directive <class-example>` with the
 ``members`` option specified.
 
 ::
 
-   .. doxygengroup:: mygroup
-      :project: group
+   .. doxygennamespace:: foo
+      :project: namespace
       :members:
 
 It produces this output:
 
-.. doxygengroup:: mygroup
-   :project: group
+.. doxygennamespace:: foo
+   :project: namespace
    :members:
    :no-link:
 
@@ -116,20 +115,20 @@ Protected Members Example
 -------------------------
 
 The ``protected-members`` option changes the output to include the protected
-members of any classes. The output for any class in the group should be the same
+members of any classes. The output for any class in the namespace should be the same
 as if it had be produced by the :ref:`doxygenclass directive <class-example>`
 with the ``protected-members`` option specified.
 
 ::
 
-   .. doxygengroup:: mygroup
-      :project: group
+   .. doxygennamespace:: foo
+      :project: namespace
       :protected-members:
 
 It produces this output:
 
-.. doxygengroup:: mygroup
-   :project: group
+.. doxygennamespace:: foo
+   :project: namespace
    :protected-members:
    :no-link:
 
@@ -138,20 +137,20 @@ Private-Members Example
 -----------------------
 
 The ``private-members`` option changes the output to include the private members
-of any classes. The output for any class in the group should be the same as if
+of any classes. The output for any class in the namespace should be the same as if
 it had be produced by the :ref:`doxygenclass directive <class-example>` with the
 ``private-members`` option specified.
 
 .. code-block:: rst
 
-   .. doxygengroup:: mygroup
-      :project: group
+   .. doxygennamespace:: foo
+      :project: namespace
       :private-members:
 
 Produces this output:
 
-.. doxygengroup:: mygroup
-   :project: group
+.. doxygennamespace:: foo
+   :project: namespace
    :private-members:
    :no-link:
 
@@ -161,19 +160,19 @@ Undocumented Members Example
 
 The ``undoc-members`` option changes the output to include any undocumentated
 members from the sections (public, protected, private) that are being displayed
-for the classes in the group output.
+for the classes in the namespace output.
 
 .. code-block:: rst
 
-   .. doxygengroup:: mygroup
-      :project: group
+   .. doxygennamespace:: foo
+      :project: namespace
       :private-members:
       :undoc-members:
 
 Produces this output:
 
-.. doxygengroup:: mygroup
-   :project: group
+.. doxygennamespace:: foo
+   :project: namespace
    :private-members:
    :undoc-members:
    :no-link:
@@ -183,6 +182,24 @@ Produces this output:
    Undocumented classes are still not shown in the output due to an implementation
    issue. Please post an issue on github if you would like this resolved.
 
+
+Nested Example
+--------------
+
+The referenced namespace can be nested in another namespace.
+
+.. code-block:: rst
+
+   .. doxygennamespace:: foo::ns
+      :project: namespace
+
+Produces this output:
+
+.. doxygennamespace:: foo::ns
+   :project: namespace
+   :no-link:
+
+
 Failing Example
 ---------------
 
@@ -190,11 +207,12 @@ This intentionally fails:
 
 .. code-block:: rst
 
-   .. doxygengroup:: madeupgroup
-      :project: group
+   .. doxygennamespace:: madeupnamespace
+      :project: namespace
 
 It produces the following warning message:
 
 .. warning:: Cannot find file "madeupgroup" in doxygen xml output for project
-             "group" from directory: ../../examples/specific/group/xml/
+             "madeupnamespace" from directory:
+             ../../examples/specific/namespacefile/xml/
 

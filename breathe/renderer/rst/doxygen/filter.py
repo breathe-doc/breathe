@@ -185,6 +185,11 @@ operator overloads.
 
 """
 
+
+class UnrecognisedKindError(Exception):
+    pass
+
+
 class Selector(object):
 
     @property
@@ -564,7 +569,11 @@ class FilterFactory(object):
         self.path_handler = path_handler
         self.default_members = ()
 
-    def create_group_render_filter(self, options):
+    def create_render_filter(self, kind, options):
+        """Render filter for group & namespace blocks"""
+
+        if kind not in ['group', 'namespace']:
+            raise UnrecognisedKindError(kind)
 
         # Generate new dictionary from defaults
         filter_options = dict((entry, u'') for entry in self.default_members)
@@ -899,19 +908,18 @@ class FilterFactory(object):
             filter_
             )
 
-    def create_group_content_filter(self, options):
-        """Returns a filter which matches the contents of the group but not the group name or
-        description.
+    def create_content_filter(self, kind, options):
+        """Returns a filter which matches the contents of the or namespace but not the group or
+        namepace name or description.
 
         This allows the groups to be used to structure sections of the documentation rather than to
         structure and further document groups of documentation
 
-        We don't need to pay attention to :members: or :private-members: as top level group members
-        can't be private and we want all the contents of the group, not specific members or no
-        members.
-
         As a finder/content filter we only need to match exactly what we're interested in.
         """
+
+        if kind not in ['group', 'namespace']:
+            raise UnrecognisedKindError(kind)
 
         node = Node()
 
@@ -924,7 +932,7 @@ class FilterFactory(object):
         # Filter for public innerclasses
         parent = Parent()
         parent_is_compounddef = parent.node_type == 'compounddef'
-        parent_is_class = parent.kind == 'group'
+        parent_is_class = parent.kind == kind
 
         node_is_innerclass = (node.node_type == "ref") & (node.node_name == "innerclass")
         node_is_public = node.prot == 'public'
@@ -975,18 +983,28 @@ class FilterFactory(object):
 
         return filter_
 
-    def create_group_finder_filter(self, name):
+    def create_finder_filter(self, kind, name):
         """Returns a filter which looks for the compound node from the index which is a group node
         (kind=group) and has the appropriate name
 
         The compound node should reference the group file which we can parse for the group
-        contents."""
+        contents.
+        """
 
-        filter_ = AndFilter(
-            InFilter(NodeTypeAccessor(Node()), ["compound"]),
-            InFilter(KindAccessor(Node()), ["group"]),
-            InFilter(NameAccessor(Node()), [name])
-            )
+        if kind == 'group':
+
+            filter_ = AndFilter(
+                InFilter(NodeTypeAccessor(Node()), ["compound"]),
+                InFilter(KindAccessor(Node()), ["group"]),
+                InFilter(NameAccessor(Node()), [name])
+                )
+        else:
+            # Assume kind == 'namespace'
+            filter_ = AndFilter(
+                InFilter(NodeTypeAccessor(Node()), ["compound"]),
+                InFilter(KindAccessor(Node()), ["namespace"]),
+                InFilter(NameAccessor(Node()), [name])
+                )
 
         return filter_
 
