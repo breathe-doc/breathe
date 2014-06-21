@@ -354,29 +354,9 @@ class HasContentFilter(Filter):
 
     def allow(self, node_stack):
         """Detects if the node in questions has an empty .content_ property.
-        
-        This is tied to the implemented of the xml parsing code which generates arrays of
-        MixedContainer objects for tags like 'briefdescription' and due to the nature of the doxygen
-        xml leaving white space between the 'briefdescription' opening and closing tags, we end up
-        with an array of MixedContainer objects which has one entry with white space in it.  
-
-        So we have to test for that.
-
-        The descriptionType class has a 'hasContent_' method but it seems to be broken.
         """
 
-        content = self.accessor(node_stack).content_
-
-        # Exit if the content actually is empty, though we don't expect this to be the case.
-        if not content:
-            return False
-
-        # Test for our annoying MixedContainer pattern. Category 1 is the
-        # Text category from the parsing code
-        if len(content) == 1 and content[0].category == 1:
-            return content[0].value.strip()
-
-        return True
+        return bool(self.accessor(node_stack).content_)
 
 
 class InFilter(Filter):
