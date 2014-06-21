@@ -82,6 +82,11 @@ Produces this output:
    :content-only:
    :no-link:
 
+.. note::
+
+   As you can see from the output, section headings like 'Functions' are missing
+   from the :content-only: display. This is due to an implementation detail. If
+   post an issue on github if you'd like it addressed.
 
 Protected Members
 -----------------
