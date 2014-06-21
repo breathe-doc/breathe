@@ -595,6 +595,7 @@ class FilterFactory(object):
             has_grandparent \
             & (grandparent.node_type == 'compounddef') \
             & (grandparent.kind != 'class') \
+            & (grandparent.kind != 'struct') \
             & (node.node_type == 'memberdef')
 
         node_is_public = node.prot == 'public'
@@ -602,7 +603,8 @@ class FilterFactory(object):
         non_class_public_memberdefs = non_class_memberdef & node_is_public | ~ non_class_memberdef
 
         return ( self.create_class_member_filter(filter_options) | non_class_memberdef ) \
-            & self.create_innerclass_filter(filter_options)
+            & self.create_innerclass_filter(filter_options) \
+            & self.create_outline_filter(filter_options)
 
     def create_class_filter(self, options):
         """Content filter for classes based on various directive options"""
@@ -809,7 +811,8 @@ class FilterFactory(object):
     def create_outline_filter(self, options):
 
         if 'outline' in options:
-            return NotFilter(InFilter(NodeTypeAccessor(Node()), ["description"]))
+            node = Node()
+            return NotFilter(Node().node_type.is_one_of(["description", "inc"]))
         else:
             return OpenFilter()
 
