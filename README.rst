@@ -82,6 +82,7 @@ Thank you to:
 - `sebastinas <https://github.com/sebastinas>`_
 - `robo9k <https://github.com/robo9k>`_
 - `sieben <https://github.com/sieben>`_
+- `rweickelt <https://github.com/rweickelt>`_
 
 For their contributions; reporting issues and improving the code and
 documentation. And thanks to:
