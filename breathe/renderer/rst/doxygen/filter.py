@@ -1,21 +1,191 @@
+"""
+Filters
+-------
+
+Filters are an interesting and somewhat challenging part of the code base. They are used for
+two different purposes:
+
+ - To figure out which nodes in the xml hierarchy to start rendering from. These are called
+   'finder filters' or 'content filters'. This is done before rendering starts.
+ - To figure out which nodes under a selected nodes in the xml hierarchy should be rendered. These
+   are called 'render filters'. This is done during the render process with a test in the
+   DoxygenToRstRendererFactory.
+
+
+General Implementation
+~~~~~~~~~~~~~~~~~~~~~~
+
+Filters are essential just tests to see if a node matches certain parameters that are needed to
+decide whether or not to include it in some output.
+
+As these filters are declared once and then used on multiple nodes, we model them as object
+hierarchies that encapsulate the required test and take a node (with its context) and return True or
+False.
+
+If you wanted a test which figures out if a node has the node_type 'memberdef' you might create the
+following object hierarchy:
+
+    node_is_memberdef = InFilter(AttributeAccessor(Node(), 'node_type'), ['memberdef'])
+
+This reads from the inside out, as get the node, then get the node_type attribute from it, and see
+if the value of the attribute is in the list ['memberdef'].
+
+The Node() is called a 'Selector'. Parent() is also a selector. It means given the current context,
+work with the parent of the current node rather than the node itself. This allows you to frame tests
+in terms of a node's parent as well as the node which helps when we want nodes with particular
+parents and not others.
+
+The AttributeAccessor() is called an 'Accessor'. It wraps up an attempt to access a particular
+attribute on the selected node. There are quite a few different specific accessors but they can
+mostly be generalised with the AttributeAccessor. This code has evolved over time and initially the
+implementation involved specific accessor classes (which are still used in large parts of it.)
+
+The InFilter() is unsurprisingly called a 'Filter'. There are lots of different filters. Filters
+either act on the results of Accessors or on the results of other Filters and they always return
+True or False. The AndFilter and the OrFilter can be used to combine the outputs of other Filters
+with logical 'and' and 'or' operations.
+
+You can build up some pretty complex expressions with this level of freedom as you
+might imagine. The complexity is unfortunate but necessary as the nature of filtering the xml is
+quite complex.
+
+
+Finder Filters
+~~~~~~~~~~~~~~
+
+The implementation of the filters can change a little depending on how they are called. Finder
+filters are called from the breathe.finder.doxygen.index and breathe.finder.doxygen.compound files.
+They are called like this:
+
+    # Descend down the hierarchy
+    # ...
+
+    if filter_.allow(node_stack):
+        matches.append(self.data_object)
+
+    # Keep on descending
+    # ...
+
+This means that the result of the filter does not stop us descending down the hierarchy and testing
+more nodes. This simplifies the filters as they only have to return true for the exact nodes they
+are interested in and they don't have to worry about allowing the iteration down the hierarchy to
+continue for nodes which don't match.
+
+An example of a finder filter is:
+
+    AndFilter(
+        InFilter(NodeTypeAccessor(Node()), ["compound"]),
+        InFilter(KindAccessor(Node()), ["group"]),
+        InFilter(NameAccessor(Node()), ["mygroup"])
+        )
+
+This says, return True for all the nodes of node_type 'compound' with 'kind' set to 'group' which
+have the name 'mygroup'. It returns false for everything else, but when a node matching this is
+found then it is added to the matches list by the code above.
+
+It is therefore relatively easy to write finder filters. If you have two separate node filters like
+the one above and you want to match on both of them then you can do:
+
+    OrFilter(
+        node_filter_1,
+        node_filter_2
+        )
+
+To combine them.
+
+
+Content Filters
+~~~~~~~~~~~~~~~
+
+Content filters are harder than the finder filters as they are responsible for halting the iteration
+down the hierarchy if they return false. This means that if you're interested in memberdef nodes
+with a particular attribute then you have to check for that but also include a clause which allows
+all other non-memberdef nodes to pass through as you don't want to interrupt them.
+
+This means you end up with filters like this:
+
+    OrFilter(
+        AndFilter(
+            InFilter(NodeTypeAccessor(Node()), ["compound"]),
+            InFilter(KindAccessor(Node()), ["group"]),
+            InFilter(NameAccessor(Node()), ["mygroup"])
+            ),
+        NotFilter(
+            AndFilter(
+                InFilter(NodeTypeAccessor(Node()), ["compound"]),
+                InFilter(KindAccessor(Node()), ["group"]),
+                )
+            )
+        )
+
+Which is to say that we want to let through a compound, with kind group, with name 'mygroup' but
+we're also happy if the node is **not** a compund with kind group. Really we just don't want to let
+through any compounds with kind group with name other than 'mygroup'. As such, we can rephrase this
+as:
+
+    NotFilter(
+        AndFilter(
+            InFilter(NodeTypeAccessor(Node()), ["compound"]),
+            InFilter(KindAccessor(Node()), ["group"]),
+            NotFilter(InFilter(NameAccessor(Node()), ["mygroup"]))
+            )
+        )
+
+Using logical manipulation we can rewrite this as:
+
+    OrFilter(
+        NotFilter(InFilter(NodeTypeAccessor(Node()), ["compound"])),
+        NotFilter(InFilter(KindAccessor(Node()), ["group"])),
+        InFilter(NameAccessor(Node()), ["mygroup"])
+        )
+
+We reads: allow if it isn't a compound, or if it is a compound but doesn't have a 'kind' of 'group',
+but if it is a compound and has a 'kind' of 'group then only allow it if it is named 'mygroup'.
+
+
+Helper Syntax
+~~~~~~~~~~~~~
+
+Some of these filter declarations get a little awkward to read and write. They are not laid out in
+manner which reads smoothly. Additional helper methods and operator overloads have been introduced
+to help with this.
+
+AttributeAccessor objects are created in property methods on the Selector classes so:
+
+    node.kind
+
+Where node has been declared as a Node() instance. Results in:
+
+    AttributeAccessor(Node(), 'kind')
+
+The '==' and '!=' operators on the Accessors have been overloaded to return the appropriate filters
+so that:
+
+    node.kind == 'group'
+
+Results in:
+
+    InFilter(AttributeAccessor(Node(), 'kind'), ['kind'])
+
+We also override the binary 'and' (&), 'or' (|) and 'not' (~) operators in Python to apply
+AndFilters, OrFilters and NotFilters respectively. We have to override the binary operators as they
+actual 'and', 'or' and 'not' operators cannot be overridden. So:
+
+    node.node_type == 'compound' | node.name == 'mygroup'
+
+Translates to:
+
+    AndFilter(
+        InFilter(NodeTypeAccessor(Node()), ["compound"])),
+        InFilter(NameAccessor(Node()), ["mygroup"])
+        )
+
+Where the former is hopefully more readable without sacrificing too much to the abstract magic of
+operator overloads.
+
+"""
 
 class Selector(object):
-    pass
-
-
-class Ancestor(Selector):
-
-    def __init__(self, generations):
-        self.generations = generations
-
-    def __call__(self, node_stack):
-        return node_stack[self.generations]
-
-
-class Parent(Selector):
-
-    def __call__(self, node_stack):
-        return node_stack[1]
 
     @property
     def node_type(self):
@@ -24,16 +194,6 @@ class Parent(Selector):
     @property
     def kind(self):
         return AttributeAccessor(self, 'kind')
-
-
-class Node(Selector):
-
-    def __call__(self, node_stack):
-        return node_stack[0]
-
-    @property
-    def node_type(self):
-        return NodeTypeAccessor(self)
 
     @property
     def node_name(self):
@@ -56,6 +216,27 @@ class Node(Selector):
         return AttributeAccessor(self, 'prot')
 
 
+class Ancestor(Selector):
+
+    def __init__(self, generations):
+        self.generations = generations
+
+    def __call__(self, node_stack):
+        return node_stack[self.generations]
+
+
+class Parent(Selector):
+
+    def __call__(self, node_stack):
+        return node_stack[1]
+
+
+class Node(Selector):
+
+    def __call__(self, node_stack):
+        return node_stack[0]
+
+
 class Accessor(object):
 
     def __init__(self, selector):
@@ -63,6 +244,9 @@ class Accessor(object):
 
     def __eq__(self, value):
         return InFilter(self, [value])
+
+    def __ne__(self, value):
+        return NotFilter(InFilter(self, [value]))
 
     def is_one_of(self, collection):
         return InFilter(self, collection)
@@ -152,6 +336,15 @@ class Filter(object):
 
     def __invert__(self):
         return NotFilter(self)
+
+
+class HasAncestorFilter(Filter):
+
+    def __init__(self, generations):
+        self.generations = generations
+
+    def allow(self, node_stack):
+        return len(node_stack) > self.generations
 
 
 class HasContentFilter(Filter):
@@ -375,18 +568,6 @@ class Gather(object):
 
 class FilterFactory(object):
 
-    # C style top level entries
-    c_kinds = set([
-            "friend",
-            "related",
-            "define",
-            "prototype",
-            "typedef",
-            "enum",
-            "func",
-            "var",
-            ])
-
     # C++ style public entries
     public_kinds = set([
             "public-type",
@@ -397,41 +578,11 @@ class FilterFactory(object):
             "public-static-attrib",
             ])
 
-    protected_kinds = set([
-            "protected-type",
-            "protected-func",
-            "protected-attrib",
-            "protected-slot",
-            "protected-static-func",
-            "protected-static-attrib",
-            ])
-
-    private_kinds = set([
-            "private-type",
-            "private-func",
-            "private-attrib",
-            "private-slot",
-            "private-static-func",
-            "private-static-attrib",
-            ])
-
     def __init__(self, globber_factory, path_handler):
 
         self.globber_factory = globber_factory
         self.path_handler = path_handler
         self.default_members = ()
-
-
-    def _create_c_kinds_filter(self, options):
-
-        parent = Parent()
-        parent_is_sectiondef = parent.node_type == "sectiondef"
-        parent_is_c = parent.kind.is_one_of(self.c_kinds)
-
-        c_kinds_filter = \
-            (parent_is_sectiondef & parent_is_c) | ~ parent_is_sectiondef
-
-        return c_kinds_filter
 
     def create_group_render_filter(self, options):
 
@@ -446,9 +597,22 @@ class FilterFactory(object):
         if 'members' in filter_options:
             filter_options['members'] = u''
 
-        c_kinds_filter = self._create_c_kinds_filter(options)
+        node = Node()
+        parent = Parent()
+        grandparent = Ancestor(2)
+        has_grandparent = HasAncestorFilter(2)
 
-        return ( self.create_class_member_filter(filter_options) | c_kinds_filter ) \
+        non_class_memberdef = \
+            has_grandparent \
+            & (grandparent.node_type == 'compounddef') \
+            & (grandparent.kind != 'class') \
+            & (node.node_type == 'memberdef')
+
+        node_is_public = node.prot == 'public'
+
+        non_class_public_memberdefs = non_class_memberdef & node_is_public | ~ non_class_memberdef
+
+        return ( self.create_class_member_filter(filter_options) | non_class_memberdef ) \
             & self.create_innerclass_filter(filter_options)
 
     def create_class_filter(self, options):
@@ -544,12 +708,15 @@ class FilterFactory(object):
     def _create_public_members_filter(self, options):
 
         node = Node()
+        node_is_memberdef = node.node_type == "memberdef"
+        node_is_public = node.prot == "public"
+
         parent = Parent()
         parent_is_sectiondef = parent.node_type == "sectiondef"
-        parent_is_public = parent.kind.is_one_of(self.public_kinds)
 
         # Nothing with a parent that's a sectiondef
-        public_members_filter = ~ parent_is_sectiondef
+        is_memberdef = parent_is_sectiondef & node_is_memberdef
+        public_members_filter = ~ is_memberdef
 
         # If the user has specified the 'members' option with arguments then we only pay attention
         # to that and not to any other member settings
@@ -574,39 +741,41 @@ class FilterFactory(object):
                 # Select anything that doesn't have a parent which is a sectiondef, or, if it does,
                 # only select the public ones
                 public_members_filter = \
-                    (parent_is_sectiondef & parent_is_public) | ~ parent_is_sectiondef
+                    (is_memberdef & node_is_public) | ~ is_memberdef
 
         return public_members_filter
 
-    def _create_non_public_members_filter(self, option_name, kinds, options):
+    def _create_non_public_members_filter(self, prot, option_name, options):
+        """'prot' is the doxygen xml term for 'public', 'protected' and 'private' categories."""
+
+        node = Node()
+        node_is_memberdef = node.node_type == "memberdef"
+        node_is_public = node.prot == prot
 
         parent = Parent()
         parent_is_sectiondef = parent.node_type == "sectiondef"
-        parent_is_protected = parent.kind.is_one_of(kinds)
 
         # Nothing with a parent that's a sectiondef
-        filter_ = ~ parent_is_sectiondef
+        is_memberdef = parent_is_sectiondef & node_is_memberdef
+        filter_ = ~ is_memberdef
 
         if option_name in options:
 
-            # Select anything that doesn't have a parent which is a sectiondef, or, if it does, only
-            # select the protected ones
-            filter_ = \
-                (parent_is_sectiondef & parent_is_protected) | ~ parent_is_sectiondef
+            # Allow anything that isn't a memberdef, or if it is only allow the public ones
+            filter_ = ~ is_memberdef | node_is_public
 
         return filter_
 
     def _create_undoc_members_filter(self, options):
 
         node = Node()
-        parent = Parent()
-        parent_is_sectiondef = parent.node_type == "sectiondef"
+        node_is_memberdef = node.node_type == 'memberdef'
 
         node_has_description = node.briefdescription.has_content() \
             | node.detaileddescription.has_content()
 
-        undoc_members_filter = \
-            (parent_is_sectiondef & node_has_description) | ~ parent_is_sectiondef
+        # Allow anything that isn't a memberdef, or if it is only allow the ones with a description
+        undoc_members_filter = ~ node_is_memberdef | node_has_description
 
         if 'undoc-members' in options:
 
@@ -631,14 +800,14 @@ class FilterFactory(object):
         public_members = self._create_public_members_filter(options)
 
         protected_members = self._create_non_public_members_filter(
+            'protected',
             'protected-members',
-            self.protected_kinds,
             options
             )
 
         private_members = self._create_non_public_members_filter(
+            'private',
             'private-members',
-            self.private_kinds,
             options
             )
 
@@ -760,23 +929,30 @@ class FilterFactory(object):
         We don't need to pay attention to :members: or :private-members: as top level group members
         can't be private and we want all the contents of the group, not specific members or no
         members.
+
+        As a finder/content filter we only need to match exactly what we're interested in.
         """
 
-        return OrFilter(
-            IfFilter(
-                condition=InFilter(NodeTypeAccessor(Parent()), ['sectiondef']),
-                if_true=InFilter(KindAccessor(Parent()), self.public_kinds),
-                if_false=ClosedFilter(),
-                ),
-            IfFilter(
-                condition=AndFilter(
-                    InFilter(NodeTypeAccessor(Node()), ['ref']),
-                    InFilter(NodeNameAccessor(Node()), ['innerclass', 'innernamespace']),
-                    ),
-                if_true=InFilter(AttributeAccessor(Node(), 'prot'), ['public']),
-                if_false=ClosedFilter(),
-                ),
-            )
+        node = Node()
+
+        # Filter for public memberdefs
+        node_is_memberdef = node.node_type == 'memberdef'
+        node_is_public = node.prot == 'public'
+
+        public_members = node_is_memberdef & node_is_public
+
+        # Filter for public innerclasses
+        parent = Parent()
+        parent_is_compounddef = parent.node_type == 'compounddef'
+        parent_is_class = parent.kind == 'group'
+
+        node_is_innerclass = (node.node_type == "ref") & (node.node_name == "innerclass")
+        node_is_public = node.prot == 'public'
+
+        public_innerclass = parent_is_compounddef & parent_is_class \
+            & node_is_innerclass & node_is_public
+
+        return public_members | public_innerclass
 
     def create_index_filter(self, options):
 

@@ -2,7 +2,7 @@
 from breathe.finder.core import FinderFactory, NoMatchesError
 from breathe.parser import DoxygenParserFactory, CacheFactory
 from breathe.renderer.rst.doxygen import DoxygenToRstRendererFactoryCreatorConstructor, \
-    RstContentCreator
+    RstContentCreator, RenderContext
 from breathe.renderer.rst.doxygen.domain import DomainHandlerFactoryCreator, NullDomainHandler
 from breathe.renderer.rst.doxygen.domain import CppDomainHelper, CDomainHelper
 from breathe.renderer.rst.doxygen.filter import FilterFactory, GlobFactory
@@ -325,7 +325,8 @@ class DoxygenGroupDirective(BaseDirective):
                 target_handler,
                 )
 
-            object_renderer = renderer_factory.create_renderer(self.root_data_object, data_object)
+            context = RenderContext([data_object, self.root_data_object])
+            object_renderer = renderer_factory.create_renderer(context)
             node_list.extend(object_renderer.render())
 
         return node_list

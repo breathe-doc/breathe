@@ -1,4 +1,5 @@
 
+from breathe.renderer.rst.doxygen.base import RenderContext
 from breathe.directive.base import BaseDirective
 from breathe.project import ProjectError
 from .base import WarningHandler, create_warning
@@ -56,7 +57,8 @@ class BaseFileDirective(BaseDirective):
                 target_handler,
                 )
 
-            object_renderer = renderer_factory.create_renderer(self.root_data_object, data_object)
+            context = RenderContext([data_object, self.root_data_object])
+            object_renderer = renderer_factory.create_renderer(context)
             node_list.extend(object_renderer.render())
 
         return node_list
