@@ -177,7 +177,7 @@ breathe_projects = {
     "nutshell":"../../examples/specific/nutshell/xml/",
     "rst":"../../examples/specific/rst/xml/",
     "c_file":"../../examples/specific/c_file/xml/",
-    "namespacefile":"../../examples/specific/namespacefile/xml/",
+    "namespace":"../../examples/specific/namespacefile/xml/",
     "userdefined":"../../examples/specific/userdefined/xml/",
     "template_function":"../../examples/specific/template_function/xml/",
     "template_class":"../../examples/specific/template_class/xml/",

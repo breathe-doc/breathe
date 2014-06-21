@@ -26,14 +26,14 @@ Example with Nested Namespaces
 This should work::
 
    .. doxygenfile:: namespacefile.h
-      :project: namespacefile
+      :project: namespace
 
 It produces this output:
 
 ----
 
 .. doxygenfile:: namespacefile.h
-   :project: namespacefile
+   :project: namespace
 
 
 Example for Multiple Files

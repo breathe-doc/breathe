@@ -40,12 +40,12 @@ Example with Namespace
 This should work::
 
    .. doxygenstruct:: foo::ns::FooStruct
-      :project: namespacefile
+      :project: namespace
 
 It produces this output:
 
 .. doxygenstruct:: foo::ns::FooStruct
-   :project: namespacefile
+   :project: namespace
    :no-link:
 
 Failing Example
