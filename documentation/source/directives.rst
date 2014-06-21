@@ -184,6 +184,7 @@ and additionally the ``content-only``, ``members``, ``protected-members``,
       :project: ...
       :path: ...
       :content-only:
+      :outline:
       :members:
       :protected-members:
       :private-members:
