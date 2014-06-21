@@ -252,11 +252,12 @@ class DoxygenContentBlockDirective(BaseDirective):
         "path": unchanged_required,
         "project": unchanged_required,
         "content-only": flag,
+        "outline": flag,
         "members": flag,
         "protected-members": flag,
         "private-members": flag,
         "undoc-members": flag,
-        "no-link": flag,
+        "no-link": flag
         }
     has_content = False
 
