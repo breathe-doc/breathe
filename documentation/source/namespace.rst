@@ -1,6 +1,8 @@
 
-Namespaces
-==========
+.. _namespace-example:
+
+doxygennamespace Directive
+==========================
 
 Breathe has basic support for namespaces.
 
@@ -13,13 +15,9 @@ If we reference this with a directive, for example::
 
    .. doxygennamespace:: test_namespace
       :project: userdefined
-      :members:
 
 It renders as:
 
 .. doxygennamespace:: test_namespace
    :project: userdefined
-   :members:
 
-
-.. note::
