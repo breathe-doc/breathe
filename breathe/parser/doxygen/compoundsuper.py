@@ -1659,10 +1659,6 @@ class descriptionType(GeneratedsSuper):
             obj_ = self.mixedclass_(MixedContainer.CategoryComplex,
                 MixedContainer.TypeNone, 'internal', childobj_)
             self.content_.append(obj_)
-        elif child_.nodeType == Node.TEXT_NODE:
-            obj_ = self.mixedclass_(MixedContainer.CategoryText,
-                MixedContainer.TypeNone, '', child_.nodeValue)
-            self.content_.append(obj_)
 # end class descriptionType
 
 
