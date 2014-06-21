@@ -88,14 +88,36 @@ Produces this output:
    from the :content-only: display. This is due to an implementation detail. If
    post an issue on github if you'd like it addressed.
 
-Protected Members
------------------
 
-The ``protected-members`` option changes the output to only include the private
-members of any classes as well as the public members. The output for any class
-in the group should be the same as if it had be produced by the
-:ref:`doxygenclass directive <class-example>` with the ``protected-members``
-option specified.
+Members Example
+---------------
+
+The ``members`` option changes the output to include the public members of any
+classes. The output for any class in the group should be the same as if it had
+be produced by the :ref:`doxygenclass directive <class-example>` with the
+``members`` option specified.
+
+::
+
+   .. doxygenclass:: GroupedClassTest
+      :project: group
+      :protected-members:
+
+It produces this output:
+
+.. doxygenclass:: GroupedClassTest
+   :project: group
+   :protected-members:
+   :no-link:
+
+
+Protected Members Example
+-------------------------
+
+The ``protected-members`` option changes the output to include the protected
+members of any classes. The output for any class in the group should be the same
+as if it had be produced by the :ref:`doxygenclass directive <class-example>`
+with the ``protected-members`` option specified.
 
 ::
 
@@ -114,11 +136,10 @@ It produces this output:
 Private-Members Example
 -----------------------
 
-The ``private-members`` option changes the output to only include the private
-members of any classes as well as the public members. The output for any class
-in the group should be the same as if it had be produced by the
-:ref:`doxygenclass directive <class-example>` with the ``private-members``
-option specified.
+The ``private-members`` option changes the output to include the private members
+of any classes. The output for any class in the group should be the same as if
+it had be produced by the :ref:`doxygenclass directive <class-example>` with the
+``private-members`` option specified.
 
 .. code-block:: rst
 
@@ -137,9 +158,9 @@ Produces this output:
 Undocumented Members Example
 ----------------------------
 
-The ``undoc-members`` option changes the output to only undocumentated members
-from the sections (public, protected, private) that are being displayed for the
-classes in the group output.
+The ``undoc-members`` option changes the output to include any undocumentated
+members from the sections (public, protected, private) that are being displayed
+for the classes in the group output.
 
 .. code-block:: rst
 
