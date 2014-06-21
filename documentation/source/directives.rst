@@ -245,8 +245,11 @@ doxygennamespace
 This directive generates the appropriate output for the contents of a namespace.
 
 It takes the standard ``project``, ``path``, ``outline`` and ``no-link`` options
-and additionally the ``content-only`` and ``sections`` options. To address a
-nested namespace, the full path must be provided, e.g. ``root::nested``.
+and additionally the ``content-only``, ``members``, ``protected-members``,
+``private-members`` and ``undoc-members`` options.
+
+To reference a nested namespace, the full namespaced path must be provided, e.g.
+``foo::bar`` for the ``bar`` namespace inside the ``foo`` namespace.
 
 ::
 
@@ -254,7 +257,10 @@ nested namespace, the full path must be provided, e.g. ``root::nested``.
       :project: ...
       :path: ...
       :content-only:
-      :sections: [...]
+      :members:
+      :protected-members:
+      :private-members:
+      :undoc-members:
       :no-link:
 
 Checkout the :ref:`doxygennamespace documentation <namespace-example>` for more
