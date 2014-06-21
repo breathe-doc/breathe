@@ -14,12 +14,14 @@ If we reference this with a directive, for example::
    .. doxygenclass:: Test
       :project: userdefined
       :members:
+      :protected-members:
 
 It renders as:
 
 .. doxygenclass:: Test
    :project: userdefined
    :members:
+   :protected-members:
 
 
 .. note::
