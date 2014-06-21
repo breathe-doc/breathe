@@ -1,21 +1,5 @@
 
 class Selector(object):
-    pass
-
-
-class Ancestor(Selector):
-
-    def __init__(self, generations):
-        self.generations = generations
-
-    def __call__(self, node_stack):
-        return node_stack[self.generations]
-
-
-class Parent(Selector):
-
-    def __call__(self, node_stack):
-        return node_stack[1]
 
     @property
     def node_type(self):
@@ -24,16 +8,6 @@ class Parent(Selector):
     @property
     def kind(self):
         return AttributeAccessor(self, 'kind')
-
-
-class Node(Selector):
-
-    def __call__(self, node_stack):
-        return node_stack[0]
-
-    @property
-    def node_type(self):
-        return NodeTypeAccessor(self)
 
     @property
     def node_name(self):
@@ -56,6 +30,27 @@ class Node(Selector):
         return AttributeAccessor(self, 'prot')
 
 
+class Ancestor(Selector):
+
+    def __init__(self, generations):
+        self.generations = generations
+
+    def __call__(self, node_stack):
+        return node_stack[self.generations]
+
+
+class Parent(Selector):
+
+    def __call__(self, node_stack):
+        return node_stack[1]
+
+
+class Node(Selector):
+
+    def __call__(self, node_stack):
+        return node_stack[0]
+
+
 class Accessor(object):
 
     def __init__(self, selector):
@@ -63,6 +58,9 @@ class Accessor(object):
 
     def __eq__(self, value):
         return InFilter(self, [value])
+
+    def __ne__(self, value):
+        return NotFilter(InFilter(self, [value]))
 
     def is_one_of(self, collection):
         return InFilter(self, collection)
@@ -152,6 +150,15 @@ class Filter(object):
 
     def __invert__(self):
         return NotFilter(self)
+
+
+class HasAncestorFilter(Filter):
+
+    def __init__(self, generations):
+        self.generations = generations
+
+    def allow(self, node_stack):
+        return len(node_stack) > self.generations
 
 
 class HasContentFilter(Filter):
@@ -375,18 +382,6 @@ class Gather(object):
 
 class FilterFactory(object):
 
-    # C style top level entries
-    c_kinds = set([
-            "friend",
-            "related",
-            "define",
-            "prototype",
-            "typedef",
-            "enum",
-            "func",
-            "var",
-            ])
-
     # C++ style public entries
     public_kinds = set([
             "public-type",
@@ -416,7 +411,22 @@ class FilterFactory(object):
         if 'members' in filter_options:
             filter_options['members'] = u''
 
-        return self.create_class_member_filter(filter_options) \
+        node = Node()
+        parent = Parent()
+        grandparent = Ancestor(2)
+        has_grandparent = HasAncestorFilter(2)
+
+        non_class_memberdef = \
+            has_grandparent \
+            & (grandparent.node_type == 'compounddef') \
+            & (grandparent.kind != 'class') \
+            & (node.node_type == 'memberdef')
+
+        node_is_public = node.prot == 'public'
+
+        non_class_public_memberdefs = non_class_memberdef & node_is_public | ~ non_class_memberdef
+
+        return ( self.create_class_member_filter(filter_options) | non_class_memberdef ) \
             & self.create_innerclass_filter(filter_options)
 
     def create_class_filter(self, options):
