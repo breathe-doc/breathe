@@ -9,7 +9,8 @@ class DoxygenTypeSubRenderer(Renderer):
 
         # Process all the compound children
         for compound in self.data_object.get_compound():
-            compound_renderer = self.renderer_factory.create_renderer(self.data_object, compound)
+            context = self.context.create_child_context(compound)
+            compound_renderer = self.renderer_factory.create_renderer(context)
             nodelist.extend(compound_renderer.render())
 
         return nodelist
@@ -21,7 +22,7 @@ class DoxygenTypeSubRenderer(Renderer):
 def render_compound(
     name,
     kind,
-    file_data,
+    parent_context,
     rendered_data,
     renderer_factory,
     node_factory,
@@ -35,12 +36,13 @@ def render_compound(
     signode.extend(domain_target)
     signode.extend(doxygen_target)
 
+    file_data = parent_context.node_stack[0]
+    new_context = parent_context.create_child_context(file_data.compounddef)
+
     # Check if there is template information and format it as desired
     if file_data.compounddef.templateparamlist:
-        renderer = renderer_factory.create_renderer(
-                file_data.compounddef,
-                file_data.compounddef.templateparamlist
-                )
+        context = new_context.create_child_context(file_data.compounddef.templateparamlist)
+        renderer = renderer_factory.create_renderer(context)
         template_nodes = [node_factory.Text("template <")]
         template_nodes.extend(renderer.render())
         template_nodes.append(node_factory.Text(">"))
@@ -55,10 +57,8 @@ def render_compound(
 
     if file_data.compounddef.includes:
         for include in file_data.compounddef.includes:
-            renderer = renderer_factory.create_renderer(
-                    file_data.compounddef,
-                    include
-                    )
+            context = new_context.create_child_context(include)
+            renderer = renderer_factory.create_renderer(context)
             contentnode.extend(renderer.render())
 
     contentnode.extend(rendered_data)
@@ -104,13 +104,14 @@ class CompoundTypeSubRenderer(Renderer):
         # Read in the corresponding xml file and process
         file_data = self.compound_parser.parse(self.data_object.refid)
 
-        data_renderer = self.renderer_factory.create_renderer(self.data_object, file_data)
+        context = self.context.create_child_context(file_data)
+        data_renderer = self.renderer_factory.create_renderer(context)
 
         # Defer to function for details
         return render_compound(
                 self.data_object.name,
                 self.data_object.kind,
-                file_data,
+                context,
                 data_renderer.render(),
                 self.renderer_factory,
                 self.node_factory,

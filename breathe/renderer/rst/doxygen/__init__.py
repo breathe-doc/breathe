@@ -1,5 +1,5 @@
 
-from breathe.renderer.rst.doxygen.base import Renderer
+from breathe.renderer.rst.doxygen.base import Renderer, RenderContext
 from breathe.renderer.rst.doxygen import index as indexrenderer
 from breathe.renderer.rst.doxygen import compound as compoundrenderer
 
@@ -56,6 +56,7 @@ class NullRenderer(Renderer):
     def render(self):
         return []
 
+
 class DoxygenToRstRendererFactory(object):
 
     def __init__(
@@ -91,11 +92,13 @@ class DoxygenToRstRendererFactory(object):
 
     def create_renderer(
             self,
-            parent_data_object,
-            data_object
+            context
             ):
 
-        if not self.filter_.allow([data_object, parent_data_object]):
+        parent_data_object = context.node_stack[1]
+        data_object = context.node_stack[0]
+
+        if not self.filter_.allow(context.node_stack):
             return NullRenderer()
 
         child_renderer_factory = self.renderer_factory_creator.create_child_factory(
@@ -119,7 +122,7 @@ class DoxygenToRstRendererFactory(object):
 
         common_args = [
                 self.project_info,
-                data_object,
+                context,
                 child_renderer_factory,
                 self.node_factory,
                 self.state,
