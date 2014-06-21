@@ -761,10 +761,8 @@ class FilterFactory(object):
 
         if option_name in options:
 
-            # Select anything that doesn't have a parent which is a sectiondef, or, if it does, only
-            # select the protected ones
-            filter_ = \
-                (is_memberdef & node_is_public) | ~ is_memberdef
+            # Allow anything that isn't a memberdef, or if it is only allow the public ones
+            filter_ = ~ is_memberdef | node_is_public
 
         return filter_
 
@@ -776,8 +774,8 @@ class FilterFactory(object):
         node_has_description = node.briefdescription.has_content() \
             | node.detaileddescription.has_content()
 
-        undoc_members_filter = \
-            (node_is_memberdef & node_has_description) | ~ node_is_memberdef
+        # Allow anything that isn't a memberdef, or if it is only allow the ones with a description
+        undoc_members_filter = ~ node_is_memberdef | node_has_description
 
         if 'undoc-members' in options:
 
@@ -931,6 +929,8 @@ class FilterFactory(object):
         We don't need to pay attention to :members: or :private-members: as top level group members
         can't be private and we want all the contents of the group, not specific members or no
         members.
+
+        As a finder/content filter we only need to match exactly what we're interested in.
         """
 
         node = Node()
