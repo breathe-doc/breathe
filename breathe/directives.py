@@ -252,13 +252,12 @@ class DoxygenGroupDirective(BaseDirective):
         "path": unchanged_required,
         "project": unchanged_required,
         "content-only": flag,
-        "members": flag,
         "outline": flag,
+        "members": flag,
         "protected-members": flag,
         "private-members": flag,
         "undoc-members": flag,
-        "no-link": flag,
-        "outline": flag
+        "no-link": flag
         }
     has_content = False
 

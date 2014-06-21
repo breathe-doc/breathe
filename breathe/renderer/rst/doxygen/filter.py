@@ -800,9 +800,7 @@ class FilterFactory(object):
         return allowed_members | description
 
     def create_outline_filter(self, options):
-
         if 'outline' in options:
-            node = Node()
             return NotFilter(Node().node_type.is_one_of(["description", "inc"]))
         else:
             return OpenFilter()
