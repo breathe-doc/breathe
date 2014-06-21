@@ -1,3 +1,189 @@
+"""
+Filters
+-------
+
+Filters are an interesting and somewhat challenging part of the code base. They are used for
+two different purposes:
+
+ - To figure out which nodes in the xml hierarchy to start rendering from. These are called
+   'finder filters' or 'content filters'. This is done before rendering starts.
+ - To figure out which nodes under a selected nodes in the xml hierarchy should be rendered. These
+   are called 'render filters'. This is done during the render process with a test in the
+   DoxygenToRstRendererFactory.
+
+
+General Implementation
+~~~~~~~~~~~~~~~~~~~~~~
+
+Filters are essential just tests to see if a node matches certain parameters that are needed to
+decide whether or not to include it in some output.
+
+As these filters are declared once and then used on multiple nodes, we model them as object
+hierarchies that encapsulate the required test and take a node (with its context) and return True or
+False.
+
+If you wanted a test which figures out if a node has the node_type 'memberdef' you might create the
+following object hierarchy:
+
+    node_is_memberdef = InFilter(AttributeAccessor(Node(), 'node_type'), ['memberdef'])
+
+This reads from the inside out, as get the node, then get the node_type attribute from it, and see
+if the value of the attribute is in the list ['memberdef'].
+
+The Node() is called a 'Selector'. Parent() is also a selector. It means given the current context,
+work with the parent of the current node rather than the node itself. This allows you to frame tests
+in terms of a node's parent as well as the node which helps when we want nodes with particular
+parents and not others.
+
+The AttributeAccessor() is called an 'Accessor'. It wraps up an attempt to access a particular
+attribute on the selected node. There are quite a few different specific accessors but they can
+mostly be generalised with the AttributeAccessor. This code has evolved over time and initially the
+implementation involved specific accessor classes (which are still used in large parts of it.)
+
+The InFilter() is unsurprisingly called a 'Filter'. There are lots of different filters. Filters
+either act on the results of Accessors or on the results of other Filters and they always return
+True or False. The AndFilter and the OrFilter can be used to combine the outputs of other Filters
+with logical 'and' and 'or' operations.
+
+You can build up some pretty complex expressions with this level of freedom as you
+might imagine. The complexity is unfortunate but necessary as the nature of filtering the xml is
+quite complex.
+
+
+Finder Filters
+~~~~~~~~~~~~~~
+
+The implementation of the filters can change a little depending on how they are called. Finder
+filters are called from the breathe.finder.doxygen.index and breathe.finder.doxygen.compound files.
+They are called like this:
+
+    # Descend down the hierarchy
+    # ...
+
+    if filter_.allow(node_stack):
+        matches.append(self.data_object)
+
+    # Keep on descending
+    # ...
+
+This means that the result of the filter does not stop us descending down the hierarchy and testing
+more nodes. This simplifies the filters as they only have to return true for the exact nodes they
+are interested in and they don't have to worry about allowing the iteration down the hierarchy to
+continue for nodes which don't match.
+
+An example of a finder filter is:
+
+    AndFilter(
+        InFilter(NodeTypeAccessor(Node()), ["compound"]),
+        InFilter(KindAccessor(Node()), ["group"]),
+        InFilter(NameAccessor(Node()), ["mygroup"])
+        )
+
+This says, return True for all the nodes of node_type 'compound' with 'kind' set to 'group' which
+have the name 'mygroup'. It returns false for everything else, but when a node matching this is
+found then it is added to the matches list by the code above.
+
+It is therefore relatively easy to write finder filters. If you have two separate node filters like
+the one above and you want to match on both of them then you can do:
+
+    OrFilter(
+        node_filter_1,
+        node_filter_2
+        )
+
+To combine them.
+
+
+Content Filters
+~~~~~~~~~~~~~~~
+
+Content filters are harder than the finder filters as they are responsible for halting the iteration
+down the hierarchy if they return false. This means that if you're interested in memberdef nodes
+with a particular attribute then you have to check for that but also include a clause which allows
+all other non-memberdef nodes to pass through as you don't want to interrupt them.
+
+This means you end up with filters like this:
+
+    OrFilter(
+        AndFilter(
+            InFilter(NodeTypeAccessor(Node()), ["compound"]),
+            InFilter(KindAccessor(Node()), ["group"]),
+            InFilter(NameAccessor(Node()), ["mygroup"])
+            ),
+        NotFilter(
+            AndFilter(
+                InFilter(NodeTypeAccessor(Node()), ["compound"]),
+                InFilter(KindAccessor(Node()), ["group"]),
+                )
+            )
+        )
+
+Which is to say that we want to let through a compound, with kind group, with name 'mygroup' but
+we're also happy if the node is **not** a compund with kind group. Really we just don't want to let
+through any compounds with kind group with name other than 'mygroup'. As such, we can rephrase this
+as:
+
+    NotFilter(
+        AndFilter(
+            InFilter(NodeTypeAccessor(Node()), ["compound"]),
+            InFilter(KindAccessor(Node()), ["group"]),
+            NotFilter(InFilter(NameAccessor(Node()), ["mygroup"]))
+            )
+        )
+
+Using logical manipulation we can rewrite this as:
+
+    OrFilter(
+        NotFilter(InFilter(NodeTypeAccessor(Node()), ["compound"])),
+        NotFilter(InFilter(KindAccessor(Node()), ["group"])),
+        InFilter(NameAccessor(Node()), ["mygroup"])
+        )
+
+We reads: allow if it isn't a compound, or if it is a compound but doesn't have a 'kind' of 'group',
+but if it is a compound and has a 'kind' of 'group then only allow it if it is named 'mygroup'.
+
+
+Helper Syntax
+~~~~~~~~~~~~~
+
+Some of these filter declarations get a little awkward to read and write. They are not laid out in
+manner which reads smoothly. Additional helper methods and operator overloads have been introduced
+to help with this.
+
+AttributeAccessor objects are created in property methods on the Selector classes so:
+
+    node.kind
+
+Where node has been declared as a Node() instance. Results in:
+
+    AttributeAccessor(Node(), 'kind')
+
+The '==' and '!=' operators on the Accessors have been overloaded to return the appropriate filters
+so that:
+
+    node.kind == 'group'
+
+Results in:
+
+    InFilter(AttributeAccessor(Node(), 'kind'), ['kind'])
+
+We also override the binary 'and' (&), 'or' (|) and 'not' (~) operators in Python to apply
+AndFilters, OrFilters and NotFilters respectively. We have to override the binary operators as they
+actual 'and', 'or' and 'not' operators cannot be overridden. So:
+
+    node.node_type == 'compound' | node.name == 'mygroup'
+
+Translates to:
+
+    AndFilter(
+        InFilter(NodeTypeAccessor(Node()), ["compound"])),
+        InFilter(NameAccessor(Node()), ["mygroup"])
+        )
+
+Where the former is hopefully more readable without sacrificing too much to the abstract magic of
+operator overloads.
+
+"""
 
 class Selector(object):
 
