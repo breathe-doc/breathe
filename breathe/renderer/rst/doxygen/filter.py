@@ -747,21 +747,26 @@ class FilterFactory(object):
         members.
         """
 
-        return OrFilter(
-            IfFilter(
-                condition=InFilter(NodeTypeAccessor(Parent()), ['sectiondef']),
-                if_true=InFilter(KindAccessor(Parent()), self.public_kinds),
-                if_false=ClosedFilter(),
-                ),
-            IfFilter(
-                condition=AndFilter(
-                    InFilter(NodeTypeAccessor(Node()), ['ref']),
-                    InFilter(NodeNameAccessor(Node()), ['innerclass', 'innernamespace']),
-                    ),
-                if_true=InFilter(AttributeAccessor(Node(), 'prot'), ['public']),
-                if_false=ClosedFilter(),
-                ),
-            )
+        node = Node()
+
+        # Filter for public memberdefs
+        node_is_memberdef = node.node_type == 'memberdef'
+        node_is_public = node.prot == 'public'
+
+        public_members = node_is_memberdef & node_is_public
+
+        # Filter for public innerclasses
+        parent = Parent()
+        parent_is_compounddef = parent.node_type == 'compounddef'
+        parent_is_class = parent.kind == 'group'
+
+        node_is_innerclass = (node.node_type == "ref") & (node.node_name == "innerclass")
+        node_is_public = node.prot == 'public'
+
+        public_innerclass = parent_is_compounddef & parent_is_class \
+            & node_is_innerclass & node_is_public
+
+        return public_members | public_innerclass
 
     def create_index_filter(self, options):
 
