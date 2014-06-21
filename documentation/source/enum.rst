@@ -23,12 +23,12 @@ Example with Namespace
 This should work::
 
    .. doxygenenum:: foo::ns::Letters
-      :project: namespacefile
+      :project: namespace
 
 It produces this output:
 
 .. doxygenenum:: foo::ns::Letters
-   :project: namespacefile
+   :project: namespace
    :no-link:
 
 Failing Example

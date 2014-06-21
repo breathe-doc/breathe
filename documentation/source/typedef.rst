@@ -23,12 +23,12 @@ Example with Namespace
 This should work::
 
    .. doxygentypedef:: foo::ns::MyInt
-      :project: namespacefile
+      :project: namespace
 
 It produces this output:
 
 .. doxygentypedef:: foo::ns::MyInt
-   :project: namespacefile
+   :project: namespace
    :no-link:
 
 Failing Example
