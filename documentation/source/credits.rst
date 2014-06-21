@@ -22,6 +22,9 @@ Thank you to:
 - `Daniel Matz <https://github.com/danielmatz>`_
 - `Andrew Hundt <https://github.com/ahundt>`_
 - `sebastinas <https://github.com/sebastinas>`_
+- `robo9k <https://github.com/robo9k>`_
+- `sieben <https://github.com/sieben>`_
+- `rweickelt <https://github.com/rweickelt>`_
 
 For their contributions; reporting bugs, suggesting features, improving the code
 and working on the documentation. And thanks to:

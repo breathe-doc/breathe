@@ -242,9 +242,9 @@ class DoxygenClassDirective(BaseDirective):
         return self.render(data_object, project_info, filter_, target_handler)
 
 
-class DoxygenGroupDirective(BaseDirective):
 
-    kind = "group"
+class DoxygenContentBlockDirective(BaseDirective):
+    """Base class for namespace and group directives which have very similar behaviours"""
 
     required_arguments = 1
     optional_arguments = 1
@@ -267,35 +267,36 @@ class DoxygenGroupDirective(BaseDirective):
         try:
             project_info = self.project_info_factory.create_project_info(self.options)
         except ProjectError as e:
-            warning = create_warning(None, self.state, self.lineno)
-            return warning.warn('doxygengroup: %s' % e)
+            warning = create_warning(None, self.state, self.lineno, kind=self.kind)
+            return warning.warn('doxygen{kind}: %s' % e)
 
         try:
             finder = self.finder_factory.create_finder(project_info)
         except MTimerError as e:
-            warning = create_warning(None, self.state, self.lineno)
-            return warning.warn('doxygengroup: %s' % e)
+            warning = create_warning(None, self.state, self.lineno, kind=self.kind)
+            return warning.warn('doxygen{kind}: %s' % e)
 
-        finder_filter = self.filter_factory.create_group_finder_filter(name)
+        finder_filter = self.filter_factory.create_finder_filter(self.kind, name)
 
         matches = []
         finder.filter_(finder_filter, matches)
 
-        # It shouldn't be possible to have too many matches as groups in their nature are merged
-        # together if there are multiple declarations, so we only check for no matches
+        # It shouldn't be possible to have too many matches as namespaces & groups in their nature
+        # are merged together if there are multiple declarations, so we only check for no matches
         if not matches:
-            warning = create_warning(project_info, self.state, self.lineno, name=name)
-            return warning.warn('doxygengroup: Cannot find group "{name}" {tail}')
+            warning = create_warning(project_info, self.state, self.lineno, name=name,
+                                     kind=self.kind)
+            return warning.warn('doxygen{kind}: Cannot find namespace "{name}" {tail}')
 
         if 'content-only' in self.options:
 
             # Unpack the single entry in the matches list
             (data_object,) = matches
 
-            filter_ = self.filter_factory.create_group_content_filter(self.options)
+            filter_ = self.filter_factory.create_content_filter(self.kind, self.options)
 
-            # Having found the compound node for the group in the index we want to grab the contents
-            # of the group which match the filter
+            # Having found the compound node for the namespace or group in the index we want to grab
+            # the contents of it which match the filter
             contents_finder = self.finder_factory.create_finder_from_root(data_object, project_info)
             contents = []
             contents_finder.filter_(filter_, contents)
@@ -306,7 +307,7 @@ class DoxygenGroupDirective(BaseDirective):
         target_handler = self.target_handler_factory.create_target_handler(
             self.options, project_info, self.state.document
             )
-        filter_ = self.filter_factory.create_group_render_filter(self.options)
+        filter_ = self.filter_factory.create_render_filter(self.kind, self.options)
 
         renderer_factory_creator = self.renderer_factory_creator_constructor.create_factory_creator(
             project_info,
@@ -330,6 +331,16 @@ class DoxygenGroupDirective(BaseDirective):
             node_list.extend(object_renderer.render())
 
         return node_list
+
+
+class DoxygenNamespaceDirective(DoxygenContentBlockDirective):
+
+    kind = "namespace"
+
+
+class DoxygenGroupDirective(DoxygenContentBlockDirective):
+
+    kind = "group"
 
 
 class DoxygenStructDirective(DoxygenBaseDirective):
@@ -526,6 +537,7 @@ class DoxygenDirectiveFactory(object):
         "doxygenenum": DoxygenEnumDirective,
         "doxygentypedef": DoxygenTypedefDirective,
         "doxygenunion": DoxygenUnionDirective,
+        "doxygennamespace": DoxygenNamespaceDirective,
         "doxygengroup": DoxygenGroupDirective,
         "doxygenfile": DoxygenFileDirective,
         "autodoxygenfile": AutoDoxygenFileDirective,
@@ -567,6 +579,9 @@ class DoxygenDirectiveFactory(object):
 
     def create_file_directive_container(self):
         return self.create_directive_container("doxygenfile")
+
+    def create_namespace_directive_container(self):
+        return self.create_directive_container("doxygennamespace")
 
     def create_group_directive_container(self):
         return self.create_directive_container("doxygengroup")
@@ -842,6 +857,11 @@ def setup(app):
     app.add_directive(
         "doxygenfile",
         directive_factory.create_file_directive_container(),
+        )
+
+    app.add_directive(
+        "doxygennamespace",
+        directive_factory.create_namespace_directive_container(),
         )
 
     app.add_directive(

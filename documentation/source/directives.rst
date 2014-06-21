@@ -8,6 +8,7 @@ Directives & Config Variables
    function
    struct
    class
+   namespace
    enum
    typedef
    union
@@ -238,6 +239,34 @@ implementation.
 Checkout the :ref:`example <autodoxygenindex-example>` to see it in action.
 
 
+doxygennamespace
+~~~~~~~~~~~~~~~~
+
+This directive generates the appropriate output for the contents of a namespace.
+
+It takes the standard ``project``, ``path``, ``outline`` and ``no-link`` options
+and additionally the ``content-only``, ``members``, ``protected-members``,
+``private-members`` and ``undoc-members`` options.
+
+To reference a nested namespace, the full namespaced path must be provided, e.g.
+``foo::bar`` for the ``bar`` namespace inside the ``foo`` namespace.
+
+::
+
+   .. doxygengroup:: <namespace>
+      :project: ...
+      :path: ...
+      :content-only:
+      :members:
+      :protected-members:
+      :private-members:
+      :undoc-members:
+      :no-link:
+
+Checkout the :ref:`doxygennamespace documentation <namespace-example>` for more
+details and to see it in action.
+
+
 doxygenstruct
 ~~~~~~~~~~~~~
 
@@ -270,6 +299,7 @@ the same as the doxygenstruct directive.
       :no-link:
 
 Checkout the :ref:`example <typedef-example>` to see it in action.
+
 
 doxygenunion
 ~~~~~~~~~~~~
