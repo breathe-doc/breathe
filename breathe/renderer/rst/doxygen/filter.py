@@ -810,7 +810,8 @@ class FilterFactory(object):
 
     def create_outline_filter(self, options):
         if 'outline' in options:
-            return NotFilter(Node().node_type.is_one_of(["description", "inc"]))
+            node = Node()
+            return ~ node.node_type.is_one_of(["description", "inc"])
         else:
             return OpenFilter()
 
