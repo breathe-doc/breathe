@@ -185,6 +185,7 @@ and additionally the ``content-only``, ``members``, ``protected-members``,
       :project: ...
       :path: ...
       :content-only:
+      :outline:
       :members:
       :protected-members:
       :private-members:
@@ -253,10 +254,11 @@ To reference a nested namespace, the full namespaced path must be provided, e.g.
 
 ::
 
-   .. doxygengroup:: <namespace>
+   .. doxygennamespace:: <namespace>
       :project: ...
       :path: ...
       :content-only:
+      :outline:
       :members:
       :protected-members:
       :private-members:
@@ -273,11 +275,19 @@ doxygenstruct
 This directive generates the appropriate output for a single struct. The struct
 name is required to be unique in the project.
 
+It takes the standard ``project``, ``path``, ``outline`` and ``no-link`` options
+and additionally the ``members``, ``protected-members``, ``private-members`` and
+``undoc-members`` options.
+
 ::
 
    .. doxygenstruct:: <struct name>
       :project: ...
       :path: ...
+      :members:
+      :protected-members:
+      :private-members:
+      :undoc-members:
       :outline:
       :no-link:
 

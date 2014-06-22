@@ -41,12 +41,13 @@ all: typedef/xml/index.xml \
 	name/xml/index.xml \
 	union/xml/index.xml \
 	group/xml/index.xml \
+	struct/xml/index.xml \
 	lists/xml/index.xml
 	
 clean:
 	rm -rf typedef class nutshell alias rst inline namespacefile c_file \
 		members multifilexml userdefined fixedwidthfont latexmath functionOverload \
-		programlisting image name auto union group
+		programlisting image name auto union group struct
 
 typedef/xml/index.xml: typedef.h typedef.cfg
 	$(DOXYGEN) typedef.cfg
@@ -120,3 +121,5 @@ union/xml/index.xml: union.h union.cfg
 group/xml/index.xml: group.h group.cfg
 	$(DOXYGEN) group.cfg
 
+struct/xml/index.xml: struct.h struct.cfg
+	$(DOXYGEN) struct.cfg

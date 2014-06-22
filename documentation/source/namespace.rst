@@ -8,8 +8,8 @@ This directive generates the appropriate output for the contents of a
 namespace.
 
 It takes the standard ``project``, ``path``, ``outline`` and ``no-link`` options
-and additionally the ``content-only``, ``members``, ``private-members`` and
-``undoc-members`` options.
+and additionally the ``content-only``, ``members``, ``protected-members``,
+``private-members`` and ``undoc-members`` options.
 
 ``content-only``
    If this flag is specified, then the directive does not output the name of the
@@ -40,8 +40,6 @@ If you would like to always specify some combination of ``members``,
 ``protected-members``, ``private-members`` and ``undoc-members`` then you can
 use the :ref:`breathe_default_members <breathe-default-members>` configuration
 variable to set it in the ``conf.py``.
-
-.. _doxygen documentation: http://www.stack.nl/~dimitri/doxygen/manual/grouping.html
 
 .. contents::
 
@@ -179,8 +177,31 @@ Produces this output:
 
 .. note::
 
-   Undocumented classes are still not shown in the output due to an implementation
-   issue. Please post an issue on github if you would like this resolved.
+   Undocumented classes are still not shown in the output due to an
+   implementation issue. Please post an issue on github if you would like this
+   resolved.
+
+
+Outline Example
+---------------
+
+This displays only the names of the members of the namespace and not their
+documentation. The other options determine which members are displayed.
+
+.. code-block:: rst
+
+   .. doxygennamespace:: foo
+      :project: namespace
+      :members:
+      :outline:
+
+It produces this output:
+
+.. doxygennamespace:: foo
+   :project: namespace
+   :members:
+   :outline:
+   :no-link:
 
 
 Nested Example
@@ -212,7 +233,6 @@ This intentionally fails:
 
 It produces the following warning message:
 
-.. warning:: Cannot find file "madeupgroup" in doxygen xml output for project
-             "madeupnamespace" from directory:
+.. warning:: doxygennamespace: Cannot find namespace “madeupnamespace” in
+             doxygen xml output for project “namespace” from directory:
              ../../examples/specific/namespacefile/xml/
-

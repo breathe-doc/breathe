@@ -186,9 +186,7 @@ class DoxygenFunctionDirective(BaseDirective):
         return data_object
 
 
-class DoxygenClassDirective(BaseDirective):
-
-    kind = "class"
+class DoxygenClassLikeDirective(BaseDirective):
 
     required_arguments = 1
     optional_arguments = 1
@@ -212,14 +210,14 @@ class DoxygenClassDirective(BaseDirective):
         try:
             project_info = self.project_info_factory.create_project_info(self.options)
         except ProjectError as e:
-            warning = create_warning(None, self.state, self.lineno)
-            return warning.warn('doxygenclass: %s' % e)
+            warning = create_warning(None, self.state, self.lineno, kind=self.kind)
+            return warning.warn('doxygen{kind}: %s' % e)
 
         try:
             finder = self.finder_factory.create_finder(project_info)
         except MTimerError as e:
-            warning = create_warning(None, self.state, self.lineno)
-            return warning.warn('doxygenclass: %s' % e)
+            warning = create_warning(None, self.state, self.lineno, kind=self.kind)
+            return warning.warn('doxygen{kind}: %s' % e)
 
         matcher_stack = self.matcher_factory.create_matcher_stack(
             {
@@ -231,16 +229,26 @@ class DoxygenClassDirective(BaseDirective):
         try:
             data_object = finder.find_one(matcher_stack)
         except NoMatchesError as e:
-            warning = create_warning(project_info, self.state, self.lineno, name=name)
-            return warning.warn('doxygenclass: Cannot find class "{name}" {tail}')
+            warning = create_warning(project_info, self.state, self.lineno, name=name,
+                                     kind=self.kind)
+            return warning.warn('doxygen{kind}: Cannot find class "{name}" {tail}')
 
         target_handler = self.target_handler_factory.create_target_handler(
             self.options, project_info, self.state.document
             )
-        filter_ = self.filter_factory.create_class_filter(self.options)
+        filter_ = self.filter_factory.create_class_filter(name, self.options)
 
         return self.render(data_object, project_info, filter_, target_handler)
 
+
+class DoxygenClassDirective(DoxygenClassLikeDirective):
+
+    kind = "class"
+
+
+class DoxygenStructDirective(DoxygenClassLikeDirective):
+
+    kind = "struct"
 
 
 class DoxygenContentBlockDirective(BaseDirective):
@@ -252,11 +260,12 @@ class DoxygenContentBlockDirective(BaseDirective):
         "path": unchanged_required,
         "project": unchanged_required,
         "content-only": flag,
+        "outline": flag,
         "members": flag,
         "protected-members": flag,
         "private-members": flag,
         "undoc-members": flag,
-        "no-link": flag,
+        "no-link": flag
         }
     has_content = False
 
@@ -343,31 +352,11 @@ class DoxygenGroupDirective(DoxygenContentBlockDirective):
     kind = "group"
 
 
-class DoxygenStructDirective(DoxygenBaseDirective):
-
-    kind = "struct"
-
-    def create_matcher_stack(self, namespace, name):
-
-        # Structs are stored in the xml file with their fully namespaced name
-        # We're using C++ namespaces here, it might be best to make this file
-        # type dependent
-        #
-        xml_name = "%s::%s" % (namespace, name) if namespace else name
-
-        return self.matcher_factory.create_matcher_stack(
-            {
-                "compound": self.matcher_factory.create_name_type_matcher(xml_name, self.kind)
-                },
-            "compound"
-            )
-
-
 # This class was the same as the DoxygenBaseDirective above, except that it
 # wraps the output in a definition_list before passing it back. This should be
-# abstracted in a far nicely way to avoid repeating so much code
+# abstracted in a far nicer way to avoid repeating so much code
 #
-# Now we're removed the definition_list wrap so we really need to refactor this!
+# Now we've removed the definition_list wrap so we really need to refactor this!
 class DoxygenBaseItemDirective(BaseDirective):
 
     required_arguments = 1
