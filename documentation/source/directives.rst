@@ -275,11 +275,19 @@ doxygenstruct
 This directive generates the appropriate output for a single struct. The struct
 name is required to be unique in the project.
 
+It takes the standard ``project``, ``path``, ``outline`` and ``no-link`` options
+and additionally the ``members``, ``protected-members``, ``private-members`` and
+``undoc-members`` options.
+
 ::
 
    .. doxygenstruct:: <struct name>
       :project: ...
       :path: ...
+      :members:
+      :protected-members:
+      :private-members:
+      :undoc-members:
       :outline:
       :no-link:
 
