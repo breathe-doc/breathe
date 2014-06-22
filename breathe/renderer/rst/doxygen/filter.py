@@ -220,6 +220,10 @@ class Selector(object):
     def prot(self):
         return AttributeAccessor(self, 'prot')
 
+    @property
+    def valueOf(self):
+        return AttributeAccessor(self, 'valueOf_')
+
 
 class Ancestor(Selector):
 
@@ -595,6 +599,7 @@ class FilterFactory(object):
             has_grandparent \
             & (grandparent.node_type == 'compounddef') \
             & (grandparent.kind != 'class') \
+            & (grandparent.kind != 'struct') \
             & (node.node_type == 'memberdef')
 
         node_is_public = node.prot == 'public'
@@ -602,9 +607,10 @@ class FilterFactory(object):
         non_class_public_memberdefs = non_class_memberdef & node_is_public | ~ non_class_memberdef
 
         return ( self.create_class_member_filter(filter_options) | non_class_memberdef ) \
-            & self.create_innerclass_filter(filter_options)
+            & self.create_innerclass_filter(filter_options) \
+            & self.create_outline_filter(filter_options)
 
-    def create_class_filter(self, options):
+    def create_class_filter(self, target, options):
         """Content filter for classes based on various directive options"""
 
         # Generate new dictionary from defaults
@@ -615,23 +621,30 @@ class FilterFactory(object):
 
         return AndFilter(
             self.create_class_member_filter(filter_options),
-            self.create_innerclass_filter(filter_options),
+            self.create_innerclass_filter(filter_options, outerclass=target),
             self.create_outline_filter(filter_options),
             self.create_show_filter(filter_options),
             )
 
-    def create_innerclass_filter(self, options):
+    def create_innerclass_filter(self, options, outerclass=''):
+        """
+        :param outerclass: Should be the class/struct being target by the directive calling this
+                           code. If it is a group or namespace directive then it should be left
+                           blank. It is used when looking for names listed in the :members: option.
+
+                           The name should include any additional namespaces that the target class
+                           is in.
+        """
 
         node = Node()
         node_is_innerclass = (node.node_type == "ref") & (node.node_name == "innerclass")
 
         parent = Parent()
         parent_is_compounddef = parent.node_type == 'compounddef'
-        parent_is_class = parent.kind == 'class'
+        parent_is_class = parent.kind.is_one_of(['class', 'struct'])
 
         allowed = set()
         all_options = {
-            'members': 'public',
             'protected-members': 'protected',
             'private-members': 'private',
             }
@@ -640,16 +653,39 @@ class FilterFactory(object):
             if option in options:
                 allowed.add(scope)
 
+        node_is_innerclass_in_class = parent_is_compounddef & parent_is_class & node_is_innerclass
+
+        public_innerclass_filter = ClosedFilter()
+
+        if 'members' in options:
+
+            if options['members'].strip():
+
+                text = options["members"]
+
+                prefix = ('%s::' % outerclass) if outerclass else ''
+
+                # Matches sphinx-autodoc behaviour of comma separated values
+                members = set(['%s%s' % (prefix, x.strip()) for x in text.split(",")])
+
+                node_valueOf_is_in_members = node.valueOf.is_one_of(members)
+
+                # Accept any nodes which don't have a "sectiondef" as a parent or, if they do, only
+                # accept them if their names are in the members list
+                public_innerclass_filter = ~ node_is_innerclass_in_class | node_valueOf_is_in_members
+
+            else:
+                allowed.add('public')
+
+
         node_is_in_allowed_scope = node.prot.is_one_of(allowed)
 
-        node_is_innerclass_in_class = parent_is_compounddef & parent_is_class & node_is_innerclass
-        innerclass = ( node_is_innerclass_in_class & node_is_in_allowed_scope ) \
-            | ~ node_is_innerclass_in_class
+        innerclass = ~ node_is_innerclass_in_class | node_is_in_allowed_scope
         description = self._create_description_filter(True, 'compounddef', options)
 
         # Put parent check last as we only want to check parents of innerclass's otherwise we have
         # to check the parent's type as well
-        return innerclass | description
+        return innerclass | public_innerclass_filter | description
 
     def create_show_filter(self, options):
         """Currently only handles the header-file entry"""
@@ -807,9 +843,9 @@ class FilterFactory(object):
         return allowed_members | description
 
     def create_outline_filter(self, options):
-
         if 'outline' in options:
-            return NotFilter(InFilter(NodeTypeAccessor(Node()), ["description"]))
+            node = Node()
+            return ~ node.node_type.is_one_of(["description", "inc"])
         else:
             return OpenFilter()
 

@@ -9,8 +9,8 @@ group. A doxygen group can be declared with specific doxygen markup in the
 source comments as cover in the `doxygen documentation`_.
 
 It takes the standard ``project``, ``path``, ``outline`` and ``no-link`` options
-and additionally the ``content-only``, ``members``, ``private-members`` and
-``undoc-members`` options.
+and additionally the ``content-only``, ``members``, ``protected-members``,
+``private-members`` and ``undoc-members`` options.
 
 ``content-only``
    If this flag is specified, then the directive does not output the name of the
@@ -182,6 +182,29 @@ Produces this output:
 
    Undocumented classes are still not shown in the output due to an implementation
    issue. Please post an issue on github if you would like this resolved.
+
+
+Outline Example
+---------------
+
+This displays only the names of the members of the group and not their
+documentation. The other options determine which members are displayed.
+
+.. code-block:: rst
+
+   .. doxygengroup:: mygroup
+      :project: group
+      :members:
+      :outline:
+
+It produces this output:
+
+.. doxygengroup:: mygroup
+   :project: group
+   :members:
+   :outline:
+   :no-link:
+
 
 Failing Example
 ---------------

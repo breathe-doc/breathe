@@ -42,19 +42,58 @@ public:
 
     //! \brief non-namespaced class function
     void function() {};
-
+ 
     //! \brief non-namespaced class other function
     void anotherFunction() {};
 
-    void undocumentedFunction() {};
+    //! \brief namespaced class function
+    virtual void publicFunction() const = 0;
+
+    virtual void undocumentedPublicFunction() const = 0;
+
+    //! A public class
+    class PublicClass {};
+
+    class UndocumentedPublicClass {};
+
+    //! A public struct
+    struct PublicStruct {};
+
+    struct UndocumentedPublicStruct {};
+
+protected:
+
+    //! A protected function
+    void protectedFunction() {};
+
+    void undocumentedProtectedFunction() {};
+
+    //! A protected class
+    class ProtectedClass {};
+
+    class UndocumentedProtectedClass {};
+
+    //! A protected struct
+    struct ProtectedStruct {};
+
+    struct UndocumentedProtectedStruct {};
 
 private:
 
-    //! \brief documented private function
-    void documentedPrivateFunction() {};
+    //! This is a private function
+    void privateFunction() const = 0;
 
-    void undocumentedPrivateFunction() {};
+    void undocumentedPrivateFunction() const = 0;
 
+    //! A private class
+    class PrivateClass {};
+
+    class UndocumentedPrivateClass {};
+
+    //! A private struct
+    struct PrivateStruct {};
+
+    struct UndocumentedPrivateStruct {};
 };
 
 
