@@ -258,6 +258,7 @@ To reference a nested namespace, the full namespaced path must be provided, e.g.
       :project: ...
       :path: ...
       :content-only:
+      :outline:
       :members:
       :protected-members:
       :private-members:

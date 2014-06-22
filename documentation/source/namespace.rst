@@ -41,8 +41,6 @@ If you would like to always specify some combination of ``members``,
 use the :ref:`breathe_default_members <breathe-default-members>` configuration
 variable to set it in the ``conf.py``.
 
-.. _doxygen documentation: http://www.stack.nl/~dimitri/doxygen/manual/grouping.html
-
 .. contents::
 
 
@@ -179,8 +177,31 @@ Produces this output:
 
 .. note::
 
-   Undocumented classes are still not shown in the output due to an implementation
-   issue. Please post an issue on github if you would like this resolved.
+   Undocumented classes are still not shown in the output due to an
+   implementation issue. Please post an issue on github if you would like this
+   resolved.
+
+
+Outline Example
+---------------
+
+This displays only the names of the members of the namespace and not their
+documentation. The other options determine which members are displayed.
+
+.. code-block:: rst
+
+   .. doxygennamespace:: foo
+      :project: namespace
+      :members:
+      :outline:
+
+It produces this output:
+
+.. doxygennamespace:: foo
+   :project: namespace
+   :members:
+   :outline:
+   :no-link:
 
 
 Nested Example
@@ -212,7 +233,6 @@ This intentionally fails:
 
 It produces the following warning message:
 
-.. warning:: Cannot find file "madeupgroup" in doxygen xml output for project
-             "madeupnamespace" from directory:
+.. warning:: doxygennamespace: Cannot find namespace “madeupnamespace” in
+             doxygen xml output for project “namespace” from directory:
              ../../examples/specific/namespacefile/xml/
-
