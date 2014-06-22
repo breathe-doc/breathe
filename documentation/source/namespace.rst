@@ -8,8 +8,8 @@ This directive generates the appropriate output for the contents of a
 namespace.
 
 It takes the standard ``project``, ``path``, ``outline`` and ``no-link`` options
-and additionally the ``content-only``, ``members``, ``private-members`` and
-``undoc-members`` options.
+and additionally the ``content-only``, ``members``, ``protected-members``,
+``private-members`` and ``undoc-members`` options.
 
 ``content-only``
    If this flag is specified, then the directive does not output the name of the

@@ -6,7 +6,8 @@ doxygenclass Directive
 
 This directive generates the appropriate output for a single class. It takes the
 standard ``project``, ``path``, ``outline`` and ``no-link`` options and
-additionally the ``members``, ``private-members`` and ``undoc-members`` options.
+additionally the ``members``, ``protected-members``, ``private-members`` and
+``undoc-members`` options.
 
 ``members``
    Designed to behavior in a similar manner to the ``members`` option for the
