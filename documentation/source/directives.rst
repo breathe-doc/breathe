@@ -254,7 +254,7 @@ To reference a nested namespace, the full namespaced path must be provided, e.g.
 
 ::
 
-   .. doxygengroup:: <namespace>
+   .. doxygennamespace:: <namespace>
       :project: ...
       :path: ...
       :content-only:
