@@ -1,3 +1,4 @@
+
 Breathe
 =======
 
@@ -100,4 +101,60 @@ documentation. And thanks to:
 - Dimitri van Heesch for `Doxygen <http://www.stack.nl/~dimitri/doxygen/>`_.
 - Georg Brandl for `Sphinx <http://sphinx-doc.org>`_.
 - David Goodger for `Docutils <http://docutils.sourceforge.net/>`_ and reStructuredText. 
+
+Change Log
+----------
+
+- Changes since the last release
+
+  - Improved ``:members:`` implementation to handle inner classes properly.
+
+  - Updated ``doxygenstruct`` to share the ``doxygenclass`` implementation path
+    which grants it the options from ``doxygenclass`` directive.
+
+  - Added ``:outline:`` option support to ``doxygengroup`` &
+    ``doxygennamespace`` directives.
+
+  - Added ``doxygennamespace`` directive.
+
+  - Added ``:undoc-members:`` option to ``doxygenclass`` & ``doxygengroup``
+    directives.
+
+  - **Breaking change**: Removed ``:sections:`` option for ``doxygenclass`` &
+    ``doxygengroup`` directives and replaced it with ``:members:``,
+    ``:protected-members:`` and ``:private-members:``, and changed
+    ``breathe_default_sections`` config variable to ``breathe_default_members``.
+    This is designed to more closely match the Sphinx autodoc functionality and
+    interface.
+
+- Breathe v2.0.0
+
+  - Add compare script for checking changes to documentation caused by changes
+    in the implementation.
+
+  - Switched to ``https`` reference for MathJax Javascript.
+
+  - **Breaking change**: Change ``autodoxygen*`` directives to require
+    explicitly declared source files in the ``conf.py`` rather than attempting
+    to detect them from the directive arguments.
+
+  - Switch documentation hosting to ReadTheDocs.org.
+
+  - **Breaking change**: Switch to assuming all relative paths are relative to
+    the directory holding the ``conf.py`` file. Previously, it would assume they
+    were relative to the user's current working directory. This breaks projects
+    which use separate build & source directories.
+
+  - Add ``doxygenunion`` directive.
+
+  - Add ``doxygengroup`` directive.
+
+  - Add support for lists in the output. They were previously ignored.
+
+  - Updated implementation to use the docutils nodes that Sphinx does where
+    possible.
+
+- Breathe v1.2.0
+
+  - Change log not recorded.
 
