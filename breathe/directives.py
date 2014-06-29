@@ -43,7 +43,8 @@ class NoMatchingFunctionError(BreatheError):
     pass
 
 class UnableToResolveFunctionError(BreatheError):
-    pass
+    def __init__(self, matches):
+        self.matches = matches
 
 class ProjectError(BreatheError):
     pass
@@ -220,10 +221,19 @@ class DoxygenFunctionDirective(BaseDirective):
                     % (namespace, function_name, project_info.name(), project_info.project_path()))
             return [docutils.nodes.warning("", docutils.nodes.paragraph("", "", docutils.nodes.Text(warning))),
                     self.state.document.reporter.warning(warning, line=self.lineno)]
-        except UnableToResolveFunctionError:
+        except UnableToResolveFunctionError, error:
+            signatures = []
+            for entry in error.matches:
+                param_types = []
+                for param in entry.param:
+                    param_type = param.type_.content_[0].value
+                    if not isinstance(param_type, unicode):
+                        param_type = param_type.valueOf_
+                    param_types.append(param_type)
+                signatures.append("%s(%s)" % (entry.name, ", ".join(param_types)))
             warning = ('doxygenfunction: Unable to resolve multiple matches for function "%s%s" with arguments (%s) in doxygen xml output '
-                    'for project "%s" from directory: %s.'
-                    % (namespace, function_name, ", ".join(args), project_info.name(), project_info.project_path()))
+                    'for project "%s" from directory: %s. Matches:\n%s'
+                    % (namespace, function_name, ", ".join(args), project_info.name(), project_info.project_path(), ',\n'.join(signatures)))
             return [docutils.nodes.warning("", docutils.nodes.paragraph("", "", docutils.nodes.Text(warning))),
                     self.state.document.reporter.warning(warning, line=self.lineno)]
 
@@ -287,7 +297,7 @@ class DoxygenFunctionDirective(BaseDirective):
                     break
 
         if not data_object:
-            raise UnableToResolveFunctionError()
+            raise UnableToResolveFunctionError(matches)
 
         return data_object
 
