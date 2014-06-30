@@ -397,8 +397,6 @@ class LinkedTextTypeSubRenderer(Renderer):
 
         # Recursively process where possible
         for i, entry in enumerate(self.data_object.content_):
-            if i:
-                nodelist.append(self.node_factory.Text(" "))
             context = self.context.create_child_context(entry)
             renderer = self.renderer_factory.create_renderer(context)
             nodelist.extend(renderer.render())

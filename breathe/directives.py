@@ -19,11 +19,16 @@ from breathe.project import ProjectInfoFactory, ProjectError
 
 from docutils.parsers.rst.directives import unchanged_required, unchanged, flag
 from docutils.statemachine import ViewList
+from docutils.core import publish_from_doctree
 from sphinx.domains.cpp import DefinitionParser
+from sphinx.writers.text import TextWriter
+from sphinx.builders.text import TextBuilder
 
 import docutils.nodes
 import sphinx.addnodes
 import sphinx.ext.mathbase
+
+from StringIO import StringIO
 
 import os
 import fnmatch
@@ -42,11 +47,36 @@ class NoMatchingFunctionError(BreatheError):
 
 
 class UnableToResolveFunctionError(BreatheError):
-    pass
+
+    def __init__(self, signatures):
+        self.signatures = signatures
 
 
 class NodeNotFoundError(BreatheError):
     pass
+
+
+class FakeDestination(object):
+
+    def write(self, output):
+        return output
+
+
+class TextRenderer(object):
+
+    def __init__(self, app):
+        self.app = app
+
+    def render(self, nodes, document):
+
+        new_document = document.copy()
+
+        new_document.children = nodes
+
+        writer = TextWriter(TextBuilder(self.app))
+        output = writer.write(new_document, FakeDestination())
+
+        return output.split('\n')[0]
 
 
 # Directives
@@ -63,6 +93,11 @@ class DoxygenFunctionDirective(BaseDirective):
         }
     has_content = False
     final_argument_whitespace = True
+
+    def __init__(self, text_renderer, *args, **kwargs):
+        super(DoxygenFunctionDirective, self).__init__(*args, **kwargs)
+
+        self.text_renderer = text_renderer
 
     def run(self):
 
@@ -109,11 +144,11 @@ class DoxygenFunctionDirective(BaseDirective):
             self.lineno,
             namespace='%s::' % namespace if namespace else '',
             function=function_name,
-            args=', '.join(args) if args is not None else None
+            args=', '.join(args)
             )
 
         try:
-            data_object = self.resolve_function(results, args)
+            data_object = self.resolve_function(results, args, project_info)
         except NoMatchingFunctionError:
             return warning.warn('doxygenfunction: Cannot find function "{namespace}{function}" '
                                 '{tail}')
@@ -132,7 +167,7 @@ class DoxygenFunctionDirective(BaseDirective):
 
         paren_index = function_description.find('(')
         if paren_index == -1:
-            return None
+            return []
         else:
             # Parse the function name string, eg. f(int, float) to
             # extract the types so we can use them for matching
@@ -152,7 +187,7 @@ class DoxygenFunctionDirective(BaseDirective):
 
             return args
 
-    def resolve_function(self, matches, args):
+    def resolve_function(self, matches, args, project_info):
 
         if not matches:
             raise NoMatchingFunctionError()
@@ -160,30 +195,36 @@ class DoxygenFunctionDirective(BaseDirective):
         if len(matches) == 1:
             return matches[0]
 
-        # Tries to match the args array agains the arguments listed in the
-        # doxygen data
-        # TODO: We don't have any doxygen xml dom accessing code at this level
-        # this might benefit from being abstracted away at some point
-        def param_args(params):
-            args = []
-            for i in range(len(params)):
-                param_type = entry.param[i].type_.content_[0].value
-                if not isinstance(param_type, unicode):
-                    param_type = param_type.valueOf_
-                args.append(param_type)
-            return args
-        if args is None:  # None means any set of arguments
-            matches_args = [param_args(entry.param) for entry in matches]
-            if all([args == matches_args[0] for args in matches_args[1:]]):
-                valid_matches = matches
-            else:
-                raise UnableToResolveFunctionError()
-        else:
-            valid_matches = [entry for entry in matches
-                if param_args(entry.param) == args]
-            if len(valid_matches) == 0:
-                raise NoMatchingFunctionError()
-        return valid_matches[-1]
+        data_object = None
+
+        signatures = []
+
+        # Iterate over the potential matches
+        for entry in matches:
+
+            # Render the matches to docutils nodes
+            target_handler = self.target_handler_factory.create_target_handler(
+                {'no-link': u''}, project_info, self.state.document
+                )
+            filter_ = self.filter_factory.create_outline_filter(self.options)
+            nodes = self.render(entry, project_info, filter_, target_handler)
+
+            # Render the nodes to text
+            signature = self.text_renderer.render(nodes, self.state.document)
+            signatures.append(signature)
+
+            # Parse the text to find the arguments
+            match_args = self.parse_args(signature)
+
+            # Match them against the arg spec
+            if args == match_args:
+                data_object = entry
+                break
+
+        if not data_object:
+            raise UnableToResolveFunctionError(signatures)
+
+        return data_object
 
 
 class DoxygenClassLikeDirective(BaseDirective):
@@ -532,9 +573,11 @@ class DoxygenDirectiveFactory(object):
         "autodoxygenfile": AutoDoxygenFileDirective,
         }
 
-    def __init__(self, root_data_object, renderer_factory_creator_constructor, finder_factory,
-                 matcher_factory, project_info_factory, filter_factory, target_handler_factory):
+    def __init__(self, text_renderer, root_data_object, renderer_factory_creator_constructor,
+                 finder_factory, matcher_factory, project_info_factory, filter_factory,
+                 target_handler_factory):
 
+        self.text_renderer = text_renderer
         self.root_data_object = root_data_object
         self.renderer_factory_creator_constructor = renderer_factory_creator_constructor
         self.finder_factory = finder_factory
@@ -549,7 +592,19 @@ class DoxygenDirectiveFactory(object):
         return self.create_directive_container("doxygenindex")
 
     def create_function_directive_container(self):
-        return self.create_directive_container("doxygenfunction")
+
+        # Pass text_renderer to the function directive
+        return DirectiveContainer(
+            self.directives["doxygenfunction"],
+            self.text_renderer,
+            self.root_data_object,
+            self.renderer_factory_creator_constructor,
+            self.finder_factory,
+            self.matcher_factory,
+            self.project_info_factory,
+            self.filter_factory,
+            self.target_handler_factory
+            )
 
     def create_struct_directive_container(self):
         return self.create_directive_container("doxygenstruct")
@@ -798,7 +853,10 @@ def setup(app):
 
     root_data_object = RootDataObject()
 
+    text_renderer = TextRenderer(app)
+
     directive_factory = DoxygenDirectiveFactory(
+        text_renderer,
         root_data_object,
         renderer_factory_creator_constructor,
         finder_factory,
@@ -807,6 +865,8 @@ def setup(app):
         filter_factory,
         target_handler_factory
         )
+
+    DoxygenFunctionDirective.app = app
 
     app.add_directive(
         "doxygenindex",

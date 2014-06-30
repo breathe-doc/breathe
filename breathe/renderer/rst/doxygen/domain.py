@@ -169,13 +169,13 @@ class CppDomainHandler(DomainHandler):
 
         # Create target node. This is required for LaTeX output as target nodes are converted to the
         # appropriate \phantomsection & \label for in document LaTeX links
-        (target,) = self.target_handler.create_target(id_)
+        target = self.target_handler.create_target(id_)
 
         # Register object with the sphinx objects registry
         self.document.settings.env.domaindata['cpp']['objects'].setdefault(name,
                 (self.document.settings.env.docname, type_, id_))
 
-        return [target]
+        return target
 
 
 class DomainHandlerFactory(object):

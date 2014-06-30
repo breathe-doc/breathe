@@ -29,5 +29,11 @@ void h(std::string, MyType);
 void h(std::string, MyOtherType);
 
 //! Another function which takes a basic type
-void h(std::string, int);
+void h(std::string, float);
+
+//! Another function which takes a const custom type
+void h(std::string, const MyType&);
+
+//! Another function which takes a const basic type
+void h(std::string, const int);
 
