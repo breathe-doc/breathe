@@ -33,7 +33,6 @@ all: class/xml/index.xml \
      qtstyle/xml/index.xml \
      jdstyle/xml/index.xml \
      structcmd/xml/index.xml \
-     decl_impl/xml/index.xml \
      autolink/xml/index.xml \
      restypedef/xml/index.xml \
      afterdoc/xml/index.xml \
@@ -96,9 +95,6 @@ jdstyle/xml/index.xml: jdstyle.cpp jdstyle.cfg
 	$(DOXYGEN) jdstyle.cfg
 
 structcmd/xml/index.xml: structcmd.h structcmd.cfg 
-	$(DOXYGEN) structcmd.cfg
-
-decl_impl/xml/index.xml: decl_impl.h decl_impl.c decl_impl.cfg 
 	$(DOXYGEN) structcmd.cfg
 
 autolink/xml/index.xml: autolink.cpp autolink.cfg 

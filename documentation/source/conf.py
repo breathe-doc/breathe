@@ -172,7 +172,7 @@ breathe_projects = {
     "class":"../../examples/doxygen/class/xml/",
     "classtest":"../../examples/specific/class/xml/",
     "struct":"../../examples/specific/struct/xml/",
-    "decl_impl":"../../examples/doxygen/decl_impl/xml/",
+    "decl_impl":"../../examples/specific/decl_impl/xml/",
     "structcmd":"../../examples/doxygen/structcmd/xml/",
     "tinyxml":"../../examples/tinyxml/tinyxml/xml/",
     "restypedef":"../../examples/doxygen/restypedef/xml/",
