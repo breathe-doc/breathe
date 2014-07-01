@@ -109,7 +109,7 @@ class DoxygenFunctionDirective(BaseDirective):
             self.lineno,
             namespace='%s::' % namespace if namespace else '',
             function=function_name,
-            args=', '.join(args)
+            args=', '.join(args) if args is not None else None
             )
 
         try:
@@ -132,7 +132,7 @@ class DoxygenFunctionDirective(BaseDirective):
 
         paren_index = function_description.find('(')
         if paren_index == -1:
-            return []
+            return None
         else:
             # Parse the function name string, eg. f(int, float) to
             # extract the types so we can use them for matching
@@ -160,30 +160,30 @@ class DoxygenFunctionDirective(BaseDirective):
         if len(matches) == 1:
             return matches[0]
 
-        data_object = None
-
         # Tries to match the args array agains the arguments listed in the
         # doxygen data
         # TODO: We don't have any doxygen xml dom accessing code at this level
         # this might benefit from being abstracted away at some point
-        for entry in matches:
-            if len(args) == len(entry.param):
-                equal = True
-                for i in range(len(args)):
-                    param_type = entry.param[i].type_.content_[0].value
-                    if not isinstance(param_type, unicode):
-                        param_type = param_type.valueOf_
-                    if args[i] != param_type:
-                        equal = False
-                        break
-                if equal:
-                    data_object = entry
-                    break
-
-        if not data_object:
-            raise UnableToResolveFunctionError()
-
-        return data_object
+        def param_args(params):
+            args = []
+            for i in range(len(params)):
+                param_type = entry.param[i].type_.content_[0].value
+                if not isinstance(param_type, unicode):
+                    param_type = param_type.valueOf_
+                args.append(param_type)
+            return args
+        if args is None:  # None means any set of arguments
+            matches_args = [param_args(entry.param) for entry in matches]
+            if all([args == matches_args[0] for args in matches_args[1:]]):
+                valid_matches = matches
+            else:
+                raise UnableToResolveFunctionError()
+        else:
+            valid_matches = [entry for entry in matches
+                if param_args(entry.param) == args]
+            if len(valid_matches) == 0:
+                raise NoMatchingFunctionError()
+        return valid_matches[-1]
 
 
 class DoxygenClassLikeDirective(BaseDirective):
