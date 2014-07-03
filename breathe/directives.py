@@ -152,9 +152,16 @@ class DoxygenFunctionDirective(BaseDirective):
         except NoMatchingFunctionError:
             return warning.warn('doxygenfunction: Cannot find function "{namespace}{function}" '
                                 '{tail}')
-        except UnableToResolveFunctionError:
-            return warning.warn('doxygenfunction: Unable to resolve multiple matches for function '
-                                '"{namespace}{function}" with arguments ({args}) {tail}')
+        except UnableToResolveFunctionError as error:
+            message = 'doxygenfunction: Unable to resolve multiple matches for function ' \
+                '{namespace}{function}" with arguments ({args}) {tail}.\n' \
+                'Potential matches:\n'
+            # TODO: We're cheating here with the set() as signatures has repeating entries for some
+            # reason (failures in the matcher_stack code) so we consolidate them by shoving them in
+            # a set to remove duplicates. Should be fixed!
+            for entry in set(error.signatures):
+                message += '    %s\n' % entry
+            return warning.warn(message)
 
         target_handler = self.target_handler_factory.create_target_handler(
             self.options, project_info, self.state.document
