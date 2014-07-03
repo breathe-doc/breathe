@@ -4,6 +4,15 @@
 build/
 Breathe.egg-info/
 
+# Folder for placing stuff to be ignored
+/ignored
+
+# My virtual env folder
+/python-2.7.4
+
+# Test folder for building simple examples of the documentation
+/simple
+
 # Covers JetBrains IDEs: IntelliJ, RubyMine, PhpStorm, AppCode, PyCharm
 
 ## Directory-based project format
