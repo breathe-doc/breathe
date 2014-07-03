@@ -76,7 +76,7 @@ Function Overloads
    :project: functionOverload
    :no-link:
 
-.. doxygenfunction:: h(std::string, int)
+.. doxygenfunction:: h(std::string, const int)
    :project: functionOverload
    :no-link:
 
