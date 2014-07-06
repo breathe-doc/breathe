@@ -188,6 +188,14 @@ class DoxygenFunctionDirective(BaseDirective):
         return self.render(data_object, project_info, filter_, target_handler, mask_factory)
 
     def parse_args(self, function_description):
+        # Strip off trailing qualifiers
+        function_description = re.sub(r'''(?<= \)) \s*
+                                          (?: const)? \s*
+                                          (?: volatile)? \s*
+                                          (?: = \s* 0)? \s* $ ''',
+                                      '',
+                                      function_description,
+                                      flags=re.VERBOSE)
 
         paren_index = function_description.find('(')
         if paren_index == -1:
