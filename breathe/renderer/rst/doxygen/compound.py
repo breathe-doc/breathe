@@ -246,6 +246,10 @@ class FuncMemberDefTypeSubRenderer(MemberDefTypeSubRenderer):
             template_nodes.append(self.node_factory.Text("> "))
             nodes.append(self.node_factory.line("", *template_nodes))
 
+        # Note whether a member function is virtual
+        if self.data_object.virt != 'non-virtual':
+            nodes.append(self.node_factory.Text('virtual '))
+
         # Get the function type and name
         nodes.extend(MemberDefTypeSubRenderer.title(self))
 
@@ -258,6 +262,16 @@ class FuncMemberDefTypeSubRenderer(MemberDefTypeSubRenderer):
             param.extend(renderer.render())
             paramlist.append(param)
         nodes.append(paramlist)
+
+        # Add CV-qualifiers
+        if self.data_object.const:
+            nodes.append(self.node_factory.Text(' const'))
+        if self.data_object.volatile:
+            nodes.append(self.node_factory.Text(' volatile'))
+
+        # Add `= 0` for pure virtual members.
+        if self.data_object.virt == 'pure-virtual':
+            nodes.append(self.node_factory.Text(' = 0'))
 
         return nodes
 
