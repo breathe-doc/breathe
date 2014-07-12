@@ -1,5 +1,6 @@
 
 from breathe.renderer.rst.doxygen.base import RenderContext
+from breathe.renderer.rst.doxygen.mask import NullMaskFactory
 from breathe.renderer.rst.doxygen import format_parser_error
 from breathe.directive.base import BaseDirective
 from breathe.project import ProjectError
@@ -48,7 +49,8 @@ class BaseIndexDirective(BaseDirective):
             target_handler,
             )
 
-        context = RenderContext([data_object, self.root_data_object])
+        mask_factory = NullMaskFactory()
+        context = RenderContext([data_object, self.root_data_object], mask_factory)
         object_renderer = renderer_factory.create_renderer(context)
 
         try:
