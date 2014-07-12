@@ -1,5 +1,6 @@
 
 from breathe.renderer.rst.doxygen.base import RenderContext
+from breathe.renderer.rst.doxygen.mask import NullMaskFactory
 from breathe.directive.base import BaseDirective
 from breathe.project import ProjectError
 from .base import WarningHandler, create_warning
@@ -57,7 +58,8 @@ class BaseFileDirective(BaseDirective):
                 target_handler,
                 )
 
-            context = RenderContext([data_object, self.root_data_object])
+            mask_factory = NullMaskFactory()
+            context = RenderContext([data_object, self.root_data_object], mask_factory)
             object_renderer = renderer_factory.create_renderer(context)
             node_list.extend(object_renderer.render())
 

@@ -7,6 +7,8 @@ from breathe.renderer.rst.doxygen.domain import DomainHandlerFactoryCreator, Nul
 from breathe.renderer.rst.doxygen.domain import CppDomainHelper, CDomainHelper
 from breathe.renderer.rst.doxygen.filter import FilterFactory, GlobFactory
 from breathe.renderer.rst.doxygen.target import TargetHandlerFactory
+from breathe.renderer.rst.doxygen.mask import MaskFactory, NullMaskFactory, NoParameterNamesMask
+
 from breathe.finder.doxygen.core import DoxygenItemFinderFactoryCreator
 from breathe.finder.doxygen.matcher import ItemMatcherFactory
 from breathe.directive.base import BaseDirective, DoxygenBaseDirective, WarningHandler, \
@@ -188,7 +190,8 @@ class DoxygenFunctionDirective(BaseDirective):
             )
         filter_ = self.filter_factory.create_outline_filter(self.options)
 
-        return self.render(data_object, project_info, filter_, target_handler)
+        mask_factory = NullMaskFactory()
+        return self.render(data_object, project_info, filter_, target_handler, mask_factory)
 
     def parse_args(self, function_description):
 
@@ -234,7 +237,8 @@ class DoxygenFunctionDirective(BaseDirective):
                 {'no-link': u''}, project_info, self.state.document
                 )
             filter_ = self.filter_factory.create_outline_filter(self.options)
-            nodes = self.render(entry, project_info, filter_, target_handler)
+            mask_factory = MaskFactory({'param': NoParameterNamesMask})
+            nodes = self.render(entry, project_info, filter_, target_handler, mask_factory)
 
             # Render the nodes to text
             signature = self.text_renderer.render(nodes, self.state.document)
@@ -306,7 +310,8 @@ class DoxygenClassLikeDirective(BaseDirective):
             )
         filter_ = self.filter_factory.create_class_filter(name, self.options)
 
-        return self.render(data_object, project_info, filter_, target_handler)
+        mask_factory = NullMaskFactory()
+        return self.render(data_object, project_info, filter_, target_handler, mask_factory)
 
 
 class DoxygenClassDirective(DoxygenClassLikeDirective):
@@ -403,7 +408,8 @@ class DoxygenContentBlockDirective(BaseDirective):
                 target_handler,
                 )
 
-            context = RenderContext([data_object, self.root_data_object])
+            mask_factory = NullMaskFactory()
+            context = RenderContext([data_object, self.root_data_object], mask_factory)
             object_renderer = renderer_factory.create_renderer(context)
             node_list.extend(object_renderer.render())
 
@@ -472,7 +478,8 @@ class DoxygenBaseItemDirective(BaseDirective):
             )
         filter_ = self.filter_factory.create_outline_filter(self.options)
 
-        return self.render(data_object, project_info, filter_, target_handler)
+        mask_factory = NullMaskFactory()
+        return self.render(data_object, project_info, filter_, target_handler, mask_factory)
 
 
 class DoxygenVariableDirective(DoxygenBaseItemDirective):

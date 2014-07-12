@@ -25,11 +25,12 @@ class Renderer(object):
 
 class RenderContext(object):
 
-    def __init__(self, node_stack):
+    def __init__(self, node_stack, mask_factory):
         self.node_stack = node_stack
+        self.mask_factory = mask_factory
 
     def create_child_context(self, data_object):
 
         node_stack = self.node_stack[:]
-        node_stack.insert(0, data_object)
-        return RenderContext(node_stack)
+        node_stack.insert(0, self.mask_factory.mask(data_object))
+        return RenderContext(node_stack, self.mask_factory)
