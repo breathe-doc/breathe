@@ -15,12 +15,17 @@ class WarningHandler(object):
         self.state = state
         self.context = context
 
-    def warn(self, text):
-        result = text.format(**self.context)
+    def warn(self, raw_text, rendered_nodes=None):
+        raw_text = self.format(raw_text)
+        if rendered_nodes is None:
+            rendered_nodes = [nodes.paragraph("", "", nodes.Text(raw_text))]
         return [
-            nodes.warning("", nodes.paragraph("", "", nodes.Text(result))),
-            self.state.document.reporter.warning(result, line=self.context['lineno'])
+            nodes.warning("", *rendered_nodes),
+            self.state.document.reporter.warning(raw_text, line=self.context['lineno'])
             ]
+
+    def format(self, text):
+        return text.format(**self.context)
 
 
 def create_warning(project_info, state, lineno, **kwargs):
