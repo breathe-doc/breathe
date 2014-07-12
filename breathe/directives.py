@@ -94,9 +94,10 @@ class DoxygenFunctionDirective(BaseDirective):
     has_content = False
     final_argument_whitespace = True
 
-    def __init__(self, text_renderer, *args, **kwargs):
+    def __init__(self, node_factory, text_renderer, *args, **kwargs):
         super(DoxygenFunctionDirective, self).__init__(*args, **kwargs)
 
+        self.node_factory = node_factory
         self.text_renderer = text_renderer
 
     def run(self):
@@ -156,12 +157,31 @@ class DoxygenFunctionDirective(BaseDirective):
             message = 'doxygenfunction: Unable to resolve multiple matches for function ' \
                 '{namespace}{function}" with arguments ({args}) {tail}.\n' \
                 'Potential matches:\n'
+
+            # We want to create a raw_text string for the console output and a set of docutils nodes
+            # for rendering into the final output. We handle the final output as a literal string
+            # with a txt based list of the options.
+            raw_text = message
+            literal_text = ''
+
             # TODO: We're cheating here with the set() as signatures has repeating entries for some
             # reason (failures in the matcher_stack code) so we consolidate them by shoving them in
             # a set to remove duplicates. Should be fixed!
-            for entry in set(error.signatures):
-                message += '    %s\n' % entry
-            return warning.warn(message)
+            for i, entry in enumerate(set(error.signatures)):
+                if i: literal_text += '\n'
+                literal_text += '%s' % entry
+                raw_text += '    %s\n' % entry
+            block = self.node_factory.literal_block('', '', self.node_factory.Text(literal_text))
+            formatted_message = warning.format(message)
+            warning_nodes = [
+                self.node_factory.paragraph(
+                    "", "",
+                    self.node_factory.Text(formatted_message)
+                    ),
+                block
+                ]
+            result = warning.warn(raw_text, warning_nodes)
+            return result
 
         target_handler = self.target_handler_factory.create_target_handler(
             self.options, project_info, self.state.document
@@ -580,10 +600,11 @@ class DoxygenDirectiveFactory(object):
         "autodoxygenfile": AutoDoxygenFileDirective,
         }
 
-    def __init__(self, text_renderer, root_data_object, renderer_factory_creator_constructor,
-                 finder_factory, matcher_factory, project_info_factory, filter_factory,
-                 target_handler_factory):
+    def __init__(self, node_factory, text_renderer, root_data_object,
+                 renderer_factory_creator_constructor, finder_factory, matcher_factory,
+                 project_info_factory, filter_factory, target_handler_factory):
 
+        self.node_factory = node_factory
         self.text_renderer = text_renderer
         self.root_data_object = root_data_object
         self.renderer_factory_creator_constructor = renderer_factory_creator_constructor
@@ -603,6 +624,7 @@ class DoxygenDirectiveFactory(object):
         # Pass text_renderer to the function directive
         return DirectiveContainer(
             self.directives["doxygenfunction"],
+            self.node_factory,
             self.text_renderer,
             self.root_data_object,
             self.renderer_factory_creator_constructor,
@@ -863,6 +885,7 @@ def setup(app):
     text_renderer = TextRenderer(app)
 
     directive_factory = DoxygenDirectiveFactory(
+        node_factory,
         text_renderer,
         root_data_object,
         renderer_factory_creator_constructor,
