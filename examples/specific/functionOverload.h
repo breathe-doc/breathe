@@ -26,8 +26,14 @@ class MyOtherType {};
 void h(std::string, MyType);
 
 //! Another function which takes another custom type
-void h(std::string, MyOtherType);
+void h(std::string, MyOtherType o);
 
 //! Another function which takes a basic type
-void h(std::string, int);
+void h(std::string, float myfloat);
+
+//! Another function which takes a const custom type
+void h(std::string, const MyType& mytype);
+
+//! Another function which takes a const basic type
+void h(std::string, const int myint);
 

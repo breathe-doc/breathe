@@ -16,6 +16,7 @@ It produces this output:
 
 .. doxygenenum:: NodeType
   :project: tinyxml
+  :no-link:
 
 Example with Namespace
 ----------------------
