@@ -171,7 +171,7 @@ We also override the binary 'and' (&), 'or' (|) and 'not' (~) operators in Pytho
 AndFilters, OrFilters and NotFilters respectively. We have to override the binary operators as they
 actual 'and', 'or' and 'not' operators cannot be overridden. So:
 
-    node.node_type == 'compound' | node.name == 'mygroup'
+    node.node_type == 'compound' & node.name == 'mygroup'
 
 Translates to:
 
