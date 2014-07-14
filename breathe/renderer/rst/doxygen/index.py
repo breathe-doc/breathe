@@ -1,5 +1,5 @@
 
-from breathe.renderer.rst.doxygen.base import Renderer
+from .base import Renderer
 
 class DoxygenTypeSubRenderer(Renderer):
 
