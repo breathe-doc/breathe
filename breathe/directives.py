@@ -1,23 +1,22 @@
 
-from breathe.finder.core import FinderFactory, NoMatchesError
-from breathe.parser import DoxygenParserFactory, CacheFactory
-from breathe.renderer.rst.doxygen import DoxygenToRstRendererFactoryCreatorConstructor, \
+from .finder.core import FinderFactory, NoMatchesError
+from .parser import DoxygenParserFactory, CacheFactory
+from .renderer.rst.doxygen import DoxygenToRstRendererFactoryCreatorConstructor, \
     RstContentCreator, RenderContext
-from breathe.renderer.rst.doxygen.domain import DomainHandlerFactoryCreator, NullDomainHandler
-from breathe.renderer.rst.doxygen.domain import CppDomainHelper, CDomainHelper
-from breathe.renderer.rst.doxygen.filter import FilterFactory, GlobFactory
-from breathe.renderer.rst.doxygen.target import TargetHandlerFactory
-from breathe.renderer.rst.doxygen.mask import MaskFactory, NullMaskFactory, NoParameterNamesMask
+from .renderer.rst.doxygen.domain import DomainHandlerFactoryCreator, NullDomainHandler
+from .renderer.rst.doxygen.domain import CppDomainHelper, CDomainHelper
+from .renderer.rst.doxygen.filter import FilterFactory, GlobFactory
+from .renderer.rst.doxygen.target import TargetHandlerFactory
+from .renderer.rst.doxygen.mask import MaskFactory, NullMaskFactory, NoParameterNamesMask
 
-from breathe.finder.doxygen.core import DoxygenItemFinderFactoryCreator
-from breathe.finder.doxygen.matcher import ItemMatcherFactory
-from breathe.directive.base import BaseDirective, DoxygenBaseDirective, WarningHandler, \
-    create_warning
-from breathe.directive.index import DoxygenIndexDirective, AutoDoxygenIndexDirective
-from breathe.directive.file import DoxygenFileDirective, AutoDoxygenFileDirective
-from breathe.process import AutoDoxygenProcessHandle
-from breathe.exception import BreatheError
-from breathe.project import ProjectInfoFactory, ProjectError
+from .finder.doxygen.core import DoxygenItemFinderFactoryCreator
+from .finder.doxygen.matcher import ItemMatcherFactory
+from .directive.base import BaseDirective, DoxygenBaseDirective, WarningHandler, create_warning
+from .directive.index import DoxygenIndexDirective, AutoDoxygenIndexDirective
+from .directive.file import DoxygenFileDirective, AutoDoxygenFileDirective
+from .process import AutoDoxygenProcessHandle
+from .exception import BreatheError
+from .project import ProjectInfoFactory, ProjectError
 
 from docutils.parsers.rst.directives import unchanged_required, unchanged, flag
 from docutils.statemachine import ViewList

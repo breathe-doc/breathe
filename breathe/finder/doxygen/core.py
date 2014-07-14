@@ -1,6 +1,6 @@
 
-from breathe.finder.doxygen import index as indexfinder
-from breathe.finder.doxygen import compound as compoundfinder
+from . import index as indexfinder
+from . import compound as compoundfinder
 
 
 class CreateCompoundTypeSubFinder(object):

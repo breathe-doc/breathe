@@ -1,5 +1,5 @@
 
-from breathe.exception import BreatheError
+from .exception import BreatheError
 
 import os
 
