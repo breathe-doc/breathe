@@ -1,6 +1,7 @@
 
 from breathe.renderer.rst.doxygen.base import RenderContext
 from breathe.renderer.rst.doxygen import format_parser_error
+from breathe.renderer.rst.doxygen.mask import NullMaskFactory
 from breathe.parser import ParserError, FileIOError
 from breathe.project import ProjectError
 from breathe.finder.core import NoMatchesError
@@ -15,12 +16,17 @@ class WarningHandler(object):
         self.state = state
         self.context = context
 
-    def warn(self, text):
-        result = text.format(**self.context)
+    def warn(self, raw_text, rendered_nodes=None):
+        raw_text = self.format(raw_text)
+        if rendered_nodes is None:
+            rendered_nodes = [nodes.paragraph("", "", nodes.Text(raw_text))]
         return [
-            nodes.warning("", nodes.paragraph("", "", nodes.Text(result))),
-            self.state.document.reporter.warning(result, line=self.context['lineno'])
+            nodes.warning("", *rendered_nodes),
+            self.state.document.reporter.warning(raw_text, line=self.context['lineno'])
             ]
+
+    def format(self, text):
+        return text.format(**self.context)
 
 
 def create_warning(project_info, state, lineno, **kwargs):
@@ -56,7 +62,7 @@ class BaseDirective(rst.Directive):
         self.filter_factory = filter_factory
         self.target_handler_factory = target_handler_factory
 
-    def render(self, data_object, project_info, filter_, target_handler):
+    def render(self, data_object, project_info, filter_, target_handler, mask_factory):
         "Standard render process used by subclasses"
 
         renderer_factory_creator = self.renderer_factory_creator_constructor.create_factory_creator(
@@ -80,7 +86,7 @@ class BaseDirective(rst.Directive):
         except FileIOError, e:
             return format_parser_error("doxygenclass", e.error, e.filename, self.state, self.lineno)
 
-        context = RenderContext([data_object, self.root_data_object])
+        context = RenderContext([data_object, self.root_data_object], mask_factory)
         object_renderer = renderer_factory.create_renderer(context)
         node_list = object_renderer.render()
 
@@ -128,5 +134,6 @@ class DoxygenBaseDirective(BaseDirective):
             self.options, project_info, self.state.document)
         filter_ = self.filter_factory.create_outline_filter(self.options)
 
-        return self.render(data_object, project_info, filter_, target_handler)
+        mask_factory = NullMaskFactory()
+        return self.render(data_object, project_info, filter_, target_handler, mask_factory)
 

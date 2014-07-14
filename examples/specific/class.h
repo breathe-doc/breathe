@@ -40,11 +40,14 @@ class ClassTest {
 
 public:
 
-    //! \brief non-namespaced class function
-    void function() {};
+    /*! \brief non-namespaced class function
+
+        More details in the header file.
+      */
+    void function();
  
     //! \brief non-namespaced class other function
-    void anotherFunction() {};
+    void anotherFunction();
 
     //! \brief namespaced class function
     virtual void publicFunction() const = 0;

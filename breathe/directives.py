@@ -7,6 +7,8 @@ from breathe.renderer.rst.doxygen.domain import DomainHandlerFactoryCreator, Nul
 from breathe.renderer.rst.doxygen.domain import CppDomainHelper, CDomainHelper
 from breathe.renderer.rst.doxygen.filter import FilterFactory, GlobFactory
 from breathe.renderer.rst.doxygen.target import TargetHandlerFactory
+from breathe.renderer.rst.doxygen.mask import MaskFactory, NullMaskFactory, NoParameterNamesMask
+
 from breathe.finder.doxygen.core import DoxygenItemFinderFactoryCreator
 from breathe.finder.doxygen.matcher import ItemMatcherFactory
 from breathe.directive.base import BaseDirective, DoxygenBaseDirective, WarningHandler, \
@@ -19,11 +21,16 @@ from breathe.project import ProjectInfoFactory, ProjectError
 
 from docutils.parsers.rst.directives import unchanged_required, unchanged, flag
 from docutils.statemachine import ViewList
+from docutils.core import publish_from_doctree
 from sphinx.domains.cpp import DefinitionParser
+from sphinx.writers.text import TextWriter
+from sphinx.builders.text import TextBuilder
 
 import docutils.nodes
 import sphinx.addnodes
 import sphinx.ext.mathbase
+
+from StringIO import StringIO
 
 import os
 import fnmatch
@@ -42,11 +49,36 @@ class NoMatchingFunctionError(BreatheError):
 
 
 class UnableToResolveFunctionError(BreatheError):
-    pass
+
+    def __init__(self, signatures):
+        self.signatures = signatures
 
 
 class NodeNotFoundError(BreatheError):
     pass
+
+
+class FakeDestination(object):
+
+    def write(self, output):
+        return output
+
+
+class TextRenderer(object):
+
+    def __init__(self, app):
+        self.app = app
+
+    def render(self, nodes, document):
+
+        new_document = document.copy()
+
+        new_document.children = nodes
+
+        writer = TextWriter(TextBuilder(self.app))
+        output = writer.write(new_document, FakeDestination())
+
+        return output.split('\n')[0]
 
 
 # Directives
@@ -63,6 +95,12 @@ class DoxygenFunctionDirective(BaseDirective):
         }
     has_content = False
     final_argument_whitespace = True
+
+    def __init__(self, node_factory, text_renderer, *args, **kwargs):
+        super(DoxygenFunctionDirective, self).__init__(*args, **kwargs)
+
+        self.node_factory = node_factory
+        self.text_renderer = text_renderer
 
     def run(self):
 
@@ -113,20 +151,47 @@ class DoxygenFunctionDirective(BaseDirective):
             )
 
         try:
-            data_object = self.resolve_function(results, args)
+            data_object = self.resolve_function(results, args, project_info)
         except NoMatchingFunctionError:
             return warning.warn('doxygenfunction: Cannot find function "{namespace}{function}" '
                                 '{tail}')
-        except UnableToResolveFunctionError:
-            return warning.warn('doxygenfunction: Unable to resolve multiple matches for function '
-                                '"{namespace}{function}" with arguments ({args}) {tail}')
+        except UnableToResolveFunctionError as error:
+            message = 'doxygenfunction: Unable to resolve multiple matches for function ' \
+                '{namespace}{function}" with arguments ({args}) {tail}.\n' \
+                'Potential matches:\n'
+
+            # We want to create a raw_text string for the console output and a set of docutils nodes
+            # for rendering into the final output. We handle the final output as a literal string
+            # with a txt based list of the options.
+            raw_text = message
+            literal_text = ''
+
+            # TODO: We're cheating here with the set() as signatures has repeating entries for some
+            # reason (failures in the matcher_stack code) so we consolidate them by shoving them in
+            # a set to remove duplicates. Should be fixed!
+            for i, entry in enumerate(set(error.signatures)):
+                if i: literal_text += '\n'
+                literal_text += '%s' % entry
+                raw_text += '    %s\n' % entry
+            block = self.node_factory.literal_block('', '', self.node_factory.Text(literal_text))
+            formatted_message = warning.format(message)
+            warning_nodes = [
+                self.node_factory.paragraph(
+                    "", "",
+                    self.node_factory.Text(formatted_message)
+                    ),
+                block
+                ]
+            result = warning.warn(raw_text, warning_nodes)
+            return result
 
         target_handler = self.target_handler_factory.create_target_handler(
             self.options, project_info, self.state.document
             )
         filter_ = self.filter_factory.create_outline_filter(self.options)
 
-        return self.render(data_object, project_info, filter_, target_handler)
+        mask_factory = NullMaskFactory()
+        return self.render(data_object, project_info, filter_, target_handler, mask_factory)
 
     def parse_args(self, function_description):
 
@@ -152,7 +217,7 @@ class DoxygenFunctionDirective(BaseDirective):
 
             return args
 
-    def resolve_function(self, matches, args):
+    def resolve_function(self, matches, args, project_info):
 
         if not matches:
             raise NoMatchingFunctionError()
@@ -162,26 +227,33 @@ class DoxygenFunctionDirective(BaseDirective):
 
         data_object = None
 
-        # Tries to match the args array agains the arguments listed in the
-        # doxygen data
-        # TODO: We don't have any doxygen xml dom accessing code at this level
-        # this might benefit from being abstracted away at some point
+        signatures = []
+
+        # Iterate over the potential matches
         for entry in matches:
-            if len(args) == len(entry.param):
-                equal = True
-                for i in range(len(args)):
-                    param_type = entry.param[i].type_.content_[0].value
-                    if not isinstance(param_type, unicode):
-                        param_type = param_type.valueOf_
-                    if args[i] != param_type:
-                        equal = False
-                        break
-                if equal:
-                    data_object = entry
-                    break
+
+            # Render the matches to docutils nodes
+            target_handler = self.target_handler_factory.create_target_handler(
+                {'no-link': u''}, project_info, self.state.document
+                )
+            filter_ = self.filter_factory.create_outline_filter(self.options)
+            mask_factory = MaskFactory({'param': NoParameterNamesMask})
+            nodes = self.render(entry, project_info, filter_, target_handler, mask_factory)
+
+            # Render the nodes to text
+            signature = self.text_renderer.render(nodes, self.state.document)
+            signatures.append(signature)
+
+            # Parse the text to find the arguments
+            match_args = self.parse_args(signature)
+
+            # Match them against the arg spec
+            if args == match_args:
+                data_object = entry
+                break
 
         if not data_object:
-            raise UnableToResolveFunctionError()
+            raise UnableToResolveFunctionError(signatures)
 
         return data_object
 
@@ -238,7 +310,8 @@ class DoxygenClassLikeDirective(BaseDirective):
             )
         filter_ = self.filter_factory.create_class_filter(name, self.options)
 
-        return self.render(data_object, project_info, filter_, target_handler)
+        mask_factory = NullMaskFactory()
+        return self.render(data_object, project_info, filter_, target_handler, mask_factory)
 
 
 class DoxygenClassDirective(DoxygenClassLikeDirective):
@@ -335,7 +408,8 @@ class DoxygenContentBlockDirective(BaseDirective):
                 target_handler,
                 )
 
-            context = RenderContext([data_object, self.root_data_object])
+            mask_factory = NullMaskFactory()
+            context = RenderContext([data_object, self.root_data_object], mask_factory)
             object_renderer = renderer_factory.create_renderer(context)
             node_list.extend(object_renderer.render())
 
@@ -404,7 +478,8 @@ class DoxygenBaseItemDirective(BaseDirective):
             )
         filter_ = self.filter_factory.create_outline_filter(self.options)
 
-        return self.render(data_object, project_info, filter_, target_handler)
+        mask_factory = NullMaskFactory()
+        return self.render(data_object, project_info, filter_, target_handler, mask_factory)
 
 
 class DoxygenVariableDirective(DoxygenBaseItemDirective):
@@ -532,9 +607,12 @@ class DoxygenDirectiveFactory(object):
         "autodoxygenfile": AutoDoxygenFileDirective,
         }
 
-    def __init__(self, root_data_object, renderer_factory_creator_constructor, finder_factory,
-                 matcher_factory, project_info_factory, filter_factory, target_handler_factory):
+    def __init__(self, node_factory, text_renderer, root_data_object,
+                 renderer_factory_creator_constructor, finder_factory, matcher_factory,
+                 project_info_factory, filter_factory, target_handler_factory):
 
+        self.node_factory = node_factory
+        self.text_renderer = text_renderer
         self.root_data_object = root_data_object
         self.renderer_factory_creator_constructor = renderer_factory_creator_constructor
         self.finder_factory = finder_factory
@@ -549,7 +627,20 @@ class DoxygenDirectiveFactory(object):
         return self.create_directive_container("doxygenindex")
 
     def create_function_directive_container(self):
-        return self.create_directive_container("doxygenfunction")
+
+        # Pass text_renderer to the function directive
+        return DirectiveContainer(
+            self.directives["doxygenfunction"],
+            self.node_factory,
+            self.text_renderer,
+            self.root_data_object,
+            self.renderer_factory_creator_constructor,
+            self.finder_factory,
+            self.matcher_factory,
+            self.project_info_factory,
+            self.filter_factory,
+            self.target_handler_factory
+            )
 
     def create_struct_directive_container(self):
         return self.create_directive_container("doxygenstruct")
@@ -798,7 +889,11 @@ def setup(app):
 
     root_data_object = RootDataObject()
 
+    text_renderer = TextRenderer(app)
+
     directive_factory = DoxygenDirectiveFactory(
+        node_factory,
+        text_renderer,
         root_data_object,
         renderer_factory_creator_constructor,
         finder_factory,
@@ -807,6 +902,8 @@ def setup(app):
         filter_factory,
         target_handler_factory
         )
+
+    DoxygenFunctionDirective.app = app
 
     app.add_directive(
         "doxygenindex",

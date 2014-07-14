@@ -18,6 +18,20 @@ It produces this output:
    :project: structcmd
    :no-link:
 
+Separated declaration / implementation Example
+----------------------------------------------
+
+This should work::
+
+   .. doxygenfunction:: open_di
+      :project: decl_impl
+
+It produces this output:
+
+.. doxygenfunction:: open_di
+   :project: decl_impl
+   :no-link:
+
 Failing Example
 ---------------
 
