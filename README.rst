@@ -107,6 +107,9 @@ Change Log
 
 - Changes since the last release
 
+  - Improve matching for overloaded functions when using ``doxygenfunction``
+    directive. Also, provide a list of potential matches when no match is found.
+
   - Improved ``:members:`` implementation to handle inner classes properly.
 
   - Updated ``doxygenstruct`` to share the ``doxygenclass`` implementation path
