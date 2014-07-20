@@ -128,15 +128,10 @@ class DoxygenFunctionDirective(BaseDirective):
         # Extract arguments from the function name.
         args = self.parse_args(args)
 
-        matcher_stack = self.matcher_factory.create_matcher_stack(
-            {
-                "compound": self.matcher_factory.create_name_matcher(namespace),
-                "member": self.matcher_factory.create_name_type_matcher(function_name, "function")
-                },
-            "member"
-            )
+        finder_filter = self.filter_factory.create_function_finder_filter(namespace, function_name)
 
-        results = finder.find(matcher_stack)
+        matches = []
+        finder.filter_(finder_filter, matches)
 
         # Create it ahead of time as it is cheap and it is ugly to declare it for both exception
         # clauses below
@@ -150,13 +145,13 @@ class DoxygenFunctionDirective(BaseDirective):
             )
 
         try:
-            data_object = self.resolve_function(results, args, project_info)
+            data_object = self.resolve_function(matches, args, project_info)
         except NoMatchingFunctionError:
             return warning.warn('doxygenfunction: Cannot find function "{namespace}{function}" '
                                 '{tail}')
         except UnableToResolveFunctionError as error:
             message = 'doxygenfunction: Unable to resolve multiple matches for function ' \
-                '{namespace}{function}" with arguments ({args}) {tail}.\n' \
+                '"{namespace}{function}" with arguments ({args}) {tail}.\n' \
                 'Potential matches:\n'
 
             # We want to create a raw_text string for the console output and a set of docutils nodes
@@ -196,6 +191,11 @@ class DoxygenFunctionDirective(BaseDirective):
 
         paren_index = function_description.find('(')
         if paren_index == -1:
+            return []
+        # If it is empty parenthesis, then return empty list as we want empty parenthesis coming
+        # from the xml file to match the user's function when the user doesn't provide parenthesis
+        # ie. when there are no args anyway
+        elif function_description == '()':
             return []
         else:
             # Parse the function name string, eg. f(int, float) to
@@ -243,8 +243,11 @@ class DoxygenFunctionDirective(BaseDirective):
             signature = self.text_renderer.render(nodes, self.state.document)
             signatures.append(signature)
 
+            match = re.match(r"([^(]*)(.*)", signature)
+            function, match_args = match.group(1), match.group(2)
+
             # Parse the text to find the arguments
-            match_args = self.parse_args(signature)
+            match_args = self.parse_args(match_args)
 
             # Match them against the arg spec
             if args == match_args:
@@ -850,8 +853,9 @@ def setup(app):
     mtimer = MTimer(os.path.getmtime)
     file_state_cache = FileStateCache(mtimer, app)
     parser_factory = DoxygenParserFactory(cache, path_handler, file_state_cache)
-    matcher_factory = ItemMatcherFactory()
-    item_finder_factory_creator = DoxygenItemFinderFactoryCreator(parser_factory, matcher_factory)
+    glob_factory = GlobFactory(fnmatch.fnmatch)
+    filter_factory = FilterFactory(glob_factory, path_handler)
+    item_finder_factory_creator = DoxygenItemFinderFactoryCreator(parser_factory, filter_factory)
     index_parser = parser_factory.create_index_parser()
     finder_factory = FinderFactory(index_parser, item_finder_factory_creator)
 
@@ -882,9 +886,8 @@ def setup(app):
     # with the breathe_build_directory config variable
     build_dir = os.path.dirname(app.doctreedir.rstrip(os.sep))
     project_info_factory = ProjectInfoFactory(app.srcdir, build_dir, app.confdir, fnmatch.fnmatch)
-    glob_factory = GlobFactory(fnmatch.fnmatch)
-    filter_factory = FilterFactory(glob_factory, path_handler)
     target_handler_factory = TargetHandlerFactory(node_factory)
+    matcher_factory = ItemMatcherFactory()
 
     root_data_object = RootDataObject()
 

@@ -7,3 +7,15 @@
     \param flags Opening flags.
 */
 int open_di(const char *,int);
+
+
+
+namespace testnamespace {
+
+/*! \brief Some documentation.
+
+    More documentation.
+    */
+int another_open_di(const char *,int);
+
+}
