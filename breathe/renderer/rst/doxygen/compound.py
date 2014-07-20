@@ -264,9 +264,13 @@ class FuncMemberDefTypeSubRenderer(MemberDefTypeSubRenderer):
         nodes.append(paramlist)
 
         # Add CV-qualifiers
-        if self.data_object.const:
+        if self.data_object.const == 'yes':
             nodes.append(self.node_factory.Text(' const'))
-        if self.data_object.volatile:
+        # The doxygen xml output doesn't seem to properly register 'volatile' as the xml attribute
+        # 'volatile' so we have to check the argsstring for the moment. Maybe it'll change in
+        # doxygen at some point. Registered as bug:
+        #     https://bugzilla.gnome.org/show_bug.cgi?id=733451
+        if self.data_object.volatile == 'yes' or self.data_object.argsstring.endswith('volatile'):
             nodes.append(self.node_factory.Text(' volatile'))
 
         # Add `= 0` for pure virtual members.
