@@ -25,6 +25,7 @@ Thank you to:
 - `robo9k <https://github.com/robo9k>`_
 - `sieben <https://github.com/sieben>`_
 - `rweickelt <https://github.com/rweickelt>`_
+- `sam-roth <https://github.com/sam-roth>`_
 
 For their contributions; reporting bugs, suggesting features, improving the code
 and working on the documentation. And thanks to:

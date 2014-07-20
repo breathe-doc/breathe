@@ -94,6 +94,7 @@ Thank you to:
 - `robo9k <https://github.com/robo9k>`_
 - `sieben <https://github.com/sieben>`_
 - `rweickelt <https://github.com/rweickelt>`_
+- `sam-roth <https://github.com/sam-roth>`_
 
 For their contributions; reporting issues and improving the code and
 documentation. And thanks to:
@@ -106,6 +107,14 @@ Change Log
 ----------
 
 - Changes since the last release
+
+  - Improve output of const, volatile, virtual and pure-virtual keywords.
+
+  - Fix css class output for HTML so that object types rather than names are
+    output as the css classes. eg. 'function' instead of 'myFunction'.
+
+  - Fix issue with Breathe getting confused over functions appearing in header
+    and implementation files.
 
   - Improve matching for overloaded functions when using ``doxygenfunction``
     directive. Also, provide a list of potential matches when no match is found.
