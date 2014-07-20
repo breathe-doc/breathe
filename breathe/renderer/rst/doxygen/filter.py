@@ -171,7 +171,7 @@ We also override the binary 'and' (&), 'or' (|) and 'not' (~) operators in Pytho
 AndFilters, OrFilters and NotFilters respectively. We have to override the binary operators as they
 actual 'and', 'or' and 'not' operators cannot be overridden. So:
 
-    node.node_type == 'compound' & node.name == 'mygroup'
+    (node.node_type == 'compound') & (node.name == 'mygroup')
 
 Translates to:
 
@@ -182,6 +182,20 @@ Translates to:
 
 Where the former is hopefully more readable without sacrificing too much to the abstract magic of
 operator overloads.
+
+
+Operator Precedences & Extra Parenthesis
+''''''''''''''''''''''''''''''''''''''''
+
+As the binary operators have a lower operator precedence than '==' and '!=' and some other operators
+we have to include additional parenthesis in the expressions to group them as we want. So instead of
+writing:
+
+    node.node_type == 'compound' & node.name == 'mygroup'
+
+We have to write:
+
+    (node.node_type == 'compound') & (node.name == 'mygroup')
 
 """
 
@@ -224,6 +238,10 @@ class Selector(object):
     def valueOf(self):
         return AttributeAccessor(self, 'valueOf_')
 
+    @property
+    def id(self):
+        return AttributeAccessor(self, 'id')
+
 
 class Ancestor(Selector):
 
@@ -262,6 +280,9 @@ class Accessor(object):
 
     def has_content(self):
         return HasContentFilter(self)
+
+    def endswith(self, string):
+        return EndsWithFilter(self, string)
 
 
 class NameAccessor(Accessor):
@@ -368,6 +389,16 @@ class HasContentFilter(Filter):
         return bool(self.accessor(node_stack).content_)
 
 
+class EndsWithFilter(Filter):
+
+    def __init__(self, accessor, string):
+        self.accessor = accessor
+        self.string = string
+
+    def allow(self, node_stack):
+        return self.accessor(node_stack).endswith(self.string)
+
+
 class InFilter(Filter):
     """Checks if what is returned from the accessor is 'in' in the members"""
 
@@ -467,7 +498,6 @@ class NotFilter(Filter):
     def allow(self, node_stack):
 
         return not self.child_filter.allow(node_stack)
-
 
 
 class AndFilter(Filter):
@@ -1008,6 +1038,11 @@ class FilterFactory(object):
 
         return OpenFilter()
 
+    def create_id_filter(self, node_type, refid):
+
+        node = Node()
+        return (node.node_type == node_type) & (node.id == refid)
+
     def create_file_finder_filter(self, filename):
 
         filter_ = AndFilter(
@@ -1018,6 +1053,30 @@ class FilterFactory(object):
             )
 
         return filter_
+
+    def create_function_finder_filter(self, namespace, function_name):
+
+        node = Node()
+        parent = Parent()
+
+        node_matches = (node.node_type == 'member') \
+                & (node.kind == 'function') \
+                & (node.name == function_name)
+
+        if namespace:
+            parent_matches = (parent.node_type == 'compound') \
+                    & ((parent.kind == 'namespace') | (parent.kind == 'class')) \
+                    & (parent.name == namespace)
+
+            return parent_matches & node_matches
+
+        else:
+            parent_is_compound = parent.node_type == 'compound'
+            parent_is_file = (parent.kind == 'file') & (~ parent.name.endswith('.c'))
+            parent_is_not_file = parent.kind != 'file'
+
+            return (parent_is_compound & parent_is_file & node_matches) \
+                | (parent_is_compound & parent_is_not_file & node_matches)
 
     def create_finder_filter(self, kind, name):
         """Returns a filter which looks for the compound node from the index which is a group node
