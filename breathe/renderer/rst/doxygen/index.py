@@ -65,7 +65,7 @@ def render_compound(
 
     node = node_factory.desc()
     node.document = document
-    node['objtype'] = name
+    node['objtype'] = kind
     node.append(signode)
     node.append(contentnode)
 

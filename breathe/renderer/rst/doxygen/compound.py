@@ -246,6 +246,10 @@ class FuncMemberDefTypeSubRenderer(MemberDefTypeSubRenderer):
             template_nodes.append(self.node_factory.Text("> "))
             nodes.append(self.node_factory.line("", *template_nodes))
 
+        # Note whether a member function is virtual
+        if self.data_object.virt != 'non-virtual':
+            nodes.append(self.node_factory.Text('virtual '))
+
         # Get the function type and name
         nodes.extend(MemberDefTypeSubRenderer.title(self))
 
@@ -258,6 +262,20 @@ class FuncMemberDefTypeSubRenderer(MemberDefTypeSubRenderer):
             param.extend(renderer.render())
             paramlist.append(param)
         nodes.append(paramlist)
+
+        # Add CV-qualifiers
+        if self.data_object.const == 'yes':
+            nodes.append(self.node_factory.Text(' const'))
+        # The doxygen xml output doesn't seem to properly register 'volatile' as the xml attribute
+        # 'volatile' so we have to check the argsstring for the moment. Maybe it'll change in
+        # doxygen at some point. Registered as bug:
+        #     https://bugzilla.gnome.org/show_bug.cgi?id=733451
+        if self.data_object.volatile == 'yes' or self.data_object.argsstring.endswith('volatile'):
+            nodes.append(self.node_factory.Text(' volatile'))
+
+        # Add `= 0` for pure virtual members.
+        if self.data_object.virt == 'pure-virtual':
+            nodes.append(self.node_factory.Text(' = 0'))
 
         return nodes
 
