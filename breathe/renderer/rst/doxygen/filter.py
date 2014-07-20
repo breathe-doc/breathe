@@ -281,8 +281,8 @@ class Accessor(object):
     def has_content(self):
         return HasContentFilter(self)
 
-    def endswith(self, string):
-        return EndsWithFilter(self, string)
+    def endswith(self, options):
+        return EndsWithFilter(self, options)
 
 
 class NameAccessor(Accessor):
@@ -390,13 +390,21 @@ class HasContentFilter(Filter):
 
 
 class EndsWithFilter(Filter):
+    """Detects if the string result of the accessor ends with any of the strings in the ``options``
+    iterable parameter.
+    """
 
-    def __init__(self, accessor, string):
+    def __init__(self, accessor, options):
         self.accessor = accessor
-        self.string = string
+        self.options = options
 
     def allow(self, node_stack):
-        return self.accessor(node_stack).endswith(self.string)
+        string = self.accessor(node_stack) 
+        for entry in self.options:
+            if string.endswith(entry):
+                return True
+
+        return False
 
 
 class InFilter(Filter):
@@ -602,6 +610,7 @@ class FilterFactory(object):
         self.globber_factory = globber_factory
         self.path_handler = path_handler
         self.default_members = ()
+        self.implementation_filename_extensions = ()
 
     def create_render_filter(self, kind, options):
         """Render filter for group & namespace blocks"""
@@ -1071,8 +1080,9 @@ class FilterFactory(object):
             return parent_matches & node_matches
 
         else:
+            is_implementation_file = parent.name.endswith(self.implementation_filename_extensions)
             parent_is_compound = parent.node_type == 'compound'
-            parent_is_file = (parent.kind == 'file') & (~ parent.name.endswith('.c'))
+            parent_is_file = (parent.kind == 'file') & (~ is_implementation_file)
             parent_is_not_file = parent.kind != 'file'
 
             return (parent_is_compound & parent_is_file & node_matches) \
@@ -1109,4 +1119,7 @@ class FilterFactory(object):
         This method is called on the 'builder-init' event in Sphinx"""
 
         self.default_members = app.config.breathe_default_members
+
+        self.implementation_filename_extensions = \
+            app.config.breathe_implementation_filename_extensions
 
