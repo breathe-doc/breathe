@@ -1,8 +1,8 @@
 
-from breathe.renderer.rst.doxygen.base import RenderContext
-from breathe.renderer.rst.doxygen.mask import NullMaskFactory
-from breathe.directive.base import BaseDirective
-from breathe.project import ProjectError
+from ..renderer.rst.doxygen.base import RenderContext
+from ..renderer.rst.doxygen.mask import NullMaskFactory
+from ..directive.base import BaseDirective
+from ..project import ProjectError
 from .base import WarningHandler, create_warning
 
 from docutils.parsers.rst.directives import unchanged_required, flag

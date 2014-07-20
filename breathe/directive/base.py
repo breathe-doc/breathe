@@ -1,10 +1,10 @@
 
-from breathe.renderer.rst.doxygen.base import RenderContext
-from breathe.renderer.rst.doxygen import format_parser_error
-from breathe.renderer.rst.doxygen.mask import NullMaskFactory
-from breathe.parser import ParserError, FileIOError
-from breathe.project import ProjectError
-from breathe.finder.core import NoMatchesError
+from ..renderer.rst.doxygen.base import RenderContext
+from ..renderer.rst.doxygen import format_parser_error
+from ..renderer.rst.doxygen.mask import NullMaskFactory
+from ..parser import ParserError, FileIOError
+from ..project import ProjectError
+from ..finder.core import NoMatchesError
 
 from docutils.parsers import rst
 from docutils.parsers.rst.directives import unchanged_required, flag

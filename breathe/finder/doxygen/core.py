@@ -1,6 +1,6 @@
 
-from breathe.finder.doxygen import index as indexfinder
-from breathe.finder.doxygen import compound as compoundfinder
+from . import index as indexfinder
+from . import compound as compoundfinder
 
 
 class CreateCompoundTypeSubFinder(object):
@@ -31,16 +31,16 @@ class DoxygenItemFinderFactory(object):
 
 class DoxygenItemFinderFactoryCreator(object):
 
-    def __init__(self, parser_factory, matcher_factory):
+    def __init__(self, parser_factory, filter_factory):
 
         self.parser_factory = parser_factory
-        self.matcher_factory = matcher_factory
+        self.filter_factory = filter_factory
 
     def create_factory(self, project_info):
 
         finders = {
             "doxygen": indexfinder.DoxygenTypeSubItemFinder,
-            "compound": CreateCompoundTypeSubFinder(self.parser_factory, self.matcher_factory),
+            "compound": CreateCompoundTypeSubFinder(self.parser_factory, self.filter_factory),
             "member": indexfinder.MemberTypeSubItemFinder,
             "doxygendef": compoundfinder.DoxygenTypeSubItemFinder,
             "compounddef": compoundfinder.CompoundDefTypeSubItemFinder,

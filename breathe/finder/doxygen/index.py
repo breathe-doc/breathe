@@ -1,5 +1,5 @@
 
-from breathe.finder.doxygen.base import ItemFinder, stack
+from .base import ItemFinder, stack
 
 
 class DoxygenTypeSubItemFinder(ItemFinder):
@@ -33,10 +33,10 @@ class DoxygenTypeSubItemFinder(ItemFinder):
 
 class CompoundTypeSubItemFinder(ItemFinder):
 
-    def __init__(self, matcher_factory, compound_parser, *args):
+    def __init__(self, filter_factory, compound_parser, *args):
         ItemFinder.__init__(self, *args)
 
-        self.matcher_factory = matcher_factory
+        self.filter_factory = filter_factory
         self.compound_parser = compound_parser
 
     def find(self, matcher_stack):
@@ -77,13 +77,37 @@ class CompoundTypeSubItemFinder(ItemFinder):
 
         node_stack = stack(self.data_object, ancestors)
 
+        # Match against compound object
         if filter_.allow(node_stack):
             matches.append(self.data_object)
 
-        file_data = self.compound_parser.parse(self.data_object.refid)
-        finder = self.item_finder_factory.create_finder(file_data)
+        # Descend to member children
+        members = self.data_object.get_member()
+        member_matches = []
+        for member in members:
+            member_finder = self.item_finder_factory.create_finder(member)
+            member_finder.filter_(node_stack, filter_, member_matches)
 
-        finder.filter_(node_stack, filter_, matches)
+        results = []
+
+        # If there are members in this compound that match the criteria
+        # then load up the file for this compound and get the member data objects
+        if member_matches:
+
+            file_data = self.compound_parser.parse(self.data_object.refid)
+            finder = self.item_finder_factory.create_finder(file_data)
+
+            for member_data in member_matches:
+                ref_filter = self.filter_factory.create_id_filter('memberdef', member_data.refid)
+                finder.filter_(node_stack, ref_filter, matches)
+
+        else:
+
+            # Read in the xml file referenced by the compound and descend into that as well
+            file_data = self.compound_parser.parse(self.data_object.refid)
+            finder = self.item_finder_factory.create_finder(file_data)
+
+            finder.filter_(node_stack, filter_, matches)
 
 
 class MemberTypeSubItemFinder(ItemFinder):
@@ -94,5 +118,13 @@ class MemberTypeSubItemFinder(ItemFinder):
             return [self.data_object]
         else:
             return []
+
+    def filter_(self, ancestors, filter_, matches):
+
+        node_stack = stack(self.data_object, ancestors)
+
+        # Match against member object
+        if filter_.allow(node_stack):
+            matches.append(self.data_object)
 
 

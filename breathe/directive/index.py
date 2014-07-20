@@ -1,10 +1,10 @@
 
-from breathe.renderer.rst.doxygen.base import RenderContext
-from breathe.renderer.rst.doxygen.mask import NullMaskFactory
-from breathe.renderer.rst.doxygen import format_parser_error
-from breathe.directive.base import BaseDirective
-from breathe.project import ProjectError
-from breathe.parser import ParserError, FileIOError
+from ..renderer.rst.doxygen.base import RenderContext
+from ..renderer.rst.doxygen.mask import NullMaskFactory
+from ..renderer.rst.doxygen import format_parser_error
+from ..directive.base import BaseDirective
+from ..project import ProjectError
+from ..parser import ParserError, FileIOError
 from .base import WarningHandler, create_warning
 
 from docutils.parsers.rst.directives import unchanged_required, flag
