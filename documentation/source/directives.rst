@@ -440,3 +440,20 @@ Config Values
 
       breathe_default_members = ('members', 'undoc-members')
 
+.. _breathe-implementation-filename-extensions:
+
+.. confval:: breathe_implementation_filename_extensions
+
+   Provides a list of the filename extensions which are considered to be
+   implementation files. These files are ignored when the ``doxygenfunction``
+   directive looks for unnamespaced function names. This is to avoid the issue
+   where the same function name appears in the doxygen XML output for a header
+   file and implementation file because the declaration is in one and the
+   definition is in the other. Doxygen appends the documentation from the
+   definition to the XML for the declaration so we don't miss any documentation
+   information from the implementation files. The default value for this
+   variable is::
+
+      breathe_implementation_filename_extensions = ['.c', '.cc', '.cpp']
+
+

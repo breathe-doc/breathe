@@ -1,5 +1,5 @@
 
-from breathe.finder.doxygen.base import ItemFinder, stack
+from .base import ItemFinder, stack
 
 
 class DoxygenTypeSubItemFinder(ItemFinder):

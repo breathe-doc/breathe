@@ -1,9 +1,9 @@
 
-from breathe.renderer.rst.doxygen.base import Renderer, RenderContext
-from breathe.renderer.rst.doxygen import index as indexrenderer
-from breathe.renderer.rst.doxygen import compound as compoundrenderer
+from .base import Renderer, RenderContext
+from . import index as indexrenderer
+from . import compound as compoundrenderer
 
-from breathe.parser.doxygen import index, compound, compoundsuper
+from ....parser.doxygen import index, compound, compoundsuper
 
 from docutils import nodes
 import textwrap
