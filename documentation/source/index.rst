@@ -31,7 +31,7 @@ relies on the Doxygen's xml output.
       official source of information.
 
 
-Features
+Overview
 --------
 
 * **Simple setup** - one doxygen config value, one Sphinx config value and one
@@ -46,26 +46,47 @@ Features
 * **Basic support for Sphinx domains** - Link to functions in the breathe output
   with a standard Sphinx domain reference.
 
-Contents
---------
+Setup & Usage
+-------------
 
 .. toctree::
    :maxdepth: 1
 
    quickstart
    directives
+   readthedocs
+
+Features
+--------
+
+.. toctree::
+   :maxdepth: 1
+
    markups
+   latexmath
    domains
    customcss
    groups
    lists
    template
-   latexmath
-   readthedocs
+
+Contributing
+------------
+
+.. toctree::
+   :maxdepth: 1
+
    contributing
    codeguide
-   testpages
    credits
+
+Example/Test Pages
+------------------
+
+.. toctree::
+   :maxdepth: 1
+
+   testpages
 
 Download
 --------
