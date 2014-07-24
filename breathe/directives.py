@@ -77,7 +77,7 @@ class TextRenderer(object):
         writer = TextWriter(TextBuilder(self.app))
         output = writer.write(new_document, FakeDestination())
 
-        return output.split('\n')[0]
+        return output.strip()
 
 
 # Directives
@@ -165,8 +165,10 @@ class DoxygenFunctionDirective(BaseDirective):
             # a set to remove duplicates. Should be fixed!
             for i, entry in enumerate(set(error.signatures)):
                 if i: literal_text += '\n'
-                literal_text += '%s' % entry
-                raw_text += '    %s\n' % entry
+                # Replace new lines with a new line & enough spacing to reach the appropriate
+                # alignment for our simple plain text list
+                literal_text += '- %s' % entry.replace('\n', '\n  ')
+                raw_text += '    - %s\n' % entry.replace('\n', '\n      ')
             block = self.node_factory.literal_block('', '', self.node_factory.Text(literal_text))
             formatted_message = warning.format(message)
             warning_nodes = [
@@ -243,7 +245,7 @@ class DoxygenFunctionDirective(BaseDirective):
             target_handler = self.target_handler_factory.create_target_handler(
                 {'no-link': u''}, project_info, self.state.document
                 )
-            filter_ = self.filter_factory.create_outline_filter(self.options)
+            filter_ = self.filter_factory.create_outline_filter({'outline', ''})
             mask_factory = MaskFactory({'param': NoParameterNamesMask})
             nodes = self.render(entry, project_info, filter_, target_handler, mask_factory)
 
