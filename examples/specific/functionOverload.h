@@ -37,3 +37,11 @@ void h(std::string, const MyType& mytype);
 //! Another function which takes a const basic type
 void h(std::string, const int myint);
 
+//! Another function which takes a const basic type
+template <typename T>
+void h(std::string, const T myType);
+
+//! Another function which takes a const basic type
+template <typename T, typename U>
+void h(std::string, const T m, const U n);
+
