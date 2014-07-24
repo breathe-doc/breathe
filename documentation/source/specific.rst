@@ -80,6 +80,10 @@ Function Overloads
    :project: functionOverload
    :no-link:
 
+.. doxygenfunction:: h(std::string, const T, const U)
+   :project: functionOverload
+   :no-link:
+
 Program Listing
 ---------------
 
