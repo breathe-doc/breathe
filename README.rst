@@ -108,6 +108,10 @@ Change Log
 
 - Changes since the last release
 
+  - No changes since v3.0.0.
+
+- Breathe v3.0.0
+
   - Improve output of const, volatile, virtual and pure-virtual keywords.
 
   - Fix css class output for HTML so that object types rather than names are
