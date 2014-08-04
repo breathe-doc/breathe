@@ -25,7 +25,7 @@ class NoParameterNamesMask(object):
 
     def __getattr__(self, attr):
 
-        if attr in ['declname', 'defname']:
+        if attr in ['declname', 'defname', 'defval']:
             return None
 
         return getattr(self.data_object, attr)
