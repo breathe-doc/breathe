@@ -68,6 +68,16 @@ Examples of Breathe used by other projects:
 If you have an example you would like listed here, please make a github issue
 with the details.
 
+Alternatives
+------------
+
+Breathe is not the only solution to this problem. These are the alternatives
+that we know about. We are very happy to list others if you'd like to provide a
+link in a github issue or get in touch on the mailing list.
+
+- `Gasp <https://github.com/troelsfr/Gasp>`_
+- `Robin <https://bitbucket.org/reima/robin>`_
+
 Credits
 -------
 
