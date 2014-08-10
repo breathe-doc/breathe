@@ -14,7 +14,7 @@ Breathe is available from github and `PyPI, the Python Package Index
 Documentation
 -------------
 
-The documentation is available `here <http://breathe.readthedocs.org/>`_. Thank
+The documentation is available `here <http://breathe.readthedocs.org/>`__. Thank
 you to the people running `Read the Docs <http://readthedocs.org>`_ for such an
 excellent service.
 
@@ -52,11 +52,12 @@ the latest possible.
 Mailing List
 ------------
 
-There is a mailing list available thanks to `LibreList <http://librelist.com>`_::
+There is a mailing list available on Google groups:
 
-    breathe@librelist.com
+    https://groups.google.com/forum/#!forum/sphinx-breathe
 
-The archives are available `here <http://librelist.com/browser/breathe/>`_.
+The previous mailing list was on `librelist.com <http://librelist.com>`__ and the
+archives are available `here <http://librelist.com/browser/breathe/>`__.
 
 Examples
 --------
