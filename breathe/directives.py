@@ -245,7 +245,7 @@ class DoxygenFunctionDirective(BaseDirective):
             target_handler = self.target_handler_factory.create_target_handler(
                 {'no-link': u''}, project_info, self.state.document
                 )
-            filter_ = self.filter_factory.create_outline_filter({'outline', ''})
+            filter_ = self.filter_factory.create_outline_filter(set(['outline', '']))
             mask_factory = MaskFactory({'param': NoParameterNamesMask})
             nodes = self.render(entry, project_info, filter_, target_handler, mask_factory)
 
