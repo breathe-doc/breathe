@@ -183,8 +183,8 @@ breathe_projects = {
     "userdefined":"../../examples/specific/userdefined/xml/",
     "template_function":"../../examples/specific/template_function/xml/",
     "template_class":"../../examples/specific/template_class/xml/",
-    "template_class_non_type":
-        "../../examples/specific/template_class_non_type/xml/",
+    "template_class_non_type": "../../examples/specific/template_class_non_type/xml/",
+    "template_specialisation": "../../examples/specific/template_specialisation/xml/",
     "latexmath":"../../examples/specific/latexmath/xml/",
     "functionOverload":"../../examples/specific/functionOverload/xml/",
     "programlisting":"../../examples/specific/programlisting/xml/",

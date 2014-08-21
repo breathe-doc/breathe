@@ -54,6 +54,38 @@ It produces this output:
    :no-link:
 
 
+Template Specialisation Example
+-------------------------------
+
+You can reference class template specialisations by include the specialisation
+in the name:
+
+.. code-block:: rst
+
+   .. doxygenclass:: TemplateClass< T * >
+      :project: template_specialisation
+
+Produces this output:
+
+.. doxygenclass:: TemplateClass< T * >
+   :project: template_specialisation
+   :no-link:
+
+Where as without the specialisation, the directive references the generic
+declaration:
+
+.. code-block:: rst
+
+   .. doxygenclass:: TemplateClass
+      :project: template_specialisation
+
+Produces this output:
+
+.. doxygenclass:: TemplateClass
+   :project: template_specialisation
+   :no-link:
+
+
 Members Example
 ---------------
 

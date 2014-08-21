@@ -2,7 +2,9 @@
 /.project
 /.pydevproject
 build/
-Breathe.egg-info/
+/dist
+/breathe
+/breathe.egg-info
 
 # Folder for placing stuff to be ignored
 /ignored
