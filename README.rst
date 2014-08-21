@@ -117,9 +117,26 @@ documentation. And thanks to:
 Change Log
 ----------
 
+Inspired by `Keepachangelog.com <http://keepachangelog.com/>`__.
+
 - Changes since the last release
 
-  - No changes since v3.0.0.
+  - Added
+
+    - Nothing
+
+  - Deprecated
+
+    - Nothing
+
+  - Removed
+
+    - Nothing
+
+  - Fixed
+
+    - The ``doxygenclass`` directive can now reference template specialisations
+      by specifying the specialisation in the argument name.
 
 - Breathe v3.0.0
 

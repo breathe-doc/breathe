@@ -31,6 +31,7 @@ all: typedef/xml/index.xml \
 	template_class/xml/index.xml \
 	template_class_non_type/xml/index.xml \
 	template_function/xml/index.xml \
+	template_specialisation/xml/index.xml \
 	userdefined/xml/index.xml \
 	fixedwidthfont/xml/index.xml \
 	latexmath/xml/index.xml \
@@ -48,7 +49,8 @@ all: typedef/xml/index.xml \
 clean:
 	rm -rf typedef class nutshell alias rst inline namespacefile c_file \
 		members multifilexml userdefined fixedwidthfont latexmath functionOverload \
-		programlisting image name auto union group struct decl_impl
+		programlisting image name auto union group struct decl_impl \
+		template_class template_class_non_type template_function template_specialisation
 
 typedef/xml/index.xml: typedef.h typedef.cfg
 	$(DOXYGEN) typedef.cfg
@@ -88,6 +90,9 @@ template_class_non_type/xml/index.xml: template_class_non_type.h template_class_
 
 template_function/xml/index.xml: template_function.h template_function.cfg
 	$(DOXYGEN) template_function.cfg
+
+template_specialisation/xml/index.xml: template_specialisation.h template_specialisation.cfg
+	$(DOXYGEN) template_specialisation.cfg
 
 userdefined/xml/index.xml: userdefined.h userdefined.cfg
 	$(DOXYGEN) userdefined.cfg
