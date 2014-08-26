@@ -1002,3 +1002,17 @@ class DocListItemTypeSubRenderer(Renderer):
             nodelist.extend(renderer.render())
 
         return [self.node_factory.list_item("", *nodelist)]
+
+
+class DocHeadingTypeSubRenderer(Renderer):
+    """
+        Heading renderer.
+
+        Renders embedded headlines as emphasized text. Different heading levels
+        are not supported.
+    """
+
+    def render(self):
+        text = self.data_object.content_[0].getValue()
+        node = self.node_factory.emphasis(text=text)
+        return [node]
