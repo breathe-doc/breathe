@@ -866,6 +866,10 @@ class docParaTypeSub(supermod.docParaType):
             obj_ = supermod.docListType.factory(subtype="ordered")
             obj_.build(child_)
             self.content.append(obj_)
+        elif child_.nodeType == Node.ELEMENT_NODE and nodeName_ == 'heading':
+            obj_ = supermod.docHeadingType.factory()
+            obj_.build(child_)
+            self.content.append(obj_)
 
 supermod.docParaType.subclass = docParaTypeSub
 # end class docParaTypeSub
