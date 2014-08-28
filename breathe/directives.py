@@ -483,7 +483,7 @@ class DoxygenBaseItemDirective(BaseDirective):
         except NoMatchesError as e:
             display_name = "%s::%s" % (namespace, name) if namespace else name
             warning = create_warning(project_info, self.state, self.lineno, kind=self.kind,
-                                     name=display_name)
+                                     display_name=display_name)
             return warning.warn('doxygen{kind}: Cannot find {kind} "{display_name}" {tail}')
 
         target_handler = self.target_handler_factory.create_target_handler(
