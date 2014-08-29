@@ -18,117 +18,48 @@ DOCDIR    = $(INSTALL)/share/doc/packages/doxygen
 QTDIR     = 
 HAVE_DOT  = /usr/bin/dot
 
-all: typedef/xml/index.xml \
-	class/xml/index.xml \
-	nutshell/xml/index.xml \
-	alias/xml/index.xml \
-	rst/xml/index.xml \
-	inline/xml/index.xml \
-	members/xml/index.xml \
-	c_file/xml/index.xml \
-	namespacefile/xml/index.xml \
-	multifilexml/xml/index.xml \
-	template_class/xml/index.xml \
-	template_class_non_type/xml/index.xml \
-	template_function/xml/index.xml \
-	template_specialisation/xml/index.xml \
-	userdefined/xml/index.xml \
-	fixedwidthfont/xml/index.xml \
-	latexmath/xml/index.xml \
-	functionOverload/xml/index.xml \
-	programlisting/xml/index.xml \
-	image/xml/index.xml \
-	auto/xml/index.xml \
-	name/xml/index.xml \
-	union/xml/index.xml \
-	group/xml/index.xml \
-	struct/xml/index.xml \
-	decl_impl/xml/index.xml \
-	lists/xml/index.xml
-	
+projects  = nutshell alias rst inline namespacefile c_file \
+			members userdefined fixedwidthfont latexmath functionOverload \
+			image name union group struct qtslots \
+			template_class template_class_non_type template_function template_specialisation
+
+special   = programlisting decl_impl multifilexml auto class typedef
+
+xmls := $(foreach project, $(projects), $(project)/xml/index.xml)
+
+special_xmls = $(foreach project, $(special), $(project)/xml/index.xml)
+
+all: $(xmls) $(special_xmls)
+
 clean:
-	rm -rf typedef class nutshell alias rst inline namespacefile c_file \
-		members multifilexml userdefined fixedwidthfont latexmath functionOverload \
-		programlisting image name auto union group struct decl_impl \
-		template_class template_class_non_type template_function template_specialisation
+	rm -rf $(projects) $(special)
 
-typedef/xml/index.xml: typedef.h typedef.cfg
-	$(DOXYGEN) typedef.cfg
 
-class/xml/index.xml: class.h class.cpp class.cfg
-	$(DOXYGEN) class.cfg
+# General pattern
+# ---------------
 
-nutshell/xml/index.xml: nutshell.h nutshell.cfg
-	$(DOXYGEN) nutshell.cfg
+$(xmls): %/xml/index.xml: %.cfg %.h 
+	$(DOXYGEN) $<
 
-alias/xml/index.xml: alias.h alias.cfg
-	$(DOXYGEN) alias.cfg
 
-rst/xml/index.xml: rst.h rst.cfg
-	$(DOXYGEN) rst.cfg
-
-inline/xml/index.xml: inline.h inline.cfg
-	$(DOXYGEN) inline.cfg
-
-members/xml/index.xml: members.h members.cfg
-	$(DOXYGEN) members.cfg
-
-c_file/xml/index.xml: c_file.h c_file.cfg
-	$(DOXYGEN) c_file.cfg
-
-namespacefile/xml/index.xml: namespacefile.h namespacefile.cfg
-	$(DOXYGEN) namespacefile.cfg
-	
-multifilexml/xml/index.xml: multifile/one/Util.h multifile/two/Util.h multifile.cfg
-	$(DOXYGEN) multifile.cfg
-
-template_class/xml/index.xml: template_class.h template_class.cfg
-	$(DOXYGEN) template_class.cfg
-
-template_class_non_type/xml/index.xml: template_class_non_type.h template_class_non_type.cfg
-	$(DOXYGEN) template_class_non_type.cfg
-
-template_function/xml/index.xml: template_function.h template_function.cfg
-	$(DOXYGEN) template_function.cfg
-
-template_specialisation/xml/index.xml: template_specialisation.h template_specialisation.cfg
-	$(DOXYGEN) template_specialisation.cfg
-
-userdefined/xml/index.xml: userdefined.h userdefined.cfg
-	$(DOXYGEN) userdefined.cfg
-
-fixedwidthfont/xml/index.xml: fixedwidthfont.h fixedwidthfont.cfg
-	$(DOXYGEN) fixedwidthfont.cfg
-
-latexmath/xml/index.xml: latexmath.h latexmath.cfg
-	$(DOXYGEN) latexmath.cfg
-
-functionOverload/xml/index.xml: functionOverload.h functionOverload.cfg
-	$(DOXYGEN) functionOverload.cfg
+# Special Cases
+# -------------
 
 programlisting/xml/index.xml: programlisting.h programlisting.cfg programlistinginclude.txt
 	$(DOXYGEN) programlisting.cfg
 
-image/xml/index.xml: image.h image.cfg
-	$(DOXYGEN) image.cfg
+decl_impl/xml/index.xml: decl_impl.h decl_impl.c decl_impl.cfg
+	$(DOXYGEN) decl_impl.cfg
+
+multifilexml/xml/index.xml: multifile/one/Util.h multifile/two/Util.h multifile.cfg
+	$(DOXYGEN) multifile.cfg
 
 auto/xml/index.xml: auto_class.h auto_function.h auto.cfg
 	$(DOXYGEN) auto.cfg
 
-name/xml/index.xml: name.h name.cfg
-	$(DOXYGEN) name.cfg
+class/xml/index.xml: class.h class.cpp class.cfg
+	$(DOXYGEN) class.cfg
 
-lists/xml/index.xml: lists.h lists.cfg
-	$(DOXYGEN) lists.cfg
+typedef/xml/index.xml: typedef.h typedef.cfg
+	$(DOXYGEN) typedef.cfg
 
-union/xml/index.xml: union.h union.cfg
-	$(DOXYGEN) union.cfg
-
-group/xml/index.xml: group.h group.cfg
-	$(DOXYGEN) group.cfg
-
-struct/xml/index.xml: struct.h struct.cfg
-	$(DOXYGEN) struct.cfg
-
-decl_impl/xml/index.xml: decl_impl.h decl_impl.c decl_impl.cfg
-	$(DOXYGEN) decl_impl.cfg

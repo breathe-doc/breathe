@@ -218,6 +218,26 @@ It produces this output:
    :no-link:
 
 
+Qt Slots Example
+----------------
+
+Doxygen is aware of Qt Slots and so Breathe can pick them up and display them in
+the output. They are displayed in appropriate ``Public Slots``, ``Protected
+Slots`` and ``Private Slots`` sections.
+
+.. code-block:: rst
+
+   .. doxygenclass:: QtSlotExample
+      :project: qtslots
+      :members:
+
+Produces the following output:
+
+.. doxygenclass:: QtSlotExample
+   :project: qtslots
+   :members:
+   :no-link:
+
 Failing Example
 ---------------
 

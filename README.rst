@@ -138,6 +138,9 @@ Inspired by `Keepachangelog.com <http://keepachangelog.com/>`__.
     - The ``doxygenclass`` directive can now reference template specialisations
       by specifying the specialisation in the argument name.
 
+    - Displaying function parameters for Qt slots output. Previously they were
+      missing even though Qt Slots are essentially just functions.
+
 - Breathe v3.0.0
 
   - Improve output of const, volatile, virtual and pure-virtual keywords.
