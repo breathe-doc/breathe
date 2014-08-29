@@ -44,7 +44,7 @@ public:
 
         More details in the header file.
       */
-    void function();
+    void function(int myParameter);
  
     //! \brief non-namespaced class other function
     void anotherFunction();
