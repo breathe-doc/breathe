@@ -106,6 +106,7 @@ Thank you to:
 - `sieben <https://github.com/sieben>`_
 - `rweickelt <https://github.com/rweickelt>`_
 - `sam-roth <https://github.com/sam-roth>`_
+- `bnewbold <https://github.com/bnewbold>`_
 
 For their contributions; reporting issues and improving the code and
 documentation. And thanks to:
@@ -140,6 +141,9 @@ Inspired by `Keepachangelog.com <http://keepachangelog.com/>`__.
 
     - Displaying function parameters for Qt slots output. Previously they were
       missing even though Qt Slots are essentially just functions.
+
+    - Crash when generating warning about being unable to find a define,
+      variable, enum, typedef or union.
 
 - Breathe v3.0.0
 
