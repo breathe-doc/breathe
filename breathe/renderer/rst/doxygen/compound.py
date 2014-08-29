@@ -449,9 +449,11 @@ class ParamTypeSubRenderer(Renderer):
             if nodelist: nodelist.append(self.node_factory.Text(" "))
             nodelist.append(self.node_factory.emphasis(text=self.data_object.declname))
 
-        if self.output_defname and self.data_object.defname:
+        elif self.output_defname and self.data_object.defname:
+            # We only want to output the definition name (from the cpp file) if the declaration name
+            # (from header file) isn't present
             if nodelist: nodelist.append(self.node_factory.Text(" "))
-            nodelist.append(self.node_factory.Text(self.data_object.defname))
+            nodelist.append(self.node_factory.emphasis(text=self.data_object.defname))
 
         # Default value
         if self.data_object.defval:
