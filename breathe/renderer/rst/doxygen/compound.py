@@ -21,7 +21,7 @@ class CompoundDefTypeSubRenderer(Renderer):
                 ("public-type", "Public Type"),
                 ("public-func", "Public Functions"),
                 ("public-attrib", "Public Members"),
-                ("public-slot", "Public Slot"),
+                ("public-slot", "Public Slots"),
                 ("signal", "Signal"),
                 ("dcop-func",  "DCOP Function"),
                 ("property",  "Property"),

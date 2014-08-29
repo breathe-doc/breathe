@@ -177,7 +177,7 @@ class DoxygenToRstRendererFactory(object):
 
         if node_type == "memberdef":
 
-            if data_object.kind == "function":
+            if data_object.kind in ("function", "slot"):
                 Renderer = compoundrenderer.FuncMemberDefTypeSubRenderer
             elif data_object.kind == "enum":
                 Renderer = compoundrenderer.EnumMemberDefTypeSubRenderer
