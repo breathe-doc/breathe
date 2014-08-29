@@ -11,6 +11,7 @@ in order to test that the warnings work without crashing the build process.
    class
    function
    group
+   define
 
 
 
