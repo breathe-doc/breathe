@@ -145,6 +145,10 @@ Inspired by `Keepachangelog.com <http://keepachangelog.com/>`__.
     - Crash when generating warning about being unable to find a define,
       variable, enum, typedef or union.
 
+    - Only output the definition name for a function parameter if the declartion
+      name is not available. Previously, where they were both available we were
+      getting two names next to each other for no good reason.
+
 - Breathe v3.0.0
 
   - Improve output of const, volatile, virtual and pure-virtual keywords.
