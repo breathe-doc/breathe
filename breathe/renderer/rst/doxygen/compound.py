@@ -1009,6 +1009,12 @@ class DocHeadingTypeSubRenderer(Renderer):
     """
 
     def render(self):
-        text = self.data_object.content_[0].getValue()
-        node = self.node_factory.emphasis(text=text)
-        return [node]
+
+        nodelist = []
+        for item in self.data_object.content_:
+            context = self.context.create_child_context(item)
+            renderer = self.renderer_factory.create_renderer(context)
+            nodelist.extend(renderer.render())
+
+        return [self.node_factory.emphasis("", "", *nodelist)]
+
