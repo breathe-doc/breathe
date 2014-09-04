@@ -629,6 +629,26 @@ class docHeadingTypeSub(supermod.docHeadingType):
 
     def __init__(self, level=None, valueOf_='', mixedclass_=None, content_=None):
         supermod.docHeadingType.__init__(self, mixedclass_, content_)
+
+    def buildChildren(self, child_, nodeName_):
+        supermod.docHeadingType.buildChildren(self, child_, nodeName_)
+
+        # Account for styled content in the heading. This might need to be expanded to include other
+        # nodes as it seems from the xsd that headings can have a lot of different children but we
+        # really don't expect most of them to come up.
+        if child_.nodeType == Node.ELEMENT_NODE and (
+                nodeName_ == 'bold' or
+                nodeName_ == 'emphasis' or
+                nodeName_ == 'computeroutput' or
+                nodeName_ == 'subscript' or
+                nodeName_ == 'superscript' or
+                nodeName_ == 'center' or
+                nodeName_ == 'small'):
+            obj_ = supermod.docMarkupType.factory()
+            obj_.build(child_)
+            obj_.type_ = nodeName_
+            self.content_.append(obj_)
+
 supermod.docHeadingType.subclass = docHeadingTypeSub
 # end class docHeadingTypeSub
 
@@ -864,6 +884,10 @@ class docParaTypeSub(supermod.docParaType):
             self.content.append(obj_)
         elif child_.nodeType == Node.ELEMENT_NODE and nodeName_ == "orderedlist":
             obj_ = supermod.docListType.factory(subtype="ordered")
+            obj_.build(child_)
+            self.content.append(obj_)
+        elif child_.nodeType == Node.ELEMENT_NODE and nodeName_ == 'heading':
+            obj_ = supermod.docHeadingType.factory()
             obj_.build(child_)
             self.content.append(obj_)
 
