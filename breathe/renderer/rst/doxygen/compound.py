@@ -909,19 +909,17 @@ class VerbatimTypeSubRenderer(Renderer):
 class MixedContainerRenderer(Renderer):
 
     def render(self):
-
         context = self.context.create_child_context(self.data_object.getValue())
         renderer = self.renderer_factory.create_renderer(context)
         return renderer.render()
 
 
 class DocListNestedRenderer(object):
-    """
-        Decorator for the list type renderer.
+    """Decorator for the list type renderer.
 
-        Creates the proper docutils node based on the sub-type
-        of the underlying data object. Takes care of proper numbering
-        for deeply nested enumerated lists.
+    Creates the proper docutils node based on the sub-type
+    of the underlying data object. Takes care of proper numbering
+    for deeply nested enumerated lists.
     """
 
     numeral_kind = ['arabic', 'loweralpha', 'lowerroman', 'upperalpha', 'upperroman']
@@ -968,10 +966,10 @@ class DocListNestedRenderer(object):
 
 
 class DocListTypeSubRenderer(Renderer):
-    """
-        List renderer.
-        The specifics of the actual list rendering are handled by the
-        decorator around the generic render function.
+    """List renderer
+
+    The specifics of the actual list rendering are handled by the
+    decorator around the generic render function.
     """
 
     @DocListNestedRenderer
@@ -987,8 +985,7 @@ class DocListTypeSubRenderer(Renderer):
 
 
 class DocListItemTypeSubRenderer(Renderer):
-    """
-        List item renderer.
+    """List item renderer.
     """
 
     def render(self):
@@ -1005,11 +1002,10 @@ class DocListItemTypeSubRenderer(Renderer):
 
 
 class DocHeadingTypeSubRenderer(Renderer):
-    """
-        Heading renderer.
+    """Heading renderer.
 
-        Renders embedded headlines as emphasized text. Different heading levels
-        are not supported.
+    Renders embedded headlines as emphasized text. Different heading levels
+    are not supported.
     """
 
     def render(self):
