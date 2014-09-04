@@ -54,6 +54,7 @@ Setup & Usage
 
    quickstart
    directives
+   differences
    readthedocs
 
 Features
