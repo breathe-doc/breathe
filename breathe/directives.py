@@ -191,13 +191,15 @@ class DoxygenFunctionDirective(BaseDirective):
 
     def parse_args(self, function_description):
         # Strip off trailing qualifiers
-        function_description = re.sub(r'''(?<= \)) \s*
-                                          (?: const)? \s*
-                                          (?: volatile)? \s*
-                                          (?: = \s* 0)? \s* $ ''',
+        pattern = re.compile(r'''(?<= \)) \s*
+                                 (?: const)? \s*
+                                 (?: volatile)? \s*
+                                 (?: = \s* 0)? \s* $ ''',
+                                 re.VERBOSE)
+
+        function_description = re.sub(pattern,
                                       '',
-                                      function_description,
-                                      flags=re.VERBOSE)
+                                      function_description)
 
         paren_index = function_description.find('(')
         if paren_index == -1:
