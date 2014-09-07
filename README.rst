@@ -122,6 +122,10 @@ Inspired by `Keepachangelog.com <http://keepachangelog.com/>`__.
 
 - Changes since the last release
 
+  - No changes since v3.1.0
+
+- 2014-09-07 - Breathe v3.1.0
+
   - Added
 
     - The ``doxygenclass`` directive can now reference template specialisations
@@ -149,7 +153,7 @@ Inspired by `Keepachangelog.com <http://keepachangelog.com/>`__.
       name is not available. Previously, where they were both available we were
       getting two names next to each other for no good reason.
 
-- Breathe v3.0.0
+- 2014-08-04 - Breathe v3.0.0
 
   - Improve output of const, volatile, virtual and pure-virtual keywords.
 
@@ -182,7 +186,7 @@ Inspired by `Keepachangelog.com <http://keepachangelog.com/>`__.
     This is designed to more closely match the Sphinx autodoc functionality and
     interface.
 
-- Breathe v2.0.0
+- 2014-06-15 - Breathe v2.0.0
 
   - Add compare script for checking changes to documentation caused by changes
     in the implementation.
