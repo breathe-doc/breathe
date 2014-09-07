@@ -140,6 +140,8 @@ Inspired by `Keepachangelog.com <http://keepachangelog.com/>`__.
     - Displaying function parameters for Qt slots output. Previously they were
       missing even though Qt Slots are essentially just functions.
 
+    - Displaying headings from doxygen comments as emphasized text.
+
     - Crash when generating warning about being unable to find a define,
       variable, enum, typedef or union.
 
