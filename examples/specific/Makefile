@@ -20,7 +20,7 @@ HAVE_DOT  = /usr/bin/dot
 
 projects  = nutshell alias rst inline namespacefile c_file \
 			members userdefined fixedwidthfont latexmath functionOverload \
-			image name union group struct qtslots headings \
+			image name union group struct qtslots lists headings \
 			template_class template_class_non_type template_function template_specialisation
 
 special   = programlisting decl_impl multifilexml auto class typedef

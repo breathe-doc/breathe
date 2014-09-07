@@ -124,7 +124,8 @@ Inspired by `Keepachangelog.com <http://keepachangelog.com/>`__.
 
   - Added
 
-    - Nothing
+    - The ``doxygenclass`` directive can now reference template specialisations
+      by specifying the specialisation in the argument name.
 
   - Deprecated
 
@@ -136,11 +137,10 @@ Inspired by `Keepachangelog.com <http://keepachangelog.com/>`__.
 
   - Fixed
 
-    - The ``doxygenclass`` directive can now reference template specialisations
-      by specifying the specialisation in the argument name.
-
     - Displaying function parameters for Qt slots output. Previously they were
       missing even though Qt Slots are essentially just functions.
+
+    - Displaying headings from doxygen comments as emphasized text.
 
     - Crash when generating warning about being unable to find a define,
       variable, enum, typedef or union.
