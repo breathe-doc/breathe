@@ -44,8 +44,8 @@ class DomainHandler(object):
 
 class NullDomainHandler(DomainHandler):
 
-    def __init__(self):
-        pass
+    def __init__(self, *args, **kwargs):
+        """Swallow args and forget them as we don't need them"""
 
     def create_function_id(self, data_object):
         return ""
@@ -182,16 +182,12 @@ class DomainHandlerFactory(object):
 
         domain = self.project_info.domain_for_file(file_)
 
-        try:
-            helper = self.domain_helpers[domain]
-        except KeyError:
-            helper = NullDomainHelper()
+        helper = self.domain_helpers.get(domain, NullDomainHelper())
 
-        try:
-            return domains_handlers[domain](self.node_factory, self.document, self.env, helper,
-                    self.project_info, self.target_handler)
-        except KeyError:
-            return NullDomainHandler()
+        DomainHandler = domains_handlers.get(domain, NullDomainHandler)
+
+        return DomainHandler(self.node_factory, self.document, self.env, helper,
+                             self.project_info, self.target_handler)
 
 class NullDomainHandlerFactory(object):
 
