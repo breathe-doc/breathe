@@ -449,13 +449,13 @@ class FilePathFilter(Filter):
 
         if self.path_handler.includes_directory(self.target_file):
             # If the target_file contains directory separators then
-            # match against the same length at the ned of the location
+            # match against the same length at the end of the location
             #
             location_match = location[-len(self.target_file):]
             return location_match == self.target_file
 
         else:
-            # If there are not separators, match against the whole filename
+            # If there are no separators, match against the whole filename
             # at the end of the location
             #
             # This is to prevent "Util.cpp" matching "PathUtil.cpp"

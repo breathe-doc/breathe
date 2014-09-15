@@ -754,7 +754,9 @@ class PathHandler(object):
 
     def includes_directory(self, file_path):
 
-        return bool(file_path.count(self.sep))
+        # Check for backslash or forward slash as we don't know what platform we're on and sometimes
+        # the doxygen paths will have forward slash even on Windows.
+        return bool(file_path.count('\\')) or bool(file_path.count('/'))
 
     def resolve_path(self, directory, filename):
         """Returns a full path to the filename in the given directory assuming that if the directory
