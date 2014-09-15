@@ -45,3 +45,13 @@ void h(std::string, const T myType);
 template <typename T, typename U>
 void h(std::string, const T m, const U n);
 
+
+/**
+ * Test function 1.
+ */
+void j(int);
+
+/**
+ * Test function 2.
+ */
+void j(char);
