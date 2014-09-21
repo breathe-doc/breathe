@@ -122,7 +122,23 @@ Inspired by `Keepachangelog.com <http://keepachangelog.com/>`__.
 
 - Changes since the last release
 
-  - No changes since v3.1.0
+  - Added
+
+    - Nothing
+
+  - Deprecated
+
+    - Nothing
+
+  - Removed
+
+    - Nothing
+
+  - Fixed
+
+    - ``KeyError`` when using ``auto`` directives without specifying the
+      ``:project:`` option even though the default project config setting was
+      set.
 
 - 2014-09-07 - Breathe v3.1.0
 

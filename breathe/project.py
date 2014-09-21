@@ -258,7 +258,13 @@ class ProjectInfoFactory(object):
         sense.
         """
 
-        name = options['project']
+        name = options.get('project', self.default_project)
+
+        if name is None:
+            raise NoDefaultProjectError(
+                    "No breathe_default_project config setting to fall back on "
+                    "for directive with no 'project' or 'path' specified."
+                    )
 
         return self.project_info_for_auto_store[name]
 
