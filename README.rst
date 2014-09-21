@@ -122,19 +122,12 @@ Inspired by `Keepachangelog.com <http://keepachangelog.com/>`__.
 
 - Changes since the last release
 
-  - Added
-
-    - Nothing
-
-  - Deprecated
-
-    - Nothing
-
-  - Removed
-
-    - Nothing
+  - Nothing Added, Deprecated or Removed
 
   - Fixed
+
+    - When checking for path separators check for both ``/`` and ``\``
+      regardless of the platform.
 
     - ``KeyError`` when using ``auto`` directives without specifying the
       ``:project:`` option even though the default project config setting was
@@ -142,18 +135,12 @@ Inspired by `Keepachangelog.com <http://keepachangelog.com/>`__.
 
 - 2014-09-07 - Breathe v3.1.0
 
+  - Nothing Deprecated or Removed
+
   - Added
 
     - The ``doxygenclass`` directive can now reference template specialisations
       by specifying the specialisation in the argument name.
-
-  - Deprecated
-
-    - Nothing
-
-  - Removed
-
-    - Nothing
 
   - Fixed
 
