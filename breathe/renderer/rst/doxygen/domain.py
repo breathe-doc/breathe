@@ -15,6 +15,17 @@ class CppDomainHelper(DomainHelper):
         self.definition_parser = definition_parser
         self.substitute = substitute
 
+        self.duplicates = {}
+
+    def check_cache(self, _id):
+        try:
+            return True, self.duplicates[_id]
+        except KeyError:
+            return False, ""
+
+    def cache(self, _id, project_info):
+        self.duplicates[_id] = project_info
+
     def remove_word(self, word, definition):
         return self.substitute(r"(\s*\b|^)%s\b\s*" % word, "", definition)
 
@@ -149,6 +160,15 @@ class CppDomainHandler(DomainHandler):
         """Creates a target node and registers it with the appropriate domain
         object list in a style which matches Sphinx's behaviour for the domain
         directives like cpp:function"""
+
+        # Check if we've already got this id
+        in_cache, project = self.helper.check_cache(id_)
+        if in_cache:
+            print("Warning: Ignoring duplicate domain reference '%s'. "
+                  "First found in project '%s'" % (id_, project.reference()))
+            return []
+
+        self.helper.cache(id_, self.project_info)
 
         # Create target node. This is required for LaTeX output as target nodes are converted to the
         # appropriate \phantomsection & \label for in document LaTeX links
