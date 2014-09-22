@@ -16,7 +16,7 @@ class TargetHandler(object):
             self.document.note_explicit_target(target)
         except Exception:
             # TODO: We should really return a docutils warning node here
-            print("Duplicate target detected: %s" % id_)
+            print("Warning: Duplicate target detected: %s" % id_)
 
         return [target]
 
