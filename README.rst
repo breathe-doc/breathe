@@ -133,6 +133,9 @@ Inspired by `Keepachangelog.com <http://keepachangelog.com/>`__.
       ``:project:`` option even though the default project config setting was
       set.
 
+    - Use of ``doxygenfunction`` no longer inappropriately triggers the
+      duplicate target check and fails to output link targets.
+
 - 2014-09-07 - Breathe v3.1.0
 
   - Nothing Deprecated or Removed
