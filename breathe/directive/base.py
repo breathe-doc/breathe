@@ -62,13 +62,13 @@ class BaseDirective(rst.Directive):
         self.filter_factory = filter_factory
         self.target_handler_factory = target_handler_factory
 
-    def render(self, data_object, project_info, filter_, target_handler, mask_factory):
+    def render(self, data_object, project_info, options, filter_, target_handler, mask_factory):
         "Standard render process used by subclasses"
 
         renderer_factory_creator = self.renderer_factory_creator_constructor.create_factory_creator(
             project_info,
             self.state.document,
-            self.options,
+            options,
             target_handler
             )
 
@@ -135,5 +135,6 @@ class DoxygenBaseDirective(BaseDirective):
         filter_ = self.filter_factory.create_outline_filter(self.options)
 
         mask_factory = NullMaskFactory()
-        return self.render(data_object, project_info, filter_, target_handler, mask_factory)
+        return self.render(data_object, project_info, self.options, filter_, target_handler,
+                           mask_factory)
 

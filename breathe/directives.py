@@ -187,7 +187,8 @@ class DoxygenFunctionDirective(BaseDirective):
         filter_ = self.filter_factory.create_outline_filter(self.options)
 
         mask_factory = NullMaskFactory()
-        return self.render(data_object, project_info, filter_, target_handler, mask_factory)
+        return self.render(data_object, project_info, self.options, filter_, target_handler,
+                           mask_factory)
 
     def parse_args(self, function_description):
         # Strip off trailing qualifiers
@@ -243,13 +244,16 @@ class DoxygenFunctionDirective(BaseDirective):
         # Iterate over the potential matches
         for entry in matches:
 
+            text_options = {'no-link': u'', 'outline': u''}
+
             # Render the matches to docutils nodes
             target_handler = self.target_handler_factory.create_target_handler(
                 {'no-link': u''}, project_info, self.state.document
                 )
-            filter_ = self.filter_factory.create_outline_filter({'outline': ''})
+            filter_ = self.filter_factory.create_outline_filter(text_options)
             mask_factory = MaskFactory({'param': NoParameterNamesMask})
-            nodes = self.render(entry, project_info, filter_, target_handler, mask_factory)
+            nodes = self.render(entry, project_info, text_options, filter_, target_handler,
+                                mask_factory)
 
             # Render the nodes to text
             signature = self.text_renderer.render(nodes, self.state.document)
@@ -326,7 +330,8 @@ class DoxygenClassLikeDirective(BaseDirective):
         filter_ = self.filter_factory.create_class_filter(name, self.options)
 
         mask_factory = NullMaskFactory()
-        return self.render(data_object, project_info, filter_, target_handler, mask_factory)
+        return self.render(data_object, project_info, self.options, filter_, target_handler,
+                           mask_factory)
 
 
 class DoxygenClassDirective(DoxygenClassLikeDirective):
@@ -494,7 +499,7 @@ class DoxygenBaseItemDirective(BaseDirective):
         filter_ = self.filter_factory.create_outline_filter(self.options)
 
         mask_factory = NullMaskFactory()
-        return self.render(data_object, project_info, filter_, target_handler, mask_factory)
+        return self.render(data_object, project_info, self.options, filter_, target_handler, mask_factory)
 
 
 class DoxygenVariableDirective(DoxygenBaseItemDirective):

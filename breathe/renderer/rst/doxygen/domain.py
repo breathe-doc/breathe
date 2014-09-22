@@ -3,8 +3,10 @@
 class DomainHelper(object):
     pass
 
+
 class NullDomainHelper(DomainHelper):
     pass
+
 
 class CppDomainHelper(DomainHelper):
 
@@ -41,7 +43,6 @@ class CDomainHelper(DomainHelper):
         self.duplicates.add(name)
 
 
-
 class DomainHandler(object):
 
     def __init__(self, node_factory, document, env, helper, project_info, target_handler):
@@ -53,10 +54,11 @@ class DomainHandler(object):
         self.project_info = project_info
         self.target_handler = target_handler
 
+
 class NullDomainHandler(DomainHandler):
 
-    def __init__(self):
-        pass
+    def __init__(self, *args, **kwargs):
+        """Swallow args and forget them as we don't need them"""
 
     def create_function_id(self, data_object):
         return ""
@@ -69,6 +71,7 @@ class NullDomainHandler(DomainHandler):
 
     def create_class_target(self, data_object):
         return []
+
 
 class CDomainHandler(DomainHandler):
 
@@ -87,8 +90,8 @@ class CDomainHandler(DomainHandler):
     def _create_target(self, name, type_):
 
         if self.helper.is_duplicate(name):
-            print ( "Warning: Ignoring duplicate '%s'. As C does not support overloaded "
-                    "functions. Perhaps you should be using the cpp domain?" % name )
+            print ("Warning: Ignoring duplicate '%s'. As C does not support overloaded "
+                   "functions. Perhaps you should be using the cpp domain?" % name)
             return
 
         self.helper.remember(name)
@@ -135,10 +138,10 @@ class CppDomainHandler(DomainHandler):
         explicit = "explicit " if data_object.explicit == "yes" else ""
 
         def_ = "%(explicit)s%(definition)s%(argstring)s" % {
-                        "explicit" : explicit,
-                        "definition" : definition,
-                        "argstring" : argstring,
-                    }
+            "explicit": explicit,
+            "definition": definition,
+            "argstring": argstring,
+            }
 
         parser = self.helper.definition_parser(def_)
         sigobj = parser.parse_function()
@@ -172,8 +175,8 @@ class CppDomainHandler(DomainHandler):
         target = self.target_handler.create_target(id_)
 
         # Register object with the sphinx objects registry
-        self.document.settings.env.domaindata['cpp']['objects'].setdefault(name,
-                (self.document.settings.env.docname, type_, id_))
+        self.document.settings.env.domaindata['cpp']['objects'].setdefault(
+            name, (self.document.settings.env.docname, type_, id_))
 
         return target
 
@@ -196,22 +199,19 @@ class DomainHandlerFactory(object):
     def create_domain_handler(self, file_):
 
         domains_handlers = {
-                "c" : CDomainHandler,
-                "cpp" : CppDomainHandler,
-                }
+            "c": CDomainHandler,
+            "cpp": CppDomainHandler,
+            }
 
         domain = self.project_info.domain_for_file(file_)
 
-        try:
-            helper = self.domain_helpers[domain]
-        except KeyError:
-            helper = NullDomainHelper()
+        helper = self.domain_helpers.get(domain, NullDomainHelper())
 
-        try:
-            return domains_handlers[domain](self.node_factory, self.document, self.env, helper,
-                    self.project_info, self.target_handler)
-        except KeyError:
-            return NullDomainHandler()
+        DomainHandler = domains_handlers.get(domain, NullDomainHandler)
+
+        return DomainHandler(self.node_factory, self.document, self.env, helper,
+                             self.project_info, self.target_handler)
+
 
 class NullDomainHandlerFactory(object):
 
@@ -222,6 +222,7 @@ class NullDomainHandlerFactory(object):
     def create_domain_handler(self, file_):
 
         return NullDomainHandler()
+
 
 class DomainHandlerFactoryCreator(object):
 
@@ -236,11 +237,11 @@ class DomainHandlerFactoryCreator(object):
             return NullDomainHandlerFactory()
 
         return DomainHandlerFactory(
-                project_info,
-                self.node_factory,
-                document,
-                env,
-                target_handler,
-                self.helpers
-                )
+            project_info,
+            self.node_factory,
+            document,
+            env,
+            target_handler,
+            self.helpers
+            )
 
