@@ -33,8 +33,8 @@ extensions = [ 'breathe', 'sphinx.ext.mathjax', 'sphinx.ext.ifconfig' ]
 
 read_the_docs_build = os.environ.get('READTHEDOCS', None) == 'True'
 
-# Get a description of the current position
-git_tag = subprocess.check_output('git describe --tags', shell=True)
+# Get a description of the current position. Use Popen for 2.6 compat
+git_tag = subprocess.Popen(['git', 'describe', '--tags'], stdout=subprocess.PIPE).communicate()[0]
 
 if read_the_docs_build:
 
