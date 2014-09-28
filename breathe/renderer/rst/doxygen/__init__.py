@@ -271,6 +271,7 @@ class DoxygenToRstRendererFactoryCreator(object):
             "doctitle" : compoundrenderer.DocTitleTypeSubRenderer,
             "docformula" : compoundrenderer.DocForumlaTypeSubRenderer,
             "docimage" : compoundrenderer.DocImageTypeSubRenderer,
+            "docurllink" : compoundrenderer.DocURLLinkSubRenderer,
             "listing" : compoundrenderer.ListingTypeSubRenderer,
             "codeline" : compoundrenderer.CodeLineTypeSubRenderer,
             "highlight" : compoundrenderer.HighlightTypeSubRenderer,
