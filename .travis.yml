@@ -17,5 +17,5 @@ install: "pip install -r requirements/production.txt"
 #
 # Provide definition for DOXYGEN variable to stop it trying
 # to run `which doxygen`
-script: make DOXYGEN=doxygen
+script: make DOXYGEN=doxygen DEBUG=""
 
