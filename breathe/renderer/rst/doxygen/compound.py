@@ -1018,3 +1018,16 @@ class DocHeadingTypeSubRenderer(Renderer):
 
         return [self.node_factory.emphasis("", "", *nodelist)]
 
+
+class DocURLLinkSubRenderer(Renderer):
+    """Url Link Renderer"""
+
+    def render(self):
+
+        nodelist = []
+        for item in self.data_object.content_:
+            context = self.context.create_child_context(item)
+            renderer = self.renderer_factory.create_renderer(context)
+            nodelist.extend(renderer.render())
+
+        return [self.node_factory.reference("", "", refuri=self.data_object.url, *nodelist)]
