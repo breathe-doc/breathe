@@ -40,13 +40,16 @@ def render_compound(
     new_context = parent_context.create_child_context(file_data.compounddef)
 
     # Check if there is template information and format it as desired
+    template_signode = None
     if file_data.compounddef.templateparamlist:
         context = new_context.create_child_context(file_data.compounddef.templateparamlist)
         renderer = renderer_factory.create_renderer(context)
         template_nodes = [node_factory.Text("template <")]
         template_nodes.extend(renderer.render())
         template_nodes.append(node_factory.Text(">"))
-        signode.append(node_factory.line("", *template_nodes))
+        signode.extend(template_nodes)
+        template_signode = signode
+        signode = node_factory.desc_signature()
 
     # Set up the title and a reference for it (refid)
     signode.append(node_factory.emphasis(text=kind))
@@ -66,6 +69,8 @@ def render_compound(
     node = node_factory.desc()
     node.document = document
     node['objtype'] = kind
+    if template_signode:
+        node.append(template_signode)
     node.append(signode)
     node.append(contentnode)
 
