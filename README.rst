@@ -2,6 +2,9 @@
 Breathe
 =======
 
+.. image:: https://travis-ci.org/michaeljones/breathe.svg?branch=travis
+    :target: https://travis-ci.org/michaeljones/breathe
+
 This is an extension to reStructuredText and Sphinx to be able to read and
 render the Doxygen xml output.
 
