@@ -8,7 +8,7 @@ from xml.dom import minidom
 from xml.parsers.expat import ExpatError
 
 
-import indexsuper as supermod
+from . import indexsuper as supermod
 
 class DoxygenTypeSub(supermod.DoxygenType):
 
