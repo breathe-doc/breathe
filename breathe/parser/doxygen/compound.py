@@ -8,8 +8,8 @@ from xml.dom import minidom
 from xml.dom import Node
 from xml.parsers.expat import ExpatError
 
-import compoundsuper as supermod
-from compoundsuper import MixedContainer
+from . import compoundsuper as supermod
+from .compoundsuper import MixedContainer
 
 
 class DoxygenTypeSub(supermod.DoxygenType):
