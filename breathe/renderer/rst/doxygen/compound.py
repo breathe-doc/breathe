@@ -73,18 +73,20 @@ class CompoundDefTypeSubRenderer(Renderer):
 
         # Get all sub sections
         for sectiondef in self.data_object.sectiondef:
+            context = self.context.create_child_context(sectiondef)
+            renderer = self.renderer_factory.create_renderer(context)
+            child_nodes = renderer.render()
+            if len(child_nodes) == 0:
+                # Sphinx doesn't allow empty desc nodes
+                continue
             kind = sectiondef.kind
             node = self.node_factory.desc()
             node.document = self.state.document
             node['objtype'] = kind
-            context = self.context.create_child_context(sectiondef)
-            renderer = self.renderer_factory.create_renderer(context)
-            node.extend(renderer.render())
-            try:
-                # As "user-defined" can repeat
-                section_nodelists[kind] += [node]
-            except KeyError:
-                section_nodelists[kind] = [node]
+            node.extend(child_nodes)
+            # As "user-defined" can repeat
+            nodes = section_nodelists.setdefault(kind, [])
+            nodes += [node]
 
         # Order the results in an appropriate manner
         for kind, _ in self.sections:
