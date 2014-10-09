@@ -205,6 +205,11 @@ class MemberDefTypeSubRenderer(Renderer):
 
         return nodes
 
+    def build_signodes(self, signode):
+
+        # Build title nodes
+        signode.extend(self.title())
+        return [signode]
 
     def render(self):
 
@@ -213,8 +218,7 @@ class MemberDefTypeSubRenderer(Renderer):
         signode.extend(self.create_domain_target())
         signode.extend(self.create_doxygen_target())
 
-        # Build title nodes
-        signode.extend(self.title())
+        signodes = self.build_signodes(signode)
 
         # Build description nodes
         contentnode = self.node_factory.desc_content()
@@ -223,7 +227,7 @@ class MemberDefTypeSubRenderer(Renderer):
         node = self.node_factory.desc()
         node.document = self.state.document
         node['objtype'] = self.data_object.kind
-        node.append(signode)
+        node.extend(signodes)
         node.append(contentnode)
 
         return [node]
@@ -235,9 +239,9 @@ class FuncMemberDefTypeSubRenderer(MemberDefTypeSubRenderer):
 
         return self.domain_handler.create_function_target(self.data_object)
 
-    def title(self):
+    def build_signodes(self, signode):
 
-        nodes = []
+        signodes = [signode]
 
         # Handle any template information
         if self.data_object.templateparamlist:
@@ -246,7 +250,17 @@ class FuncMemberDefTypeSubRenderer(MemberDefTypeSubRenderer):
             template_nodes = [self.node_factory.Text("template <")]
             template_nodes.extend(renderer.render())
             template_nodes.append(self.node_factory.Text("> "))
-            nodes.append(self.node_factory.line("", *template_nodes))
+            signode.extend(template_nodes)
+            signode = self.node_factory.desc_signature()
+            signodes.append(signode)
+
+        # Build title nodes
+        signode.extend(self.title())
+        return signodes
+
+    def title(self):
+
+        nodes = []
 
         # Note whether a member function is virtual
         if self.data_object.virt != 'non-virtual':
