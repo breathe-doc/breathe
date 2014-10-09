@@ -36,6 +36,9 @@ read_the_docs_build = os.environ.get('READTHEDOCS', None) == 'True'
 # Get a description of the current position. Use Popen for 2.6 compat
 git_tag = subprocess.Popen(['git', 'describe', '--tags'], stdout=subprocess.PIPE).communicate()[0]
 
+# Convert to unicode for python3
+git_tag = unicode(git_tag)
+
 if read_the_docs_build:
 
     # On RTD we'll be in the 'source' directory
