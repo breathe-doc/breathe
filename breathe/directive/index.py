@@ -23,10 +23,10 @@ class BaseIndexDirective(BaseDirective):
 
         try:
             finder = self.finder_factory.create_finder(project_info)
-        except ParserError, e:
+        except ParserError as e:
             return format_parser_error(self.name, e.error, e.filename, self.state,
                                        self.lineno, True)
-        except FileIOError, e:
+        except FileIOError as e:
             return format_parser_error(self.name, e.error, e.filename, self.state, self.lineno)
 
         data_object = finder.root()
@@ -55,10 +55,10 @@ class BaseIndexDirective(BaseDirective):
 
         try:
             node_list = object_renderer.render()
-        except ParserError, e:
+        except ParserError as e:
             return format_parser_error(self.name, e.error, e.filename, self.state,
                                        self.lineno, True)
-        except FileIOError, e:
+        except FileIOError as e:
             return format_parser_error(self.name, e.error, e.filename, self.state, self.lineno)
 
         return node_list
@@ -81,7 +81,7 @@ class DoxygenIndexDirective(BaseIndexDirective):
 
         try:
             project_info = self.project_info_factory.create_project_info(self.options)
-        except ProjectError, e:
+        except ProjectError as e:
             warning = create_warning(None, self.state, self.lineno)
             return warning.warn('doxygenindex: %s' % e)
 
@@ -106,7 +106,7 @@ class AutoDoxygenIndexDirective(BaseIndexDirective):
 
         try:
             project_info = self.project_info_factory.retrieve_project_info_for_auto(self.options)
-        except ProjectError, e:
+        except ProjectError as e:
             warning = create_warning(None, self.state, self.lineno)
             return warning.warn('autodoxygenindex: %s' % e)
 

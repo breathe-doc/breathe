@@ -87,7 +87,7 @@ class DoxygenFileDirective(BaseFileDirective):
 
         try:
             project_info = self.project_info_factory.create_project_info(self.options)
-        except ProjectError, e:
+        except ProjectError as e:
             warning = create_warning(None, self.state, self.lineno)
             return warning.warn('doxygenfile: %s' % e)
 
@@ -115,7 +115,7 @@ class AutoDoxygenFileDirective(BaseFileDirective):
 
         try:
             project_info = self.project_info_factory.retrieve_project_info_for_auto(self.options)
-        except ProjectError, e:
+        except ProjectError as e:
             warning = create_warning(None, self.state, self.lineno)
             return warning.warn('autodoxygenfile: %s' % e)
 
