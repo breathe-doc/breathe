@@ -80,10 +80,10 @@ class BaseDirective(rst.Directive):
                 filter_,
                 target_handler,
                 )
-        except ParserError, e:
+        except ParserError as e:
             return format_parser_error("doxygenclass", e.error, e.filename, self.state,
                                        self.lineno, True)
-        except FileIOError, e:
+        except FileIOError as e:
             return format_parser_error("doxygenclass", e.error, e.filename, self.state, self.lineno)
 
         context = RenderContext([data_object, self.root_data_object], mask_factory)
@@ -114,7 +114,7 @@ class DoxygenBaseDirective(BaseDirective):
 
         try:
             project_info = self.project_info_factory.create_project_info(self.options)
-        except ProjectError, e:
+        except ProjectError as e:
             warning = create_warning(None, self.state, self.lineno)
             return warning.warn('doxygen%s: %s' % (self.kind, e))
 
@@ -124,7 +124,7 @@ class DoxygenBaseDirective(BaseDirective):
 
         try:
             data_object = finder.find_one(matcher_stack)
-        except NoMatchesError, e:
+        except NoMatchesError as e:
             display_name = "%s::%s" % (namespace, name) if namespace else name
             warning = create_warning(project_info, self.state, self.lineno, name=display_name,
                                      kind=self.kind)
