@@ -32,6 +32,7 @@ import re
 extensions = [ 'breathe', 'sphinx.ext.mathjax', 'sphinx.ext.ifconfig' ]
 
 read_the_docs_build = os.environ.get('READTHEDOCS', None) == 'True'
+travis_build = os.environ.get('TRAVIS_CI', None) == 'True'
 
 # Get a description of the current position. Use Popen for 2.6 compat
 git_tag = subprocess.Popen(['git', 'describe', '--tags'], stdout=subprocess.PIPE).communicate()[0]
@@ -39,7 +40,16 @@ git_tag = subprocess.Popen(['git', 'describe', '--tags'], stdout=subprocess.PIPE
 # Convert to unicode for python3
 git_tag = unicode(git_tag)
 
-if read_the_docs_build:
+if travis_build:
+
+    # Don't attempt to set the path as breathe is installed to virtualenv on travis
+
+    # Set values with simple strings
+    version = '\'travis\''
+    release = '\'travis\''
+    documentation_build = 'travis'
+
+elif read_the_docs_build:
 
     # On RTD we'll be in the 'source' directory
     sys.path.append('../../')
