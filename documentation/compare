@@ -41,5 +41,6 @@ echo git checkout $currentbranch
 git checkout $currentbranch
 
 # Launch meld to compare the two html directories
+echo meld $firstdir/html $seconddir/html
 meld $firstdir/html $seconddir/html
 
