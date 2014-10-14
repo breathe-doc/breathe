@@ -455,6 +455,10 @@ class ParamTypeSubRenderer(Renderer):
             if nodelist: nodelist.append(self.node_factory.Text(" "))
             nodelist.append(self.node_factory.emphasis(text=self.data_object.defname))
 
+        # array information
+        if self.data_object.array:
+            nodelist.append(self.node_factory.Text(self.data_object.array))
+
         # Default value
         if self.data_object.defval:
             nodelist.append(self.node_factory.Text(" = "))
