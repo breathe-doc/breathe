@@ -110,6 +110,7 @@ Thank you to:
 - `rweickelt <https://github.com/rweickelt>`_
 - `sam-roth <https://github.com/sam-roth>`_
 - `bnewbold <https://github.com/bnewbold>`_
+- `serge-sans-paille <https://github.com/serge-sans-paille>`_
 
 For their contributions; reporting issues and improving the code and
 documentation. And thanks to:

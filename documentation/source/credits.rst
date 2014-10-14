@@ -27,6 +27,7 @@ Thank you to:
 - `rweickelt <https://github.com/rweickelt>`_
 - `sam-roth <https://github.com/sam-roth>`_
 - `bnewbold <https://github.com/bnewbold>`_
+- `serge-sans-paille <https://github.com/serge-sans-paille>`_
 
 For their contributions; reporting bugs, suggesting features, improving the code
 and working on the documentation. And thanks to:
