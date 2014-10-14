@@ -76,7 +76,7 @@ class CompoundDefTypeSubRenderer(Renderer):
             context = self.context.create_child_context(sectiondef)
             renderer = self.renderer_factory.create_renderer(context)
             child_nodes = renderer.render()
-            if len(child_nodes) == 0:
+            if not child_nodes:
                 # Sphinx doesn't allow empty desc nodes
                 continue
             kind = sectiondef.kind
@@ -84,7 +84,9 @@ class CompoundDefTypeSubRenderer(Renderer):
             node.document = self.state.document
             node['objtype'] = kind
             node.extend(child_nodes)
-            # As "user-defined" can repeat
+            # We store the nodes as a list against the kind in a dictionary as the kind can be
+            # 'user-edited' and that can repeat so this allows us to collect all the 'user-edited'
+            # entries together
             nodes = section_nodelists.setdefault(kind, [])
             nodes += [node]
 
