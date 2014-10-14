@@ -110,6 +110,7 @@ Thank you to:
 - `rweickelt <https://github.com/rweickelt>`_
 - `sam-roth <https://github.com/sam-roth>`_
 - `bnewbold <https://github.com/bnewbold>`_
+- `serge-sans-paille <https://github.com/serge-sans-paille>`_
 
 For their contributions; reporting issues and improving the code and
 documentation. And thanks to:
@@ -129,6 +130,8 @@ Inspired by `Keepachangelog.com <http://keepachangelog.com/>`__.
 
   - Fixed
 
+    - Changed docutils/Sphinx node usage to fix latex/pdf output.
+
     - When checking for path separators check for both ``/`` and ``\``
       regardless of the platform.
 
@@ -138,6 +141,10 @@ Inspired by `Keepachangelog.com <http://keepachangelog.com/>`__.
 
     - Use of ``doxygenfunction`` no longer inappropriately triggers the
       duplicate target check and fails to output link targets.
+
+    - Support for inline urls in the doxygen comments.
+
+    - Support for array notation in function parameters.
 
 - 2014-09-07 - Breathe v3.1.0
 
