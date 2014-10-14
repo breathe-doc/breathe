@@ -207,20 +207,24 @@ class MemberDefTypeSubRenderer(Renderer):
 
         return nodes
 
-    def build_signodes(self, signode):
+    def build_signodes(self, targets):
+        """Returns a list to account for when we need multiple signature nodes to account for
+        multi-line declarations like templated declarations"""
 
         # Build title nodes
+        signode = self.node_factory.desc_signature()
+        signode.extend(targets)
         signode.extend(self.title())
         return [signode]
 
     def render(self):
 
         # Build targets for linking
-        signode = self.node_factory.desc_signature()
-        signode.extend(self.create_domain_target())
-        signode.extend(self.create_doxygen_target())
+        targets = []
+        targets.extend(self.create_domain_target())
+        targets.extend(self.create_doxygen_target())
 
-        signodes = self.build_signodes(signode)
+        signodes = self.build_signodes(targets)
 
         # Build description nodes
         contentnode = self.node_factory.desc_content()
@@ -241,9 +245,10 @@ class FuncMemberDefTypeSubRenderer(MemberDefTypeSubRenderer):
 
         return self.domain_handler.create_function_target(self.data_object)
 
-    def build_signodes(self, signode):
+    def build_signodes(self, targets):
 
-        signodes = [signode]
+        signodes = []
+        title_signode = self.node_factory.desc_signature()
 
         # Handle any template information
         if self.data_object.templateparamlist:
@@ -252,12 +257,18 @@ class FuncMemberDefTypeSubRenderer(MemberDefTypeSubRenderer):
             template_nodes = [self.node_factory.Text("template <")]
             template_nodes.extend(renderer.render())
             template_nodes.append(self.node_factory.Text("> "))
-            signode.extend(template_nodes)
-            signode = self.node_factory.desc_signature()
-            signodes.append(signode)
+            template_signode = self.node_factory.desc_signature()
+            # Add targets to the template line if it is there
+            template_signode.extend(targets)
+            template_signode.extend(template_nodes)
+            signodes.append(template_signode)
 
-        # Build title nodes
-        signode.extend(self.title())
+        else:
+            # Add targets to title line if there is no template line
+            title_signode.extend(targets)
+
+        title_signode.extend(self.title())
+        signodes.append(title_signode)
         return signodes
 
     def title(self):
