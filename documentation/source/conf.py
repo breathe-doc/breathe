@@ -206,6 +206,7 @@ breathe_projects = {
     "group":"../../examples/specific/group/xml/",
     "union":"../../examples/specific/union/xml/",
     "qtslots":"../../examples/specific/qtslots/xml/",
+    "array":"../../examples/specific/array/xml/",
     }
 
 breathe_projects_source = {

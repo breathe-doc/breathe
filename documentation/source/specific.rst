@@ -102,3 +102,16 @@ Image
    :project: image
    :no-link:
 
+
+Array Parameter
+---------------
+
+.. doxygenfunction:: foo
+   :project: array
+   :no-link:
+
+.. doxygenfunction:: bar
+   :project: array
+   :no-link:
+
+
