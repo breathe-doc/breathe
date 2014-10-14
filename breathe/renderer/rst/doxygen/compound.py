@@ -73,18 +73,22 @@ class CompoundDefTypeSubRenderer(Renderer):
 
         # Get all sub sections
         for sectiondef in self.data_object.sectiondef:
+            context = self.context.create_child_context(sectiondef)
+            renderer = self.renderer_factory.create_renderer(context)
+            child_nodes = renderer.render()
+            if not child_nodes:
+                # Sphinx doesn't allow empty desc nodes
+                continue
             kind = sectiondef.kind
             node = self.node_factory.desc()
             node.document = self.state.document
             node['objtype'] = kind
-            context = self.context.create_child_context(sectiondef)
-            renderer = self.renderer_factory.create_renderer(context)
-            node.extend(renderer.render())
-            try:
-                # As "user-defined" can repeat
-                section_nodelists[kind] += [node]
-            except KeyError:
-                section_nodelists[kind] = [node]
+            node.extend(child_nodes)
+            # We store the nodes as a list against the kind in a dictionary as the kind can be
+            # 'user-edited' and that can repeat so this allows us to collect all the 'user-edited'
+            # entries together
+            nodes = section_nodelists.setdefault(kind, [])
+            nodes += [node]
 
         # Order the results in an appropriate manner
         for kind, _ in self.sections:
@@ -203,16 +207,24 @@ class MemberDefTypeSubRenderer(Renderer):
 
         return nodes
 
+    def build_signodes(self, targets):
+        """Returns a list to account for when we need multiple signature nodes to account for
+        multi-line declarations like templated declarations"""
+
+        # Build title nodes
+        signode = self.node_factory.desc_signature()
+        signode.extend(targets)
+        signode.extend(self.title())
+        return [signode]
 
     def render(self):
 
         # Build targets for linking
-        signode = self.node_factory.desc_signature()
-        signode.extend(self.create_domain_target())
-        signode.extend(self.create_doxygen_target())
+        targets = []
+        targets.extend(self.create_domain_target())
+        targets.extend(self.create_doxygen_target())
 
-        # Build title nodes
-        signode.extend(self.title())
+        signodes = self.build_signodes(targets)
 
         # Build description nodes
         contentnode = self.node_factory.desc_content()
@@ -221,7 +233,7 @@ class MemberDefTypeSubRenderer(Renderer):
         node = self.node_factory.desc()
         node.document = self.state.document
         node['objtype'] = self.data_object.kind
-        node.append(signode)
+        node.extend(signodes)
         node.append(contentnode)
 
         return [node]
@@ -233,9 +245,10 @@ class FuncMemberDefTypeSubRenderer(MemberDefTypeSubRenderer):
 
         return self.domain_handler.create_function_target(self.data_object)
 
-    def title(self):
+    def build_signodes(self, targets):
 
-        nodes = []
+        signodes = []
+        title_signode = self.node_factory.desc_signature()
 
         # Handle any template information
         if self.data_object.templateparamlist:
@@ -244,7 +257,23 @@ class FuncMemberDefTypeSubRenderer(MemberDefTypeSubRenderer):
             template_nodes = [self.node_factory.Text("template <")]
             template_nodes.extend(renderer.render())
             template_nodes.append(self.node_factory.Text("> "))
-            nodes.append(self.node_factory.line("", *template_nodes))
+            template_signode = self.node_factory.desc_signature()
+            # Add targets to the template line if it is there
+            template_signode.extend(targets)
+            template_signode.extend(template_nodes)
+            signodes.append(template_signode)
+
+        else:
+            # Add targets to title line if there is no template line
+            title_signode.extend(targets)
+
+        title_signode.extend(self.title())
+        signodes.append(title_signode)
+        return signodes
+
+    def title(self):
+
+        nodes = []
 
         # Note whether a member function is virtual
         if self.data_object.virt != 'non-virtual':
