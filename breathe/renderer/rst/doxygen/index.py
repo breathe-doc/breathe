@@ -32,26 +32,35 @@ def render_compound(
     ):
 
     # Build targets for linking
-    signode = node_factory.desc_signature()
-    signode.extend(domain_target)
-    signode.extend(doxygen_target)
+    targets = []
+    targets.extend(domain_target)
+    targets.extend(doxygen_target)
+
+    title_signode = node_factory.desc_signature()
 
     file_data = parent_context.node_stack[0]
     new_context = parent_context.create_child_context(file_data.compounddef)
 
     # Check if there is template information and format it as desired
+    template_signode = None
     if file_data.compounddef.templateparamlist:
         context = new_context.create_child_context(file_data.compounddef.templateparamlist)
         renderer = renderer_factory.create_renderer(context)
         template_nodes = [node_factory.Text("template <")]
         template_nodes.extend(renderer.render())
         template_nodes.append(node_factory.Text(">"))
-        signode.append(node_factory.line("", *template_nodes))
+        template_signode = node_factory.desc_signature()
+        # Add targets to the template line if it is there
+        template_signode.extend(targets)
+        template_signode.extend(template_nodes)
+    else:
+        # Add targets to title line if there is no template line
+        title_signode.extend(targets)
 
-    # Set up the title and a reference for it (refid)
-    signode.append(node_factory.emphasis(text=kind))
-    signode.append(node_factory.Text(" "))
-    signode.append(node_factory.desc_name(text=name))
+    # Set up the title
+    title_signode.append(node_factory.emphasis(text=kind))
+    title_signode.append(node_factory.Text(" "))
+    title_signode.append(node_factory.desc_name(text=name))
 
     contentnode = node_factory.desc_content()
 
@@ -66,7 +75,9 @@ def render_compound(
     node = node_factory.desc()
     node.document = document
     node['objtype'] = kind
-    node.append(signode)
+    if template_signode:
+        node.append(template_signode)
+    node.append(title_signode)
     node.append(contentnode)
 
     return [node]
