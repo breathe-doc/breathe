@@ -68,6 +68,7 @@ Examples
 Examples of Breathe used by other projects:
 
 - `cppformat <http://cppformat.readthedocs.org/en/latest/>`_
+  [`pdf <https://media.readthedocs.org/pdf/cppformat/master/cppformat.pdf>`_]
 
 If you have an example you would like listed here, please make a github issue
 with the details.
