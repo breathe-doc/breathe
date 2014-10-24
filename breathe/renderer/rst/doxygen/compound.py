@@ -129,9 +129,6 @@ class SectionDefTypeSubRenderer(Renderer):
 
         if node_list:
 
-            contentnode = self.node_factory.desc_content()
-            contentnode.extend(node_list)
-
             text = self.section_titles[self.data_object.kind]
 
             # Override default name for user-defined sections. Use "Unnamed
@@ -143,12 +140,13 @@ class SectionDefTypeSubRenderer(Renderer):
                     text = self.data_object.header
                 else:
                     text = "Unnamed Group"
-            title = self.node_factory.emphasis(text=text)
 
-            signode = self.node_factory.desc_signature()
-            signode.append(title)
+            section = self.node_factory.section()
+            section["ids"] = [self.data_object.kind]
+            section += self.node_factory.title(text=text)
+            section.extend(node_list)
 
-            return [signode, contentnode]
+            return [section]
 
         return []
 
