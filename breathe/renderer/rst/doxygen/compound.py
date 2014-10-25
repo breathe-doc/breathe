@@ -77,10 +77,10 @@ class CompoundDefTypeSubRenderer(Renderer):
             renderer = self.renderer_factory.create_renderer(context)
             child_nodes = renderer.render()
             if not child_nodes:
-                # Sphinx doesn't allow empty desc nodes
+                # Skip empty section
                 continue
             kind = sectiondef.kind
-            node = self.node_factory.desc()
+            node = self.node_factory.container()
             node.document = self.state.document
             node['objtype'] = kind
             node.extend(child_nodes)
@@ -141,12 +141,11 @@ class SectionDefTypeSubRenderer(Renderer):
                 else:
                     text = "Unnamed Group"
 
-            section = self.node_factory.section()
-            section["ids"] = [self.data_object.kind]
-            section += self.node_factory.title(text=text)
-            section.extend(node_list)
+            # Use rubric for the title because, unlike the docutils element "section",
+            # it doesn't interfere with the document structure.
+            rubric = self.node_factory.rubric(text=text)
 
-            return [section]
+            return [rubric] + node_list
 
         return []
 
