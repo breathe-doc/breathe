@@ -80,7 +80,7 @@ class CompoundDefTypeSubRenderer(Renderer):
                 # Skip empty section
                 continue
             kind = sectiondef.kind
-            node = self.node_factory.container()
+            node = self.node_factory.container(classes=['breathe-sectiondef'])
             node.document = self.state.document
             node['objtype'] = kind
             node.extend(child_nodes)
@@ -143,7 +143,7 @@ class SectionDefTypeSubRenderer(Renderer):
 
             # Use rubric for the title because, unlike the docutils element "section",
             # it doesn't interfere with the document structure.
-            rubric = self.node_factory.rubric(text=text)
+            rubric = self.node_factory.rubric(text=text, classes=['breathe-sectiondef-title'])
 
             return [rubric] + node_list
 
