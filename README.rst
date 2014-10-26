@@ -147,6 +147,10 @@ Inspired by `Keepachangelog.com <http://keepachangelog.com/>`__.
 
     - Support for array notation in function parameters.
 
+    - Reduced intention by changing ``section-defs`` to use ``container`` &
+      ``rubric`` nodes rather than ``desc`` nodes with signatures & content. Now
+      headings like 'Public Functions' appear inline with their subject matter.
+
 - 2014-09-07 - Breathe v3.1.0
 
   - Nothing Deprecated or Removed
