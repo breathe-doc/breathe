@@ -77,10 +77,10 @@ class CompoundDefTypeSubRenderer(Renderer):
             renderer = self.renderer_factory.create_renderer(context)
             child_nodes = renderer.render()
             if not child_nodes:
-                # Sphinx doesn't allow empty desc nodes
+                # Skip empty section
                 continue
             kind = sectiondef.kind
-            node = self.node_factory.desc()
+            node = self.node_factory.container(classes=['breathe-sectiondef'])
             node.document = self.state.document
             node['objtype'] = kind
             node.extend(child_nodes)
@@ -129,9 +129,6 @@ class SectionDefTypeSubRenderer(Renderer):
 
         if node_list:
 
-            contentnode = self.node_factory.desc_content()
-            contentnode.extend(node_list)
-
             text = self.section_titles[self.data_object.kind]
 
             # Override default name for user-defined sections. Use "Unnamed
@@ -143,12 +140,12 @@ class SectionDefTypeSubRenderer(Renderer):
                     text = self.data_object.header
                 else:
                     text = "Unnamed Group"
-            title = self.node_factory.emphasis(text=text)
 
-            signode = self.node_factory.desc_signature()
-            signode.append(title)
+            # Use rubric for the title because, unlike the docutils element "section",
+            # it doesn't interfere with the document structure.
+            rubric = self.node_factory.rubric(text=text, classes=['breathe-sectiondef-title'])
 
-            return [signode, contentnode]
+            return [rubric] + node_list
 
         return []
 
