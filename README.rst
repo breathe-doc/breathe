@@ -127,6 +127,10 @@ Inspired by `Keepachangelog.com <http://keepachangelog.com/>`__.
 
 - Changes since the last release
 
+  - Nothing
+
+- 2014-11-09 - Breathe v3.2.0
+
   - Nothing Added, Deprecated or Removed
 
   - Fixed
