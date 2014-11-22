@@ -24,6 +24,14 @@ excellent service.
 The source for the documentation is in the ``documentation`` folder if you want
 to built it and read it locally.
 
+Development
+-----------
+
+Breathe does not always get the attention it deserves but I am keen to keep it
+moving forward. If you report an issue, please keep reminding me about it until
+it is fixed. I should be better at this but in silence I tend to move to other
+things so keep reminding me.
+
 Testing
 -------
 
