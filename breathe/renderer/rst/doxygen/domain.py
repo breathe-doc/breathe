@@ -98,7 +98,7 @@ class CDomainHandler(DomainHandler):
 
         # Create target node. This is required for LaTeX output as target nodes are converted to the
         # appropriate \phantomsection & \label for in document LaTeX links
-        (target,) = self.target_handler.create_target(name)
+        (target,) = self.target_handler.create_target('c.' + name)
 
         inv = self.env.domaindata['c']['objects']
         if name in inv:
