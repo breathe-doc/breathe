@@ -924,12 +924,12 @@ class VerbatimTypeSubRenderer(Renderer):
             lines = map( lambda text: text.replace( "*", " ", 1 ), lines )
             self.data_object.text = "\n".join( lines )
 
-        # do we need to strep leading ///?
+        # do we need to strip leading ///?
         elif self.data_object.text.strip().startswith("embed:rst:leading-cppcomments"):
 
             lines = self.data_object.text.splitlines()
-            # Replace the /// on each line with a blank space
-            lines = map( lambda text: text.replace( "///", " ", 1 ), lines )
+            # Replace the /// on each line with three blank spaces
+            lines = map( lambda text: text.replace( "///", "   ", 1 ), lines )
             self.data_object.text = "\n".join( lines )
 
         rst = self.content_creator(self.data_object.text)
