@@ -14,14 +14,6 @@ class with a comment like::
     * @f[
     * \int_a^b f(x) dx = F(b) - F(a)
     * @f]
-    *
-    * A specific environment formula:
-    * \f{equation}{
-    * \begin{array}{cc}
-    * a & b \\
-    * c & d
-    * \end{array}
-    * \f}
     */
    class MathHelper 
    {
