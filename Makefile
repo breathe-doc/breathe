@@ -1,6 +1,7 @@
 
 all: data
 	$(MAKE) -C documentation html
+	$(MAKE) -C documentation latexpdf
 	
 data:
 	$(MAKE) -C examples/doxygen all

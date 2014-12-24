@@ -182,11 +182,6 @@ class NestedLists_4
  *        -# mouse move event
  *            1. swipe event
  *              -# swipe left
- *                  1. swipe left residual (it's nonsense)
- *                  2. more nonsense
- *                  3. even more nonsense
- *                      -# deep even more nonsense
- *                  4. even even more nonsense
  *              -# swipe right
  *            2. circle event
  *            3. wave event
