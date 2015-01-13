@@ -397,7 +397,7 @@ class EnumvalueTypeSubRenderer(Renderer):
         if self.data_object.initializer:
             context = self.context.create_child_context(self.data_object.initializer)
             renderer = self.renderer_factory.create_renderer(context)
-            nodelist = [self.node_factory.Text(" = ")]
+            nodelist = [self.node_factory.Text(" ")]
             nodelist.extend(renderer.render())
             description_nodes.append(self.node_factory.literal("", "", *nodelist))
 
