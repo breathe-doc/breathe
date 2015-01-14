@@ -82,9 +82,47 @@ To prevent this, use an **embed:rst:leading-asterisk** tag::
 
 This will appropriately handle the leading asterisks and render as:
 
+----
+
 .. doxygenfunction:: TestClass::rawLeadingAsteriskVerbatim
    :project: rst
    :no-link:
+
+----
+
+Handling Leading Slashes
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+Similar troubles can be encountered when using comment blocks that start with a
+triple forward slash. For example::
+
+   /// Some kind of method
+   ///
+   /// @param something a parameter
+   /// @returns the same value provided in something param
+   ///
+   /// @verbatim embed:rst:leading-slashes
+   ///    .. code-block:: c
+   ///       :linenos:
+   ///
+   ///       bool foo(bool something) {
+   ///           return something;
+   ///       };
+   ///
+   /// @endverbatim
+
+For these kinds of blocks, you can use an **embed:rst:leading-slashes** tag as
+shown in the above example.
+
+This will appropriately handle the leading slashes and render as:
+
+----
+
+.. doxygenfunction:: TestClass::rawLeadingSlashesVerbatim
+   :project: rst
+   :no-link:
+
+----
 
 Aliases
 ~~~~~~~
