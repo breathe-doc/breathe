@@ -49,6 +49,24 @@ public:
     */
     virtual void rawLeadingAsteriskVerbatim() const = 0;
 
+    //////////////////////////////////////////////////////////////
+    /// Some kind of method
+    ///
+    /// @param something a parameter
+    /// @returns the same value provided in something param
+    ///
+    /// @verbatim embed:rst:leading-slashes
+    ///    .. code-block:: c
+    ///       :linenos:
+    ///
+    ///       bool foo(bool something) {
+    ///           return something;
+    ///       };
+    ///
+    /// @endverbatim
+    //////////////////////////////////////////////////////////////
+    virtual void rawLeadingSlashesVerbatim(int something) const = 0;
+
     //! Brief description
     virtual void testFunction() const {};
 };
