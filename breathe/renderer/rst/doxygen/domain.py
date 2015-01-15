@@ -130,6 +130,13 @@ class CppDomainHandler(DomainHandler):
 
         return self._create_target(name, "class", id_)
 
+    def create_typedef_target(self, data_object):
+
+        id_ = self.create_class_id(data_object)
+        name = data_object.name
+
+        return self._create_target(name, "type", id_)
+
     def create_function_id(self, data_object):
 
         definition = self.helper.remove_word("virtual", data_object.definition)
