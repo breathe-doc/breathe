@@ -72,6 +72,8 @@ class NullDomainHandler(DomainHandler):
     def create_class_target(self, data_object):
         return []
 
+    def create_typedef_target(self, data_object):
+        return []
 
 class CDomainHandler(DomainHandler):
 
