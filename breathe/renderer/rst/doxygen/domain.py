@@ -72,7 +72,7 @@ class NullDomainHandler(DomainHandler):
     def create_class_target(self, data_object):
         return []
 
-    def create_typedef_target(self, data_object):
+    def create_typedef_target(self, node_stack):
         return []
 
 class CDomainHandler(DomainHandler):
@@ -116,6 +116,17 @@ class CDomainHandler(DomainHandler):
 
 class CppDomainHandler(DomainHandler):
 
+    def get_fully_qualified_name(self, node_stack):
+
+        names = []
+        for node in node_stack:
+            if node.node_type == 'compounddef':
+                names.insert(0, node.compoundname)
+            elif node.node_type == 'memberdef':
+                names.insert(0, node.name)
+
+        return '::'.join(names)
+
     def create_class_id(self, data_object):
 
         def_ = data_object.name
@@ -132,12 +143,10 @@ class CppDomainHandler(DomainHandler):
 
         return self._create_target(name, "class", id_)
 
-    def create_typedef_target(self, data_object):
+    def create_typedef_target(self, node_stack):
 
-        id_ = self.create_class_id(data_object)
-        name = data_object.name
-
-        return self._create_target(name, "type", id_)
+        name = self.get_fully_qualified_name(node_stack)
+        return self._create_target(name, "type", name)
 
     def create_function_id(self, data_object):
 
