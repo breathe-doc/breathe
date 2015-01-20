@@ -18,7 +18,7 @@ class CompoundDefTypeSubRenderer(Renderer):
     # having two lists in case they fall out of sync
     sections = [
                 ("user-defined", "User Defined"),
-                ("public-type", "Public Type"),
+                ("public-type", "Public Types"),
                 ("public-func", "Public Functions"),
                 ("public-attrib", "Public Members"),
                 ("public-slot", "Public Slots"),
