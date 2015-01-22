@@ -75,4 +75,43 @@ which renders as: :c:func:`frob_foos()`, or using::
    
 which renders as: :c:func:`another reference <frob_foos()>`. Note the use of the **c** domain.
 
+Typedef Examples
+----------------
 
+Given the following Breathe directives::
+
+   .. doxygentypedef:: TestTypedef
+      :path: ../../examples/specific/typedef/xml
+
+   .. doxygentypedef:: testnamespace::AnotherTypedef
+      :path: ../../examples/specific/typedef/xml
+
+   .. doxygenclass:: TestClass
+      :path: ../../examples/specific/typedef/xml
+      :members:
+
+which create formatted output like:
+
+   .. doxygentypedef:: TestTypedef
+      :path: ../../examples/specific/typedef/xml
+
+   .. doxygentypedef:: testnamespace::AnotherTypedef
+      :path: ../../examples/specific/typedef/xml
+
+   .. doxygenclass:: TestClass
+      :path: ../../examples/specific/typedef/xml
+      :members:
+
+We can refer to **TestTypedef** using::
+
+   :cpp:type:`TestTypedef`
+   
+which renders as :cpp:type:`TestTypedef`, to **testnamespace::AnotherTypedef** using::
+
+   :cpp:type:`testnamespace::AnotherTypedef`
+
+which renders as :cpp:type:`testnamespace::AnotherTypedef` and to **TestClass::MemberTypedef** using::
+
+   :cpp:type:`TestClass::MemberTypedef`
+
+which renders as :cpp:type:`TestClass::MemberTypedef`.
