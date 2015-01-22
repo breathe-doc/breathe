@@ -124,7 +124,8 @@ class DoxygenFunctionDirective(BaseDirective):
         # Extract arguments from the function name.
         args = self.parse_args(args)
 
-        finder_filter = self.filter_factory.create_function_finder_filter(namespace, function_name)
+        finder_filter = self.filter_factory.create_member_finder_filter(
+            namespace, function_name, 'function')
 
         matches = []
         finder.filter_(finder_filter, matches)
@@ -459,6 +460,12 @@ class DoxygenBaseItemDirective(BaseDirective):
         }
     has_content = False
 
+    def create_finder_filter(self, namespace, name):
+        """Creates a filter to find the node corresponding to this item."""
+
+        return self.filter_factory.create_member_finder_filter(
+            namespace, name, self.kind)
+
     def run(self):
 
         try:
@@ -478,12 +485,12 @@ class DoxygenBaseItemDirective(BaseDirective):
             warning = create_warning(None, self.state, self.lineno, kind=self.kind)
             return warning.warn('doxygen{kind}: %s' % e)
 
+        finder_filter = self.create_finder_filter(namespace, name)
 
-        matcher_stack = self.create_matcher_stack(namespace, name)
+        matches = []
+        finder.filter_(finder_filter, matches)
 
-        try:
-            data_object = finder.find_one(matcher_stack)
-        except NoMatchesError as e:
+        if len(matches) == 0:
             display_name = "%s::%s" % (namespace, name) if namespace else name
             warning = create_warning(project_info, self.state, self.lineno, kind=self.kind,
                                      display_name=display_name)
@@ -495,87 +502,41 @@ class DoxygenBaseItemDirective(BaseDirective):
         filter_ = self.filter_factory.create_outline_filter(self.options)
 
         mask_factory = NullMaskFactory()
-        return self.render(data_object, project_info, self.options, filter_, target_handler, mask_factory)
+        return self.render(matches[0], project_info, self.options, filter_, target_handler, mask_factory)
 
 
 class DoxygenVariableDirective(DoxygenBaseItemDirective):
 
     kind = "variable"
 
-    def create_matcher_stack(self, namespace, name):
-
-        return self.matcher_factory.create_matcher_stack(
-            {
-                "compound": self.matcher_factory.create_name_matcher(namespace),
-                "member": self.matcher_factory.create_name_type_matcher(name, self.kind)
-                },
-            "member"
-            )
-
 
 class DoxygenDefineDirective(DoxygenBaseItemDirective):
 
     kind = "define"
-
-    def create_matcher_stack(self, namespace, name):
-
-        return self.matcher_factory.create_matcher_stack(
-            {
-                "compound": self.matcher_factory.create_name_matcher(namespace),
-                "member": self.matcher_factory.create_name_type_matcher(name, self.kind)
-                },
-            "member"
-            )
 
 
 class DoxygenEnumDirective(DoxygenBaseItemDirective):
 
     kind = "enum"
 
-    def create_matcher_stack(self, namespace, name):
-
-        return self.matcher_factory.create_matcher_stack(
-            {
-                "compound": self.matcher_factory.create_name_matcher(namespace),
-                "member": self.matcher_factory.create_name_type_matcher(name, self.kind)
-                },
-            "member"
-            )
-
 
 class DoxygenTypedefDirective(DoxygenBaseItemDirective):
 
     kind = "typedef"
-
-    def create_matcher_stack(self, namespace, name):
-
-        return self.matcher_factory.create_matcher_stack(
-            {
-                "compound": self.matcher_factory.create_name_matcher(namespace),
-                "member": self.matcher_factory.create_name_type_matcher(name, self.kind)
-                },
-            "member"
-            )
 
 
 class DoxygenUnionDirective(DoxygenBaseItemDirective):
 
     kind = "union"
 
-    def create_matcher_stack(self, namespace, name):
+    def create_finder_filter(self, namespace, name):
 
         # Unions are stored in the xml file with their fully namespaced name
         # We're using C++ namespaces here, it might be best to make this file
         # type dependent
         #
         xml_name = "%s::%s" % (namespace, name) if namespace else name
-
-        return self.matcher_factory.create_matcher_stack(
-            {
-                "compound": self.matcher_factory.create_name_type_matcher(xml_name, self.kind)
-                },
-            "compound"
-            )
+        return self.filter_factory.create_compound_finder_filter(xml_name, 'union')
 
 
 # Setup Administration
