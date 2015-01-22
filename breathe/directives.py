@@ -11,7 +11,7 @@ from .renderer.rst.doxygen.mask import MaskFactory, NullMaskFactory, NoParameter
 
 from .finder.doxygen.core import DoxygenItemFinderFactoryCreator
 from .finder.doxygen.matcher import ItemMatcherFactory
-from .directive.base import BaseDirective, DoxygenBaseDirective, WarningHandler, create_warning
+from .directive.base import BaseDirective, create_warning
 from .directive.index import DoxygenIndexDirective, AutoDoxygenIndexDirective
 from .directive.file import DoxygenFileDirective, AutoDoxygenFileDirective
 from .process import AutoDoxygenProcessHandle
@@ -20,7 +20,6 @@ from .project import ProjectInfoFactory, ProjectError
 
 from docutils.parsers.rst.directives import unchanged_required, unchanged, flag
 from docutils.statemachine import ViewList
-from docutils.core import publish_from_doctree
 from sphinx.domains.cpp import DefinitionParser
 from sphinx.writers.text import TextWriter
 from sphinx.builders.text import TextBuilder
@@ -28,8 +27,6 @@ from sphinx.builders.text import TextBuilder
 import docutils.nodes
 import sphinx.addnodes
 import sphinx.ext.mathbase
-
-from StringIO import StringIO
 
 import os
 import fnmatch
@@ -39,7 +36,6 @@ import collections
 import subprocess
 
 # Somewhat outrageously, reach in and fix a Sphinx regex
-import sphinx.domains.cpp
 sphinx.domains.cpp._identifier_re = re.compile(r'(~?\b[a-zA-Z_][a-zA-Z0-9_]*)\b')
 
 
