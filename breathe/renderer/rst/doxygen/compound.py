@@ -360,6 +360,10 @@ class EnumMemberDefTypeSubRenderer(MemberDefTypeSubRenderer):
 
 class TypedefMemberDefTypeSubRenderer(MemberDefTypeSubRenderer):
 
+    def create_domain_target(self):
+
+        return self.domain_handler.create_typedef_target(self.context.node_stack)
+
     def title(self):
 
         args = [self.node_factory.Text("typedef ")]
