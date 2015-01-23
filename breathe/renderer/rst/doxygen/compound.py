@@ -332,12 +332,7 @@ class EnumMemberDefTypeSubRenderer(MemberDefTypeSubRenderer):
 
     def title(self):
 
-        if self.data_object.name.startswith("@"):
-            # Assume anonymous enum
-            return [self.node_factory.strong(text="Anonymous enum")]
-
-        name = self.node_factory.strong(text="%s enum" % self.data_object.name)
-        return [name]
+        return [self.node_factory.Text("enum ")] + MemberDefTypeSubRenderer.title(self)
 
     def description(self):
 
