@@ -79,7 +79,7 @@ class CompoundTypeSubItemFinder(ItemFinder):
 
         # Match against compound object
         if filter_.allow(node_stack):
-            matches.append(self.data_object)
+            matches.append(node_stack)
 
         # Descend to member children
         members = self.data_object.get_member()
@@ -97,8 +97,8 @@ class CompoundTypeSubItemFinder(ItemFinder):
             file_data = self.compound_parser.parse(self.data_object.refid)
             finder = self.item_finder_factory.create_finder(file_data)
 
-            for member_data in member_matches:
-                ref_filter = self.filter_factory.create_id_filter('memberdef', member_data.refid)
+            for member_stack in member_matches:
+                ref_filter = self.filter_factory.create_id_filter('memberdef', member_stack[0].refid)
                 finder.filter_(node_stack, ref_filter, matches)
 
         else:
@@ -125,6 +125,6 @@ class MemberTypeSubItemFinder(ItemFinder):
 
         # Match against member object
         if filter_.allow(node_stack):
-            matches.append(self.data_object)
+            matches.append(node_stack)
 
 
