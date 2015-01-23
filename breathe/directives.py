@@ -142,7 +142,7 @@ class DoxygenFunctionDirective(BaseDirective):
             )
 
         try:
-            data_object = self.resolve_function(matches, args, project_info)
+            data_object = self.resolve_function(matches, args, project_info)[0]
         except NoMatchingFunctionError:
             return warning.warn('doxygenfunction: Cannot find function "{namespace}{function}" '
                                 '{tail}')
@@ -234,7 +234,7 @@ class DoxygenFunctionDirective(BaseDirective):
         if len(matches) == 1:
             return matches[0]
 
-        data_object = None
+        node_stack = None
 
         signatures = []
 
@@ -249,7 +249,7 @@ class DoxygenFunctionDirective(BaseDirective):
                 )
             filter_ = self.filter_factory.create_outline_filter(text_options)
             mask_factory = MaskFactory({'param': NoParameterNamesMask})
-            nodes = self.render(entry, project_info, text_options, filter_, target_handler,
+            nodes = self.render(entry[0], project_info, text_options, filter_, target_handler,
                                 mask_factory)
 
             # Render the nodes to text
@@ -264,13 +264,13 @@ class DoxygenFunctionDirective(BaseDirective):
 
             # Match them against the arg spec
             if args == match_args:
-                data_object = entry
+                node_stack = entry
                 break
 
-        if not data_object:
+        if not node_stack:
             raise UnableToResolveFunctionError(signatures)
 
-        return data_object
+        return node_stack
 
 
 class DoxygenClassLikeDirective(BaseDirective):
@@ -390,13 +390,13 @@ class DoxygenContentBlockDirective(BaseDirective):
         if 'content-only' in self.options:
 
             # Unpack the single entry in the matches list
-            (data_object,) = matches
+            (node_stack,) = matches
 
             filter_ = self.filter_factory.create_content_filter(self.kind, self.options)
 
             # Having found the compound node for the namespace or group in the index we want to grab
             # the contents of it which match the filter
-            contents_finder = self.finder_factory.create_finder_from_root(data_object, project_info)
+            contents_finder = self.finder_factory.create_finder_from_root(node_stack[0], project_info)
             contents = []
             contents_finder.filter_(filter_, contents)
 
@@ -416,9 +416,9 @@ class DoxygenContentBlockDirective(BaseDirective):
             )
         node_list = []
 
-        for data_object in matches:
+        for node_stack in matches:
             renderer_factory = renderer_factory_creator.create_factory(
-                data_object,
+                node_stack[0],
                 self.state,
                 self.state.document,
                 filter_,
@@ -426,7 +426,7 @@ class DoxygenContentBlockDirective(BaseDirective):
                 )
 
             mask_factory = NullMaskFactory()
-            context = RenderContext([data_object, self.root_data_object], mask_factory)
+            context = RenderContext(node_stack, mask_factory)
             object_renderer = renderer_factory.create_renderer(context)
             node_list.extend(object_renderer.render())
 
@@ -501,8 +501,9 @@ class DoxygenBaseItemDirective(BaseDirective):
             )
         filter_ = self.filter_factory.create_outline_filter(self.options)
 
+        node_stack = matches[0]
         mask_factory = NullMaskFactory()
-        return self.render(matches[0], project_info, self.options, filter_, target_handler, mask_factory)
+        return self.render(node_stack[0], project_info, self.options, filter_, target_handler, mask_factory)
 
 
 class DoxygenVariableDirective(DoxygenBaseItemDirective):
