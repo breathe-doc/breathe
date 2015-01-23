@@ -37,7 +37,7 @@ class CompoundDefTypeSubItemFinder(ItemFinder):
         node_stack = stack(self.data_object, ancestors)
 
         if filter_.allow(node_stack):
-            matches.append(self.data_object)
+            matches.append(node_stack)
 
         for sectiondef in self.data_object.sectiondef:
             finder = self.item_finder_factory.create_finder(sectiondef)
@@ -66,7 +66,7 @@ class SectionDefTypeSubItemFinder(ItemFinder):
         node_stack = stack(self.data_object, ancestors)
 
         if filter_.allow(node_stack):
-            matches.append(self.data_object)
+            matches.append(node_stack)
 
         for memberdef in self.data_object.memberdef:
             finder = self.item_finder_factory.create_finder(memberdef)
@@ -88,7 +88,7 @@ class MemberDefTypeSubItemFinder(ItemFinder):
         node_stack = stack(self.data_object, ancestors)
 
         if filter_.allow(node_stack):
-            matches.append(self.data_object)
+            matches.append(node_stack)
 
 
 class RefTypeSubItemFinder(ItemFinder):
@@ -98,5 +98,5 @@ class RefTypeSubItemFinder(ItemFinder):
         node_stack = stack(self.data_object, ancestors)
 
         if filter_.allow(node_stack):
-            matches.append(self.data_object)
+            matches.append(node_stack)
 

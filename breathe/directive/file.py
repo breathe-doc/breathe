@@ -48,7 +48,9 @@ class BaseFileDirective(BaseDirective):
             target_handler
             )
         node_list = []
-        for data_object in matches:
+        for node_stack in matches:
+
+            data_object = node_stack[0]
 
             renderer_factory = renderer_factory_creator.create_factory(
                 data_object,
