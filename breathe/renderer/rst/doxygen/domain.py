@@ -120,9 +120,8 @@ class CppDomainHandler(DomainHandler):
 
         names = []
         for node in node_stack:
-            if node.node_type == 'compounddef':
-                names.insert(0, node.compoundname)
-            elif node.node_type == 'memberdef':
+            if (node.node_type == 'compound' and node.kind != 'file') or \
+                node.node_type == 'memberdef':
                 names.insert(0, node.name)
 
         return '::'.join(names)
