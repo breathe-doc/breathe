@@ -123,6 +123,12 @@ class CppDomainHandler(DomainHandler):
             if (node.node_type == 'compound' and node.kind != 'file') or \
                 node.node_type == 'memberdef':
                 names.insert(0, node.name)
+            if (node.node_type == 'compounddef' and node.kind == 'namespace'):
+                # Nested namespaces include there parent namespace in there compoundname. ie,
+                # compoundname is 'foo::bar' instead of just 'bar' for namespace 'bar' nested in
+                # namespace 'foo'. But our node_stack includes 'foo' so we only want 'bar' at
+                # this point.
+                names.insert(0, node.compoundname.split('::')[-1])
 
         return '::'.join(names)
 
