@@ -3,10 +3,9 @@ from ..renderer.rst.doxygen.base import RenderContext
 from ..renderer.rst.doxygen.mask import NullMaskFactory
 from ..directive.base import BaseDirective
 from ..project import ProjectError
-from .base import WarningHandler, create_warning
+from .base import create_warning
 
 from docutils.parsers.rst.directives import unchanged_required, flag
-from docutils import nodes
 
 
 class BaseFileDirective(BaseDirective):
