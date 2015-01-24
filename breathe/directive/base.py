@@ -62,7 +62,7 @@ class BaseDirective(rst.Directive):
         self.filter_factory = filter_factory
         self.target_handler_factory = target_handler_factory
 
-    def render(self, data_object, project_info, options, filter_, target_handler, mask_factory):
+    def render(self, node_stack, project_info, options, filter_, target_handler, mask_factory):
         "Standard render process used by subclasses"
 
         renderer_factory_creator = self.renderer_factory_creator_constructor.create_factory_creator(
@@ -74,7 +74,7 @@ class BaseDirective(rst.Directive):
 
         try:
             renderer_factory = renderer_factory_creator.create_factory(
-                data_object,
+                node_stack[0],
                 self.state,
                 self.state.document,
                 filter_,
@@ -86,7 +86,7 @@ class BaseDirective(rst.Directive):
         except FileIOError as e:
             return format_parser_error("doxygenclass", e.error, e.filename, self.state, self.lineno)
 
-        context = RenderContext([data_object, self.root_data_object], mask_factory)
+        context = RenderContext(node_stack, mask_factory)
         object_renderer = renderer_factory.create_renderer(context)
         node_list = object_renderer.render()
 
@@ -135,6 +135,6 @@ class DoxygenBaseDirective(BaseDirective):
         filter_ = self.filter_factory.create_outline_filter(self.options)
 
         mask_factory = NullMaskFactory()
-        return self.render(data_object, project_info, self.options, filter_, target_handler,
-                           mask_factory)
+        return self.render([data_object, self.root_data_object], project_info, self.options,
+                           filter_, target_handler, mask_factory)
 
