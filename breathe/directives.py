@@ -142,7 +142,7 @@ class DoxygenFunctionDirective(BaseDirective):
             )
 
         try:
-            data_object = self.resolve_function(matches, args, project_info)[0]
+            node_stack = self.resolve_function(matches, args, project_info)
         except NoMatchingFunctionError:
             return warning.warn('doxygenfunction: Cannot find function "{namespace}{function}" '
                                 '{tail}')
@@ -184,7 +184,7 @@ class DoxygenFunctionDirective(BaseDirective):
         filter_ = self.filter_factory.create_outline_filter(self.options)
 
         mask_factory = NullMaskFactory()
-        return self.render(data_object, project_info, self.options, filter_, target_handler,
+        return self.render(node_stack, project_info, self.options, filter_, target_handler,
                            mask_factory)
 
     def parse_args(self, function_description):
@@ -249,7 +249,7 @@ class DoxygenFunctionDirective(BaseDirective):
                 )
             filter_ = self.filter_factory.create_outline_filter(text_options)
             mask_factory = MaskFactory({'param': NoParameterNamesMask})
-            nodes = self.render(entry[0], project_info, text_options, filter_, target_handler,
+            nodes = self.render(entry, project_info, text_options, filter_, target_handler,
                                 mask_factory)
 
             # Render the nodes to text
@@ -327,8 +327,8 @@ class DoxygenClassLikeDirective(BaseDirective):
         filter_ = self.filter_factory.create_class_filter(name, self.options)
 
         mask_factory = NullMaskFactory()
-        return self.render(data_object, project_info, self.options, filter_, target_handler,
-                           mask_factory)
+        return self.render([data_object, self.root_data_object], project_info, self.options,
+                           filter_, target_handler, mask_factory)
 
 
 class DoxygenClassDirective(DoxygenClassLikeDirective):
@@ -503,7 +503,7 @@ class DoxygenBaseItemDirective(BaseDirective):
 
         node_stack = matches[0]
         mask_factory = NullMaskFactory()
-        return self.render(node_stack[0], project_info, self.options, filter_, target_handler, mask_factory)
+        return self.render(node_stack, project_info, self.options, filter_, target_handler, mask_factory)
 
 
 class DoxygenVariableDirective(DoxygenBaseItemDirective):
