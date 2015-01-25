@@ -16,6 +16,7 @@ It produces this output:
 
 .. doxygentypedef:: UINT32
   :project: structcmd
+  :no-link:
 
 Example with Namespace
 ----------------------

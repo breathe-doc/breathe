@@ -3,10 +3,9 @@ from ..renderer.rst.doxygen.base import RenderContext
 from ..renderer.rst.doxygen.mask import NullMaskFactory
 from ..directive.base import BaseDirective
 from ..project import ProjectError
-from .base import WarningHandler, create_warning
+from .base import create_warning
 
 from docutils.parsers.rst.directives import unchanged_required, flag
-from docutils import nodes
 
 
 class BaseFileDirective(BaseDirective):
@@ -50,10 +49,8 @@ class BaseFileDirective(BaseDirective):
         node_list = []
         for node_stack in matches:
 
-            data_object = node_stack[0]
-
             renderer_factory = renderer_factory_creator.create_factory(
-                data_object,
+                node_stack[0],
                 self.state,
                 self.state.document,
                 filter_,
@@ -61,7 +58,7 @@ class BaseFileDirective(BaseDirective):
                 )
 
             mask_factory = NullMaskFactory()
-            context = RenderContext([data_object, self.root_data_object], mask_factory)
+            context = RenderContext(node_stack, mask_factory)
             object_renderer = renderer_factory.create_renderer(context)
             node_list.extend(object_renderer.render())
 
