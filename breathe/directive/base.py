@@ -47,14 +47,12 @@ def create_warning(project_info, state, lineno, **kwargs):
 class BaseDirective(rst.Directive):
 
     def __init__(self, root_data_object, renderer_factory_creator_constructor, finder_factory,
-                 matcher_factory, project_info_factory, filter_factory, target_handler_factory,
-                 *args):
+                 project_info_factory, filter_factory, target_handler_factory, *args):
         rst.Directive.__init__(self, *args)
 
         self.root_data_object = root_data_object
         self.renderer_factory_creator_constructor = renderer_factory_creator_constructor
         self.finder_factory = finder_factory
-        self.matcher_factory = matcher_factory
         self.project_info_factory = project_info_factory
         self.filter_factory = filter_factory
         self.target_handler_factory = target_handler_factory
