@@ -72,6 +72,9 @@ class NullDomainHandler(DomainHandler):
     def create_class_target(self, data_object):
         return []
 
+    def create_inner_class_target(self, data_object):
+        return []
+
     def create_typedef_target(self, node_stack):
         return []
 
@@ -153,6 +156,12 @@ class CppDomainHandler(DomainHandler):
         name = data_object.name
 
         return self._create_target(name, "class", id_)
+
+    def create_inner_class_target(self, data_object):
+        """Creates a target for a class defined in another class."""
+
+        name = data_object.content_[0].getValue()
+        return self._create_target(name, "class", name)
 
     def create_typedef_target(self, node_stack):
 

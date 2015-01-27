@@ -34,6 +34,16 @@ public:
 
 };;
 
+//! \brief class outside of namespace
+class OuterClass {
+
+public:
+
+    //! \brief inner class
+    class InnerClass {};
+
+};
+
 
 //! \brief class outside of namespace
 class ClassTest {
