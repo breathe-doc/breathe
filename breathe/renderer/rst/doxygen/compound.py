@@ -894,7 +894,7 @@ class RefTypeSubRenderer(Renderer):
                 child_nodes,
                 self.renderer_factory,
                 self.node_factory,
-                [], # No domain reference
+                self.domain_handler.create_inner_class_target(self.data_object),
                 self.target_handler.create_target(refid),
                 self.state.document
                 )
