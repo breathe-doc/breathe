@@ -1,5 +1,5 @@
 
-from .finder.core import FinderFactory, NoMatchesError
+from .finder.core import FinderFactory
 from .parser import DoxygenParserFactory, CacheFactory
 from .renderer.rst.doxygen import DoxygenToRstRendererFactoryCreatorConstructor, \
     RstContentCreator, RenderContext
@@ -10,7 +10,6 @@ from .renderer.rst.doxygen.target import TargetHandlerFactory
 from .renderer.rst.doxygen.mask import MaskFactory, NullMaskFactory, NoParameterNamesMask
 
 from .finder.doxygen.core import DoxygenItemFinderFactoryCreator
-from .finder.doxygen.matcher import ItemMatcherFactory
 from .directive.base import BaseDirective, create_warning
 from .directive.index import DoxygenIndexDirective, AutoDoxygenIndexDirective
 from .directive.file import DoxygenFileDirective, AutoDoxygenFileDirective
@@ -307,16 +306,12 @@ class DoxygenClassLikeDirective(BaseDirective):
             warning = create_warning(None, self.state, self.lineno, kind=self.kind)
             return warning.warn('doxygen{kind}: %s' % e)
 
-        matcher_stack = self.matcher_factory.create_matcher_stack(
-            {
-                "compound": self.matcher_factory.create_name_type_matcher(name, self.kind)
-                },
-            "compound"
-            )
+        finder_filter = self.filter_factory.create_compound_finder_filter(name, self.kind)
 
-        try:
-            data_object = finder.find_one(matcher_stack)
-        except NoMatchesError as e:
+        matches = []
+        finder.filter_(finder_filter, matches)
+
+        if len(matches) == 0:
             warning = create_warning(project_info, self.state, self.lineno, name=name,
                                      kind=self.kind)
             return warning.warn('doxygen{kind}: Cannot find class "{name}" {tail}')
@@ -327,8 +322,7 @@ class DoxygenClassLikeDirective(BaseDirective):
         filter_ = self.filter_factory.create_class_filter(name, self.options)
 
         mask_factory = NullMaskFactory()
-        return self.render([data_object, self.root_data_object], project_info, self.options,
-                           filter_, target_handler, mask_factory)
+        return self.render(matches[0], project_info, self.options, filter_, target_handler, mask_factory)
 
 
 class DoxygenClassDirective(DoxygenClassLikeDirective):
@@ -586,7 +580,7 @@ class DoxygenDirectiveFactory(object):
         }
 
     def __init__(self, node_factory, text_renderer, root_data_object,
-                 renderer_factory_creator_constructor, finder_factory, matcher_factory,
+                 renderer_factory_creator_constructor, finder_factory,
                  project_info_factory, filter_factory, target_handler_factory):
 
         self.node_factory = node_factory
@@ -594,7 +588,6 @@ class DoxygenDirectiveFactory(object):
         self.root_data_object = root_data_object
         self.renderer_factory_creator_constructor = renderer_factory_creator_constructor
         self.finder_factory = finder_factory
-        self.matcher_factory = matcher_factory
         self.project_info_factory = project_info_factory
         self.filter_factory = filter_factory
         self.target_handler_factory = target_handler_factory
@@ -614,7 +607,6 @@ class DoxygenDirectiveFactory(object):
             self.root_data_object,
             self.renderer_factory_creator_constructor,
             self.finder_factory,
-            self.matcher_factory,
             self.project_info_factory,
             self.filter_factory,
             self.target_handler_factory
@@ -663,7 +655,6 @@ class DoxygenDirectiveFactory(object):
             self.root_data_object,
             self.renderer_factory_creator_constructor,
             self.finder_factory,
-            self.matcher_factory,
             self.project_info_factory,
             self.filter_factory,
             self.target_handler_factory
@@ -865,7 +856,6 @@ def setup(app):
     build_dir = os.path.dirname(app.doctreedir.rstrip(os.sep))
     project_info_factory = ProjectInfoFactory(app.srcdir, build_dir, app.confdir, fnmatch.fnmatch)
     target_handler_factory = TargetHandlerFactory(node_factory)
-    matcher_factory = ItemMatcherFactory()
 
     root_data_object = RootDataObject()
 
@@ -877,7 +867,6 @@ def setup(app):
         root_data_object,
         renderer_factory_creator_constructor,
         finder_factory,
-        matcher_factory,
         project_info_factory,
         filter_factory,
         target_handler_factory
