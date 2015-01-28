@@ -72,7 +72,7 @@ class NullDomainHandler(DomainHandler):
     def create_class_target(self, data_object):
         return []
 
-    def create_inner_class_target(self, data_object):
+    def create_inner_ref_target(self, data_object):
         return []
 
     def create_typedef_target(self, node_stack):
@@ -157,9 +157,11 @@ class CppDomainHandler(DomainHandler):
 
         return self._create_target(name, "class", id_)
 
-    def create_inner_class_target(self, data_object):
-        """Creates a target for a class defined in another class."""
+    def create_inner_ref_target(self, data_object):
+        """Creates a target for a class or namespace defined in another class or namespace."""
 
+        # Extract fully qualified name (OuterClass::InnerClass) from node with xml like:
+        #    <innerclass refid="..." prot="public">OuterClass::InnerClass</innerclass>
         name = data_object.content_[0].getValue()
         return self._create_target(name, "class", name)
 
