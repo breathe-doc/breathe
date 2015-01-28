@@ -158,7 +158,16 @@ class CppDomainHandler(DomainHandler):
         return self._create_target(name, "class", id_)
 
     def create_inner_ref_target(self, data_object):
-        """Creates a target for a class or namespace defined in another class or namespace."""
+        """Creates a target for a class or namespace defined in another class or namespace. This
+        will get called for any 'refType' node which includes a number of doxygen documentation
+        nodes like 'innerpage' & 'innergroup'. So we return nothing unless it is a class or
+        namespace.
+
+        See breathe.parser.doxygen.compoundsuper:compounddefType.buildChildren for the full list.
+        """
+
+        if data_object.node_name not in ['innerclass', 'innernamespace']:
+            return []
 
         # Extract fully qualified name (OuterClass::InnerClass) from node with xml like:
         #    <innerclass refid="..." prot="public">OuterClass::InnerClass</innerclass>
