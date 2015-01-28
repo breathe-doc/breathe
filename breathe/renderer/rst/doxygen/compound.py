@@ -862,6 +862,7 @@ class IncTypeSubRenderer(Renderer):
 
         return [self.node_factory.emphasis(text=text)]
 
+
 class RefTypeSubRenderer(Renderer):
 
     def __init__(self, compound_parser, *args):
@@ -894,7 +895,7 @@ class RefTypeSubRenderer(Renderer):
                 child_nodes,
                 self.renderer_factory,
                 self.node_factory,
-                self.domain_handler.create_inner_class_target(self.data_object),
+                self.domain_handler.create_inner_ref_target(self.data_object),
                 self.target_handler.create_target(refid),
                 self.state.document
                 )
