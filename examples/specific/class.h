@@ -11,10 +11,10 @@ public:
 
     static void functionS();
 
-    explicit NamespacedClassTest() {};
+    explicit NamespacedClassTest() {}
 
     //! \brief namespaced class other function
-    void anotherFunction() {};
+    void anotherFunction() {}
 };
 
 
@@ -24,15 +24,25 @@ class ClassTest {
 public:
 
     //! \brief second namespaced class function
-    void function() {};
+    void function() {}
 
     //! \brief second namespaced class other function
-    void anotherFunction() {};
+    void anotherFunction() {}
 
 };
 
 
-};;
+}
+
+//! \brief class outside of namespace
+class OuterClass {
+
+public:
+
+    //! \brief inner class
+    class InnerClass {};
+
+};
 
 
 //! \brief class outside of namespace
@@ -67,9 +77,9 @@ public:
 protected:
 
     //! A protected function
-    void protectedFunction() {};
+    void protectedFunction() {}
 
-    void undocumentedProtectedFunction() {};
+    void undocumentedProtectedFunction() {}
 
     //! A protected class
     class ProtectedClass {};

@@ -35,6 +35,27 @@ which renders as :cpp:class:`testnamespace::NamespacedClassTest`, or using::
    
 which renders as: :cpp:class:`another reference <testnamespace::NamespacedClassTest>`.
 
+Inner Class Example
+-------------------
+
+Given the following Breathe directive::
+
+   .. doxygenclass:: OuterClass
+      :path: ../../examples/specific/class/xml
+      :members:
+
+Which create formatted output like:
+
+   .. doxygenclass:: OuterClass
+      :path: ../../examples/specific/class/xml
+      :members:
+
+We can refer to **OuterClass::InnerClass** using::
+
+   :cpp:class:`OuterClass::InnerClass`
+   
+which renders as :cpp:class:`OuterClass::InnerClass`.
+
 Function Examples
 -----------------
 

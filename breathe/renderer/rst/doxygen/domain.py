@@ -72,6 +72,9 @@ class NullDomainHandler(DomainHandler):
     def create_class_target(self, data_object):
         return []
 
+    def create_inner_ref_target(self, data_object):
+        return []
+
     def create_typedef_target(self, node_stack):
         return []
 
@@ -153,6 +156,28 @@ class CppDomainHandler(DomainHandler):
         name = data_object.name
 
         return self._create_target(name, "class", id_)
+
+    def create_inner_ref_target(self, data_object):
+        """Creates a target for a class or namespace defined in another class or namespace. This
+        will get called for any 'refType' node which includes a number of doxygen documentation
+        nodes like 'innerpage' & 'innergroup'. So we return nothing unless it is a class or
+        namespace.
+
+        See breathe.parser.doxygen.compoundsuper:compounddefType.buildChildren for the full list.
+        """
+
+        if data_object.node_name not in ['innerclass', 'innernamespace']:
+            return []
+
+        # Drop 'inner' to get 'class' or 'namespace'. Sphinx does support 'namespace' types in the
+        # cpp domain yet but we'll do this properly for the moment and correct it or updated Sphinx
+        # if needed
+        type_ = data_object.node_name.replace('inner', '')
+
+        # Extract fully qualified name (OuterClass::InnerClass) from node with xml like:
+        #    <innerclass refid="..." prot="public">OuterClass::InnerClass</innerclass>
+        name = data_object.content_[0].getValue()
+        return self._create_target(name, type_, name)
 
     def create_typedef_target(self, node_stack):
 

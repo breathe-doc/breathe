@@ -7,10 +7,6 @@ class MultipleMatchesError(FinderError):
     pass
 
 
-class NoMatchesError(FinderError):
-    pass
-
-
 class FakeParentNode(object):
 
     node_type = "fakeparent"
@@ -34,20 +30,6 @@ class Finder(object):
 
         item_finder = self.item_finder_factory.create_finder(self._root)
         item_finder.filter_([FakeParentNode()], filter_, matches)
-
-    def find_one(self, matcher_stack):
-
-        results = self.find(matcher_stack)
-
-        count = len(results)
-        if count == 1:
-            return results[0]
-        elif count > 1:
-            # Multiple matches can easily happen as same thing
-            # can be present in both file and group sections
-            return results[0]
-        elif count < 1:
-            raise NoMatchesError(matcher_stack)
 
     def root(self):
 
