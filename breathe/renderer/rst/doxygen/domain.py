@@ -169,10 +169,15 @@ class CppDomainHandler(DomainHandler):
         if data_object.node_name not in ['innerclass', 'innernamespace']:
             return []
 
+        # Drop 'inner' to get 'class' or 'namespace'. Sphinx does support 'namespace' types in the
+        # cpp domain yet but we'll do this properly for the moment and correct it or updated Sphinx
+        # if needed
+        type_ = data_object.node_name.replace('inner', '')
+
         # Extract fully qualified name (OuterClass::InnerClass) from node with xml like:
         #    <innerclass refid="..." prot="public">OuterClass::InnerClass</innerclass>
         name = data_object.content_[0].getValue()
-        return self._create_target(name, "class", name)
+        return self._create_target(name, type_, name)
 
     def create_typedef_target(self, node_stack):
 
