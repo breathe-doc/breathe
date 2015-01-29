@@ -136,3 +136,32 @@ which renders as :cpp:type:`testnamespace::AnotherTypedef` and to **TestClass::M
    :cpp:type:`TestClass::MemberTypedef`
 
 which renders as :cpp:type:`TestClass::MemberTypedef`.
+
+Enum Value Examples
+-------------------
+
+Given the following Breathe directives::
+
+   .. doxygenenumvalue:: VALUE
+      :path: ../../examples/specific/enum/xml
+
+   .. doxygenenumvalue:: testnamespace::FIRST
+      :path: ../../examples/specific/enum/xml
+
+Which create formatted output like:
+
+   .. doxygenenumvalue:: VALUE
+      :path: ../../examples/specific/enum/xml
+
+   .. doxygenenumvalue:: testnamespace::FIRST
+      :path: ../../examples/specific/enum/xml
+
+We can refer to **VALUE** using::
+
+   :cpp:member:`VALUE`
+   
+which renders as :cpp:member:`VALUE` and to **testnamespace::FIRST** using ::
+
+   :cpp:member:`testnamespace::FIRST`
+
+which renders as :cpp:member:`testnamespace::FIRST`.
