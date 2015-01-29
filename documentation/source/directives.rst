@@ -10,6 +10,7 @@ Directives & Config Variables
    class
    namespace
    enum
+   enumvalue
    typedef
    union
    define
@@ -117,6 +118,22 @@ the same as the doxygenstruct directive.
       :no-link:
 
 Checkout the :ref:`example <enum-example>` to see it in action.
+
+
+doxygenenumvalue
+~~~~~~~~~~~~~~~~
+
+This directive generates the appropriate output for a single enum value.
+
+::
+
+   .. doxygenenumvalue:: <enum value name>
+      :project: ...
+      :path: ...
+      :outline:
+      :no-link:
+
+Checkout the :ref:`example <enumvalue-example>` to see it in action.
 
 
 doxygenfile

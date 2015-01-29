@@ -412,7 +412,7 @@ class DoxygenContentBlockDirective(BaseDirective):
 
         for node_stack in matches:
             renderer_factory = renderer_factory_creator.create_factory(
-                node_stack[0],
+                node_stack,
                 self.state,
                 self.state.document,
                 filter_,
@@ -515,6 +515,15 @@ class DoxygenEnumDirective(DoxygenBaseItemDirective):
     kind = "enum"
 
 
+class DoxygenEnumValueDirective(DoxygenBaseItemDirective):
+
+    kind = "enumvalue"
+
+    def create_finder_filter(self, namespace, name):
+
+        return self.filter_factory.create_enumvalue_finder_filter(name)
+
+
 class DoxygenTypedefDirective(DoxygenBaseItemDirective):
 
     kind = "typedef"
@@ -571,6 +580,7 @@ class DoxygenDirectiveFactory(object):
         "doxygenvariable": DoxygenVariableDirective,
         "doxygendefine": DoxygenDefineDirective,
         "doxygenenum": DoxygenEnumDirective,
+        "doxygenenumvalue": DoxygenEnumValueDirective,
         "doxygentypedef": DoxygenTypedefDirective,
         "doxygenunion": DoxygenUnionDirective,
         "doxygennamespace": DoxygenNamespaceDirective,
@@ -617,6 +627,9 @@ class DoxygenDirectiveFactory(object):
 
     def create_enum_directive_container(self):
         return self.create_directive_container("doxygenenum")
+
+    def create_enumvalue_directive_container(self):
+        return self.create_directive_container("doxygenenumvalue")
 
     def create_typedef_directive_container(self):
         return self.create_directive_container("doxygentypedef")
@@ -892,6 +905,11 @@ def setup(app):
     app.add_directive(
         "doxygenenum",
         directive_factory.create_enum_directive_container(),
+        )
+
+    app.add_directive(
+        "doxygenenumvalue",
+        directive_factory.create_enumvalue_directive_container(),
         )
 
     app.add_directive(

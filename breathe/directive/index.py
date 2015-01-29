@@ -42,7 +42,7 @@ class BaseIndexDirective(BaseDirective):
             target_handler
             )
         renderer_factory = renderer_factory_creator.create_factory(
-            data_object,
+            [data_object],
             self.state,
             self.state.document,
             filter_,
