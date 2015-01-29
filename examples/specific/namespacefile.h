@@ -61,7 +61,7 @@ namespace foo {
 
             class InnerFoo {};
 
-        }
+        };
     }
 
 }
