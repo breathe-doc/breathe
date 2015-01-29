@@ -50,7 +50,7 @@ class BaseFileDirective(BaseDirective):
         for node_stack in matches:
 
             renderer_factory = renderer_factory_creator.create_factory(
-                node_stack[0],
+                node_stack,
                 self.state,
                 self.state.document,
                 filter_,
