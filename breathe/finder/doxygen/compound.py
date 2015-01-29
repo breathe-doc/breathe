@@ -85,10 +85,17 @@ class MemberDefTypeSubItemFinder(ItemFinder):
 
     def filter_(self, ancestors, filter_, matches):
 
-        node_stack = stack(self.data_object, ancestors)
+        data_object = self.data_object
+        node_stack = stack(data_object, ancestors)
 
         if filter_.allow(node_stack):
             matches.append(node_stack)
+
+        if data_object.kind == 'enum':
+            for value in data_object.enumvalue:
+                value_stack = stack(value, node_stack)
+                if filter_.allow(value_stack):
+                    matches.append(value_stack)
 
 
 class RefTypeSubItemFinder(ItemFinder):
