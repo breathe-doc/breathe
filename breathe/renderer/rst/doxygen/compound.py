@@ -214,6 +214,10 @@ class MemberDefTypeSubRenderer(Renderer):
         signode.extend(self.title())
         return [signode]
 
+    def objtype(self):
+
+        return self.data_object.kind
+
     def render(self):
 
         # Build targets for linking
@@ -229,7 +233,7 @@ class MemberDefTypeSubRenderer(Renderer):
 
         node = self.node_factory.desc()
         node.document = self.state.document
-        node['objtype'] = self.data_object.kind
+        node['objtype'] = self.objtype()
         node.extend(signodes)
         node.append(contentnode)
 
@@ -392,35 +396,23 @@ class VariableMemberDefTypeSubRenderer(MemberDefTypeSubRenderer):
         return args
 
 
-class EnumvalueTypeSubRenderer(Renderer):
+class EnumvalueTypeSubRenderer(MemberDefTypeSubRenderer):
 
-    def render(self):
+    def title(self):
 
-        name = self.node_factory.literal(text=self.data_object.name)
-        description_nodes = [name]
+        nodes = [self.node_factory.desc_name(text=self.data_object.name)]
 
         if self.data_object.initializer:
             context = self.context.create_child_context(self.data_object.initializer)
             renderer = self.renderer_factory.create_renderer(context)
-            nodelist = [self.node_factory.Text(" ")]
-            nodelist.extend(renderer.render())
-            description_nodes.append(self.node_factory.literal("", "", *nodelist))
+            nodes.append(self.node_factory.Text(" "))
+            nodes.extend(renderer.render())
 
-        separator = self.node_factory.Text(" - ")
-        description_nodes.append(separator)
+        return nodes
 
-        if self.data_object.briefdescription:
-            context = self.context.create_child_context(self.data_object.briefdescription)
-            renderer = self.renderer_factory.create_renderer(context)
-            description_nodes.extend(renderer.render())
+    def objtype(self):
 
-        if self.data_object.detaileddescription:
-            context = self.context.create_child_context(self.data_object.detaileddescription)
-            renderer = self.renderer_factory.create_renderer(context)
-            description_nodes.extend(renderer.render())
-
-        # Build the list item
-        return [self.node_factory.list_item("", *description_nodes)]
+        return 'enumvalue'
 
 
 class DescriptionTypeSubRenderer(Renderer):
