@@ -48,7 +48,11 @@ namespace foo {
 
         typedef int MyInt;
 
-        enum Letters {A, B, C};
+        enum Letters {
+            A, /**< A documented enumeration constant */
+            B,
+            C
+        };
 
         /** Documentation here */
         struct FooStruct {};
