@@ -245,7 +245,9 @@ class DoxygenToRstRendererFactoryCreator(object):
         self.domain_handler_factory = domain_handler_factory
         self.project_info = project_info
 
-    def create_factory(self, data_object, state, document, filter_, target_handler):
+    def create_factory(self, node_stack, state, document, filter_, target_handler):
+
+        data_object = node_stack[0]
 
         renderers = {
             "doxygen" : indexrenderer.DoxygenTypeSubRenderer,
@@ -296,7 +298,9 @@ class DoxygenToRstRendererFactoryCreator(object):
             else:
                 raise e
 
-        success, domain_handler, type_ = self.get_domain(data_object, self.default_domain_handler)
+        # An enumvalue node doesn't have location, so use its parent node for detecting the domain instead.
+        domain_node = data_object if node_type != "enumvalue" else node_stack[1]
+        success, domain_handler, type_ = self.get_domain(domain_node, self.default_domain_handler)
 
         if not success and node_type == "compound":
 

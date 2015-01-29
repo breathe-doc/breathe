@@ -78,6 +78,10 @@ class NullDomainHandler(DomainHandler):
     def create_typedef_target(self, node_stack):
         return []
 
+    def create_enumvalue_target(self, node_stack):
+        return []
+
+
 class CDomainHandler(DomainHandler):
 
     def create_function_id(self, data_object):
@@ -122,6 +126,11 @@ class CppDomainHandler(DomainHandler):
     def get_fully_qualified_name(self, node_stack):
 
         names = []
+        if node_stack[0].node_type == 'enumvalue':
+            names.append(node_stack[0].name)
+            # Skip the name of the containing enum because it is not a part of the fully qualified name.
+            node_stack = node_stack[2:]
+
         for node in node_stack:
             if (node.node_type == 'compound' and node.kind not in ['file', 'namespace']) or \
                 node.node_type == 'memberdef':
@@ -183,6 +192,11 @@ class CppDomainHandler(DomainHandler):
 
         name = self.get_fully_qualified_name(node_stack)
         return self._create_target(name, "type", name)
+
+    def create_enumvalue_target(self, node_stack):
+
+        name = self.get_fully_qualified_name(node_stack)
+        return self._create_target(name, "member", name)
 
     def create_function_id(self, data_object):
 
