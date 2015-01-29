@@ -1089,11 +1089,17 @@ class FilterFactory(object):
             return (parent_is_compound & parent_is_file & node_matches) \
                 | (parent_is_compound & parent_is_not_file & node_matches)
 
+    def create_enumvalue_finder_filter(self, name):
+        """Returns a filter which looks for an enumvalue with the specified name."""
+
+        node = Node()
+        return (node.node_type == 'enumvalue') & (node.name == name)
+
     def create_compound_finder_filter(self, name, kind):
         """Returns a filter which looks for a compound with the specified name and kind."""
 
         node = Node()
-        return (node.node_type == 'compound') & (node.kind == kind)  & (node.name == name);
+        return (node.node_type == 'compound') & (node.kind == kind)  & (node.name == name)
 
     def create_finder_filter(self, kind, name):
         """Returns a filter which looks for the compound node from the index which is a group node
