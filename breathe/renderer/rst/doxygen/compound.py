@@ -358,7 +358,7 @@ class EnumMemberDefTypeSubRenderer(MemberDefTypeSubRenderer):
             renderer = self.renderer_factory.create_renderer(context)
             enums.extend(renderer.render())
 
-        description_nodes.append(self.node_factory.bullet_list("", classes=["breatheenumvalues"], *enums))
+        description_nodes.extend(enums)
 
         return description_nodes
 
