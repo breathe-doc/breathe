@@ -398,6 +398,10 @@ class VariableMemberDefTypeSubRenderer(MemberDefTypeSubRenderer):
 
 class EnumvalueTypeSubRenderer(MemberDefTypeSubRenderer):
 
+    def create_domain_target(self):
+
+        return self.domain_handler.create_enumvalue_target(self.context.node_stack)
+
     def title(self):
 
         nodes = [self.node_factory.desc_name(text=self.data_object.name)]
