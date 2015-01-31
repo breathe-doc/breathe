@@ -1,6 +1,6 @@
 
 from .base import Renderer
-from .index import render_compound
+from .index import CompoundRenderer
 
 class DoxygenTypeSubRenderer(Renderer):
 
@@ -859,42 +859,18 @@ class IncTypeSubRenderer(Renderer):
         return [self.node_factory.emphasis(text=text)]
 
 
-class RefTypeSubRenderer(Renderer):
+class RefTypeSubRenderer(CompoundRenderer):
 
     def __init__(self, compound_parser, *args):
-        Renderer.__init__(self, *args)
+        CompoundRenderer.__init__(self, compound_parser, False, *args)
 
-        self.compound_parser = compound_parser
-
-    def render(self):
-
-        # Read in the corresponding xml file and process
-        file_data = self.compound_parser.parse(self.data_object.refid)
-
-        context = self.context.create_child_context(file_data)
-        data_renderer = self.renderer_factory.create_renderer(context)
-        child_nodes = data_renderer.render()
-
-        if not child_nodes:
-            return []
-
-        refid = "%s%s" % (self.project_info.name(), self.data_object.refid)
-
+    def get_node_info(self, file_data):
         name = self.data_object.content_[0].getValue()
         name = name.rsplit("::", 1)[-1]
+        return name, file_data.compounddef.kind
 
-        # Defer to function for details
-        return render_compound(
-                name,
-                file_data.compounddef.kind,
-                context,
-                child_nodes,
-                self.renderer_factory,
-                self.node_factory,
-                self.domain_handler.create_inner_ref_target(self.data_object),
-                self.target_handler.create_target(refid),
-                self.state.document
-                )
+    def create_domain_target(self):
+        return self.domain_handler.create_inner_ref_target(self.data_object)
 
 
 class VerbatimTypeSubRenderer(Renderer):
