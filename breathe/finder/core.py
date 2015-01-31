@@ -1,12 +1,4 @@
 
-class FinderError(Exception):
-    pass
-
-
-class MultipleMatchesError(FinderError):
-    pass
-
-
 class FakeParentNode(object):
 
     node_type = "fakeparent"
@@ -18,12 +10,6 @@ class Finder(object):
 
         self._root = root
         self.item_finder_factory = item_finder_factory
-
-    def find(self, matcher_stack):
-
-        item_finder = self.item_finder_factory.create_finder(self._root)
-
-        return item_finder.find(matcher_stack)
 
     def filter_(self, filter_, matches):
         """Adds all nodes which match the filter into the matches list"""
