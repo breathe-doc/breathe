@@ -137,14 +137,12 @@ particular class for the :ref:`doxygenclass directive <doxygenclass>`, we use
 the finder classes to go and find the object corresponding to that class.
 
 In fact, if you look closely, it is the finders that use the parser entry points
-to parse the xml and then find the objects. The finders also use ``Matcher``
+to parse the xml and then find the objects. The finders also use ``Filter``
 objects to actually figure out if they have found what they are looking for. 
 
-In the simplest case, the finder only has to find the root of the hierarchy for
-the :ref:`doxygenindex directive <doxygenindex>`. In the other cases, the
-finder is given a ``MatcherStack`` and the level of the hierarchy it should be
-aiming for. The ``MatcherStack`` is what is sounds like, a stack of ``Matcher``
-objects which are designed to match at different levels of the hierarchy, 
+The finder is given a hierarchy of filter objects which are designed to match
+at different levels of the XML hierarchy. Filters can also represent logical
+conditions such as 'and' and 'or'.
 
 More Details, Please
 ~~~~~~~~~~~~~~~~~~~~
