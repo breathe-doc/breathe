@@ -5,19 +5,22 @@ from ..renderer.rst.doxygen import format_parser_error
 from ..directive.base import BaseDirective
 from ..project import ProjectError
 from ..parser import ParserError, FileIOError
-from .base import WarningHandler, create_warning
+from .base import create_warning
 
+from docutils.parsers import rst
 from docutils.parsers.rst.directives import unchanged_required, flag
-from docutils import nodes
 
 
-class BaseIndexDirective(BaseDirective):
+class BaseIndexDirective(BaseDirective, rst.Directive):
     """Base class handle the main work when given the appropriate project info to work from.
     """
 
     # We use inheritance here rather than a separate object and composition, because so much
     # information is present in the Directive class from the docutils framework that we'd have to
     # pass way too much stuff to a helper object to be reasonable.
+
+    def init_standard_args(self, *args):
+        rst.Directive.__init__(self, *args)
 
     def handle_contents(self, project_info):
 
