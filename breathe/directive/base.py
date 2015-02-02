@@ -3,7 +3,6 @@ from ..renderer.rst.doxygen.base import RenderContext
 from ..renderer.rst.doxygen import format_parser_error
 from ..parser import ParserError, FileIOError
 
-from docutils.parsers import rst
 from docutils import nodes
 
 
@@ -44,11 +43,12 @@ def create_warning(project_info, state, lineno, **kwargs):
     return WarningHandler(state, context)
 
 
-class BaseDirective(rst.Directive):
+class BaseDirective:
 
     def __init__(self, root_data_object, renderer_factory_creator_constructor, finder_factory,
                  project_info_factory, filter_factory, target_handler_factory, *args):
-        rst.Directive.__init__(self, *args)
+        # Initialize standard directive's (rst.Directive or its subclass) arguments.
+        self.init_standard_args(*args)
 
         self.root_data_object = root_data_object
         self.renderer_factory_creator_constructor = renderer_factory_creator_constructor
