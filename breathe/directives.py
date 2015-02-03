@@ -19,7 +19,6 @@ from .project import ProjectInfoFactory, ProjectError
 
 from docutils.parsers.rst.directives import unchanged_required, unchanged, flag
 from docutils.statemachine import ViewList
-from docutils.parsers import rst
 from sphinx.domains import cpp
 from sphinx.writers.text import TextWriter
 from sphinx.builders.text import TextBuilder
@@ -79,7 +78,7 @@ class TextRenderer(object):
 # Directives
 # ----------
 
-class DoxygenFunctionDirective(BaseDirective, rst.Directive):
+class DoxygenFunctionDirective(BaseDirective):
 
     required_arguments = 1
     option_spec = {
@@ -96,9 +95,6 @@ class DoxygenFunctionDirective(BaseDirective, rst.Directive):
 
         self.node_factory = node_factory
         self.text_renderer = text_renderer
-
-    def init_standard_args(self, *args):
-        rst.Directive.__init__(self, *args)
 
     def run(self):
 
@@ -276,7 +272,7 @@ class DoxygenFunctionDirective(BaseDirective, rst.Directive):
         return node_stack
 
 
-class DoxygenClassLikeDirective(BaseDirective, cpp.CPPClassObject):
+class DoxygenClassLikeDirective(BaseDirective):
 
     required_arguments = 1
     optional_arguments = 0
@@ -294,8 +290,8 @@ class DoxygenClassLikeDirective(BaseDirective, cpp.CPPClassObject):
         }
     has_content = False
 
-    def init_standard_args(self, *args):
-        cpp.CPPClassObject.__init__(self, *args)
+    def __init__(self, *args):
+        BaseDirective.__init__(self, *args, directive=cpp.CPPClassObject)
 
     def run(self):
 
@@ -329,7 +325,7 @@ class DoxygenClassLikeDirective(BaseDirective, cpp.CPPClassObject):
         filter_ = self.filter_factory.create_class_filter(name, self.options)
 
         mask_factory = NullMaskFactory()
-        result = cpp.CPPClassObject.run(self)
+        result = self.directive.run()
         self.render(matches[0], project_info, self.options, filter_, target_handler, mask_factory, result[1])
         return result
 
@@ -344,7 +340,7 @@ class DoxygenStructDirective(DoxygenClassLikeDirective):
     kind = "struct"
 
 
-class DoxygenContentBlockDirective(BaseDirective, rst.Directive):
+class DoxygenContentBlockDirective(BaseDirective):
     """Base class for namespace and group directives which have very similar behaviours"""
 
     required_arguments = 1
@@ -361,9 +357,6 @@ class DoxygenContentBlockDirective(BaseDirective, rst.Directive):
         "no-link": flag
         }
     has_content = False
-
-    def init_standard_args(self, *args):
-        rst.Directive.__init__(self, *args)
 
     def run(self):
 
@@ -454,7 +447,7 @@ class DoxygenGroupDirective(DoxygenContentBlockDirective):
 # abstracted in a far nicer way to avoid repeating so much code
 #
 # Now we've removed the definition_list wrap so we really need to refactor this!
-class DoxygenBaseItemDirective(BaseDirective, rst.Directive):
+class DoxygenBaseItemDirective(BaseDirective):
 
     required_arguments = 1
     optional_arguments = 1
@@ -465,9 +458,6 @@ class DoxygenBaseItemDirective(BaseDirective, rst.Directive):
         "no-link": flag,
         }
     has_content = False
-
-    def init_standard_args(self, *args):
-        rst.Directive.__init__(self, *args)
 
     def create_finder_filter(self, namespace, name):
         """Creates a filter to find the node corresponding to this item."""
