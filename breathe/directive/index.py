@@ -11,16 +11,13 @@ from docutils.parsers import rst
 from docutils.parsers.rst.directives import unchanged_required, flag
 
 
-class BaseIndexDirective(BaseDirective, rst.Directive):
+class BaseIndexDirective(BaseDirective):
     """Base class handle the main work when given the appropriate project info to work from.
     """
 
     # We use inheritance here rather than a separate object and composition, because so much
     # information is present in the Directive class from the docutils framework that we'd have to
     # pass way too much stuff to a helper object to be reasonable.
-
-    def init_standard_args(self, *args):
-        rst.Directive.__init__(self, *args)
 
     def handle_contents(self, project_info):
 

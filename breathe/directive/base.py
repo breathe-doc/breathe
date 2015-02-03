@@ -4,6 +4,7 @@ from ..renderer.rst.doxygen import format_parser_error
 from ..parser import ParserError, FileIOError
 
 from docutils import nodes
+from docutils.parsers import rst
 
 
 class WarningHandler(object):
@@ -43,12 +44,12 @@ def create_warning(project_info, state, lineno, **kwargs):
     return WarningHandler(state, context)
 
 
-class BaseDirective:
+class BaseDirective(rst.Directive):
 
     def __init__(self, root_data_object, renderer_factory_creator_constructor, finder_factory,
-                 project_info_factory, filter_factory, target_handler_factory, *args):
-        # Initialize standard directive's (rst.Directive or its subclass) arguments.
-        self.init_standard_args(*args)
+                 project_info_factory, filter_factory, target_handler_factory, *args, **kwargs):
+        directive_class = kwargs.get("directive", rst.Directive)
+        self.directive = directive_class(*args)
 
         self.root_data_object = root_data_object
         self.renderer_factory_creator_constructor = renderer_factory_creator_constructor
@@ -56,6 +57,10 @@ class BaseDirective:
         self.project_info_factory = project_info_factory
         self.filter_factory = filter_factory
         self.target_handler_factory = target_handler_factory
+
+    def __getattr__(self, attr):
+        """Forward getattr to the main directive."""
+        return getattr(self.directive, attr)
 
     def render(self, node_stack, project_info, options, filter_, target_handler, mask_factory, node=None):
         "Standard render process used by subclasses"
