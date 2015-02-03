@@ -218,7 +218,7 @@ class MemberDefTypeSubRenderer(Renderer):
 
         return self.data_object.kind
 
-    def render(self):
+    def render(self, node=None):
 
         # Build targets for linking
         targets = []

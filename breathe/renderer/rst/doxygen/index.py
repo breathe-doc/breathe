@@ -35,7 +35,7 @@ class CompoundRenderer(Renderer):
         refid = "%s%s" % (self.project_info.name(), self.data_object.refid)
         return self.target_handler.create_target(refid)
 
-    def render(self):
+    def render(self, node=None):
 
         # Read in the corresponding xml file and process
         file_data = self.compound_parser.parse(self.data_object.refid)
@@ -50,38 +50,43 @@ class CompoundRenderer(Renderer):
         if not rendered_data and not self.render_empty_node:
             return []
 
-        # Build targets for linking
-        targets = []
-        targets.extend(self.create_domain_target())
-        targets.extend(self.create_doxygen_target())
-
-        title_signode = self.node_factory.desc_signature()
-
+        doxygen_target = self.create_doxygen_target()
         file_data = parent_context.node_stack[0]
         new_context = parent_context.create_child_context(file_data.compounddef)
 
-        # Check if there is template information and format it as desired
-        template_signode = None
-        if file_data.compounddef.templateparamlist:
-            context = new_context.create_child_context(file_data.compounddef.templateparamlist)
-            renderer = self.renderer_factory.create_renderer(context)
-            template_nodes = [self.node_factory.Text("template <")]
-            template_nodes.extend(renderer.render())
-            template_nodes.append(self.node_factory.Text(">"))
-            template_signode = self.node_factory.desc_signature()
-            # Add targets to the template line if it is there
-            template_signode.extend(targets)
-            template_signode.extend(template_nodes)
+        if node:
+            node.children[0].insert(0, doxygen_target)
+            contentnode = node.children[1]
         else:
-            # Add targets to title line if there is no template line
-            title_signode.extend(targets)
+            # Build targets for linking
+            targets = []
+            targets.extend(self.create_domain_target())
+            targets.extend(doxygen_target)
 
-        # Set up the title
-        title_signode.append(self.node_factory.emphasis(text=kind))
-        title_signode.append(self.node_factory.Text(" "))
-        title_signode.append(self.node_factory.desc_name(text=name))
+            title_signode = self.node_factory.desc_signature()
 
-        contentnode = self.node_factory.desc_content()
+            # Check if there is template information and format it as desired
+            template_signode = None
+            if file_data.compounddef.templateparamlist:
+                context = new_context.create_child_context(file_data.compounddef.templateparamlist)
+                renderer = self.renderer_factory.create_renderer(context)
+                template_nodes = [self.node_factory.Text("template <")]
+                template_nodes.extend(renderer.render())
+                template_nodes.append(self.node_factory.Text(">"))
+                template_signode = self.node_factory.desc_signature()
+                # Add targets to the template line if it is there
+                template_signode.extend(targets)
+                template_signode.extend(template_nodes)
+            else:
+                # Add targets to title line if there is no template line
+                title_signode.extend(targets)
+
+            # Set up the title
+            title_signode.append(self.node_factory.emphasis(text=kind))
+            title_signode.append(self.node_factory.Text(" "))
+            title_signode.append(self.node_factory.desc_name(text=name))
+
+            contentnode = self.node_factory.desc_content()
 
         if file_data.compounddef.includes:
             for include in file_data.compounddef.includes:
@@ -91,15 +96,15 @@ class CompoundRenderer(Renderer):
 
         contentnode.extend(rendered_data)
 
-        node = self.node_factory.desc()
-        node.document = self.state.document
-        node['objtype'] = kind
-        if template_signode:
-            node.append(template_signode)
-        node.append(title_signode)
-        node.append(contentnode)
-
-        return [node]
+        if not node:
+            node = self.node_factory.desc()
+            node.document = self.state.document
+            node['objtype'] = kind
+            if template_signode:
+                node.append(template_signode)
+            node.append(title_signode)
+            node.append(contentnode)
+            return [node]
 
 
 class CompoundTypeSubRenderer(CompoundRenderer):
@@ -118,11 +123,3 @@ class CompoundTypeSubRenderer(CompoundRenderer):
         instead of some kind of special null node value"""
 
         return []
-
-
-class ClassCompoundTypeSubRenderer(CompoundTypeSubRenderer):
-
-    def create_domain_target(self):
-
-        return self.domain_handler.create_class_target(self.data_object)
-
