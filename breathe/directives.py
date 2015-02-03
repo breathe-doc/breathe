@@ -20,7 +20,7 @@ from .project import ProjectInfoFactory, ProjectError
 from docutils.parsers.rst.directives import unchanged_required, unchanged, flag
 from docutils.statemachine import ViewList
 from docutils.parsers import rst
-from sphinx.domains.cpp import DefinitionParser
+from sphinx.domains import cpp
 from sphinx.writers.text import TextWriter
 from sphinx.builders.text import TextBuilder
 
@@ -36,7 +36,7 @@ import collections
 import subprocess
 
 # Somewhat outrageously, reach in and fix a Sphinx regex
-sphinx.domains.cpp._identifier_re = re.compile(r'(~?\b[a-zA-Z_][a-zA-Z0-9_]*)\b')
+cpp._identifier_re = re.compile(r'(~?\b[a-zA-Z_][a-zA-Z0-9_]*)\b')
 
 
 class NoMatchingFunctionError(BreatheError):
@@ -276,7 +276,7 @@ class DoxygenFunctionDirective(BaseDirective, rst.Directive):
         return node_stack
 
 
-class DoxygenClassLikeDirective(BaseDirective, rst.Directive):
+class DoxygenClassLikeDirective(BaseDirective, cpp.CPPClassObject):
 
     required_arguments = 1
     optional_arguments = 0
@@ -295,7 +295,7 @@ class DoxygenClassLikeDirective(BaseDirective, rst.Directive):
     has_content = False
 
     def init_standard_args(self, *args):
-        rst.Directive.__init__(self, *args)
+        cpp.CPPClassObject.__init__(self, *args)
 
     def run(self):
 
@@ -329,7 +329,9 @@ class DoxygenClassLikeDirective(BaseDirective, rst.Directive):
         filter_ = self.filter_factory.create_class_filter(name, self.options)
 
         mask_factory = NullMaskFactory()
-        return self.render(matches[0], project_info, self.options, filter_, target_handler, mask_factory)
+        result = cpp.CPPClassObject.run(self)
+        self.render(matches[0], project_info, self.options, filter_, target_handler, mask_factory, result[1])
+        return result
 
 
 class DoxygenClassDirective(DoxygenClassLikeDirective):
@@ -861,7 +863,7 @@ def setup(app):
     math_nodes.displaymath = sphinx.ext.mathbase.displaymath
     node_factory = NodeFactory(docutils.nodes, sphinx.addnodes, math_nodes)
 
-    cpp_domain_helper = CppDomainHelper(DefinitionParser, re.sub)
+    cpp_domain_helper = CppDomainHelper(cpp.DefinitionParser, re.sub)
     c_domain_helper = CDomainHelper()
     domain_helpers = {"c": c_domain_helper, "cpp": cpp_domain_helper}
     domain_handler_factory_creator = DomainHandlerFactoryCreator(node_factory, domain_helpers)

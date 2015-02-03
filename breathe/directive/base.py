@@ -57,7 +57,7 @@ class BaseDirective:
         self.filter_factory = filter_factory
         self.target_handler_factory = target_handler_factory
 
-    def render(self, node_stack, project_info, options, filter_, target_handler, mask_factory):
+    def render(self, node_stack, project_info, options, filter_, target_handler, mask_factory, node=None):
         "Standard render process used by subclasses"
 
         renderer_factory_creator = self.renderer_factory_creator_constructor.create_factory_creator(
@@ -83,6 +83,6 @@ class BaseDirective:
 
         context = RenderContext(node_stack, mask_factory)
         object_renderer = renderer_factory.create_renderer(context)
-        node_list = object_renderer.render()
+        node_list = object_renderer.render(node)
 
         return node_list
