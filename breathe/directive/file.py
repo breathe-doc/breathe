@@ -6,6 +6,7 @@ from ..project import ProjectError
 from .base import create_warning
 
 from docutils.parsers.rst.directives import unchanged_required, flag
+from docutils.parsers import rst
 
 
 class BaseFileDirective(BaseDirective):

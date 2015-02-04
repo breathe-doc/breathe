@@ -3,8 +3,8 @@ from ..renderer.rst.doxygen.base import RenderContext
 from ..renderer.rst.doxygen import format_parser_error
 from ..parser import ParserError, FileIOError
 
-from docutils.parsers import rst
 from docutils import nodes
+from docutils.parsers import rst
 
 
 class WarningHandler(object):
@@ -47,8 +47,10 @@ def create_warning(project_info, state, lineno, **kwargs):
 class BaseDirective(rst.Directive):
 
     def __init__(self, root_data_object, renderer_factory_creator_constructor, finder_factory,
-                 project_info_factory, filter_factory, target_handler_factory, *args):
+                 project_info_factory, filter_factory, target_handler_factory, domain_directive_factories,
+                 parser_factory, *args):
         rst.Directive.__init__(self, *args)
+        self.directive_args = args
 
         self.root_data_object = root_data_object
         self.renderer_factory_creator_constructor = renderer_factory_creator_constructor
@@ -56,8 +58,31 @@ class BaseDirective(rst.Directive):
         self.project_info_factory = project_info_factory
         self.filter_factory = filter_factory
         self.target_handler_factory = target_handler_factory
+        self.domain_directive_factories = domain_directive_factories
+        self.parser_factory = parser_factory
 
-    def render(self, node_stack, project_info, options, filter_, target_handler, mask_factory):
+    @staticmethod
+    def get_filename(node):
+        """Returns the name of a file where the declaration represented by node is located."""
+        try:
+            return node.location.file
+        except AttributeError:
+            return None
+
+    def get_domain(self, node_stack, project_info):
+        """Returns the domain for the declaration represented by node_stack."""
+        node = node_stack[0]
+        # An enumvalue node doesn't have location, so use its parent node for detecting the domain instead.
+        if node.node_type == "enumvalue":
+            node = node_stack[1]
+        filename = BaseDirective.get_filename(node)
+        if not filename and node.node_type == "compound":
+            compound_parser = self.parser_factory.create_compound_parser(project_info)
+            file_data = compound_parser.parse(node.refid)
+            filename = BaseDirective.get_filename(file_data.compounddef)
+        return project_info.domain_for_file(filename)
+
+    def render(self, node_stack, project_info, options, filter_, target_handler, mask_factory, node=None):
         "Standard render process used by subclasses"
 
         renderer_factory_creator = self.renderer_factory_creator_constructor.create_factory_creator(
@@ -83,6 +108,6 @@ class BaseDirective(rst.Directive):
 
         context = RenderContext(node_stack, mask_factory)
         object_renderer = renderer_factory.create_renderer(context)
-        node_list = object_renderer.render()
+        node_list = object_renderer.render(node)
 
         return node_list
