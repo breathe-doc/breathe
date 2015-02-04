@@ -54,9 +54,22 @@ class CompoundRenderer(Renderer):
         file_data = parent_context.node_stack[0]
         new_context = parent_context.create_child_context(file_data.compounddef)
 
+        # Check if there is template information and format it as desired
+        template_signode = None
+        if file_data.compounddef.templateparamlist:
+            context = new_context.create_child_context(file_data.compounddef.templateparamlist)
+            renderer = self.renderer_factory.create_renderer(context)
+            template_nodes = [self.node_factory.Text("template <")]
+            template_nodes.extend(renderer.render())
+            template_nodes.append(self.node_factory.Text(">"))
+            template_signode = self.node_factory.desc_signature()
+            template_signode.extend(template_nodes)
+
         if node:
-            node.children[0].insert(0, doxygen_target)
             contentnode = node.children[1]
+            if template_signode:
+                node.insert(0, template_signode)
+            node.children[0].insert(0, doxygen_target)
         else:
             # Build targets for linking
             targets = []
@@ -64,19 +77,9 @@ class CompoundRenderer(Renderer):
             targets.extend(doxygen_target)
 
             title_signode = self.node_factory.desc_signature()
-
-            # Check if there is template information and format it as desired
-            template_signode = None
-            if file_data.compounddef.templateparamlist:
-                context = new_context.create_child_context(file_data.compounddef.templateparamlist)
-                renderer = self.renderer_factory.create_renderer(context)
-                template_nodes = [self.node_factory.Text("template <")]
-                template_nodes.extend(renderer.render())
-                template_nodes.append(self.node_factory.Text(">"))
-                template_signode = self.node_factory.desc_signature()
+            if template_signode:
                 # Add targets to the template line if it is there
                 template_signode.extend(targets)
-                template_signode.extend(template_nodes)
             else:
                 # Add targets to title line if there is no template line
                 title_signode.extend(targets)
