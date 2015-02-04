@@ -290,9 +290,6 @@ class DoxygenClassLikeDirective(BaseDirective):
         }
     has_content = False
 
-    def __init__(self, *args):
-        BaseDirective.__init__(self, *args, directive=cpp.CPPClassObject)
-
     def run(self):
 
         name = self.arguments[0]
@@ -325,7 +322,9 @@ class DoxygenClassLikeDirective(BaseDirective):
         filter_ = self.filter_factory.create_class_filter(name, self.options)
 
         mask_factory = NullMaskFactory()
-        result = self.directive.run()
+        # Defer to domains specific directive.
+        domain_directive = self.domain_directive_factory.create_class_directive(*self.directive_args)
+        result = domain_directive.run()
         self.render(matches[0], project_info, self.options, filter_, target_handler, mask_factory, result[1])
         return result
 
@@ -596,7 +595,7 @@ class DoxygenDirectiveFactory(object):
 
     def __init__(self, node_factory, text_renderer, root_data_object,
                  renderer_factory_creator_constructor, finder_factory,
-                 project_info_factory, filter_factory, target_handler_factory):
+                 project_info_factory, filter_factory, target_handler_factory, domain_directive_factory):
 
         self.node_factory = node_factory
         self.text_renderer = text_renderer
@@ -606,6 +605,7 @@ class DoxygenDirectiveFactory(object):
         self.project_info_factory = project_info_factory
         self.filter_factory = filter_factory
         self.target_handler_factory = target_handler_factory
+        self.domain_directive_factory = domain_directive_factory
 
     # TODO: This methods should be scrapped as they are only called in one place. We should just
     # inline the code at the call site
@@ -624,7 +624,8 @@ class DoxygenDirectiveFactory(object):
             self.finder_factory,
             self.project_info_factory,
             self.filter_factory,
-            self.target_handler_factory
+            self.target_handler_factory,
+            self.domain_directive_factory
             )
 
     def create_struct_directive_container(self):
@@ -675,7 +676,8 @@ class DoxygenDirectiveFactory(object):
             self.finder_factory,
             self.project_info_factory,
             self.filter_factory,
-            self.target_handler_factory
+            self.target_handler_factory,
+            self.domain_directive_factory
             )
 
     def get_config_values(self, app):
@@ -829,6 +831,11 @@ class FileStateCache(object):
             del self.app.env.breathe_file_state[filename]
 
 
+class CPPDomainDirectiveFactory:
+    @staticmethod
+    def create_class_directive(*args):
+        return cpp.CPPClassObject(*args)
+
 # Setup
 # -----
 
@@ -887,7 +894,8 @@ def setup(app):
         finder_factory,
         project_info_factory,
         filter_factory,
-        target_handler_factory
+        target_handler_factory,
+        CPPDomainDirectiveFactory
         )
 
     DoxygenFunctionDirective.app = app
