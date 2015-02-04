@@ -47,7 +47,7 @@ def create_warning(project_info, state, lineno, **kwargs):
 class BaseDirective(rst.Directive):
 
     def __init__(self, root_data_object, renderer_factory_creator_constructor, finder_factory,
-                 project_info_factory, filter_factory, target_handler_factory, domain_directive_factory, *args):
+                 project_info_factory, filter_factory, target_handler_factory, domain_directive_factories, *args):
         rst.Directive.__init__(self, *args)
         self.directive_args = args
 
@@ -57,7 +57,7 @@ class BaseDirective(rst.Directive):
         self.project_info_factory = project_info_factory
         self.filter_factory = filter_factory
         self.target_handler_factory = target_handler_factory
-        self.domain_directive_factory = domain_directive_factory
+        self.domain_directive_factories = domain_directive_factories
 
     def render(self, node_stack, project_info, options, filter_, target_handler, mask_factory, node=None):
         "Standard render process used by subclasses"
