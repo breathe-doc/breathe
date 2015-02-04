@@ -640,7 +640,7 @@ class DocParamListTypeSubRenderer(Renderer):
 
 
 class DocParamListItemSubRenderer(Renderer):
-    """ Paramter Description Renderer  """
+    """ Parameter Description Renderer  """
 
     def render(self):
 
