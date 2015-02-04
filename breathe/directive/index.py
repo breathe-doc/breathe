@@ -5,10 +5,10 @@ from ..renderer.rst.doxygen import format_parser_error
 from ..directive.base import BaseDirective
 from ..project import ProjectError
 from ..parser import ParserError, FileIOError
-from .base import WarningHandler, create_warning
+from .base import create_warning
 
+from docutils.parsers import rst
 from docutils.parsers.rst.directives import unchanged_required, flag
-from docutils import nodes
 
 
 class BaseIndexDirective(BaseDirective):

@@ -19,7 +19,7 @@ from .project import ProjectInfoFactory, ProjectError
 
 from docutils.parsers.rst.directives import unchanged_required, unchanged, flag
 from docutils.statemachine import ViewList
-from sphinx.domains.cpp import DefinitionParser
+from sphinx.domains import cpp, c
 from sphinx.writers.text import TextWriter
 from sphinx.builders.text import TextBuilder
 
@@ -35,7 +35,7 @@ import collections
 import subprocess
 
 # Somewhat outrageously, reach in and fix a Sphinx regex
-sphinx.domains.cpp._identifier_re = re.compile(r'(~?\b[a-zA-Z_][a-zA-Z0-9_]*)\b')
+cpp._identifier_re = re.compile(r'(~?\b[a-zA-Z_][a-zA-Z0-9_]*)\b')
 
 
 class NoMatchingFunctionError(BreatheError):
@@ -91,7 +91,7 @@ class DoxygenFunctionDirective(BaseDirective):
     final_argument_whitespace = True
 
     def __init__(self, node_factory, text_renderer, *args, **kwargs):
-        super(DoxygenFunctionDirective, self).__init__(*args, **kwargs)
+        BaseDirective.__init__(self, *args, **kwargs)
 
         self.node_factory = node_factory
         self.text_renderer = text_renderer
@@ -322,7 +322,13 @@ class DoxygenClassLikeDirective(BaseDirective):
         filter_ = self.filter_factory.create_class_filter(name, self.options)
 
         mask_factory = NullMaskFactory()
-        return self.render(matches[0], project_info, self.options, filter_, target_handler, mask_factory)
+        # Defer to domains specific directive.
+        node_stack = matches[0]
+        domain = self.get_domain(node_stack, project_info)
+        domain_directive = self.domain_directive_factories[domain].create_class_directive(*self.directive_args)
+        result = domain_directive.run()
+        self.render(node_stack, project_info, self.options, filter_, target_handler, mask_factory, result[1])
+        return result
 
 
 class DoxygenClassDirective(DoxygenClassLikeDirective):
@@ -591,7 +597,8 @@ class DoxygenDirectiveFactory(object):
 
     def __init__(self, node_factory, text_renderer, root_data_object,
                  renderer_factory_creator_constructor, finder_factory,
-                 project_info_factory, filter_factory, target_handler_factory):
+                 project_info_factory, filter_factory, target_handler_factory,
+                 domain_directive_factories, parser_factory):
 
         self.node_factory = node_factory
         self.text_renderer = text_renderer
@@ -601,6 +608,8 @@ class DoxygenDirectiveFactory(object):
         self.project_info_factory = project_info_factory
         self.filter_factory = filter_factory
         self.target_handler_factory = target_handler_factory
+        self.domain_directive_factories = domain_directive_factories
+        self.parser_factory = parser_factory
 
     # TODO: This methods should be scrapped as they are only called in one place. We should just
     # inline the code at the call site
@@ -619,7 +628,9 @@ class DoxygenDirectiveFactory(object):
             self.finder_factory,
             self.project_info_factory,
             self.filter_factory,
-            self.target_handler_factory
+            self.target_handler_factory,
+            self.domain_directive_factories,
+            self.parser_factory
             )
 
     def create_struct_directive_container(self):
@@ -670,7 +681,9 @@ class DoxygenDirectiveFactory(object):
             self.finder_factory,
             self.project_info_factory,
             self.filter_factory,
-            self.target_handler_factory
+            self.target_handler_factory,
+            self.domain_directive_factories,
+            self.parser_factory
             )
 
     def get_config_values(self, app):
@@ -824,6 +837,18 @@ class FileStateCache(object):
             del self.app.env.breathe_file_state[filename]
 
 
+class CDomainDirectiveFactory:
+    @staticmethod
+    def create_class_directive(*args):
+        return c.CObject(*args)
+
+
+class CPPDomainDirectiveFactory:
+    @staticmethod
+    def create_class_directive(*args):
+        return cpp.CPPClassObject(*args)
+
+
 # Setup
 # -----
 
@@ -848,7 +873,7 @@ def setup(app):
     math_nodes.displaymath = sphinx.ext.mathbase.displaymath
     node_factory = NodeFactory(docutils.nodes, sphinx.addnodes, math_nodes)
 
-    cpp_domain_helper = CppDomainHelper(DefinitionParser, re.sub)
+    cpp_domain_helper = CppDomainHelper(cpp.DefinitionParser, re.sub)
     c_domain_helper = CDomainHelper()
     domain_helpers = {"c": c_domain_helper, "cpp": cpp_domain_helper}
     domain_handler_factory_creator = DomainHandlerFactoryCreator(node_factory, domain_helpers)
@@ -882,7 +907,9 @@ def setup(app):
         finder_factory,
         project_info_factory,
         filter_factory,
-        target_handler_factory
+        target_handler_factory,
+        {"c": CDomainDirectiveFactory, "cpp": CPPDomainDirectiveFactory},
+        parser_factory
         )
 
     DoxygenFunctionDirective.app = app
