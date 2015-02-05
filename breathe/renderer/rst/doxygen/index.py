@@ -66,7 +66,10 @@ class CompoundRenderer(Renderer):
             template_signode.extend(template_nodes)
 
         if node:
-            contentnode = node.children[1]
+            signode, contentnode = node.children
+            # The cpp domain in Sphinx doesn't support structs at the moment, so change the text from "class "
+            # to the correct kind which can be "class " or "struct ".
+            signode[0].children[0] = self.node_factory.Text(kind + " ")
             if template_signode:
                 node.insert(0, template_signode)
             node.children[0].insert(0, doxygen_target)
