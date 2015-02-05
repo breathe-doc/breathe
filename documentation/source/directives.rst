@@ -190,7 +190,7 @@ doxygengroup
 
 This directive generates the appropriate output for the contents of a doxygen
 group. A doxygen group can be declared with specific doxygen markup in the
-source comments as cover in the `doxygen documentation`_.
+source comments as covered in the `doxygen documentation`_.
 
 It takes the standard ``project``, ``path``, ``outline`` and ``no-link`` options
 and additionally the ``content-only``, ``members``, ``protected-members``,
