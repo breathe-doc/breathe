@@ -183,8 +183,8 @@ class DoxygenFunctionDirective(BaseDirective):
         filter_ = self.filter_factory.create_outline_filter(self.options)
 
         mask_factory = NullMaskFactory()
-        return self.do_render(node_stack, project_info, self.options, filter_, target_handler,
-                              mask_factory)
+        # TODO: get full function signature
+        return self.render(node_stack, project_info, self.options, filter_, target_handler, mask_factory)
 
     def parse_args(self, function_description):
         # Strip off trailing qualifiers
@@ -841,7 +841,8 @@ class CPPDomainDirectiveFactory:
     # A mapping from Breathe directive names to domain classes.
     classes = {
         'doxygenclass': cpp.CPPClassObject,
-        'doxygenstruct': cpp.CPPClassObject
+        'doxygenstruct': cpp.CPPClassObject,
+        'doxygenfunction': cpp.CPPFunctionObject
     }
 
     @staticmethod
