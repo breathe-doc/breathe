@@ -82,7 +82,7 @@ class BaseDirective(rst.Directive):
             filename = BaseDirective.get_filename(file_data.compounddef)
         return project_info.domain_for_file(filename)
 
-    def render(self, node_stack, project_info, options, filter_, target_handler, mask_factory, node=None):
+    def do_render(self, node_stack, project_info, options, filter_, target_handler, mask_factory, node=None):
         "Standard render process used by subclasses"
 
         renderer_factory_creator = self.renderer_factory_creator_constructor.create_factory_creator(
@@ -111,3 +111,12 @@ class BaseDirective(rst.Directive):
         node_list = object_renderer.render(node)
 
         return node_list
+
+    def render(self, node_stack, project_info, options, filter_, target_handler, mask_factory):
+        # Defer to domains specific directive.
+        domain = self.get_domain(node_stack, project_info)
+        # TODO: replace domain_directive_factories dictionary with an object
+        domain_directive = self.domain_directive_factories[domain].create(*self.directive_args)
+        result = domain_directive.run()
+        self.do_render(node_stack, project_info, options, filter_, target_handler, mask_factory, result[1])
+        return result
