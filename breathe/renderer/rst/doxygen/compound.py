@@ -220,23 +220,28 @@ class MemberDefTypeSubRenderer(Renderer):
 
     def render(self, node=None):
 
-        # Build targets for linking
-        targets = []
-        targets.extend(self.create_domain_target())
-        targets.extend(self.create_doxygen_target())
+        doxygen_target = self.create_doxygen_target()
+        if node:
+            node.children[0].insert(0, doxygen_target)
+            contentnode = node.children[1]
+        else:
+            # Build targets for linking
+            targets = []
+            targets.extend(self.create_domain_target())
+            targets.extend(doxygen_target)
 
-        signodes = self.build_signodes(targets)
+            signodes = self.build_signodes(targets)
 
-        # Build description nodes
-        contentnode = self.node_factory.desc_content()
+            # Build description nodes
+            contentnode = self.node_factory.desc_content()
+
+            node = self.node_factory.desc()
+            node.document = self.state.document
+            node['objtype'] = self.objtype()
+            node.extend(signodes)
+            node.append(contentnode)
+
         contentnode.extend(self.description())
-
-        node = self.node_factory.desc()
-        node.document = self.state.document
-        node['objtype'] = self.objtype()
-        node.extend(signodes)
-        node.append(contentnode)
-
         return [node]
 
 
