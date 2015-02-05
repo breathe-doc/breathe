@@ -325,7 +325,8 @@ class DoxygenClassLikeDirective(BaseDirective):
         # Defer to domains specific directive.
         node_stack = matches[0]
         domain = self.get_domain(node_stack, project_info)
-        domain_directive = self.domain_directive_factories[domain].create_class_directive(*self.directive_args)
+        args = ('class',) + self.directive_args[1:]
+        domain_directive = self.domain_directive_factories[domain].create_class_directive(*args)
         result = domain_directive.run()
         self.render(node_stack, project_info, self.options, filter_, target_handler, mask_factory, result[1])
         return result
