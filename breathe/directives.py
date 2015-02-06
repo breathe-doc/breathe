@@ -185,7 +185,13 @@ class DoxygenFunctionDirective(BaseDirective):
         mask_factory = NullMaskFactory()
         # Get full function signature for the domain directive.
         node = node_stack[0]
-        signature = node.definition + node.argsstring
+        params = []
+        for param in node.param:
+            param_type = param.type_.content_[0].value
+            if not isinstance(param_type, unicode):
+                param_type = param_type.valueOf_
+            params.append(param_type + ' ' + param.defname)
+        signature = '{}({})'.format(node.definition, ', '.join(params))
         # Remove 'virtual' keyword as Sphinx 1.2 doesn't support virtual functions.
         virtual = 'virtual '
         if signature.startswith(virtual):
