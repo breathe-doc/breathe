@@ -117,6 +117,9 @@ class BaseDirective(rst.Directive):
         domain = self.get_domain(node_stack, project_info)
         # TODO: replace domain_directive_factories dictionary with an object
         domain_directive = self.domain_directive_factories[domain].create(self.directive_args)
+        # Translate Breathe's no-link option into the standard noindex option.
+        if 'no-link' in options:
+            domain_directive.options['noindex'] = True
         result = domain_directive.run()
         self.do_render(node_stack, project_info, options, filter_, target_handler, mask_factory, result[1])
         return result
