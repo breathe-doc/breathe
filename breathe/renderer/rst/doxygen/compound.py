@@ -222,8 +222,10 @@ class MemberDefTypeSubRenderer(Renderer):
 
         doxygen_target = self.create_doxygen_target()
         if node:
-            node.children[0].insert(0, doxygen_target)
-            contentnode = node.children[1]
+            signode, contentnode = node.children
+            if self.data_object.virt:
+                signode.insert(0, self.node_factory.Text("virtual "))
+            signode.insert(0, doxygen_target)
         else:
             # Build targets for linking
             targets = []
