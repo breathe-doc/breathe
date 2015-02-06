@@ -838,16 +838,19 @@ class CDomainDirectiveFactory:
 
 
 class CPPDomainDirectiveFactory:
-    # A mapping from Breathe directive names to domain classes.
+    # A mapping from Breathe directive names to domain classes and directive names.
     classes = {
-        'doxygenclass': cpp.CPPClassObject,
-        'doxygenstruct': cpp.CPPClassObject,
-        'doxygenfunction': cpp.CPPFunctionObject
+        'doxygenclass': (cpp.CPPClassObject, 'class'),
+        'doxygenstruct': (cpp.CPPClassObject, 'class'),
+        'doxygenfunction': (cpp.CPPFunctionObject, 'function')
     }
 
     @staticmethod
     def create(*args):
-        cls = CPPDomainDirectiveFactory.classes.get(args[0], cpp.CPPObject)
+        cls, name = CPPDomainDirectiveFactory.classes.get(args[0], cpp.CPPObject)
+        # Replace the directive name because domain directives don't know how to handle
+        # Breathe's "doxygen" directives.
+        args = (name,) + args[1:]
         return cls(*args)
 
 
