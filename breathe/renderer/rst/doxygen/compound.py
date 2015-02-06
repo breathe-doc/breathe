@@ -278,28 +278,12 @@ class FuncMemberDefTypeSubRenderer(MemberDefTypeSubRenderer):
 
     def build_signodes(self, targets):
 
-        signodes = []
-        title_signode = self.node_factory.desc_signature()
-
-        # Handle any template information
-        if self.data_object.templateparamlist:
-            context = self.context.create_child_context(self.data_object.templateparamlist)
-            renderer = self.renderer_factory.create_renderer(context)
-            template_nodes = [self.node_factory.Text("template <")]
-            template_nodes.extend(renderer.render())
-            template_nodes.append(self.node_factory.Text("> "))
-            template_signode = self.node_factory.desc_signature()
-            # Add targets to the template line if it is there
-            template_signode.extend(targets)
-            template_signode.extend(template_nodes)
-            signodes.append(template_signode)
-
-        else:
-            # Add targets to title line if there is no template line
-            title_signode.extend(targets)
-
-        title_signode.extend(self.title())
-        signodes.append(title_signode)
+        template_node = self.create_template_node(self.data_object)
+        signodes = [template_node] if template_node else []
+        title_node = self.node_factory.desc_signature()
+        title_node.extend(self.title())
+        signodes.append(title_node)
+        signodes[0].extend(targets)
         return signodes
 
     def title(self):
