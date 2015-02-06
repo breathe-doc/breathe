@@ -183,7 +183,9 @@ class DoxygenFunctionDirective(BaseDirective):
         filter_ = self.filter_factory.create_outline_filter(self.options)
 
         mask_factory = NullMaskFactory()
-        # TODO: get full function signature
+        # Get full function signature for the domain directive.
+        node = node_stack[0]
+        self.directive_args[1] = [node.definition + node.argsstring]
         return self.render(node_stack, project_info, self.options, filter_, target_handler, mask_factory)
 
     def parse_args(self, function_description):
@@ -833,7 +835,7 @@ class FileStateCache(object):
 
 class CDomainDirectiveFactory:
     @staticmethod
-    def create(*args):
+    def create(args):
         return c.CObject(*args)
 
 
@@ -846,11 +848,11 @@ class CPPDomainDirectiveFactory:
     }
 
     @staticmethod
-    def create(*args):
+    def create(args):
         cls, name = CPPDomainDirectiveFactory.classes.get(args[0], cpp.CPPObject)
         # Replace the directive name because domain directives don't know how to handle
         # Breathe's "doxygen" directives.
-        args = (name,) + args[1:]
+        args[0] = name
         return cls(*args)
 
 

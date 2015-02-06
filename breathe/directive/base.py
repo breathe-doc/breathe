@@ -50,7 +50,7 @@ class BaseDirective(rst.Directive):
                  project_info_factory, filter_factory, target_handler_factory, domain_directive_factories,
                  parser_factory, *args):
         rst.Directive.__init__(self, *args)
-        self.directive_args = args
+        self.directive_args = list(args)  # Convert tuple to list to allow modification.
 
         self.root_data_object = root_data_object
         self.renderer_factory_creator_constructor = renderer_factory_creator_constructor
@@ -116,7 +116,7 @@ class BaseDirective(rst.Directive):
         # Defer to domains specific directive.
         domain = self.get_domain(node_stack, project_info)
         # TODO: replace domain_directive_factories dictionary with an object
-        domain_directive = self.domain_directive_factories[domain].create(*self.directive_args)
+        domain_directive = self.domain_directive_factories[domain].create(self.directive_args)
         result = domain_directive.run()
         self.do_render(node_stack, project_info, options, filter_, target_handler, mask_factory, result[1])
         return result
