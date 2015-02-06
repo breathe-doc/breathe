@@ -26,7 +26,7 @@ class Renderer(object):
         """Creates a node for the ``template <...>`` part of the declaration represented by object."""
         if not object.templateparamlist:
             return None
-        context = self.context.create_child_context(self.data_object.templateparamlist)
+        context = self.context.create_child_context(object.templateparamlist)
         renderer = self.renderer_factory.create_renderer(context)
         nodes = [self.node_factory.Text("template <")]
         nodes.extend(renderer.render())

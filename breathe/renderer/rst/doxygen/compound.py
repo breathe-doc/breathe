@@ -306,6 +306,14 @@ class FuncMemberDefTypeSubRenderer(MemberDefTypeSubRenderer):
         self.add_qualifiers(nodes)
         return nodes
 
+    def render(self, node=None):
+        result = MemberDefTypeSubRenderer.render(self, node)
+        if node:
+            template_node = self.create_template_node(self.data_object)
+            if template_node:
+                node.insert(0, template_node)
+        return result
+
 
 class DefineMemberDefTypeSubRenderer(MemberDefTypeSubRenderer):
 
