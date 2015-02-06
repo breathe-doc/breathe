@@ -283,7 +283,8 @@ class FuncMemberDefTypeSubRenderer(MemberDefTypeSubRenderer):
         title_node = self.node_factory.desc_signature()
         title_node.extend(self.title())
         signodes.append(title_node)
-        signodes[0].extend(targets)
+        for target in reversed(targets):
+            signodes[0].insert(0, target)
         return signodes
 
     def title(self):
