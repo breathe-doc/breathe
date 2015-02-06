@@ -223,7 +223,7 @@ class MemberDefTypeSubRenderer(Renderer):
         doxygen_target = self.create_doxygen_target()
         if node:
             signode, contentnode = node.children
-            if self.data_object.virt:
+            if self.data_object.virt != 'non-virtual':
                 signode.insert(0, self.node_factory.Text("virtual "))
             signode.insert(0, doxygen_target)
         else:
