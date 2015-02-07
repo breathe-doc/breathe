@@ -22,15 +22,15 @@ class Renderer(object):
         self.domain_handler = domain_handler
         self.target_handler = target_handler
 
-    def create_template_node(self, object):
-        """Creates a node for the ``template <...>`` part of the declaration represented by object."""
-        if not object.templateparamlist:
+    def create_template_node(self, decl):
+        """Creates a node for the ``template <...>`` part of the declaration."""
+        if not decl.templateparamlist:
             return None
-        context = self.context.create_child_context(object.templateparamlist)
+        context = self.context.create_child_context(decl.templateparamlist)
         renderer = self.renderer_factory.create_renderer(context)
         nodes = [self.node_factory.Text("template <")]
         nodes.extend(renderer.render())
-        nodes.append(self.node_factory.Text("> "))
+        nodes.append(self.node_factory.Text(">"))
         signode = self.node_factory.desc_signature()
         signode.extend(nodes)
         return signode
