@@ -218,25 +218,35 @@ class MemberDefTypeSubRenderer(Renderer):
 
         return self.data_object.kind
 
+    def add_qualifiers(self, signode):
+        """Adds qualifiers to the signature node if necessary."""
+        pass
+
     def render(self, node=None):
 
-        # Build targets for linking
-        targets = []
-        targets.extend(self.create_domain_target())
-        targets.extend(self.create_doxygen_target())
+        doxygen_target = self.create_doxygen_target()
+        if node:
+            signode, contentnode = node.children
+            self.add_qualifiers(signode)
+            signode.insert(0, doxygen_target)
+        else:
+            # Build targets for linking
+            targets = []
+            targets.extend(self.create_domain_target())
+            targets.extend(doxygen_target)
 
-        signodes = self.build_signodes(targets)
+            signodes = self.build_signodes(targets)
 
-        # Build description nodes
-        contentnode = self.node_factory.desc_content()
+            # Build description nodes
+            contentnode = self.node_factory.desc_content()
+
+            node = self.node_factory.desc()
+            node.document = self.state.document
+            node['objtype'] = self.objtype()
+            node.extend(signodes)
+            node.append(contentnode)
+
         contentnode.extend(self.description())
-
-        node = self.node_factory.desc()
-        node.document = self.state.document
-        node['objtype'] = self.objtype()
-        node.extend(signodes)
-        node.append(contentnode)
-
         return [node]
 
 
@@ -246,39 +256,40 @@ class FuncMemberDefTypeSubRenderer(MemberDefTypeSubRenderer):
 
         return self.domain_handler.create_function_target(self.data_object)
 
+    def add_qualifiers(self, signode):
+
+        # Note whether a member function is virtual
+        if self.data_object.virt != 'non-virtual':
+            signode.insert(0, self.node_factory.Text('virtual '))
+
+        # Add CV-qualifiers
+        if self.data_object.const == 'yes':
+            signode.append(self.node_factory.Text(' const'))
+        # The doxygen xml output doesn't seem to properly register 'volatile' as the xml attribute
+        # 'volatile' so we have to check the argsstring for the moment. Maybe it'll change in
+        # doxygen at some point. Registered as bug:
+        #     https://bugzilla.gnome.org/show_bug.cgi?id=733451
+        if self.data_object.volatile == 'yes' or self.data_object.argsstring.endswith('volatile'):
+            signode.append(self.node_factory.Text(' volatile'))
+
+        # Add `= 0` for pure virtual members.
+        if self.data_object.virt == 'pure-virtual':
+            signode.append(self.node_factory.Text(' = 0'))
+
     def build_signodes(self, targets):
 
-        signodes = []
-        title_signode = self.node_factory.desc_signature()
-
-        # Handle any template information
-        if self.data_object.templateparamlist:
-            context = self.context.create_child_context(self.data_object.templateparamlist)
-            renderer = self.renderer_factory.create_renderer(context)
-            template_nodes = [self.node_factory.Text("template <")]
-            template_nodes.extend(renderer.render())
-            template_nodes.append(self.node_factory.Text("> "))
-            template_signode = self.node_factory.desc_signature()
-            # Add targets to the template line if it is there
-            template_signode.extend(targets)
-            template_signode.extend(template_nodes)
-            signodes.append(template_signode)
-
-        else:
-            # Add targets to title line if there is no template line
-            title_signode.extend(targets)
-
-        title_signode.extend(self.title())
-        signodes.append(title_signode)
+        template_node = self.create_template_node(self.data_object)
+        signodes = [template_node] if template_node else []
+        title_node = self.node_factory.desc_signature()
+        title_node.extend(self.title())
+        signodes.append(title_node)
+        for target in reversed(targets):
+            signodes[0].insert(0, target)
         return signodes
 
     def title(self):
 
         nodes = []
-
-        # Note whether a member function is virtual
-        if self.data_object.virt != 'non-virtual':
-            nodes.append(self.node_factory.Text('virtual '))
 
         # Get the function type and name
         nodes.extend(MemberDefTypeSubRenderer.title(self))
@@ -293,21 +304,16 @@ class FuncMemberDefTypeSubRenderer(MemberDefTypeSubRenderer):
             paramlist.append(param)
         nodes.append(paramlist)
 
-        # Add CV-qualifiers
-        if self.data_object.const == 'yes':
-            nodes.append(self.node_factory.Text(' const'))
-        # The doxygen xml output doesn't seem to properly register 'volatile' as the xml attribute
-        # 'volatile' so we have to check the argsstring for the moment. Maybe it'll change in
-        # doxygen at some point. Registered as bug:
-        #     https://bugzilla.gnome.org/show_bug.cgi?id=733451
-        if self.data_object.volatile == 'yes' or self.data_object.argsstring.endswith('volatile'):
-            nodes.append(self.node_factory.Text(' volatile'))
-
-        # Add `= 0` for pure virtual members.
-        if self.data_object.virt == 'pure-virtual':
-            nodes.append(self.node_factory.Text(' = 0'))
-
+        self.add_qualifiers(nodes)
         return nodes
+
+    def render(self, node=None):
+        result = MemberDefTypeSubRenderer.render(self, node)
+        if node:
+            template_node = self.create_template_node(self.data_object)
+            if template_node:
+                node.insert(0, template_node)
+        return result
 
 
 class DefineMemberDefTypeSubRenderer(MemberDefTypeSubRenderer):

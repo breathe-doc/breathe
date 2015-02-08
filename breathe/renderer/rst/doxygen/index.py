@@ -55,15 +55,7 @@ class CompoundRenderer(Renderer):
         new_context = parent_context.create_child_context(file_data.compounddef)
 
         # Check if there is template information and format it as desired
-        template_signode = None
-        if file_data.compounddef.templateparamlist:
-            context = new_context.create_child_context(file_data.compounddef.templateparamlist)
-            renderer = self.renderer_factory.create_renderer(context)
-            template_nodes = [self.node_factory.Text("template <")]
-            template_nodes.extend(renderer.render())
-            template_nodes.append(self.node_factory.Text(">"))
-            template_signode = self.node_factory.desc_signature()
-            template_signode.extend(template_nodes)
+        template_signode = self.create_template_node(file_data.compounddef)
 
         if node:
             signode, contentnode = node.children

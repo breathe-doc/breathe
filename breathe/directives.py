@@ -183,8 +183,21 @@ class DoxygenFunctionDirective(BaseDirective):
         filter_ = self.filter_factory.create_outline_filter(self.options)
 
         mask_factory = NullMaskFactory()
-        return self.render(node_stack, project_info, self.options, filter_, target_handler,
-                           mask_factory)
+        # Get full function signature for the domain directive.
+        node = node_stack[0]
+        params = []
+        for param in node.param:
+            param_type = param.type_.content_[0].value
+            if not isinstance(param_type, unicode):
+                param_type = param_type.valueOf_
+            params.append(param_type + ' ' + (param.defname if param.defname else param.declname))
+        signature = '{0}({1})'.format(node.definition, ', '.join(params))
+        # Remove 'virtual' keyword as Sphinx 1.2 doesn't support virtual functions.
+        virtual = 'virtual '
+        if signature.startswith(virtual):
+            signature = signature[len(virtual):]
+        self.directive_args[1] = [signature]
+        return self.render(node_stack, project_info, self.options, filter_, target_handler, mask_factory)
 
     def parse_args(self, function_description):
         # Strip off trailing qualifiers
@@ -248,8 +261,8 @@ class DoxygenFunctionDirective(BaseDirective):
                 )
             filter_ = self.filter_factory.create_outline_filter(text_options)
             mask_factory = MaskFactory({'param': NoParameterNamesMask})
-            nodes = self.render(entry, project_info, text_options, filter_, target_handler,
-                                mask_factory)
+            nodes = self.do_render(entry, project_info, text_options, filter_, target_handler,
+                                   mask_factory)
 
             # Render the nodes to text
             signature = self.text_renderer.render(nodes, self.state.document)
@@ -322,14 +335,7 @@ class DoxygenClassLikeDirective(BaseDirective):
         filter_ = self.filter_factory.create_class_filter(name, self.options)
 
         mask_factory = NullMaskFactory()
-        # Defer to domains specific directive.
-        node_stack = matches[0]
-        domain = self.get_domain(node_stack, project_info)
-        args = ('class',) + self.directive_args[1:]
-        domain_directive = self.domain_directive_factories[domain].create_class_directive(*args)
-        result = domain_directive.run()
-        self.render(node_stack, project_info, self.options, filter_, target_handler, mask_factory, result[1])
-        return result
+        return self.render(matches[0], project_info, self.options, filter_, target_handler, mask_factory)
 
 
 class DoxygenClassDirective(DoxygenClassLikeDirective):
@@ -504,7 +510,7 @@ class DoxygenBaseItemDirective(BaseDirective):
 
         node_stack = matches[0]
         mask_factory = NullMaskFactory()
-        return self.render(node_stack, project_info, self.options, filter_, target_handler, mask_factory)
+        return self.do_render(node_stack, project_info, self.options, filter_, target_handler, mask_factory)
 
 
 class DoxygenVariableDirective(DoxygenBaseItemDirective):
@@ -840,14 +846,25 @@ class FileStateCache(object):
 
 class CDomainDirectiveFactory:
     @staticmethod
-    def create_class_directive(*args):
+    def create(args):
         return c.CObject(*args)
 
 
 class CPPDomainDirectiveFactory:
+    # A mapping from Breathe directive names to domain classes and directive names.
+    classes = {
+        'doxygenclass': (cpp.CPPClassObject, 'class'),
+        'doxygenstruct': (cpp.CPPClassObject, 'class'),
+        'doxygenfunction': (cpp.CPPFunctionObject, 'function')
+    }
+
     @staticmethod
-    def create_class_directive(*args):
-        return cpp.CPPClassObject(*args)
+    def create(args):
+        cls, name = CPPDomainDirectiveFactory.classes.get(args[0], cpp.CPPObject)
+        # Replace the directive name because domain directives don't know how to handle
+        # Breathe's "doxygen" directives.
+        args[0] = name
+        return cls(*args)
 
 
 # Setup
