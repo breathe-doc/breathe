@@ -261,8 +261,7 @@ class DoxygenFunctionDirective(BaseDirective):
                 )
             filter_ = self.filter_factory.create_outline_filter(text_options)
             mask_factory = MaskFactory({'param': NoParameterNamesMask})
-            nodes = self.do_render(entry, project_info, text_options, filter_, target_handler,
-                                   mask_factory)
+            nodes = self.render(entry, project_info, text_options, filter_, target_handler, mask_factory)
 
             # Render the nodes to text
             signature = self.text_renderer.render(nodes, self.state.document)
@@ -510,7 +509,7 @@ class DoxygenBaseItemDirective(BaseDirective):
 
         node_stack = matches[0]
         mask_factory = NullMaskFactory()
-        return self.do_render(node_stack, project_info, self.options, filter_, target_handler, mask_factory)
+        return self.render(node_stack, project_info, self.options, filter_, target_handler, mask_factory)
 
 
 class DoxygenVariableDirective(DoxygenBaseItemDirective):
@@ -604,8 +603,7 @@ class DoxygenDirectiveFactory(object):
 
     def __init__(self, node_factory, text_renderer, root_data_object,
                  renderer_factory_creator_constructor, finder_factory,
-                 project_info_factory, filter_factory, target_handler_factory,
-                 domain_directive_factories, parser_factory):
+                 project_info_factory, filter_factory, target_handler_factory, parser_factory):
 
         self.node_factory = node_factory
         self.text_renderer = text_renderer
@@ -615,7 +613,6 @@ class DoxygenDirectiveFactory(object):
         self.project_info_factory = project_info_factory
         self.filter_factory = filter_factory
         self.target_handler_factory = target_handler_factory
-        self.domain_directive_factories = domain_directive_factories
         self.parser_factory = parser_factory
 
     # TODO: This methods should be scrapped as they are only called in one place. We should just
@@ -636,7 +633,6 @@ class DoxygenDirectiveFactory(object):
             self.project_info_factory,
             self.filter_factory,
             self.target_handler_factory,
-            self.domain_directive_factories,
             self.parser_factory
             )
 
@@ -689,7 +685,6 @@ class DoxygenDirectiveFactory(object):
             self.project_info_factory,
             self.filter_factory,
             self.target_handler_factory,
-            self.domain_directive_factories,
             self.parser_factory
             )
 
@@ -860,7 +855,7 @@ class CPPDomainDirectiveFactory:
 
     @staticmethod
     def create(args):
-        cls, name = CPPDomainDirectiveFactory.classes.get(args[0], cpp.CPPObject)
+        cls, name = CPPDomainDirectiveFactory.classes.get(args[0], (cpp.CPPMemberObject, 'member'))
         # Replace the directive name because domain directives don't know how to handle
         # Breathe's "doxygen" directives.
         args[0] = name
@@ -901,6 +896,7 @@ def setup(app):
     renderer_factory_creator_constructor = DoxygenToRstRendererFactoryCreatorConstructor(
         node_factory,
         parser_factory,
+        {"c": CDomainDirectiveFactory, "cpp": CPPDomainDirectiveFactory},
         default_domain_handler,
         domain_handler_factory_creator,
         rst_content_creator
@@ -926,7 +922,6 @@ def setup(app):
         project_info_factory,
         filter_factory,
         target_handler_factory,
-        {"c": CDomainDirectiveFactory, "cpp": CPPDomainDirectiveFactory},
         parser_factory
         )
 
