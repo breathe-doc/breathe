@@ -9,7 +9,8 @@ class Renderer(object):
             state,
             document,
             domain_handler,
-            target_handler
+            target_handler,
+            domain_directive_factories
             ):
 
         self.project_info = project_info
@@ -21,6 +22,7 @@ class Renderer(object):
         self.document = document
         self.domain_handler = domain_handler
         self.target_handler = target_handler
+        self.domain_directive_factories = domain_directive_factories
 
     def create_template_node(self, decl):
         """Creates a node for the ``template <...>`` part of the declaration."""
