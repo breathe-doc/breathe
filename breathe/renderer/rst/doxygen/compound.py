@@ -368,6 +368,11 @@ class EnumMemberDefTypeSubRenderer(MemberDefTypeSubRenderer):
 
         return description_nodes
 
+    def update_signature(self, signode):
+        # Replace "type" with "enum" in the signature. This is needed because Sphinx cpp domain doesn't have an enum
+        # directive and we use a type directive instead.
+        signode.children[0][0] = self.node_factory.Text("enum ")
+
 
 class TypedefMemberDefTypeSubRenderer(MemberDefTypeSubRenderer):
 
