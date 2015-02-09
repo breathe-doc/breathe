@@ -218,8 +218,8 @@ class MemberDefTypeSubRenderer(Renderer):
 
         return self.data_object.kind
 
-    def add_qualifiers(self, signode):
-        """Adds qualifiers to the signature node if necessary."""
+    def update_signature(self, signode):
+        """Update the signature node if necessary, e.g. add qualifiers."""
         pass
 
     def render(self, node=None):
@@ -227,7 +227,7 @@ class MemberDefTypeSubRenderer(Renderer):
         doxygen_target = self.create_doxygen_target()
         if node:
             signode, contentnode = node.children
-            self.add_qualifiers(signode)
+            self.update_signature(signode)
             signode.insert(0, doxygen_target)
         else:
             # Build targets for linking
@@ -256,7 +256,7 @@ class FuncMemberDefTypeSubRenderer(MemberDefTypeSubRenderer):
 
         return self.domain_handler.create_function_target(self.data_object)
 
-    def add_qualifiers(self, signode):
+    def update_signature(self, signode):
 
         # Note whether a member function is virtual
         if self.data_object.virt != 'non-virtual':
@@ -304,7 +304,7 @@ class FuncMemberDefTypeSubRenderer(MemberDefTypeSubRenderer):
             paramlist.append(param)
         nodes.append(paramlist)
 
-        self.add_qualifiers(nodes)
+        self.update_signature(nodes)
         return nodes
 
     def render(self, node=None):
@@ -423,6 +423,11 @@ class EnumvalueTypeSubRenderer(MemberDefTypeSubRenderer):
     def objtype(self):
 
         return 'enumvalue'
+
+    def update_signature(self, signode):
+        # Remove "class" from the signature. This is needed because Sphinx cpp domain doesn't have an enum value
+        # directive and we use a class directive instead.
+        signode.children.pop(0)
 
 
 class DescriptionTypeSubRenderer(Renderer):
