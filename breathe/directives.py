@@ -850,7 +850,8 @@ class CPPDomainDirectiveFactory:
     classes = {
         'doxygenclass': (cpp.CPPClassObject, 'class'),
         'doxygenstruct': (cpp.CPPClassObject, 'class'),
-        'doxygenfunction': (cpp.CPPFunctionObject, 'function')
+        'doxygenfunction': (cpp.CPPFunctionObject, 'function'),
+        'doxygentypedef': (cpp.CPPTypeObject, 'type')
     }
 
     @staticmethod
