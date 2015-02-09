@@ -182,22 +182,7 @@ class DoxygenFunctionDirective(BaseDirective):
             )
         filter_ = self.filter_factory.create_outline_filter(self.options)
 
-        mask_factory = NullMaskFactory()
-        # Get full function signature for the domain directive.
-        node = node_stack[0]
-        params = []
-        for param in node.param:
-            param_type = param.type_.content_[0].value
-            if not isinstance(param_type, unicode):
-                param_type = param_type.valueOf_
-            params.append(param_type + ' ' + (param.defname if param.defname else param.declname))
-        signature = '{0}({1})'.format(node.definition, ', '.join(params))
-        # Remove 'virtual' keyword as Sphinx 1.2 doesn't support virtual functions.
-        virtual = 'virtual '
-        if signature.startswith(virtual):
-            signature = signature[len(virtual):]
-        self.directive_args[1] = [signature]
-        return self.render(node_stack, project_info, self.options, filter_, target_handler, mask_factory)
+        return self.render(node_stack, project_info, self.options, filter_, target_handler, NullMaskFactory())
 
     def parse_args(self, function_description):
         # Strip off trailing qualifiers
@@ -282,6 +267,23 @@ class DoxygenFunctionDirective(BaseDirective):
             raise UnableToResolveFunctionError(signatures)
 
         return node_stack
+
+    def render(self, node_stack, project_info, options, filter_, target_handler, mask_factory):
+        # Get full function signature for the domain directive.
+        node = node_stack[0]
+        params = []
+        for param in node.param:
+            param_type = param.type_.content_[0].value
+            if not isinstance(param_type, unicode):
+                param_type = param_type.valueOf_
+            params.append(param_type + ' ' + (param.defname if param.defname else param.declname))
+        signature = '{0}({1})'.format(node.definition, ', '.join(params))
+        # Remove 'virtual' keyword as Sphinx 1.2 doesn't support virtual functions.
+        virtual = 'virtual '
+        if signature.startswith(virtual):
+            signature = signature[len(virtual):]
+        self.directive_args[1] = [signature]
+        return BaseDirective.render(self, node_stack, project_info, options, filter_, target_handler, mask_factory)
 
 
 class DoxygenClassLikeDirective(BaseDirective):
@@ -864,7 +866,7 @@ class CPPDomainDirectiveFactory:
         cls, name = CPPDomainDirectiveFactory.classes.get(args[0], (cpp.CPPMemberObject, 'member'))
         # Replace the directive name because domain directives don't know how to handle
         # Breathe's "doxygen" directives.
-        args[0] = name
+        args = [name] + args[1:]
         return cls(*args)
 
 
