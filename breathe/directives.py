@@ -851,8 +851,9 @@ class CPPDomainDirectiveFactory:
         'doxygenclass': (cpp.CPPClassObject, 'class'),
         'doxygenstruct': (cpp.CPPClassObject, 'class'),
         'doxygenfunction': (cpp.CPPFunctionObject, 'function'),
-        'doxygentypedef': (cpp.CPPTypeObject, 'type'),
         'doxygenenum': (cpp.CPPTypeObject, 'type'),
+        'doxygentypedef': (cpp.CPPTypeObject, 'type'),
+        'doxygenunion': (cpp.CPPTypeObject, 'type'),
         # Use CPPClassObject for enum values as the cpp domain doesn't have a directive for enum values and
         # CPPMemberObject requires a type.
         'doxygenenumvalue': (cpp.CPPClassObject, 'member')
