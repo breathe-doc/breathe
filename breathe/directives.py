@@ -273,10 +273,12 @@ class DoxygenFunctionDirective(BaseDirective):
         node = node_stack[0]
         params = []
         for param in node.param:
+            param = mask_factory.mask(param)
             param_type = param.type_.content_[0].value
             if not isinstance(param_type, unicode):
                 param_type = param_type.valueOf_
-            params.append(param_type + ' ' + (param.defname if param.defname else param.declname))
+            param_name = param.defname if param.defname else param.declname
+            params.append(param_type if not param_name else param_type + ' ' + param_name)
         signature = '{0}({1})'.format(node.definition, ', '.join(params))
         # Remove 'virtual' keyword as Sphinx 1.2 doesn't support virtual functions.
         virtual = 'virtual '
