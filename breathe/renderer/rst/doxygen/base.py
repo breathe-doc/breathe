@@ -10,7 +10,7 @@ class Renderer(object):
             document,
             domain_handler,
             target_handler,
-            domain_directive_factories
+            domain_directive_factories,
             ):
 
         self.project_info = project_info
@@ -40,12 +40,13 @@ class Renderer(object):
 
 class RenderContext(object):
 
-    def __init__(self, node_stack, mask_factory):
+    def __init__(self, node_stack, mask_factory, directive_args):
         self.node_stack = node_stack
         self.mask_factory = mask_factory
+        self.directive_args = directive_args
 
     def create_child_context(self, data_object):
 
         node_stack = self.node_stack[:]
         node_stack.insert(0, self.mask_factory.mask(data_object))
-        return RenderContext(node_stack, self.mask_factory)
+        return RenderContext(node_stack, self.mask_factory, self.directive_args)
