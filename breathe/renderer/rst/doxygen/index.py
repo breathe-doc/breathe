@@ -84,7 +84,7 @@ class CompoundRenderer(Renderer):
         # TODO: replace domain_directive_factories dictionary with an object
         domain_directive = self.renderer_factory.domain_directive_factories[self.context.domain].create(
             self.context.directive_args)
-        domain_directive.arguments[0] = name
+        domain_directive.arguments[0] = kind + ' ' + name
         # Translate Breathe's no-link option into the standard noindex option.
         if 'no-link' in self.context.directive_args[2]:
             domain_directive.options['noindex'] = True
