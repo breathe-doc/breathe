@@ -31,9 +31,13 @@ class AutoProjectInfo(object):
         self._reference = reference
         self._source_dir = source_dir
         self._config_dir = config_dir
-        self._domain_by_extension = domain_by_extension
+        self._domain_by_extension = dict(domain_by_extension)
         self._domain_by_file_pattern = domain_by_file_pattern
         self._match = match
+
+        # Add default mapping from extension to domain  which can be overridden by the user.
+        if 'h' not in self._domain_by_extension:
+            self._domain_by_extension['h'] = 'c'
 
     def name(self):
         return self._name
