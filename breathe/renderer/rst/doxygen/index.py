@@ -20,10 +20,9 @@ class CompoundRenderer(Renderer):
     """Base class for CompoundTypeSubRenderer and RefTypeSubRenderer."""
 
     def __init__(self, compound_parser, render_empty_node, *args):
-        Renderer.__init__(self, *args)
-
         self.compound_parser = compound_parser
         self.render_empty_node = render_empty_node
+        Renderer.__init__(self, *args)
 
     def create_doxygen_target(self):
         """Can be overridden to create a target node which uses the doxygen refid information
@@ -35,34 +34,11 @@ class CompoundRenderer(Renderer):
         refid = "%s%s" % (self.project_info.name(), self.data_object.refid)
         return self.target_handler.create_target(refid)
 
-    def get_domain(self):
-        """Returns the domain for the current node."""
-
-        def get_filename(node):
-            """Returns the name of a file where the declaration represented by node is located."""
-            try:
-                return node.location.file
-            except AttributeError:
-                return None
-
-        node_stack = self.context.node_stack
-        node = node_stack[0]
-        # An enumvalue node doesn't have location, so use its parent node for detecting the domain instead.
-        if node.node_type == "enumvalue":
-            node = node_stack[1]
-        filename = get_filename(node)
-        if not filename and node.node_type == "compound":
-            file_data = self.compound_parser.parse(node.refid)
-            filename = get_filename(file_data.compounddef)
-        return self.project_info.domain_for_file(filename)
-
     def render(self, node=None):
 
         # Read in the corresponding xml file and process
         file_data = self.compound_parser.parse(self.data_object.refid)
 
-        if not self.context.domain:
-            self.context.domain = self.get_domain()
         parent_context = self.context.create_child_context(file_data)
 
         name, kind = self.get_node_info(file_data)
