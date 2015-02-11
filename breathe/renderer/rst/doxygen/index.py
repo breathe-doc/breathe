@@ -61,6 +61,8 @@ class CompoundRenderer(Renderer):
         # Read in the corresponding xml file and process
         file_data = self.compound_parser.parse(self.data_object.refid)
 
+        if not self.context.domain:
+            self.context.domain = self.get_domain()
         parent_context = self.context.create_child_context(file_data)
 
         name, kind = self.get_node_info(file_data)
@@ -79,9 +81,10 @@ class CompoundRenderer(Renderer):
         template_signode = self.create_template_node(file_data.compounddef)
 
         # Defer to domains specific directive.
-        domain = self.get_domain()
         # TODO: replace domain_directive_factories dictionary with an object
-        domain_directive = self.renderer_factory.domain_directive_factories[domain].create(self.context.directive_args)
+        domain_directive = self.renderer_factory.domain_directive_factories[self.context.domain].create(
+            self.context.directive_args)
+        domain_directive.arguments[0] = name
         # Translate Breathe's no-link option into the standard noindex option.
         if 'no-link' in self.context.directive_args[2]:
             domain_directive.options['noindex'] = True
