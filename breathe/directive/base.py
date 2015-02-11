@@ -59,27 +59,6 @@ class BaseDirective(rst.Directive):
         self.target_handler_factory = target_handler_factory
         self.parser_factory = parser_factory
 
-    @staticmethod
-    def get_filename(node):
-        """Returns the name of a file where the declaration represented by node is located."""
-        try:
-            return node.location.file
-        except AttributeError:
-            return None
-
-    def get_domain(self, node_stack, project_info):
-        """Returns the domain for the declaration represented by node_stack."""
-        node = node_stack[0]
-        # An enumvalue node doesn't have location, so use its parent node for detecting the domain instead.
-        if node.node_type == "enumvalue":
-            node = node_stack[1]
-        filename = BaseDirective.get_filename(node)
-        if not filename and node.node_type == "compound":
-            compound_parser = self.parser_factory.create_compound_parser(project_info)
-            file_data = compound_parser.parse(node.refid)
-            filename = BaseDirective.get_filename(file_data.compounddef)
-        return project_info.domain_for_file(filename)
-
     def render(self, node_stack, project_info, options, filter_, target_handler, mask_factory):
         "Standard render process used by subclasses"
 
@@ -104,17 +83,6 @@ class BaseDirective(rst.Directive):
         except FileIOError as e:
             return format_parser_error("doxygenclass", e.error, e.filename, self.state, self.lineno)
 
-        # Defer to domains specific directive.
-        domain = self.get_domain(node_stack, project_info)
-        # TODO: replace domain_directive_factories dictionary with an object
-        domain_directive = renderer_factory.domain_directive_factories[domain].create(self.directive_args)
-        # Translate Breathe's no-link option into the standard noindex option.
-        if 'no-link' in options:
-            domain_directive.options['noindex'] = True
-        result = domain_directive.run()
-
-        context = RenderContext(node_stack, mask_factory)
+        context = RenderContext(node_stack, mask_factory, self.directive_args)
         object_renderer = renderer_factory.create_renderer(context)
-        object_renderer.render(result[1])
-
-        return result
+        return object_renderer.render()

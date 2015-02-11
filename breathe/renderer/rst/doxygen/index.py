@@ -35,6 +35,27 @@ class CompoundRenderer(Renderer):
         refid = "%s%s" % (self.project_info.name(), self.data_object.refid)
         return self.target_handler.create_target(refid)
 
+    def get_domain(self):
+        """Returns the domain for the current node."""
+
+        def get_filename(node):
+            """Returns the name of a file where the declaration represented by node is located."""
+            try:
+                return node.location.file
+            except AttributeError:
+                return None
+
+        node_stack = self.context.node_stack
+        node = node_stack[0]
+        # An enumvalue node doesn't have location, so use its parent node for detecting the domain instead.
+        if node.node_type == "enumvalue":
+            node = node_stack[1]
+        filename = get_filename(node)
+        if not filename and node.node_type == "compound":
+            file_data = self.compound_parser.parse(node.refid)
+            filename = get_filename(file_data.compounddef)
+        return self.project_info.domain_for_file(filename)
+
     def render(self, node=None):
 
         # Read in the corresponding xml file and process
@@ -57,34 +78,23 @@ class CompoundRenderer(Renderer):
         # Check if there is template information and format it as desired
         template_signode = self.create_template_node(file_data.compounddef)
 
-        if node:
-            signode, contentnode = node.children
-            # The cpp domain in Sphinx doesn't support structs at the moment, so change the text from "class "
-            # to the correct kind which can be "class " or "struct ".
-            signode[0].children[0] = self.node_factory.Text(kind + " ")
-            if template_signode:
-                node.insert(0, template_signode)
-            node.children[0].insert(0, doxygen_target)
-        else:
-            # Build targets for linking
-            targets = []
-            targets.extend(self.create_domain_target())
-            targets.extend(doxygen_target)
+        # Defer to domains specific directive.
+        domain = self.get_domain()
+        # TODO: replace domain_directive_factories dictionary with an object
+        domain_directive = self.renderer_factory.domain_directive_factories[domain].create(self.context.directive_args)
+        # Translate Breathe's no-link option into the standard noindex option.
+        if 'no-link' in self.context.directive_args[2]:
+            domain_directive.options['noindex'] = True
+        nodes = domain_directive.run()
+        node = nodes[1]
 
-            title_signode = self.node_factory.desc_signature()
-            if template_signode:
-                # Add targets to the template line if it is there
-                template_signode.extend(targets)
-            else:
-                # Add targets to title line if there is no template line
-                title_signode.extend(targets)
-
-            # Set up the title
-            title_signode.append(self.node_factory.emphasis(text=kind))
-            title_signode.append(self.node_factory.Text(" "))
-            title_signode.append(self.node_factory.desc_name(text=name))
-
-            contentnode = self.node_factory.desc_content()
+        signode, contentnode = node.children
+        # The cpp domain in Sphinx doesn't support structs at the moment, so change the text from "class "
+        # to the correct kind which can be "class " or "struct ".
+        signode[0].children[0] = self.node_factory.Text(kind + " ")
+        if template_signode:
+            node.insert(0, template_signode)
+        node.children[0].insert(0, doxygen_target)
 
         if file_data.compounddef.includes:
             for include in file_data.compounddef.includes:
@@ -93,16 +103,7 @@ class CompoundRenderer(Renderer):
                 contentnode.extend(renderer.render())
 
         contentnode.extend(rendered_data)
-
-        if not node:
-            node = self.node_factory.desc()
-            node.document = self.state.document
-            node['objtype'] = kind
-            if template_signode:
-                node.append(template_signode)
-            node.append(title_signode)
-            node.append(contentnode)
-            return [node]
+        return nodes
 
 
 class CompoundTypeSubRenderer(CompoundRenderer):
