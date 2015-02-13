@@ -854,29 +854,28 @@ class FileStateCache(object):
 
 
 class DomainDirectiveFactory:
-    # A mapping from Breathe directive names to cpp domain classes and directive names.
+    # A mapping from node kinds to cpp domain classes and directive names.
     cpp_classes = {
-        'doxygenclass': (cpp.CPPClassObject, 'class'),
-        'doxygenstruct': (cpp.CPPClassObject, 'class'),
-        'doxygenfunction': (cpp.CPPFunctionObject, 'function'),
-        'doxygenenum': (cpp.CPPTypeObject, 'type'),
-        'doxygentypedef': (cpp.CPPTypeObject, 'type'),
-        'doxygenunion': (cpp.CPPTypeObject, 'type'),
+        'class': (cpp.CPPClassObject, 'class'),
+        'struct': (cpp.CPPClassObject, 'class'),
+        'function': (cpp.CPPFunctionObject, 'function'),
+        'enum': (cpp.CPPTypeObject, 'type'),
+        'typedef': (cpp.CPPTypeObject, 'type'),
+        'union': (cpp.CPPTypeObject, 'type'),
         # Use CPPClassObject for enum values as the cpp domain doesn't have a directive for enum values and
         # CPPMemberObject requires a type.
-        'doxygenenumvalue': (cpp.CPPClassObject, 'member')
+        'enumvalue': (cpp.CPPClassObject, 'member')
     }
 
     @staticmethod
     def create(domain, args):
-        if domain == 'cpp':
-            cls, name = DomainDirectiveFactory.cpp_classes.get(args[0], (cpp.CPPMemberObject, 'member'))
-            # Replace the directive name because domain directives don't know how to handle
-            # Breathe's "doxygen" directives.
-            args = [name] + args[1:]
-            return cls(*args)
         if domain == 'c':
             return c.CObject(*args)
+        cls, name = DomainDirectiveFactory.cpp_classes.get(args[0], (cpp.CPPMemberObject, 'member'))
+        # Replace the directive name because domain directives don't know how to handle
+        # Breathe's "doxygen" directives.
+        args = [name] + args[1:]
+        return cls(*args)
 
 
 # Setup
