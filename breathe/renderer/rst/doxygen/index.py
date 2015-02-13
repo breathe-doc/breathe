@@ -34,33 +34,13 @@ class CompoundRenderer(Renderer):
         refid = "%s%s" % (self.project_info.name(), self.data_object.refid)
         return self.target_handler.create_target(refid)
 
-    def render(self, node=None):
-
-        # Read in the corresponding xml file and process
-        file_data = self.compound_parser.parse(self.data_object.refid)
-
-        parent_context = self.context.create_child_context(file_data)
-
-        name, kind = self.get_node_info(file_data)
-
-        data_renderer = self.renderer_factory.create_renderer(parent_context)
-        rendered_data = data_renderer.render()
-
-        if not rendered_data and not self.render_empty_node:
-            return []
-
-        doxygen_target = self.create_doxygen_target()
-        file_data = parent_context.node_stack[0]
-        new_context = parent_context.create_child_context(file_data.compounddef)
-
-        # Check if there is template information and format it as desired
-        template_signode = self.create_template_node(file_data.compounddef)
-
+    def render_signature(self, file_data, doxygen_target):
         # Defer to domains specific directive.
-        # TODO: replace domain_directive_factories dictionary with an object
-        domain_directive = self.renderer_factory.domain_directive_factories[self.context.domain].create(
-            self.context.directive_args)
+        name, kind = self.get_node_info(file_data)
+        domain_directive = self.renderer_factory.domain_directive_factory.create(
+            self.context.domain, self.context.directive_args)
         domain_directive.arguments = [kind + ' ' + name]
+
         # Translate Breathe's no-link option into the standard noindex option.
         if 'no-link' in self.context.directive_args[2]:
             domain_directive.options['noindex'] = True
@@ -71,9 +51,30 @@ class CompoundRenderer(Renderer):
         # The cpp domain in Sphinx doesn't support structs at the moment, so change the text from "class "
         # to the correct kind which can be "class " or "struct ".
         signode[0].children[0] = self.node_factory.Text(kind + " ")
+
+        # Check if there is template information and format it as desired
+        template_signode = self.create_template_node(file_data.compounddef)
         if template_signode:
             node.insert(0, template_signode)
         node.children[0].insert(0, doxygen_target)
+        return nodes, contentnode
+
+    def render(self, node=None):
+
+        # Read in the corresponding xml file and process
+        file_data = self.compound_parser.parse(self.data_object.refid)
+
+        parent_context = self.context.create_child_context(file_data)
+        data_renderer = self.renderer_factory.create_renderer(parent_context)
+        rendered_data = data_renderer.render()
+
+        if not rendered_data and not self.render_empty_node:
+            return []
+
+        file_data = parent_context.node_stack[0]
+        new_context = parent_context.create_child_context(file_data.compounddef)
+
+        nodes, contentnode = self.render_signature(file_data, self.create_doxygen_target())
 
         if file_data.compounddef.includes:
             for include in file_data.compounddef.includes:
@@ -101,3 +102,30 @@ class CompoundTypeSubRenderer(CompoundRenderer):
         instead of some kind of special null node value"""
 
         return []
+
+
+class FileRenderer(CompoundTypeSubRenderer):
+
+    def render_signature(self, file_data, doxygen_target):
+        # Build targets for linking
+        targets = []
+        targets.extend(self.create_domain_target())
+        targets.extend(doxygen_target)
+
+        title_signode = self.node_factory.desc_signature()
+        title_signode.extend(targets)
+
+        # Set up the title
+        name, kind = self.get_node_info(file_data)
+        title_signode.append(self.node_factory.emphasis(text=kind))
+        title_signode.append(self.node_factory.Text(" "))
+        title_signode.append(self.node_factory.desc_name(text=name))
+
+        contentnode = self.node_factory.desc_content()
+
+        node = self.node_factory.desc()
+        node.document = self.state.document
+        node['objtype'] = kind
+        node.append(title_signode)
+        node.append(contentnode)
+        return [node], contentnode
