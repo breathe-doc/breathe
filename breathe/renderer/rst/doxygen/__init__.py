@@ -166,6 +166,10 @@ class DoxygenToRstRendererFactory(object):
 
         if node_type == "compound":
 
+            kind = data_object.kind
+            if kind == "file" or kind == "dir":
+                return Renderer(indexrenderer.FileRenderer, *common_args)
+
             class_ = indexrenderer.CompoundTypeSubRenderer
 
             # For compound node types Renderer is CreateCompoundTypeSubRenderer
