@@ -38,7 +38,7 @@ class CompoundRenderer(Renderer):
         # Defer to domains specific directive.
         name, kind = self.get_node_info(file_data)
         domain_directive = self.renderer_factory.domain_directive_factory.create(
-            self.context.domain, self.context.directive_args)
+            self.context.domain, [kind] + self.context.directive_args[1:])
         domain_directive.arguments = [kind + ' ' + name]
 
         # Translate Breathe's no-link option into the standard noindex option.
