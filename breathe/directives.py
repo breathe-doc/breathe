@@ -853,15 +853,9 @@ class FileStateCache(object):
             del self.app.env.breathe_file_state[filename]
 
 
-class CDomainDirectiveFactory:
-    @staticmethod
-    def create(args):
-        return c.CObject(*args)
-
-
-class CPPDomainDirectiveFactory:
-    # A mapping from Breathe directive names to domain classes and directive names.
-    classes = {
+class DomainDirectiveFactory:
+    # A mapping from Breathe directive names to cpp domain classes and directive names.
+    cpp_classes = {
         'doxygenclass': (cpp.CPPClassObject, 'class'),
         'doxygenstruct': (cpp.CPPClassObject, 'class'),
         'doxygenfunction': (cpp.CPPFunctionObject, 'function'),
@@ -874,12 +868,15 @@ class CPPDomainDirectiveFactory:
     }
 
     @staticmethod
-    def create(args):
-        cls, name = CPPDomainDirectiveFactory.classes.get(args[0], (cpp.CPPMemberObject, 'member'))
-        # Replace the directive name because domain directives don't know how to handle
-        # Breathe's "doxygen" directives.
-        args = [name] + args[1:]
-        return cls(*args)
+    def create(domain, args):
+        if domain == 'cpp':
+            cls, name = DomainDirectiveFactory.cpp_classes.get(args[0], (cpp.CPPMemberObject, 'member'))
+            # Replace the directive name because domain directives don't know how to handle
+            # Breathe's "doxygen" directives.
+            args = [name] + args[1:]
+            return cls(*args)
+        if domain == 'c':
+            return c.CObject(*args)
 
 
 # Setup
@@ -916,7 +913,7 @@ def setup(app):
     renderer_factory_creator_constructor = DoxygenToRstRendererFactoryCreatorConstructor(
         node_factory,
         parser_factory,
-        {"c": CDomainDirectiveFactory, "cpp": CPPDomainDirectiveFactory},
+        DomainDirectiveFactory,
         default_domain_handler,
         domain_handler_factory_creator,
         rst_content_creator
