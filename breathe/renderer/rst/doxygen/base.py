@@ -40,7 +40,7 @@ class Renderer(object):
         node_stack = self.context.node_stack
         node = node_stack[0]
         # An enumvalue node doesn't have location, so use its parent node for detecting the domain instead.
-        if node.node_type == "enumvalue":
+        if type(node) == unicode or node.node_type == "enumvalue":
             node = node_stack[1]
         filename = get_filename(node)
         if not filename and node.node_type == "compound":
