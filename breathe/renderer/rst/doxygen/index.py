@@ -39,7 +39,7 @@ class CompoundRenderer(Renderer):
         name, kind = self.get_node_info(file_data)
         domain_directive = self.renderer_factory.domain_directive_factory.create(
             self.context.domain, [kind] + self.context.directive_args[1:])
-        domain_directive.arguments = [kind + ' ' + name]
+        domain_directive.arguments = [name]
 
         # Translate Breathe's no-link option into the standard noindex option.
         if 'no-link' in self.context.directive_args[2]:
@@ -50,7 +50,7 @@ class CompoundRenderer(Renderer):
         signode, contentnode = node.children
         # The cpp domain in Sphinx doesn't support structs at the moment, so change the text from "class "
         # to the correct kind which can be "class " or "struct ".
-        signode[0].children[0] = self.node_factory.Text(kind + " ")
+        signode[0] = self.node_factory.desc_annotation(kind + ' ', kind + ' ')
 
         # Check if there is template information and format it as desired
         template_signode = self.create_template_node(file_data.compounddef)
