@@ -38,10 +38,15 @@ class CompoundRenderer(Renderer):
 
         names = []
         node_stack = self.context.node_stack
-        if node_stack[0].node_type == 'enumvalue':
-            names.append(node_stack[0].name)
+        node = node_stack[0]
+        if node.node_type == 'enumvalue':
+            names.append(node.name)
             # Skip the name of the containing enum because it is not a part of the fully qualified name.
             node_stack = node_stack[2:]
+
+        # If the node is a namespace, use its name because namespaces are skipped in the main loop.
+        if node.node_type == 'compound' and node.kind == 'namespace':
+            names.append(node.name)
 
         for node in node_stack:
             if node.node_type == 'ref':
