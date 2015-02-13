@@ -10,7 +10,7 @@ class Renderer(object):
             document,
             domain_handler,
             target_handler,
-            domain_directive_factories,
+            domain_directive_factory,
             ):
 
         self.project_info = project_info
@@ -22,7 +22,7 @@ class Renderer(object):
         self.document = document
         self.domain_handler = domain_handler
         self.target_handler = target_handler
-        self.domain_directive_factories = domain_directive_factories
+        self.domain_directive_factory = domain_directive_factory
 
         if self.context.domain == '':
             self.context.domain = self.get_domain()
