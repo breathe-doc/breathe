@@ -853,7 +853,7 @@ class FileStateCache(object):
             del self.app.env.breathe_file_state[filename]
 
 
-class DomainDirectiveFactory:
+class DomainDirectiveFactory(object):
     # A mapping from node kinds to cpp domain classes and directive names.
     cpp_classes = {
         'class': (cpp.CPPClassObject, 'class'),
