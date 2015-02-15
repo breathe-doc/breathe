@@ -94,7 +94,8 @@ link in a github issue or get in touch on the mailing list.
 Credits
 -------
 
-Thank you to:
+Breathe is maintained by `michaeljones <https://github.com/michaeljones>`_ &
+`vitaut <https://github.com/vitaut>`_ with contributions from:
 
 - `nijel <https://github.com/nijel>`_
 - `sebastianschaetz <https://github.com/sebastianschaetz>`_
@@ -105,7 +106,6 @@ Thank you to:
 - `hobu <https://github.com/hobu>`_
 - `magro11 <https://github.com/magro11>`_
 - `scopatz <https://github.com/scopatz>`_
-- `vitaut <https://github.com/vitaut>`_
 - `vonj <https://github.com/vonj>`_
 - `jmnas <https://github.com/jmnas>`_
 - `donkopotamus <https://github.com/donkopotamus>`_
@@ -121,8 +121,7 @@ Thank you to:
 - `bnewbold <https://github.com/bnewbold>`_
 - `serge-sans-paille <https://github.com/serge-sans-paille>`_
 
-For their contributions; reporting issues and improving the code and
-documentation. And thanks to:
+Thanks to:
 
 - Dimitri van Heesch for `Doxygen <http://www.stack.nl/~dimitri/doxygen/>`_.
 - Georg Brandl for `Sphinx <http://sphinx-doc.org>`_.
