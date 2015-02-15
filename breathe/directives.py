@@ -182,22 +182,7 @@ class DoxygenFunctionDirective(BaseDirective):
             )
         filter_ = self.filter_factory.create_outline_filter(self.options)
 
-        mask_factory = NullMaskFactory()
-        # Get full function signature for the domain directive.
-        node = node_stack[0]
-        params = []
-        for param in node.param:
-            param_type = param.type_.content_[0].value
-            if not isinstance(param_type, unicode):
-                param_type = param_type.valueOf_
-            params.append(param_type + ' ' + (param.defname if param.defname else param.declname))
-        signature = '{0}({1})'.format(node.definition, ', '.join(params))
-        # Remove 'virtual' keyword as Sphinx 1.2 doesn't support virtual functions.
-        virtual = 'virtual '
-        if signature.startswith(virtual):
-            signature = signature[len(virtual):]
-        self.directive_args[1] = [signature]
-        return self.render(node_stack, project_info, self.options, filter_, target_handler, mask_factory)
+        return self.render(node_stack, project_info, self.options, filter_, target_handler, NullMaskFactory())
 
     def parse_args(self, function_description):
         # Strip off trailing qualifiers
@@ -261,8 +246,7 @@ class DoxygenFunctionDirective(BaseDirective):
                 )
             filter_ = self.filter_factory.create_outline_filter(text_options)
             mask_factory = MaskFactory({'param': NoParameterNamesMask})
-            nodes = self.do_render(entry, project_info, text_options, filter_, target_handler,
-                                   mask_factory)
+            nodes = self.render(entry, project_info, text_options, filter_, target_handler, mask_factory)
 
             # Render the nodes to text
             signature = self.text_renderer.render(nodes, self.state.document)
@@ -283,6 +267,25 @@ class DoxygenFunctionDirective(BaseDirective):
             raise UnableToResolveFunctionError(signatures)
 
         return node_stack
+
+    def render(self, node_stack, project_info, options, filter_, target_handler, mask_factory):
+        # Get full function signature for the domain directive.
+        node = node_stack[0]
+        params = []
+        for param in node.param:
+            param = mask_factory.mask(param)
+            param_type = param.type_.content_[0].value
+            if not isinstance(param_type, unicode):
+                param_type = param_type.valueOf_
+            param_name = param.defname if param.defname else param.declname
+            params.append(param_type if not param_name else param_type + ' ' + param_name)
+        signature = '{0}({1})'.format(node.definition, ', '.join(params))
+        # Remove 'virtual' keyword as Sphinx 1.2 doesn't support virtual functions.
+        virtual = 'virtual '
+        if signature.startswith(virtual):
+            signature = signature[len(virtual):]
+        self.directive_args[1] = [signature]
+        return BaseDirective.render(self, node_stack, project_info, options, filter_, target_handler, mask_factory)
 
 
 class DoxygenClassLikeDirective(BaseDirective):
@@ -433,7 +436,7 @@ class DoxygenContentBlockDirective(BaseDirective):
                 )
 
             mask_factory = NullMaskFactory()
-            context = RenderContext(node_stack, mask_factory)
+            context = RenderContext(node_stack, mask_factory, self.directive_args)
             object_renderer = renderer_factory.create_renderer(context)
             node_list.extend(object_renderer.render())
 
@@ -510,12 +513,22 @@ class DoxygenBaseItemDirective(BaseDirective):
 
         node_stack = matches[0]
         mask_factory = NullMaskFactory()
-        return self.do_render(node_stack, project_info, self.options, filter_, target_handler, mask_factory)
+        return self.render(node_stack, project_info, self.options, filter_, target_handler, mask_factory)
 
 
 class DoxygenVariableDirective(DoxygenBaseItemDirective):
 
     kind = "variable"
+
+    def render(self, node_stack, project_info, options, filter_, target_handler, mask_factory):
+        # Remove 'extern' keyword as Sphinx doesn't support it.
+        definition = node_stack[0].definition
+        extern = 'extern '
+        if definition.startswith(extern):
+            definition = definition[len(extern):]
+        self.directive_args[1] = [definition]
+        return DoxygenBaseItemDirective.render(self, node_stack, project_info, options, filter_,
+                                               target_handler, mask_factory)
 
 
 class DoxygenDefineDirective(DoxygenBaseItemDirective):
@@ -604,8 +617,7 @@ class DoxygenDirectiveFactory(object):
 
     def __init__(self, node_factory, text_renderer, root_data_object,
                  renderer_factory_creator_constructor, finder_factory,
-                 project_info_factory, filter_factory, target_handler_factory,
-                 domain_directive_factories, parser_factory):
+                 project_info_factory, filter_factory, target_handler_factory, parser_factory):
 
         self.node_factory = node_factory
         self.text_renderer = text_renderer
@@ -615,7 +627,6 @@ class DoxygenDirectiveFactory(object):
         self.project_info_factory = project_info_factory
         self.filter_factory = filter_factory
         self.target_handler_factory = target_handler_factory
-        self.domain_directive_factories = domain_directive_factories
         self.parser_factory = parser_factory
 
     # TODO: This methods should be scrapped as they are only called in one place. We should just
@@ -636,7 +647,6 @@ class DoxygenDirectiveFactory(object):
             self.project_info_factory,
             self.filter_factory,
             self.target_handler_factory,
-            self.domain_directive_factories,
             self.parser_factory
             )
 
@@ -689,7 +699,6 @@ class DoxygenDirectiveFactory(object):
             self.project_info_factory,
             self.filter_factory,
             self.target_handler_factory,
-            self.domain_directive_factories,
             self.parser_factory
             )
 
@@ -844,26 +853,29 @@ class FileStateCache(object):
             del self.app.env.breathe_file_state[filename]
 
 
-class CDomainDirectiveFactory:
-    @staticmethod
-    def create(args):
-        return c.CObject(*args)
-
-
-class CPPDomainDirectiveFactory:
-    # A mapping from Breathe directive names to domain classes and directive names.
-    classes = {
-        'doxygenclass': (cpp.CPPClassObject, 'class'),
-        'doxygenstruct': (cpp.CPPClassObject, 'class'),
-        'doxygenfunction': (cpp.CPPFunctionObject, 'function')
+class DomainDirectiveFactory(object):
+    # A mapping from node kinds to cpp domain classes and directive names.
+    cpp_classes = {
+        'class': (cpp.CPPClassObject, 'class'),
+        'struct': (cpp.CPPClassObject, 'class'),
+        'function': (cpp.CPPFunctionObject, 'function'),
+        'enum': (cpp.CPPTypeObject, 'type'),
+        'typedef': (cpp.CPPTypeObject, 'type'),
+        'union': (cpp.CPPTypeObject, 'type'),
+        'namespace': (cpp.CPPTypeObject, 'type'),
+        # Use CPPClassObject for enum values as the cpp domain doesn't have a directive for enum values and
+        # CPPMemberObject requires a type.
+        'enumvalue': (cpp.CPPClassObject, 'member')
     }
 
     @staticmethod
-    def create(args):
-        cls, name = CPPDomainDirectiveFactory.classes.get(args[0], cpp.CPPObject)
+    def create(domain, args):
+        if domain == 'c':
+            return c.CObject(*args)
+        cls, name = DomainDirectiveFactory.cpp_classes.get(args[0], (cpp.CPPMemberObject, 'member'))
         # Replace the directive name because domain directives don't know how to handle
         # Breathe's "doxygen" directives.
-        args[0] = name
+        args = [name] + args[1:]
         return cls(*args)
 
 
@@ -901,6 +913,7 @@ def setup(app):
     renderer_factory_creator_constructor = DoxygenToRstRendererFactoryCreatorConstructor(
         node_factory,
         parser_factory,
+        DomainDirectiveFactory,
         default_domain_handler,
         domain_handler_factory_creator,
         rst_content_creator
@@ -926,7 +939,6 @@ def setup(app):
         project_info_factory,
         filter_factory,
         target_handler_factory,
-        {"c": CDomainDirectiveFactory, "cpp": CPPDomainDirectiveFactory},
         parser_factory
         )
 

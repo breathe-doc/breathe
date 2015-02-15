@@ -50,7 +50,7 @@ class BaseIndexDirective(BaseDirective):
             )
 
         mask_factory = NullMaskFactory()
-        context = RenderContext([data_object, self.root_data_object], mask_factory)
+        context = RenderContext([data_object, self.root_data_object], mask_factory, self.directive_args)
         object_renderer = renderer_factory.create_renderer(context)
 
         try:
