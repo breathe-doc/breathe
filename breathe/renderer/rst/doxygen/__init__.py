@@ -73,7 +73,8 @@ class DoxygenToRstRendererFactory(object):
             domain_handler,
             rst_content_creator,
             filter_,
-            target_handler
+            target_handler,
+            domain_directive_factory
             ):
 
         self.node_type = node_type
@@ -89,6 +90,7 @@ class DoxygenToRstRendererFactory(object):
         self.rst_content_creator = rst_content_creator
         self.filter_ = filter_
         self.target_handler = target_handler
+        self.domain_directive_factory = domain_directive_factory
 
     def create_renderer(
             self,
@@ -128,7 +130,8 @@ class DoxygenToRstRendererFactory(object):
                 self.state,
                 self.document,
                 self.domain_handler,
-                self.target_handler
+                self.target_handler,
+                self.domain_directive_factory
                 ]
 
         if node_type == "docmarkup":
@@ -162,6 +165,10 @@ class DoxygenToRstRendererFactory(object):
                     )
 
         if node_type == "compound":
+
+            kind = data_object.kind
+            if kind in ["file", "dir", "page", "example", "group"]:
+                return Renderer(indexrenderer.FileRenderer, *common_args)
 
             class_ = indexrenderer.CompoundTypeSubRenderer
 
@@ -229,6 +236,7 @@ class DoxygenToRstRendererFactoryCreator(object):
             self,
             node_factory,
             parser_factory,
+            domain_directive_factory,
             default_domain_handler,
             rst_content_creator,
             domain_handler_factory,
@@ -237,6 +245,7 @@ class DoxygenToRstRendererFactoryCreator(object):
 
         self.node_factory = node_factory
         self.parser_factory = parser_factory
+        self.domain_directive_factory = domain_directive_factory
         self.default_domain_handler = default_domain_handler
         self.rst_content_creator = rst_content_creator
         self.domain_handler_factory = domain_handler_factory
@@ -322,7 +331,8 @@ class DoxygenToRstRendererFactoryCreator(object):
                 domain_handler,
                 self.rst_content_creator,
                 filter_,
-                target_handler
+                target_handler,
+                self.domain_directive_factory
                 )
 
     def create_child_factory( self, project_info, data_object, parent_renderer_factory ):
@@ -370,7 +380,8 @@ class DoxygenToRstRendererFactoryCreator(object):
                     domain_handler,
                     self.rst_content_creator,
                     parent_renderer_factory.filter_,
-                    parent_renderer_factory.target_handler
+                    parent_renderer_factory.target_handler,
+                    parent_renderer_factory.domain_directive_factory
                     )
 
 
@@ -391,6 +402,7 @@ class DoxygenToRstRendererFactoryCreatorConstructor(object):
             self,
             node_factory,
             parser_factory,
+            domain_directive_factory,
             default_domain_handler,
             domain_handler_factory_creator,
             rst_content_creator
@@ -398,6 +410,7 @@ class DoxygenToRstRendererFactoryCreatorConstructor(object):
 
         self.node_factory = node_factory
         self.parser_factory = parser_factory
+        self.domain_directive_factory = domain_directive_factory
         self.default_domain_handler = default_domain_handler
         self.domain_handler_factory_creator = domain_handler_factory_creator
         self.rst_content_creator = rst_content_creator
@@ -415,6 +428,7 @@ class DoxygenToRstRendererFactoryCreatorConstructor(object):
         return DoxygenToRstRendererFactoryCreator(
                 self.node_factory,
                 self.parser_factory,
+                self.domain_directive_factory,
                 self.default_domain_handler,
                 self.rst_content_creator,
                 domain_handler_factory,
