@@ -61,6 +61,15 @@ class Renderer(object):
         signode.extend(nodes)
         return signode
 
+    def run_domain_directive(self, kind):
+        domain_directive = self.renderer_factory.domain_directive_factory.create(
+            self.context.domain, [kind] + self.context.directive_args[1:])
+
+        # Translate Breathe's no-link option into the standard noindex option.
+        if 'no-link' in self.context.directive_args[2]:
+            domain_directive.options['noindex'] = True
+        return domain_directive.run()
+
 
 class RenderContext(object):
 
