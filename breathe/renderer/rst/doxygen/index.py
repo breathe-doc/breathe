@@ -81,11 +81,6 @@ class CompoundRenderer(Renderer):
         # to the correct kind which can be "class " or "struct ".
         signode[0] = self.node_factory.desc_annotation(kind + ' ', kind + ' ')
 
-        # Filter out outer class names if we are rendering an inner class as a part of its outer class content.
-        names = self.context.directive_args[1]
-        if len(names) > 0 and names[0] != name:
-            signode.children = [n for n in signode.children if not n.tagname == 'desc_addname']
-
         # Check if there is template information and format it as desired
         template_signode = self.create_template_node(file_data.compounddef)
         if template_signode:
