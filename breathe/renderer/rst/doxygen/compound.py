@@ -311,9 +311,13 @@ class FuncMemberDefTypeSubRenderer(MemberDefTypeSubRenderer):
         # Get full function signature for the domain directive.
         params = []
         for param in self.data_object.param:
-            param_type = param.type_.content_[0].value
-            if not isinstance(param_type, unicode):
-                param_type = param_type.valueOf_
+            param_type = []
+            for p in param.type_.content_:
+                value = p.value
+                if not isinstance(value, unicode):
+                    value = value.valueOf_
+                param_type.append(value)
+            param_type = ' '.join(param_type)
             param_name = param.defname if param.defname else param.declname
             params.append(param_type if not param_name else param_type + ' ' + param_name)
         signature = '{0}({1})'.format(self.data_object.definition, ', '.join(params))
@@ -672,7 +676,6 @@ class DocParamListTypeSubRenderer(Renderer):
         definition = self.node_factory.definition('', nodelist_list)
 
         return [self.node_factory.definition_list_item('', term, definition)]
-
 
 
 class DocParamListItemSubRenderer(Renderer):
