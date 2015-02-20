@@ -311,6 +311,7 @@ class FuncMemberDefTypeSubRenderer(MemberDefTypeSubRenderer):
         # Get full function signature for the domain directive.
         params = []
         for param in self.data_object.param:
+            param = self.context.mask_factory.mask(param)
             param_type = []
             for p in param.type_.content_:
                 value = p.value
