@@ -19,7 +19,7 @@ from .project import ProjectInfoFactory, ProjectError
 
 from docutils.parsers.rst.directives import unchanged_required, unchanged, flag
 from docutils.statemachine import ViewList
-from sphinx.domains import cpp, c
+from sphinx.domains import cpp, c, python
 from sphinx.writers.text import TextWriter
 from sphinx.builders.text import TextBuilder
 
@@ -850,11 +850,27 @@ class DomainDirectiveFactory(object):
         'enumvalue': (cpp.CPPClassObject, 'member')
     }
 
+    python_classes = {
+        'function': (python.PyModulelevel, 'function')
+    }
+
+    @staticmethod
+    def fix_python_signature(sig):
+        def_ = 'def '
+        if sig.startswith(def_):
+            sig = sig[len(def_):]
+        # Doxygen uses an invalid separator ('::') in Python signatures. Replace them with '.'.
+        return sig.replace('::', '.')
+
     @staticmethod
     def create(domain, args):
         if domain == 'c':
             return c.CObject(*args)
-        cls, name = DomainDirectiveFactory.cpp_classes.get(args[0], (cpp.CPPMemberObject, 'member'))
+        if domain == 'py':
+            cls, name = DomainDirectiveFactory.python_classes.get(args[0], (python.PyClasslike, 'class'))
+            args[1] = [DomainDirectiveFactory.fix_python_signature(n) for n in args[1]]
+        else:
+            cls, name = DomainDirectiveFactory.cpp_classes.get(args[0], (cpp.CPPMemberObject, 'member'))
         # Replace the directive name because domain directives don't know how to handle
         # Breathe's "doxygen" directives.
         args = [name] + args[1:]
