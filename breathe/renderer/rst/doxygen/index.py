@@ -72,25 +72,14 @@ class CompoundRenderer(Renderer):
     def render_signature(self, file_data, doxygen_target):
         # Defer to domains specific directive.
         name, kind = self.get_node_info(file_data)
-        domain_directive = self.renderer_factory.domain_directive_factory.create(
-            self.context.domain, [kind] + self.context.directive_args[1:])
-        domain_directive.arguments = [self.get_fully_qualified_name()]
-
-        # Translate Breathe's no-link option into the standard noindex option.
-        if 'no-link' in self.context.directive_args[2]:
-            domain_directive.options['noindex'] = True
-        nodes = domain_directive.run()
+        self.context.directive_args[1] = [self.get_fully_qualified_name()]
+        nodes = self.run_domain_directive(kind)
         node = nodes[1]
-
         signode, contentnode = node.children
+
         # The cpp domain in Sphinx doesn't support structs at the moment, so change the text from "class "
         # to the correct kind which can be "class " or "struct ".
         signode[0] = self.node_factory.desc_annotation(kind + ' ', kind + ' ')
-
-        # Filter out outer class names if we are rendering an inner class as a part of its outer class content.
-        names = self.context.directive_args[1]
-        if len(names) > 0 and names[0] != name:
-            signode.children = [n for n in signode.children if not n.tagname == 'desc_addname']
 
         # Check if there is template information and format it as desired
         template_signode = self.create_template_node(file_data.compounddef)
