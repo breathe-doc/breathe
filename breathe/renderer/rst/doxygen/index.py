@@ -88,7 +88,7 @@ class CompoundRenderer(Renderer):
         node.children[0].insert(0, doxygen_target)
         return nodes, contentnode
 
-    def render(self, node=None):
+    def render(self):
 
         # Read in the corresponding xml file and process
         file_data = self.compound_parser.parse(self.data_object.refid)
