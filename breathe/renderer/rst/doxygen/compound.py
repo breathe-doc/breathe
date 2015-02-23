@@ -308,12 +308,37 @@ class FuncMemberDefTypeSubRenderer(MemberDefTypeSubRenderer):
         return nodes
 
     def render(self, node=None):
-        result = MemberDefTypeSubRenderer.render(self, node)
-        if node:
-            template_node = self.create_template_node(self.data_object)
-            if template_node:
-                node.insert(0, template_node)
-        return result
+        # Get full function signature for the domain directive.
+        params = []
+        for param in self.data_object.param:
+            param = self.context.mask_factory.mask(param)
+            param_type = []
+            for p in param.type_.content_:
+                value = p.value
+                if not isinstance(value, unicode):
+                    value = value.valueOf_
+                param_type.append(value)
+            param_type = ' '.join(param_type)
+            param_name = param.declname if param.declname else param.defname
+            params.append(param_type if not param_name else param_type + ' ' + param_name)
+        signature = '{0}({1})'.format(self.data_object.definition, ', '.join(params))
+        # Remove 'virtual' keyword as Sphinx 1.2 doesn't support virtual functions.
+        virtual = 'virtual '
+        if signature.startswith(virtual):
+            signature = signature[len(virtual):]
+        self.context.directive_args[1] = [signature]
+
+        nodes = self.run_domain_directive(self.data_object.kind)
+        node = nodes[1]
+        signode, contentnode = node.children
+        signode.insert(0, self.create_doxygen_target())
+        self.update_signature(signode)
+        contentnode.extend(self.description())
+
+        template_node = self.create_template_node(self.data_object)
+        if template_node:
+            node.insert(0, template_node)
+        return nodes
 
 
 class DefineMemberDefTypeSubRenderer(MemberDefTypeSubRenderer):
@@ -652,7 +677,6 @@ class DocParamListTypeSubRenderer(Renderer):
         definition = self.node_factory.definition('', nodelist_list)
 
         return [self.node_factory.definition_list_item('', term, definition)]
-
 
 
 class DocParamListItemSubRenderer(Renderer):

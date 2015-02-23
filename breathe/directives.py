@@ -268,25 +268,6 @@ class DoxygenFunctionDirective(BaseDirective):
 
         return node_stack
 
-    def render(self, node_stack, project_info, options, filter_, target_handler, mask_factory):
-        # Get full function signature for the domain directive.
-        node = node_stack[0]
-        params = []
-        for param in node.param:
-            param = mask_factory.mask(param)
-            param_type = param.type_.content_[0].value
-            if not isinstance(param_type, unicode):
-                param_type = param_type.valueOf_
-            param_name = param.defname if param.defname else param.declname
-            params.append(param_type if not param_name else param_type + ' ' + param_name)
-        signature = '{0}({1})'.format(node.definition, ', '.join(params))
-        # Remove 'virtual' keyword as Sphinx 1.2 doesn't support virtual functions.
-        virtual = 'virtual '
-        if signature.startswith(virtual):
-            signature = signature[len(virtual):]
-        self.directive_args[1] = [signature]
-        return BaseDirective.render(self, node_stack, project_info, options, filter_, target_handler, mask_factory)
-
 
 class DoxygenClassLikeDirective(BaseDirective):
 
@@ -859,6 +840,7 @@ class DomainDirectiveFactory(object):
         'class': (cpp.CPPClassObject, 'class'),
         'struct': (cpp.CPPClassObject, 'class'),
         'function': (cpp.CPPFunctionObject, 'function'),
+        'slot': (cpp.CPPFunctionObject, 'function'),
         'enum': (cpp.CPPTypeObject, 'type'),
         'typedef': (cpp.CPPTypeObject, 'type'),
         'union': (cpp.CPPTypeObject, 'type'),
