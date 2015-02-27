@@ -222,29 +222,24 @@ class MemberDefTypeSubRenderer(Renderer):
         """Update the signature node if necessary, e.g. add qualifiers."""
         pass
 
-    def render(self, node=None):
+    def render(self):
 
         doxygen_target = self.create_doxygen_target()
-        if node:
-            signode, contentnode = node.children
-            self.update_signature(signode)
-            signode.insert(0, doxygen_target)
-        else:
-            # Build targets for linking
-            targets = []
-            targets.extend(self.create_domain_target())
-            targets.extend(doxygen_target)
+        # Build targets for linking
+        targets = []
+        targets.extend(self.create_domain_target())
+        targets.extend(doxygen_target)
 
-            signodes = self.build_signodes(targets)
+        signodes = self.build_signodes(targets)
 
-            # Build description nodes
-            contentnode = self.node_factory.desc_content()
+        # Build description nodes
+        contentnode = self.node_factory.desc_content()
 
-            node = self.node_factory.desc()
-            node.document = self.state.document
-            node['objtype'] = self.objtype()
-            node.extend(signodes)
-            node.append(contentnode)
+        node = self.node_factory.desc()
+        node.document = self.state.document
+        node['objtype'] = self.objtype()
+        node.extend(signodes)
+        node.append(contentnode)
 
         contentnode.extend(self.description())
         return [node]
@@ -307,7 +302,7 @@ class FuncMemberDefTypeSubRenderer(MemberDefTypeSubRenderer):
         self.update_signature(nodes)
         return nodes
 
-    def render(self, node=None):
+    def render(self):
         # Get full function signature for the domain directive.
         params = []
         for param in self.data_object.param:
