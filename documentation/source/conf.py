@@ -217,6 +217,7 @@ breathe_default_project = "tinyxml"
 
 breathe_domain_by_extension = {
         "h" : "cpp",
+        "py": "py",
         }
 
 breathe_domain_by_file_pattern = {
