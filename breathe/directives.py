@@ -1019,7 +1019,8 @@ def setup(app):
 
     app.add_config_value("breathe_projects", {}, True)
     app.add_config_value("breathe_default_project", "", True)
-    app.add_config_value("breathe_domain_by_extension", {}, True)
+    # Provide reasonable defaults for domain_by_extension mapping. Can be overridden by users.
+    app.add_config_value("breathe_domain_by_extension", {'py': 'py'}, True)
     app.add_config_value("breathe_domain_by_file_pattern", {}, True)
     app.add_config_value("breathe_projects_source", {}, True)
     app.add_config_value("breathe_build_directory", '', True)

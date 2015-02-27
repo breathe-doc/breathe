@@ -172,12 +172,9 @@ class ProjectInfoFactory(object):
             build_dir
             ):
 
-        # Provide reasonable defaults for domain_by_extension mapping. Can be overridden by users.
-        default_domain_by_extension = {'py': 'py'}
-
         self.projects = projects
         self.default_project = default_project
-        self.domain_by_extension = dict(default_domain_by_extension.items() + domain_by_extension.items())
+        self.domain_by_extension = domain_by_extension
         self.domain_by_file_pattern = domain_by_file_pattern
         self.projects_source = projects_source
 
