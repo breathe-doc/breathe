@@ -230,7 +230,8 @@ class MemberDefTypeSubRenderer(Renderer):
     def render(self):
         nodes = self.run_domain_directive(self.objtype(), [self.declaration()])
         node = nodes[1]
-        signode, contentnode = node.children
+        signode = node[0]
+        contentnode = node[-1]
         self.update_signature(signode)
         contentnode.extend(self.description())
         return nodes
