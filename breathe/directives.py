@@ -838,6 +838,7 @@ class DomainDirectiveFactory(object):
         'class': (cpp.CPPClassObject, 'class'),
         'struct': (cpp.CPPClassObject, 'class'),
         'function': (cpp.CPPFunctionObject, 'function'),
+        'friend': (cpp.CPPFunctionObject, 'function'),
         'slot': (cpp.CPPFunctionObject, 'function'),
         'enum': (cpp.CPPTypeObject, 'type'),
         'typedef': (cpp.CPPTypeObject, 'type'),
