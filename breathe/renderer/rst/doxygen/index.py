@@ -73,7 +73,7 @@ class CompoundRenderer(Renderer):
         # Defer to domains specific directive.
         name, kind = self.get_node_info(file_data)
         self.context.directive_args[1] = [self.get_fully_qualified_name()]
-        nodes = self.run_domain_directive(kind)
+        nodes = self.run_domain_directive(kind, self.context.directive_args[1])
         node = nodes[1]
         signode, contentnode = node.children
 

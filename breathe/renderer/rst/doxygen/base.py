@@ -61,9 +61,9 @@ class Renderer(object):
         signode.extend(nodes)
         return signode
 
-    def run_domain_directive(self, kind):
+    def run_domain_directive(self, kind, names):
         domain_directive = self.renderer_factory.domain_directive_factory.create(
-            self.context.domain, [kind] + self.context.directive_args[1:])
+            self.context.domain, [kind, names] + self.context.directive_args[2:])
 
         # Translate Breathe's no-link option into the standard noindex option.
         if 'no-link' in self.context.directive_args[2]:
@@ -72,7 +72,6 @@ class Renderer(object):
 
         # Filter out outer class names if we are rendering a member as a part of a class content.
         signode = nodes[1].children[0]
-        names = self.context.directive_args[1]
         if len(names) > 0 and self.context.child:
             signode.children = [n for n in signode.children if not n.tagname == 'desc_addname']
         return nodes
