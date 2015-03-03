@@ -317,6 +317,9 @@ class FuncMemberDefTypeSubRenderer(MemberDefTypeSubRenderer):
 
 class DefineMemberDefTypeSubRenderer(MemberDefTypeSubRenderer):
 
+    def update_signature(self, signode):
+        pass
+
     def title(self):
 
         title = [self.node_factory.strong(text=self.data_object.name)]

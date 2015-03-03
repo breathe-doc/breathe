@@ -845,7 +845,8 @@ class DomainDirectiveFactory(object):
         'namespace': (cpp.CPPTypeObject, 'type'),
         # Use CPPClassObject for enum values as the cpp domain doesn't have a directive for enum values and
         # CPPMemberObject requires a type.
-        'enumvalue': (cpp.CPPClassObject, 'member')
+        'enumvalue': (cpp.CPPClassObject, 'member'),
+        'define': (c.CObject, 'macro')
     }
 
     python_classes = {
