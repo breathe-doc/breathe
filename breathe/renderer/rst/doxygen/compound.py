@@ -195,16 +195,6 @@ class MemberDefTypeSubRenderer(Renderer):
 
         return nodes
 
-    def build_signodes(self, targets):
-        """Returns a list to account for when we need multiple signature nodes to account for
-        multi-line declarations like templated declarations"""
-
-        # Build title nodes
-        signode = self.node_factory.desc_signature()
-        signode.extend(targets)
-        signode.extend(self.title())
-        return [signode]
-
     def objtype(self):
         """Return the type of the rendered object."""
         return self.data_object.kind
@@ -249,37 +239,6 @@ class FuncMemberDefTypeSubRenderer(MemberDefTypeSubRenderer):
         # Add `= 0` for pure virtual members.
         if self.data_object.virt == 'pure-virtual':
             signode.append(self.node_factory.Text(' = 0'))
-
-    def build_signodes(self, targets):
-
-        template_node = self.create_template_node(self.data_object)
-        signodes = [template_node] if template_node else []
-        title_node = self.node_factory.desc_signature()
-        title_node.extend(self.title())
-        signodes.append(title_node)
-        for target in reversed(targets):
-            signodes[0].insert(0, target)
-        return signodes
-
-    def title(self):
-
-        nodes = []
-
-        # Get the function type and name
-        nodes.extend(MemberDefTypeSubRenderer.title(self))
-
-        # Get the function arguments
-        paramlist = self.node_factory.desc_parameterlist()
-        for i, parameter in enumerate(self.data_object.param):
-            param = self.node_factory.desc_parameter('', '', noemph=True)
-            context = self.context.create_child_context(parameter)
-            renderer = self.renderer_factory.create_renderer(context)
-            param.extend(renderer.render())
-            paramlist.append(param)
-        nodes.append(paramlist)
-
-        self.update_signature(nodes)
-        return nodes
 
     def render(self):
         # Get full function signature for the domain directive.
