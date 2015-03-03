@@ -211,7 +211,7 @@ class MemberDefTypeSubRenderer(Renderer):
 
     def declaration(self):
         """Return the declaration of the rendered object."""
-        return self.data_object.name
+        return self.get_fully_qualified_name()
 
     def update_signature(self, signode):
         """Update the signature node if necessary, e.g. add qualifiers."""
