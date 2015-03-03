@@ -317,23 +317,19 @@ class FuncMemberDefTypeSubRenderer(MemberDefTypeSubRenderer):
 
 class DefineMemberDefTypeSubRenderer(MemberDefTypeSubRenderer):
 
+    def declaration(self):
+        decl = self.data_object.name
+        if self.data_object.param:
+            decl += "("
+            for i, parameter in enumerate(self.data_object.param):
+                if i:
+                    decl += ", "
+                decl += parameter.defname
+            decl += ")"
+        return decl
+
     def update_signature(self, signode):
         pass
-
-    def title(self):
-
-        title = [self.node_factory.strong(text=self.data_object.name)]
-
-        if self.data_object.param:
-            title.append(self.node_factory.Text("("))
-            for i, parameter in enumerate(self.data_object.param):
-                if i: title.append(self.node_factory.Text(", "))
-                context = self.context.create_child_context(parameter)
-                renderer = self.renderer_factory.create_renderer(context)
-                title.extend(renderer.render())
-            title.append(self.node_factory.Text(")"))
-
-        return title
 
     def description(self):
 
