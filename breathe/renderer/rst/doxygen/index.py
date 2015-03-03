@@ -123,22 +123,12 @@ class CompoundTypeSubRenderer(CompoundRenderer):
     def get_node_info(self, file_data):
         return self.data_object.name, self.data_object.kind
 
-    def create_domain_target(self):
-        """Should be overridden to create a target node which uses the Sphinx domain information so
-        that it can be linked to from Sphinx domain roles like cpp:func:`myFunc`
-
-        Returns a list so that if there is no domain active then we simply return an empty list
-        instead of some kind of special null node value"""
-
-        return []
-
 
 class FileRenderer(CompoundTypeSubRenderer):
 
     def render_signature(self, file_data, doxygen_target):
         # Build targets for linking
         targets = []
-        targets.extend(self.create_domain_target())
         targets.extend(doxygen_target)
 
         title_signode = self.node_factory.desc_signature()
