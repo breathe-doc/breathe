@@ -8,7 +8,6 @@ class Renderer(object):
             node_factory,
             state,
             document,
-            domain_handler,
             target_handler,
             domain_directive_factory,
             ):
@@ -20,7 +19,6 @@ class Renderer(object):
         self.node_factory = node_factory
         self.state = state
         self.document = document
-        self.domain_handler = domain_handler
         self.target_handler = target_handler
         self.domain_directive_factory = domain_directive_factory
 

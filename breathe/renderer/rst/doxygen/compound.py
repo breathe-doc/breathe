@@ -162,15 +162,6 @@ class MemberDefTypeSubRenderer(Renderer):
         refid = "%s%s" % (self.project_info.name(), self.data_object.id)
         return self.target_handler.create_target(refid)
 
-    def create_domain_target(self):
-        """Should be overridden to create a target node which uses the Sphinx domain information so
-        that it can be linked to from Sphinx domain roles like cpp:func:`myFunc`
-
-        Returns a list so that if there is no domain active then we simply return an empty list
-        instead of some kind of special null node value"""
-
-        return []
-
     def title(self):
 
         nodes = []
@@ -238,10 +229,6 @@ class MemberDefTypeSubRenderer(Renderer):
 
 
 class FuncMemberDefTypeSubRenderer(MemberDefTypeSubRenderer):
-
-    def create_domain_target(self):
-
-        return self.domain_handler.create_function_target(self.data_object)
 
     def update_signature(self, signode):
 
@@ -387,10 +374,6 @@ class EnumMemberDefTypeSubRenderer(MemberDefTypeSubRenderer):
 
 class TypedefMemberDefTypeSubRenderer(MemberDefTypeSubRenderer):
 
-    def create_domain_target(self):
-
-        return self.domain_handler.create_typedef_target(self.context.node_stack)
-
     def title(self):
 
         args = [self.node_factory.Text("typedef ")]
@@ -414,10 +397,6 @@ class VariableMemberDefTypeSubRenderer(MemberDefTypeSubRenderer):
 
 
 class EnumvalueTypeSubRenderer(MemberDefTypeSubRenderer):
-
-    def create_domain_target(self):
-
-        return self.domain_handler.create_enumvalue_target(self.context.node_stack)
 
     def objtype(self):
 
@@ -883,9 +862,6 @@ class RefTypeSubRenderer(CompoundRenderer):
         name = self.data_object.content_[0].getValue()
         name = name.rsplit("::", 1)[-1]
         return name, file_data.compounddef.kind
-
-    def create_domain_target(self):
-        return self.domain_handler.create_inner_ref_target(self.data_object)
 
 
 class VerbatimTypeSubRenderer(Renderer):
