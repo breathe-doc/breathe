@@ -220,29 +220,16 @@ class MemberDefTypeSubRenderer(Renderer):
 
     def update_signature(self, signode):
         """Update the signature node if necessary, e.g. add qualifiers."""
-        pass
+        prefix = self.objtype() + ' '
+        signode[0] = self.node_factory.desc_annotation(prefix, prefix)
 
     def render(self):
-
-        doxygen_target = self.create_doxygen_target()
-        # Build targets for linking
-        targets = []
-        targets.extend(self.create_domain_target())
-        targets.extend(doxygen_target)
-
-        signodes = self.build_signodes(targets)
-
-        # Build description nodes
-        contentnode = self.node_factory.desc_content()
-
-        node = self.node_factory.desc()
-        node.document = self.state.document
-        node['objtype'] = self.objtype()
-        node.extend(signodes)
-        node.append(contentnode)
-
+        nodes = self.run_domain_directive(self.objtype(), [self.data_object.name])
+        node = nodes[1]
+        signode, contentnode = node.children
+        self.update_signature(signode)
         contentnode.extend(self.description())
-        return [node]
+        return nodes
 
 
 class FuncMemberDefTypeSubRenderer(MemberDefTypeSubRenderer):
@@ -323,7 +310,7 @@ class FuncMemberDefTypeSubRenderer(MemberDefTypeSubRenderer):
             signature = signature[len(virtual):]
         self.context.directive_args[1] = [signature]
 
-        nodes = self.run_domain_directive(self.data_object.kind)
+        nodes = self.run_domain_directive(self.data_object.kind, self.context.directive_args[1])
         node = nodes[1]
         signode, contentnode = node.children
         signode.insert(0, self.create_doxygen_target())
@@ -433,18 +420,6 @@ class EnumvalueTypeSubRenderer(MemberDefTypeSubRenderer):
 
         return self.domain_handler.create_enumvalue_target(self.context.node_stack)
 
-    def title(self):
-
-        nodes = [self.node_factory.desc_name(text=self.data_object.name)]
-
-        if self.data_object.initializer:
-            context = self.context.create_child_context(self.data_object.initializer)
-            renderer = self.renderer_factory.create_renderer(context)
-            nodes.append(self.node_factory.Text(" "))
-            nodes.extend(renderer.render())
-
-        return nodes
-
     def objtype(self):
 
         return 'enumvalue'
@@ -453,6 +428,12 @@ class EnumvalueTypeSubRenderer(MemberDefTypeSubRenderer):
         # Remove "class" from the signature. This is needed because Sphinx cpp domain doesn't have an enum value
         # directive and we use a class directive instead.
         signode.children.pop(0)
+        initializer = self.data_object.initializer
+        if initializer:
+            context = self.context.create_child_context(initializer)
+            renderer = self.renderer_factory.create_renderer(context)
+            signode.append(self.node_factory.Text(" "))
+            signode.extend(renderer.render())
 
 
 class DescriptionTypeSubRenderer(Renderer):
