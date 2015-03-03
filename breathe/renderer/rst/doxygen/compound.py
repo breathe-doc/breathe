@@ -377,17 +377,12 @@ class EnumMemberDefTypeSubRenderer(MemberDefTypeSubRenderer):
 
 class TypedefMemberDefTypeSubRenderer(MemberDefTypeSubRenderer):
 
-    def title(self):
-
-        args = [self.node_factory.Text("typedef ")]
-        args.extend(MemberDefTypeSubRenderer.title(self))
-
-        if self.data_object.argsstring:
-            context = self.context.create_child_context(self.data_object.argsstring)
-            renderer = self.renderer_factory.create_renderer(context)
-            args.extend(renderer.render())
-
-        return args
+    def declaration(self):
+        decl = self.data_object.definition
+        typedef = "typedef "
+        if decl.startswith(typedef):
+            decl = decl[len(typedef):]
+        return decl
 
 
 class VariableMemberDefTypeSubRenderer(MemberDefTypeSubRenderer):
