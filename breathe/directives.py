@@ -851,7 +851,8 @@ class DomainDirectiveFactory(object):
     }
 
     python_classes = {
-        'function': (python.PyModulelevel, 'function')
+        'function': (python.PyModulelevel, 'function'),
+        'variable': (python.PyClassmember, 'attribute')
     }
 
     @staticmethod
