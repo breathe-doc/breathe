@@ -209,7 +209,7 @@ class MemberDefTypeSubRenderer(Renderer):
         signode[0] = self.node_factory.desc_annotation(prefix, prefix)
 
     def render(self):
-        nodes = self.run_domain_directive(self.objtype(), [self.declaration()])
+        nodes = self.run_domain_directive(self.objtype(), [self.declaration().replace('\n', ' ')])
         node = nodes[1]
         signode = node[0]
         contentnode = node[-1]
@@ -343,7 +343,9 @@ class TypedefMemberDefTypeSubRenderer(MemberDefTypeSubRenderer):
 class VariableMemberDefTypeSubRenderer(MemberDefTypeSubRenderer):
 
     def declaration(self):
-        return self.data_object.definition
+        decl = self.data_object.definition
+        enum = 'enum '
+        return decl[len(enum):] if decl.startswith(enum) else decl
 
     def update_signature(self, signode):
         pass
