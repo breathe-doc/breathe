@@ -206,7 +206,11 @@ class MemberDefTypeSubRenderer(Renderer):
     def update_signature(self, signode):
         """Update the signature node if necessary, e.g. add qualifiers."""
         prefix = self.objtype() + ' '
-        signode[0] = self.node_factory.desc_annotation(prefix, prefix)
+        annotation = self.node_factory.desc_annotation(prefix, prefix)
+        if signode[0].tagname != 'desc_name':
+            signode[0] = annotation
+        else:
+            signode.insert(0, annotation)
 
     def render(self):
         nodes = self.run_domain_directive(self.objtype(), [self.declaration().replace('\n', ' ')])
