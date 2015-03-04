@@ -61,7 +61,7 @@ class Renderer(object):
             names.append(node.name)
 
         for node in node_stack:
-            if node.node_type == 'ref':
+            if node.node_type == 'ref' and len(names) == 0:
                 return node.valueOf_
             if (node.node_type == 'compound' and node.kind not in ['file', 'namespace']) or \
                 node.node_type == 'memberdef':
