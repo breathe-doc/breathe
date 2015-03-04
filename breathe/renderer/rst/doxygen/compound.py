@@ -214,6 +214,7 @@ class MemberDefTypeSubRenderer(Renderer):
         signode = node[0]
         contentnode = node[-1]
         self.update_signature(signode)
+        signode.insert(0, self.create_doxygen_target())
         contentnode.extend(self.description())
         return nodes
 
