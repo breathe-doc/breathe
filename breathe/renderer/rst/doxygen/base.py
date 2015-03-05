@@ -8,7 +8,6 @@ class Renderer(object):
             node_factory,
             state,
             document,
-            domain_handler,
             target_handler,
             domain_directive_factory,
             ):
@@ -20,7 +19,6 @@ class Renderer(object):
         self.node_factory = node_factory
         self.state = state
         self.document = document
-        self.domain_handler = domain_handler
         self.target_handler = target_handler
         self.domain_directive_factory = domain_directive_factory
 
@@ -48,6 +46,41 @@ class Renderer(object):
             filename = get_filename(file_data.compounddef)
         return self.project_info.domain_for_file(filename) if filename else ''
 
+    def get_fully_qualified_name(self):
+
+        names = []
+        node_stack = self.context.node_stack
+        node = node_stack[0]
+        if node.node_type == 'enumvalue':
+            names.append(node.name)
+            # Skip the name of the containing enum because it is not a part of the fully qualified name.
+            node_stack = node_stack[2:]
+
+        # If the node is a namespace, use its name because namespaces are skipped in the main loop.
+        if node.node_type == 'compound' and node.kind == 'namespace':
+            names.append(node.name)
+
+        for node in node_stack:
+            if node.node_type == 'ref' and len(names) == 0:
+                return node.valueOf_
+            if (node.node_type == 'compound' and node.kind not in ['file', 'namespace']) or \
+                node.node_type == 'memberdef':
+                # We skip the 'file' entries because the file name doesn't form part of the
+                # qualified name for the identifier. We skip the 'namespace' entries because if we
+                # find an object through the namespace 'compound' entry in the index.xml then we'll
+                # also have the 'compounddef' entry in our node stack and we'll get it from that. We
+                # need the 'compounddef' entry because if we find the object through the 'file'
+                # entry in the index.xml file then we need to get the namespace name from somewhere
+                names.insert(0, node.name)
+            if (node.node_type == 'compounddef' and node.kind == 'namespace'):
+                # Nested namespaces include there parent namespace in there compoundname. ie,
+                # compoundname is 'foo::bar' instead of just 'bar' for namespace 'bar' nested in
+                # namespace 'foo'. But our node_stack includes 'foo' so we only want 'bar' at
+                # this point.
+                names.insert(0, node.compoundname.split('::')[-1])
+
+        return '::'.join(names)
+
     def create_template_node(self, decl):
         """Creates a node for the ``template <...>`` part of the declaration."""
         if not decl.templateparamlist:
@@ -61,9 +94,9 @@ class Renderer(object):
         signode.extend(nodes)
         return signode
 
-    def run_domain_directive(self, kind):
+    def run_domain_directive(self, kind, names):
         domain_directive = self.renderer_factory.domain_directive_factory.create(
-            self.context.domain, [kind] + self.context.directive_args[1:])
+            self.context.domain, [kind, names] + self.context.directive_args[2:])
 
         # Translate Breathe's no-link option into the standard noindex option.
         if 'no-link' in self.context.directive_args[2]:
@@ -72,7 +105,6 @@ class Renderer(object):
 
         # Filter out outer class names if we are rendering a member as a part of a class content.
         signode = nodes[1].children[0]
-        names = self.context.directive_args[1]
         if len(names) > 0 and self.context.child:
             signode.children = [n for n in signode.children if not n.tagname == 'desc_addname']
         return nodes
