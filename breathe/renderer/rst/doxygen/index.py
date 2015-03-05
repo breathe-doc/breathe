@@ -34,46 +34,11 @@ class CompoundRenderer(Renderer):
         refid = "%s%s" % (self.project_info.name(), self.data_object.refid)
         return self.target_handler.create_target(refid)
 
-    def get_fully_qualified_name(self):
-
-        names = []
-        node_stack = self.context.node_stack
-        node = node_stack[0]
-        if node.node_type == 'enumvalue':
-            names.append(node.name)
-            # Skip the name of the containing enum because it is not a part of the fully qualified name.
-            node_stack = node_stack[2:]
-
-        # If the node is a namespace, use its name because namespaces are skipped in the main loop.
-        if node.node_type == 'compound' and node.kind == 'namespace':
-            names.append(node.name)
-
-        for node in node_stack:
-            if node.node_type == 'ref':
-                return node.valueOf_
-            if (node.node_type == 'compound' and node.kind not in ['file', 'namespace']) or \
-                node.node_type == 'memberdef':
-                # We skip the 'file' entries because the file name doesn't form part of the
-                # qualified name for the identifier. We skip the 'namespace' entries because if we
-                # find an object through the namespace 'compound' entry in the index.xml then we'll
-                # also have the 'compounddef' entry in our node stack and we'll get it from that. We
-                # need the 'compounddef' entry because if we find the object through the 'file'
-                # entry in the index.xml file then we need to get the namespace name from somewhere
-                names.insert(0, node.name)
-            if (node.node_type == 'compounddef' and node.kind == 'namespace'):
-                # Nested namespaces include there parent namespace in there compoundname. ie,
-                # compoundname is 'foo::bar' instead of just 'bar' for namespace 'bar' nested in
-                # namespace 'foo'. But our node_stack includes 'foo' so we only want 'bar' at
-                # this point.
-                names.insert(0, node.compoundname.split('::')[-1])
-
-        return '::'.join(names)
-
     def render_signature(self, file_data, doxygen_target):
         # Defer to domains specific directive.
         name, kind = self.get_node_info(file_data)
         self.context.directive_args[1] = [self.get_fully_qualified_name()]
-        nodes = self.run_domain_directive(kind)
+        nodes = self.run_domain_directive(kind, self.context.directive_args[1])
         node = nodes[1]
         signode, contentnode = node.children
 
@@ -123,22 +88,12 @@ class CompoundTypeSubRenderer(CompoundRenderer):
     def get_node_info(self, file_data):
         return self.data_object.name, self.data_object.kind
 
-    def create_domain_target(self):
-        """Should be overridden to create a target node which uses the Sphinx domain information so
-        that it can be linked to from Sphinx domain roles like cpp:func:`myFunc`
-
-        Returns a list so that if there is no domain active then we simply return an empty list
-        instead of some kind of special null node value"""
-
-        return []
-
 
 class FileRenderer(CompoundTypeSubRenderer):
 
     def render_signature(self, file_data, doxygen_target):
         # Build targets for linking
         targets = []
-        targets.extend(self.create_domain_target())
         targets.extend(doxygen_target)
 
         title_signode = self.node_factory.desc_signature()

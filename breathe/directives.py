@@ -3,8 +3,6 @@ from .finder.core import FinderFactory
 from .parser import DoxygenParserFactory, CacheFactory
 from .renderer.rst.doxygen import DoxygenToRstRendererFactoryCreatorConstructor, \
     RstContentCreator, RenderContext
-from .renderer.rst.doxygen.domain import DomainHandlerFactoryCreator, NullDomainHandler
-from .renderer.rst.doxygen.domain import CppDomainHelper, CDomainHelper
 from .renderer.rst.doxygen.filter import FilterFactory, GlobFactory
 from .renderer.rst.doxygen.target import TargetHandlerFactory
 from .renderer.rst.doxygen.mask import MaskFactory, NullMaskFactory, NoParameterNamesMask
@@ -840,6 +838,7 @@ class DomainDirectiveFactory(object):
         'class': (cpp.CPPClassObject, 'class'),
         'struct': (cpp.CPPClassObject, 'class'),
         'function': (cpp.CPPFunctionObject, 'function'),
+        'friend': (cpp.CPPFunctionObject, 'function'),
         'slot': (cpp.CPPFunctionObject, 'function'),
         'enum': (cpp.CPPTypeObject, 'type'),
         'typedef': (cpp.CPPTypeObject, 'type'),
@@ -847,11 +846,13 @@ class DomainDirectiveFactory(object):
         'namespace': (cpp.CPPTypeObject, 'type'),
         # Use CPPClassObject for enum values as the cpp domain doesn't have a directive for enum values and
         # CPPMemberObject requires a type.
-        'enumvalue': (cpp.CPPClassObject, 'member')
+        'enumvalue': (cpp.CPPClassObject, 'member'),
+        'define': (c.CObject, 'macro')
     }
 
     python_classes = {
-        'function': (python.PyModulelevel, 'function')
+        'function': (python.PyModulelevel, 'function'),
+        'variable': (python.PyClassmember, 'attribute')
     }
 
     @staticmethod
@@ -901,19 +902,11 @@ def setup(app):
     math_nodes.displaymath = sphinx.ext.mathbase.displaymath
     node_factory = NodeFactory(docutils.nodes, sphinx.addnodes, math_nodes)
 
-    cpp_domain_helper = CppDomainHelper(cpp.DefinitionParser, re.sub)
-    c_domain_helper = CDomainHelper()
-    domain_helpers = {"c": c_domain_helper, "cpp": cpp_domain_helper}
-    domain_handler_factory_creator = DomainHandlerFactoryCreator(node_factory, domain_helpers)
-
     rst_content_creator = RstContentCreator(ViewList, textwrap.dedent)
-    default_domain_handler = NullDomainHandler()
     renderer_factory_creator_constructor = DoxygenToRstRendererFactoryCreatorConstructor(
         node_factory,
         parser_factory,
         DomainDirectiveFactory,
-        default_domain_handler,
-        domain_handler_factory_creator,
         rst_content_creator
         )
 
