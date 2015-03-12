@@ -370,8 +370,12 @@ class EnumvalueTypeSubRenderer(MemberDefTypeSubRenderer):
         if initializer:
             context = self.context.create_child_context(initializer)
             renderer = self.renderer_factory.create_renderer(context)
-            signode.append(self.node_factory.Text(" "))
-            signode.extend(renderer.render())
+            nodes = renderer.render()
+            separator = ' '
+            if not nodes[0].startswith('='):
+                separator += '= '
+            signode.append(self.node_factory.Text(separator))
+            signode.extend(nodes)
 
 
 class DescriptionTypeSubRenderer(Renderer):
