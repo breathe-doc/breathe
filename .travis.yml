@@ -26,5 +26,5 @@ install:
 # to run `which doxygen`
 script:
   - make DOXYGEN=doxygen DEBUG=""
-  - flake8
+  - flake8 breathe/*.py
 

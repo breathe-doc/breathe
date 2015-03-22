@@ -17,6 +17,7 @@ ALIASES = "rst=\verbatim embed:rst"
 ALIASES += "endrst=\endverbatim"
 """.strip()
 
+
 class ProjectData(object):
     "Simple handler for the files and project_info for each project"
 
@@ -24,6 +25,7 @@ class ProjectData(object):
 
         self.auto_project_info = auto_project_info
         self.files = files
+
 
 class AutoDoxygenProcessHandle(object):
 
@@ -45,7 +47,7 @@ class AutoDoxygenProcessHandle(object):
             contents = file_structure[1]
 
             auto_project_info = self.project_info_factory.create_auto_project_info(
-                    project_name, folder)
+                project_name, folder)
 
             project_files[project_name] = ProjectData(auto_project_info, contents)
 
@@ -83,4 +85,3 @@ class AutoDoxygenProcessHandle(object):
         self.run_process(['doxygen', cfgfile], cwd=build_dir)
 
         return self.path_handler.join(build_dir, name, "xml")
-
