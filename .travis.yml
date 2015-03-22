@@ -16,6 +16,7 @@ before_install:
   - sudo apt-get install -y doxygen texlive-latex-base texlive-latex-extra texlive-fonts-recommended
 
 install:
+  - pip install flake8
   - pip install Sphinx==$SPHINX_VERSION
   - pip install .
 
@@ -23,5 +24,7 @@ install:
 #
 # Provide definition for DOXYGEN variable to stop it trying
 # to run `which doxygen`
-script: make DOXYGEN=doxygen DEBUG=""
+script:
+  - make DOXYGEN=doxygen DEBUG=""
+  - flake8
 
