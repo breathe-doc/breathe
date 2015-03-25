@@ -158,7 +158,8 @@ class DoxygenFunctionDirective(BaseDirective):
             # reason (failures in the matcher_stack code) so we consolidate them by shoving them in
             # a set to remove duplicates. Should be fixed!
             for i, entry in enumerate(set(error.signatures)):
-                if i: literal_text += '\n'
+                if i:
+                    literal_text += '\n'
                 # Replace new lines with a new line & enough spacing to reach the appropriate
                 # alignment for our simple plain text list
                 literal_text += '- %s' % entry.replace('\n', '\n  ')
@@ -180,15 +181,16 @@ class DoxygenFunctionDirective(BaseDirective):
             )
         filter_ = self.filter_factory.create_outline_filter(self.options)
 
-        return self.render(node_stack, project_info, self.options, filter_, target_handler, NullMaskFactory())
+        return self.render(node_stack, project_info, self.options, filter_, target_handler,
+                           NullMaskFactory())
 
     def parse_args(self, function_description):
         # Strip off trailing qualifiers
         pattern = re.compile(r'''(?<= \)) \s*
-                                 (?: const)? \s*
-                                 (?: volatile)? \s*
-                                 (?: = \s* 0)? \s* $ ''',
-                                 re.VERBOSE)
+                             (?: const)? \s*
+                             (?: volatile)? \s*
+                             (?: = \s* 0)? \s* $ ''',
+                             re.VERBOSE)
 
         function_description = re.sub(pattern,
                                       '',
@@ -244,14 +246,15 @@ class DoxygenFunctionDirective(BaseDirective):
                 )
             filter_ = self.filter_factory.create_outline_filter(text_options)
             mask_factory = MaskFactory({'param': NoParameterNamesMask})
-            nodes = self.render(entry, project_info, text_options, filter_, target_handler, mask_factory)
+            nodes = self.render(entry, project_info, text_options, filter_, target_handler,
+                                mask_factory)
 
             # Render the nodes to text
             signature = self.text_renderer.render(nodes, self.state.document)
             signatures.append(signature)
 
             match = re.match(r"([^(]*)(.*)", signature)
-            function, match_args = match.group(1), match.group(2)
+            match_args = match.group(2)
 
             # Parse the text to find the arguments
             match_args = self.parse_args(match_args)
@@ -317,7 +320,8 @@ class DoxygenClassLikeDirective(BaseDirective):
         filter_ = self.filter_factory.create_class_filter(name, self.options)
 
         mask_factory = NullMaskFactory()
-        return self.render(matches[0], project_info, self.options, filter_, target_handler, mask_factory)
+        return self.render(matches[0], project_info, self.options, filter_, target_handler,
+                           mask_factory)
 
 
 class DoxygenClassDirective(DoxygenClassLikeDirective):
@@ -385,7 +389,8 @@ class DoxygenContentBlockDirective(BaseDirective):
 
             # Having found the compound node for the namespace or group in the index we want to grab
             # the contents of it which match the filter
-            contents_finder = self.finder_factory.create_finder_from_root(node_stack[0], project_info)
+            contents_finder = self.finder_factory.create_finder_from_root(node_stack[0],
+                                                                          project_info)
             contents = []
             contents_finder.filter_(filter_, contents)
 
@@ -492,7 +497,8 @@ class DoxygenBaseItemDirective(BaseDirective):
 
         node_stack = matches[0]
         mask_factory = NullMaskFactory()
-        return self.render(node_stack, project_info, self.options, filter_, target_handler, mask_factory)
+        return self.render(node_stack, project_info, self.options, filter_, target_handler,
+                           mask_factory)
 
 
 class DoxygenVariableDirective(DoxygenBaseItemDirective):
@@ -844,8 +850,8 @@ class DomainDirectiveFactory(object):
         'typedef': (cpp.CPPTypeObject, 'type'),
         'union': (cpp.CPPTypeObject, 'type'),
         'namespace': (cpp.CPPTypeObject, 'type'),
-        # Use CPPClassObject for enum values as the cpp domain doesn't have a directive for enum values and
-        # CPPMemberObject requires a type.
+        # Use CPPClassObject for enum values as the cpp domain doesn't have a directive for
+        # enum values and CPPMemberObject requires a type.
         'enumvalue': (cpp.CPPClassObject, 'member'),
         'define': (c.CObject, 'macro')
     }
@@ -868,10 +874,12 @@ class DomainDirectiveFactory(object):
         if domain == 'c':
             return c.CObject(*args)
         if domain == 'py':
-            cls, name = DomainDirectiveFactory.python_classes.get(args[0], (python.PyClasslike, 'class'))
+            cls, name = DomainDirectiveFactory.python_classes.get(
+                args[0], (python.PyClasslike, 'class'))
             args[1] = [DomainDirectiveFactory.fix_python_signature(n) for n in args[1]]
         else:
-            cls, name = DomainDirectiveFactory.cpp_classes.get(args[0], (cpp.CPPMemberObject, 'member'))
+            cls, name = DomainDirectiveFactory.cpp_classes.get(
+                args[0], (cpp.CPPMemberObject, 'member'))
         # Replace the directive name because domain directives don't know how to handle
         # Breathe's "doxygen" directives.
         args = [name] + args[1:]
@@ -1038,4 +1046,3 @@ def setup(app):
     app.connect("env-get-outdated", file_state_cache.get_outdated)
 
     app.connect("env-purge-doc", file_state_cache.purge_doc)
-

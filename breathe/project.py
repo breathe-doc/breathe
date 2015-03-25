@@ -3,11 +3,14 @@ from .exception import BreatheError
 
 import os
 
+
 class ProjectError(BreatheError):
     pass
 
+
 class NoDefaultProjectError(ProjectError):
     pass
+
 
 class AutoProjectInfo(object):
     """Created as a temporary step in the automatic xml generation process"""
@@ -34,7 +37,6 @@ class AutoProjectInfo(object):
         self._domain_by_extension = domain_by_extension
         self._domain_by_file_pattern = domain_by_file_pattern
         self._match = match
-
 
     def name(self):
         return self._name
@@ -65,6 +67,7 @@ class AutoProjectInfo(object):
             self._domain_by_file_pattern,
             self._match
             )
+
 
 class ProjectInfo(object):
 
@@ -103,16 +106,17 @@ class ProjectInfo(object):
     def relative_path_to_xml_file(self, file_):
         """
         Returns relative path from Sphinx documentation top-level source directory to the specified
-        file assuming that the specified file is a path relative to the doxygen xml output directory.
+        file assuming that the specified file is a path relative to the doxygen xml output
+        directory.
         """
 
         # os.path.join does the appropriate handling if _project_path is an absolute path
         full_xml_project_path = os.path.join(self._config_dir, self._project_path, file_)
 
         return os.path.relpath(
-                full_xml_project_path,
-                self._source_dir
-                )
+            full_xml_project_path,
+            self._source_dir
+        )
 
     def sphinx_abs_path_to_file(self, file_):
         """
@@ -187,17 +191,17 @@ class ProjectInfoFactory(object):
 
         if not self.default_project:
             raise NoDefaultProjectError(
-                    "No breathe_default_project config setting to fall back on "
-                    "for directive with no 'project' or 'path' specified."
-                    )
+                "No breathe_default_project config setting to fall back on "
+                "for directive with no 'project' or 'path' specified."
+            )
 
         try:
             return self.projects[self.default_project]
         except KeyError:
             raise ProjectError(
-                    ( "breathe_default_project value '%s' does not seem to be a valid key for the "
-                      "breathe_projects dictionary" ) % self.default_project
-                    )
+                ("breathe_default_project value '%s' does not seem to be a valid key for the "
+                 "breathe_projects dictionary") % self.default_project
+            )
 
     def create_project_info(self, options):
 
@@ -208,7 +212,8 @@ class ProjectInfoFactory(object):
                 path = self.projects[options["project"]]
                 name = options["project"]
             except KeyError:
-                raise ProjectError( "Unable to find project '%s' in breathe_projects dictionary" % options["project"] )
+                raise ProjectError("Unable to find project '%s' in breathe_projects dictionary"
+                                   % options["project"])
 
         elif "path" in options:
             path = options["path"]
@@ -228,16 +233,16 @@ class ProjectInfoFactory(object):
                 self.project_count += 1
 
             project_info = ProjectInfo(
-                    name,
-                    path,
-                    "NoSourcePath",
-                    reference,
-                    self.source_dir,
-                    self.config_dir,
-                    self.domain_by_extension,
-                    self.domain_by_file_pattern,
-                    self.match
-                    )
+                name,
+                path,
+                "NoSourcePath",
+                reference,
+                self.source_dir,
+                self.config_dir,
+                self.domain_by_extension,
+                self.domain_by_file_pattern,
+                self.match
+            )
 
             self.project_info_store[path] = project_info
 
@@ -263,9 +268,9 @@ class ProjectInfoFactory(object):
 
         if name is None:
             raise NoDefaultProjectError(
-                    "No breathe_default_project config setting to fall back on "
-                    "for directive with no 'project' or 'path' specified."
-                    )
+                "No breathe_default_project config setting to fall back on "
+                "for directive with no 'project' or 'path' specified."
+            )
 
         return self.project_info_for_auto_store[name]
 
@@ -285,16 +290,16 @@ class ProjectInfoFactory(object):
                 self.project_count += 1
 
             auto_project_info = AutoProjectInfo(
-                    name,
-                    source_path,
-                    self.build_dir,
-                    reference,
-                    self.source_dir,
-                    self.config_dir,
-                    self.domain_by_extension,
-                    self.domain_by_file_pattern,
-                    self.match
-                    )
+                name,
+                source_path,
+                self.build_dir,
+                reference,
+                self.source_dir,
+                self.config_dir,
+                self.domain_by_extension,
+                self.domain_by_file_pattern,
+                self.match
+            )
 
             self.auto_project_info_store[key] = auto_project_info
 
