@@ -1028,7 +1028,9 @@ def setup(app):
     app.add_config_value("breathe_default_members", (), True)
     app.add_config_value("breathe_implementation_filename_extensions", ['.c', '.cc', '.cpp'], True)
 
-    app.add_stylesheet("breathe.css")
+    breathe_css = "breathe.css"
+    if (os.path.exists(os.path.join(app.confdir, "_static", breathe_css))):
+        app.add_stylesheet(breathe_css)
 
     doxygen_handle = AutoDoxygenProcessHandle(
         path_handler,
