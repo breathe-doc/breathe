@@ -132,9 +132,10 @@ Change Log
 
 Inspired by `Keepachangelog.com <http://keepachangelog.com/>`__.
 
-- Changes since the last release
+- 2015-04-02 - Breathe v4.0.0
 
-  - Nothing
+  - Significant work on the code base with miminal reStructureText interface
+    changes. To be documented.
 
 - 2014-11-09 - Breathe v3.2.0
 
