@@ -258,7 +258,15 @@ class FuncMemberDefTypeSubRenderer(MemberDefTypeSubRenderer):
                 param_type.append(value)
             param_type = ' '.join(param_type)
             param_name = param.declname if param.declname else param.defname
-            params.append(param_type if not param_name else param_type + ' ' + param_name)
+            if not param_name:
+                param_decl = param_type
+            elif '(*)' in param_type:
+                param_decl = param_type.replace('(*)', '(*' + param_name + ')')
+            else:
+                param_decl = param_type + ' ' + param_name
+            if param.array:
+                param_decl += param.array
+            params.append(param_decl)
         signature = '{0}({1})'.format(self.data_object.definition, ', '.join(params))
         # Remove 'virtual' keyword as Sphinx 1.2 doesn't support virtual functions.
         virtual = 'virtual '
