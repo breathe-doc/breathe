@@ -223,6 +223,28 @@ class MemberDefTypeSubRenderer(Renderer):
         return nodes
 
 
+def get_param_decl(param):
+
+    param_type = []
+    for p in param.type_.content_:
+        value = p.value
+        if not isinstance(value, unicode):
+            value = value.valueOf_
+        param_type.append(value)
+    param_type = ' '.join(param_type)
+    param_name = param.declname if param.declname else param.defname
+    if not param_name:
+        param_decl = param_type
+    elif '(*)' in param_type:
+        param_decl = param_type.replace('(*)', '(*' + param_name + ')')
+    else:
+        param_decl = param_type + ' ' + param_name
+    if param.array:
+        param_decl += param.array
+
+    return param_decl
+
+
 class FuncMemberDefTypeSubRenderer(MemberDefTypeSubRenderer):
 
     def update_signature(self, signode):
@@ -247,27 +269,12 @@ class FuncMemberDefTypeSubRenderer(MemberDefTypeSubRenderer):
 
     def render(self):
         # Get full function signature for the domain directive.
-        params = []
+        param_list = []
         for param in self.data_object.param:
             param = self.context.mask_factory.mask(param)
-            param_type = []
-            for p in param.type_.content_:
-                value = p.value
-                if not isinstance(value, unicode):
-                    value = value.valueOf_
-                param_type.append(value)
-            param_type = ' '.join(param_type)
-            param_name = param.declname if param.declname else param.defname
-            if not param_name:
-                param_decl = param_type
-            elif '(*)' in param_type:
-                param_decl = param_type.replace('(*)', '(*' + param_name + ')')
-            else:
-                param_decl = param_type + ' ' + param_name
-            if param.array:
-                param_decl += param.array
-            params.append(param_decl)
-        signature = '{0}({1})'.format(self.data_object.definition, ', '.join(params))
+            param_decl = get_param_decl(param)
+            param_list.append(param_decl)
+        signature = '{0}({1})'.format(self.data_object.definition, ', '.join(param_list))
         # Remove 'virtual' keyword as Sphinx 1.2 doesn't support virtual functions.
         virtual = 'virtual '
         if signature.startswith(virtual):
