@@ -20,3 +20,8 @@ clean:
 	$(MAKE) -C examples/tinyxml $@
 	$(MAKE) -C examples/specific $@
 
+test:
+	cd tests && nosetests
+
+flake8:
+	flake8 breathe/*.py
