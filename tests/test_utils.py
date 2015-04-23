@@ -4,6 +4,7 @@ from xml.dom import minidom
 
 from breathe.renderer.rst.doxygen.compound import get_param_decl
 from breathe.parser.doxygen.compoundsuper import memberdefType
+from breathe.directives import PathHandler
 
 class TestUtils(TestCase):
 
@@ -52,3 +53,14 @@ class TestUtils(TestCase):
         self.assertEqual(get_param_decl(memberdef.param[3]), 'int(*p)[3]')
         self.assertEqual(get_param_decl(memberdef.param[4]), 'MyClass a')
         self.assertEqual(get_param_decl(memberdef.param[5]), 'MyClass  * b')
+
+
+class TestPathHandler(TestCase):
+
+    def test_path_handler(self):
+
+        path_handler = PathHandler(None, None, None, None)
+
+        self.assertEqual(path_handler.includes_directory('directory/file.h'), True)
+        self.assertEqual(path_handler.includes_directory('directory\\file.h'), True)
+        self.assertEqual(path_handler.includes_directory('file.h'), False)
