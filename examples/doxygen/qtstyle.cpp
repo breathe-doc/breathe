@@ -3,7 +3,7 @@
   A more elaborate class description.
 */
 
-class Test
+class Test12
 {
   public:
 
@@ -25,20 +25,20 @@ class Test
     /*!
       A more elaborate description of the constructor.
     */
-    Test();
+    Test12();
 
     //! A destructor.
     /*!
       A more elaborate description of the destructor.
     */
-   ~Test();
+   ~Test12();
     
     //! A normal member taking two arguments and returning an integer value.
     /*!
       \param a an integer argument.
       \param s a constant character pointer.
       \return The test results
-      \sa Test(), ~Test(), testMeToo() and publicVar()
+      \sa Test12(), ~Test12(), testMeToo() and publicVar()
     */
     int testMe(int a,const char *s);
        

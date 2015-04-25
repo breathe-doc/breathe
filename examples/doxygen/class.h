@@ -1,6 +1,6 @@
 /* A dummy class */
 
-class Test
+class Test3
 {
 };
 
