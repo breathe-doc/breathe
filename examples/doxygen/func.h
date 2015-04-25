@@ -1,18 +1,18 @@
-class Test
+class Test6
 {
   public:
     const char *member(char,int) throw(std::out_of_range);
 };
 
-const char *Test::member(char c,int n) throw(std::out_of_range) {}
+const char *Test6::member(char c,int n) throw(std::out_of_range) {}
 
-/*! \class Test
- * \brief Test class.
+/*! \class Test6
+ * \brief Test6 class.
  *
- * Details about Test.
+ * Details about Test6.
  */
 
-/*! \fn const char *Test::member(char c,int n) 
+/*! \fn const char *Test6::member(char c,int n)
  *  \brief A member function.
  *  \param c a character.
  *  \param n an integer.

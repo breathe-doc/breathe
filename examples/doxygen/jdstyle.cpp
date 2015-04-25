@@ -2,7 +2,7 @@
  *  A test class. A more elaborate class description.
  */
 
-class Test
+class Test8
 {
   public:
 
@@ -23,20 +23,20 @@ class Test
        * A constructor.
        * A more elaborate description of the constructor.
        */
-      Test();
+      Test8();
 
       /**
        * A destructor.
        * A more elaborate description of the destructor.
        */
-     ~Test();
+     ~Test8();
     
       /**
        * a normal member taking two arguments and returning an integer value.
        * @param a an integer argument.
        * @param s a constant character pointer.
-       * @see Test()
-       * @see ~Test()
+       * @see Test8()
+       * @see ~Test8()
        * @see testMeToo()
        * @see publicVar()
        * @return The test results
