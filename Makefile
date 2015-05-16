@@ -1,6 +1,10 @@
 
-all: data
+all: html pdf
+
+html: data
 	$(MAKE) -C documentation html
+
+pdf: data
 	$(MAKE) -C documentation latexpdf
 	
 data:
