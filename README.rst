@@ -2,7 +2,7 @@
 Breathe
 =======
 
-.. image:: https://travis-ci.org/michaeljones/breathe.svg?branch=travis
+.. image:: https://travis-ci.org/michaeljones/breathe.svg?branch=master
     :target: https://travis-ci.org/michaeljones/breathe
 
 This is an extension to reStructuredText and Sphinx to be able to read and
