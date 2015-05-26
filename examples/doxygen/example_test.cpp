@@ -1,5 +1,5 @@
 void main()
 {
-  Test t;
+  Test7 t;
   t.example();
 }

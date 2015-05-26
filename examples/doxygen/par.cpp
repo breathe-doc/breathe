@@ -1,4 +1,4 @@
-/*! \class Test
+/*! \class Test11
  * Normal text.
  *
  * \par User defined paragraph:
@@ -17,4 +17,4 @@
  * More normal text. 
  */
   
-class Test {};
+class Test11 {};

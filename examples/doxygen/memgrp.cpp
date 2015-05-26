@@ -1,5 +1,5 @@
 /** A class. Details */
-class Test
+class Test9
 {
   public:
     //@{
@@ -15,17 +15,17 @@ class Test
     void func2InGroup2();
 };
 
-void Test::func1InGroup1() {}
-void Test::func2InGroup1() {}
+void Test9::func1InGroup1() {}
+void Test9::func2InGroup1() {}
 
 /** @name Group2
  *  Description of group 2. 
  */
 //@{
 /** Function 2 in group 2. Details. */
-void Test::func2InGroup2() {}
+void Test9::func2InGroup2() {}
 /** Function 1 in group 2. Details. */
-void Test::func1InGroup2() {}
+void Test9::func1InGroup2() {}
 //@}
 
 /*! \file 

@@ -614,11 +614,6 @@ class DoxygenDirectiveFactory(object):
         self.target_handler_factory = target_handler_factory
         self.parser_factory = parser_factory
 
-    # TODO: This methods should be scrapped as they are only called in one place. We should just
-    # inline the code at the call site
-    def create_index_directive_container(self):
-        return self.create_directive_container("doxygenindex")
-
     def create_function_directive_container(self):
 
         # Pass text_renderer to the function directive
@@ -634,45 +629,6 @@ class DoxygenDirectiveFactory(object):
             self.target_handler_factory,
             self.parser_factory
             )
-
-    def create_struct_directive_container(self):
-        return self.create_directive_container("doxygenstruct")
-
-    def create_enum_directive_container(self):
-        return self.create_directive_container("doxygenenum")
-
-    def create_enumvalue_directive_container(self):
-        return self.create_directive_container("doxygenenumvalue")
-
-    def create_typedef_directive_container(self):
-        return self.create_directive_container("doxygentypedef")
-
-    def create_union_directive_container(self):
-        return self.create_directive_container("doxygenunion")
-
-    def create_class_directive_container(self):
-        return self.create_directive_container("doxygenclass")
-
-    def create_file_directive_container(self):
-        return self.create_directive_container("doxygenfile")
-
-    def create_namespace_directive_container(self):
-        return self.create_directive_container("doxygennamespace")
-
-    def create_group_directive_container(self):
-        return self.create_directive_container("doxygengroup")
-
-    def create_variable_directive_container(self):
-        return self.create_directive_container("doxygenvariable")
-
-    def create_define_directive_container(self):
-        return self.create_directive_container("doxygendefine")
-
-    def create_auto_index_directive_container(self):
-        return self.create_directive_container("autodoxygenindex")
-
-    def create_auto_file_directive_container(self):
-        return self.create_directive_container("autodoxygenfile")
 
     def create_directive_container(self, type_):
 
@@ -943,79 +899,27 @@ def setup(app):
 
     DoxygenFunctionDirective.app = app
 
-    app.add_directive(
-        "doxygenindex",
-        directive_factory.create_index_directive_container(),
-        )
+    def add_directive(name):
+        app.add_directive(name, directive_factory.create_directive_container(name))
+
+    add_directive('doxygenindex')
+    add_directive('doxygenstruct')
+    add_directive('doxygenenum')
+    add_directive('doxygenenumvalue')
+    add_directive('doxygentypedef')
+    add_directive('doxygenunion')
+    add_directive('doxygenclass')
+    add_directive('doxygenfile')
+    add_directive('doxygennamespace')
+    add_directive('doxygengroup')
+    add_directive('doxygenvariable')
+    add_directive('doxygendefine')
+    add_directive('autodoxygenindex')
+    add_directive('autodoxygenfile')
 
     app.add_directive(
         "doxygenfunction",
         directive_factory.create_function_directive_container(),
-        )
-
-    app.add_directive(
-        "doxygenstruct",
-        directive_factory.create_struct_directive_container(),
-        )
-
-    app.add_directive(
-        "doxygenenum",
-        directive_factory.create_enum_directive_container(),
-        )
-
-    app.add_directive(
-        "doxygenenumvalue",
-        directive_factory.create_enumvalue_directive_container(),
-        )
-
-    app.add_directive(
-        "doxygentypedef",
-        directive_factory.create_typedef_directive_container(),
-        )
-
-    app.add_directive(
-        "doxygenunion",
-        directive_factory.create_union_directive_container(),
-        )
-
-    app.add_directive(
-        "doxygenclass",
-        directive_factory.create_class_directive_container(),
-        )
-
-    app.add_directive(
-        "doxygenfile",
-        directive_factory.create_file_directive_container(),
-        )
-
-    app.add_directive(
-        "doxygennamespace",
-        directive_factory.create_namespace_directive_container(),
-        )
-
-    app.add_directive(
-        "doxygengroup",
-        directive_factory.create_group_directive_container(),
-        )
-
-    app.add_directive(
-        "doxygenvariable",
-        directive_factory.create_variable_directive_container(),
-        )
-
-    app.add_directive(
-        "doxygendefine",
-        directive_factory.create_define_directive_container(),
-        )
-
-    app.add_directive(
-        "autodoxygenindex",
-        directive_factory.create_auto_index_directive_container(),
-        )
-
-    app.add_directive(
-        "autodoxygenfile",
-        directive_factory.create_auto_file_directive_container(),
         )
 
     app.add_config_value("breathe_projects", {}, True)
