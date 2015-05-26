@@ -10,7 +10,7 @@ class C1 {};
 class C2 {};
 
 /** function in group 1 */
-void func() {}
+void func1() {}
 
 /** @} */ // end of group1
 

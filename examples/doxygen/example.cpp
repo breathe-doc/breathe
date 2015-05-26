@@ -1,8 +1,8 @@
-/** A Test class.
+/** A Test5 class.
  *  More details about this class.
  */
 
-class Test
+class Test5
 {
   public:
     /** An example member function.
@@ -11,9 +11,9 @@ class Test
     void example();
 };
 
-void Test::example() {}
+void Test5::example() {}
 
 /** \example example_test.cpp
- * This is an example of how to use the Test class.
+ * This is an example of how to use the Test5 class.
  * More details about this example.
  */

@@ -1,4 +1,4 @@
-class Test
+class Test4
 {
   public:
     enum TEnum { Val1, Val2 };
@@ -11,14 +11,14 @@ class Test
     };
 };
 
-/*! \class Test
+/*! \class Test4
  * The class description.
  */
 
-/*! \enum Test::TEnum
+/*! \enum Test4::TEnum
  * A description of the enum type.
  */
 
-/*! \var Test::TEnum Test::Val1
+/*! \var Test4::TEnum Test4::Val1
  * The description of the first enum value.
  */

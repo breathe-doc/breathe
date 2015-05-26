@@ -20,3 +20,11 @@ clean:
 	$(MAKE) -C examples/tinyxml $@
 	$(MAKE) -C examples/specific $@
 
+test:
+	cd tests && nosetests
+
+dev-test:
+	cd tests && PYTHONPATH=../:$(PTYONPATH) nosetests
+
+flake8:
+	flake8 breathe/*.py
