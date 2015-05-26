@@ -23,5 +23,8 @@ clean:
 test:
 	cd tests && nosetests
 
+dev-test:
+	cd tests && PYTHONPATH=../:$(PTYONPATH) nosetests
+
 flake8:
 	flake8 breathe/*.py
