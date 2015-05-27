@@ -245,6 +245,30 @@ def get_param_decl(param):
     return param_decl
 
 
+def get_definition_without_template_args(data_object):
+    """
+    Return data_object.definition removing any template arguments from the class name in the member function.
+    Otherwise links to classes defined in the same template are not generated correctly.
+    """
+    definition = data_object.definition
+    qual_name = '::' + data_object.name
+    if definition.endswith(qual_name):
+        qual_name_start = len(definition) - len(qual_name)
+        pos = qual_name_start - 1
+        if definition[pos] == '>':
+            bracket_count = 0
+            while pos > 0:
+                if definition[pos] == '>':
+                    bracket_count += 1
+                elif definition[pos] == '<':
+                    bracket_count -= 1
+                    if bracket_count == 0:
+                        definition = definition[:pos] + definition[qual_name_start:]
+                        break
+                pos -= 1
+    return definition
+
+
 class FuncMemberDefTypeSubRenderer(MemberDefTypeSubRenderer):
 
     def update_signature(self, signode):
@@ -274,7 +298,8 @@ class FuncMemberDefTypeSubRenderer(MemberDefTypeSubRenderer):
             param = self.context.mask_factory.mask(param)
             param_decl = get_param_decl(param)
             param_list.append(param_decl)
-        signature = '{0}({1})'.format(self.data_object.definition, ', '.join(param_list))
+        signature = '{0}({1})'.format(get_definition_without_template_args(self.data_object),
+                                      ', '.join(param_list))
         # Remove 'virtual' keyword as Sphinx 1.2 doesn't support virtual functions.
         virtual = 'virtual '
         if signature.startswith(virtual):

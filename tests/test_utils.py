@@ -2,7 +2,7 @@
 from unittest import TestCase
 from xml.dom import minidom
 
-from breathe.renderer.rst.doxygen.compound import get_param_decl
+from breathe.renderer.rst.doxygen.compound import get_param_decl, get_definition_without_template_args
 from breathe.parser.doxygen.compoundsuper import memberdefType
 from breathe.directives import PathHandler
 
@@ -53,6 +53,22 @@ class TestUtils(TestCase):
         self.assertEqual(get_param_decl(memberdef.param[3]), 'int(*p)[3]')
         self.assertEqual(get_param_decl(memberdef.param[4]), 'MyClass a')
         self.assertEqual(get_param_decl(memberdef.param[5]), 'MyClass  * b')
+
+
+    def test_definition_without_template_args(self):
+
+      def get_definition(definition, name):
+        class MockDataObject:
+            def __init__(self, definition, name):
+              self.definition = definition
+              self.name = name
+        return get_definition_without_template_args(MockDataObject(definition, name))
+
+      self.assertEqual('void A::foo', get_definition('void A<T>::foo', 'foo'))
+      # Template arguments in the return type should be preserved:
+      self.assertEqual('Result<T> A::f', get_definition('Result<T> A::f', 'f'))
+      # Nested template arguments:
+      self.assertEqual('Result<T> A::f', get_definition('Result<T> A< B<C> >::f', 'f'))
 
 
 class TestPathHandler(TestCase):
