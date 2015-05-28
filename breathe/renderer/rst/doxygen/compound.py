@@ -249,6 +249,8 @@ def get_definition_without_template_args(data_object):
     """
     Return data_object.definition removing any template arguments from the class name in the member function.
     Otherwise links to classes defined in the same template are not generated correctly.
+
+    For example in 'Result<T> A< B<C> >::f' we want to remove the '< B<C> >' part.
     """
     definition = data_object.definition
     qual_name = '::' + data_object.name
@@ -257,6 +259,8 @@ def get_definition_without_template_args(data_object):
         pos = qual_name_start - 1
         if definition[pos] == '>':
             bracket_count = 0
+            # Iterate back through the characters of the definition counting matching braces and
+            # then remove all braces and everything between
             while pos > 0:
                 if definition[pos] == '>':
                     bracket_count += 1

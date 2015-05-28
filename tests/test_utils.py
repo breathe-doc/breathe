@@ -54,21 +54,20 @@ class TestUtils(TestCase):
         self.assertEqual(get_param_decl(memberdef.param[4]), 'MyClass a')
         self.assertEqual(get_param_decl(memberdef.param[5]), 'MyClass  * b')
 
-
     def test_definition_without_template_args(self):
 
-      def get_definition(definition, name):
-        class MockDataObject:
-            def __init__(self, definition, name):
-              self.definition = definition
-              self.name = name
-        return get_definition_without_template_args(MockDataObject(definition, name))
+        def get_definition(definition, name):
+            class MockDataObject:
+                def __init__(self, definition, name):
+                    self.definition = definition
+                    self.name = name
+            return get_definition_without_template_args(MockDataObject(definition, name))
 
-      self.assertEqual('void A::foo', get_definition('void A<T>::foo', 'foo'))
-      # Template arguments in the return type should be preserved:
-      self.assertEqual('Result<T> A::f', get_definition('Result<T> A::f', 'f'))
-      # Nested template arguments:
-      self.assertEqual('Result<T> A::f', get_definition('Result<T> A< B<C> >::f', 'f'))
+        self.assertEqual('void A::foo', get_definition('void A<T>::foo', 'foo'))
+        # Template arguments in the return type should be preserved:
+        self.assertEqual('Result<T> A::f', get_definition('Result<T> A::f', 'f'))
+        # Nested template arguments:
+        self.assertEqual('Result<T> A::f', get_definition('Result<T> A< B<C> >::f', 'f'))
 
 
 class TestPathHandler(TestCase):
