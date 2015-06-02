@@ -382,7 +382,7 @@ class EnumMemberDefTypeSubRenderer(MemberDefTypeSubRenderer):
 class TypedefMemberDefTypeSubRenderer(MemberDefTypeSubRenderer):
 
     def declaration(self):
-        decl = self.data_object.definition
+        decl = get_definition_without_template_args(self.data_object)
         typedef = "typedef "
         if decl.startswith(typedef):
             decl = decl[len(typedef):]
@@ -392,7 +392,7 @@ class TypedefMemberDefTypeSubRenderer(MemberDefTypeSubRenderer):
 class VariableMemberDefTypeSubRenderer(MemberDefTypeSubRenderer):
 
     def declaration(self):
-        decl = self.data_object.definition
+        decl = get_definition_without_template_args(self.data_object)
         enum = 'enum '
         return decl[len(enum):] if decl.startswith(enum) else decl
 
