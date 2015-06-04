@@ -237,6 +237,8 @@ def get_param_decl(param):
         param_decl = param_type
     elif '(*)' in param_type:
         param_decl = param_type.replace('(*)', '(*' + param_name + ')')
+    elif '(&)' in param_type:
+        param_decl = param_type.replace('(&)', '(&' + param_name + ')')
     else:
         param_decl = param_type + ' ' + param_name
     if param.array:
