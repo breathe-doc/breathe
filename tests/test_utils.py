@@ -38,6 +38,11 @@ class TestUtils(TestCase):
           <type><ref refid="class_my_class" kindref="compound">MyClass</ref> *</type>
           <declname>b</declname>
         </param>
+        <param>
+          <type>int(&amp;)</type>
+          <declname>r</declname>
+          <array>[3]</array>
+        </param>
         </memberdef>
         """
 
@@ -53,6 +58,7 @@ class TestUtils(TestCase):
         self.assertEqual(get_param_decl(memberdef.param[3]), 'int(*p)[3]')
         self.assertEqual(get_param_decl(memberdef.param[4]), 'MyClass a')
         self.assertEqual(get_param_decl(memberdef.param[5]), 'MyClass  * b')
+        self.assertEqual(get_param_decl(memberdef.param[6]), 'int(&r)[3]')
 
     def test_definition_without_template_args(self):
 
