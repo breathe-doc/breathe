@@ -115,3 +115,9 @@ Array Parameter
    :no-link:
 
 
+C Enum
+------
+
+.. doxygenenum:: GSM_BackupFormat
+   :project: c_enum
+   :no-link:
