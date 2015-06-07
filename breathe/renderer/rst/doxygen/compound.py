@@ -2,6 +2,7 @@
 from .base import Renderer
 from .index import CompoundRenderer
 
+
 class DoxygenTypeSubRenderer(Renderer):
 
     def render(self):
@@ -374,9 +375,14 @@ class EnumMemberDefTypeSubRenderer(MemberDefTypeSubRenderer):
         return description_nodes
 
     def update_signature(self, signode):
-        # Replace "type" with "enum" in the signature. This is needed because Sphinx cpp domain doesn't have an enum
-        # directive and we use a type directive instead.
-        signode.children[0][0] = self.node_factory.Text("enum ")
+        first_node = signode.children[0]
+        if isinstance(first_node, self.node_factory.desc_annotation):
+            # Replace "type" with "enum" in the signature. This is needed because older versions of Sphinx cpp
+            # domain didn't have an enum directive and we use a type directive instead.
+            first_node[0] = self.node_factory.Text("enum ")
+        else:
+            # If there is no "type" annotation, insert "enum".
+            first_node.insert(0, self.node_factory.desc_annotation("enum ", "enum "))
         if self.data_object.name.startswith("@"):
             signode.children[1][0] = self.node_factory.strong(text="[anonymous]")
 
