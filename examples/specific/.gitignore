@@ -8,6 +8,7 @@
 /members
 /image
 /decl_impl
+*/doxygen_sqlite3.db
 */xml/*.xml
 */xml/*.xsd
 */xml/*.xslt
