@@ -627,7 +627,7 @@ class DocParamListTypeSubRenderer(Renderer):
     lookup = {
             "param" : "Parameters",
             "exception" : "Exceptions",
-            "templateparam" : "Templates",
+            "templateparam" : "Template Parameters",
             "retval" : "Return Value",
             }
 
