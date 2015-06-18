@@ -1083,6 +1083,18 @@ class FilterFactory(object):
             return (parent_is_compound & parent_is_file & node_matches) \
                 | (parent_is_compound & parent_is_not_file & node_matches)
 
+    def create_function_finder_filter(self, namespace, name):
+
+        parent = Parent()
+        parent_is_compound = parent.node_type == 'compound'
+        parent_is_group = parent.kind == 'group'
+
+        function_filter = self.create_member_finder_filter(namespace, name, 'function')
+        # Get matching functions but only ones in which the parent is either not a compound or if it
+        # is a compound it isn't a group. We want to skip function entries in groups as we'll find
+        # the same functions in a file's xml output elsewhere
+        return function_filter & (~parent_is_compound | ~parent_is_group)
+
     def create_enumvalue_finder_filter(self, name):
         """Returns a filter which looks for an enumvalue with the specified name."""
 
