@@ -399,7 +399,7 @@ class EndsWithFilter(Filter):
         self.options = options
 
     def allow(self, node_stack):
-        string = self.accessor(node_stack) 
+        string = self.accessor(node_stack)
         for entry in self.options:
             if string.endswith(entry):
                 return True
@@ -597,13 +597,13 @@ class FilterFactory(object):
 
     # C++ style public entries
     public_kinds = set([
-            "public-type",
-            "public-func",
-            "public-attrib",
-            "public-slot",
-            "public-static-func",
-            "public-static-attrib",
-            ])
+        "public-type",
+        "public-func",
+        "public-attrib",
+        "public-slot",
+        "public-static-func",
+        "public-static-attrib",
+    ])
 
     def __init__(self, globber_factory, path_handler):
 
@@ -630,7 +630,6 @@ class FilterFactory(object):
             filter_options['members'] = u''
 
         node = Node()
-        parent = Parent()
         grandparent = Ancestor(2)
         has_grandparent = HasAncestorFilter(2)
 
@@ -641,11 +640,7 @@ class FilterFactory(object):
             & (grandparent.kind != 'struct') \
             & (node.node_type == 'memberdef')
 
-        node_is_public = node.prot == 'public'
-
-        non_class_public_memberdefs = non_class_memberdef & node_is_public | ~ non_class_memberdef
-
-        return ( self.create_class_member_filter(filter_options) | non_class_memberdef ) \
+        return (self.create_class_member_filter(filter_options) | non_class_memberdef) \
             & self.create_innerclass_filter(filter_options) \
             & self.create_outline_filter(filter_options)
 
@@ -711,11 +706,10 @@ class FilterFactory(object):
 
                 # Accept any nodes which don't have a "sectiondef" as a parent or, if they do, only
                 # accept them if their names are in the members list
-                public_innerclass_filter = ~ node_is_innerclass_in_class | node_valueOf_is_in_members
+                public_innerclass_filter = ~node_is_innerclass_in_class | node_valueOf_is_in_members
 
             else:
                 allowed.add('public')
-
 
         node_is_in_allowed_scope = node.prot.is_one_of(allowed)
 
@@ -878,7 +872,7 @@ class FilterFactory(object):
         undoc_members = self._create_undoc_members_filter(options)
 
         # Allow any public/private members which also fit the undoc filter and all the descriptions
-        allowed_members = ( public_members | protected_members | private_members ) & undoc_members
+        allowed_members = (public_members | protected_members | private_members) & undoc_members
         return allowed_members | description
 
     def create_outline_filter(self, options):
@@ -1070,13 +1064,13 @@ class FilterFactory(object):
         parent = Parent()
 
         node_matches = (node.node_type == 'member') \
-                & (node.kind == kind) \
-                & (node.name == name)
+            & (node.kind == kind) \
+            & (node.name == name)
 
         if namespace:
             parent_matches = (parent.node_type == 'compound') \
-                    & ((parent.kind == 'namespace') | (parent.kind == 'class')) \
-                    & (parent.name == namespace)
+                & ((parent.kind == 'namespace') | (parent.kind == 'class')) \
+                & (parent.name == namespace)
 
             return parent_matches & node_matches
 
@@ -1099,7 +1093,7 @@ class FilterFactory(object):
         """Returns a filter which looks for a compound with the specified name and kind."""
 
         node = Node()
-        return (node.node_type == 'compound') & (node.kind == kind)  & (node.name == name)
+        return (node.node_type == 'compound') & (node.kind == kind) & (node.name == name)
 
     def create_finder_filter(self, kind, name):
         """Returns a filter which looks for the compound node from the index which is a group node
@@ -1135,4 +1129,3 @@ class FilterFactory(object):
 
         self.implementation_filename_extensions = \
             app.config.breathe_implementation_filename_extensions
-
