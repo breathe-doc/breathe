@@ -853,7 +853,14 @@ class TemplateParamListRenderer(Renderer):
                 nodelist.append(self.node_factory.Text(", "))
             context = self.context.create_child_context(item)
             renderer = self.renderer_factory.create_renderer(context)
-            nodelist.extend(renderer.render())
+            item_nodes = renderer.render()
+            # Render keywords as annotations for consistency with the cpp domain.
+            for keyword in ['typename', 'class']:
+              if len(item_nodes) > 0 and item_nodes[0].startswith(keyword):
+                item_nodes[0] = item_nodes[0].lstrip(keyword)
+                item_nodes.insert(0, self.node_factory.desc_annotation(keyword, keyword))
+                break
+            nodelist.extend(item_nodes)
 
         return nodelist
 
