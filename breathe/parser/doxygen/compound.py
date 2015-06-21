@@ -960,5 +960,3 @@ def parse(inFilename):
     rootObj = supermod.DoxygenType.factory()
     rootObj.build(rootNode)
     return rootObj
-
-
