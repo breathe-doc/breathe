@@ -479,7 +479,16 @@ class ParamTypeSubRenderer(Renderer):
         if self.data_object.type_:
             context = self.context.create_child_context(self.data_object.type_)
             renderer = self.renderer_factory.create_renderer(context)
-            nodelist.extend(renderer.render())
+            type_nodes = renderer.render()
+            # Render keywords as annotations for consistency with the cpp domain.
+            if len(type_nodes) > 0:
+                first_node = type_nodes[0]
+                for keyword in ['typename', 'class']:
+                    if first_node.startswith(keyword + ' '):
+                        type_nodes[0] = self.node_factory.Text(first_node.replace(keyword, '', 1))
+                        type_nodes.insert(0, self.node_factory.desc_annotation(keyword, keyword))
+                    break
+            nodelist.extend(type_nodes)
 
         # Parameter name
         if self.data_object.declname:
@@ -859,14 +868,7 @@ class TemplateParamListRenderer(Renderer):
                 nodelist.append(self.node_factory.Text(", "))
             context = self.context.create_child_context(item)
             renderer = self.renderer_factory.create_renderer(context)
-            item_nodes = renderer.render()
-            # Render keywords as annotations for consistency with the cpp domain.
-            for keyword in ['typename', 'class']:
-                if len(item_nodes) > 0 and item_nodes[0].startswith(keyword + ' '):
-                    item_nodes[0] = self.node_factory.Text(item_nodes[0].replace(keyword, '', 1))
-                    item_nodes.insert(0, self.node_factory.desc_annotation(keyword, keyword))
-                    break
-            nodelist.extend(item_nodes)
+            nodelist.extend(renderer.render())
 
         return nodelist
 
