@@ -1,6 +1,7 @@
 
 from .base import Renderer
 from .index import CompoundRenderer
+import six
 
 
 class DoxygenTypeSubRenderer(Renderer):
@@ -229,7 +230,7 @@ def get_param_decl(param):
     param_type = []
     for p in param.type_.content_:
         value = p.value
-        if not isinstance(value, unicode):
+        if not isinstance(value, six.text_type):
             value = value.valueOf_
         param_type.append(value)
     param_type = ' '.join(param_type)
