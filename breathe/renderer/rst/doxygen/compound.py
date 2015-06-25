@@ -487,7 +487,7 @@ class ParamTypeSubRenderer(Renderer):
                     if first_node.startswith(keyword + ' '):
                         type_nodes[0] = self.node_factory.Text(first_node.replace(keyword, '', 1))
                         type_nodes.insert(0, self.node_factory.desc_annotation(keyword, keyword))
-                    break
+                        break
             nodelist.extend(type_nodes)
 
         # Parameter name
