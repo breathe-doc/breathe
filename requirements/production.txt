@@ -3,3 +3,4 @@ Jinja2==2.7.3
 MarkupSafe==0.23
 Pygments==1.6
 Sphinx==1.2.2
+six==1.9.0

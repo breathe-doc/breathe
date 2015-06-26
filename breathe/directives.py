@@ -121,8 +121,7 @@ class DoxygenFunctionDirective(BaseDirective):
         # Extract arguments from the function name.
         args = self.parse_args(args)
 
-        finder_filter = self.filter_factory.create_member_finder_filter(
-            namespace, function_name, 'function')
+        finder_filter = self.filter_factory.create_function_finder_filter(namespace, function_name)
 
         matches = []
         finder.filter_(finder_filter, matches)
