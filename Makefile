@@ -27,4 +27,4 @@ dev-test:
 	cd tests && PYTHONPATH=../:$(PTYONPATH) nosetests
 
 flake8:
-	flake8 breathe/*.py
+	flake8 breathe/*.py breathe/renderer/rst/doxygen/filter.py
