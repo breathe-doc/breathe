@@ -1,6 +1,7 @@
 
 from .base import Renderer
 from .index import CompoundRenderer
+import six
 
 
 class DoxygenTypeSubRenderer(Renderer):
@@ -18,47 +19,47 @@ class CompoundDefTypeSubRenderer(Renderer):
     # here and the titles for the SectionDefTypeSubRenderer but we don't want the repetition of
     # having two lists in case they fall out of sync
     sections = [
-                ("user-defined", "User Defined"),
-                ("public-type", "Public Types"),
-                ("public-func", "Public Functions"),
-                ("public-attrib", "Public Members"),
-                ("public-slot", "Public Slots"),
-                ("signal", "Signal"),
-                ("dcop-func",  "DCOP Function"),
-                ("property",  "Property"),
-                ("event",  "Event"),
-                ("public-static-func", "Public Static Functions"),
-                ("public-static-attrib", "Public Static Attributes"),
-                ("protected-type",  "Protected Types"),
-                ("protected-func",  "Protected Functions"),
-                ("protected-attrib",  "Protected Attributes"),
-                ("protected-slot",  "Protected Slots"),
-                ("protected-static-func",  "Protected Static Functions"),
-                ("protected-static-attrib",  "Protected Static Attributes"),
-                ("package-type",  "Package Types"),
-                ("package-func", "Package Functions"),
-                ("package-attrib", "Package Attributes"),
-                ("package-static-func", "Package Static Functions"),
-                ("package-static-attrib", "Package Static Attributes"),
-                ("private-type", "Private Types"),
-                ("private-func", "Private Functions"),
-                ("private-attrib", "Private Members"),
-                ("private-slot",  "Private Slots"),
-                ("private-static-func", "Private Static Functions"),
-                ("private-static-attrib",  "Private Static Attributes"),
-                ("friend",  "Friends"),
-                ("related",  "Related"),
-                ("define",  "Defines"),
-                ("prototype",  "Prototypes"),
-                ("typedef",  "Typedefs"),
-                ("enum",  "Enums"),
-                ("func",  "Functions"),
-                ("var",  "Variables"),
-                ]
+        ("user-defined", "User Defined"),
+        ("public-type", "Public Types"),
+        ("public-func", "Public Functions"),
+        ("public-attrib", "Public Members"),
+        ("public-slot", "Public Slots"),
+        ("signal", "Signal"),
+        ("dcop-func",  "DCOP Function"),
+        ("property",  "Property"),
+        ("event",  "Event"),
+        ("public-static-func", "Public Static Functions"),
+        ("public-static-attrib", "Public Static Attributes"),
+        ("protected-type",  "Protected Types"),
+        ("protected-func",  "Protected Functions"),
+        ("protected-attrib",  "Protected Attributes"),
+        ("protected-slot",  "Protected Slots"),
+        ("protected-static-func",  "Protected Static Functions"),
+        ("protected-static-attrib",  "Protected Static Attributes"),
+        ("package-type",  "Package Types"),
+        ("package-func", "Package Functions"),
+        ("package-attrib", "Package Attributes"),
+        ("package-static-func", "Package Static Functions"),
+        ("package-static-attrib", "Package Static Attributes"),
+        ("private-type", "Private Types"),
+        ("private-func", "Private Functions"),
+        ("private-attrib", "Private Members"),
+        ("private-slot",  "Private Slots"),
+        ("private-static-func", "Private Static Functions"),
+        ("private-static-attrib",  "Private Static Attributes"),
+        ("friend",  "Friends"),
+        ("related",  "Related"),
+        ("define",  "Defines"),
+        ("prototype",  "Prototypes"),
+        ("typedef",  "Typedefs"),
+        ("enum",  "Enums"),
+        ("func",  "Functions"),
+        ("var",  "Variables"),
+    ]
 
     def render(self):
 
-        nodelist = []    
+        nodelist = []
 
         if self.data_object.briefdescription:
             context = self.context.create_child_context(self.data_object.briefdescription)
@@ -229,7 +230,7 @@ def get_param_decl(param):
     param_type = []
     for p in param.type_.content_:
         value = p.value
-        if not isinstance(value, unicode):
+        if not isinstance(value, six.text_type):
             value = value.valueOf_
         param_type.append(value)
     param_type = ' '.join(param_type)
@@ -250,8 +251,8 @@ def get_param_decl(param):
 
 def get_definition_without_template_args(data_object):
     """
-    Return data_object.definition removing any template arguments from the class name in the member function.
-    Otherwise links to classes defined in the same template are not generated correctly.
+    Return data_object.definition removing any template arguments from the class name in the member
+    function.  Otherwise links to classes defined in the same template are not generated correctly.
 
     For example in 'Result<T> A< B<C> >::f' we want to remove the '< B<C> >' part.
     """
@@ -351,8 +352,8 @@ class EnumMemberDefTypeSubRenderer(MemberDefTypeSubRenderer):
 
     def declaration(self):
 
-        # Sphinx requires a name to be a valid identifier, so replace anonymous enum name of the form @id
-        # generated by Doxygen with "anonymous".
+        # Sphinx requires a name to be a valid identifier, so replace anonymous enum name of the
+        # form @id generated by Doxygen with "anonymous".
         name = self.get_fully_qualified_name()
         return name.replace("@", "__anonymous") if self.data_object.name.startswith("@") else name
 
@@ -377,8 +378,8 @@ class EnumMemberDefTypeSubRenderer(MemberDefTypeSubRenderer):
     def update_signature(self, signode):
         first_node = signode.children[0]
         if isinstance(first_node, self.node_factory.desc_annotation):
-            # Replace "type" with "enum" in the signature. This is needed because older versions of Sphinx cpp
-            # domain didn't have an enum directive and we use a type directive instead.
+            # Replace "type" with "enum" in the signature. This is needed because older versions of
+            # Sphinx cpp domain didn't have an enum directive and we use a type directive instead.
             first_node[0] = self.node_factory.Text("enum ")
         else:
             # If there is no "type" annotation, insert "enum".
@@ -415,8 +416,8 @@ class EnumvalueTypeSubRenderer(MemberDefTypeSubRenderer):
         return 'enumvalue'
 
     def update_signature(self, signode):
-        # Remove "class" from the signature. This is needed because Sphinx cpp domain doesn't have an enum value
-        # directive and we use a class directive instead.
+        # Remove "class" from the signature. This is needed because Sphinx cpp domain doesn't have
+        # an enum value directive and we use a class directive instead.
         signode.children.pop(0)
         initializer = self.data_object.initializer
         if initializer:
@@ -468,8 +469,7 @@ class ParamTypeSubRenderer(Renderer):
             *args
             ):
 
-        Renderer.__init__( self, *args )
-
+        Renderer.__init__(self, *args)
         self.output_defname = output_defname
 
     def render(self):
@@ -480,17 +480,28 @@ class ParamTypeSubRenderer(Renderer):
         if self.data_object.type_:
             context = self.context.create_child_context(self.data_object.type_)
             renderer = self.renderer_factory.create_renderer(context)
-            nodelist.extend(renderer.render())
+            type_nodes = renderer.render()
+            # Render keywords as annotations for consistency with the cpp domain.
+            if len(type_nodes) > 0:
+                first_node = type_nodes[0]
+                for keyword in ['typename', 'class']:
+                    if first_node.startswith(keyword + ' '):
+                        type_nodes[0] = self.node_factory.Text(first_node.replace(keyword, '', 1))
+                        type_nodes.insert(0, self.node_factory.desc_annotation(keyword, keyword))
+                        break
+            nodelist.extend(type_nodes)
 
         # Parameter name
         if self.data_object.declname:
-            if nodelist: nodelist.append(self.node_factory.Text(" "))
+            if nodelist:
+                nodelist.append(self.node_factory.Text(" "))
             nodelist.append(self.node_factory.emphasis(text=self.data_object.declname))
 
         elif self.output_defname and self.data_object.defname:
             # We only want to output the definition name (from the cpp file) if the declaration name
             # (from header file) isn't present
-            if nodelist: nodelist.append(self.node_factory.Text(" "))
+            if nodelist:
+                nodelist.append(self.node_factory.Text(" "))
             nodelist.append(self.node_factory.emphasis(text=self.data_object.defname))
 
         # array information
@@ -505,7 +516,6 @@ class ParamTypeSubRenderer(Renderer):
             nodelist.extend(renderer.render())
 
         return nodelist
-
 
 
 class DocRefTextTypeSubRenderer(Renderer):
@@ -526,16 +536,16 @@ class DocRefTextTypeSubRenderer(Renderer):
 
         refid = "%s%s" % (self.project_info.name(), self.data_object.refid)
         nodelist = [
-                self.node_factory.pending_xref(
-                    "",
-                    reftype="ref",
-                    refdomain="std",
-                    refexplicit=True,
-                    refid=refid, 
-                    reftarget=refid,
-                    *nodelist
-                    )
-                ]
+            self.node_factory.pending_xref(
+                "",
+                reftype="ref",
+                refdomain="std",
+                refexplicit=True,
+                refid=refid,
+                reftarget=refid,
+                *nodelist
+            )
+        ]
 
         return nodelist
 
@@ -590,12 +600,13 @@ class DocImageTypeSubRenderer(Renderer):
     def render(self):
 
         path_to_image = self.project_info.sphinx_abs_path_to_file(
-                self.data_object.name
-                )
+            self.data_object.name
+        )
 
-        options = { "uri" : path_to_image }
+        options = {"uri": path_to_image}
 
         return [self.node_factory.image("", **options)]
+
 
 class DocMarkupTypeSubRenderer(Renderer):
 
@@ -605,8 +616,7 @@ class DocMarkupTypeSubRenderer(Renderer):
             *args
             ):
 
-        Renderer.__init__( self, *args )
-
+        Renderer.__init__(self, *args)
         self.creator = creator
 
     def render(self):
@@ -625,11 +635,11 @@ class DocParamListTypeSubRenderer(Renderer):
     """Parameter/Exception documentation"""
 
     lookup = {
-            "param" : "Parameters",
-            "exception" : "Exceptions",
-            "templateparam" : "Template Parameters",
-            "retval" : "Return Value",
-            }
+        "param": "Parameters",
+        "exception": "Exceptions",
+        "templateparam": "Template Parameters",
+        "retval": "Return Value",
+    }
 
     def render(self):
 
@@ -640,10 +650,11 @@ class DocParamListTypeSubRenderer(Renderer):
             nodelist.extend(renderer.render())
 
         # Fild list entry
-        nodelist_list = self.node_factory.bullet_list("", classes=["breatheparameterlist"], *nodelist)
+        nodelist_list = self.node_factory.bullet_list("", classes=["breatheparameterlist"],
+                                                      *nodelist)
 
         term_text = self.lookup[self.data_object.kind]
-        term = self.node_factory.term("", "", self.node_factory.strong( "", term_text ) )
+        term = self.node_factory.term("", "", self.node_factory.strong("", term_text))
         definition = self.node_factory.definition('', nodelist_list)
 
         return [self.node_factory.definition_list_item('', term, definition)]
@@ -660,7 +671,7 @@ class DocParamListItemSubRenderer(Renderer):
             renderer = self.renderer_factory.create_renderer(context)
             nodelist.extend(renderer.render())
 
-        term = self.node_factory.literal("","", *nodelist)
+        term = self.node_factory.literal("", "", *nodelist)
 
         separator = self.node_factory.Text(" - ")
 
@@ -672,6 +683,7 @@ class DocParamListItemSubRenderer(Renderer):
             nodelist.extend(renderer.render())
 
         return [self.node_factory.list_item("", term, separator, *nodelist)]
+
 
 class DocParamNameListSubRenderer(Renderer):
     """ Parameter Name Renderer """
@@ -686,6 +698,7 @@ class DocParamNameListSubRenderer(Renderer):
 
         return nodelist
 
+
 class DocParamNameSubRenderer(Renderer):
 
     def render(self):
@@ -697,6 +710,7 @@ class DocParamNameSubRenderer(Renderer):
             nodelist.extend(renderer.render())
 
         return nodelist
+
 
 class DocSect1TypeSubRenderer(Renderer):
 
@@ -712,7 +726,7 @@ class DocSimpleSectTypeSubRenderer(Renderer):
 
         text = self.node_factory.Text(self.data_object.kind.capitalize())
 
-        return [self.node_factory.strong( "", text )]
+        return [self.node_factory.strong("", text)]
 
     def render(self):
 
@@ -735,7 +749,7 @@ class ParDocSimpleSectTypeSubRenderer(DocSimpleSectTypeSubRenderer):
         context = self.context.create_child_context(self.data_object.title)
         renderer = self.renderer_factory.create_renderer(context)
 
-        return [self.node_factory.strong( "", *renderer.render() )]
+        return [self.node_factory.strong("", *renderer.render())]
 
 
 class DocTitleTypeSubRenderer(Renderer):
@@ -798,7 +812,6 @@ class ListingTypeSubRenderer(Renderer):
 
     def render(self):
 
-        lines = []
         nodelist = []
         for i, item in enumerate(self.data_object.codeline):
             # Put new lines between the lines. There must be a more pythonic way of doing this
@@ -811,12 +824,13 @@ class ListingTypeSubRenderer(Renderer):
         # Add blank string at the start otherwise for some reason it renders
         # the pending_xref tags around the kind in plain text
         block = self.node_factory.literal_block(
-                "",
-                "",
-                *nodelist
-                )
+            "",
+            "",
+            *nodelist
+        )
 
         return [block]
+
 
 class CodeLineTypeSubRenderer(Renderer):
 
@@ -830,6 +844,7 @@ class CodeLineTypeSubRenderer(Renderer):
 
         return nodelist
 
+
 class HighlightTypeSubRenderer(Renderer):
 
     def render(self):
@@ -841,6 +856,7 @@ class HighlightTypeSubRenderer(Renderer):
             nodelist.extend(renderer.render())
 
         return nodelist
+
 
 class TemplateParamListRenderer(Renderer):
 
@@ -856,6 +872,7 @@ class TemplateParamListRenderer(Renderer):
             nodelist.extend(renderer.render())
 
         return nodelist
+
 
 class IncTypeSubRenderer(Renderer):
 
