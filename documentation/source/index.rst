@@ -97,11 +97,11 @@ Breathe is available from:
 * `PyPI, the Python Package Index <http://pypi.python.org/pypi/breathe>`_
 * `Github <https://github.com/michaeljones/breathe>`_
 
-Licence
+License
 -------
 
-Breathe is under the `BSD licence
-<https://github.com/michaeljones/breathe/blob/master/LICENCE>`_.
+Breathe is under the `BSD license
+<https://github.com/michaeljones/breathe/blob/master/LICENSE>`_.
 
 In a Nutshell
 -------------
