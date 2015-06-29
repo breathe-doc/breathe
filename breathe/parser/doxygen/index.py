@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 """
 Generated Mon Feb  9 19:08:05 2009 by generateDS.py.
 """
