@@ -36,7 +36,7 @@ struct
 py
 conf
 inline
-Licence
+License
 autodoc
 mux
 renderers
