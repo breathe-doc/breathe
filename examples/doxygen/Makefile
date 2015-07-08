@@ -2,9 +2,9 @@
 # This file was generated from Makefile.in on Sat Dec 13 12:17:28 GMT 2008
 #
 
-DOXYGEN   ?= `which doxygen`
+#DOXYGEN   ?= `which doxygen`
 TMAKEPATH = 
-ENV       = env TMAKEPATH=$(TMAKEPATH)
+#ENV       = env TMAKEPATH=$(TMAKEPATH)
 TMAKE     = 
 MAKE      = /usr/bin/make
 PERL      = /usr/bin/perl
