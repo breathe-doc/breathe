@@ -221,3 +221,21 @@ It produces the following warning message:
 .. warning:: Cannot find file "madeupgroup" in doxygen xml output for project
              "group" from directory: ../../examples/specific/group/xml/
 
+
+Member Group Example
+--------------------
+
+Here is a member group example.
+
+.. code-block:: rst
+                
+   .. doxygenclass:: ns1::ns2::MyClass2
+      :project: group
+      :members:
+      :protected-members:
+                
+.. doxygenclass:: ns1::ns2::MyClass2
+   :project: group
+   :members:
+   :protected-members:
+      

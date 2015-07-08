@@ -67,3 +67,50 @@ private:
 //! Ungrouped function
 void ungroupedFunction();
 
+//! \brief outer namespace
+//! \ingroup mygroup
+namespace ns1 {
+
+//! \brief A class in ns1
+//! \ingroup mygroup
+class MyClass1 {
+public:
+    /// \brief default constructor
+    MyClass1();
+};
+
+//! \brief inner namespace
+//! \ingroup mygroup
+namespace ns2 {
+
+//! \brief A class in ns1::ns2
+//! \details Detailed description of function2.
+//! \ingroup mygroup
+class MyClass2
+{
+public:
+    // \brief brief statement for member group
+
+    /// \name member group name
+    ///
+    /// Description of member group goes here
+    ///@{
+    
+    /// \brief method1 brief
+    ///
+    /// method1 details
+    void method1();
+
+protected:
+    /// \brief method2 brief
+    ///
+    /// method2 details
+    void method2();
+    ///@}
+
+    /// \brief method3 is not in the member group
+    void method3();
+};
+
+} // namespace ns2
+} // namespace ns1
