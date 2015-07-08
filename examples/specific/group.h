@@ -112,5 +112,25 @@ protected:
     void method3();
 };
 
+/// \brief another class
+class MyClass3
+{
+public:
+    /// \brief default constructor
+    MyClass3();
+};
+
+/// \brief another nested namespace
+namespace ns3 {
+/// \brief another class
+/// \ingroup mygroup
+class MyClass4
+{
+public:
+    /// \brief default constructor
+    MyClass4();
+};
+} // namespace ns3
+
 } // namespace ns2
 } // namespace ns1
