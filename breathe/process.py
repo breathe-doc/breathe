@@ -15,6 +15,7 @@ GENERATE_HTML = NO
 GENERATE_XML = YES
 ALIASES = "rst=\verbatim embed:rst"
 ALIASES += "endrst=\endverbatim"
+{extra}
 """.strip()
 
 
@@ -55,13 +56,13 @@ class AutoDoxygenProcessHandle(object):
         # a directory in the Sphinx build area
         for project_name, data in project_files.items():
 
-            project_path = self.process(data.auto_project_info, data.files)
+            project_path = self.process(data.auto_project_info, data.files, app)
 
             project_info = data.auto_project_info.create_project_info(project_path)
 
             self.project_info_factory.store_project_info_for_auto(project_name, project_info)
 
-    def process(self, auto_project_info, files):
+    def process(self, auto_project_info, files, app):
 
         name = auto_project_info.name()
         cfgfile = "%s.cfg" % name
@@ -71,7 +72,8 @@ class AutoDoxygenProcessHandle(object):
         cfg = AUTOCFG_TEMPLATE.format(
             project_name=name,
             output_dir=name,
-            input=" ".join(full_paths)
+            input=" ".join(full_paths),
+            extra='\n'.join("%s=%s" % pair for pair in app.config.breathe_doxygen_config_options.items())
             )
 
         build_dir = self.path_handler.join(
