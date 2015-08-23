@@ -930,6 +930,7 @@ def setup(app):
     app.add_config_value("breathe_build_directory", '', True)
     app.add_config_value("breathe_default_members", (), True)
     app.add_config_value("breathe_implementation_filename_extensions", ['.c', '.cc', '.cpp'], True)
+    app.add_config_value("breathe_doxygen_config_options", {}, True)
 
     breathe_css = "breathe.css"
     if (os.path.exists(os.path.join(app.confdir, "_static", breathe_css))):
@@ -942,7 +943,13 @@ def setup(app):
         project_info_factory
         )
 
-    app.connect("builder-inited", doxygen_handle.generate_xml)
+    def doxygen_hook(app):
+        doxygen_handle.generate_xml(
+            app.config.breathe_projects_source,
+            app.config.breathe_doxygen_config_options
+        )
+
+    app.connect("builder-inited", doxygen_hook)
 
     app.connect("builder-inited", directive_factory.get_config_values)
 
