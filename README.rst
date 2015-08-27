@@ -132,6 +132,27 @@ Change Log
 
 Inspired by `Keepachangelog.com <http://keepachangelog.com/>`__.
 
+- 2015-08-27 - Breathe v4.1.0
+
+  - Added
+
+    - ``breathe_doxygen_config_options`` config variable which allows for adding
+      more config lines to the doxygen file used for the auto-directives.
+
+  - Fixed
+
+    - Display of array & array reference parameters for functions.
+
+    - Handling of links to classes with template arguments.
+
+    - Handling of unnamed enums in C.
+
+    - Naming of template parameter section.
+
+    - Finding functions that are within groups.
+
+    - Rendering of 'typename' and 'class' keywords for templates.
+
 - 2015-04-02 - Breathe v4.0.0
 
   - Significant work on the code base with miminal reStructureText interface
