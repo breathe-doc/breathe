@@ -19,7 +19,6 @@ Specific Members
    :members: functionS, anotherFunction
    :no-link:
 
-
 No Members
 ----------
 
@@ -27,3 +26,17 @@ No Members
    :path: ../../examples/specific/members/xml
    :no-link:
 
+Struct Members
+----------------
+
+.. doxygenfunction:: testnamespace::MyClass::MyClass
+   :path: ../../examples/specific/struct_function/xml
+   :no-link:
+
+.. doxygenfunction:: testnamespace::MyClass<T>::MyClass
+   :path: ../../examples/specific/struct_function/xml
+   :no-link:
+
+.. doxygenfunction:: testnamespace::MyClass< T >::MyClass
+   :path: ../../examples/specific/struct_function/xml
+   :no-link:
