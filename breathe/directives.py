@@ -1,4 +1,6 @@
 
+from __future__ import unicode_literals
+
 from .finder.core import FinderFactory
 from .parser import DoxygenParserFactory
 from .renderer import DoxygenToRstRendererFactory
@@ -835,12 +837,12 @@ def setup(app):
             app.config.breathe_doxygen_config_options
         )
 
-    app.connect("builder-inited", doxygen_hook)
+    app.connect(b"builder-inited", doxygen_hook)
 
-    app.connect("builder-inited", directive_factory.get_config_values)
+    app.connect(b"builder-inited", directive_factory.get_config_values)
 
-    app.connect("builder-inited", filter_factory.get_config_values)
+    app.connect(b"builder-inited", filter_factory.get_config_values)
 
-    app.connect("env-get-outdated", file_state_cache.get_outdated)
+    app.connect(b"env-get-outdated", file_state_cache.get_outdated)
 
-    app.connect("env-purge-doc", file_state_cache.purge_doc)
+    app.connect(b"env-purge-doc", file_state_cache.purge_doc)
