@@ -36,6 +36,7 @@ import subprocess
 
 # Somewhat outrageously, reach in and fix a Sphinx regex
 cpp._identifier_re = re.compile(r'(~?\b[a-zA-Z_][a-zA-Z0-9_]*)\b')
+white_space_re = re.compile(r'\s+')
 
 
 class NoMatchingFunctionError(BreatheError):
@@ -252,9 +253,15 @@ class DoxygenFunctionDirective(BaseDirective):
 
             # Render the nodes to text
             signature = self.text_renderer.render(nodes, self.state.document)
-            signatures.append(signature)
 
-            match = re.match(r"([^(]*)(.*)", signature)
+            # Replace 'non-breaking whitespace' with normal space
+            processed_signature = signature.replace('\xa0', ' ')
+            # Collapse consecutive white space characters
+            processed_signature = white_space_re.sub(' ', processed_signature)
+
+            signatures.append(processed_signature)
+
+            match = re.match(r"([^(]*)(.*)", processed_signature)
             match_args = match.group(2)
 
             # Parse the text to find the arguments
