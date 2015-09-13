@@ -33,3 +33,6 @@ Struct Members
    :path: ../../examples/specific/struct_function/xml
    :no-link:
 
+.. doxygenfunction:: testnamespace::MyClass::MyClass(const MyClass&)
+   :path: ../../examples/specific/struct_function/xml
+   :no-link:
