@@ -205,7 +205,7 @@ class ProjectInfoFactory(object):
 
     def create_project_info(self, options):
 
-        name = ""
+        name = self.default_project
 
         if "project" in options:
             try:
