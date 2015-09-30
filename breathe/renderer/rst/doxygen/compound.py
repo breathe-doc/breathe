@@ -4,6 +4,23 @@ from .index import CompoundRenderer
 import six
 
 
+def renderIterable(renderer, iterable):
+    output = []
+    for entry in iterable:
+        context = renderer.context.create_child_context(entry)
+        child_renderer = renderer.renderer_factory.create_renderer(context)
+        output.extend(child_renderer.render())
+    return output
+
+
+def intersperse(iterable, delimiter):
+    it = iter(iterable)
+    yield next(it)
+    for x in it:
+        yield delimiter
+        yield x
+
+
 class DoxygenTypeSubRenderer(Renderer):
 
     def render(self):
@@ -70,6 +87,30 @@ class CompoundDefTypeSubRenderer(Renderer):
             context = self.context.create_child_context(self.data_object.detaileddescription)
             renderer = self.renderer_factory.create_renderer(context)
             nodelist.extend(renderer.render())
+
+        if self.data_object.basecompoundref:
+            output = renderIterable(self, self.data_object.basecompoundref)
+            if output:
+                nodelist.append(
+                    self.node_factory.paragraph(
+                        '',
+                        '',
+                        self.node_factory.Text('Inherits from '),
+                        *intersperse(output, self.node_factory.Text(', '))
+                    )
+                )
+
+        if self.data_object.derivedcompoundref:
+            output = renderIterable(self, self.data_object.derivedcompoundref)
+            if output:
+                nodelist.append(
+                    self.node_factory.paragraph(
+                        '',
+                        '',
+                        self.node_factory.Text('Subclassed by '),
+                        *intersperse(output, self.node_factory.Text(', '))
+                    )
+                )
 
         section_nodelists = {}
 
@@ -429,6 +470,33 @@ class EnumvalueTypeSubRenderer(MemberDefTypeSubRenderer):
                 separator += '= '
             signode.append(self.node_factory.Text(separator))
             signode.extend(nodes)
+
+
+class CompoundRefTypeSubRenderer(Renderer):
+
+    def render(self):
+
+        nodelist = []
+
+        for item in self.data_object.content_:
+            context = self.context.create_child_context(item)
+            renderer = self.renderer_factory.create_renderer(context)
+            nodelist.extend(renderer.render())
+
+        refid = "%s%s" % (self.project_info.name(), self.data_object.refid)
+        nodelist = [
+            self.node_factory.pending_xref(
+                "",
+                reftype="ref",
+                refdomain="std",
+                refexplicit=True,
+                refid=refid,
+                reftarget=refid,
+                *nodelist
+            )
+        ]
+
+        return nodelist
 
 
 class DescriptionTypeSubRenderer(Renderer):
