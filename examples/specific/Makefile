@@ -18,7 +18,7 @@ DOCDIR    = $(INSTALL)/share/doc/packages/doxygen
 QTDIR     = 
 HAVE_DOT  = /usr/bin/dot
 
-projects  = nutshell alias rst inline namespacefile c_file array c_enum \
+projects  = nutshell alias rst inline namespacefile c_file array c_enum inheritance \
 			members userdefined fixedwidthfont latexmath functionOverload \
 			image name union group struct qtslots lists headings links parameters \
 			template_class template_class_non_type template_function template_specialisation enum
