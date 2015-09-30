@@ -34,6 +34,9 @@ If you would like to always specify some combination of ``members``,
 use the :ref:`breathe_default_members <breathe-default-members>` configuration
 variable to set it in the ``conf.py``.
 
+The output includes references to any base classes and derived classes of the
+specified class.
+
 .. contents::
 
 
