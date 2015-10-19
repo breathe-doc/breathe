@@ -351,6 +351,7 @@ class DoxygenToRstRendererFactoryCreatorConstructor(object):
 
     def create_factory_creator(self, project_info, document, options, target_handler):
 
+        # the argument `options` is never used
         return DoxygenToRstRendererFactoryCreator(
                 self.node_factory,
                 self.parser_factory,
