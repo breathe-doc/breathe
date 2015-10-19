@@ -237,7 +237,7 @@ class DoxygenFunctionDirective(BaseDirective):
         # Iterate over the potential matches
         for entry in matches:
 
-            text_options = {'no-link': u'', 'outline': u''}
+            text_options = {'no-link': u'', 'outline': u''}  # this is never used
 
             # Render the matches to docutils nodes
             target_handler = self.target_handler_factory.create_target_handler(

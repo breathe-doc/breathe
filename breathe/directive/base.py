@@ -65,7 +65,7 @@ class BaseDirective(rst.Directive):
         renderer_factory_creator = self.renderer_factory_creator_constructor.create_factory_creator(
             project_info,
             self.state.document,
-            options,
+            options,  # not used in the call
             target_handler
             )
 
@@ -83,6 +83,9 @@ class BaseDirective(rst.Directive):
         except FileIOError as e:
             return format_parser_error("doxygenclass", e.error, e.filename, self.state, self.lineno)
 
-        context = RenderContext(node_stack, mask_factory, self.directive_args)
+        # Quick hack to get it working: inject options here
+        directive_args = self.directive_args[:]
+        directive_args[2] = options
+        context = RenderContext(node_stack, mask_factory, directive_args)
         object_renderer = renderer_factory.create_renderer(context)
         return object_renderer.render()
