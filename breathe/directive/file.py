@@ -6,7 +6,6 @@ from ..project import ProjectError
 from .base import create_warning
 
 from docutils.parsers.rst.directives import unchanged_required, flag
-from docutils.parsers import rst
 
 
 class BaseFileDirective(BaseDirective):
@@ -44,7 +43,6 @@ class BaseFileDirective(BaseDirective):
         renderer_factory_creator = self.renderer_factory_creator_constructor.create_factory_creator(
             project_info,
             self.state.document,
-            self.options,
             target_handler
             )
         node_list = []
@@ -120,4 +118,3 @@ class AutoDoxygenFileDirective(BaseFileDirective):
             return warning.warn('autodoxygenfile: %s' % e)
 
         return self.handle_contents(file_, project_info)
-
