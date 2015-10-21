@@ -1,7 +1,8 @@
 
 class Renderer(object):
 
-    def __init__(self,
+    def __init__(
+            self,
             project_info,
             context,
             renderer_factory,
@@ -10,7 +11,7 @@ class Renderer(object):
             document,
             target_handler,
             domain_directive_factory,
-            ):
+    ):
 
         self.project_info = project_info
         self.context = context
@@ -37,7 +38,8 @@ class Renderer(object):
 
         node_stack = self.context.node_stack
         node = node_stack[0]
-        # An enumvalue node doesn't have location, so use its parent node for detecting the domain instead.
+        # An enumvalue node doesn't have location, so use its parent node for detecting
+        # the domain instead.
         if type(node) == unicode or node.node_type == "enumvalue":
             node = node_stack[1]
         filename = get_filename(node)
@@ -53,7 +55,8 @@ class Renderer(object):
         node = node_stack[0]
         if node.node_type == 'enumvalue':
             names.append(node.name)
-            # Skip the name of the containing enum because it is not a part of the fully qualified name.
+            # Skip the name of the containing enum because it is not a part of the
+            # fully qualified name.
             node_stack = node_stack[2:]
 
         # If the node is a namespace, use its name because namespaces are skipped in the main loop.
@@ -64,7 +67,7 @@ class Renderer(object):
             if node.node_type == 'ref' and len(names) == 0:
                 return node.valueOf_
             if (node.node_type == 'compound' and node.kind not in ['file', 'namespace']) or \
-                node.node_type == 'memberdef':
+                    node.node_type == 'memberdef':
                 # We skip the 'file' entries because the file name doesn't form part of the
                 # qualified name for the identifier. We skip the 'namespace' entries because if we
                 # find an object through the namespace 'compound' entry in the index.xml then we'll

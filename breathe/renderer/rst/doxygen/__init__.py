@@ -1,10 +1,11 @@
 
-from .base import Renderer, RenderContext
+from .base import Renderer
 from . import index as indexrenderer
 from . import compound as compoundrenderer
 
 from docutils import nodes
 import textwrap
+
 
 class RstContentCreator(object):
 
@@ -28,6 +29,7 @@ class RstContentCreator(object):
 
         return result
 
+
 class UnicodeRenderer(Renderer):
 
     def render(self):
@@ -45,6 +47,7 @@ class UnicodeRenderer(Renderer):
             return [self.node_factory.Text(self.data_object)]
         else:
             return []
+
 
 class NullRenderer(Renderer):
 
@@ -96,10 +99,10 @@ class DoxygenToRstRendererFactory(object):
             return NullRenderer()
 
         child_renderer_factory = self.renderer_factory_creator.create_child_factory(
-                self.project_info,
-                data_object,
-                self
-                )
+            self.project_info,
+            data_object,
+            self
+        )
 
         try:
             node_type = data_object.node_type
@@ -115,15 +118,15 @@ class DoxygenToRstRendererFactory(object):
         Renderer = self.renderers[node_type]
 
         common_args = [
-                self.project_info,
-                context,
-                child_renderer_factory,
-                self.node_factory,
-                self.state,
-                self.document,
-                self.target_handler,
-                self.domain_directive_factory
-                ]
+            self.project_info,
+            context,
+            child_renderer_factory,
+            self.node_factory,
+            self.state,
+            self.document,
+            self.target_handler,
+            self.domain_directive_factory
+        ]
 
         if node_type == "docmarkup":
 
@@ -144,16 +147,16 @@ class DoxygenToRstRendererFactory(object):
                 print("Warning: does not currently handle 'small' text display")
 
             return Renderer(
-                    creator,
-                    *common_args
-                    )
+                creator,
+                *common_args
+            )
 
         if node_type == "verbatim":
 
             return Renderer(
-                    self.rst_content_creator,
-                    *common_args
-                    )
+                self.rst_content_creator,
+                *common_args
+            )
 
         if node_type == "compound":
 
@@ -166,13 +169,14 @@ class DoxygenToRstRendererFactory(object):
             # For compound node types Renderer is CreateCompoundTypeSubRenderer
             # as defined below. This could be cleaner
             return Renderer(
-                    class_,
-                    *common_args
-                    )
+                class_,
+                *common_args
+            )
 
         if node_type == "memberdef":
 
-            if data_object.kind in ("function", "slot") or (data_object.kind == 'friend' and data_object.argsstring):
+            if data_object.kind in ("function", "slot") or \
+                    (data_object.kind == 'friend' and data_object.argsstring):
                 Renderer = compoundrenderer.FuncMemberDefTypeSubRenderer
             elif data_object.kind == "enum":
                 Renderer = compoundrenderer.EnumMemberDefTypeSubRenderer
@@ -185,17 +189,18 @@ class DoxygenToRstRendererFactory(object):
 
         if node_type == "param":
             return Renderer(
-                    parent_data_object.node_type != "templateparamlist", 
-                    *common_args
-                    )
+                parent_data_object.node_type != "templateparamlist",
+                *common_args
+            )
 
         if node_type == "docsimplesect":
             if data_object.kind == "par":
                 Renderer = compoundrenderer.ParDocSimpleSectTypeSubRenderer
 
         return Renderer(
-                *common_args
-                )
+            *common_args
+        )
+
 
 class CreateCompoundTypeSubRenderer(object):
 
@@ -240,46 +245,60 @@ class DoxygenToRstRendererFactoryCreator(object):
 
     def create_factory(self, node_stack, state, document, filter_, target_handler):
 
-        data_object = node_stack[0]
-
         renderers = {
-            "doxygen" : indexrenderer.DoxygenTypeSubRenderer,
-            "compound" : CreateCompoundTypeSubRenderer(self.parser_factory),
-            "doxygendef" : compoundrenderer.DoxygenTypeSubRenderer,
-            "compounddef" : compoundrenderer.CompoundDefTypeSubRenderer,
-            "sectiondef" : compoundrenderer.SectionDefTypeSubRenderer,
-            "memberdef" : compoundrenderer.MemberDefTypeSubRenderer,
-            "enumvalue" : compoundrenderer.EnumvalueTypeSubRenderer,
-            "linkedtext" : compoundrenderer.LinkedTextTypeSubRenderer,
-            "description" : compoundrenderer.DescriptionTypeSubRenderer,
-            "param" : compoundrenderer.ParamTypeSubRenderer,
-            "docreftext" : compoundrenderer.DocRefTextTypeSubRenderer,
-            "docheading" : compoundrenderer.DocHeadingTypeSubRenderer,
-            "docpara" : compoundrenderer.DocParaTypeSubRenderer,
-            "docmarkup" : compoundrenderer.DocMarkupTypeSubRenderer,
-            "docparamlist" : compoundrenderer.DocParamListTypeSubRenderer,
-            "docparamlistitem" : compoundrenderer.DocParamListItemSubRenderer,
-            "docparamnamelist" : compoundrenderer.DocParamNameListSubRenderer,
-            "docparamname" : compoundrenderer.DocParamNameSubRenderer,
-            "docsect1" : compoundrenderer.DocSect1TypeSubRenderer,
-            "docsimplesect" : compoundrenderer.DocSimpleSectTypeSubRenderer,
-            "doctitle" : compoundrenderer.DocTitleTypeSubRenderer,
-            "docformula" : compoundrenderer.DocForumlaTypeSubRenderer,
-            "docimage" : compoundrenderer.DocImageTypeSubRenderer,
-            "docurllink" : compoundrenderer.DocURLLinkSubRenderer,
-            "listing" : compoundrenderer.ListingTypeSubRenderer,
-            "codeline" : compoundrenderer.CodeLineTypeSubRenderer,
-            "highlight" : compoundrenderer.HighlightTypeSubRenderer,
-            "templateparamlist" : compoundrenderer.TemplateParamListRenderer,
-            "inc" : compoundrenderer.IncTypeSubRenderer,
-            "ref" : CreateRefTypeSubRenderer(self.parser_factory),
-            "verbatim" : compoundrenderer.VerbatimTypeSubRenderer,
-            "mixedcontainer" : compoundrenderer.MixedContainerRenderer,
-            "unicode" : UnicodeRenderer,
+            "doxygen": indexrenderer.DoxygenTypeSubRenderer,
+            "compound": CreateCompoundTypeSubRenderer(self.parser_factory),
+            "doxygendef": compoundrenderer.DoxygenTypeSubRenderer,
+            "compounddef": compoundrenderer.CompoundDefTypeSubRenderer,
+            "sectiondef": compoundrenderer.SectionDefTypeSubRenderer,
+            "memberdef": compoundrenderer.MemberDefTypeSubRenderer,
+            "enumvalue": compoundrenderer.EnumvalueTypeSubRenderer,
+            "linkedtext": compoundrenderer.LinkedTextTypeSubRenderer,
+            "description": compoundrenderer.DescriptionTypeSubRenderer,
+            "param": compoundrenderer.ParamTypeSubRenderer,
+            "docreftext": compoundrenderer.DocRefTextTypeSubRenderer,
+            "docheading": compoundrenderer.DocHeadingTypeSubRenderer,
+            "docpara": compoundrenderer.DocParaTypeSubRenderer,
+            "docmarkup": compoundrenderer.DocMarkupTypeSubRenderer,
+            "docparamlist": compoundrenderer.DocParamListTypeSubRenderer,
+            "docparamlistitem": compoundrenderer.DocParamListItemSubRenderer,
+            "docparamnamelist": compoundrenderer.DocParamNameListSubRenderer,
+            "docparamname": compoundrenderer.DocParamNameSubRenderer,
+            "docsect1": compoundrenderer.DocSect1TypeSubRenderer,
+            "docsimplesect": compoundrenderer.DocSimpleSectTypeSubRenderer,
+            "doctitle": compoundrenderer.DocTitleTypeSubRenderer,
+            "docformula": compoundrenderer.DocForumlaTypeSubRenderer,
+            "docimage": compoundrenderer.DocImageTypeSubRenderer,
+            "docurllink": compoundrenderer.DocURLLinkSubRenderer,
+            "listing": compoundrenderer.ListingTypeSubRenderer,
+            "codeline": compoundrenderer.CodeLineTypeSubRenderer,
+            "highlight": compoundrenderer.HighlightTypeSubRenderer,
+            "templateparamlist": compoundrenderer.TemplateParamListRenderer,
+            "inc": compoundrenderer.IncTypeSubRenderer,
+            "ref": CreateRefTypeSubRenderer(self.parser_factory),
+            "verbatim": compoundrenderer.VerbatimTypeSubRenderer,
+            "mixedcontainer": compoundrenderer.MixedContainerRenderer,
+            "unicode": UnicodeRenderer,
             "doclist": compoundrenderer.DocListTypeSubRenderer,
             "doclistitem": compoundrenderer.DocListItemTypeSubRenderer,
             }
 
+        return DoxygenToRstRendererFactory(
+            "root",
+            renderers,
+            self,
+            self.node_factory,
+            self.project_info,
+            state,
+            document,
+            self.rst_content_creator,
+            filter_,
+            target_handler,
+            self.domain_directive_factory
+        )
+
+    def create_child_factory(self, project_info, data_object, parent_renderer_factory):
+
         try:
             node_type = data_object.node_type
         except AttributeError as e:
@@ -292,45 +311,18 @@ class DoxygenToRstRendererFactoryCreator(object):
                 raise e
 
         return DoxygenToRstRendererFactory(
-                "root",
-                renderers,
-                self,
-                self.node_factory,
-                self.project_info,
-                state,
-                document,
-                self.rst_content_creator,
-                filter_,
-                target_handler,
-                self.domain_directive_factory
-                )
-
-    def create_child_factory( self, project_info, data_object, parent_renderer_factory ):
-
-        try:
-            node_type = data_object.node_type
-        except AttributeError as e:
-
-            # Horrible hack to silence errors on filtering unicode objects
-            # until we fix the parsing
-            if type(data_object) == unicode:
-                node_type = "unicode"
-            else:
-                raise e
-
-        return DoxygenToRstRendererFactory(
-                    node_type,
-                    parent_renderer_factory.renderers,
-                    self,
-                    self.node_factory,
-                    parent_renderer_factory.project_info,
-                    parent_renderer_factory.state,
-                    parent_renderer_factory.document,
-                    self.rst_content_creator,
-                    parent_renderer_factory.filter_,
-                    parent_renderer_factory.target_handler,
-                    parent_renderer_factory.domain_directive_factory
-                    )
+            node_type,
+            parent_renderer_factory.renderers,
+            self,
+            self.node_factory,
+            parent_renderer_factory.project_info,
+            parent_renderer_factory.state,
+            parent_renderer_factory.document,
+            self.rst_content_creator,
+            parent_renderer_factory.filter_,
+            parent_renderer_factory.target_handler,
+            parent_renderer_factory.domain_directive_factory
+        )
 
 
 # FactoryFactoryFactory. Ridiculous but necessary.
@@ -349,15 +341,15 @@ class DoxygenToRstRendererFactoryCreatorConstructor(object):
         self.domain_directive_factory = domain_directive_factory
         self.rst_content_creator = rst_content_creator
 
-    def create_factory_creator(self, project_info, document, options, target_handler):
+    def create_factory_creator(self, project_info, document, target_handler):
 
         return DoxygenToRstRendererFactoryCreator(
-                self.node_factory,
-                self.parser_factory,
-                self.domain_directive_factory,
-                self.rst_content_creator,
-                project_info,
-                )
+            self.node_factory,
+            self.parser_factory,
+            self.domain_directive_factory,
+            self.rst_content_creator,
+            project_info,
+        )
 
 
 def format_parser_error(name, error, filename, state, lineno, do_unicode_warning):
@@ -374,10 +366,13 @@ def format_parser_error(name, error, filename, state, lineno, do_unicode_warning
         output xml.""").strip().replace("\n", " ")
         unicode_explanation = [nodes.paragraph("", "", nodes.Text(unicode_explanation_text))]
 
-    return [nodes.warning("",
-                nodes.paragraph("", "", nodes.Text(warning)),
-                nodes.paragraph("", "", nodes.Text(explanation)),
-                *unicode_explanation
-                ),
-            state.document.reporter.warning(warning + explanation + unicode_explanation_text, line=lineno)
-            ]
+    return [
+        nodes.warning(
+            "",
+            nodes.paragraph("", "", nodes.Text(warning)),
+            nodes.paragraph("", "", nodes.Text(explanation)),
+            *unicode_explanation
+        ),
+        state.document.reporter.warning(
+            warning + explanation + unicode_explanation_text, line=lineno)
+    ]

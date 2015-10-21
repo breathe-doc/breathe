@@ -47,7 +47,8 @@ def create_warning(project_info, state, lineno, **kwargs):
 class BaseDirective(rst.Directive):
 
     def __init__(self, root_data_object, renderer_factory_creator_constructor, finder_factory,
-                 project_info_factory, filter_factory, target_handler_factory, parser_factory, *args):
+                 project_info_factory, filter_factory, target_handler_factory, parser_factory,
+                 *args):
         rst.Directive.__init__(self, *args)
         self.directive_args = list(args)  # Convert tuple to list to allow modification.
 
@@ -59,13 +60,13 @@ class BaseDirective(rst.Directive):
         self.target_handler_factory = target_handler_factory
         self.parser_factory = parser_factory
 
-    def render(self, node_stack, project_info, options, filter_, target_handler, mask_factory):
+    def render(self, node_stack, project_info, filter_, target_handler, mask_factory,
+               directive_args):
         "Standard render process used by subclasses"
 
         renderer_factory_creator = self.renderer_factory_creator_constructor.create_factory_creator(
             project_info,
             self.state.document,
-            options,
             target_handler
             )
 
@@ -83,6 +84,6 @@ class BaseDirective(rst.Directive):
         except FileIOError as e:
             return format_parser_error("doxygenclass", e.error, e.filename, self.state, self.lineno)
 
-        context = RenderContext(node_stack, mask_factory, self.directive_args)
+        context = RenderContext(node_stack, mask_factory, directive_args)
         object_renderer = renderer_factory.create_renderer(context)
         return object_renderer.render()

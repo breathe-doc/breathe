@@ -7,7 +7,6 @@ from ..project import ProjectError
 from ..parser import ParserError, FileIOError
 from .base import create_warning
 
-from docutils.parsers import rst
 from docutils.parsers.rst.directives import unchanged_required, flag
 
 
@@ -38,7 +37,6 @@ class BaseIndexDirective(BaseDirective):
         renderer_factory_creator = self.renderer_factory_creator_constructor.create_factory_creator(
             project_info,
             self.state.document,
-            self.options,
             target_handler
             )
         renderer_factory = renderer_factory_creator.create_factory(
@@ -50,7 +48,8 @@ class BaseIndexDirective(BaseDirective):
             )
 
         mask_factory = NullMaskFactory()
-        context = RenderContext([data_object, self.root_data_object], mask_factory, self.directive_args)
+        context = RenderContext([data_object, self.root_data_object], mask_factory,
+                                self.directive_args)
         object_renderer = renderer_factory.create_renderer(context)
 
         try:
@@ -111,5 +110,3 @@ class AutoDoxygenIndexDirective(BaseIndexDirective):
             return warning.warn('autodoxygenindex: %s' % e)
 
         return self.handle_contents(project_info)
-
-
