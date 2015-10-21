@@ -120,6 +120,7 @@ Breathe is maintained by `michaeljones <https://github.com/michaeljones>`_ &
 - `sam-roth <https://github.com/sam-roth>`_
 - `bnewbold <https://github.com/bnewbold>`_
 - `serge-sans-paille <https://github.com/serge-sans-paille>`_
+- `dean0x7d <https://github.com/dean0x7d>`_
 
 Thanks to:
 
