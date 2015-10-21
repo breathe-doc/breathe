@@ -2,7 +2,8 @@
 from .finder.core import FinderFactory
 from .parser import DoxygenParserFactory, CacheFactory
 from .renderer.rst.doxygen import DoxygenToRstRendererFactoryCreatorConstructor, \
-    RstContentCreator, RenderContext
+    RstContentCreator
+from .renderer.rst.doxygen.base import RenderContext
 from .renderer.rst.doxygen.filter import FilterFactory, GlobFactory
 from .renderer.rst.doxygen.target import TargetHandlerFactory
 from .renderer.rst.doxygen.mask import MaskFactory, NullMaskFactory, NoParameterNamesMask
