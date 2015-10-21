@@ -44,7 +44,6 @@ class BaseFileDirective(BaseDirective):
         renderer_factory_creator = self.renderer_factory_creator_constructor.create_factory_creator(
             project_info,
             self.state.document,
-            self.options,
             target_handler
             )
         node_list = []

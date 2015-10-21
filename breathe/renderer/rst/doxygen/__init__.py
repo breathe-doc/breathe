@@ -349,9 +349,8 @@ class DoxygenToRstRendererFactoryCreatorConstructor(object):
         self.domain_directive_factory = domain_directive_factory
         self.rst_content_creator = rst_content_creator
 
-    def create_factory_creator(self, project_info, document, options, target_handler):
+    def create_factory_creator(self, project_info, document, target_handler):
 
-        # the argument `options` is never used
         return DoxygenToRstRendererFactoryCreator(
                 self.node_factory,
                 self.parser_factory,
