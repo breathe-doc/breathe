@@ -60,7 +60,8 @@ class BaseDirective(rst.Directive):
         self.target_handler_factory = target_handler_factory
         self.parser_factory = parser_factory
 
-    def render(self, node_stack, project_info, options, filter_, target_handler, mask_factory):
+    def render(self, node_stack, project_info, filter_, target_handler, mask_factory,
+               directive_args):
         "Standard render process used by subclasses"
 
         renderer_factory_creator = self.renderer_factory_creator_constructor.create_factory_creator(
@@ -83,9 +84,6 @@ class BaseDirective(rst.Directive):
         except FileIOError as e:
             return format_parser_error("doxygenclass", e.error, e.filename, self.state, self.lineno)
 
-        # Quick hack to get it working: inject options here
-        directive_args = self.directive_args[:]
-        directive_args[2] = options
         context = RenderContext(node_stack, mask_factory, directive_args)
         object_renderer = renderer_factory.create_renderer(context)
         return object_renderer.render()
