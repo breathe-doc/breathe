@@ -19,7 +19,7 @@ supermod.DoxygenType.subclass = DoxygenTypeSub
 
 
 class CompoundTypeSub(supermod.CompoundType):
-    
+
     node_type = "compound"
 
     def __init__(self, kind=None, refid=None, name='', member=None):
@@ -58,4 +58,3 @@ def parse(inFilename):
     rootObj.build(rootNode)
 
     return rootObj
-
