@@ -59,4 +59,3 @@ class NullMaskFactory(object):
 
     def mask(self, data_object):
         return data_object
-

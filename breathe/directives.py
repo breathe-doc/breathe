@@ -1,12 +1,12 @@
 
 from .finder.core import FinderFactory
 from .parser import DoxygenParserFactory, CacheFactory
-from .renderer.rst.doxygen import DoxygenToRstRendererFactoryCreatorConstructor, \
+from .renderer import DoxygenToRstRendererFactoryCreatorConstructor, \
     RstContentCreator
-from .renderer.rst.doxygen.base import RenderContext
-from .renderer.rst.doxygen.filter import FilterFactory, GlobFactory
-from .renderer.rst.doxygen.target import TargetHandlerFactory
-from .renderer.rst.doxygen.mask import MaskFactory, NullMaskFactory, NoParameterNamesMask
+from .renderer.base import RenderContext
+from .renderer.filter import FilterFactory, GlobFactory
+from .renderer.target import TargetHandlerFactory
+from .renderer.mask import MaskFactory, NullMaskFactory, NoParameterNamesMask
 
 from .finder.core import DoxygenItemFinderFactoryCreator
 from .directive.base import BaseDirective, create_warning
