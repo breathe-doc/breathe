@@ -94,5 +94,3 @@ class FinderFactory(object):
         item_finder_factory = self.item_finder_factory_creator.create_factory(project_info)
 
         return Finder(root, item_finder_factory)
-
-
