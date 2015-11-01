@@ -15,4 +15,3 @@ def stack(element, list_):
     output = list_[:]
     output.insert(0, element)
     return output
-

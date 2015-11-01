@@ -72,4 +72,3 @@ class RefTypeSubItemFinder(ItemFinder):
 
         if filter_.allow(node_stack):
             matches.append(node_stack)
-
