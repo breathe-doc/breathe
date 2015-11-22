@@ -276,6 +276,7 @@ class DoxygenToRstRendererFactoryCreator(object):
             "templateparamlist": compoundrenderer.TemplateParamListRenderer,
             "inc": compoundrenderer.IncTypeSubRenderer,
             "ref": CreateRefTypeSubRenderer(self.parser_factory),
+            "compoundref": compoundrenderer.CompoundRefTypeSubRenderer,
             "verbatim": compoundrenderer.VerbatimTypeSubRenderer,
             "mixedcontainer": compoundrenderer.MixedContainerRenderer,
             "unicode": UnicodeRenderer,
