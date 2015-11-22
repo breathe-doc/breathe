@@ -90,6 +90,7 @@ link in a github issue or get in touch on the mailing list.
 
 - `Gasp <https://github.com/troelsfr/Gasp>`_
 - `Robin <https://bitbucket.org/reima/robin>`_
+- `sphinxcontrib-autodoc_doxygen <https://github.com/rmcgibbo/sphinxcontrib-autodoc_doxygen>`_
 
 Credits
 -------
