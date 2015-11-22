@@ -37,4 +37,3 @@ class TargetHandlerFactory(object):
             return NullTargetHandler()
 
         return TargetHandler(project_info, self.node_factory, document)
-

@@ -1,7 +1,7 @@
 
-from ..renderer.rst.doxygen.base import RenderContext
-from ..renderer.rst.doxygen.mask import NullMaskFactory
-from ..renderer.rst.doxygen import format_parser_error
+from ..renderer.base import RenderContext
+from ..renderer.mask import NullMaskFactory
+from ..renderer import format_parser_error
 from ..directive.base import BaseDirective
 from ..project import ProjectError
 from ..parser import ParserError, FileIOError

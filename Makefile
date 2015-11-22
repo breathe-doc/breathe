@@ -28,6 +28,8 @@ dev-test:
 
 flake8:
 	flake8 breathe/*.py \
-		breathe/renderer/rst/doxygen/compound.py \
-		breathe/renderer/rst/doxygen/filter.py \
-		breathe/parser/doxygen/compound.py
+		breathe/directive/*.py \
+		breathe/finder/*.py \
+		breathe/renderer/compound.py \
+		breathe/renderer/filter.py \
+		breathe/parser/compound.py
