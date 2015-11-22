@@ -1,6 +1,7 @@
 
-import breathe.parser.doxygen.index
-import breathe.parser.doxygen.compound
+from . import index
+from . import compound
+
 
 class ParserError(Exception):
 
@@ -10,6 +11,7 @@ class ParserError(Exception):
         self.error = error
         self.filename = filename
 
+
 class FileIOError(Exception):
 
     def __init__(self, error, filename):
@@ -17,6 +19,7 @@ class FileIOError(Exception):
 
         self.error = error
         self.filename = filename
+
 
 class Parser(object):
 
@@ -26,6 +29,7 @@ class Parser(object):
         self.path_handler = path_handler
         self.file_state_cache = file_state_cache
 
+
 class DoxygenIndexParser(Parser):
 
     def __init__(self, cache, path_handler, file_state_cache):
@@ -34,26 +38,27 @@ class DoxygenIndexParser(Parser):
     def parse(self, project_info):
 
         filename = self.path_handler.resolve_path(
-                project_info.project_path(),
-                "index.xml"
-                )
+            project_info.project_path(),
+            "index.xml"
+        )
 
         self.file_state_cache.update(filename)
 
-        try: 
+        try:
             # Try to get from our cache
             return self.cache[filename]
         except KeyError:
 
             # If that fails, parse it afresh
             try:
-                result = breathe.parser.doxygen.index.parse(filename)
+                result = index.parse(filename)
                 self.cache[filename] = result
                 return result
-            except breathe.parser.doxygen.index.ParseError as e:
+            except index.ParseError as e:
                 raise ParserError(e, filename)
-            except breathe.parser.doxygen.index.FileIOError as e:
+            except index.FileIOError as e:
                 raise FileIOError(e, filename)
+
 
 class DoxygenCompoundParser(Parser):
 
@@ -65,26 +70,27 @@ class DoxygenCompoundParser(Parser):
     def parse(self, refid):
 
         filename = self.path_handler.resolve_path(
-                self.project_info.project_path(),
-                "%s.xml" % refid
-                )
+            self.project_info.project_path(),
+            "%s.xml" % refid
+        )
 
         self.file_state_cache.update(filename)
 
-        try: 
+        try:
             # Try to get from our cache
             return self.cache[filename]
         except KeyError:
 
             # If that fails, parse it afresh
             try:
-                result = breathe.parser.doxygen.compound.parse(filename)
+                result = compound.parse(filename)
                 self.cache[filename] = result
                 return result
-            except breathe.parser.doxygen.compound.ParseError as e:
+            except compound.ParseError as e:
                 raise ParserError(e, filename)
-            except breathe.parser.doxygen.compound.FileIOError as e:
+            except compound.FileIOError as e:
                 raise FileIOError(e, filename)
+
 
 class CacheFactory(object):
 
@@ -92,6 +98,7 @@ class CacheFactory(object):
 
         # Return basic dictionary as cache
         return {}
+
 
 class DoxygenParserFactory(object):
 
@@ -108,11 +115,8 @@ class DoxygenParserFactory(object):
     def create_compound_parser(self, project_info):
 
         return DoxygenCompoundParser(
-                self.cache,
-                self.path_handler,
-                self.file_state_cache,
-                project_info
-                )
-
-
-
+            self.cache,
+            self.path_handler,
+            self.file_state_cache,
+            project_info
+        )

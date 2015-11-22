@@ -1,6 +1,6 @@
 
-from ..renderer.rst.doxygen.base import RenderContext
-from ..renderer.rst.doxygen import format_parser_error
+from ..renderer.base import RenderContext
+from ..renderer import format_parser_error
 from ..parser import ParserError, FileIOError
 
 from docutils import nodes

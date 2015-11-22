@@ -1,6 +1,6 @@
 
-from ..renderer.rst.doxygen.base import RenderContext
-from ..renderer.rst.doxygen.mask import NullMaskFactory
+from ..renderer.base import RenderContext
+from ..renderer.mask import NullMaskFactory
 from ..directive.base import BaseDirective
 from ..project import ProjectError
 from .base import create_warning

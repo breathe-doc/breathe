@@ -3,7 +3,6 @@
 /.pydevproject
 build/
 /dist
-/breathe
 /breathe.egg-info
 
 # Folder for placing stuff to be ignored
