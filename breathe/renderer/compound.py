@@ -1,6 +1,7 @@
 
 from .base import Renderer
 from .index import CompoundRenderer
+import re
 import six
 
 
@@ -253,12 +254,11 @@ def get_param_decl(param):
     param_name = param.declname if param.declname else param.defname
     if not param_name:
         param_decl = param_type
-    elif '(*)' in param_type:
-        param_decl = param_type.replace('(*)', '(*' + param_name + ')')
-    elif '(&)' in param_type:
-        param_decl = param_type.replace('(&)', '(&' + param_name + ')')
     else:
-        param_decl = param_type + ' ' + param_name
+        param_decl, number_of_subs = re.subn(r'(\([*&]+)(\))', r'\1' + param_name + r'\2',
+                                             param_type)
+        if number_of_subs == 0:
+            param_decl = param_type + ' ' + param_name
     if param.array:
         param_decl += param.array
 
