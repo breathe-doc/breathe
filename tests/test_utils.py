@@ -26,7 +26,7 @@ class TestUtils(TestCase):
           <declname>c</declname>
         </param>
         <param>
-          <type>int(*)</type>
+          <type>int(**)</type>
           <declname>p</declname>
           <array>[3]</array>
         </param>
@@ -55,7 +55,7 @@ class TestUtils(TestCase):
         self.assertEqual(get_param_decl(memberdef.param[0]), 'int a')
         self.assertEqual(get_param_decl(memberdef.param[1]), 'float b')
         self.assertEqual(get_param_decl(memberdef.param[2]), 'int * c')
-        self.assertEqual(get_param_decl(memberdef.param[3]), 'int(*p)[3]')
+        self.assertEqual(get_param_decl(memberdef.param[3]), 'int(**p)[3]')
         self.assertEqual(get_param_decl(memberdef.param[4]), 'MyClass a')
         self.assertEqual(get_param_decl(memberdef.param[5]), 'MyClass  * b')
         self.assertEqual(get_param_decl(memberdef.param[6]), 'int(&r)[3]')
