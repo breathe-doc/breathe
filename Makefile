@@ -24,7 +24,7 @@ test:
 	cd tests && nosetests
 
 dev-test:
-	cd tests && PYTHONPATH=../:$(PTYONPATH) nosetests
+	cd tests && PYTHONPATH=../:$(PYTHONPATH) nosetests
 
 flake8:
 	flake8 breathe/*.py \
