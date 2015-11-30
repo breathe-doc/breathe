@@ -27,6 +27,6 @@ install:
 # to run `which doxygen`
 script:
   - make DOXYGEN=doxygen DEBUG=""
-  - make tests
+  - make test
   - make flake8
 
