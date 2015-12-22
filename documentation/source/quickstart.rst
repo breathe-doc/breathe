@@ -37,12 +37,12 @@ The following steps are required to integrate breathe functionality:
 
 Once this is done you may use the the following commands::
 
-  ..doxygenindex::
-  ..doxygenfunction::
-  ..doxygenstruct::
-  ..doxygenenum::
-  ..doxygentypedef::
-  ..doxygenclass::
+  .. doxygenindex::
+  .. doxygenfunction::
+  .. doxygenstruct::
+  .. doxygenenum::
+  .. doxygentypedef::
+  .. doxygenclass::
 
 to include documentation for different constructs. For each of these commands the
 the following directives may be specified:
