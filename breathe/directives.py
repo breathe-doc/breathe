@@ -157,7 +157,7 @@ class DoxygenFunctionDirective(BaseDirective):
             # TODO: We're cheating here with the set() as signatures has repeating entries for some
             # reason (failures in the matcher_stack code) so we consolidate them by shoving them in
             # a set to remove duplicates. Should be fixed!
-            for i, entry in enumerate(set(error.signatures)):
+            for i, entry in enumerate(sorted(set(error.signatures))):
                 if i:
                     literal_text += '\n'
                 # Replace new lines with a new line & enough spacing to reach the appropriate
