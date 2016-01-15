@@ -896,8 +896,6 @@ def setup(app):
         parser_factory
         )
 
-    DoxygenFunctionDirective.app = app
-
     def add_directive(name):
         app.add_directive(name, directive_factory.create_directive_container(name))
 
