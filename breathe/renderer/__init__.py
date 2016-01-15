@@ -1,6 +1,7 @@
 
 import textwrap
 
+from ..node_factory import create_node_factory
 from .base import Renderer
 from . import index as indexrenderer
 from . import compound as compoundrenderer
@@ -62,7 +63,6 @@ class DoxygenToRstRendererFactory(object):
             node_type,
             renderers,
             renderer_factory_creator,
-            node_factory,
             project_info,
             state,
             document,
@@ -72,7 +72,6 @@ class DoxygenToRstRendererFactory(object):
             ):
 
         self.node_type = node_type
-        self.node_factory = node_factory
         self.project_info = project_info
         self.renderers = renderers
         self.renderer_factory_creator = renderer_factory_creator
@@ -112,11 +111,13 @@ class DoxygenToRstRendererFactory(object):
 
         Renderer = self.renderers[node_type]
 
+        node_factory = create_node_factory()
+
         common_args = [
             self.project_info,
             context,
             child_renderer_factory,
-            self.node_factory,
+            node_factory,
             self.state,
             self.document,
             self.target_handler,
@@ -125,17 +126,17 @@ class DoxygenToRstRendererFactory(object):
 
         if node_type == "docmarkup":
 
-            creator = self.node_factory.inline
+            creator = node_factory.inline
             if data_object.type_ == "emphasis":
-                creator = self.node_factory.emphasis
+                creator = node_factory.emphasis
             elif data_object.type_ == "computeroutput":
-                creator = self.node_factory.literal
+                creator = node_factory.literal
             elif data_object.type_ == "bold":
-                creator = self.node_factory.strong
+                creator = node_factory.strong
             elif data_object.type_ == "superscript":
-                creator = self.node_factory.superscript
+                creator = node_factory.superscript
             elif data_object.type_ == "subscript":
-                creator = self.node_factory.subscript
+                creator = node_factory.subscript
             elif data_object.type_ == "center":
                 print("Warning: does not currently handle 'center' text display")
             elif data_object.type_ == "small":
@@ -225,13 +226,11 @@ class DoxygenToRstRendererFactoryCreator(object):
 
     def __init__(
             self,
-            node_factory,
             parser_factory,
             domain_directive_factory,
             project_info
             ):
 
-        self.node_factory = node_factory
         self.parser_factory = parser_factory
         self.domain_directive_factory = domain_directive_factory
         self.project_info = project_info
@@ -281,7 +280,6 @@ class DoxygenToRstRendererFactoryCreator(object):
             "root",
             renderers,
             self,
-            self.node_factory,
             self.project_info,
             state,
             document,
@@ -307,7 +305,6 @@ class DoxygenToRstRendererFactoryCreator(object):
             node_type,
             parent_renderer_factory.renderers,
             self,
-            self.node_factory,
             parent_renderer_factory.project_info,
             parent_renderer_factory.state,
             parent_renderer_factory.document,
@@ -322,19 +319,16 @@ class DoxygenToRstRendererFactoryCreatorConstructor(object):
 
     def __init__(
             self,
-            node_factory,
             parser_factory,
             domain_directive_factory,
             ):
 
-        self.node_factory = node_factory
         self.parser_factory = parser_factory
         self.domain_directive_factory = domain_directive_factory
 
     def create_factory_creator(self, project_info, document, target_handler):
 
         return DoxygenToRstRendererFactoryCreator(
-            self.node_factory,
             self.parser_factory,
             self.domain_directive_factory,
             project_info,

@@ -14,20 +14,16 @@ from .directive.file import DoxygenFileDirective, AutoDoxygenFileDirective
 from .process import AutoDoxygenProcessHandle
 from .exception import BreatheError
 from .project import ProjectInfoFactory, ProjectError
+from .node_factory import create_node_factory
 
 from docutils.parsers.rst.directives import unchanged_required, unchanged, flag
 from sphinx.domains import cpp, c, python
 from sphinx.writers.text import TextWriter
 from sphinx.builders.text import TextBuilder
 
-import docutils.nodes
-import sphinx.addnodes
-import sphinx.ext.mathbase
-
 import os
 import fnmatch
 import re
-import collections
 import subprocess
 
 # Somewhat outrageously, reach in and fix a Sphinx regex
@@ -42,10 +38,6 @@ class UnableToResolveFunctionError(BreatheError):
 
     def __init__(self, signatures):
         self.signatures = signatures
-
-
-class NodeNotFoundError(BreatheError):
-    pass
 
 
 class FakeDestination(object):
@@ -658,23 +650,6 @@ class DoxygenDirectiveFactory(object):
             )
 
 
-class NodeFactory(object):
-
-    def __init__(self, *args):
-
-        self.sources = args
-
-    def __getattr__(self, node_name):
-
-        for source in self.sources:
-            try:
-                return getattr(source, node_name)
-            except AttributeError:
-                pass
-
-        raise NodeNotFoundError(node_name)
-
-
 class RootDataObject(object):
 
     node_type = "root"
@@ -857,15 +832,7 @@ def setup(app):
     index_parser = parser_factory.create_index_parser()
     finder_factory = FinderFactory(index_parser, item_finder_factory_creator)
 
-    # Create a math_nodes object with a displaymath member for the displaymath
-    # node so that we can treat it in the same way as the nodes & addnodes
-    # modules in the NodeFactory
-    math_nodes = collections.namedtuple("MathNodes", ["displaymath"])
-    math_nodes.displaymath = sphinx.ext.mathbase.displaymath
-    node_factory = NodeFactory(docutils.nodes, sphinx.addnodes, math_nodes)
-
     renderer_factory_creator_constructor = DoxygenToRstRendererFactoryCreatorConstructor(
-        node_factory,
         parser_factory,
         DomainDirectiveFactory,
         )
@@ -875,6 +842,7 @@ def setup(app):
     # with the breathe_build_directory config variable
     build_dir = os.path.dirname(app.doctreedir.rstrip(os.sep))
     project_info_factory = ProjectInfoFactory(app.srcdir, build_dir, app.confdir, fnmatch.fnmatch)
+    node_factory = create_node_factory()
     target_handler_factory = TargetHandlerFactory(node_factory)
 
     root_data_object = RootDataObject()
