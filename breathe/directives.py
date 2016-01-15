@@ -19,15 +19,11 @@ from .node_factory import create_node_factory
 from docutils.parsers.rst.directives import unchanged_required, unchanged, flag
 from sphinx.writers.text import TextWriter
 from sphinx.builders.text import TextBuilder
-from sphinx.domains import cpp
 
 import os
 import fnmatch
 import re
 import subprocess
-
-# Somewhat outrageously, reach in and fix a Sphinx regex
-cpp._identifier_re = re.compile(r'(~?\b[a-zA-Z_][a-zA-Z0-9_]*)\b')
 
 
 class NoMatchingFunctionError(BreatheError):
