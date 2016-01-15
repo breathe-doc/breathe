@@ -589,13 +589,12 @@ class DoxygenDirectiveFactory(object):
         "autodoxygenfile": AutoDoxygenFileDirective,
         }
 
-    def __init__(self, node_factory, text_renderer, root_data_object,
+    def __init__(self, node_factory, text_renderer,
                  renderer_factory_creator_constructor, finder_factory,
                  project_info_factory, filter_factory, target_handler_factory, parser_factory):
 
         self.node_factory = node_factory
         self.text_renderer = text_renderer
-        self.root_data_object = root_data_object
         self.renderer_factory_creator_constructor = renderer_factory_creator_constructor
         self.finder_factory = finder_factory
         self.project_info_factory = project_info_factory
@@ -610,7 +609,6 @@ class DoxygenDirectiveFactory(object):
             self.directives["doxygenfunction"],
             self.node_factory,
             self.text_renderer,
-            self.root_data_object,
             self.renderer_factory_creator_constructor,
             self.finder_factory,
             self.project_info_factory,
@@ -623,7 +621,6 @@ class DoxygenDirectiveFactory(object):
 
         return DirectiveContainer(
             self.directives[type_],
-            self.root_data_object,
             self.renderer_factory_creator_constructor,
             self.finder_factory,
             self.project_info_factory,
@@ -644,11 +641,6 @@ class DoxygenDirectiveFactory(object):
             app.config.breathe_projects_source,
             app.config.breathe_build_directory
             )
-
-
-class RootDataObject(object):
-
-    node_type = "root"
 
 
 class PathHandler(object):
@@ -792,14 +784,11 @@ def setup(app):
     node_factory = create_node_factory()
     target_handler_factory = TargetHandlerFactory(node_factory)
 
-    root_data_object = RootDataObject()
-
     text_renderer = TextRenderer(app)
 
     directive_factory = DoxygenDirectiveFactory(
         node_factory,
         text_renderer,
-        root_data_object,
         renderer_factory_creator_constructor,
         finder_factory,
         project_info_factory,
