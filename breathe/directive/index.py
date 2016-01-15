@@ -10,6 +10,11 @@ from .base import create_warning
 from docutils.parsers.rst.directives import unchanged_required, flag
 
 
+class RootDataObject(object):
+
+    node_type = "root"
+
+
 class BaseIndexDirective(BaseDirective):
     """Base class handle the main work when given the appropriate project info to work from.
     """
@@ -48,7 +53,7 @@ class BaseIndexDirective(BaseDirective):
             )
 
         mask_factory = NullMaskFactory()
-        context = RenderContext([data_object, self.root_data_object], mask_factory,
+        context = RenderContext([data_object, RootDataObject()], mask_factory,
                                 self.directive_args)
         object_renderer = renderer_factory.create_renderer(context)
 
