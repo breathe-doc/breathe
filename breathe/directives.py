@@ -17,9 +17,9 @@ from .project import ProjectInfoFactory, ProjectError
 from .node_factory import create_node_factory
 
 from docutils.parsers.rst.directives import unchanged_required, unchanged, flag
-from sphinx.domains import cpp, c, python
 from sphinx.writers.text import TextWriter
 from sphinx.builders.text import TextBuilder
+from sphinx.domains import cpp
 
 import os
 import fnmatch
@@ -770,54 +770,6 @@ class FileStateCache(object):
             del self.app.env.breathe_file_state[filename]
 
 
-class DomainDirectiveFactory(object):
-    # A mapping from node kinds to cpp domain classes and directive names.
-    cpp_classes = {
-        'class': (cpp.CPPClassObject, 'class'),
-        'struct': (cpp.CPPClassObject, 'class'),
-        'function': (cpp.CPPFunctionObject, 'function'),
-        'friend': (cpp.CPPFunctionObject, 'function'),
-        'slot': (cpp.CPPFunctionObject, 'function'),
-        'enum': (cpp.CPPTypeObject, 'type'),
-        'typedef': (cpp.CPPTypeObject, 'type'),
-        'union': (cpp.CPPTypeObject, 'type'),
-        'namespace': (cpp.CPPTypeObject, 'type'),
-        # Use CPPClassObject for enum values as the cpp domain doesn't have a directive for
-        # enum values and CPPMemberObject requires a type.
-        'enumvalue': (cpp.CPPClassObject, 'member'),
-        'define': (c.CObject, 'macro')
-    }
-
-    python_classes = {
-        'function': (python.PyModulelevel, 'function'),
-        'variable': (python.PyClassmember, 'attribute')
-    }
-
-    @staticmethod
-    def fix_python_signature(sig):
-        def_ = 'def '
-        if sig.startswith(def_):
-            sig = sig[len(def_):]
-        # Doxygen uses an invalid separator ('::') in Python signatures. Replace them with '.'.
-        return sig.replace('::', '.')
-
-    @staticmethod
-    def create(domain, args):
-        if domain == 'c':
-            return c.CObject(*args)
-        if domain == 'py':
-            cls, name = DomainDirectiveFactory.python_classes.get(
-                args[0], (python.PyClasslike, 'class'))
-            args[1] = [DomainDirectiveFactory.fix_python_signature(n) for n in args[1]]
-        else:
-            cls, name = DomainDirectiveFactory.cpp_classes.get(
-                args[0], (cpp.CPPMemberObject, 'member'))
-        # Replace the directive name because domain directives don't know how to handle
-        # Breathe's "doxygen" directives.
-        args = [name] + args[1:]
-        return cls(*args)
-
-
 # Setup
 # -----
 
@@ -834,7 +786,6 @@ def setup(app):
 
     renderer_factory_creator_constructor = DoxygenToRstRendererFactoryCreatorConstructor(
         parser_factory,
-        DomainDirectiveFactory,
         )
 
     # Assume general build directory is the doctree directory without the last component. We strip
