@@ -17,7 +17,6 @@ from .exception import BreatheError
 from .project import ProjectInfoFactory, ProjectError
 
 from docutils.parsers.rst.directives import unchanged_required, unchanged, flag
-from docutils.statemachine import ViewList
 from sphinx.domains import cpp, c, python
 from sphinx.writers.text import TextWriter
 from sphinx.builders.text import TextBuilder
@@ -29,7 +28,6 @@ import sphinx.ext.mathbase
 import os
 import fnmatch
 import re
-import textwrap
 import collections
 import subprocess
 
@@ -867,7 +865,7 @@ def setup(app):
     math_nodes.displaymath = sphinx.ext.mathbase.displaymath
     node_factory = NodeFactory(docutils.nodes, sphinx.addnodes, math_nodes)
 
-    rst_content_creator = RstContentCreator(ViewList, textwrap.dedent)
+    rst_content_creator = RstContentCreator()
     renderer_factory_creator_constructor = DoxygenToRstRendererFactoryCreatorConstructor(
         node_factory,
         parser_factory,
