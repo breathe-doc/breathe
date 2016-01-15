@@ -1,6 +1,6 @@
 
 from .finder.core import FinderFactory
-from .parser import DoxygenParserFactory, CacheFactory
+from .parser import DoxygenParserFactory
 from .renderer import DoxygenToRstRendererFactoryCreatorConstructor, \
     RstContentCreator
 from .renderer.base import RenderContext
@@ -851,12 +851,10 @@ class DomainDirectiveFactory(object):
 
 def setup(app):
 
-    cache_factory = CacheFactory()
-    cache = cache_factory.create_cache()
     path_handler = PathHandler(app.confdir, os.sep, os.path.basename, os.path.join)
     mtimer = MTimer(os.path.getmtime)
     file_state_cache = FileStateCache(mtimer, app)
-    parser_factory = DoxygenParserFactory(cache, path_handler, file_state_cache)
+    parser_factory = DoxygenParserFactory(path_handler, file_state_cache)
     filter_factory = FilterFactory(path_handler)
     item_finder_factory_creator = DoxygenItemFinderFactoryCreator(parser_factory, filter_factory)
     index_parser = parser_factory.create_index_parser()
