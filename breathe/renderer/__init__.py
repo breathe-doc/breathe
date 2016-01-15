@@ -1,18 +1,15 @@
 
+import textwrap
+
 from .base import Renderer
 from . import index as indexrenderer
 from . import compound as compoundrenderer
 
 from docutils import nodes
-import textwrap
+from docutils.statemachine import ViewList
 
 
 class RstContentCreator(object):
-
-    def __init__(self, list_type, dedent):
-
-        self.list_type = list_type
-        self.dedent = dedent
 
     def __call__(self, text):
 
@@ -20,10 +17,10 @@ class RstContentCreator(object):
         text = "\n".join(text.split(u"\n")[1:])
 
         # Remove starting whitespace
-        text = self.dedent(text)
+        text = textwrap.dedent(text)
 
         # Inspired by autodoc.py in Sphinx
-        result = self.list_type()
+        result = ViewList()
         for line in text.split("\n"):
             result.append(line, "<breathe>")
 
