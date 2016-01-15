@@ -4,7 +4,7 @@ from .parser import DoxygenParserFactory, CacheFactory
 from .renderer import DoxygenToRstRendererFactoryCreatorConstructor, \
     RstContentCreator
 from .renderer.base import RenderContext
-from .renderer.filter import FilterFactory, GlobFactory
+from .renderer.filter import FilterFactory
 from .renderer.target import TargetHandlerFactory
 from .renderer.mask import MaskFactory, NullMaskFactory, NoParameterNamesMask
 
@@ -857,8 +857,7 @@ def setup(app):
     mtimer = MTimer(os.path.getmtime)
     file_state_cache = FileStateCache(mtimer, app)
     parser_factory = DoxygenParserFactory(cache, path_handler, file_state_cache)
-    glob_factory = GlobFactory(fnmatch.fnmatch)
-    filter_factory = FilterFactory(glob_factory, path_handler)
+    filter_factory = FilterFactory(path_handler)
     item_finder_factory_creator = DoxygenItemFinderFactoryCreator(parser_factory, filter_factory)
     index_parser = parser_factory.create_index_parser()
     finder_factory = FinderFactory(index_parser, item_finder_factory_creator)

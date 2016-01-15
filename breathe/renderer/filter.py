@@ -570,17 +570,6 @@ class Glob(object):
         return self.method(name, self.pattern)
 
 
-class GlobFactory(object):
-
-    def __init__(self, method):
-
-        self.method = method
-
-    def create(self, pattern):
-
-        return Glob(self.method, pattern)
-
-
 class Gather(object):
 
     def __init__(self, accessor, names):
@@ -607,9 +596,8 @@ class FilterFactory(object):
         "public-static-attrib",
     ])
 
-    def __init__(self, globber_factory, path_handler):
+    def __init__(self, path_handler):
 
-        self.globber_factory = globber_factory
         self.path_handler = path_handler
         self.default_members = ()
         self.implementation_filename_extensions = ()
