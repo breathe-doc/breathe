@@ -1,8 +1,7 @@
 
 from .finder.core import FinderFactory
 from .parser import DoxygenParserFactory
-from .renderer import DoxygenToRstRendererFactoryCreatorConstructor, \
-    RstContentCreator
+from .renderer import DoxygenToRstRendererFactoryCreatorConstructor
 from .renderer.base import RenderContext
 from .renderer.filter import FilterFactory
 from .renderer.target import TargetHandlerFactory
@@ -865,12 +864,10 @@ def setup(app):
     math_nodes.displaymath = sphinx.ext.mathbase.displaymath
     node_factory = NodeFactory(docutils.nodes, sphinx.addnodes, math_nodes)
 
-    rst_content_creator = RstContentCreator()
     renderer_factory_creator_constructor = DoxygenToRstRendererFactoryCreatorConstructor(
         node_factory,
         parser_factory,
         DomainDirectiveFactory,
-        rst_content_creator
         )
 
     # Assume general build directory is the doctree directory without the last component. We strip

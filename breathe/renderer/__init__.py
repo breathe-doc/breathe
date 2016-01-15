@@ -66,7 +66,6 @@ class DoxygenToRstRendererFactory(object):
             project_info,
             state,
             document,
-            rst_content_creator,
             filter_,
             target_handler,
             domain_directive_factory
@@ -79,7 +78,6 @@ class DoxygenToRstRendererFactory(object):
         self.renderer_factory_creator = renderer_factory_creator
         self.state = state
         self.document = document
-        self.rst_content_creator = rst_content_creator
         self.filter_ = filter_
         self.target_handler = target_handler
         self.domain_directive_factory = domain_directive_factory
@@ -151,7 +149,7 @@ class DoxygenToRstRendererFactory(object):
         if node_type == "verbatim":
 
             return Renderer(
-                self.rst_content_creator,
+                RstContentCreator(),
                 *common_args
             )
 
@@ -230,14 +228,12 @@ class DoxygenToRstRendererFactoryCreator(object):
             node_factory,
             parser_factory,
             domain_directive_factory,
-            rst_content_creator,
             project_info
             ):
 
         self.node_factory = node_factory
         self.parser_factory = parser_factory
         self.domain_directive_factory = domain_directive_factory
-        self.rst_content_creator = rst_content_creator
         self.project_info = project_info
 
     def create_factory(self, node_stack, state, document, filter_, target_handler):
@@ -289,7 +285,6 @@ class DoxygenToRstRendererFactoryCreator(object):
             self.project_info,
             state,
             document,
-            self.rst_content_creator,
             filter_,
             target_handler,
             self.domain_directive_factory
@@ -316,7 +311,6 @@ class DoxygenToRstRendererFactoryCreator(object):
             parent_renderer_factory.project_info,
             parent_renderer_factory.state,
             parent_renderer_factory.document,
-            self.rst_content_creator,
             parent_renderer_factory.filter_,
             parent_renderer_factory.target_handler,
             parent_renderer_factory.domain_directive_factory
@@ -331,13 +325,11 @@ class DoxygenToRstRendererFactoryCreatorConstructor(object):
             node_factory,
             parser_factory,
             domain_directive_factory,
-            rst_content_creator
             ):
 
         self.node_factory = node_factory
         self.parser_factory = parser_factory
         self.domain_directive_factory = domain_directive_factory
-        self.rst_content_creator = rst_content_creator
 
     def create_factory_creator(self, project_info, document, target_handler):
 
@@ -345,7 +337,6 @@ class DoxygenToRstRendererFactoryCreatorConstructor(object):
             self.node_factory,
             self.parser_factory,
             self.domain_directive_factory,
-            self.rst_content_creator,
             project_info,
         )
 
