@@ -68,7 +68,6 @@ class DoxygenToRstRendererFactory(object):
             document,
             filter_,
             target_handler,
-            domain_directive_factory
             ):
 
         self.node_type = node_type
@@ -79,7 +78,6 @@ class DoxygenToRstRendererFactory(object):
         self.document = document
         self.filter_ = filter_
         self.target_handler = target_handler
-        self.domain_directive_factory = domain_directive_factory
 
     def create_renderer(
             self,
@@ -121,7 +119,6 @@ class DoxygenToRstRendererFactory(object):
             self.state,
             self.document,
             self.target_handler,
-            self.domain_directive_factory
         ]
 
         if node_type == "docmarkup":
@@ -227,12 +224,10 @@ class DoxygenToRstRendererFactoryCreator(object):
     def __init__(
             self,
             parser_factory,
-            domain_directive_factory,
             project_info
             ):
 
         self.parser_factory = parser_factory
-        self.domain_directive_factory = domain_directive_factory
         self.project_info = project_info
 
     def create_factory(self, node_stack, state, document, filter_, target_handler):
@@ -285,7 +280,6 @@ class DoxygenToRstRendererFactoryCreator(object):
             document,
             filter_,
             target_handler,
-            self.domain_directive_factory
         )
 
     def create_child_factory(self, project_info, data_object, parent_renderer_factory):
@@ -310,7 +304,6 @@ class DoxygenToRstRendererFactoryCreator(object):
             parent_renderer_factory.document,
             parent_renderer_factory.filter_,
             parent_renderer_factory.target_handler,
-            parent_renderer_factory.domain_directive_factory
         )
 
 
@@ -320,17 +313,14 @@ class DoxygenToRstRendererFactoryCreatorConstructor(object):
     def __init__(
             self,
             parser_factory,
-            domain_directive_factory,
             ):
 
         self.parser_factory = parser_factory
-        self.domain_directive_factory = domain_directive_factory
 
     def create_factory_creator(self, project_info, document, target_handler):
 
         return DoxygenToRstRendererFactoryCreator(
             self.parser_factory,
-            self.domain_directive_factory,
             project_info,
         )
 
