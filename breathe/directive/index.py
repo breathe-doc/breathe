@@ -1,7 +1,7 @@
 
 from ..renderer.base import RenderContext
 from ..renderer.mask import NullMaskFactory
-from ..renderer import format_parser_error
+from ..renderer import format_parser_error, DoxygenToRstRendererFactoryCreator
 from ..directive.base import BaseDirective
 from ..project import ProjectError
 from ..parser import ParserError, FileIOError
@@ -39,8 +39,9 @@ class BaseIndexDirective(BaseDirective):
             self.options, project_info, self.state.document)
         filter_ = self.filter_factory.create_index_filter(self.options)
 
-        renderer_factory_creator = self.renderer_factory_creator_constructor.create_factory_creator(
-            project_info,
+        renderer_factory_creator = DoxygenToRstRendererFactoryCreator(
+            self.parser_factory,
+            project_info
             )
         renderer_factory = renderer_factory_creator.create_factory(
             [data_object],

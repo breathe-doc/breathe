@@ -307,24 +307,6 @@ class DoxygenToRstRendererFactoryCreator(object):
         )
 
 
-# FactoryFactoryFactory. Ridiculous but necessary.
-class DoxygenToRstRendererFactoryCreatorConstructor(object):
-
-    def __init__(
-            self,
-            parser_factory,
-            ):
-
-        self.parser_factory = parser_factory
-
-    def create_factory_creator(self, project_info):
-
-        return DoxygenToRstRendererFactoryCreator(
-            self.parser_factory,
-            project_info,
-        )
-
-
 def format_parser_error(name, error, filename, state, lineno, do_unicode_warning):
 
     warning = '%s: Unable to parse xml file "%s". ' % (name, filename)
