@@ -1,7 +1,7 @@
 
 from .finder.core import FinderFactory
 from .parser import DoxygenParserFactory
-from .renderer import DoxygenToRstRendererFactoryCreatorConstructor
+from .renderer import DoxygenToRstRendererFactoryCreator
 from .renderer.base import RenderContext
 from .renderer.filter import FilterFactory
 from .renderer.target import TargetHandlerFactory
@@ -392,8 +392,9 @@ class DoxygenContentBlockDirective(BaseDirective):
             )
         filter_ = self.filter_factory.create_render_filter(self.kind, self.options)
 
-        renderer_factory_creator = self.renderer_factory_creator_constructor.create_factory_creator(
-            project_info,
+        renderer_factory_creator = DoxygenToRstRendererFactoryCreator(
+            self.parser_factory,
+            project_info
             )
         node_list = []
 
@@ -587,13 +588,11 @@ class DoxygenDirectiveFactory(object):
         "autodoxygenfile": AutoDoxygenFileDirective,
         }
 
-    def __init__(self, node_factory, text_renderer,
-                 renderer_factory_creator_constructor, finder_factory,
+    def __init__(self, node_factory, text_renderer, finder_factory,
                  project_info_factory, filter_factory, target_handler_factory, parser_factory):
 
         self.node_factory = node_factory
         self.text_renderer = text_renderer
-        self.renderer_factory_creator_constructor = renderer_factory_creator_constructor
         self.finder_factory = finder_factory
         self.project_info_factory = project_info_factory
         self.filter_factory = filter_factory
@@ -607,7 +606,6 @@ class DoxygenDirectiveFactory(object):
             self.directives["doxygenfunction"],
             self.node_factory,
             self.text_renderer,
-            self.renderer_factory_creator_constructor,
             self.finder_factory,
             self.project_info_factory,
             self.filter_factory,
@@ -619,7 +617,6 @@ class DoxygenDirectiveFactory(object):
 
         return DirectiveContainer(
             self.directives[type_],
-            self.renderer_factory_creator_constructor,
             self.finder_factory,
             self.project_info_factory,
             self.filter_factory,
@@ -770,10 +767,6 @@ def setup(app):
     index_parser = parser_factory.create_index_parser()
     finder_factory = FinderFactory(index_parser, item_finder_factory_creator)
 
-    renderer_factory_creator_constructor = DoxygenToRstRendererFactoryCreatorConstructor(
-        parser_factory,
-        )
-
     # Assume general build directory is the doctree directory without the last component. We strip
     # off any trailing slashes so that dirname correctly drops the last part. This can be overriden
     # with the breathe_build_directory config variable
@@ -787,7 +780,6 @@ def setup(app):
     directive_factory = DoxygenDirectiveFactory(
         node_factory,
         text_renderer,
-        renderer_factory_creator_constructor,
         finder_factory,
         project_info_factory,
         filter_factory,
