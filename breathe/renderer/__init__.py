@@ -317,7 +317,7 @@ class DoxygenToRstRendererFactoryCreatorConstructor(object):
 
         self.parser_factory = parser_factory
 
-    def create_factory_creator(self, project_info, document, target_handler):
+    def create_factory_creator(self, project_info):
 
         return DoxygenToRstRendererFactoryCreator(
             self.parser_factory,
