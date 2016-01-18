@@ -1,4 +1,5 @@
 
+from ..renderer import DoxygenToRstRendererFactoryCreator
 from ..renderer.base import RenderContext
 from ..renderer.mask import NullMaskFactory
 from ..directive.base import BaseDirective
@@ -40,10 +41,9 @@ class BaseFileDirective(BaseDirective):
             self.options, project_info, self.state.document)
         filter_ = self.filter_factory.create_file_filter(file_, self.options)
 
-        renderer_factory_creator = self.renderer_factory_creator_constructor.create_factory_creator(
-            project_info,
-            self.state.document,
-            target_handler
+        renderer_factory_creator = DoxygenToRstRendererFactoryCreator(
+            self.parser_factory,
+            project_info
             )
         node_list = []
         for node_stack in matches:

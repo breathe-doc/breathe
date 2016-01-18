@@ -92,19 +92,11 @@ class DoxygenCompoundParser(Parser):
                 raise FileIOError(e, filename)
 
 
-class CacheFactory(object):
-
-    def create_cache(self):
-
-        # Return basic dictionary as cache
-        return {}
-
-
 class DoxygenParserFactory(object):
 
-    def __init__(self, cache, path_handler, file_state_cache):
+    def __init__(self, path_handler, file_state_cache):
 
-        self.cache = cache
+        self.cache = {}
         self.path_handler = path_handler
         self.file_state_cache = file_state_cache
 

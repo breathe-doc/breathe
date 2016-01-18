@@ -1,4 +1,55 @@
 
+from sphinx.domains import cpp, c, python
+
+
+class DomainDirectiveFactory(object):
+    # A mapping from node kinds to cpp domain classes and directive names.
+    cpp_classes = {
+        'class': (cpp.CPPClassObject, 'class'),
+        'struct': (cpp.CPPClassObject, 'class'),
+        'function': (cpp.CPPFunctionObject, 'function'),
+        'friend': (cpp.CPPFunctionObject, 'function'),
+        'slot': (cpp.CPPFunctionObject, 'function'),
+        'enum': (cpp.CPPTypeObject, 'type'),
+        'typedef': (cpp.CPPTypeObject, 'type'),
+        'union': (cpp.CPPTypeObject, 'type'),
+        'namespace': (cpp.CPPTypeObject, 'type'),
+        # Use CPPClassObject for enum values as the cpp domain doesn't have a directive for
+        # enum values and CPPMemberObject requires a type.
+        'enumvalue': (cpp.CPPClassObject, 'member'),
+        'define': (c.CObject, 'macro')
+    }
+
+    python_classes = {
+        'function': (python.PyModulelevel, 'function'),
+        'variable': (python.PyClassmember, 'attribute')
+    }
+
+    @staticmethod
+    def fix_python_signature(sig):
+        def_ = 'def '
+        if sig.startswith(def_):
+            sig = sig[len(def_):]
+        # Doxygen uses an invalid separator ('::') in Python signatures. Replace them with '.'.
+        return sig.replace('::', '.')
+
+    @staticmethod
+    def create(domain, args):
+        if domain == 'c':
+            return c.CObject(*args)
+        if domain == 'py':
+            cls, name = DomainDirectiveFactory.python_classes.get(
+                args[0], (python.PyClasslike, 'class'))
+            args[1] = [DomainDirectiveFactory.fix_python_signature(n) for n in args[1]]
+        else:
+            cls, name = DomainDirectiveFactory.cpp_classes.get(
+                args[0], (cpp.CPPMemberObject, 'member'))
+        # Replace the directive name because domain directives don't know how to handle
+        # Breathe's "doxygen" directives.
+        args = [name] + args[1:]
+        return cls(*args)
+
+
 class Renderer(object):
 
     def __init__(
@@ -10,7 +61,6 @@ class Renderer(object):
             state,
             document,
             target_handler,
-            domain_directive_factory,
     ):
 
         self.project_info = project_info
@@ -21,7 +71,6 @@ class Renderer(object):
         self.state = state
         self.document = document
         self.target_handler = target_handler
-        self.domain_directive_factory = domain_directive_factory
 
         if self.context.domain == '':
             self.context.domain = self.get_domain()
@@ -100,7 +149,7 @@ class Renderer(object):
         return signode
 
     def run_domain_directive(self, kind, names):
-        domain_directive = self.renderer_factory.domain_directive_factory.create(
+        domain_directive = DomainDirectiveFactory.create(
             self.context.domain, [kind, names] + self.context.directive_args[2:])
 
         # Translate Breathe's no-link option into the standard noindex option.
