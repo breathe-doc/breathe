@@ -1,18 +1,16 @@
 
+import textwrap
+
+from ..node_factory import create_node_factory
 from .base import Renderer
 from . import index as indexrenderer
 from . import compound as compoundrenderer
 
 from docutils import nodes
-import textwrap
+from docutils.statemachine import ViewList
 
 
 class RstContentCreator(object):
-
-    def __init__(self, list_type, dedent):
-
-        self.list_type = list_type
-        self.dedent = dedent
 
     def __call__(self, text):
 
@@ -20,10 +18,10 @@ class RstContentCreator(object):
         text = "\n".join(text.split(u"\n")[1:])
 
         # Remove starting whitespace
-        text = self.dedent(text)
+        text = textwrap.dedent(text)
 
         # Inspired by autodoc.py in Sphinx
-        result = self.list_type()
+        result = ViewList()
         for line in text.split("\n"):
             result.append(line, "<breathe>")
 
@@ -65,27 +63,21 @@ class DoxygenToRstRendererFactory(object):
             node_type,
             renderers,
             renderer_factory_creator,
-            node_factory,
             project_info,
             state,
             document,
-            rst_content_creator,
             filter_,
             target_handler,
-            domain_directive_factory
             ):
 
         self.node_type = node_type
-        self.node_factory = node_factory
         self.project_info = project_info
         self.renderers = renderers
         self.renderer_factory_creator = renderer_factory_creator
         self.state = state
         self.document = document
-        self.rst_content_creator = rst_content_creator
         self.filter_ = filter_
         self.target_handler = target_handler
-        self.domain_directive_factory = domain_directive_factory
 
     def create_renderer(
             self,
@@ -117,30 +109,31 @@ class DoxygenToRstRendererFactory(object):
 
         Renderer = self.renderers[node_type]
 
+        node_factory = create_node_factory()
+
         common_args = [
             self.project_info,
             context,
             child_renderer_factory,
-            self.node_factory,
+            node_factory,
             self.state,
             self.document,
             self.target_handler,
-            self.domain_directive_factory
         ]
 
         if node_type == "docmarkup":
 
-            creator = self.node_factory.inline
+            creator = node_factory.inline
             if data_object.type_ == "emphasis":
-                creator = self.node_factory.emphasis
+                creator = node_factory.emphasis
             elif data_object.type_ == "computeroutput":
-                creator = self.node_factory.literal
+                creator = node_factory.literal
             elif data_object.type_ == "bold":
-                creator = self.node_factory.strong
+                creator = node_factory.strong
             elif data_object.type_ == "superscript":
-                creator = self.node_factory.superscript
+                creator = node_factory.superscript
             elif data_object.type_ == "subscript":
-                creator = self.node_factory.subscript
+                creator = node_factory.subscript
             elif data_object.type_ == "center":
                 print("Warning: does not currently handle 'center' text display")
             elif data_object.type_ == "small":
@@ -154,7 +147,7 @@ class DoxygenToRstRendererFactory(object):
         if node_type == "verbatim":
 
             return Renderer(
-                self.rst_content_creator,
+                RstContentCreator(),
                 *common_args
             )
 
@@ -230,17 +223,11 @@ class DoxygenToRstRendererFactoryCreator(object):
 
     def __init__(
             self,
-            node_factory,
             parser_factory,
-            domain_directive_factory,
-            rst_content_creator,
             project_info
             ):
 
-        self.node_factory = node_factory
         self.parser_factory = parser_factory
-        self.domain_directive_factory = domain_directive_factory
-        self.rst_content_creator = rst_content_creator
         self.project_info = project_info
 
     def create_factory(self, node_stack, state, document, filter_, target_handler):
@@ -288,14 +275,11 @@ class DoxygenToRstRendererFactoryCreator(object):
             "root",
             renderers,
             self,
-            self.node_factory,
             self.project_info,
             state,
             document,
-            self.rst_content_creator,
             filter_,
             target_handler,
-            self.domain_directive_factory
         )
 
     def create_child_factory(self, project_info, data_object, parent_renderer_factory):
@@ -315,41 +299,11 @@ class DoxygenToRstRendererFactoryCreator(object):
             node_type,
             parent_renderer_factory.renderers,
             self,
-            self.node_factory,
             parent_renderer_factory.project_info,
             parent_renderer_factory.state,
             parent_renderer_factory.document,
-            self.rst_content_creator,
             parent_renderer_factory.filter_,
             parent_renderer_factory.target_handler,
-            parent_renderer_factory.domain_directive_factory
-        )
-
-
-# FactoryFactoryFactory. Ridiculous but necessary.
-class DoxygenToRstRendererFactoryCreatorConstructor(object):
-
-    def __init__(
-            self,
-            node_factory,
-            parser_factory,
-            domain_directive_factory,
-            rst_content_creator
-            ):
-
-        self.node_factory = node_factory
-        self.parser_factory = parser_factory
-        self.domain_directive_factory = domain_directive_factory
-        self.rst_content_creator = rst_content_creator
-
-    def create_factory_creator(self, project_info, document, target_handler):
-
-        return DoxygenToRstRendererFactoryCreator(
-            self.node_factory,
-            self.parser_factory,
-            self.domain_directive_factory,
-            self.rst_content_creator,
-            project_info,
         )
 
 

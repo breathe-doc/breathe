@@ -1,13 +1,18 @@
 
 from ..renderer.base import RenderContext
 from ..renderer.mask import NullMaskFactory
-from ..renderer import format_parser_error
+from ..renderer import format_parser_error, DoxygenToRstRendererFactoryCreator
 from ..directive.base import BaseDirective
 from ..project import ProjectError
 from ..parser import ParserError, FileIOError
 from .base import create_warning
 
 from docutils.parsers.rst.directives import unchanged_required, flag
+
+
+class RootDataObject(object):
+
+    node_type = "root"
 
 
 class BaseIndexDirective(BaseDirective):
@@ -34,10 +39,9 @@ class BaseIndexDirective(BaseDirective):
             self.options, project_info, self.state.document)
         filter_ = self.filter_factory.create_index_filter(self.options)
 
-        renderer_factory_creator = self.renderer_factory_creator_constructor.create_factory_creator(
-            project_info,
-            self.state.document,
-            target_handler
+        renderer_factory_creator = DoxygenToRstRendererFactoryCreator(
+            self.parser_factory,
+            project_info
             )
         renderer_factory = renderer_factory_creator.create_factory(
             [data_object],
@@ -48,7 +52,7 @@ class BaseIndexDirective(BaseDirective):
             )
 
         mask_factory = NullMaskFactory()
-        context = RenderContext([data_object, self.root_data_object], mask_factory,
+        context = RenderContext([data_object, RootDataObject()], mask_factory,
                                 self.directive_args)
         object_renderer = renderer_factory.create_renderer(context)
 

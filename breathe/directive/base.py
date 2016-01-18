@@ -1,6 +1,6 @@
 
 from ..renderer.base import RenderContext
-from ..renderer import format_parser_error
+from ..renderer import format_parser_error, DoxygenToRstRendererFactoryCreator
 from ..parser import ParserError, FileIOError
 
 from docutils import nodes
@@ -46,14 +46,12 @@ def create_warning(project_info, state, lineno, **kwargs):
 
 class BaseDirective(rst.Directive):
 
-    def __init__(self, root_data_object, renderer_factory_creator_constructor, finder_factory,
+    def __init__(self, finder_factory,
                  project_info_factory, filter_factory, target_handler_factory, parser_factory,
                  *args):
         rst.Directive.__init__(self, *args)
         self.directive_args = list(args)  # Convert tuple to list to allow modification.
 
-        self.root_data_object = root_data_object
-        self.renderer_factory_creator_constructor = renderer_factory_creator_constructor
         self.finder_factory = finder_factory
         self.project_info_factory = project_info_factory
         self.filter_factory = filter_factory
@@ -64,10 +62,9 @@ class BaseDirective(rst.Directive):
                directive_args):
         "Standard render process used by subclasses"
 
-        renderer_factory_creator = self.renderer_factory_creator_constructor.create_factory_creator(
-            project_info,
-            self.state.document,
-            target_handler
+        renderer_factory_creator = DoxygenToRstRendererFactoryCreator(
+            self.parser_factory,
+            project_info
             )
 
         try:
