@@ -14,3 +14,4 @@ def setup(app):
     from . import directives
 
     directives.setup(app)
+    return {'version': __version__}
