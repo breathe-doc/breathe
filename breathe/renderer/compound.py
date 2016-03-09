@@ -244,13 +244,17 @@ class MemberDefTypeSubRenderer(Renderer):
 
 def get_param_decl(param):
 
-    param_type = []
-    for p in param.type_.content_:
-        value = p.value
-        if not isinstance(value, six.text_type):
-            value = value.valueOf_
-        param_type.append(value)
-    param_type = ' '.join(param_type)
+    def to_string(node):
+        """Convert Doxygen node content to a string."""
+        result = []
+        for p in node.content_:
+            value = p.value
+            if not isinstance(value, six.text_type):
+                value = value.valueOf_
+            result.append(value)
+        return ' '.join(result)
+
+    param_type = to_string(param.type_)
     param_name = param.declname if param.declname else param.defname
     if not param_name:
         param_decl = param_type
@@ -261,6 +265,8 @@ def get_param_decl(param):
             param_decl = param_type + ' ' + param_name
     if param.array:
         param_decl += param.array
+    if param.defval:
+        param_decl += ' = ' + to_string(param.defval)
 
     return param_decl
 
