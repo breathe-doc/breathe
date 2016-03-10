@@ -28,12 +28,13 @@ from breathe import __version__
 # Reference: Doxygen XSD schema file, CompoundKind only
 # Only what breathe supports are included
 # Translates identifier to English
-TYPEDICT = {"class":"Class",
-            "struct":"Struct",
-            "union":"Union",
-            "file":"File",
-            "namespace":"Namespace",
-            "group":"Group",}
+TYPEDICT = {'class': 'Class',
+            'struct': 'Struct',
+            'union': 'Union',
+            'file': 'File',
+            'namespace': 'Namespace',
+            'group': 'Group'}
+
 
 def write_file(name, text, args):
     """Write the output file for module/package <name>."""
@@ -48,7 +49,7 @@ def write_file(name, text, args):
         if not os.path.exists(os.path.dirname(fname)):
             try:
                 os.makedirs(os.path.dirname(fname))
-            except OSError as exc: # Guard against race condition
+            except OSError as exc:  # Guard against race condition
                 if exc.errno != errno.EEXIST:
                     raise
         target = open(fname, 'w')
@@ -63,15 +64,17 @@ def format_heading(level, text):
     underlining = ['=', '-', '~', ][level - 1] * len(text)
     return '%s\n%s\n\n' % (text, underlining)
 
+
 def format_directive(package_type, package):
     """Create the breathe directive and add the options."""
     directive = '.. doxygen%s:: %s\n' % (package_type, package)
     return directive
 
+
 def create_package_file(package, package_type, package_id, args):
     """Build the text of the file and write the file."""
     # Some types are unsupported by breathe
-    if not package_type in TYPEDICT:
+    if package_type not in TYPEDICT:
         return
     text = format_heading(1, '%s %s' % (TYPEDICT[package_type], package))
     text += format_directive(package_type, package)
@@ -90,6 +93,7 @@ def create_modules_toc_file(key, value, args):
 
     write_file('%slist' % key, text, args)
 
+
 def recurse_tree(args):
     """
     Look for every file in the directory tree and create the corresponding
@@ -101,6 +105,7 @@ def recurse_tree(args):
     for compound in index.getroot():
         create_package_file(compound.findtext('name'), compound.get('kind'),
                             compound.get('refid'), args)
+
 
 def main():
     """Parse and check the command line arguments."""
@@ -139,7 +144,7 @@ Note: By default this script will not overwrite already created files.""")
     if not os.path.isdir(args.rootpath):
         print('%s is not a directory.' % args.rootpath, file=sys.stderr)
         sys.exit(1)
-    if not 'index.xml' in os.listdir(args.rootpath):
+    if 'index.xml' not in os.listdir(args.rootpath):
         print('%s does not contain a index.xml' % args.rootpath, file=sys.stderr)
         sys.exit(1)
     if not os.path.isdir(args.destdir):
