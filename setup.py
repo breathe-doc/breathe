@@ -70,6 +70,11 @@ setup(
     platforms='any',
     packages=find_packages(),
     include_package_data=True,
+    entry_points={
+        'console_scripts': [
+            'breathe-apidoc = breathe.apidoc:main',
+        ],
+    },
     install_requires=requires,
     use_2to3=True,
 )
