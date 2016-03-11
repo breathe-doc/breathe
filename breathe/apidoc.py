@@ -129,15 +129,11 @@ Note: By default this script will not overwrite already created files.""")
                         help='Don\'t create a table of contents file')
     parser.add_argument('-s', '--suffix', action='store', dest='suffix',
                         help='file suffix (default: rst)', default='rst')
-    parser.add_argument('--version', action='store_true', dest='show_version',
-                        help='Show version information and exit')
+    parser.add_argument('--version', action='version',
+                        version='Breathe (breathe-apidoc) %s' % __version__)
     parser.add_argument('rootpath', type=str,
                         help='The directory contains index.xml')
     args = parser.parse_args()
-
-    if args.show_version:
-        print('Breathe (breathe-apidoc) %s' % __version__)
-        return 0
 
     if args.suffix.startswith('.'):
         args.suffix = args.suffix[1:]
