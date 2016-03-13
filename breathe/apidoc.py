@@ -111,13 +111,11 @@ def main():
     """Parse and check the command line arguments."""
     parser = argparse.ArgumentParser(
         description="""\
-Parse XML created by Doxygen in <xml_directory> and create one reST file with
-breathe generation directives per definition in the <output_path>.
+Parse XML created by Doxygen in <rootpath> and create one reST file with
+breathe generation directives per definition in the <DESTDIR>.
 
-The <exclude_path>s can be files and/or directories that will be excluded
-from generation.
-
-Note: By default this script will not overwrite already created files.""")
+Note: By default this script will not overwrite already created files.""",
+        formatter_class=argparse.RawDescriptionHelpFormatter)
 
     parser.add_argument('-o', '--output-dir', action='store', dest='destdir',
                         help='Directory to place all output', required=True)
