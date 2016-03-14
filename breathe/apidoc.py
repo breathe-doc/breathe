@@ -3,9 +3,9 @@
     breathe.apidoc
     ~~~~~~~~~~~~~~
 
-    Parses a directory tree looking for C/C++ modules and packages and creates
-    ReST files appropriately to create code documentation with Sphinx.  It also
-    creates a modules index (named modules.<suffix>).
+    Parses doxygen XML tree looking for C/C++ modules and creates ReST files
+    appropriately to create code documentation with Sphinx. It also creates a
+    modules index (See TYPEDICT below.).
 
     This is derived from the "sphinx-autopackage" script, which is:
     Copyright 2008 Société des arts technologiques (SAT),
