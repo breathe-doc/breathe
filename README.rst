@@ -76,9 +76,9 @@ Examples
 Examples of Breathe used by other projects:
 
 - `cppformat <http://cppformat.readthedocs.org/en/latest/>`_
-  [`pdf <https://media.readthedocs.org/pdf/cppformat/master/cppformat.pdf>`_]
+  [`pdf <https://media.readthedocs.org/pdf/cppformat/master/cppformat.pdf>`__]
 - `Lasso C API <http://lassoguide.com/api/lcapi-reference.html>`_
-  [`pdf <http://lassoguide.com/LassoGuide9.2.pdf>`_]
+  [`pdf <http://lassoguide.com/LassoGuide9.2.pdf>`__]
 
 If you have an example you would like listed here, please make a github issue
 with the details.
@@ -136,6 +136,30 @@ Change Log
 
 Inspired by `Keepachangelog.com <http://keepachangelog.com/>`__.
 
+- 2016-03-19 - Breathe v4.2.0
+
+  - Added
+ 
+    - Output links to a class' parents & children.
+
+    - Support for Sphinx's `needs_extensions` config option.
+
+    - breathe-apidoc script for generating ReStructuredText stub files with
+      Breathe directives from doxygen xml files.
+
+  - Fixed
+
+    - Handling default values in parameter declarations
+
+    - Output order not being reproducible due to iteration over Set.
+
+    - Handling of multiple pointers and references
+
+    - `SEVERE: Duplicate ID` warnings when using function overloads.
+
+    - Use project name for link references when using default project. So we use
+      the project name instead of 'project0'.
+  
 - 2015-08-27 - Breathe v4.1.0
 
   - Added
