@@ -303,18 +303,10 @@ class FuncMemberDefTypeSubRenderer(MemberDefTypeSubRenderer):
 
     def update_signature(self, signode):
 
-        # Note whether a member function is virtual
-        if self.data_object.virt != 'non-virtual':
-            signode.insert(0, self.node_factory.Text('virtual '))
-
         # Add CV-qualifiers
         if self.data_object.const == 'yes':
             signode.append(self.node_factory.Text(' const'))
-        # The doxygen xml output doesn't seem to properly register 'volatile' as the xml attribute
-        # 'volatile' so we have to check the argsstring for the moment. Maybe it'll change in
-        # doxygen at some point. Registered as bug:
-        #     https://bugzilla.gnome.org/show_bug.cgi?id=733451
-        if self.data_object.volatile == 'yes' or self.data_object.argsstring.endswith('volatile'):
+        if self.data_object.volatile == 'yes':
             signode.append(self.node_factory.Text(' volatile'))
 
         # Add `= 0` for pure virtual members.
@@ -330,10 +322,6 @@ class FuncMemberDefTypeSubRenderer(MemberDefTypeSubRenderer):
             param_list.append(param_decl)
         signature = '{0}({1})'.format(get_definition_without_template_args(self.data_object),
                                       ', '.join(param_list))
-        # Remove 'virtual' keyword as Sphinx 1.2 doesn't support virtual functions.
-        virtual = 'virtual '
-        if signature.startswith(virtual):
-            signature = signature[len(virtual):]
         self.context.directive_args[1] = [signature]
 
         nodes = self.run_domain_directive(self.data_object.kind, self.context.directive_args[1])
@@ -415,8 +403,11 @@ class TypedefMemberDefTypeSubRenderer(MemberDefTypeSubRenderer):
     def declaration(self):
         decl = get_definition_without_template_args(self.data_object)
         typedef = "typedef "
+        usingalias = "using "
         if decl.startswith(typedef):
             decl = decl[len(typedef):]
+        elif decl.startswith(usingalias):
+            decl = decl[len(usingalias):]
         return decl
 
 
