@@ -172,8 +172,6 @@ class DoxygenFunctionDirective(BaseDirective):
     def parse_args(self, function_description):
         # Strip off trailing qualifiers
         pattern = re.compile(r'''(?<= \)) \s*
-                             (?: const)? \s*
-                             (?: volatile)? \s*
                              (?: = \s* 0)? \s* $ ''',
                              re.VERBOSE)
 
