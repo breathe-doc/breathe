@@ -172,8 +172,6 @@ class DoxygenFunctionDirective(BaseDirective):
     def parse_args(self, function_description):
         # Strip off trailing qualifiers
         pattern = re.compile(r'''(?<= \)) \s*
-                             (?: const)? \s*
-                             (?: volatile)? \s*
                              (?: = \s* 0)? \s* $ ''',
                              re.VERBOSE)
 
@@ -494,11 +492,7 @@ class DoxygenVariableDirective(DoxygenBaseItemDirective):
     kind = "variable"
 
     def render(self, node_stack, project_info, options, filter_, target_handler, mask_factory):
-        # Remove 'extern' keyword as Sphinx doesn't support it.
         definition = node_stack[0].definition
-        extern = 'extern '
-        if definition.startswith(extern):
-            definition = definition[len(extern):]
         self.directive_args[1] = [definition]
         return DoxygenBaseItemDirective.render(self, node_stack, project_info, options, filter_,
                                                target_handler, mask_factory)
