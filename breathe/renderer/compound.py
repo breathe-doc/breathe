@@ -307,16 +307,6 @@ class FuncMemberDefTypeSubRenderer(MemberDefTypeSubRenderer):
         if self.data_object.virt != 'non-virtual':
             signode.insert(0, self.node_factory.Text('virtual '))
 
-        # Add CV-qualifiers
-        if self.data_object.const == 'yes':
-            signode.append(self.node_factory.Text(' const'))
-        # The doxygen xml output doesn't seem to properly register 'volatile' as the xml attribute
-        # 'volatile' so we have to check the argsstring for the moment. Maybe it'll change in
-        # doxygen at some point. Registered as bug:
-        #     https://bugzilla.gnome.org/show_bug.cgi?id=733451
-        if self.data_object.volatile == 'yes' or self.data_object.argsstring.endswith('volatile'):
-            signode.append(self.node_factory.Text(' volatile'))
-
         # Add `= 0` for pure virtual members.
         if self.data_object.virt == 'pure-virtual':
             signode.append(self.node_factory.Text(' = 0'))
@@ -334,6 +324,16 @@ class FuncMemberDefTypeSubRenderer(MemberDefTypeSubRenderer):
         virtual = 'virtual '
         if signature.startswith(virtual):
             signature = signature[len(virtual):]
+        
+        # Add CV-qualifiers.
+        if self.data_object.const == 'yes':
+            signature += ' const'
+        # The doxygen xml output doesn't register 'volatile' as the xml attribute for functions
+        # until version 1.8.8 so we also check argsstring:
+        #     https://bugzilla.gnome.org/show_bug.cgi?id=733451
+        if self.data_object.volatile == 'yes' or self.data_object.argsstring.endswith('volatile'):
+            signature += ' volatile'
+
         self.context.directive_args[1] = [signature]
 
         nodes = self.run_domain_directive(self.data_object.kind, self.context.directive_args[1])
