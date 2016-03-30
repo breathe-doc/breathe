@@ -40,7 +40,12 @@ class CompoundRenderer(Renderer):
         self.context.directive_args[1] = [self.get_fully_qualified_name()]
         nodes = self.run_domain_directive(kind, self.context.directive_args[1])
         node = nodes[1]
-        signode, contentnode = node.children
+
+        # Templates have multiple signature nodes in recent versions of Sphinx.
+        # Update the last signature node because it contains the actual signature
+        # rather than "template <...>".
+        signode = node.children[-2]
+        contentnode = node.children[-1]
 
         # The cpp domain in Sphinx doesn't support structs at the moment, so change the text from "class "
         # to the correct kind which can be "class " or "struct ".
