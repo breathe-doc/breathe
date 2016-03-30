@@ -721,7 +721,7 @@ class DocTitleTypeSubRenderer(Renderer):
         return renderIterable(self, self.data_object.content_)
 
 
-class DocForumlaTypeSubRenderer(Renderer):
+class DocFormulaTypeSubRenderer(Renderer):
 
     def render(self):
 
