@@ -324,7 +324,7 @@ class FuncMemberDefTypeSubRenderer(MemberDefTypeSubRenderer):
         virtual = 'virtual '
         if signature.startswith(virtual):
             signature = signature[len(virtual):]
-        
+
         # Add CV-qualifiers.
         if self.data_object.const == 'yes':
             signature += ' const'
