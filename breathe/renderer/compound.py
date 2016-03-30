@@ -1,6 +1,6 @@
 
 from .base import Renderer
-from .index import CompoundRenderer
+from .index import CompoundRenderer, NodeFinder
 import re
 import six
 
@@ -338,14 +338,14 @@ class FuncMemberDefTypeSubRenderer(MemberDefTypeSubRenderer):
 
         nodes = self.run_domain_directive(self.data_object.kind, self.context.directive_args[1])
         node = nodes[1]
+        finder = NodeFinder(node.document)
+        node.walk(finder)
+
         # Templates have multiple signature nodes in recent versions of Sphinx.
         # Insert Doxygen target into the first signature node.
         node.children[0].insert(0, self.create_doxygen_target())
-        # Update the last signature node because it contains the actual signature
-        # rather than "template <...>".
-        self.update_signature(node.children[-2])
-        # Add description to the content node.
-        node.children[-1].extend(self.description())
+        self.update_signature(finder.declarator)
+        finder.content.extend(self.description())
 
         template_node = self.create_template_node(self.data_object)
         if template_node:
