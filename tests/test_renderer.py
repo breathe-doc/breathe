@@ -1,7 +1,8 @@
 # Renderer tests
 
 import sphinx.environment
-from breathe.renderer.compound import FuncMemberDefTypeSubRenderer
+from breathe.parser.compound import linkedTextTypeSub, memberdefTypeSub, paramTypeSub, MixedContainer
+from breathe.renderer.compound import FuncMemberDefTypeSubRenderer, TypedefMemberDefTypeSubRenderer
 from docutils import frontend, nodes, parsers, utils
 from sphinx.domains import CPPDomain
 from distutils.version import LooseVersion
@@ -10,31 +11,50 @@ from distutils.version import LooseVersion
 sphinx.locale.init([], None)
 
 
-class MockDoxygenNode:
+class TestDoxygenNode:
+    """
+    A base class for test wrappers of Doxygen nodes. It allows setting all attributes via keyword arguments
+    in the constructor.
+    """
+    def __init__(self, cls, **kwargs):
+        if cls:
+            cls.__init__(self)
+        for name, value in kwargs.items():
+            if not hasattr(self, name):
+                raise AttributeError('invalid attribute ' + name)
+            setattr(self, name, value)
+
+
+class TestMixedContainer(MixedContainer, TestDoxygenNode):
+    """A test wrapper of Doxygen mixed container."""
     def __init__(self, **kwargs):
-        attributes = {
-            'id': None,
-            'kind': None,
-            'name': '',
-            'definition': '',
-            'param': [],
-            'virt': None,
-            'const': None,
-            'volatile': None,
-            'argsstring': '',
-            'briefdescription': None,
-            'detaileddescription': None,
-            'templateparamlist': None
-        }
-        for name, value in attributes.items():
-            setattr(self, name, kwargs.get(name, value))
+        MixedContainer.__init__(self, None, None, None, None)
+        TestDoxygenNode.__init__(self, None, **kwargs)
+
+
+class TestLinkedText(linkedTextTypeSub, TestDoxygenNode):
+    """A test wrapper of Doxygen linked text."""
+    def __init__(self, **kwargs):
+        TestDoxygenNode.__init__(self, linkedTextTypeSub, **kwargs)
+
+
+class TestMemberDef(memberdefTypeSub, TestDoxygenNode):
+    """A test wrapper of Doxygen class/file/namespace member symbol such as a function declaration."""
+    def __init__(self, **kwargs):
+        TestDoxygenNode.__init__(self, memberdefTypeSub, **kwargs)
+
+
+class TestParam(paramTypeSub, TestDoxygenNode):
+    """A test wrapper of Doxygen parameter."""
+    def __init__(self, **kwargs):
+        TestDoxygenNode.__init__(self, paramTypeSub, **kwargs)
 
 
 class MockState:
     def __init__(self):
         env = sphinx.environment.BuildEnvironment(None, None, None)
         CPPDomain(env)
-        env.temp_data['docname'] = None
+        env.temp_data['docname'] = 'mock-doc'
         settings = frontend.OptionParser(
             components=(parsers.rst.Parser,)).get_default_values()
         settings.env = env
@@ -60,6 +80,14 @@ class MockStateMachine:
         self.reporter = MockReporter()
 
 
+class MockMaskFactory:
+    def __init__(self):
+        pass
+
+    def mask(self, node):
+        return node
+
+
 class MockContext:
     def __init__(self, node_stack):
         self.domain = None
@@ -74,6 +102,7 @@ class MockContext:
             None,  # block_text
             MockState(), MockStateMachine()]
         self.child = None
+        self.mask_factory = MockMaskFactory()
 
     def create_child_context(self, attribute):
         return self
@@ -92,14 +121,6 @@ class MockTargetHandler:
         pass
 
     def create_target(self, refid):
-        pass
-
-
-class MockNodeFactory:
-    def __init__(self):
-        pass
-
-    def Text(self, data):
         pass
 
 
@@ -180,15 +201,31 @@ def test_find_node():
                     'the number of nodes Text is 2')
 
 
+def render(member_def, renderer_class):
+    """Render Doxygen *member_def* with *renderer_class*."""
+    renderer = renderer_class(MockProjectInfo(), MockContext([member_def]),
+                              None,  # renderer_factory
+                              sphinx.addnodes,
+                              None,  # state
+                              None,  # document
+                              MockTargetHandler())
+    return renderer.render()
+
+
 def test_func_renderer():
-    doxy_node = MockDoxygenNode(definition='void f', argsstring='()')
-    renderer = FuncMemberDefTypeSubRenderer(MockProjectInfo(), MockContext([doxy_node]),
-                                            None,  # renderer_factory
-                                            MockNodeFactory(),
-                                            None,  # state
-                                            None,  # document
-                                            MockTargetHandler())
-    nodes = renderer.render()
-    node = find_node(nodes, 'desc_name')
+    member_def = TestMemberDef(definition='void foo', argsstring='(int)', virt='non-virtual',
+                               param=[TestParam(type_=TestLinkedText(content_=[TestMixedContainer(value=u'int')]))])
+    signature = find_node(render(member_def, FuncMemberDefTypeSubRenderer), 'desc_signature')
+    assert signature[0] == 'void'
     if LooseVersion(sphinx.__version__) >= LooseVersion('1.3'):
-        assert node[0] == 'f'
+        assert find_node(signature, 'desc_name')[0] == 'foo'
+        params = find_node(signature, 'desc_parameterlist')
+        assert len(params) == 1
+        param = params[0]
+        assert param[0] == 'int'
+
+
+def test_typedef_renderer():
+    member_def = TestMemberDef(kind='typedef', definition='typedef int foo')
+    signature = find_node(render(member_def, TypedefMemberDefTypeSubRenderer), 'desc_signature')
+    assert signature.astext() == 'typedef int foo'
