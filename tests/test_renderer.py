@@ -6,7 +6,6 @@ from breathe.parser.compound import linkedTextTypeSub, memberdefTypeSub, paramTy
 from breathe.renderer.compound import FuncMemberDefTypeSubRenderer, TypedefMemberDefTypeSubRenderer
 from docutils import frontend, nodes, parsers, utils
 from sphinx.domains import CPPDomain
-from distutils.version import LooseVersion
 
 
 sphinx.locale.init([], None)
@@ -218,12 +217,11 @@ def test_render_func():
                                param=[TestParam(type_=TestLinkedText(content_=[TestMixedContainer(value=u'int')]))])
     signature = find_node(render(member_def, FuncMemberDefTypeSubRenderer), 'desc_signature')
     assert signature[0] == 'void'
-    if LooseVersion(sphinx.__version__) >= LooseVersion('1.3'):
-        assert find_node(signature, 'desc_name')[0] == 'foo'
-        params = find_node(signature, 'desc_parameterlist')
-        assert len(params) == 1
-        param = params[0]
-        assert param[0] == 'int'
+    assert find_node(signature, 'desc_name')[0] == 'foo'
+    params = find_node(signature, 'desc_parameterlist')
+    assert len(params) == 1
+    param = params[0]
+    assert param[0] == 'int'
 
 
 def test_render_typedef():
