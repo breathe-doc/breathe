@@ -1,6 +1,7 @@
 # Renderer tests
 
 import sphinx.environment
+from breathe.node_factory import create_node_factory
 from breathe.parser.compound import linkedTextTypeSub, memberdefTypeSub, paramTypeSub, MixedContainer
 from breathe.renderer.compound import FuncMemberDefTypeSubRenderer, TypedefMemberDefTypeSubRenderer
 from docutils import frontend, nodes, parsers, utils
@@ -205,14 +206,14 @@ def render(member_def, renderer_class):
     """Render Doxygen *member_def* with *renderer_class*."""
     renderer = renderer_class(MockProjectInfo(), MockContext([member_def]),
                               None,  # renderer_factory
-                              sphinx.addnodes,
+                              create_node_factory(),
                               None,  # state
                               None,  # document
                               MockTargetHandler())
     return renderer.render()
 
 
-def test_func_renderer():
+def test_render_func():
     member_def = TestMemberDef(definition='void foo', argsstring='(int)', virt='non-virtual',
                                param=[TestParam(type_=TestLinkedText(content_=[TestMixedContainer(value=u'int')]))])
     signature = find_node(render(member_def, FuncMemberDefTypeSubRenderer), 'desc_signature')
@@ -225,7 +226,14 @@ def test_func_renderer():
         assert param[0] == 'int'
 
 
-def test_typedef_renderer():
+def test_render_typedef():
     member_def = TestMemberDef(kind='typedef', definition='typedef int foo')
     signature = find_node(render(member_def, TypedefMemberDefTypeSubRenderer), 'desc_signature')
     assert signature.astext() == 'typedef int foo'
+
+
+def test_render_const_func():
+    member_def = TestMemberDef(kind='function', definition='void f', argsstring='() const',
+                               virt='non-virtual', const='yes')
+    signature = find_node(render(member_def, FuncMemberDefTypeSubRenderer), 'desc_signature')
+    assert '_CPPv2NK1fEv' in signature['ids']
