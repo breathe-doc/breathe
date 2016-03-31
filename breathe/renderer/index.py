@@ -1,5 +1,7 @@
 
+from docutils import nodes
 from .base import Renderer
+
 
 class DoxygenTypeSubRenderer(Renderer):
 
@@ -14,6 +16,24 @@ class DoxygenTypeSubRenderer(Renderer):
             nodelist.extend(compound_renderer.render())
 
         return nodelist
+
+
+class NodeFinder(nodes.SparseNodeVisitor):
+    """Find the Docutils desc_signature declarator and desc_content nodes."""
+
+    def __init__(self, document):
+        nodes.SparseNodeVisitor.__init__(self, document)
+        self.declarator = None
+        self.content = None
+
+    def visit_desc_signature(self, node):
+        # Find the last signature node because it contains the actual declarator
+        # rather than "template <...>". In Sphinx 1.4.1 we'll be able to use sphinx_cpp_tagname:
+        # https://github.com/michaeljones/breathe/issues/242
+        self.declarator = node
+
+    def visit_desc_content(self, node):
+        self.content = node
 
 
 class CompoundRenderer(Renderer):
@@ -40,18 +60,20 @@ class CompoundRenderer(Renderer):
         self.context.directive_args[1] = [self.get_fully_qualified_name()]
         nodes = self.run_domain_directive(kind, self.context.directive_args[1])
         node = nodes[1]
-        signode, contentnode = node.children
+
+        finder = NodeFinder(node.document)
+        node.walk(finder)
 
         # The cpp domain in Sphinx doesn't support structs at the moment, so change the text from "class "
         # to the correct kind which can be "class " or "struct ".
-        signode[0] = self.node_factory.desc_annotation(kind + ' ', kind + ' ')
+        finder.declarator[0] = self.node_factory.desc_annotation(kind + ' ', kind + ' ')
 
         # Check if there is template information and format it as desired
         template_signode = self.create_template_node(file_data.compounddef)
         if template_signode:
             node.insert(0, template_signode)
         node.children[0].insert(0, doxygen_target)
-        return nodes, contentnode
+        return nodes, finder.content
 
     def render(self):
 
