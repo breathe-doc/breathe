@@ -403,15 +403,24 @@ class EnumMemberDefTypeSubRenderer(MemberDefTypeSubRenderer):
 
 class TypedefMemberDefTypeSubRenderer(MemberDefTypeSubRenderer):
 
-    def declaration(self):
-        decl = get_definition_without_template_args(self.data_object)
+    def __init__(self, *args):
+        MemberDefTypeSubRenderer.__init__(self, *args)
+        self.decl = get_definition_without_template_args(self.data_object)
         typedef = "typedef "
         usingalias = "using "
-        if decl.startswith(typedef):
-            decl = decl[len(typedef):]
-        elif decl.startswith(usingalias):
-            decl = decl[len(usingalias):]
-        return decl
+        self.kind = self.data_object.kind
+        if self.decl.startswith(typedef):
+            self.decl = self.decl[len(typedef):]
+        elif self.decl.startswith(usingalias):
+            self.decl = self.decl[len(usingalias):]
+            self.kind = "using"
+
+    def objtype(self):
+        """Return the type of the rendered object."""
+        return self.kind
+
+    def declaration(self):
+        return self.decl
 
 
 class VariableMemberDefTypeSubRenderer(MemberDefTypeSubRenderer):
