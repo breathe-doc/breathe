@@ -302,11 +302,6 @@ def get_definition_without_template_args(data_object):
 class FuncMemberDefTypeSubRenderer(MemberDefTypeSubRenderer):
 
     def update_signature(self, signode):
-
-        # Note whether a member function is virtual
-        if self.data_object.virt != 'non-virtual':
-            signode.insert(0, self.node_factory.Text('virtual '))
-
         # Add `= 0` for pure virtual members.
         if self.data_object.virt == 'pure-virtual':
             signode.append(self.node_factory.Text(' = 0'))
@@ -320,10 +315,6 @@ class FuncMemberDefTypeSubRenderer(MemberDefTypeSubRenderer):
             param_list.append(param_decl)
         signature = '{0}({1})'.format(get_definition_without_template_args(self.data_object),
                                       ', '.join(param_list))
-        # Remove 'virtual' keyword as Sphinx 1.2 doesn't support virtual functions.
-        virtual = 'virtual '
-        if signature.startswith(virtual):
-            signature = signature[len(virtual):]
 
         # Add CV-qualifiers.
         if self.data_object.const == 'yes':
@@ -415,8 +406,11 @@ class TypedefMemberDefTypeSubRenderer(MemberDefTypeSubRenderer):
     def declaration(self):
         decl = get_definition_without_template_args(self.data_object)
         typedef = "typedef "
+        usingalias = "using "
         if decl.startswith(typedef):
             decl = decl[len(typedef):]
+        elif decl.startswith(usingalias):
+            decl = decl[len(usingalias):]
         return decl
 
 
