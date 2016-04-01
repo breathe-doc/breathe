@@ -769,7 +769,7 @@ class FileStateCache(object):
 
         stale = []
 
-        for filename, info in self.app.env.breathe_file_state.iteritems():
+        for filename, info in self.app.env.breathe_file_state.items():
             old_mtime, docnames = info
             if self.mtimer.get_mtime(filename) > old_mtime:
                 stale.extend(docnames)
@@ -783,7 +783,7 @@ class FileStateCache(object):
 
         toremove = []
 
-        for filename, info in self.app.env.breathe_file_state.iteritems():
+        for filename, info in self.app.env.breathe_file_state.items():
 
             _, docnames = info
             docnames.discard(docname)
