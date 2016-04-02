@@ -230,6 +230,12 @@ def test_render_typedef():
     assert signature.astext() == 'typedef int foo'
 
 
+def test_render_using_alias():
+    member_def = TestMemberDef(kind='typedef', definition='using foo = int')
+    signature = find_node(render(member_def, TypedefMemberDefTypeSubRenderer), 'desc_signature')
+    assert signature.astext() == 'using foo = int'
+
+
 def test_render_const_func():
     member_def = TestMemberDef(kind='function', definition='void f', argsstring='() const',
                                virt='non-virtual', const='yes')
