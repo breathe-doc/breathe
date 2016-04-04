@@ -581,8 +581,6 @@ class DocParaTypeSubRenderer(Renderer):
     def render(self):
 
         nodelist = renderIterable(self, self.data_object.content)
-
-        nodelist.extend(renderIterable(self, self.data_object.programlisting))
         nodelist.extend(renderIterable(self, self.data_object.images))
 
         # Returns, user par's, etc
