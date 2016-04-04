@@ -1,5 +1,6 @@
 """
 Generated Mon Feb  9 19:08:05 2009 by generateDS.py.
+This file contains manual modifications.
 """
 
 from xml.dom import minidom
@@ -847,7 +848,10 @@ class docParaTypeSub(supermod.docParaType):
         elif child_.nodeType == Node.ELEMENT_NODE and nodeName_ == 'programlisting':
             obj_ = supermod.listingType.factory()
             obj_.build(child_)
-            self.programlisting.append(obj_)
+            # Add programlisting nodes to self.content rather than self.programlisting,
+            # because programlisting and content nodes can interleave as shown in
+            # https://www.stack.nl/~dimitri/doxygen/manual/examples/include/html/example.html.
+            self.content.append(obj_)
         elif child_.nodeType == Node.ELEMENT_NODE and nodeName_ == 'image':
             obj_ = supermod.docImageType.factory()
             obj_.build(child_)
