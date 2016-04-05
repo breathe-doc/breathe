@@ -55,7 +55,6 @@ class Renderer(object):
     def __init__(
             self,
             project_info,
-            context,
             renderer_factory,
             node_factory,
             state,
@@ -64,13 +63,15 @@ class Renderer(object):
     ):
 
         self.project_info = project_info
-        self.context = context
         self.renderer_factory = renderer_factory
         self.node_factory = node_factory
         self.state = state
         self.document = document
         self.target_handler = target_handler
+        self.context = None
 
+    def set_context(self, context):
+        self.context = context
         if self.context.domain == '':
             self.context.domain = self.get_domain()
 

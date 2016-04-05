@@ -77,8 +77,21 @@ class DoxygenToRstRendererFactory(object):
         self.document = document
         self.filter_ = filter_
         self.target_handler = target_handler
+        self.renderer = compoundrenderer.SphinxRenderer(
+            self.project_info,
+            self,
+            create_node_factory(),
+            self.state,
+            self.document,
+            self.target_handler
+        )
 
-    def create_renderer(
+    def create_renderer(self, context):
+        renderer = self.do_create_renderer(context)
+        renderer.set_context(context)
+        return renderer
+
+    def do_create_renderer(
             self,
             context
             ):
@@ -112,7 +125,6 @@ class DoxygenToRstRendererFactory(object):
 
         common_args = [
             self.project_info,
-            context,
             child_renderer_factory,
             node_factory,
             self.state,
@@ -166,18 +178,7 @@ class DoxygenToRstRendererFactory(object):
             )
 
         if node_type == "memberdef":
-
-            if data_object.kind in ("function", "slot") or \
-                    (data_object.kind == 'friend' and data_object.argsstring):
-                Renderer = compoundrenderer.FuncMemberDefTypeSubRenderer
-            elif data_object.kind == "enum":
-                Renderer = compoundrenderer.EnumMemberDefTypeSubRenderer
-            elif data_object.kind == "typedef":
-                Renderer = compoundrenderer.TypedefMemberDefTypeSubRenderer
-            elif data_object.kind == "variable":
-                Renderer = compoundrenderer.VariableMemberDefTypeSubRenderer
-            elif data_object.kind == "define":
-                Renderer = compoundrenderer.DefineMemberDefTypeSubRenderer
+            return self.renderer
 
         if node_type == "param":
             return Renderer(
@@ -236,9 +237,9 @@ class DoxygenToRstRendererFactoryCreator(object):
             "compound": CreateCompoundTypeSubRenderer(self.parser_factory),
             "doxygendef": compoundrenderer.DoxygenTypeSubRenderer,
             "compounddef": compoundrenderer.CompoundDefTypeSubRenderer,
-            "sectiondef": compoundrenderer.SectionDefTypeSubRenderer,
-            "memberdef": compoundrenderer.MemberDefTypeSubRenderer,
-            "enumvalue": compoundrenderer.EnumvalueTypeSubRenderer,
+            "sectiondef": compoundrenderer.SphinxRenderer,
+            "memberdef": compoundrenderer.SphinxRenderer,
+            "enumvalue": compoundrenderer.SphinxRenderer,
             "linkedtext": compoundrenderer.LinkedTextTypeSubRenderer,
             "description": compoundrenderer.DescriptionTypeSubRenderer,
             "param": compoundrenderer.ParamTypeSubRenderer,
