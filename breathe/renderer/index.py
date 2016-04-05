@@ -5,7 +5,7 @@ from .base import Renderer
 
 class DoxygenTypeSubRenderer(Renderer):
 
-    def render(self):
+    def render(self, node):
 
         nodelist = []
 
@@ -13,7 +13,7 @@ class DoxygenTypeSubRenderer(Renderer):
         for compound in self.data_object.get_compound():
             context = self.context.create_child_context(compound)
             compound_renderer = self.renderer_factory.create_renderer(context)
-            nodelist.extend(compound_renderer.render())
+            nodelist.extend(compound_renderer.render(context.node_stack[0]))
 
         return nodelist
 
@@ -75,14 +75,14 @@ class CompoundRenderer(Renderer):
         node.children[0].insert(0, doxygen_target)
         return nodes, finder.content
 
-    def render(self):
+    def render(self, node):
 
         # Read in the corresponding xml file and process
         file_data = self.compound_parser.parse(self.data_object.refid)
 
         parent_context = self.context.create_child_context(file_data)
         data_renderer = self.renderer_factory.create_renderer(parent_context)
-        rendered_data = data_renderer.render()
+        rendered_data = data_renderer.render(parent_context.node_stack[0])
 
         if not rendered_data and not self.render_empty_node:
             return []
@@ -96,7 +96,7 @@ class CompoundRenderer(Renderer):
             for include in file_data.compounddef.includes:
                 context = new_context.create_child_context(include)
                 renderer = self.renderer_factory.create_renderer(context)
-                contentnode.extend(renderer.render())
+                contentnode.extend(renderer.render(context.node_stack[0]))
 
         contentnode.extend(rendered_data)
         return nodes

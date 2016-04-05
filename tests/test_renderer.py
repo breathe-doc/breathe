@@ -209,7 +209,7 @@ def render(member_def, renderer_class):
                               None,  # state
                               None,  # document
                               MockTargetHandler())
-    return renderer.render()
+    return renderer.render(member_def)
 
 
 def test_render_func():
