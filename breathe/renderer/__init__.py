@@ -39,12 +39,11 @@ class UnicodeRenderer(Renderer):
         #
         # We counter that second issue slightly by allowing through single white spaces
         #
-        if self.data_object.strip():
-            return [self.node_factory.Text(self.data_object)]
-        elif self.data_object == unicode(" "):
-            return [self.node_factory.Text(self.data_object)]
-        else:
-            return []
+        if node.strip():
+            return [self.node_factory.Text(node)]
+        if node == unicode(" "):
+            return [self.node_factory.Text(node)]
+        return []
 
 
 class NullRenderer(Renderer):
