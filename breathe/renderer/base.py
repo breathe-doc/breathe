@@ -65,7 +65,6 @@ class Renderer(object):
 
         self.project_info = project_info
         self.context = context
-        self.data_object = context.node_stack[0]
         self.renderer_factory = renderer_factory
         self.node_factory = node_factory
         self.state = state
