@@ -142,7 +142,7 @@ class Renderer(object):
         renderer = self.renderer_factory.create_renderer(context)
         template = 'template '
         nodes = [self.node_factory.desc_annotation(template, template), self.node_factory.Text('<')]
-        nodes.extend(renderer.render())
+        nodes.extend(renderer.render(context.node_stack[0]))
         nodes.append(self.node_factory.Text(">"))
         signode = self.node_factory.desc_signature()
         signode.extend(nodes)

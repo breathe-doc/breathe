@@ -30,7 +30,7 @@ class RstContentCreator(object):
 
 class UnicodeRenderer(Renderer):
 
-    def render(self):
+    def render(self, node):
 
         # Skip any nodes that are pure whitespace
         # Probably need a better way to do this as currently we're only doing
@@ -52,7 +52,7 @@ class NullRenderer(Renderer):
     def __init__(self):
         pass
 
-    def render(self):
+    def render(self, node):
         return []
 
 

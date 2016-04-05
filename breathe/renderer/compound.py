@@ -9,7 +9,7 @@ def render(renderer, attribute):
     if attribute:
         context = renderer.context.create_child_context(attribute)
         child_renderer = renderer.renderer_factory.create_renderer(context)
-        return child_renderer.render()
+        return child_renderer.render(context.node_stack[0])
     return []
 
 
@@ -18,7 +18,7 @@ def renderIterable(renderer, iterable):
     for entry in iterable:
         context = renderer.context.create_child_context(entry)
         child_renderer = renderer.renderer_factory.create_renderer(context)
-        output.extend(child_renderer.render())
+        output.extend(child_renderer.render(context.node_stack[0]))
     return output
 
 
@@ -32,11 +32,11 @@ def intersperse(iterable, delimiter):
 
 class DoxygenTypeSubRenderer(Renderer):
 
-    def render(self):
+    def render(self, node):
 
-        context = self.context.create_child_context(self.data_object.compounddef)
+        context = self.context.create_child_context(node.compounddef)
         compound_renderer = self.renderer_factory.create_renderer(context)
-        return compound_renderer.render()
+        return compound_renderer.render(context.node_stack[0])
 
 
 class CompoundDefTypeSubRenderer(Renderer):
@@ -83,7 +83,7 @@ class CompoundDefTypeSubRenderer(Renderer):
         ("var",  "Variables"),
     ]
 
-    def render(self):
+    def render(self, node):
 
         nodelist = []
 
@@ -120,20 +120,20 @@ class CompoundDefTypeSubRenderer(Renderer):
         for sectiondef in self.data_object.sectiondef:
             context = self.context.create_child_context(sectiondef)
             renderer = self.renderer_factory.create_renderer(context)
-            child_nodes = renderer.render()
+            child_nodes = renderer.render(context.node_stack[0])
             if not child_nodes:
                 # Skip empty section
                 continue
             kind = sectiondef.kind
-            node = self.node_factory.container(classes=['breathe-sectiondef'])
-            node.document = self.state.document
-            node['objtype'] = kind
-            node.extend(child_nodes)
+            rst_node = self.node_factory.container(classes=['breathe-sectiondef'])
+            rst_node.document = self.state.document
+            rst_node['objtype'] = kind
+            rst_node.extend(child_nodes)
             # We store the nodes as a list against the kind in a dictionary as the kind can be
             # 'user-edited' and that can repeat so this allows us to collect all the 'user-edited'
             # entries together
             nodes = section_nodelists.setdefault(kind, [])
-            nodes += [node]
+            nodes += [rst_node]
 
         # Order the results in an appropriate manner
         for kind, _ in self.sections:
@@ -150,7 +150,7 @@ class SectionDefTypeSubRenderer(Renderer):
 
     section_titles = dict(CompoundDefTypeSubRenderer.sections)
 
-    def render(self):
+    def render(self, node):
 
         node_list = []
 
@@ -231,11 +231,11 @@ class MemberDefTypeSubRenderer(Renderer):
         else:
             signode.insert(0, annotation)
 
-    def render(self):
+    def render(self, node):
         nodes = self.run_domain_directive(self.objtype(), [self.declaration().replace('\n', ' ')])
-        node = nodes[1]
-        signode = node[0]
-        contentnode = node[-1]
+        rst_node = nodes[1]
+        signode = rst_node[0]
+        contentnode = rst_node[-1]
         self.update_signature(signode)
         signode.insert(0, self.create_doxygen_target())
         contentnode.extend(self.description())
@@ -306,41 +306,41 @@ class FuncMemberDefTypeSubRenderer(MemberDefTypeSubRenderer):
         if self.data_object.virt == 'pure-virtual':
             signode.append(self.node_factory.Text(' = 0'))
 
-    def render(self):
+    def render(self, node):
         # Get full function signature for the domain directive.
         param_list = []
-        for param in self.data_object.param:
+        for param in node.param:
             param = self.context.mask_factory.mask(param)
             param_decl = get_param_decl(param)
             param_list.append(param_decl)
-        signature = '{0}({1})'.format(get_definition_without_template_args(self.data_object),
+        signature = '{0}({1})'.format(get_definition_without_template_args(node),
                                       ', '.join(param_list))
 
         # Add CV-qualifiers.
-        if self.data_object.const == 'yes':
+        if node.const == 'yes':
             signature += ' const'
         # The doxygen xml output doesn't register 'volatile' as the xml attribute for functions
         # until version 1.8.8 so we also check argsstring:
         #     https://bugzilla.gnome.org/show_bug.cgi?id=733451
-        if self.data_object.volatile == 'yes' or self.data_object.argsstring.endswith('volatile'):
+        if node.volatile == 'yes' or node.argsstring.endswith('volatile'):
             signature += ' volatile'
 
         self.context.directive_args[1] = [signature]
 
-        nodes = self.run_domain_directive(self.data_object.kind, self.context.directive_args[1])
-        node = nodes[1]
-        finder = NodeFinder(node.document)
-        node.walk(finder)
+        nodes = self.run_domain_directive(node.kind, self.context.directive_args[1])
+        rst_node = nodes[1]
+        finder = NodeFinder(rst_node.document)
+        rst_node.walk(finder)
 
         # Templates have multiple signature nodes in recent versions of Sphinx.
         # Insert Doxygen target into the first signature node.
-        node.children[0].insert(0, self.create_doxygen_target())
+        rst_node.children[0].insert(0, self.create_doxygen_target())
         self.update_signature(finder.declarator)
         finder.content.extend(self.description())
 
-        template_node = self.create_template_node(self.data_object)
+        template_node = self.create_template_node(node)
         if template_node:
-            node.insert(0, template_node)
+            rst_node.insert(0, template_node)
         return nodes
 
 
@@ -448,7 +448,7 @@ class EnumvalueTypeSubRenderer(MemberDefTypeSubRenderer):
         if initializer:
             context = self.context.create_child_context(initializer)
             renderer = self.renderer_factory.create_renderer(context)
-            nodes = renderer.render()
+            nodes = renderer.render(context.node_stack[0])
             separator = ' '
             if not nodes[0].startswith('='):
                 separator += '= '
@@ -458,7 +458,7 @@ class EnumvalueTypeSubRenderer(MemberDefTypeSubRenderer):
 
 class CompoundRefTypeSubRenderer(Renderer):
 
-    def render(self):
+    def render(self, node):
 
         nodelist = renderIterable(self, self.data_object.content_)
 
@@ -480,13 +480,13 @@ class CompoundRefTypeSubRenderer(Renderer):
 
 class DescriptionTypeSubRenderer(Renderer):
 
-    def render(self):
+    def render(self, node):
         return renderIterable(self, self.data_object.content_)
 
 
 class LinkedTextTypeSubRenderer(Renderer):
 
-    def render(self):
+    def render(self, node):
         return renderIterable(self, self.data_object.content_)
 
 
@@ -501,7 +501,7 @@ class ParamTypeSubRenderer(Renderer):
         Renderer.__init__(self, *args)
         self.output_defname = output_defname
 
-    def render(self):
+    def render(self, node):
 
         nodelist = []
 
@@ -509,7 +509,7 @@ class ParamTypeSubRenderer(Renderer):
         if self.data_object.type_:
             context = self.context.create_child_context(self.data_object.type_)
             renderer = self.renderer_factory.create_renderer(context)
-            type_nodes = renderer.render()
+            type_nodes = renderer.render(context.node_stack[0])
             # Render keywords as annotations for consistency with the cpp domain.
             if len(type_nodes) > 0:
                 first_node = type_nodes[0]
@@ -542,14 +542,14 @@ class ParamTypeSubRenderer(Renderer):
             nodelist.append(self.node_factory.Text(" = "))
             context = self.context.create_child_context(self.data_object.defval)
             renderer = self.renderer_factory.create_renderer(context)
-            nodelist.extend(renderer.render())
+            nodelist.extend(renderer.render(context.node_stack[0]))
 
         return nodelist
 
 
 class DocRefTextTypeSubRenderer(Renderer):
 
-    def render(self):
+    def render(self, node):
 
         nodelist = renderIterable(self, self.data_object.content_)
         nodelist.extend(renderIterable(self, self.data_object.para))
@@ -578,7 +578,7 @@ class DocParaTypeSubRenderer(Renderer):
     things tend to each be in a separate neighbouring para tag.
     """
 
-    def render(self):
+    def render(self, node):
 
         nodelist = renderIterable(self, self.data_object.content)
         nodelist.extend(renderIterable(self, self.data_object.images))
@@ -598,7 +598,7 @@ class DocParaTypeSubRenderer(Renderer):
 class DocImageTypeSubRenderer(Renderer):
     """Output docutils image node using name attribute from xml as the uri"""
 
-    def render(self):
+    def render(self, node):
 
         path_to_image = self.project_info.sphinx_abs_path_to_file(
             self.data_object.name
@@ -620,7 +620,7 @@ class DocMarkupTypeSubRenderer(Renderer):
         Renderer.__init__(self, *args)
         self.creator = creator
 
-    def render(self):
+    def render(self, node):
 
         nodelist = renderIterable(self, self.data_object.content_)
         return [self.creator("", "", *nodelist)]
@@ -636,7 +636,7 @@ class DocParamListTypeSubRenderer(Renderer):
         "retval": "Return Value",
     }
 
-    def render(self):
+    def render(self, node):
 
         nodelist = renderIterable(self, self.data_object.parameteritem)
 
@@ -654,7 +654,7 @@ class DocParamListTypeSubRenderer(Renderer):
 class DocParamListItemSubRenderer(Renderer):
     """ Parameter Description Renderer  """
 
-    def render(self):
+    def render(self, node):
 
         nodelist = renderIterable(self, self.data_object.parameternamelist)
 
@@ -670,19 +670,19 @@ class DocParamListItemSubRenderer(Renderer):
 class DocParamNameListSubRenderer(Renderer):
     """ Parameter Name Renderer """
 
-    def render(self):
+    def render(self, node):
         return renderIterable(self, self.data_object.parametername)
 
 
 class DocParamNameSubRenderer(Renderer):
 
-    def render(self):
+    def render(self, node):
         return renderIterable(self, self.data_object.content_)
 
 
 class DocSect1TypeSubRenderer(Renderer):
 
-    def render(self):
+    def render(self, node):
 
         return []
 
@@ -696,7 +696,7 @@ class DocSimpleSectTypeSubRenderer(Renderer):
 
         return [self.node_factory.strong("", text)]
 
-    def render(self):
+    def render(self, node):
 
         nodelist = renderIterable(self, self.data_object.para)
 
@@ -713,18 +713,18 @@ class ParDocSimpleSectTypeSubRenderer(DocSimpleSectTypeSubRenderer):
         context = self.context.create_child_context(self.data_object.title)
         renderer = self.renderer_factory.create_renderer(context)
 
-        return [self.node_factory.strong("", *renderer.render())]
+        return [self.node_factory.strong("", *renderer.render(context.node_stack[0]))]
 
 
 class DocTitleTypeSubRenderer(Renderer):
 
-    def render(self):
+    def render(self, node):
         return renderIterable(self, self.data_object.content_)
 
 
 class DocFormulaTypeSubRenderer(Renderer):
 
-    def render(self):
+    def render(self, node):
 
         nodelist = []
 
@@ -734,17 +734,17 @@ class DocFormulaTypeSubRenderer(Renderer):
 
             # Somewhat hacky if statements to strip out the doxygen markup that slips through
 
-            node = None
+            rst_node = None
 
             # Either inline
             if latex.startswith("$") and latex.endswith("$"):
                 latex = latex[1:-1]
 
                 # If we're inline create a math node like the :math: role
-                node = self.node_factory.math()
+                rst_node = self.node_factory.math()
             else:
                 # Else we're multiline
-                node = self.node_factory.displaymath()
+                rst_node = self.node_factory.displaymath()
 
             # Or multiline
             if latex.startswith("\[") and latex.endswith("\]"):
@@ -752,21 +752,21 @@ class DocFormulaTypeSubRenderer(Renderer):
 
             # Here we steal the core of the mathbase "math" directive handling code from:
             #    sphinx.ext.mathbase
-            node["latex"] = latex
+            rst_node["latex"] = latex
 
             # Required parameters which we don't have values for
-            node["label"] = None
-            node["nowrap"] = False
-            node["docname"] = self.state.document.settings.env.docname
+            rst_node["label"] = None
+            rst_node["nowrap"] = False
+            rst_node["docname"] = self.state.document.settings.env.docname
 
-            nodelist.append(node)
+            nodelist.append(rst_node)
 
         return nodelist
 
 
 class ListingTypeSubRenderer(Renderer):
 
-    def render(self):
+    def render(self, node):
 
         nodelist = []
         for i, item in enumerate(self.data_object.codeline):
@@ -775,7 +775,7 @@ class ListingTypeSubRenderer(Renderer):
                 nodelist.append(self.node_factory.Text("\n"))
             context = self.context.create_child_context(item)
             renderer = self.renderer_factory.create_renderer(context)
-            nodelist.extend(renderer.render())
+            nodelist.extend(renderer.render(context.node_stack[0]))
 
         # Add blank string at the start otherwise for some reason it renders
         # the pending_xref tags around the kind in plain text
@@ -790,19 +790,19 @@ class ListingTypeSubRenderer(Renderer):
 
 class CodeLineTypeSubRenderer(Renderer):
 
-    def render(self):
+    def render(self, node):
         return renderIterable(self, self.data_object.highlight)
 
 
 class HighlightTypeSubRenderer(Renderer):
 
-    def render(self):
+    def render(self, node):
         return renderIterable(self, self.data_object.content_)
 
 
 class TemplateParamListRenderer(Renderer):
 
-    def render(self):
+    def render(self, node):
 
         nodelist = []
 
@@ -811,14 +811,14 @@ class TemplateParamListRenderer(Renderer):
                 nodelist.append(self.node_factory.Text(", "))
             context = self.context.create_child_context(item)
             renderer = self.renderer_factory.create_renderer(context)
-            nodelist.extend(renderer.render())
+            nodelist.extend(renderer.render(context.node_stack[0]))
 
         return nodelist
 
 
 class IncTypeSubRenderer(Renderer):
 
-    def render(self):
+    def render(self, node):
 
         if self.data_object.local == u"yes":
             text = '#include "%s"' % self.data_object.content_[0].getValue()
@@ -846,7 +846,7 @@ class VerbatimTypeSubRenderer(Renderer):
 
         self.content_creator = content_creator
 
-    def render(self):
+    def render(self, node):
 
         if not self.data_object.text.strip().startswith("embed:rst"):
 
@@ -879,18 +879,18 @@ class VerbatimTypeSubRenderer(Renderer):
         rst = self.content_creator(self.data_object.text)
 
         # Parent node for the generated node subtree
-        node = self.node_factory.paragraph()
-        node.document = self.state.document
+        rst_node = self.node_factory.paragraph()
+        rst_node.document = self.state.document
 
         # Generate node subtree
-        self.state.nested_parse(rst, 0, node)
+        self.state.nested_parse(rst, 0, rst_node)
 
-        return node
+        return rst_node
 
 
 class MixedContainerRenderer(Renderer):
 
-    def render(self):
+    def render(self, node):
         return render(self, self.data_object.getValue())
 
 
@@ -913,15 +913,15 @@ class DocListNestedRenderer(object):
         import functools
         return functools.partial(self.__call__, obj)
 
-    def __call__(self, rend_self):
+    def __call__(self, rend_self, node):
         """ Call the wrapped render function. Update the nesting level for the enumerated lists. """
         rend_instance = rend_self
         if rend_instance.data_object.node_subtype is "itemized":
-            val = self.__render(rend_instance)
+            val = self.__render(rend_instance, node)
             return DocListNestedRenderer.render_unordered(rend_instance, children=val)
         elif rend_instance.data_object.node_subtype is "ordered":
             self.__nesting_level += 1
-            val = self.__render(rend_instance)
+            val = self.__render(rend_instance, node)
             self.__nesting_level -= 1
             return DocListNestedRenderer.render_enumerated(rend_instance, children=val,
                                                            nesting_level=self.__nesting_level)
@@ -953,7 +953,7 @@ class DocListTypeSubRenderer(Renderer):
     """
 
     @DocListNestedRenderer
-    def render(self):
+    def render(self, node):
         """ Render all the children depth-first. """
         return renderIterable(self, self.data_object.listitem)
 
@@ -962,7 +962,7 @@ class DocListItemTypeSubRenderer(Renderer):
     """List item renderer.
     """
 
-    def render(self):
+    def render(self, node):
         """ Render all the children depth-first.
             Upon return expand the children node list into a docutils list-item.
         """
@@ -977,7 +977,7 @@ class DocHeadingTypeSubRenderer(Renderer):
     are not supported.
     """
 
-    def render(self):
+    def render(self, node):
         nodelist = renderIterable(self, self.data_object.content_)
         return [self.node_factory.emphasis("", "", *nodelist)]
 
@@ -985,6 +985,6 @@ class DocHeadingTypeSubRenderer(Renderer):
 class DocURLLinkSubRenderer(Renderer):
     """Url Link Renderer"""
 
-    def render(self):
+    def render(self, node):
         nodelist = renderIterable(self, self.data_object.content_)
         return [self.node_factory.reference("", "", refuri=self.data_object.url, *nodelist)]
