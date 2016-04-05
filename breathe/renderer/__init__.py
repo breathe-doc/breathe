@@ -132,29 +132,6 @@ class DoxygenToRstRendererFactory(object):
             self.target_handler,
         ]
 
-        if node_type == "docmarkup":
-
-            creator = node_factory.inline
-            if data_object.type_ == "emphasis":
-                creator = node_factory.emphasis
-            elif data_object.type_ == "computeroutput":
-                creator = node_factory.literal
-            elif data_object.type_ == "bold":
-                creator = node_factory.strong
-            elif data_object.type_ == "superscript":
-                creator = node_factory.superscript
-            elif data_object.type_ == "subscript":
-                creator = node_factory.subscript
-            elif data_object.type_ == "center":
-                print("Warning: does not currently handle 'center' text display")
-            elif data_object.type_ == "small":
-                print("Warning: does not currently handle 'small' text display")
-
-            return Renderer(
-                creator,
-                *common_args
-            )
-
         if node_type == "verbatim":
 
             return Renderer(
@@ -179,16 +156,6 @@ class DoxygenToRstRendererFactory(object):
 
         if node_type == "memberdef":
             return self.renderer
-
-        if node_type == "param":
-            return Renderer(
-                parent_data_object.node_type != "templateparamlist",
-                *common_args
-            )
-
-        if node_type == "docsimplesect":
-            if data_object.kind == "par":
-                Renderer = compoundrenderer.ParDocSimpleSectTypeSubRenderer
 
         return Renderer(
             *common_args
@@ -235,35 +202,35 @@ class DoxygenToRstRendererFactoryCreator(object):
         renderers = {
             "doxygen": indexrenderer.DoxygenTypeSubRenderer,
             "compound": CreateCompoundTypeSubRenderer(self.parser_factory),
-            "doxygendef": compoundrenderer.DoxygenTypeSubRenderer,
-            "compounddef": compoundrenderer.CompoundDefTypeSubRenderer,
+            "doxygendef": compoundrenderer.SphinxRenderer,
+            "compounddef": compoundrenderer.SphinxRenderer,
             "sectiondef": compoundrenderer.SphinxRenderer,
             "memberdef": compoundrenderer.SphinxRenderer,
             "enumvalue": compoundrenderer.SphinxRenderer,
-            "linkedtext": compoundrenderer.LinkedTextTypeSubRenderer,
-            "description": compoundrenderer.DescriptionTypeSubRenderer,
-            "param": compoundrenderer.ParamTypeSubRenderer,
-            "docreftext": compoundrenderer.DocRefTextTypeSubRenderer,
+            "linkedtext": compoundrenderer.SphinxRenderer,
+            "description": compoundrenderer.SphinxRenderer,
+            "param": compoundrenderer.SphinxRenderer,
+            "docreftext": compoundrenderer.SphinxRenderer,
             "docheading": compoundrenderer.DocHeadingTypeSubRenderer,
-            "docpara": compoundrenderer.DocParaTypeSubRenderer,
-            "docmarkup": compoundrenderer.DocMarkupTypeSubRenderer,
-            "docparamlist": compoundrenderer.DocParamListTypeSubRenderer,
-            "docparamlistitem": compoundrenderer.DocParamListItemSubRenderer,
-            "docparamnamelist": compoundrenderer.DocParamNameListSubRenderer,
-            "docparamname": compoundrenderer.DocParamNameSubRenderer,
-            "docsect1": compoundrenderer.DocSect1TypeSubRenderer,
-            "docsimplesect": compoundrenderer.DocSimpleSectTypeSubRenderer,
-            "doctitle": compoundrenderer.DocTitleTypeSubRenderer,
-            "docformula": compoundrenderer.DocFormulaTypeSubRenderer,
-            "docimage": compoundrenderer.DocImageTypeSubRenderer,
+            "docpara": compoundrenderer.SphinxRenderer,
+            "docmarkup": compoundrenderer.SphinxRenderer,
+            "docparamlist": compoundrenderer.SphinxRenderer,
+            "docparamlistitem": compoundrenderer.SphinxRenderer,
+            "docparamnamelist": compoundrenderer.SphinxRenderer,
+            "docparamname": compoundrenderer.SphinxRenderer,
+            "docsect1": compoundrenderer.SphinxRenderer,
+            "docsimplesect": compoundrenderer.SphinxRenderer,
+            "doctitle": compoundrenderer.SphinxRenderer,
+            "docformula": compoundrenderer.SphinxRenderer,
+            "docimage": compoundrenderer.SphinxRenderer,
             "docurllink": compoundrenderer.DocURLLinkSubRenderer,
-            "listing": compoundrenderer.ListingTypeSubRenderer,
-            "codeline": compoundrenderer.CodeLineTypeSubRenderer,
-            "highlight": compoundrenderer.HighlightTypeSubRenderer,
-            "templateparamlist": compoundrenderer.TemplateParamListRenderer,
-            "inc": compoundrenderer.IncTypeSubRenderer,
+            "listing": compoundrenderer.SphinxRenderer,
+            "codeline": compoundrenderer.SphinxRenderer,
+            "highlight": compoundrenderer.SphinxRenderer,
+            "templateparamlist": compoundrenderer.SphinxRenderer,
+            "inc": compoundrenderer.SphinxRenderer,
             "ref": CreateRefTypeSubRenderer(self.parser_factory),
-            "compoundref": compoundrenderer.CompoundRefTypeSubRenderer,
+            "compoundref": compoundrenderer.SphinxRenderer,
             "verbatim": compoundrenderer.VerbatimTypeSubRenderer,
             "mixedcontainer": compoundrenderer.MixedContainerRenderer,
             "unicode": UnicodeRenderer,
