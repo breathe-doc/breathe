@@ -146,99 +146,6 @@ class CompoundDefTypeSubRenderer(Renderer):
         return nodelist
 
 
-class SectionDefTypeSubRenderer(Renderer):
-
-    section_titles = dict(CompoundDefTypeSubRenderer.sections)
-
-    def render(self, node):
-
-        node_list = []
-
-        node_list.extend(render(self, node.description))
-
-        # Get all the memberdef info
-        node_list.extend(renderIterable(self, node.memberdef))
-
-        if node_list:
-
-            text = self.section_titles[node.kind]
-
-            # Override default name for user-defined sections. Use "Unnamed
-            # Group" if the user didn't name the section
-            # This is different to Doxygen which will track the groups and name
-            # them Group1, Group2, Group3, etc.
-            if node.kind == "user-defined":
-                if node.header:
-                    text = node.header
-                else:
-                    text = "Unnamed Group"
-
-            # Use rubric for the title because, unlike the docutils element "section",
-            # it doesn't interfere with the document structure.
-            rubric = self.node_factory.rubric(text=text, classes=['breathe-sectiondef-title'])
-
-            return [rubric] + node_list
-
-        return []
-
-
-class MemberDefTypeSubRenderer(Renderer):
-
-    def create_doxygen_target(self, node):
-        """Can be overridden to create a target node which uses the doxygen refid information
-        which can be used for creating links between internal doxygen elements.
-
-        The default implementation should suffice most of the time.
-        """
-
-        refid = "%s%s" % (self.project_info.name(), node.id)
-        return self.target_handler.create_target(refid)
-
-    def title(self, node):
-
-        nodes = []
-
-        # Variable type or function return type
-        nodes.extend(render(self, node.type_))
-        if nodes:
-            nodes.append(self.node_factory.Text(" "))
-
-        nodes.append(self.node_factory.desc_name(text=node.name))
-
-        return nodes
-
-    def description(self, node):
-        return render(self, node.briefdescription) + render(self, node.detaileddescription)
-
-    def objtype(self, node):
-        """Return the type of the rendered object."""
-        return node.kind
-
-    def declaration(self, node):
-        """Return the declaration of the rendered object."""
-        return self.get_fully_qualified_name()
-
-    def update_signature(self, node, signode):
-        """Update the signature node if necessary, e.g. add qualifiers."""
-        prefix = self.objtype(node) + ' '
-        annotation = self.node_factory.desc_annotation(prefix, prefix)
-        if signode[0].tagname != 'desc_name':
-            signode[0] = annotation
-        else:
-            signode.insert(0, annotation)
-
-    def render(self, node):
-        nodes = self.run_domain_directive(self.objtype(node),
-                                          [self.declaration(node).replace('\n', ' ')])
-        rst_node = nodes[1]
-        signode = rst_node[0]
-        contentnode = rst_node[-1]
-        self.update_signature(node, signode)
-        signode.insert(0, self.create_doxygen_target(node))
-        contentnode.extend(self.description(node))
-        return nodes
-
-
 def get_param_decl(param):
 
     def to_string(node):
@@ -296,14 +203,100 @@ def get_definition_without_template_args(data_object):
     return definition
 
 
-class FuncMemberDefTypeSubRenderer(MemberDefTypeSubRenderer):
+class SphinxRenderer(Renderer):
+    """
+    Doxygen node visitor that converts input into Sphinx/RST representation.
+    Each visit method takes a Doxygen node as an argument and returns a list of RST nodes.
+    """
 
-    def update_signature(self, node, signode):
-        # Add `= 0` for pure virtual members.
-        if node.virt == 'pure-virtual':
-            signode.append(self.node_factory.Text(' = 0'))
+    def create_doxygen_target(self, node):
+        """Can be overridden to create a target node which uses the doxygen refid information
+        which can be used for creating links between internal doxygen elements.
 
-    def render(self, node):
+        The default implementation should suffice most of the time.
+        """
+
+        refid = "%s%s" % (self.project_info.name(), node.id)
+        return self.target_handler.create_target(refid)
+
+    def title(self, node):
+
+        nodes = []
+
+        # Variable type or function return type
+        nodes.extend(render(self, node.type_))
+        if nodes:
+            nodes.append(self.node_factory.Text(" "))
+
+        nodes.append(self.node_factory.desc_name(text=node.name))
+
+        return nodes
+
+    def description(self, node):
+        return render(self, node.briefdescription) + render(self, node.detaileddescription)
+
+    def update_signature(self, signature, obj_type):
+        """Update the signature node if necessary, e.g. add qualifiers."""
+        prefix = obj_type + ' '
+        annotation = self.node_factory.desc_annotation(prefix, prefix)
+        if signature[0].tagname != 'desc_name':
+            signature[0] = annotation
+        else:
+            signature.insert(0, annotation)
+
+    def render_declaration(self, node, declaration=None, description=None, **kwargs):
+        if declaration is None:
+            declaration = self.get_fully_qualified_name()
+        obj_type = kwargs.get('objtype', None)
+        if obj_type is None:
+            obj_type = node.kind
+        nodes = self.run_domain_directive(obj_type, [declaration.replace('\n', ' ')])
+        rst_node = nodes[1]
+        signode = rst_node[0]
+        contentnode = rst_node[-1]
+        update_signature = kwargs.get('update_signature', None)
+        if update_signature is not None:
+            update_signature(signode, obj_type)
+        if description is None:
+            description = self.description(node)
+        signode.insert(0, self.create_doxygen_target(node))
+        contentnode.extend(description)
+        return nodes
+
+    section_titles = dict(CompoundDefTypeSubRenderer.sections)
+
+    def visit_section(self, node):
+
+        node_list = []
+
+        node_list.extend(render(self, node.description))
+
+        # Get all the memberdef info
+        node_list.extend(renderIterable(self, node.memberdef))
+
+        if node_list:
+
+            text = self.section_titles[node.kind]
+
+            # Override default name for user-defined sections. Use "Unnamed
+            # Group" if the user didn't name the section
+            # This is different to Doxygen which will track the groups and name
+            # them Group1, Group2, Group3, etc.
+            if node.kind == "user-defined":
+                if node.header:
+                    text = node.header
+                else:
+                    text = "Unnamed Group"
+
+            # Use rubric for the title because, unlike the docutils element "section",
+            # it doesn't interfere with the document structure.
+            rubric = self.node_factory.rubric(text=text, classes=['breathe-sectiondef-title'])
+
+            return [rubric] + node_list
+
+        return []
+
+    def visit_function(self, node):
         # Get full function signature for the domain directive.
         param_list = []
         for param in node.param:
@@ -332,7 +325,11 @@ class FuncMemberDefTypeSubRenderer(MemberDefTypeSubRenderer):
         # Templates have multiple signature nodes in recent versions of Sphinx.
         # Insert Doxygen target into the first signature node.
         rst_node.children[0].insert(0, self.create_doxygen_target(node))
-        self.update_signature(node, finder.declarator)
+
+        # Add `= 0` for pure virtual members.
+        if node.virt == 'pure-virtual':
+            finder.declarator.append(self.node_factory.Text(' = 0'))
+
         finder.content.extend(self.description(node))
 
         template_node = self.create_template_node(node)
@@ -340,113 +337,104 @@ class FuncMemberDefTypeSubRenderer(MemberDefTypeSubRenderer):
             rst_node.insert(0, template_node)
         return nodes
 
-
-class DefineMemberDefTypeSubRenderer(MemberDefTypeSubRenderer):
-
-    def declaration(self, node):
-        decl = node.name
+    def visit_define(self, node):
+        declaration = node.name
         if node.param:
-            decl += "("
+            declaration += "("
             for i, parameter in enumerate(node.param):
                 if i:
-                    decl += ", "
-                decl += parameter.defname
-            decl += ")"
-        return decl
+                    declaration += ", "
+                declaration += parameter.defname
+            declaration += ")"
+        return self.render_declaration(node, declaration)
 
-    def update_signature(self, node, signode):
-        pass
-
-    def description(self, node):
-
-        return MemberDefTypeSubRenderer.description(self, node)
-
-
-class EnumMemberDefTypeSubRenderer(MemberDefTypeSubRenderer):
-
-    def declaration(self, node):
-
+    def visit_enum(self, node):
         # Sphinx requires a name to be a valid identifier, so replace anonymous enum name of the
         # form @id generated by Doxygen with "anonymous".
         name = self.get_fully_qualified_name()
-        return name.replace("@", "__anonymous") if node.name.startswith("@") else name
+        declaration = name.replace("@", "__anonymous") if node.name.startswith("@") else name
 
-    def description(self, node):
-
-        description_nodes = MemberDefTypeSubRenderer.description(self, node)
-
+        description_nodes = self.description(node)
         name = self.node_factory.emphasis("", self.node_factory.Text("Values:"))
         title = self.node_factory.paragraph("", "", name)
         description_nodes.append(title)
-
         enums = renderIterable(self, node.enumvalue)
-
         description_nodes.extend(enums)
 
-        return description_nodes
+        def update_signature(signature, obj_type):
+            first_node = signature.children[0]
+            if isinstance(first_node, self.node_factory.desc_annotation):
+                # Replace "type" with "enum" in the signature. This is needed because older versions of
+                # Sphinx cpp domain didn't have an enum directive and we use a type directive instead.
+                first_node[0] = self.node_factory.Text("enum ")
+            else:
+                # If there is no "type" annotation, insert "enum".
+                first_node.insert(0, self.node_factory.desc_annotation("enum ", "enum "))
+            if node.name.startswith("@"):
+                signature.children[1][0] = self.node_factory.strong(text="[anonymous]")
 
-    def update_signature(self, node, signode):
-        first_node = signode.children[0]
-        if isinstance(first_node, self.node_factory.desc_annotation):
-            # Replace "type" with "enum" in the signature. This is needed because older versions of
-            # Sphinx cpp domain didn't have an enum directive and we use a type directive instead.
-            first_node[0] = self.node_factory.Text("enum ")
-        else:
-            # If there is no "type" annotation, insert "enum".
-            first_node.insert(0, self.node_factory.desc_annotation("enum ", "enum "))
-        if node.name.startswith("@"):
-            signode.children[1][0] = self.node_factory.strong(text="[anonymous]")
+        return self.render_declaration(node, declaration, description_nodes,
+                                       update_signature=update_signature)
 
-
-class TypedefMemberDefTypeSubRenderer(MemberDefTypeSubRenderer):
-
-    def objtype(self, node):
-        decl = get_definition_without_template_args(node)
-        if decl.startswith("using "):
-            return "using"
-        return node.kind
-
-    def declaration(self, node):
-        decl = get_definition_without_template_args(node)
+    def visit_typedef(self, node):
+        declaration = get_definition_without_template_args(node)
         typedef = "typedef "
-        if decl.startswith(typedef):
-            return decl[len(typedef):]
-        usingalias = "using "
-        if decl.startswith(usingalias):
-            return decl[len(usingalias):]
-        return decl
+        using = "using "
+        obj_type = node.kind
+        if declaration.startswith(typedef):
+            declaration = declaration[len(typedef):]
+        elif declaration.startswith(using):
+            declaration = declaration[len(using):]
+            obj_type = "using"
+        return self.render_declaration(node, declaration, objtype=obj_type,
+                                       update_signature=self.update_signature)
 
-
-class VariableMemberDefTypeSubRenderer(MemberDefTypeSubRenderer):
-
-    def declaration(self, node):
-        decl = get_definition_without_template_args(node)
+    def visit_variable(self, node):
+        declaration = get_definition_without_template_args(node)
         enum = 'enum '
-        return decl[len(enum):] if decl.startswith(enum) else decl
+        if declaration.startswith(enum):
+            declaration = declaration[len(enum):]
+        return self.render_declaration(node, declaration)
 
-    def update_signature(self, node, signode):
-        pass
+    def visit_enumerator(self, node):
+        def update_signature(signature, obj_type):
+            # Remove "class" from the signature. This is needed because Sphinx cpp domain doesn't have
+            # an enum value directive and we use a class directive instead.
+            signature.children.pop(0)
+            initializer = node.initializer
+            if initializer:
+                context = self.context.create_child_context(initializer)
+                renderer = self.renderer_factory.create_renderer(context)
+                nodes = renderer.render(context.node_stack[0])
+                separator = ' '
+                if not nodes[0].startswith('='):
+                    separator += '= '
+                signature.append(self.node_factory.Text(separator))
+                signature.extend(nodes)
+        return self.render_declaration(node, objtype='enumvalue', update_signature=update_signature)
 
+    methods = {
+        "sectiondef": visit_section,
+        "enumvalue": visit_enumerator
+    }
 
-class EnumvalueTypeSubRenderer(MemberDefTypeSubRenderer):
-
-    def objtype(self, node):
-        return 'enumvalue'
-
-    def update_signature(self, node, signode):
-        # Remove "class" from the signature. This is needed because Sphinx cpp domain doesn't have
-        # an enum value directive and we use a class directive instead.
-        signode.children.pop(0)
-        initializer = node.initializer
-        if initializer:
-            context = self.context.create_child_context(initializer)
-            renderer = self.renderer_factory.create_renderer(context)
-            nodes = renderer.render(context.node_stack[0])
-            separator = ' '
-            if not nodes[0].startswith('='):
-                separator += '= '
-            signode.append(self.node_factory.Text(separator))
-            signode.extend(nodes)
+    def render(self, node):
+        method = SphinxRenderer.methods.get(node.node_type)
+        if method is not None:
+            return method(self, node)
+        if node.node_type == "memberdef":
+            if node.kind in ("function", "slot") or \
+                    (node.kind == 'friend' and node.argsstring):
+                return self.visit_function(node)
+            if node.kind == "enum":
+                return self.visit_enum(node)
+            if node.kind == "typedef":
+                return self.visit_typedef(node)
+            if node.kind == "variable":
+                return self.visit_variable(node)
+            if node.kind == "define":
+                return self.visit_define(node)
+            return self.render_declaration(node, update_signature=self.update_signature)
 
 
 class CompoundRefTypeSubRenderer(Renderer):

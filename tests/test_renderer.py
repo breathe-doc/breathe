@@ -3,7 +3,7 @@
 import sphinx.environment
 from breathe.node_factory import create_node_factory
 from breathe.parser.compound import linkedTextTypeSub, memberdefTypeSub, paramTypeSub, MixedContainer
-from breathe.renderer.compound import FuncMemberDefTypeSubRenderer, TypedefMemberDefTypeSubRenderer
+from breathe.renderer.compound import SphinxRenderer, TypedefMemberDefTypeSubRenderer
 from docutils import frontend, nodes, parsers, utils
 from sphinx.domains import CPPDomain
 
@@ -215,7 +215,7 @@ def render(member_def, renderer_class):
 def test_render_func():
     member_def = TestMemberDef(definition='void foo', argsstring='(int)', virt='non-virtual',
                                param=[TestParam(type_=TestLinkedText(content_=[TestMixedContainer(value=u'int')]))])
-    signature = find_node(render(member_def, FuncMemberDefTypeSubRenderer), 'desc_signature')
+    signature = find_node(render(member_def, SphinxRenderer), 'desc_signature')
     assert signature[0] == 'void'
     assert find_node(signature, 'desc_name')[0] == 'foo'
     params = find_node(signature, 'desc_parameterlist')
@@ -239,5 +239,5 @@ def test_render_using_alias():
 def test_render_const_func():
     member_def = TestMemberDef(kind='function', definition='void f', argsstring='() const',
                                virt='non-virtual', const='yes')
-    signature = find_node(render(member_def, FuncMemberDefTypeSubRenderer), 'desc_signature')
+    signature = find_node(render(member_def, SphinxRenderer), 'desc_signature')
     assert '_CPPv2NK1fEv' in signature['ids']
