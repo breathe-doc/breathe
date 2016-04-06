@@ -26,19 +26,13 @@ class NodeFinder(nodes.SparseNodeVisitor):
 
 
 def render(renderer, attribute):
-    if attribute:
-        context = renderer.context.create_child_context(attribute)
-        child_renderer = renderer.renderer_factory.create_renderer(context)
-        return child_renderer.render(context.node_stack[0])
-    return []
+    return renderer.render(attribute) if attribute else []
 
 
 def renderIterable(renderer, iterable):
     output = []
     for entry in iterable:
-        context = renderer.context.create_child_context(entry)
-        child_renderer = renderer.renderer_factory.create_renderer(context)
-        output.extend(child_renderer.render(context.node_stack[0]))
+        output.extend(renderer.render(entry))
     return output
 
 
@@ -194,32 +188,22 @@ class SphinxRenderer(Renderer):
 
         # Process all the compound children
         for compound in node.get_compound():
-            context = self.context.create_child_context(compound)
-            compound_renderer = self.renderer_factory.create_renderer(context)
-            nodelist.extend(compound_renderer.render(context.node_stack[0]))
+            nodelist.extend(self.render(compound))
 
         return nodelist
 
     def visit_doxygendef(self, node):
-
-        context = self.context.create_child_context(node.compounddef)
-        compound_renderer = self.renderer_factory.create_renderer(context)
-        return compound_renderer.render(context.node_stack[0])
+        return self.render(node.compounddef)
 
     def visit_compound(self, node, render_empty_node=True, **kwargs):
 
         # Read in the corresponding xml file and process
         file_data = self.compound_parser.parse(node.refid)
 
-        parent_context = self.context.create_child_context(file_data)
-        data_renderer = self.renderer_factory.create_renderer(parent_context)
-        rendered_data = data_renderer.render(parent_context.node_stack[0])
+        rendered_data = self.render(file_data)
 
         if not rendered_data and not render_empty_node:
             return []
-
-        file_data = parent_context.node_stack[0]
-        new_context = parent_context.create_child_context(file_data.compounddef)
 
         def get_node_info(file_data):
             return node.name, node.kind
@@ -251,9 +235,7 @@ class SphinxRenderer(Renderer):
 
         if file_data.compounddef.includes:
             for include in file_data.compounddef.includes:
-                context = new_context.create_child_context(include)
-                renderer = self.renderer_factory.create_renderer(context)
-                contentnode.extend(renderer.render(context.node_stack[0]))
+                contentnode.extend(self.render(include))
 
         contentnode.extend(rendered_data)
         return nodes
@@ -359,9 +341,7 @@ class SphinxRenderer(Renderer):
 
         # Get all sub sections
         for sectiondef in node.sectiondef:
-            context = self.context.create_child_context(sectiondef)
-            renderer = self.renderer_factory.create_renderer(context)
-            child_nodes = renderer.render(context.node_stack[0])
+            child_nodes = self.render(sectiondef)
             if not child_nodes:
                 # Skip empty section
                 continue
@@ -515,9 +495,7 @@ class SphinxRenderer(Renderer):
         nodelist = renderIterable(self, node.para)
 
         if node.kind == "par":
-            context = self.context.create_child_context(node.title)
-            renderer = self.renderer_factory.create_renderer(context)
-            text = renderer.render(context.node_stack[0])
+            text = self.render(node.title)
         else:
             text = [self.node_factory.Text(node.kind.capitalize())]
         title = self.node_factory.strong("", *text)
@@ -576,9 +554,7 @@ class SphinxRenderer(Renderer):
             # Put new lines between the lines. There must be a more pythonic way of doing this
             if i:
                 nodelist.append(self.node_factory.Text("\n"))
-            context = self.context.create_child_context(item)
-            renderer = self.renderer_factory.create_renderer(context)
-            nodelist.extend(renderer.render(context.node_stack[0]))
+            nodelist.extend(self.render(item))
 
         # Add blank string at the start otherwise for some reason it renders
         # the pending_xref tags around the kind in plain text
@@ -838,9 +814,7 @@ class SphinxRenderer(Renderer):
             signature.children.pop(0)
             initializer = node.initializer
             if initializer:
-                context = self.context.create_child_context(initializer)
-                renderer = self.renderer_factory.create_renderer(context)
-                nodes = renderer.render(context.node_stack[0])
+                nodes = self.render(initializer)
                 separator = ' '
                 if not nodes[0].startswith('='):
                     separator += '= '
@@ -854,9 +828,7 @@ class SphinxRenderer(Renderer):
 
         # Parameter type
         if node.type_:
-            context = self.context.create_child_context(node.type_)
-            renderer = self.renderer_factory.create_renderer(context)
-            type_nodes = renderer.render(context.node_stack[0])
+            type_nodes = self.render(node.type_)
             # Render keywords as annotations for consistency with the cpp domain.
             if len(type_nodes) > 0:
                 first_node = type_nodes[0]
@@ -887,9 +859,7 @@ class SphinxRenderer(Renderer):
         # Default value
         if node.defval:
             nodelist.append(self.node_factory.Text(" = "))
-            context = self.context.create_child_context(node.defval)
-            renderer = self.renderer_factory.create_renderer(context)
-            nodelist.extend(renderer.render(context.node_stack[0]))
+            nodelist.extend(self.render(node.defval))
 
         return nodelist
 
@@ -942,9 +912,7 @@ class SphinxRenderer(Renderer):
         for i, item in enumerate(node.param):
             if i:
                 nodelist.append(self.node_factory.Text(", "))
-            context = self.context.create_child_context(item)
-            renderer = self.renderer_factory.create_renderer(context)
-            nodelist.extend(renderer.render(context.node_stack[0]))
+            nodelist.extend(self.render(item))
         self.output_defname = True
         return nodelist
 
