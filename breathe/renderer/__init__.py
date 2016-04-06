@@ -39,7 +39,8 @@ class DoxygenToRstRendererFactory(object):
             state,
             document,
             target_handler,
-            compound_parser
+            compound_parser,
+            filter_
         )
 
     def create_renderer(self, context):
@@ -72,7 +73,7 @@ class DoxygenToRstRendererFactoryCreator(object):
             document,
             filter_,
             target_handler,
-            self.parser_factory.create_compound_parser(self.project_info)
+            self.parser_factory.create_compound_parser(self.project_info),
         )
 
 def format_parser_error(name, error, filename, state, lineno, do_unicode_warning):

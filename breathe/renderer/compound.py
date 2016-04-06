@@ -218,8 +218,8 @@ class SphinxRenderer(Renderer):
             finder = NodeFinder(rst_node.document)
             rst_node.walk(finder)
 
-            # The cpp domain in Sphinx doesn't support structs at the moment, so change the text from "class "
-            # to the correct kind which can be "class " or "struct ".
+            # The cpp domain in Sphinx doesn't support structs at the moment, so change the text
+            # from "class " to the correct kind which can be "class " or "struct ".
             finder.declarator[0] = self.node_factory.desc_annotation(kind + ' ', kind + ' ')
 
             # Check if there is template information and format it as desired
@@ -231,7 +231,8 @@ class SphinxRenderer(Renderer):
 
         refid = "%s%s" % (self.project_info.name(), node.refid)
         render_sig = kwargs.get('render_signature', render_signature)
-        nodes, contentnode = render_sig(file_data, self.target_handler.create_target(refid), name, kind)
+        nodes, contentnode = render_sig(file_data, self.target_handler.create_target(refid),
+                                        name, kind)
 
         if file_data.compounddef.includes:
             for include in file_data.compounddef.includes:
@@ -956,6 +957,8 @@ class SphinxRenderer(Renderer):
         saved_context = self.context
         self.context = self.context.create_child_context(node)
         try:
+            if not self.filter_.allow(self.context.node_stack):
+                return []
             if isinstance(node, six.text_type):
                 return self.visit_unicode(node)
             method = SphinxRenderer.methods.get(node.node_type)
