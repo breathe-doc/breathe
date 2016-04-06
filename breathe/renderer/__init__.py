@@ -48,7 +48,6 @@ class DoxygenToRstRendererFactory(object):
         if not self.filter_.allow(context.node_stack):
             return NullRenderer()
 
-        self.renderer.set_context(context)
         return self.renderer
 
 

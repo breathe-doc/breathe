@@ -83,4 +83,4 @@ class BaseDirective(rst.Directive):
 
         context = RenderContext(node_stack, mask_factory, directive_args)
         object_renderer = renderer_factory.create_renderer(context)
-        return object_renderer.render(node_stack[0])
+        return object_renderer.render(node_stack[0], context)

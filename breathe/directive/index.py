@@ -57,7 +57,7 @@ class BaseIndexDirective(BaseDirective):
         object_renderer = renderer_factory.create_renderer(context)
 
         try:
-            node_list = object_renderer.render(context.node_stack[0])
+            node_list = object_renderer.render(context.node_stack[0], context)
         except ParserError as e:
             return format_parser_error(self.name, e.error, e.filename, self.state,
                                        self.lineno, True)
