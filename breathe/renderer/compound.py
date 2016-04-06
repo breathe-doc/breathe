@@ -166,7 +166,7 @@ class SphinxRenderer(Renderer):
         #
         if node.strip():
             return [self.node_factory.Text(node)]
-        if node == unicode(" "):
+        if node == six.u(" "):
             return [self.node_factory.Text(node)]
         return []
 
@@ -883,7 +883,7 @@ class SphinxRenderer(Renderer):
     }
 
     def render(self, node):
-        if isinstance(node, unicode):
+        if isinstance(node, six.text_type):
             return self.visit_unicode(node)
         method = SphinxRenderer.methods.get(node.node_type)
         if method is not None:
