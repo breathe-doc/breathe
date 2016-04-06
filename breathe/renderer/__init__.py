@@ -7,43 +7,6 @@ from . import index as indexrenderer
 from . import compound as compoundrenderer
 
 from docutils import nodes
-from docutils.statemachine import ViewList
-
-
-class RstContentCreator(object):
-
-    def __call__(self, text):
-
-        # Remove the first line which is "embed:rst[:leading-asterisk]"
-        text = "\n".join(text.split(u"\n")[1:])
-
-        # Remove starting whitespace
-        text = textwrap.dedent(text)
-
-        # Inspired by autodoc.py in Sphinx
-        result = ViewList()
-        for line in text.split("\n"):
-            result.append(line, "<breathe>")
-
-        return result
-
-
-class UnicodeRenderer(Renderer):
-
-    def render(self, node):
-
-        # Skip any nodes that are pure whitespace
-        # Probably need a better way to do this as currently we're only doing
-        # it skip whitespace between higher-level nodes, but this will also
-        # skip any pure whitespace entries in actual content nodes
-        #
-        # We counter that second issue slightly by allowing through single white spaces
-        #
-        if node.strip():
-            return [self.node_factory.Text(node)]
-        if node == unicode(" "):
-            return [self.node_factory.Text(node)]
-        return []
 
 
 class NullRenderer(Renderer):
@@ -96,7 +59,6 @@ class DoxygenToRstRendererFactory(object):
             context
             ):
 
-        parent_data_object = context.node_stack[1]
         data_object = context.node_stack[0]
 
         if not self.filter_.allow(context.node_stack):
@@ -131,13 +93,6 @@ class DoxygenToRstRendererFactory(object):
             self.document,
             self.target_handler,
         ]
-
-        if node_type == "verbatim":
-
-            return Renderer(
-                RstContentCreator(),
-                *common_args
-            )
 
         if node_type == "compound":
 
@@ -200,7 +155,7 @@ class DoxygenToRstRendererFactoryCreator(object):
     def create_factory(self, node_stack, state, document, filter_, target_handler):
 
         renderers = {
-            "doxygen": indexrenderer.DoxygenTypeSubRenderer,
+            "doxygen": compoundrenderer.SphinxRenderer,
             "compound": CreateCompoundTypeSubRenderer(self.parser_factory),
             "doxygendef": compoundrenderer.SphinxRenderer,
             "compounddef": compoundrenderer.SphinxRenderer,
@@ -211,7 +166,7 @@ class DoxygenToRstRendererFactoryCreator(object):
             "description": compoundrenderer.SphinxRenderer,
             "param": compoundrenderer.SphinxRenderer,
             "docreftext": compoundrenderer.SphinxRenderer,
-            "docheading": compoundrenderer.DocHeadingTypeSubRenderer,
+            "docheading": compoundrenderer.SphinxRenderer,
             "docpara": compoundrenderer.SphinxRenderer,
             "docmarkup": compoundrenderer.SphinxRenderer,
             "docparamlist": compoundrenderer.SphinxRenderer,
@@ -223,7 +178,7 @@ class DoxygenToRstRendererFactoryCreator(object):
             "doctitle": compoundrenderer.SphinxRenderer,
             "docformula": compoundrenderer.SphinxRenderer,
             "docimage": compoundrenderer.SphinxRenderer,
-            "docurllink": compoundrenderer.DocURLLinkSubRenderer,
+            "docurllink": compoundrenderer.SphinxRenderer,
             "listing": compoundrenderer.SphinxRenderer,
             "codeline": compoundrenderer.SphinxRenderer,
             "highlight": compoundrenderer.SphinxRenderer,
@@ -231,11 +186,11 @@ class DoxygenToRstRendererFactoryCreator(object):
             "inc": compoundrenderer.SphinxRenderer,
             "ref": CreateRefTypeSubRenderer(self.parser_factory),
             "compoundref": compoundrenderer.SphinxRenderer,
-            "verbatim": compoundrenderer.VerbatimTypeSubRenderer,
-            "mixedcontainer": compoundrenderer.MixedContainerRenderer,
-            "unicode": UnicodeRenderer,
-            "doclist": compoundrenderer.DocListTypeSubRenderer,
-            "doclistitem": compoundrenderer.DocListItemTypeSubRenderer,
+            "verbatim": compoundrenderer.SphinxRenderer,
+            "mixedcontainer": compoundrenderer.SphinxRenderer,
+            "unicode": compoundrenderer.SphinxRenderer,
+            "doclist": compoundrenderer.SphinxRenderer,
+            "doclistitem": compoundrenderer.SphinxRenderer,
             }
 
         return DoxygenToRstRendererFactory(
