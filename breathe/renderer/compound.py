@@ -953,25 +953,30 @@ class SphinxRenderer(Renderer):
     }
 
     def render(self, node):
-        if isinstance(node, six.text_type):
-            return self.visit_unicode(node)
-        method = SphinxRenderer.methods.get(node.node_type)
-        if method is not None:
-            return method(self, node)
-        if node.node_type == "memberdef":
-            if node.kind in ("function", "slot") or \
-                    (node.kind == 'friend' and node.argsstring):
-                return self.visit_function(node)
-            if node.kind == "enum":
-                return self.visit_enum(node)
-            if node.kind == "typedef":
-                return self.visit_typedef(node)
-            if node.kind == "variable":
-                return self.visit_variable(node)
-            if node.kind == "define":
-                return self.visit_define(node)
-            return self.render_declaration(node, update_signature=self.update_signature)
-        if node.node_type == "compound":
-            if node.kind in ["file", "dir", "page", "example", "group"]:
-                return self.visit_file(node)
-            return self.visit_compound(node)
+        saved_context = self.context
+        self.context = self.context.create_child_context(node)
+        try:
+            if isinstance(node, six.text_type):
+                return self.visit_unicode(node)
+            method = SphinxRenderer.methods.get(node.node_type)
+            if method is not None:
+                return method(self, node)
+            if node.node_type == "memberdef":
+                if node.kind in ("function", "slot") or \
+                        (node.kind == 'friend' and node.argsstring):
+                    return self.visit_function(node)
+                if node.kind == "enum":
+                    return self.visit_enum(node)
+                if node.kind == "typedef":
+                    return self.visit_typedef(node)
+                if node.kind == "variable":
+                    return self.visit_variable(node)
+                if node.kind == "define":
+                    return self.visit_define(node)
+                return self.render_declaration(node, update_signature=self.update_signature)
+            if node.node_type == "compound":
+                if node.kind in ["file", "dir", "page", "example", "group"]:
+                    return self.visit_file(node)
+                return self.visit_compound(node)
+        finally:
+            self.context = saved_context
