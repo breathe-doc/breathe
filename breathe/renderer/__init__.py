@@ -3,7 +3,6 @@ import textwrap
 
 from ..node_factory import create_node_factory
 from .base import Renderer
-from . import index as indexrenderer
 from . import compound as compoundrenderer
 
 from docutils import nodes
@@ -30,6 +29,7 @@ class DoxygenToRstRendererFactory(object):
             document,
             filter_,
             target_handler,
+            compound_parser
             ):
 
         self.node_type = node_type
@@ -40,13 +40,15 @@ class DoxygenToRstRendererFactory(object):
         self.document = document
         self.filter_ = filter_
         self.target_handler = target_handler
+        self.compound_parser = compound_parser
         self.renderer = compoundrenderer.SphinxRenderer(
             self.project_info,
             self,
             create_node_factory(),
             self.state,
             self.document,
-            self.target_handler
+            self.target_handler,
+            compound_parser
         )
 
     def create_renderer(self, context):
@@ -54,10 +56,7 @@ class DoxygenToRstRendererFactory(object):
         renderer.set_context(context)
         return renderer
 
-    def do_create_renderer(
-            self,
-            context
-            ):
+    def do_create_renderer(self, context):
 
         data_object = context.node_stack[0]
 
@@ -92,29 +91,22 @@ class DoxygenToRstRendererFactory(object):
             self.state,
             self.document,
             self.target_handler,
+            self.compound_parser
         ]
 
         if node_type == "compound":
-
-            kind = data_object.kind
-            if kind in ["file", "dir", "page", "example", "group"]:
-                return Renderer(indexrenderer.FileRenderer, *common_args)
-
-            class_ = indexrenderer.CompoundTypeSubRenderer
+            return self.renderer
 
             # For compound node types Renderer is CreateCompoundTypeSubRenderer
             # as defined below. This could be cleaner
-            return Renderer(
-                class_,
+            return compoundrenderer.CompoundTypeSubRenderer(
                 *common_args
             )
 
         if node_type == "memberdef":
             return self.renderer
 
-        return Renderer(
-            *common_args
-        )
+        return Renderer(*common_args)
 
 
 class CreateCompoundTypeSubRenderer(object):
@@ -123,22 +115,8 @@ class CreateCompoundTypeSubRenderer(object):
 
         self.parser_factory = parser_factory
 
-    def __call__(self, class_, project_info, *args):
-
-        compound_parser = self.parser_factory.create_compound_parser(project_info)
-        return class_(compound_parser, project_info, *args)
-
-
-class CreateRefTypeSubRenderer(object):
-
-    def __init__(self, parser_factory):
-
-        self.parser_factory = parser_factory
-
-    def __call__(self, project_info, *args):
-
-        compound_parser = self.parser_factory.create_compound_parser(project_info)
-        return compoundrenderer.RefTypeSubRenderer(compound_parser, project_info, *args)
+    def __call__(self, class_, *args):
+        return class_(*args)
 
 
 class DoxygenToRstRendererFactoryCreator(object):
@@ -156,7 +134,7 @@ class DoxygenToRstRendererFactoryCreator(object):
 
         renderers = {
             "doxygen": compoundrenderer.SphinxRenderer,
-            "compound": CreateCompoundTypeSubRenderer(self.parser_factory),
+            "compound": compoundrenderer.SphinxRenderer,
             "doxygendef": compoundrenderer.SphinxRenderer,
             "compounddef": compoundrenderer.SphinxRenderer,
             "sectiondef": compoundrenderer.SphinxRenderer,
@@ -184,7 +162,7 @@ class DoxygenToRstRendererFactoryCreator(object):
             "highlight": compoundrenderer.SphinxRenderer,
             "templateparamlist": compoundrenderer.SphinxRenderer,
             "inc": compoundrenderer.SphinxRenderer,
-            "ref": CreateRefTypeSubRenderer(self.parser_factory),
+            "ref": compoundrenderer.SphinxRenderer,
             "compoundref": compoundrenderer.SphinxRenderer,
             "verbatim": compoundrenderer.SphinxRenderer,
             "mixedcontainer": compoundrenderer.SphinxRenderer,
@@ -202,6 +180,7 @@ class DoxygenToRstRendererFactoryCreator(object):
             document,
             filter_,
             target_handler,
+            self.parser_factory.create_compound_parser(self.project_info)
         )
 
     def create_child_factory(self, project_info, data_object, parent_renderer_factory):
@@ -226,6 +205,7 @@ class DoxygenToRstRendererFactoryCreator(object):
             parent_renderer_factory.document,
             parent_renderer_factory.filter_,
             parent_renderer_factory.target_handler,
+            parent_renderer_factory.compound_parser
         )
 
 
