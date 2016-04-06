@@ -234,9 +234,11 @@ class SphinxRenderer(Renderer):
         nodes, contentnode = render_sig(file_data, self.target_handler.create_target(refid),
                                         name, kind)
 
+        parent_context = self.context.create_child_context(file_data)
+        new_context = parent_context.create_child_context(file_data.compounddef)
         if file_data.compounddef.includes:
             for include in file_data.compounddef.includes:
-                contentnode.extend(self.render(include))
+                contentnode.extend(self.render(include, new_context.create_child_context(include)))
 
         contentnode.extend(rendered_data)
         return nodes
