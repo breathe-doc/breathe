@@ -408,7 +408,7 @@ class DoxygenContentBlockDirective(BaseDirective):
             mask_factory = NullMaskFactory()
             context = RenderContext(node_stack, mask_factory, self.directive_args)
             object_renderer = renderer_factory.create_renderer(context)
-            node_list.extend(object_renderer.render(context.node_stack[0]))
+            node_list.extend(object_renderer.render(context.node_stack[0], context))
 
         return node_list
 

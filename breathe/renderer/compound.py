@@ -953,9 +953,9 @@ class SphinxRenderer(Renderer):
         "templateparamlist": visit_templateparamlist
     }
 
-    def render(self, node):
+    def render(self, node, context=None):
         saved_context = self.context
-        self.context = self.context.create_child_context(node)
+        self.context = context if context else self.context.create_child_context(node)
         try:
             if not self.filter_.allow(self.context.node_stack):
                 return []
