@@ -22,7 +22,6 @@ class DoxygenToRstRendererFactory(object):
     def __init__(
             self,
             node_type,
-            renderers,
             renderer_factory_creator,
             project_info,
             state,
@@ -32,81 +31,24 @@ class DoxygenToRstRendererFactory(object):
             compound_parser
             ):
 
-        self.node_type = node_type
-        self.project_info = project_info
-        self.renderers = renderers
-        self.renderer_factory_creator = renderer_factory_creator
-        self.state = state
-        self.document = document
         self.filter_ = filter_
-        self.target_handler = target_handler
-        self.compound_parser = compound_parser
         self.renderer = compoundrenderer.SphinxRenderer(
-            self.project_info,
+            project_info,
             self,
             create_node_factory(),
-            self.state,
-            self.document,
-            self.target_handler,
+            state,
+            document,
+            target_handler,
             compound_parser
         )
 
     def create_renderer(self, context):
-        renderer = self.do_create_renderer(context)
-        renderer.set_context(context)
-        return renderer
-
-    def do_create_renderer(self, context):
-
-        data_object = context.node_stack[0]
 
         if not self.filter_.allow(context.node_stack):
             return NullRenderer()
 
-        child_renderer_factory = self.renderer_factory_creator.create_child_factory(
-            self.project_info,
-            data_object,
-            self
-        )
-
-        try:
-            node_type = data_object.node_type
-        except AttributeError as e:
-
-            # Horrible hack to silence errors on filtering unicode objects
-            # until we fix the parsing
-            if type(data_object) == unicode:
-                node_type = "unicode"
-            else:
-                raise e
-
-        Renderer = self.renderers[node_type]
-
-        node_factory = create_node_factory()
-
-        common_args = [
-            self.project_info,
-            child_renderer_factory,
-            node_factory,
-            self.state,
-            self.document,
-            self.target_handler,
-            self.compound_parser
-        ]
-
-        if node_type == "compound":
-            return self.renderer
-
-            # For compound node types Renderer is CreateCompoundTypeSubRenderer
-            # as defined below. This could be cleaner
-            return compoundrenderer.CompoundTypeSubRenderer(
-                *common_args
-            )
-
-        if node_type == "memberdef":
-            return self.renderer
-
-        return Renderer(*common_args)
+        self.renderer.set_context(context)
+        return self.renderer
 
 
 class CreateCompoundTypeSubRenderer(object):
@@ -132,48 +74,8 @@ class DoxygenToRstRendererFactoryCreator(object):
 
     def create_factory(self, node_stack, state, document, filter_, target_handler):
 
-        renderers = {
-            "doxygen": compoundrenderer.SphinxRenderer,
-            "compound": compoundrenderer.SphinxRenderer,
-            "doxygendef": compoundrenderer.SphinxRenderer,
-            "compounddef": compoundrenderer.SphinxRenderer,
-            "sectiondef": compoundrenderer.SphinxRenderer,
-            "memberdef": compoundrenderer.SphinxRenderer,
-            "enumvalue": compoundrenderer.SphinxRenderer,
-            "linkedtext": compoundrenderer.SphinxRenderer,
-            "description": compoundrenderer.SphinxRenderer,
-            "param": compoundrenderer.SphinxRenderer,
-            "docreftext": compoundrenderer.SphinxRenderer,
-            "docheading": compoundrenderer.SphinxRenderer,
-            "docpara": compoundrenderer.SphinxRenderer,
-            "docmarkup": compoundrenderer.SphinxRenderer,
-            "docparamlist": compoundrenderer.SphinxRenderer,
-            "docparamlistitem": compoundrenderer.SphinxRenderer,
-            "docparamnamelist": compoundrenderer.SphinxRenderer,
-            "docparamname": compoundrenderer.SphinxRenderer,
-            "docsect1": compoundrenderer.SphinxRenderer,
-            "docsimplesect": compoundrenderer.SphinxRenderer,
-            "doctitle": compoundrenderer.SphinxRenderer,
-            "docformula": compoundrenderer.SphinxRenderer,
-            "docimage": compoundrenderer.SphinxRenderer,
-            "docurllink": compoundrenderer.SphinxRenderer,
-            "listing": compoundrenderer.SphinxRenderer,
-            "codeline": compoundrenderer.SphinxRenderer,
-            "highlight": compoundrenderer.SphinxRenderer,
-            "templateparamlist": compoundrenderer.SphinxRenderer,
-            "inc": compoundrenderer.SphinxRenderer,
-            "ref": compoundrenderer.SphinxRenderer,
-            "compoundref": compoundrenderer.SphinxRenderer,
-            "verbatim": compoundrenderer.SphinxRenderer,
-            "mixedcontainer": compoundrenderer.SphinxRenderer,
-            "unicode": compoundrenderer.SphinxRenderer,
-            "doclist": compoundrenderer.SphinxRenderer,
-            "doclistitem": compoundrenderer.SphinxRenderer,
-            }
-
         return DoxygenToRstRendererFactory(
             "root",
-            renderers,
             self,
             self.project_info,
             state,
@@ -182,32 +84,6 @@ class DoxygenToRstRendererFactoryCreator(object):
             target_handler,
             self.parser_factory.create_compound_parser(self.project_info)
         )
-
-    def create_child_factory(self, project_info, data_object, parent_renderer_factory):
-
-        try:
-            node_type = data_object.node_type
-        except AttributeError as e:
-
-            # Horrible hack to silence errors on filtering unicode objects
-            # until we fix the parsing
-            if type(data_object) == unicode:
-                node_type = "unicode"
-            else:
-                raise e
-
-        return DoxygenToRstRendererFactory(
-            node_type,
-            parent_renderer_factory.renderers,
-            self,
-            parent_renderer_factory.project_info,
-            parent_renderer_factory.state,
-            parent_renderer_factory.document,
-            parent_renderer_factory.filter_,
-            parent_renderer_factory.target_handler,
-            parent_renderer_factory.compound_parser
-        )
-
 
 def format_parser_error(name, error, filename, state, lineno, do_unicode_warning):
 
