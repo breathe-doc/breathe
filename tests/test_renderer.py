@@ -4,6 +4,7 @@ import sphinx.environment
 from breathe.node_factory import create_node_factory
 from breathe.parser.compound import linkedTextTypeSub, memberdefTypeSub, paramTypeSub, MixedContainer
 from breathe.renderer.compound import SphinxRenderer
+from breathe.renderer.filter import OpenFilter
 from docutils import frontend, nodes, parsers, utils
 from sphinx.domains import CPPDomain
 
@@ -208,7 +209,9 @@ def render(member_def):
                               create_node_factory(),
                               None,  # state
                               None,  # document
-                              MockTargetHandler())
+                              MockTargetHandler(),
+                              None,   # compound_parser
+                              OpenFilter())
     renderer.context = MockContext([member_def])
     return renderer.render(member_def)
 
