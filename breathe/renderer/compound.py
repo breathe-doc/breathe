@@ -957,7 +957,7 @@ class SphinxRenderer(Renderer):
 
     def render(self, node, context=None):
         saved_context = self.context
-        self.context = context if context else self.context.create_child_context(node)
+        self.set_context(context if context else self.context.create_child_context(node))
         try:
             if not self.filter_.allow(self.context.node_stack):
                 return []
