@@ -51,16 +51,6 @@ class DoxygenToRstRendererFactory(object):
         return self.renderer
 
 
-class CreateCompoundTypeSubRenderer(object):
-
-    def __init__(self, parser_factory):
-
-        self.parser_factory = parser_factory
-
-    def __call__(self, class_, *args):
-        return class_(*args)
-
-
 class DoxygenToRstRendererFactoryCreator(object):
 
     def __init__(
