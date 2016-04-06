@@ -1,8 +1,10 @@
 
 from .base import Renderer
 from .index import CompoundRenderer, NodeFinder
+from docutils.statemachine import ViewList
 import re
 import six
+import textwrap
 
 
 def render(renderer, attribute):
@@ -96,6 +98,8 @@ class SphinxRenderer(Renderer):
     def __init__(self, *args):
         Renderer.__init__(self, *args)
         self.output_defname = True
+        # Nesting level for lists.
+        self.nesting_level = 0
 
     def create_doxygen_target(self, node):
         """Can be overridden to create a target node which uses the doxygen refid information
@@ -150,6 +154,33 @@ class SphinxRenderer(Renderer):
         signode.insert(0, self.create_doxygen_target(node))
         contentnode.extend(description)
         return nodes
+
+    def visit_unicode(self, node):
+
+        # Skip any nodes that are pure whitespace
+        # Probably need a better way to do this as currently we're only doing
+        # it skip whitespace between higher-level nodes, but this will also
+        # skip any pure whitespace entries in actual content nodes
+        #
+        # We counter that second issue slightly by allowing through single white spaces
+        #
+        if node.strip():
+            return [self.node_factory.Text(node)]
+        if node == unicode(" "):
+            return [self.node_factory.Text(node)]
+        return []
+
+    def visit_doxygen(self, node):
+
+        nodelist = []
+
+        # Process all the compound children
+        for compound in node.get_compound():
+            context = self.context.create_child_context(compound)
+            compound_renderer = self.renderer_factory.create_renderer(context)
+            nodelist.extend(compound_renderer.render(context.node_stack[0]))
+
+        return nodelist
 
     def visit_doxygendef(self, node):
 
@@ -314,6 +345,15 @@ class SphinxRenderer(Renderer):
 
         return nodelist
 
+    def visit_docheading(self, node):
+        """Heading renderer.
+
+        Renders embedded headlines as emphasized text. Different heading levels
+        are not supported.
+        """
+        nodelist = renderIterable(self, node.content_)
+        return [self.node_factory.emphasis("", "", *nodelist)]
+
     def visit_docpara(self, node):
         """
         <para> tags in the Doxygen output tend to contain either text or a single other tag of
@@ -346,6 +386,11 @@ class SphinxRenderer(Renderer):
         options = {"uri": path_to_image}
 
         return [self.node_factory.image("", **options)]
+
+    def visit_docurllink(self, node):
+        """Url Link Renderer"""
+        nodelist = renderIterable(self, node.content_)
+        return [self.node_factory.reference("", "", refuri=node.url, *nodelist)]
 
     def visit_docmarkup(self, node):
 
@@ -457,6 +502,56 @@ class SphinxRenderer(Renderer):
     def visit_highlight(self, node):
         return renderIterable(self, node.content_)
 
+    def visit_verbatim(self, node):
+
+        if not node.text.strip().startswith("embed:rst"):
+
+            # Remove trailing new lines. Purely subjective call from viewing results
+            text = node.text.rstrip()
+
+            # Handle has a preformatted text
+            return [self.node_factory.literal_block(text, text)]
+
+        # do we need to strip leading asterisks?
+        # NOTE: We could choose to guess this based on every line starting with '*'.
+        #   However This would have a side-effect for any users who have an rst-block
+        #   consisting of a simple bullet list.
+        #   For now we just look for an extended embed tag
+        if node.text.strip().startswith("embed:rst:leading-asterisk"):
+
+            lines = node.text.splitlines()
+            # Replace the first * on each line with a blank space
+            lines = map(lambda text: text.replace("*", " ", 1), lines)
+            node.text = "\n".join(lines)
+
+        # do we need to strip leading ///?
+        elif node.text.strip().startswith("embed:rst:leading-slashes"):
+
+            lines = node.text.splitlines()
+            # Replace the /// on each line with three blank spaces
+            lines = map(lambda text: text.replace("///", "   ", 1), lines)
+            node.text = "\n".join(lines)
+
+        # Remove the first line which is "embed:rst[:leading-asterisk]"
+        text = "\n".join(node.text.split(u"\n")[1:])
+
+        # Remove starting whitespace
+        text = textwrap.dedent(text)
+
+        # Inspired by autodoc.py in Sphinx
+        rst = ViewList()
+        for line in text.split("\n"):
+            rst.append(line, "<breathe>")
+
+        # Parent node for the generated node subtree
+        rst_node = self.node_factory.paragraph()
+        rst_node.document = self.state.document
+
+        # Generate node subtree
+        self.state.nested_parse(rst, 0, rst_node)
+
+        return rst_node
+
     def visit_inc(self, node):
 
         if node.local == u"yes":
@@ -465,6 +560,46 @@ class SphinxRenderer(Renderer):
             text = '#include <%s>' % node.content_[0].getValue()
 
         return [self.node_factory.emphasis(text=text)]
+
+    def visit_doclistitem(self, node):
+        """List item renderer. Render all the children depth-first.
+        Upon return expand the children node list into a docutils list-item.
+        """
+        nodelist = renderIterable(self, node.para)
+        return [self.node_factory.list_item("", *nodelist)]
+
+    numeral_kind = ['arabic', 'loweralpha', 'lowerroman', 'upperalpha', 'upperroman']
+
+    def render_unordered(self, children):
+        nodelist_list = self.node_factory.bullet_list("", *children)
+
+        return [nodelist_list]
+
+    def render_enumerated(self, children, nesting_level):
+        nodelist_list = self.node_factory.enumerated_list("", *children)
+        idx = nesting_level % len(SphinxRenderer.numeral_kind)
+        nodelist_list['enumtype'] = SphinxRenderer.numeral_kind[idx]
+        nodelist_list['prefix'] = ''
+        nodelist_list['suffix'] = '.'
+
+        return [nodelist_list]
+
+    def visit_doclist(self, node):
+        """List renderer
+
+        The specifics of the actual list rendering are handled by the
+        decorator around the generic render function.
+        Render all the children depth-first. """
+        """ Call the wrapped render function. Update the nesting level for the enumerated lists. """
+        if node.node_subtype is "itemized":
+            val = renderIterable(self, node.listitem)
+            return self.render_unordered(children=val)
+        elif node.node_subtype is "ordered":
+            self.nesting_level += 1
+            val = renderIterable(self, node.listitem)
+            self.nesting_level -= 1
+            return self.render_enumerated(children=val, nesting_level=self.nesting_level)
+        return []
 
     def visit_compoundref(self, node):
 
@@ -484,6 +619,9 @@ class SphinxRenderer(Renderer):
         ]
 
         return nodelist
+
+    def visit_mixedcontainer(self, node):
+        return render(self, node.getValue())
 
     def visit_description(self, node):
         return renderIterable(self, node.content_)
@@ -710,12 +848,15 @@ class SphinxRenderer(Renderer):
         return nodelist
 
     methods = {
+        "doxygen": visit_doxygen,
         "doxygendef": visit_doxygendef,
         "compounddef": visit_compounddef,
         "sectiondef": visit_sectiondef,
         "docreftext": visit_docreftext,
+        "docheading": visit_docheading,
         "docpara": visit_docpara,
         "docimage": visit_docimage,
+        "docurllink": visit_docurllink,
         "docmarkup": visit_docmarkup,
         "docsect1": visit_docsect1,
         "docsimplesect": visit_docsimplesect,
@@ -724,10 +865,14 @@ class SphinxRenderer(Renderer):
         "listing": visit_listing,
         "codeline": visit_codeline,
         "highlight": visit_highlight,
+        "verbatim": visit_verbatim,
         "inc": visit_inc,
+        "doclist": visit_doclist,
+        "doclistitem": visit_doclistitem,
         "enumvalue": visit_enumvalue,
         "linkedtext": visit_linkedtext,
         "compoundref": visit_compoundref,
+        "mixedcontainer": visit_mixedcontainer,
         "description": visit_description,
         "param": visit_param,
         "docparamlist": visit_docparamlist,
@@ -738,6 +883,8 @@ class SphinxRenderer(Renderer):
     }
 
     def render(self, node):
+        if isinstance(node, unicode):
+            return self.visit_unicode(node)
         method = SphinxRenderer.methods.get(node.node_type)
         if method is not None:
             return method(self, node)
@@ -765,154 +912,3 @@ class RefTypeSubRenderer(CompoundRenderer):
         name = node.content_[0].getValue()
         name = name.rsplit("::", 1)[-1]
         return name, file_data.compounddef.kind
-
-
-class VerbatimTypeSubRenderer(Renderer):
-
-    def __init__(self, content_creator, *args):
-        Renderer.__init__(self, *args)
-
-        self.content_creator = content_creator
-
-    def render(self, node):
-
-        if not node.text.strip().startswith("embed:rst"):
-
-            # Remove trailing new lines. Purely subjective call from viewing results
-            text = node.text.rstrip()
-
-            # Handle has a preformatted text
-            return [self.node_factory.literal_block(text, text)]
-
-        # do we need to strip leading asterisks?
-        # NOTE: We could choose to guess this based on every line starting with '*'.
-        #   However This would have a side-effect for any users who have an rst-block
-        #   consisting of a simple bullet list.
-        #   For now we just look for an extended embed tag
-        if node.text.strip().startswith("embed:rst:leading-asterisk"):
-
-            lines = node.text.splitlines()
-            # Replace the first * on each line with a blank space
-            lines = map(lambda text: text.replace("*", " ", 1), lines)
-            node.text = "\n".join(lines)
-
-        # do we need to strip leading ///?
-        elif node.text.strip().startswith("embed:rst:leading-slashes"):
-
-            lines = node.text.splitlines()
-            # Replace the /// on each line with three blank spaces
-            lines = map(lambda text: text.replace("///", "   ", 1), lines)
-            node.text = "\n".join(lines)
-
-        rst = self.content_creator(node.text)
-
-        # Parent node for the generated node subtree
-        rst_node = self.node_factory.paragraph()
-        rst_node.document = self.state.document
-
-        # Generate node subtree
-        self.state.nested_parse(rst, 0, rst_node)
-
-        return rst_node
-
-
-class MixedContainerRenderer(Renderer):
-
-    def render(self, node):
-        return render(self, node.getValue())
-
-
-class DocListNestedRenderer(object):
-    """Decorator for the list type renderer.
-
-    Creates the proper docutils node based on the sub-type
-    of the underlying data object. Takes care of proper numbering
-    for deeply nested enumerated lists.
-    """
-
-    numeral_kind = ['arabic', 'loweralpha', 'lowerroman', 'upperalpha', 'upperroman']
-
-    def __init__(self, f):
-        self.__render = f
-        self.__nesting_level = 0
-
-    def __get__(self, obj, objtype):
-        """ Support instance methods. """
-        import functools
-        return functools.partial(self.__call__, obj)
-
-    def __call__(self, rend_self, node):
-        """ Call the wrapped render function. Update the nesting level for the enumerated lists. """
-        rend_instance = rend_self
-        if node.node_subtype is "itemized":
-            val = self.__render(rend_instance, node)
-            return DocListNestedRenderer.render_unordered(rend_instance, children=val)
-        elif node.node_subtype is "ordered":
-            self.__nesting_level += 1
-            val = self.__render(rend_instance, node)
-            self.__nesting_level -= 1
-            return DocListNestedRenderer.render_enumerated(rend_instance, children=val,
-                                                           nesting_level=self.__nesting_level)
-
-        return []
-
-    @staticmethod
-    def render_unordered(renderer, children):
-        nodelist_list = renderer.node_factory.bullet_list("", *children)
-
-        return [nodelist_list]
-
-    @staticmethod
-    def render_enumerated(renderer, children, nesting_level):
-        nodelist_list = renderer.node_factory.enumerated_list("", *children)
-        idx = nesting_level % len(DocListNestedRenderer.numeral_kind)
-        nodelist_list['enumtype'] = DocListNestedRenderer.numeral_kind[idx]
-        nodelist_list['prefix'] = ''
-        nodelist_list['suffix'] = '.'
-
-        return [nodelist_list]
-
-
-class DocListTypeSubRenderer(Renderer):
-    """List renderer
-
-    The specifics of the actual list rendering are handled by the
-    decorator around the generic render function.
-    """
-
-    @DocListNestedRenderer
-    def render(self, node):
-        """ Render all the children depth-first. """
-        return renderIterable(self, node.listitem)
-
-
-class DocListItemTypeSubRenderer(Renderer):
-    """List item renderer.
-    """
-
-    def render(self, node):
-        """ Render all the children depth-first.
-            Upon return expand the children node list into a docutils list-item.
-        """
-        nodelist = renderIterable(self, node.para)
-        return [self.node_factory.list_item("", *nodelist)]
-
-
-class DocHeadingTypeSubRenderer(Renderer):
-    """Heading renderer.
-
-    Renders embedded headlines as emphasized text. Different heading levels
-    are not supported.
-    """
-
-    def render(self, node):
-        nodelist = renderIterable(self, node.content_)
-        return [self.node_factory.emphasis("", "", *nodelist)]
-
-
-class DocURLLinkSubRenderer(Renderer):
-    """Url Link Renderer"""
-
-    def render(self, node):
-        nodelist = renderIterable(self, node.content_)
-        return [self.node_factory.reference("", "", refuri=node.url, *nodelist)]

@@ -3,21 +3,6 @@ from docutils import nodes
 from .base import Renderer
 
 
-class DoxygenTypeSubRenderer(Renderer):
-
-    def render(self, node):
-
-        nodelist = []
-
-        # Process all the compound children
-        for compound in node.get_compound():
-            context = self.context.create_child_context(compound)
-            compound_renderer = self.renderer_factory.create_renderer(context)
-            nodelist.extend(compound_renderer.render(context.node_stack[0]))
-
-        return nodelist
-
-
 class NodeFinder(nodes.SparseNodeVisitor):
     """Find the Docutils desc_signature declarator and desc_content nodes."""
 
