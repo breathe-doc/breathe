@@ -1,10 +1,28 @@
 
 from .base import Renderer
-from .index import CompoundRenderer, NodeFinder
+from docutils import nodes
 from docutils.statemachine import ViewList
 import re
 import six
 import textwrap
+
+
+class NodeFinder(nodes.SparseNodeVisitor):
+    """Find the Docutils desc_signature declarator and desc_content nodes."""
+
+    def __init__(self, document):
+        nodes.SparseNodeVisitor.__init__(self, document)
+        self.declarator = None
+        self.content = None
+
+    def visit_desc_signature(self, node):
+        # Find the last signature node because it contains the actual declarator
+        # rather than "template <...>". In Sphinx 1.4.1 we'll be able to use sphinx_cpp_tagname:
+        # https://github.com/michaeljones/breathe/issues/242
+        self.declarator = node
+
+    def visit_desc_content(self, node):
+        self.content = node
 
 
 def render(renderer, attribute):
@@ -187,6 +205,82 @@ class SphinxRenderer(Renderer):
         context = self.context.create_child_context(node.compounddef)
         compound_renderer = self.renderer_factory.create_renderer(context)
         return compound_renderer.render(context.node_stack[0])
+
+    def visit_compound(self, node, render_empty_node=True, **kwargs):
+
+        # Read in the corresponding xml file and process
+        file_data = self.compound_parser.parse(node.refid)
+
+        parent_context = self.context.create_child_context(file_data)
+        data_renderer = self.renderer_factory.create_renderer(parent_context)
+        rendered_data = data_renderer.render(parent_context.node_stack[0])
+
+        if not rendered_data and not render_empty_node:
+            return []
+
+        file_data = parent_context.node_stack[0]
+        new_context = parent_context.create_child_context(file_data.compounddef)
+
+        def get_node_info(file_data):
+            return node.name, node.kind
+        name, kind = kwargs.get('get_node_info', get_node_info)(file_data)
+
+        def render_signature(file_data, doxygen_target, name, kind):
+            # Defer to domains specific directive.
+            self.context.directive_args[1] = [self.get_fully_qualified_name()]
+            nodes = self.run_domain_directive(kind, self.context.directive_args[1])
+            rst_node = nodes[1]
+
+            finder = NodeFinder(rst_node.document)
+            rst_node.walk(finder)
+
+            # The cpp domain in Sphinx doesn't support structs at the moment, so change the text from "class "
+            # to the correct kind which can be "class " or "struct ".
+            finder.declarator[0] = self.node_factory.desc_annotation(kind + ' ', kind + ' ')
+
+            # Check if there is template information and format it as desired
+            template_signode = self.create_template_node(file_data.compounddef)
+            if template_signode:
+                rst_node.insert(0, template_signode)
+            rst_node.children[0].insert(0, doxygen_target)
+            return nodes, finder.content
+
+        refid = "%s%s" % (self.project_info.name(), node.refid)
+        render_sig = kwargs.get('render_signature', render_signature)
+        nodes, contentnode = render_sig(file_data, self.target_handler.create_target(refid), name, kind)
+
+        if file_data.compounddef.includes:
+            for include in file_data.compounddef.includes:
+                context = new_context.create_child_context(include)
+                renderer = self.renderer_factory.create_renderer(context)
+                contentnode.extend(renderer.render(context.node_stack[0]))
+
+        contentnode.extend(rendered_data)
+        return nodes
+
+    def visit_file(self, node):
+        def render_signature(file_data, doxygen_target, name, kind):
+            # Build targets for linking
+            targets = []
+            targets.extend(doxygen_target)
+
+            title_signode = self.node_factory.desc_signature()
+            title_signode.extend(targets)
+
+            # Set up the title
+            title_signode.append(self.node_factory.emphasis(text=kind))
+            title_signode.append(self.node_factory.Text(" "))
+            title_signode.append(self.node_factory.desc_name(text=name))
+
+            contentnode = self.node_factory.desc_content()
+
+            rst_node = self.node_factory.desc()
+            rst_node.document = self.state.document
+            rst_node['objtype'] = kind
+            rst_node.append(title_signode)
+            rst_node.append(contentnode)
+            return [rst_node], contentnode
+        return self.visit_compound(node, render_signature=render_signature)
 
     # We store both the identified and appropriate title text here as we want to define the order
     # here and the titles for the SectionDefTypeSubRenderer but we don't want the repetition of
@@ -561,6 +655,13 @@ class SphinxRenderer(Renderer):
 
         return [self.node_factory.emphasis(text=text)]
 
+    def visit_ref(self, node):
+        def get_node_info(file_data):
+            name = node.content_[0].getValue()
+            name = name.rsplit("::", 1)[-1]
+            return name, file_data.compounddef.kind
+        return self.visit_compound(node, False, get_node_info=get_node_info)
+
     def visit_doclistitem(self, node):
         """List item renderer. Render all the children depth-first.
         Upon return expand the children node list into a docutils list-item.
@@ -867,6 +968,7 @@ class SphinxRenderer(Renderer):
         "highlight": visit_highlight,
         "verbatim": visit_verbatim,
         "inc": visit_inc,
+        "ref": visit_ref,
         "doclist": visit_doclist,
         "doclistitem": visit_doclistitem,
         "enumvalue": visit_enumvalue,
@@ -901,14 +1003,7 @@ class SphinxRenderer(Renderer):
             if node.kind == "define":
                 return self.visit_define(node)
             return self.render_declaration(node, update_signature=self.update_signature)
-
-
-class RefTypeSubRenderer(CompoundRenderer):
-
-    def __init__(self, compound_parser, *args):
-        CompoundRenderer.__init__(self, compound_parser, False, *args)
-
-    def get_node_info(self, node, file_data):
-        name = node.content_[0].getValue()
-        name = name.rsplit("::", 1)[-1]
-        return name, file_data.compounddef.kind
+        if node.node_type == "compound":
+            if node.kind in ["file", "dir", "page", "example", "group"]:
+                return self.visit_file(node)
+            return self.visit_compound(node)

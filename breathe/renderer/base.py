@@ -60,6 +60,7 @@ class Renderer(object):
             state,
             document,
             target_handler,
+            compound_parser
     ):
 
         self.project_info = project_info
@@ -68,6 +69,7 @@ class Renderer(object):
         self.state = state
         self.document = document
         self.target_handler = target_handler
+        self.compound_parser = compound_parser
         self.context = None
 
     def set_context(self, context):
