@@ -919,11 +919,41 @@ class SphinxRenderer(Renderer):
         self.output_defname = True
         return nodelist
 
+    def visit_unknown(self, node):
+        """Visit a node of unknown type."""
+        return []
+
+    def dispatch_compound(self, node):
+        """Dispatch handling of a compound node to a suitable visit method."""
+        if node.kind in ["file", "dir", "page", "example", "group"]:
+            return self.visit_file(node)
+        return self.visit_compound(node)
+
+    def dispatch_memberdef(self, node):
+        """Dispatch handling of a memberdef node to a suitable visit method."""
+        if node.kind in ("function", "slot") or \
+                (node.kind == 'friend' and node.argsstring):
+            return self.visit_function(node)
+        if node.kind == "enum":
+            return self.visit_enum(node)
+        if node.kind == "typedef":
+            return self.visit_typedef(node)
+        if node.kind == "variable":
+            return self.visit_variable(node)
+        if node.kind == "define":
+            return self.visit_define(node)
+        return self.render_declaration(node, update_signature=self.update_signature)
+
+    # A mapping from node types to corresponding dispatch and visit methods.
+    # Dispatch methods, as the name suggest, dispatch nodes to appropriate visit
+    # methods based on node attributes such as kind.
     methods = {
         "doxygen": visit_doxygen,
         "doxygendef": visit_doxygendef,
+        "compound": dispatch_compound,
         "compounddef": visit_compounddef,
         "sectiondef": visit_sectiondef,
+        "memberdef": dispatch_memberdef,
         "docreftext": visit_docreftext,
         "docheading": visit_docheading,
         "docpara": visit_docpara,
@@ -958,30 +988,13 @@ class SphinxRenderer(Renderer):
     def render(self, node, context=None):
         saved_context = self.context
         self.set_context(context if context else self.context.create_child_context(node))
-        try:
-            if not self.filter_.allow(self.context.node_stack):
-                return []
-            if isinstance(node, six.text_type):
-                return self.visit_unicode(node)
-            method = SphinxRenderer.methods.get(node.node_type)
-            if method is not None:
-                return method(self, node)
-            if node.node_type == "memberdef":
-                if node.kind in ("function", "slot") or \
-                        (node.kind == 'friend' and node.argsstring):
-                    return self.visit_function(node)
-                if node.kind == "enum":
-                    return self.visit_enum(node)
-                if node.kind == "typedef":
-                    return self.visit_typedef(node)
-                if node.kind == "variable":
-                    return self.visit_variable(node)
-                if node.kind == "define":
-                    return self.visit_define(node)
-                return self.render_declaration(node, update_signature=self.update_signature)
-            if node.node_type == "compound":
-                if node.kind in ["file", "dir", "page", "example", "group"]:
-                    return self.visit_file(node)
-                return self.visit_compound(node)
-        finally:
-            self.context = saved_context
+        result = []
+        if not self.filter_.allow(self.context.node_stack):
+            pass
+        elif isinstance(node, six.text_type):
+            result = self.visit_unicode(node)
+        else:
+            method = SphinxRenderer.methods.get(node.node_type, SphinxRenderer.visit_unknown)
+            result = method(self, node)
+        self.context = saved_context
+        return result
