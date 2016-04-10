@@ -1,24 +1,38 @@
 
 from .base import Renderer
-from .index import CompoundRenderer, NodeFinder
+from docutils import nodes
+from docutils.statemachine import ViewList
 import re
 import six
+import textwrap
+
+
+class NodeFinder(nodes.SparseNodeVisitor):
+    """Find the Docutils desc_signature declarator and desc_content nodes."""
+
+    def __init__(self, document):
+        nodes.SparseNodeVisitor.__init__(self, document)
+        self.declarator = None
+        self.content = None
+
+    def visit_desc_signature(self, node):
+        # Find the last signature node because it contains the actual declarator
+        # rather than "template <...>". In Sphinx 1.4.1 we'll be able to use sphinx_cpp_tagname:
+        # https://github.com/michaeljones/breathe/issues/242
+        self.declarator = node
+
+    def visit_desc_content(self, node):
+        self.content = node
 
 
 def render(renderer, attribute):
-    if attribute:
-        context = renderer.context.create_child_context(attribute)
-        child_renderer = renderer.renderer_factory.create_renderer(context)
-        return child_renderer.render()
-    return []
+    return renderer.render(attribute) if attribute else []
 
 
 def renderIterable(renderer, iterable):
     output = []
     for entry in iterable:
-        context = renderer.context.create_child_context(entry)
-        child_renderer = renderer.renderer_factory.create_renderer(context)
-        output.extend(child_renderer.render())
+        output.extend(renderer.render(entry))
     return output
 
 
@@ -28,218 +42,6 @@ def intersperse(iterable, delimiter):
     for x in it:
         yield delimiter
         yield x
-
-
-class DoxygenTypeSubRenderer(Renderer):
-
-    def render(self):
-
-        context = self.context.create_child_context(self.data_object.compounddef)
-        compound_renderer = self.renderer_factory.create_renderer(context)
-        return compound_renderer.render()
-
-
-class CompoundDefTypeSubRenderer(Renderer):
-
-    # We store both the identified and appropriate title text here as we want to define the order
-    # here and the titles for the SectionDefTypeSubRenderer but we don't want the repetition of
-    # having two lists in case they fall out of sync
-    sections = [
-        ("user-defined", "User Defined"),
-        ("public-type", "Public Types"),
-        ("public-func", "Public Functions"),
-        ("public-attrib", "Public Members"),
-        ("public-slot", "Public Slots"),
-        ("signal", "Signal"),
-        ("dcop-func",  "DCOP Function"),
-        ("property",  "Property"),
-        ("event",  "Event"),
-        ("public-static-func", "Public Static Functions"),
-        ("public-static-attrib", "Public Static Attributes"),
-        ("protected-type",  "Protected Types"),
-        ("protected-func",  "Protected Functions"),
-        ("protected-attrib",  "Protected Attributes"),
-        ("protected-slot",  "Protected Slots"),
-        ("protected-static-func",  "Protected Static Functions"),
-        ("protected-static-attrib",  "Protected Static Attributes"),
-        ("package-type",  "Package Types"),
-        ("package-func", "Package Functions"),
-        ("package-attrib", "Package Attributes"),
-        ("package-static-func", "Package Static Functions"),
-        ("package-static-attrib", "Package Static Attributes"),
-        ("private-type", "Private Types"),
-        ("private-func", "Private Functions"),
-        ("private-attrib", "Private Members"),
-        ("private-slot",  "Private Slots"),
-        ("private-static-func", "Private Static Functions"),
-        ("private-static-attrib",  "Private Static Attributes"),
-        ("friend",  "Friends"),
-        ("related",  "Related"),
-        ("define",  "Defines"),
-        ("prototype",  "Prototypes"),
-        ("typedef",  "Typedefs"),
-        ("enum",  "Enums"),
-        ("func",  "Functions"),
-        ("var",  "Variables"),
-    ]
-
-    def render(self):
-
-        nodelist = []
-
-        nodelist.extend(render(self, self.data_object.briefdescription))
-        nodelist.extend(render(self, self.data_object.detaileddescription))
-
-        if self.data_object.basecompoundref:
-            output = renderIterable(self, self.data_object.basecompoundref)
-            if output:
-                nodelist.append(
-                    self.node_factory.paragraph(
-                        '',
-                        '',
-                        self.node_factory.Text('Inherits from '),
-                        *intersperse(output, self.node_factory.Text(', '))
-                    )
-                )
-
-        if self.data_object.derivedcompoundref:
-            output = renderIterable(self, self.data_object.derivedcompoundref)
-            if output:
-                nodelist.append(
-                    self.node_factory.paragraph(
-                        '',
-                        '',
-                        self.node_factory.Text('Subclassed by '),
-                        *intersperse(output, self.node_factory.Text(', '))
-                    )
-                )
-
-        section_nodelists = {}
-
-        # Get all sub sections
-        for sectiondef in self.data_object.sectiondef:
-            context = self.context.create_child_context(sectiondef)
-            renderer = self.renderer_factory.create_renderer(context)
-            child_nodes = renderer.render()
-            if not child_nodes:
-                # Skip empty section
-                continue
-            kind = sectiondef.kind
-            node = self.node_factory.container(classes=['breathe-sectiondef'])
-            node.document = self.state.document
-            node['objtype'] = kind
-            node.extend(child_nodes)
-            # We store the nodes as a list against the kind in a dictionary as the kind can be
-            # 'user-edited' and that can repeat so this allows us to collect all the 'user-edited'
-            # entries together
-            nodes = section_nodelists.setdefault(kind, [])
-            nodes += [node]
-
-        # Order the results in an appropriate manner
-        for kind, _ in self.sections:
-            nodelist.extend(section_nodelists.get(kind, []))
-
-        # Take care of innerclasses
-        nodelist.extend(renderIterable(self, self.data_object.innerclass))
-        nodelist.extend(renderIterable(self, self.data_object.innernamespace))
-
-        return nodelist
-
-
-class SectionDefTypeSubRenderer(Renderer):
-
-    section_titles = dict(CompoundDefTypeSubRenderer.sections)
-
-    def render(self):
-
-        node_list = []
-
-        node_list.extend(render(self, self.data_object.description))
-
-        # Get all the memberdef info
-        node_list.extend(renderIterable(self, self.data_object.memberdef))
-
-        if node_list:
-
-            text = self.section_titles[self.data_object.kind]
-
-            # Override default name for user-defined sections. Use "Unnamed
-            # Group" if the user didn't name the section
-            # This is different to Doxygen which will track the groups and name
-            # them Group1, Group2, Group3, etc.
-            if self.data_object.kind == "user-defined":
-                if self.data_object.header:
-                    text = self.data_object.header
-                else:
-                    text = "Unnamed Group"
-
-            # Use rubric for the title because, unlike the docutils element "section",
-            # it doesn't interfere with the document structure.
-            rubric = self.node_factory.rubric(text=text, classes=['breathe-sectiondef-title'])
-
-            return [rubric] + node_list
-
-        return []
-
-
-class MemberDefTypeSubRenderer(Renderer):
-
-    def create_doxygen_target(self):
-        """Can be overridden to create a target node which uses the doxygen refid information
-        which can be used for creating links between internal doxygen elements.
-
-        The default implementation should suffice most of the time.
-        """
-
-        refid = "%s%s" % (self.project_info.name(), self.data_object.id)
-        return self.target_handler.create_target(refid)
-
-    def title(self):
-
-        nodes = []
-
-        # Variable type or function return type
-        nodes.extend(render(self, self.data_object.type_))
-        if nodes:
-            nodes.append(self.node_factory.Text(" "))
-
-        nodes.append(self.node_factory.desc_name(text=self.data_object.name))
-
-        return nodes
-
-    def description(self):
-
-        nodes = []
-        nodes.extend(render(self, self.data_object.briefdescription))
-        nodes.extend(render(self, self.data_object.detaileddescription))
-        return nodes
-
-    def objtype(self):
-        """Return the type of the rendered object."""
-        return self.data_object.kind
-
-    def declaration(self):
-        """Return the declaration of the rendered object."""
-        return self.get_fully_qualified_name()
-
-    def update_signature(self, signode):
-        """Update the signature node if necessary, e.g. add qualifiers."""
-        prefix = self.objtype() + ' '
-        annotation = self.node_factory.desc_annotation(prefix, prefix)
-        if signode[0].tagname != 'desc_name':
-            signode[0] = annotation
-        else:
-            signode.insert(0, annotation)
-
-    def render(self):
-        nodes = self.run_domain_directive(self.objtype(), [self.declaration().replace('\n', ' ')])
-        node = nodes[1]
-        signode = node[0]
-        contentnode = node[-1]
-        self.update_signature(signode)
-        signode.insert(0, self.create_doxygen_target())
-        contentnode.extend(self.description())
-        return nodes
 
 
 def get_param_decl(param):
@@ -299,262 +101,313 @@ def get_definition_without_template_args(data_object):
     return definition
 
 
-class FuncMemberDefTypeSubRenderer(MemberDefTypeSubRenderer):
-
-    def update_signature(self, signode):
-        # Add `= 0` for pure virtual members.
-        if self.data_object.virt == 'pure-virtual':
-            signode.append(self.node_factory.Text(' = 0'))
-
-    def render(self):
-        # Get full function signature for the domain directive.
-        param_list = []
-        for param in self.data_object.param:
-            param = self.context.mask_factory.mask(param)
-            param_decl = get_param_decl(param)
-            param_list.append(param_decl)
-        signature = '{0}({1})'.format(get_definition_without_template_args(self.data_object),
-                                      ', '.join(param_list))
-
-        # Add CV-qualifiers.
-        if self.data_object.const == 'yes':
-            signature += ' const'
-        # The doxygen xml output doesn't register 'volatile' as the xml attribute for functions
-        # until version 1.8.8 so we also check argsstring:
-        #     https://bugzilla.gnome.org/show_bug.cgi?id=733451
-        if self.data_object.volatile == 'yes' or self.data_object.argsstring.endswith('volatile'):
-            signature += ' volatile'
-
-        self.context.directive_args[1] = [signature]
-
-        nodes = self.run_domain_directive(self.data_object.kind, self.context.directive_args[1])
-        node = nodes[1]
-        finder = NodeFinder(node.document)
-        node.walk(finder)
-
-        # Templates have multiple signature nodes in recent versions of Sphinx.
-        # Insert Doxygen target into the first signature node.
-        node.children[0].insert(0, self.create_doxygen_target())
-        self.update_signature(finder.declarator)
-        finder.content.extend(self.description())
-
-        template_node = self.create_template_node(self.data_object)
-        if template_node:
-            node.insert(0, template_node)
-        return nodes
-
-
-class DefineMemberDefTypeSubRenderer(MemberDefTypeSubRenderer):
-
-    def declaration(self):
-        decl = self.data_object.name
-        if self.data_object.param:
-            decl += "("
-            for i, parameter in enumerate(self.data_object.param):
-                if i:
-                    decl += ", "
-                decl += parameter.defname
-            decl += ")"
-        return decl
-
-    def update_signature(self, signode):
-        pass
-
-    def description(self):
-
-        return MemberDefTypeSubRenderer.description(self)
-
-
-class EnumMemberDefTypeSubRenderer(MemberDefTypeSubRenderer):
-
-    def declaration(self):
-
-        # Sphinx requires a name to be a valid identifier, so replace anonymous enum name of the
-        # form @id generated by Doxygen with "anonymous".
-        name = self.get_fully_qualified_name()
-        return name.replace("@", "__anonymous") if self.data_object.name.startswith("@") else name
-
-    def description(self):
-
-        description_nodes = MemberDefTypeSubRenderer.description(self)
-
-        name = self.node_factory.emphasis("", self.node_factory.Text("Values:"))
-        title = self.node_factory.paragraph("", "", name)
-        description_nodes.append(title)
-
-        enums = renderIterable(self, self.data_object.enumvalue)
-
-        description_nodes.extend(enums)
-
-        return description_nodes
-
-    def update_signature(self, signode):
-        first_node = signode.children[0]
-        if isinstance(first_node, self.node_factory.desc_annotation):
-            # Replace "type" with "enum" in the signature. This is needed because older versions of
-            # Sphinx cpp domain didn't have an enum directive and we use a type directive instead.
-            first_node[0] = self.node_factory.Text("enum ")
-        else:
-            # If there is no "type" annotation, insert "enum".
-            first_node.insert(0, self.node_factory.desc_annotation("enum ", "enum "))
-        if self.data_object.name.startswith("@"):
-            signode.children[1][0] = self.node_factory.strong(text="[anonymous]")
-
-
-class TypedefMemberDefTypeSubRenderer(MemberDefTypeSubRenderer):
+class SphinxRenderer(Renderer):
+    """
+    Doxygen node visitor that converts input into Sphinx/RST representation.
+    Each visit method takes a Doxygen node as an argument and returns a list of RST nodes.
+    """
 
     def __init__(self, *args):
-        MemberDefTypeSubRenderer.__init__(self, *args)
-        self.decl = get_definition_without_template_args(self.data_object)
-        typedef = "typedef "
-        usingalias = "using "
-        self.kind = self.data_object.kind
-        if self.decl.startswith(typedef):
-            self.decl = self.decl[len(typedef):]
-        elif self.decl.startswith(usingalias):
-            self.decl = self.decl[len(usingalias):]
-            self.kind = "using"
-
-    def objtype(self):
-        """Return the type of the rendered object."""
-        return self.kind
-
-    def declaration(self):
-        return self.decl
-
-
-class VariableMemberDefTypeSubRenderer(MemberDefTypeSubRenderer):
-
-    def declaration(self):
-        decl = get_definition_without_template_args(self.data_object)
-        enum = 'enum '
-        return decl[len(enum):] if decl.startswith(enum) else decl
-
-    def update_signature(self, signode):
-        pass
-
-
-class EnumvalueTypeSubRenderer(MemberDefTypeSubRenderer):
-
-    def objtype(self):
-
-        return 'enumvalue'
-
-    def update_signature(self, signode):
-        # Remove "class" from the signature. This is needed because Sphinx cpp domain doesn't have
-        # an enum value directive and we use a class directive instead.
-        signode.children.pop(0)
-        initializer = self.data_object.initializer
-        if initializer:
-            context = self.context.create_child_context(initializer)
-            renderer = self.renderer_factory.create_renderer(context)
-            nodes = renderer.render()
-            separator = ' '
-            if not nodes[0].startswith('='):
-                separator += '= '
-            signode.append(self.node_factory.Text(separator))
-            signode.extend(nodes)
-
-
-class CompoundRefTypeSubRenderer(Renderer):
-
-    def render(self):
-
-        nodelist = renderIterable(self, self.data_object.content_)
-
-        refid = "%s%s" % (self.project_info.name(), self.data_object.refid)
-        nodelist = [
-            self.node_factory.pending_xref(
-                "",
-                reftype="ref",
-                refdomain="std",
-                refexplicit=True,
-                refid=refid,
-                reftarget=refid,
-                *nodelist
-            )
-        ]
-
-        return nodelist
-
-
-class DescriptionTypeSubRenderer(Renderer):
-
-    def render(self):
-        return renderIterable(self, self.data_object.content_)
-
-
-class LinkedTextTypeSubRenderer(Renderer):
-
-    def render(self):
-        return renderIterable(self, self.data_object.content_)
-
-
-class ParamTypeSubRenderer(Renderer):
-
-    def __init__(
-            self,
-            output_defname,
-            *args
-            ):
-
         Renderer.__init__(self, *args)
-        self.output_defname = output_defname
+        self.output_defname = True
+        # Nesting level for lists.
+        self.nesting_level = 0
 
-    def render(self):
+    def create_doxygen_target(self, node):
+        """Can be overridden to create a target node which uses the doxygen refid information
+        which can be used for creating links between internal doxygen elements.
+
+        The default implementation should suffice most of the time.
+        """
+
+        refid = "%s%s" % (self.project_info.name(), node.id)
+        return self.target_handler.create_target(refid)
+
+    def title(self, node):
+
+        nodes = []
+
+        # Variable type or function return type
+        nodes.extend(render(self, node.type_))
+        if nodes:
+            nodes.append(self.node_factory.Text(" "))
+
+        nodes.append(self.node_factory.desc_name(text=node.name))
+
+        return nodes
+
+    def description(self, node):
+        return render(self, node.briefdescription) + render(self, node.detaileddescription)
+
+    def update_signature(self, signature, obj_type):
+        """Update the signature node if necessary, e.g. add qualifiers."""
+        prefix = obj_type + ' '
+        annotation = self.node_factory.desc_annotation(prefix, prefix)
+        if signature[0].tagname != 'desc_name':
+            signature[0] = annotation
+        else:
+            signature.insert(0, annotation)
+
+    def render_declaration(self, node, declaration=None, description=None, **kwargs):
+        if declaration is None:
+            declaration = self.get_fully_qualified_name()
+        obj_type = kwargs.get('objtype', None)
+        if obj_type is None:
+            obj_type = node.kind
+        nodes = self.run_domain_directive(obj_type, [declaration.replace('\n', ' ')])
+        rst_node = nodes[1]
+        signode = rst_node[0]
+        contentnode = rst_node[-1]
+        update_signature = kwargs.get('update_signature', None)
+        if update_signature is not None:
+            update_signature(signode, obj_type)
+        if description is None:
+            description = self.description(node)
+        signode.insert(0, self.create_doxygen_target(node))
+        contentnode.extend(description)
+        return nodes
+
+    def visit_unicode(self, node):
+
+        # Skip any nodes that are pure whitespace
+        # Probably need a better way to do this as currently we're only doing
+        # it skip whitespace between higher-level nodes, but this will also
+        # skip any pure whitespace entries in actual content nodes
+        #
+        # We counter that second issue slightly by allowing through single white spaces
+        #
+        if node.strip():
+            return [self.node_factory.Text(node)]
+        if node == six.u(" "):
+            return [self.node_factory.Text(node)]
+        return []
+
+    def visit_doxygen(self, node):
 
         nodelist = []
 
-        # Parameter type
-        if self.data_object.type_:
-            context = self.context.create_child_context(self.data_object.type_)
-            renderer = self.renderer_factory.create_renderer(context)
-            type_nodes = renderer.render()
-            # Render keywords as annotations for consistency with the cpp domain.
-            if len(type_nodes) > 0:
-                first_node = type_nodes[0]
-                for keyword in ['typename', 'class']:
-                    if first_node.startswith(keyword + ' '):
-                        type_nodes[0] = self.node_factory.Text(first_node.replace(keyword, '', 1))
-                        type_nodes.insert(0, self.node_factory.desc_annotation(keyword, keyword))
-                        break
-            nodelist.extend(type_nodes)
-
-        # Parameter name
-        if self.data_object.declname:
-            if nodelist:
-                nodelist.append(self.node_factory.Text(" "))
-            nodelist.append(self.node_factory.emphasis(text=self.data_object.declname))
-
-        elif self.output_defname and self.data_object.defname:
-            # We only want to output the definition name (from the cpp file) if the declaration name
-            # (from header file) isn't present
-            if nodelist:
-                nodelist.append(self.node_factory.Text(" "))
-            nodelist.append(self.node_factory.emphasis(text=self.data_object.defname))
-
-        # array information
-        if self.data_object.array:
-            nodelist.append(self.node_factory.Text(self.data_object.array))
-
-        # Default value
-        if self.data_object.defval:
-            nodelist.append(self.node_factory.Text(" = "))
-            context = self.context.create_child_context(self.data_object.defval)
-            renderer = self.renderer_factory.create_renderer(context)
-            nodelist.extend(renderer.render())
+        # Process all the compound children
+        for compound in node.get_compound():
+            nodelist.extend(self.render(compound))
 
         return nodelist
 
+    def visit_doxygendef(self, node):
+        return self.render(node.compounddef)
 
-class DocRefTextTypeSubRenderer(Renderer):
+    def visit_compound(self, node, render_empty_node=True, **kwargs):
 
-    def render(self):
+        # Read in the corresponding xml file and process
+        file_data = self.compound_parser.parse(node.refid)
 
-        nodelist = renderIterable(self, self.data_object.content_)
-        nodelist.extend(renderIterable(self, self.data_object.para))
+        rendered_data = self.render(file_data)
 
-        refid = "%s%s" % (self.project_info.name(), self.data_object.refid)
+        if not rendered_data and not render_empty_node:
+            return []
+
+        def get_node_info(file_data):
+            return node.name, node.kind
+        name, kind = kwargs.get('get_node_info', get_node_info)(file_data)
+
+        def render_signature(file_data, doxygen_target, name, kind):
+            # Defer to domains specific directive.
+            self.context.directive_args[1] = [self.get_fully_qualified_name()]
+            nodes = self.run_domain_directive(kind, self.context.directive_args[1])
+            rst_node = nodes[1]
+
+            finder = NodeFinder(rst_node.document)
+            rst_node.walk(finder)
+
+            # The cpp domain in Sphinx doesn't support structs at the moment, so change the text
+            # from "class " to the correct kind which can be "class " or "struct ".
+            finder.declarator[0] = self.node_factory.desc_annotation(kind + ' ', kind + ' ')
+
+            # Check if there is template information and format it as desired
+            template_signode = self.create_template_node(file_data.compounddef)
+            if template_signode:
+                rst_node.insert(0, template_signode)
+            rst_node.children[0].insert(0, doxygen_target)
+            return nodes, finder.content
+
+        refid = "%s%s" % (self.project_info.name(), node.refid)
+        render_sig = kwargs.get('render_signature', render_signature)
+        nodes, contentnode = render_sig(file_data, self.target_handler.create_target(refid),
+                                        name, kind)
+
+        parent_context = self.context.create_child_context(file_data)
+        new_context = parent_context.create_child_context(file_data.compounddef)
+        if file_data.compounddef.includes:
+            for include in file_data.compounddef.includes:
+                contentnode.extend(self.render(include, new_context.create_child_context(include)))
+
+        contentnode.extend(rendered_data)
+        return nodes
+
+    def visit_file(self, node):
+        def render_signature(file_data, doxygen_target, name, kind):
+            # Build targets for linking
+            targets = []
+            targets.extend(doxygen_target)
+
+            title_signode = self.node_factory.desc_signature()
+            title_signode.extend(targets)
+
+            # Set up the title
+            title_signode.append(self.node_factory.emphasis(text=kind))
+            title_signode.append(self.node_factory.Text(" "))
+            title_signode.append(self.node_factory.desc_name(text=name))
+
+            contentnode = self.node_factory.desc_content()
+
+            rst_node = self.node_factory.desc()
+            rst_node.document = self.state.document
+            rst_node['objtype'] = kind
+            rst_node.append(title_signode)
+            rst_node.append(contentnode)
+            return [rst_node], contentnode
+        return self.visit_compound(node, render_signature=render_signature)
+
+    # We store both the identified and appropriate title text here as we want to define the order
+    # here and the titles for the SectionDefTypeSubRenderer but we don't want the repetition of
+    # having two lists in case they fall out of sync
+    sections = [
+        ("user-defined", "User Defined"),
+        ("public-type", "Public Types"),
+        ("public-func", "Public Functions"),
+        ("public-attrib", "Public Members"),
+        ("public-slot", "Public Slots"),
+        ("signal", "Signal"),
+        ("dcop-func",  "DCOP Function"),
+        ("property",  "Property"),
+        ("event",  "Event"),
+        ("public-static-func", "Public Static Functions"),
+        ("public-static-attrib", "Public Static Attributes"),
+        ("protected-type",  "Protected Types"),
+        ("protected-func",  "Protected Functions"),
+        ("protected-attrib",  "Protected Attributes"),
+        ("protected-slot",  "Protected Slots"),
+        ("protected-static-func",  "Protected Static Functions"),
+        ("protected-static-attrib",  "Protected Static Attributes"),
+        ("package-type",  "Package Types"),
+        ("package-func", "Package Functions"),
+        ("package-attrib", "Package Attributes"),
+        ("package-static-func", "Package Static Functions"),
+        ("package-static-attrib", "Package Static Attributes"),
+        ("private-type", "Private Types"),
+        ("private-func", "Private Functions"),
+        ("private-attrib", "Private Members"),
+        ("private-slot",  "Private Slots"),
+        ("private-static-func", "Private Static Functions"),
+        ("private-static-attrib",  "Private Static Attributes"),
+        ("friend",  "Friends"),
+        ("related",  "Related"),
+        ("define",  "Defines"),
+        ("prototype",  "Prototypes"),
+        ("typedef",  "Typedefs"),
+        ("enum",  "Enums"),
+        ("func",  "Functions"),
+        ("var",  "Variables"),
+    ]
+
+    def visit_compounddef(self, node):
+
+        nodelist = []
+
+        nodelist.extend(render(self, node.briefdescription))
+        nodelist.extend(render(self, node.detaileddescription))
+
+        if node.basecompoundref:
+            output = renderIterable(self, node.basecompoundref)
+            if output:
+                nodelist.append(
+                    self.node_factory.paragraph(
+                        '',
+                        '',
+                        self.node_factory.Text('Inherits from '),
+                        *intersperse(output, self.node_factory.Text(', '))
+                    )
+                )
+
+        if node.derivedcompoundref:
+            output = renderIterable(self, node.derivedcompoundref)
+            if output:
+                nodelist.append(
+                    self.node_factory.paragraph(
+                        '',
+                        '',
+                        self.node_factory.Text('Subclassed by '),
+                        *intersperse(output, self.node_factory.Text(', '))
+                    )
+                )
+
+        section_nodelists = {}
+
+        # Get all sub sections
+        for sectiondef in node.sectiondef:
+            child_nodes = self.render(sectiondef)
+            if not child_nodes:
+                # Skip empty section
+                continue
+            kind = sectiondef.kind
+            rst_node = self.node_factory.container(classes=['breathe-sectiondef'])
+            rst_node.document = self.state.document
+            rst_node['objtype'] = kind
+            rst_node.extend(child_nodes)
+            # We store the nodes as a list against the kind in a dictionary as the kind can be
+            # 'user-edited' and that can repeat so this allows us to collect all the 'user-edited'
+            # entries together
+            nodes = section_nodelists.setdefault(kind, [])
+            nodes += [rst_node]
+
+        # Order the results in an appropriate manner
+        for kind, _ in self.sections:
+            nodelist.extend(section_nodelists.get(kind, []))
+
+        # Take care of innerclasses
+        nodelist.extend(renderIterable(self, node.innerclass))
+        nodelist.extend(renderIterable(self, node.innernamespace))
+
+        return nodelist
+
+    section_titles = dict(sections)
+
+    def visit_sectiondef(self, node):
+
+        node_list = []
+
+        node_list.extend(render(self, node.description))
+
+        # Get all the memberdef info
+        node_list.extend(renderIterable(self, node.memberdef))
+
+        if node_list:
+
+            text = self.section_titles[node.kind]
+
+            # Override default name for user-defined sections. Use "Unnamed
+            # Group" if the user didn't name the section
+            # This is different to Doxygen which will track the groups and name
+            # them Group1, Group2, Group3, etc.
+            if node.kind == "user-defined":
+                if node.header:
+                    text = node.header
+                else:
+                    text = "Unnamed Group"
+
+            # Use rubric for the title because, unlike the docutils element "section",
+            # it doesn't interfere with the document structure.
+            rubric = self.node_factory.rubric(text=text, classes=['breathe-sectiondef-title'])
+
+            return [rubric] + node_list
+
+        return []
+
+    def visit_docreftext(self, node):
+
+        nodelist = renderIterable(self, node.content_)
+        nodelist.extend(renderIterable(self, node.para))
+
+        refid = "%s%s" % (self.project_info.name(), node.refid)
         nodelist = [
             self.node_factory.pending_xref(
                 "",
@@ -569,24 +422,30 @@ class DocRefTextTypeSubRenderer(Renderer):
 
         return nodelist
 
+    def visit_docheading(self, node):
+        """Heading renderer.
 
-class DocParaTypeSubRenderer(Renderer):
-    """
-    <para> tags in the Doxygen output tend to contain either text or a single other tag of interest.
-    So whilst it looks like we're combined descriptions and program listings and other things, in
-    the end we generally only deal with one per para tag. Multiple neighbouring instances of these
-    things tend to each be in a separate neighbouring para tag.
-    """
+        Renders embedded headlines as emphasized text. Different heading levels
+        are not supported.
+        """
+        nodelist = renderIterable(self, node.content_)
+        return [self.node_factory.emphasis("", "", *nodelist)]
 
-    def render(self):
+    def visit_docpara(self, node):
+        """
+        <para> tags in the Doxygen output tend to contain either text or a single other tag of
+        interest. So whilst it looks like we're combined descriptions and program listings and
+        other things, in the end we generally only deal with one per para tag. Multiple
+        neighbouring instances of these things tend to each be in a separate neighbouring para tag.
+        """
 
-        nodelist = renderIterable(self, self.data_object.content)
-        nodelist.extend(renderIterable(self, self.data_object.images))
+        nodelist = renderIterable(self, node.content)
+        nodelist.extend(renderIterable(self, node.images))
 
         # Returns, user par's, etc
-        definition_nodes = renderIterable(self, self.data_object.simplesects)
+        definition_nodes = renderIterable(self, node.simplesects)
         # Parameters/Exceptions
-        definition_nodes.extend(renderIterable(self, self.data_object.parameterlist))
+        definition_nodes.extend(renderIterable(self, node.parameterlist))
 
         if definition_nodes:
             definition_list = self.node_factory.definition_list("", *definition_nodes)
@@ -594,157 +453,85 @@ class DocParaTypeSubRenderer(Renderer):
 
         return [self.node_factory.paragraph("", "", *nodelist)]
 
-
-class DocImageTypeSubRenderer(Renderer):
-    """Output docutils image node using name attribute from xml as the uri"""
-
-    def render(self):
+    def visit_docimage(self, node):
+        """Output docutils image node using name attribute from xml as the uri"""
 
         path_to_image = self.project_info.sphinx_abs_path_to_file(
-            self.data_object.name
+            node.name
         )
 
         options = {"uri": path_to_image}
 
         return [self.node_factory.image("", **options)]
 
+    def visit_docurllink(self, node):
+        """Url Link Renderer"""
+        nodelist = renderIterable(self, node.content_)
+        return [self.node_factory.reference("", "", refuri=node.url, *nodelist)]
 
-class DocMarkupTypeSubRenderer(Renderer):
+    def visit_docmarkup(self, node):
 
-    def __init__(
-            self,
-            creator,
-            *args
-            ):
+        nodelist = renderIterable(self, node.content_)
+        creator = self.node_factory.inline
+        if node.type_ == "emphasis":
+            creator = self.node_factory.emphasis
+        elif node.type_ == "computeroutput":
+            creator = self.node_factory.literal
+        elif node.type_ == "bold":
+            creator = self.node_factory.strong
+        elif node.type_ == "superscript":
+            creator = self.node_factory.superscript
+        elif node.type_ == "subscript":
+            creator = self.node_factory.subscript
+        elif node.type_ == "center":
+            print("Warning: does not currently handle 'center' text display")
+        elif node.type_ == "small":
+            print("Warning: does not currently handle 'small' text display")
+        return [creator("", "", *nodelist)]
 
-        Renderer.__init__(self, *args)
-        self.creator = creator
-
-    def render(self):
-
-        nodelist = renderIterable(self, self.data_object.content_)
-        return [self.creator("", "", *nodelist)]
-
-
-class DocParamListTypeSubRenderer(Renderer):
-    """Parameter/Exception documentation"""
-
-    lookup = {
-        "param": "Parameters",
-        "exception": "Exceptions",
-        "templateparam": "Template Parameters",
-        "retval": "Return Value",
-    }
-
-    def render(self):
-
-        nodelist = renderIterable(self, self.data_object.parameteritem)
-
-        # Fild list entry
-        nodelist_list = self.node_factory.bullet_list("", classes=["breatheparameterlist"],
-                                                      *nodelist)
-
-        term_text = self.lookup[self.data_object.kind]
-        term = self.node_factory.term("", "", self.node_factory.strong("", term_text))
-        definition = self.node_factory.definition('', nodelist_list)
-
-        return [self.node_factory.definition_list_item('', term, definition)]
-
-
-class DocParamListItemSubRenderer(Renderer):
-    """ Parameter Description Renderer  """
-
-    def render(self):
-
-        nodelist = renderIterable(self, self.data_object.parameternamelist)
-
-        term = self.node_factory.literal("", "", *nodelist)
-
-        separator = self.node_factory.Text(" - ")
-
-        nodelist = render(self, self.data_object.parameterdescription)
-
-        return [self.node_factory.list_item("", term, separator, *nodelist)]
-
-
-class DocParamNameListSubRenderer(Renderer):
-    """ Parameter Name Renderer """
-
-    def render(self):
-        return renderIterable(self, self.data_object.parametername)
-
-
-class DocParamNameSubRenderer(Renderer):
-
-    def render(self):
-        return renderIterable(self, self.data_object.content_)
-
-
-class DocSect1TypeSubRenderer(Renderer):
-
-    def render(self):
-
+    def visit_docsect1(self, node):
         return []
 
+    def visit_docsimplesect(self, node):
+        """Other Type documentation such as Warning, Note, Returns, etc"""
 
-class DocSimpleSectTypeSubRenderer(Renderer):
-    """Other Type documentation such as Warning, Note, Returns, etc"""
+        nodelist = renderIterable(self, node.para)
 
-    def title(self):
+        if node.kind == "par":
+            text = self.render(node.title)
+        else:
+            text = [self.node_factory.Text(node.kind.capitalize())]
+        title = self.node_factory.strong("", *text)
 
-        text = self.node_factory.Text(self.data_object.kind.capitalize())
-
-        return [self.node_factory.strong("", text)]
-
-    def render(self):
-
-        nodelist = renderIterable(self, self.data_object.para)
-
-        term = self.node_factory.term("", "", *self.title())
+        term = self.node_factory.term("", "", title)
         definition = self.node_factory.definition("", *nodelist)
 
         return [self.node_factory.definition_list_item("", term, definition)]
 
+    def visit_doctitle(self, node):
+        return renderIterable(self, node.content_)
 
-class ParDocSimpleSectTypeSubRenderer(DocSimpleSectTypeSubRenderer):
-
-    def title(self):
-
-        context = self.context.create_child_context(self.data_object.title)
-        renderer = self.renderer_factory.create_renderer(context)
-
-        return [self.node_factory.strong("", *renderer.render())]
-
-
-class DocTitleTypeSubRenderer(Renderer):
-
-    def render(self):
-        return renderIterable(self, self.data_object.content_)
-
-
-class DocFormulaTypeSubRenderer(Renderer):
-
-    def render(self):
+    def visit_docformula(self, node):
 
         nodelist = []
 
-        for item in self.data_object.content_:
+        for item in node.content_:
 
             latex = item.getValue()
 
             # Somewhat hacky if statements to strip out the doxygen markup that slips through
 
-            node = None
+            rst_node = None
 
             # Either inline
             if latex.startswith("$") and latex.endswith("$"):
                 latex = latex[1:-1]
 
                 # If we're inline create a math node like the :math: role
-                node = self.node_factory.math()
+                rst_node = self.node_factory.math()
             else:
                 # Else we're multiline
-                node = self.node_factory.displaymath()
+                rst_node = self.node_factory.displaymath()
 
             # Or multiline
             if latex.startswith("\[") and latex.endswith("\]"):
@@ -752,30 +539,25 @@ class DocFormulaTypeSubRenderer(Renderer):
 
             # Here we steal the core of the mathbase "math" directive handling code from:
             #    sphinx.ext.mathbase
-            node["latex"] = latex
+            rst_node["latex"] = latex
 
             # Required parameters which we don't have values for
-            node["label"] = None
-            node["nowrap"] = False
-            node["docname"] = self.state.document.settings.env.docname
+            rst_node["label"] = None
+            rst_node["nowrap"] = False
+            rst_node["docname"] = self.state.document.settings.env.docname
 
-            nodelist.append(node)
+            nodelist.append(rst_node)
 
         return nodelist
 
-
-class ListingTypeSubRenderer(Renderer):
-
-    def render(self):
+    def visit_listing(self, node):
 
         nodelist = []
-        for i, item in enumerate(self.data_object.codeline):
+        for i, item in enumerate(node.codeline):
             # Put new lines between the lines. There must be a more pythonic way of doing this
             if i:
                 nodelist.append(self.node_factory.Text("\n"))
-            context = self.context.create_child_context(item)
-            renderer = self.renderer_factory.create_renderer(context)
-            nodelist.extend(renderer.render())
+            nodelist.extend(self.render(item))
 
         # Add blank string at the start otherwise for some reason it renders
         # the pending_xref tags around the kind in plain text
@@ -787,71 +569,18 @@ class ListingTypeSubRenderer(Renderer):
 
         return [block]
 
+    def visit_codeline(self, node):
+        return renderIterable(self, node.highlight)
 
-class CodeLineTypeSubRenderer(Renderer):
+    def visit_highlight(self, node):
+        return renderIterable(self, node.content_)
 
-    def render(self):
-        return renderIterable(self, self.data_object.highlight)
+    def visit_verbatim(self, node):
 
-
-class HighlightTypeSubRenderer(Renderer):
-
-    def render(self):
-        return renderIterable(self, self.data_object.content_)
-
-
-class TemplateParamListRenderer(Renderer):
-
-    def render(self):
-
-        nodelist = []
-
-        for i, item in enumerate(self.data_object.param):
-            if i:
-                nodelist.append(self.node_factory.Text(", "))
-            context = self.context.create_child_context(item)
-            renderer = self.renderer_factory.create_renderer(context)
-            nodelist.extend(renderer.render())
-
-        return nodelist
-
-
-class IncTypeSubRenderer(Renderer):
-
-    def render(self):
-
-        if self.data_object.local == u"yes":
-            text = '#include "%s"' % self.data_object.content_[0].getValue()
-        else:
-            text = '#include <%s>' % self.data_object.content_[0].getValue()
-
-        return [self.node_factory.emphasis(text=text)]
-
-
-class RefTypeSubRenderer(CompoundRenderer):
-
-    def __init__(self, compound_parser, *args):
-        CompoundRenderer.__init__(self, compound_parser, False, *args)
-
-    def get_node_info(self, file_data):
-        name = self.data_object.content_[0].getValue()
-        name = name.rsplit("::", 1)[-1]
-        return name, file_data.compounddef.kind
-
-
-class VerbatimTypeSubRenderer(Renderer):
-
-    def __init__(self, content_creator, *args):
-        Renderer.__init__(self, *args)
-
-        self.content_creator = content_creator
-
-    def render(self):
-
-        if not self.data_object.text.strip().startswith("embed:rst"):
+        if not node.text.strip().startswith("embed:rst"):
 
             # Remove trailing new lines. Purely subjective call from viewing results
-            text = self.data_object.text.rstrip()
+            text = node.text.rstrip()
 
             # Handle has a preformatted text
             return [self.node_factory.literal_block(text, text)]
@@ -861,130 +590,398 @@ class VerbatimTypeSubRenderer(Renderer):
         #   However This would have a side-effect for any users who have an rst-block
         #   consisting of a simple bullet list.
         #   For now we just look for an extended embed tag
-        if self.data_object.text.strip().startswith("embed:rst:leading-asterisk"):
+        if node.text.strip().startswith("embed:rst:leading-asterisk"):
 
-            lines = self.data_object.text.splitlines()
+            lines = node.text.splitlines()
             # Replace the first * on each line with a blank space
             lines = map(lambda text: text.replace("*", " ", 1), lines)
-            self.data_object.text = "\n".join(lines)
+            node.text = "\n".join(lines)
 
         # do we need to strip leading ///?
-        elif self.data_object.text.strip().startswith("embed:rst:leading-slashes"):
+        elif node.text.strip().startswith("embed:rst:leading-slashes"):
 
-            lines = self.data_object.text.splitlines()
+            lines = node.text.splitlines()
             # Replace the /// on each line with three blank spaces
             lines = map(lambda text: text.replace("///", "   ", 1), lines)
-            self.data_object.text = "\n".join(lines)
+            node.text = "\n".join(lines)
 
-        rst = self.content_creator(self.data_object.text)
+        # Remove the first line which is "embed:rst[:leading-asterisk]"
+        text = "\n".join(node.text.split(u"\n")[1:])
+
+        # Remove starting whitespace
+        text = textwrap.dedent(text)
+
+        # Inspired by autodoc.py in Sphinx
+        rst = ViewList()
+        for line in text.split("\n"):
+            rst.append(line, "<breathe>")
 
         # Parent node for the generated node subtree
-        node = self.node_factory.paragraph()
-        node.document = self.state.document
+        rst_node = self.node_factory.paragraph()
+        rst_node.document = self.state.document
 
         # Generate node subtree
-        self.state.nested_parse(rst, 0, node)
+        self.state.nested_parse(rst, 0, rst_node)
 
-        return node
+        return rst_node
 
+    def visit_inc(self, node):
 
-class MixedContainerRenderer(Renderer):
+        if node.local == u"yes":
+            text = '#include "%s"' % node.content_[0].getValue()
+        else:
+            text = '#include <%s>' % node.content_[0].getValue()
 
-    def render(self):
-        return render(self, self.data_object.getValue())
+        return [self.node_factory.emphasis(text=text)]
 
+    def visit_ref(self, node):
+        def get_node_info(file_data):
+            name = node.content_[0].getValue()
+            name = name.rsplit("::", 1)[-1]
+            return name, file_data.compounddef.kind
+        return self.visit_compound(node, False, get_node_info=get_node_info)
 
-class DocListNestedRenderer(object):
-    """Decorator for the list type renderer.
-
-    Creates the proper docutils node based on the sub-type
-    of the underlying data object. Takes care of proper numbering
-    for deeply nested enumerated lists.
-    """
+    def visit_doclistitem(self, node):
+        """List item renderer. Render all the children depth-first.
+        Upon return expand the children node list into a docutils list-item.
+        """
+        nodelist = renderIterable(self, node.para)
+        return [self.node_factory.list_item("", *nodelist)]
 
     numeral_kind = ['arabic', 'loweralpha', 'lowerroman', 'upperalpha', 'upperroman']
 
-    def __init__(self, f):
-        self.__render = f
-        self.__nesting_level = 0
-
-    def __get__(self, obj, objtype):
-        """ Support instance methods. """
-        import functools
-        return functools.partial(self.__call__, obj)
-
-    def __call__(self, rend_self):
-        """ Call the wrapped render function. Update the nesting level for the enumerated lists. """
-        rend_instance = rend_self
-        if rend_instance.data_object.node_subtype is "itemized":
-            val = self.__render(rend_instance)
-            return DocListNestedRenderer.render_unordered(rend_instance, children=val)
-        elif rend_instance.data_object.node_subtype is "ordered":
-            self.__nesting_level += 1
-            val = self.__render(rend_instance)
-            self.__nesting_level -= 1
-            return DocListNestedRenderer.render_enumerated(rend_instance, children=val,
-                                                           nesting_level=self.__nesting_level)
-
-        return []
-
-    @staticmethod
-    def render_unordered(renderer, children):
-        nodelist_list = renderer.node_factory.bullet_list("", *children)
+    def render_unordered(self, children):
+        nodelist_list = self.node_factory.bullet_list("", *children)
 
         return [nodelist_list]
 
-    @staticmethod
-    def render_enumerated(renderer, children, nesting_level):
-        nodelist_list = renderer.node_factory.enumerated_list("", *children)
-        idx = nesting_level % len(DocListNestedRenderer.numeral_kind)
-        nodelist_list['enumtype'] = DocListNestedRenderer.numeral_kind[idx]
+    def render_enumerated(self, children, nesting_level):
+        nodelist_list = self.node_factory.enumerated_list("", *children)
+        idx = nesting_level % len(SphinxRenderer.numeral_kind)
+        nodelist_list['enumtype'] = SphinxRenderer.numeral_kind[idx]
         nodelist_list['prefix'] = ''
         nodelist_list['suffix'] = '.'
 
         return [nodelist_list]
 
+    def visit_doclist(self, node):
+        """List renderer
 
-class DocListTypeSubRenderer(Renderer):
-    """List renderer
+        The specifics of the actual list rendering are handled by the
+        decorator around the generic render function.
+        Render all the children depth-first. """
+        """ Call the wrapped render function. Update the nesting level for the enumerated lists. """
+        if node.node_subtype is "itemized":
+            val = renderIterable(self, node.listitem)
+            return self.render_unordered(children=val)
+        elif node.node_subtype is "ordered":
+            self.nesting_level += 1
+            val = renderIterable(self, node.listitem)
+            self.nesting_level -= 1
+            return self.render_enumerated(children=val, nesting_level=self.nesting_level)
+        return []
 
-    The specifics of the actual list rendering are handled by the
-    decorator around the generic render function.
-    """
+    def visit_compoundref(self, node):
 
-    @DocListNestedRenderer
-    def render(self):
-        """ Render all the children depth-first. """
-        return renderIterable(self, self.data_object.listitem)
+        nodelist = renderIterable(self, node.content_)
 
+        refid = "%s%s" % (self.project_info.name(), node.refid)
+        nodelist = [
+            self.node_factory.pending_xref(
+                "",
+                reftype="ref",
+                refdomain="std",
+                refexplicit=True,
+                refid=refid,
+                reftarget=refid,
+                *nodelist
+            )
+        ]
 
-class DocListItemTypeSubRenderer(Renderer):
-    """List item renderer.
-    """
+        return nodelist
 
-    def render(self):
-        """ Render all the children depth-first.
-            Upon return expand the children node list into a docutils list-item.
-        """
-        nodelist = renderIterable(self, self.data_object.para)
-        return [self.node_factory.list_item("", *nodelist)]
+    def visit_mixedcontainer(self, node):
+        return render(self, node.getValue())
 
+    def visit_description(self, node):
+        return renderIterable(self, node.content_)
 
-class DocHeadingTypeSubRenderer(Renderer):
-    """Heading renderer.
+    def visit_linkedtext(self, node):
+        return renderIterable(self, node.content_)
 
-    Renders embedded headlines as emphasized text. Different heading levels
-    are not supported.
-    """
+    def visit_function(self, node):
+        # Get full function signature for the domain directive.
+        param_list = []
+        for param in node.param:
+            param = self.context.mask_factory.mask(param)
+            param_decl = get_param_decl(param)
+            param_list.append(param_decl)
+        signature = '{0}({1})'.format(get_definition_without_template_args(node),
+                                      ', '.join(param_list))
 
-    def render(self):
-        nodelist = renderIterable(self, self.data_object.content_)
-        return [self.node_factory.emphasis("", "", *nodelist)]
+        # Add CV-qualifiers.
+        if node.const == 'yes':
+            signature += ' const'
+        # The doxygen xml output doesn't register 'volatile' as the xml attribute for functions
+        # until version 1.8.8 so we also check argsstring:
+        #     https://bugzilla.gnome.org/show_bug.cgi?id=733451
+        if node.volatile == 'yes' or node.argsstring.endswith('volatile'):
+            signature += ' volatile'
 
+        self.context.directive_args[1] = [signature]
 
-class DocURLLinkSubRenderer(Renderer):
-    """Url Link Renderer"""
+        nodes = self.run_domain_directive(node.kind, self.context.directive_args[1])
+        rst_node = nodes[1]
+        finder = NodeFinder(rst_node.document)
+        rst_node.walk(finder)
 
-    def render(self):
-        nodelist = renderIterable(self, self.data_object.content_)
-        return [self.node_factory.reference("", "", refuri=self.data_object.url, *nodelist)]
+        # Templates have multiple signature nodes in recent versions of Sphinx.
+        # Insert Doxygen target into the first signature node.
+        rst_node.children[0].insert(0, self.create_doxygen_target(node))
+
+        # Add `= 0` for pure virtual members.
+        if node.virt == 'pure-virtual':
+            finder.declarator.append(self.node_factory.Text(' = 0'))
+
+        finder.content.extend(self.description(node))
+
+        template_node = self.create_template_node(node)
+        if template_node:
+            rst_node.insert(0, template_node)
+        return nodes
+
+    def visit_define(self, node):
+        declaration = node.name
+        if node.param:
+            declaration += "("
+            for i, parameter in enumerate(node.param):
+                if i:
+                    declaration += ", "
+                declaration += parameter.defname
+            declaration += ")"
+        return self.render_declaration(node, declaration)
+
+    def visit_enum(self, node):
+        # Sphinx requires a name to be a valid identifier, so replace anonymous enum name of the
+        # form @id generated by Doxygen with "anonymous".
+        name = self.get_fully_qualified_name()
+        declaration = name.replace("@", "__anonymous") if node.name.startswith("@") else name
+
+        description_nodes = self.description(node)
+        name = self.node_factory.emphasis("", self.node_factory.Text("Values:"))
+        title = self.node_factory.paragraph("", "", name)
+        description_nodes.append(title)
+        enums = renderIterable(self, node.enumvalue)
+        description_nodes.extend(enums)
+
+        def update_signature(signature, obj_type):
+            first_node = signature.children[0]
+            if isinstance(first_node, self.node_factory.desc_annotation):
+                # Replace "type" with "enum" in the signature. This is needed because older
+                # versions of Sphinx cpp domain didn't have an enum directive and we use a type
+                # directive instead.
+                first_node[0] = self.node_factory.Text("enum ")
+            else:
+                # If there is no "type" annotation, insert "enum".
+                first_node.insert(0, self.node_factory.desc_annotation("enum ", "enum "))
+            if node.name.startswith("@"):
+                signature.children[1][0] = self.node_factory.strong(text="[anonymous]")
+
+        return self.render_declaration(node, declaration, description_nodes,
+                                       update_signature=update_signature)
+
+    def visit_typedef(self, node):
+        declaration = get_definition_without_template_args(node)
+        typedef = "typedef "
+        using = "using "
+        obj_type = node.kind
+        if declaration.startswith(typedef):
+            declaration = declaration[len(typedef):]
+        elif declaration.startswith(using):
+            declaration = declaration[len(using):]
+            obj_type = "using"
+        return self.render_declaration(node, declaration, objtype=obj_type,
+                                       update_signature=self.update_signature)
+
+    def visit_variable(self, node):
+        declaration = get_definition_without_template_args(node)
+        enum = 'enum '
+        if declaration.startswith(enum):
+            declaration = declaration[len(enum):]
+        return self.render_declaration(node, declaration)
+
+    def visit_enumvalue(self, node):
+        def update_signature(signature, obj_type):
+            # Remove "class" from the signature. This is needed because Sphinx cpp domain doesn't
+            # have an enum value directive and we use a class directive instead.
+            signature.children.pop(0)
+            initializer = node.initializer
+            if initializer:
+                nodes = self.render(initializer)
+                separator = ' '
+                if not nodes[0].startswith('='):
+                    separator += '= '
+                signature.append(self.node_factory.Text(separator))
+                signature.extend(nodes)
+        return self.render_declaration(node, objtype='enumvalue', update_signature=update_signature)
+
+    def visit_param(self, node):
+
+        nodelist = []
+
+        # Parameter type
+        if node.type_:
+            type_nodes = self.render(node.type_)
+            # Render keywords as annotations for consistency with the cpp domain.
+            if len(type_nodes) > 0:
+                first_node = type_nodes[0]
+                for keyword in ['typename', 'class']:
+                    if first_node.startswith(keyword + ' '):
+                        type_nodes[0] = self.node_factory.Text(first_node.replace(keyword, '', 1))
+                        type_nodes.insert(0, self.node_factory.desc_annotation(keyword, keyword))
+                        break
+            nodelist.extend(type_nodes)
+
+        # Parameter name
+        if node.declname:
+            if nodelist:
+                nodelist.append(self.node_factory.Text(" "))
+            nodelist.append(self.node_factory.emphasis(text=node.declname))
+
+        elif self.output_defname and node.defname:
+            # We only want to output the definition name (from the cpp file) if the declaration name
+            # (from header file) isn't present
+            if nodelist:
+                nodelist.append(self.node_factory.Text(" "))
+            nodelist.append(self.node_factory.emphasis(text=node.defname))
+
+        # array information
+        if node.array:
+            nodelist.append(self.node_factory.Text(node.array))
+
+        # Default value
+        if node.defval:
+            nodelist.append(self.node_factory.Text(" = "))
+            nodelist.extend(self.render(node.defval))
+
+        return nodelist
+
+    lookup = {
+        "param": "Parameters",
+        "exception": "Exceptions",
+        "templateparam": "Template Parameters",
+        "retval": "Return Value",
+    }
+
+    def visit_docparamlist(self, node):
+        """Parameter/Exception documentation"""
+
+        nodelist = renderIterable(self, node.parameteritem)
+
+        # Fild list entry
+        nodelist_list = self.node_factory.bullet_list("", classes=["breatheparameterlist"],
+                                                      *nodelist)
+
+        term_text = self.lookup[node.kind]
+        term = self.node_factory.term("", "", self.node_factory.strong("", term_text))
+        definition = self.node_factory.definition('', nodelist_list)
+
+        return [self.node_factory.definition_list_item('', term, definition)]
+
+    def visit_docparamlistitem(self, node):
+        """ Parameter Description Renderer  """
+
+        nodelist = renderIterable(self, node.parameternamelist)
+
+        term = self.node_factory.literal("", "", *nodelist)
+
+        separator = self.node_factory.Text(" - ")
+
+        nodelist = render(self, node.parameterdescription)
+
+        return [self.node_factory.list_item("", term, separator, *nodelist)]
+
+    def visit_docparamnamelist(self, node):
+        """ Parameter Name Renderer"""
+        return renderIterable(self, node.parametername)
+
+    def visit_docparamname(self, node):
+        return renderIterable(self, node.content_)
+
+    def visit_templateparamlist(self, node):
+
+        nodelist = []
+        self.output_defname = False
+        for i, item in enumerate(node.param):
+            if i:
+                nodelist.append(self.node_factory.Text(", "))
+            nodelist.extend(self.render(item))
+        self.output_defname = True
+        return nodelist
+
+    methods = {
+        "doxygen": visit_doxygen,
+        "doxygendef": visit_doxygendef,
+        "compounddef": visit_compounddef,
+        "sectiondef": visit_sectiondef,
+        "docreftext": visit_docreftext,
+        "docheading": visit_docheading,
+        "docpara": visit_docpara,
+        "docimage": visit_docimage,
+        "docurllink": visit_docurllink,
+        "docmarkup": visit_docmarkup,
+        "docsect1": visit_docsect1,
+        "docsimplesect": visit_docsimplesect,
+        "doctitle": visit_doctitle,
+        "docformula": visit_docformula,
+        "listing": visit_listing,
+        "codeline": visit_codeline,
+        "highlight": visit_highlight,
+        "verbatim": visit_verbatim,
+        "inc": visit_inc,
+        "ref": visit_ref,
+        "doclist": visit_doclist,
+        "doclistitem": visit_doclistitem,
+        "enumvalue": visit_enumvalue,
+        "linkedtext": visit_linkedtext,
+        "compoundref": visit_compoundref,
+        "mixedcontainer": visit_mixedcontainer,
+        "description": visit_description,
+        "param": visit_param,
+        "docparamlist": visit_docparamlist,
+        "docparamlistitem": visit_docparamlistitem,
+        "docparamnamelist": visit_docparamnamelist,
+        "docparamname": visit_docparamname,
+        "templateparamlist": visit_templateparamlist
+    }
+
+    def render(self, node, context=None):
+        saved_context = self.context
+        self.set_context(context if context else self.context.create_child_context(node))
+        try:
+            if not self.filter_.allow(self.context.node_stack):
+                return []
+            if isinstance(node, six.text_type):
+                return self.visit_unicode(node)
+            method = SphinxRenderer.methods.get(node.node_type)
+            if method is not None:
+                return method(self, node)
+            if node.node_type == "memberdef":
+                if node.kind in ("function", "slot") or \
+                        (node.kind == 'friend' and node.argsstring):
+                    return self.visit_function(node)
+                if node.kind == "enum":
+                    return self.visit_enum(node)
+                if node.kind == "typedef":
+                    return self.visit_typedef(node)
+                if node.kind == "variable":
+                    return self.visit_variable(node)
+                if node.kind == "define":
+                    return self.visit_define(node)
+                return self.render_declaration(node, update_signature=self.update_signature)
+            if node.node_type == "compound":
+                if node.kind in ["file", "dir", "page", "example", "group"]:
+                    return self.visit_file(node)
+                return self.visit_compound(node)
+        finally:
+            self.context = saved_context

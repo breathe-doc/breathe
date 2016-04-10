@@ -55,23 +55,27 @@ class Renderer(object):
     def __init__(
             self,
             project_info,
-            context,
             renderer_factory,
             node_factory,
             state,
             document,
             target_handler,
+            compound_parser,
+            filter_
     ):
 
         self.project_info = project_info
-        self.context = context
-        self.data_object = context.node_stack[0]
         self.renderer_factory = renderer_factory
         self.node_factory = node_factory
         self.state = state
         self.document = document
         self.target_handler = target_handler
+        self.compound_parser = compound_parser
+        self.filter_ = filter_
+        self.context = None
 
+    def set_context(self, context):
+        self.context = context
         if self.context.domain == '':
             self.context.domain = self.get_domain()
 
@@ -138,11 +142,9 @@ class Renderer(object):
         """Creates a node for the ``template <...>`` part of the declaration."""
         if not decl.templateparamlist:
             return None
-        context = self.context.create_child_context(decl.templateparamlist)
-        renderer = self.renderer_factory.create_renderer(context)
         template = 'template '
         nodes = [self.node_factory.desc_annotation(template, template), self.node_factory.Text('<')]
-        nodes.extend(renderer.render())
+        nodes.extend(self.render(decl.templateparamlist))
         nodes.append(self.node_factory.Text(">"))
         signode = self.node_factory.desc_signature()
         signode.extend(nodes)
