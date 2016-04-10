@@ -305,29 +305,22 @@ class SphinxRenderer(Renderer):
         nodelist.extend(self.render_optional(node.briefdescription))
         nodelist.extend(self.render_optional(node.detaileddescription))
 
-        if node.basecompoundref:
-            output = self.render_iterable(node.basecompoundref)
-            if output:
-                nodelist.append(
-                    self.node_factory.paragraph(
-                        '',
-                        '',
-                        self.node_factory.Text('Inherits from '),
-                        *intersperse(output, self.node_factory.Text(', '))
-                    )
+        def render_list(node, prefix):
+            if node is None:
+                return
+            output = self.render_iterable(node)
+            if not output:
+                return
+            nodelist.append(
+                self.node_factory.paragraph(
+                    '',
+                    '',
+                    self.node_factory.Text(prefix),
+                    *intersperse(output, self.node_factory.Text(', '))
                 )
-
-        if node.derivedcompoundref:
-            output = self.render_iterable(node.derivedcompoundref)
-            if output:
-                nodelist.append(
-                    self.node_factory.paragraph(
-                        '',
-                        '',
-                        self.node_factory.Text('Subclassed by '),
-                        *intersperse(output, self.node_factory.Text(', '))
-                    )
-                )
+            )
+        render_list(node.basecompoundref, 'Inherits from ')
+        render_list(node.derivedcompoundref, 'Subclassed by ')
 
         section_nodelists = {}
 
