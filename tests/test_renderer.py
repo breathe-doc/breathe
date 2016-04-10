@@ -3,7 +3,8 @@
 import sphinx.environment
 from breathe.node_factory import create_node_factory
 from breathe.parser.compound import linkedTextTypeSub, memberdefTypeSub, paramTypeSub, MixedContainer
-from breathe.renderer.compound import FuncMemberDefTypeSubRenderer, TypedefMemberDefTypeSubRenderer
+from breathe.renderer.compound import SphinxRenderer
+from breathe.renderer.filter import OpenFilter
 from docutils import frontend, nodes, parsers, utils
 from sphinx.domains import CPPDomain
 
@@ -201,21 +202,24 @@ def test_find_node():
                     'the number of nodes Text is 2')
 
 
-def render(member_def, renderer_class):
+def render(member_def):
     """Render Doxygen *member_def* with *renderer_class*."""
-    renderer = renderer_class(MockProjectInfo(), MockContext([member_def]),
+    renderer = SphinxRenderer(MockProjectInfo(),
                               None,  # renderer_factory
                               create_node_factory(),
                               None,  # state
                               None,  # document
-                              MockTargetHandler())
-    return renderer.render()
+                              MockTargetHandler(),
+                              None,   # compound_parser
+                              OpenFilter())
+    renderer.context = MockContext([member_def])
+    return renderer.render(member_def)
 
 
 def test_render_func():
-    member_def = TestMemberDef(definition='void foo', argsstring='(int)', virt='non-virtual',
+    member_def = TestMemberDef(kind='function', definition='void foo', argsstring='(int)', virt='non-virtual',
                                param=[TestParam(type_=TestLinkedText(content_=[TestMixedContainer(value=u'int')]))])
-    signature = find_node(render(member_def, FuncMemberDefTypeSubRenderer), 'desc_signature')
+    signature = find_node(render(member_def), 'desc_signature')
     assert signature[0] == 'void'
     assert find_node(signature, 'desc_name')[0] == 'foo'
     params = find_node(signature, 'desc_parameterlist')
@@ -226,18 +230,18 @@ def test_render_func():
 
 def test_render_typedef():
     member_def = TestMemberDef(kind='typedef', definition='typedef int foo')
-    signature = find_node(render(member_def, TypedefMemberDefTypeSubRenderer), 'desc_signature')
+    signature = find_node(render(member_def), 'desc_signature')
     assert signature.astext() == 'typedef int foo'
 
 
 def test_render_using_alias():
     member_def = TestMemberDef(kind='typedef', definition='using foo = int')
-    signature = find_node(render(member_def, TypedefMemberDefTypeSubRenderer), 'desc_signature')
+    signature = find_node(render(member_def), 'desc_signature')
     assert signature.astext() == 'using foo = int'
 
 
 def test_render_const_func():
     member_def = TestMemberDef(kind='function', definition='void f', argsstring='() const',
                                virt='non-virtual', const='yes')
-    signature = find_node(render(member_def, FuncMemberDefTypeSubRenderer), 'desc_signature')
+    signature = find_node(render(member_def), 'desc_signature')
     assert '_CPPv2NK1fEv' in signature['ids']
