@@ -25,10 +25,6 @@ class NodeFinder(nodes.SparseNodeVisitor):
         self.content = node
 
 
-def render(renderer, attribute):
-    return renderer.render(attribute) if attribute else []
-
-
 def renderIterable(renderer, iterable):
     output = []
     for entry in iterable:
@@ -128,7 +124,7 @@ class SphinxRenderer(Renderer):
         nodes = []
 
         # Variable type or function return type
-        nodes.extend(render(self, node.type_))
+        nodes.extend(self.render_optional(node.type_))
         if nodes:
             nodes.append(self.node_factory.Text(" "))
 
@@ -137,7 +133,7 @@ class SphinxRenderer(Renderer):
         return nodes
 
     def description(self, node):
-        return render(self, node.briefdescription) + render(self, node.detaileddescription)
+        return self.render_optional(node.briefdescription) + self.render_optional(node.detaileddescription)
 
     def update_signature(self, signature, obj_type):
         """Update the signature node if necessary, e.g. add qualifiers."""
@@ -313,8 +309,8 @@ class SphinxRenderer(Renderer):
 
         nodelist = []
 
-        nodelist.extend(render(self, node.briefdescription))
-        nodelist.extend(render(self, node.detaileddescription))
+        nodelist.extend(self.render_optional(node.briefdescription))
+        nodelist.extend(self.render_optional(node.detaileddescription))
 
         if node.basecompoundref:
             output = renderIterable(self, node.basecompoundref)
@@ -375,7 +371,7 @@ class SphinxRenderer(Renderer):
 
         node_list = []
 
-        node_list.extend(render(self, node.description))
+        node_list.extend(self.render_optional(node.description))
 
         # Get all the memberdef info
         node_list.extend(renderIterable(self, node.memberdef))
@@ -701,7 +697,7 @@ class SphinxRenderer(Renderer):
         return nodelist
 
     def visit_mixedcontainer(self, node):
-        return render(self, node.getValue())
+        return self.render_optional(node.getValue())
 
     def visit_description(self, node):
         return renderIterable(self, node.content_)
@@ -897,7 +893,7 @@ class SphinxRenderer(Renderer):
 
         separator = self.node_factory.Text(" - ")
 
-        nodelist = render(self, node.parameterdescription)
+        nodelist = self.render_optional(node.parameterdescription)
 
         return [self.node_factory.list_item("", term, separator, *nodelist)]
 
@@ -998,3 +994,7 @@ class SphinxRenderer(Renderer):
             result = method(self, node)
         self.context = saved_context
         return result
+
+    def render_optional(self, node):
+        """Render a node that can be None."""
+        return self.render(node) if node else []
