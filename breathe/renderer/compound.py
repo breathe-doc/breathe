@@ -25,13 +25,6 @@ class NodeFinder(nodes.SparseNodeVisitor):
         self.content = node
 
 
-def renderIterable(renderer, iterable):
-    output = []
-    for entry in iterable:
-        output.extend(renderer.render(entry))
-    return output
-
-
 def intersperse(iterable, delimiter):
     it = iter(iterable)
     yield next(it)
@@ -313,7 +306,7 @@ class SphinxRenderer(Renderer):
         nodelist.extend(self.render_optional(node.detaileddescription))
 
         if node.basecompoundref:
-            output = renderIterable(self, node.basecompoundref)
+            output = self.render_iterable(node.basecompoundref)
             if output:
                 nodelist.append(
                     self.node_factory.paragraph(
@@ -325,7 +318,7 @@ class SphinxRenderer(Renderer):
                 )
 
         if node.derivedcompoundref:
-            output = renderIterable(self, node.derivedcompoundref)
+            output = self.render_iterable(node.derivedcompoundref)
             if output:
                 nodelist.append(
                     self.node_factory.paragraph(
@@ -360,8 +353,8 @@ class SphinxRenderer(Renderer):
             nodelist.extend(section_nodelists.get(kind, []))
 
         # Take care of innerclasses
-        nodelist.extend(renderIterable(self, node.innerclass))
-        nodelist.extend(renderIterable(self, node.innernamespace))
+        nodelist.extend(self.render_iterable(node.innerclass))
+        nodelist.extend(self.render_iterable(node.innernamespace))
 
         return nodelist
 
@@ -374,7 +367,7 @@ class SphinxRenderer(Renderer):
         node_list.extend(self.render_optional(node.description))
 
         # Get all the memberdef info
-        node_list.extend(renderIterable(self, node.memberdef))
+        node_list.extend(self.render_iterable(node.memberdef))
 
         if node_list:
 
@@ -400,8 +393,8 @@ class SphinxRenderer(Renderer):
 
     def visit_docreftext(self, node):
 
-        nodelist = renderIterable(self, node.content_)
-        nodelist.extend(renderIterable(self, node.para))
+        nodelist = self.render_iterable(node.content_)
+        nodelist.extend(self.render_iterable(node.para))
 
         refid = "%s%s" % (self.project_info.name(), node.refid)
         nodelist = [
@@ -424,7 +417,7 @@ class SphinxRenderer(Renderer):
         Renders embedded headlines as emphasized text. Different heading levels
         are not supported.
         """
-        nodelist = renderIterable(self, node.content_)
+        nodelist = self.render_iterable(node.content_)
         return [self.node_factory.emphasis("", "", *nodelist)]
 
     def visit_docpara(self, node):
@@ -435,13 +428,13 @@ class SphinxRenderer(Renderer):
         neighbouring instances of these things tend to each be in a separate neighbouring para tag.
         """
 
-        nodelist = renderIterable(self, node.content)
-        nodelist.extend(renderIterable(self, node.images))
+        nodelist = self.render_iterable(node.content)
+        nodelist.extend(self.render_iterable(node.images))
 
         # Returns, user par's, etc
-        definition_nodes = renderIterable(self, node.simplesects)
+        definition_nodes = self.render_iterable(node.simplesects)
         # Parameters/Exceptions
-        definition_nodes.extend(renderIterable(self, node.parameterlist))
+        definition_nodes.extend(self.render_iterable(node.parameterlist))
 
         if definition_nodes:
             definition_list = self.node_factory.definition_list("", *definition_nodes)
@@ -462,12 +455,12 @@ class SphinxRenderer(Renderer):
 
     def visit_docurllink(self, node):
         """Url Link Renderer"""
-        nodelist = renderIterable(self, node.content_)
+        nodelist = self.render_iterable(node.content_)
         return [self.node_factory.reference("", "", refuri=node.url, *nodelist)]
 
     def visit_docmarkup(self, node):
 
-        nodelist = renderIterable(self, node.content_)
+        nodelist = self.render_iterable(node.content_)
         creator = self.node_factory.inline
         if node.type_ == "emphasis":
             creator = self.node_factory.emphasis
@@ -491,7 +484,7 @@ class SphinxRenderer(Renderer):
     def visit_docsimplesect(self, node):
         """Other Type documentation such as Warning, Note, Returns, etc"""
 
-        nodelist = renderIterable(self, node.para)
+        nodelist = self.render_iterable(node.para)
 
         if node.kind == "par":
             text = self.render(node.title)
@@ -505,7 +498,7 @@ class SphinxRenderer(Renderer):
         return [self.node_factory.definition_list_item("", term, definition)]
 
     def visit_doctitle(self, node):
-        return renderIterable(self, node.content_)
+        return self.render_iterable(node.content_)
 
     def visit_docformula(self, node):
 
@@ -566,10 +559,10 @@ class SphinxRenderer(Renderer):
         return [block]
 
     def visit_codeline(self, node):
-        return renderIterable(self, node.highlight)
+        return self.render_iterable(node.highlight)
 
     def visit_highlight(self, node):
-        return renderIterable(self, node.content_)
+        return self.render_iterable(node.content_)
 
     def visit_verbatim(self, node):
 
@@ -641,7 +634,7 @@ class SphinxRenderer(Renderer):
         """List item renderer. Render all the children depth-first.
         Upon return expand the children node list into a docutils list-item.
         """
-        nodelist = renderIterable(self, node.para)
+        nodelist = self.render_iterable(node.para)
         return [self.node_factory.list_item("", *nodelist)]
 
     numeral_kind = ['arabic', 'loweralpha', 'lowerroman', 'upperalpha', 'upperroman']
@@ -668,18 +661,18 @@ class SphinxRenderer(Renderer):
         Render all the children depth-first. """
         """ Call the wrapped render function. Update the nesting level for the enumerated lists. """
         if node.node_subtype is "itemized":
-            val = renderIterable(self, node.listitem)
+            val = self.render_iterable(node.listitem)
             return self.render_unordered(children=val)
         elif node.node_subtype is "ordered":
             self.nesting_level += 1
-            val = renderIterable(self, node.listitem)
+            val = self.render_iterable(node.listitem)
             self.nesting_level -= 1
             return self.render_enumerated(children=val, nesting_level=self.nesting_level)
         return []
 
     def visit_compoundref(self, node):
 
-        nodelist = renderIterable(self, node.content_)
+        nodelist = self.render_iterable(node.content_)
 
         refid = "%s%s" % (self.project_info.name(), node.refid)
         nodelist = [
@@ -700,10 +693,10 @@ class SphinxRenderer(Renderer):
         return self.render_optional(node.getValue())
 
     def visit_description(self, node):
-        return renderIterable(self, node.content_)
+        return self.render_iterable(node.content_)
 
     def visit_linkedtext(self, node):
-        return renderIterable(self, node.content_)
+        return self.render_iterable(node.content_)
 
     def visit_function(self, node):
         # Get full function signature for the domain directive.
@@ -767,7 +760,7 @@ class SphinxRenderer(Renderer):
         name = self.node_factory.emphasis("", self.node_factory.Text("Values:"))
         title = self.node_factory.paragraph("", "", name)
         description_nodes.append(title)
-        enums = renderIterable(self, node.enumvalue)
+        enums = self.render_iterable(node.enumvalue)
         description_nodes.extend(enums)
 
         def update_signature(signature, obj_type):
@@ -872,7 +865,7 @@ class SphinxRenderer(Renderer):
     def visit_docparamlist(self, node):
         """Parameter/Exception documentation"""
 
-        nodelist = renderIterable(self, node.parameteritem)
+        nodelist = self.render_iterable(node.parameteritem)
 
         # Fild list entry
         nodelist_list = self.node_factory.bullet_list("", classes=["breatheparameterlist"],
@@ -887,7 +880,7 @@ class SphinxRenderer(Renderer):
     def visit_docparamlistitem(self, node):
         """ Parameter Description Renderer  """
 
-        nodelist = renderIterable(self, node.parameternamelist)
+        nodelist = self.render_iterable(node.parameternamelist)
 
         term = self.node_factory.literal("", "", *nodelist)
 
@@ -899,10 +892,10 @@ class SphinxRenderer(Renderer):
 
     def visit_docparamnamelist(self, node):
         """ Parameter Name Renderer"""
-        return renderIterable(self, node.parametername)
+        return self.render_iterable(node.parametername)
 
     def visit_docparamname(self, node):
-        return renderIterable(self, node.content_)
+        return self.render_iterable(node.content_)
 
     def visit_templateparamlist(self, node):
 
@@ -998,3 +991,9 @@ class SphinxRenderer(Renderer):
     def render_optional(self, node):
         """Render a node that can be None."""
         return self.render(node) if node else []
+
+    def render_iterable(self, iterable):
+        output = []
+        for entry in iterable:
+            output.extend(self.render(entry))
+        return output
