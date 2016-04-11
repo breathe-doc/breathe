@@ -48,7 +48,7 @@ class BaseFileDirective(BaseDirective):
         node_list = []
         for node_stack in matches:
 
-            renderer_factory = renderer_factory_creator.create_factory(
+            object_renderer = renderer_factory_creator.create_factory(
                 node_stack,
                 self.state,
                 self.state.document,
@@ -58,7 +58,6 @@ class BaseFileDirective(BaseDirective):
 
             mask_factory = NullMaskFactory()
             context = RenderContext(node_stack, mask_factory, self.directive_args)
-            object_renderer = renderer_factory.create_renderer(context)
             node_list.extend(object_renderer.render(node_stack[0], context))
 
         return node_list
