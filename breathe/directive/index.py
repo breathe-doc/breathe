@@ -43,7 +43,7 @@ class BaseIndexDirective(BaseDirective):
             self.parser_factory,
             project_info
             )
-        renderer_factory = renderer_factory_creator.create_factory(
+        object_renderer = renderer_factory_creator.create_factory(
             [data_object],
             self.state,
             self.state.document,
@@ -54,7 +54,6 @@ class BaseIndexDirective(BaseDirective):
         mask_factory = NullMaskFactory()
         context = RenderContext([data_object, RootDataObject()], mask_factory,
                                 self.directive_args)
-        object_renderer = renderer_factory.create_renderer(context)
 
         try:
             node_list = object_renderer.render(context.node_stack[0], context)
