@@ -1,7 +1,7 @@
 
 from .finder.core import FinderFactory
 from .parser import DoxygenParserFactory
-from .renderer import DoxygenToRstRendererFactoryCreator
+from .renderer import DoxygenToRstRendererFactory
 from .renderer.base import RenderContext
 from .renderer.filter import FilterFactory
 from .renderer.target import TargetHandlerFactory
@@ -390,14 +390,14 @@ class DoxygenContentBlockDirective(BaseDirective):
             )
         filter_ = self.filter_factory.create_render_filter(self.kind, self.options)
 
-        renderer_factory_creator = DoxygenToRstRendererFactoryCreator(
+        renderer_factory = DoxygenToRstRendererFactory(
             self.parser_factory,
             project_info
             )
         node_list = []
 
         for node_stack in matches:
-            object_renderer = renderer_factory_creator.create_factory(
+            object_renderer = renderer_factory.create_renderer(
                 node_stack,
                 self.state,
                 self.state.document,

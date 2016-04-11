@@ -1,6 +1,6 @@
 
 from ..renderer.base import RenderContext
-from ..renderer import format_parser_error, DoxygenToRstRendererFactoryCreator
+from ..renderer import format_parser_error, DoxygenToRstRendererFactory
 from ..parser import ParserError, FileIOError
 
 from docutils import nodes
@@ -62,13 +62,13 @@ class BaseDirective(rst.Directive):
                directive_args):
         "Standard render process used by subclasses"
 
-        renderer_factory_creator = DoxygenToRstRendererFactoryCreator(
+        renderer_factory = DoxygenToRstRendererFactory(
             self.parser_factory,
             project_info
             )
 
         try:
-            object_renderer = renderer_factory_creator.create_factory(
+            object_renderer = renderer_factory.create_renderer(
                 node_stack,
                 self.state,
                 self.state.document,
