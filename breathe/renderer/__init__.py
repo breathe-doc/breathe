@@ -7,7 +7,7 @@ from . import compound as compoundrenderer
 from docutils import nodes
 
 
-class DoxygenToRstRendererFactoryCreator(object):
+class DoxygenToRstRendererFactory(object):
 
     def __init__(
             self,
@@ -18,7 +18,7 @@ class DoxygenToRstRendererFactoryCreator(object):
         self.parser_factory = parser_factory
         self.project_info = project_info
 
-    def create_factory(self, node_stack, state, document, filter_, target_handler):
+    def create_renderer(self, node_stack, state, document, filter_, target_handler):
 
         return compoundrenderer.SphinxRenderer(
             self.project_info,
