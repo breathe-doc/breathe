@@ -2,19 +2,9 @@
 import textwrap
 
 from ..node_factory import create_node_factory
-from .base import Renderer
 from . import compound as compoundrenderer
 
 from docutils import nodes
-
-
-class NullRenderer(Renderer):
-
-    def __init__(self):
-        pass
-
-    def render(self, node):
-        return []
 
 
 class DoxygenToRstRendererFactory(object):
@@ -44,9 +34,6 @@ class DoxygenToRstRendererFactory(object):
         )
 
     def create_renderer(self, context):
-
-        if not self.filter_.allow(context.node_stack):
-            return NullRenderer()
 
         return self.renderer
 
