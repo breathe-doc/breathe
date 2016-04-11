@@ -188,7 +188,7 @@ class SphinxRenderer(object):
         node = node_stack[0]
         # An enumvalue node doesn't have location, so use its parent node for detecting
         # the domain instead.
-        if type(node) == unicode or node.node_type == "enumvalue":
+        if isinstance(node, six.text_type) or node.node_type == "enumvalue":
             node = node_stack[1]
         filename = get_filename(node)
         if not filename and node.node_type == "compound":
@@ -284,7 +284,8 @@ class SphinxRenderer(object):
         return nodes
 
     def description(self, node):
-        return self.render_optional(node.briefdescription) + self.render_optional(node.detaileddescription)
+        return self.render_optional(node.briefdescription) + \
+               self.render_optional(node.detaileddescription)
 
     def update_signature(self, signature, obj_type):
         """Update the signature node if necessary, e.g. add qualifiers."""
