@@ -325,7 +325,11 @@ class SphinxRenderer(object):
         # We counter that second issue slightly by allowing through single white spaces
         #
         if node.strip():
-            return [self.node_factory.Text(node)]
+            if "<linebreak>" not in node:
+                return [self.node_factory.Text(node)]
+            # Render lines as paragraphs because RST doesn't have line breaks.
+            return [self.node_factory.paragraph('', '', self.node_factory.Text(line))
+                    for line in node.split("<linebreak>")]
         if node == six.u(" "):
             return [self.node_factory.Text(node)]
         return []
