@@ -2,56 +2,12 @@
 import textwrap
 
 from ..node_factory import create_node_factory
-from .base import Renderer
 from . import compound as compoundrenderer
 
 from docutils import nodes
 
 
-class NullRenderer(Renderer):
-
-    def __init__(self):
-        pass
-
-    def render(self, node):
-        return []
-
-
 class DoxygenToRstRendererFactory(object):
-
-    def __init__(
-            self,
-            node_type,
-            renderer_factory_creator,
-            project_info,
-            state,
-            document,
-            filter_,
-            target_handler,
-            compound_parser
-            ):
-
-        self.filter_ = filter_
-        self.renderer = compoundrenderer.SphinxRenderer(
-            project_info,
-            self,
-            create_node_factory(),
-            state,
-            document,
-            target_handler,
-            compound_parser,
-            filter_
-        )
-
-    def create_renderer(self, context):
-
-        if not self.filter_.allow(context.node_stack):
-            return NullRenderer()
-
-        return self.renderer
-
-
-class DoxygenToRstRendererFactoryCreator(object):
 
     def __init__(
             self,
@@ -62,18 +18,19 @@ class DoxygenToRstRendererFactoryCreator(object):
         self.parser_factory = parser_factory
         self.project_info = project_info
 
-    def create_factory(self, node_stack, state, document, filter_, target_handler):
+    def create_renderer(self, node_stack, state, document, filter_, target_handler):
 
-        return DoxygenToRstRendererFactory(
-            "root",
-            self,
+        return compoundrenderer.SphinxRenderer(
             self.project_info,
+            self,
+            create_node_factory(),
             state,
             document,
-            filter_,
             target_handler,
             self.parser_factory.create_compound_parser(self.project_info),
+            filter_
         )
+
 
 def format_parser_error(name, error, filename, state, lineno, do_unicode_warning):
 

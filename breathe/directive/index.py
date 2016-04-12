@@ -1,7 +1,7 @@
 
 from ..renderer.base import RenderContext
 from ..renderer.mask import NullMaskFactory
-from ..renderer import format_parser_error, DoxygenToRstRendererFactoryCreator
+from ..renderer import format_parser_error, DoxygenToRstRendererFactory
 from ..directive.base import BaseDirective
 from ..project import ProjectError
 from ..parser import ParserError, FileIOError
@@ -39,11 +39,11 @@ class BaseIndexDirective(BaseDirective):
             self.options, project_info, self.state.document)
         filter_ = self.filter_factory.create_index_filter(self.options)
 
-        renderer_factory_creator = DoxygenToRstRendererFactoryCreator(
+        renderer_factory = DoxygenToRstRendererFactory(
             self.parser_factory,
             project_info
             )
-        renderer_factory = renderer_factory_creator.create_factory(
+        object_renderer = renderer_factory.create_renderer(
             [data_object],
             self.state,
             self.state.document,
@@ -54,7 +54,6 @@ class BaseIndexDirective(BaseDirective):
         mask_factory = NullMaskFactory()
         context = RenderContext([data_object, RootDataObject()], mask_factory,
                                 self.directive_args)
-        object_renderer = renderer_factory.create_renderer(context)
 
         try:
             node_list = object_renderer.render(context.node_stack[0], context)
