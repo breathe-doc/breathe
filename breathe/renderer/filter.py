@@ -1059,7 +1059,9 @@ class FilterFactory(object):
 
         if namespace:
             parent_matches = (parent.node_type == 'compound') \
-                & ((parent.kind == 'namespace') | (parent.kind == 'class')) \
+                & ((parent.kind == 'namespace') |
+                   (parent.kind == 'class') |
+                   (parent.kind == 'struct')) \
                 & (parent.name == namespace)
 
             return parent_matches & node_matches
