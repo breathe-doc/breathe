@@ -18,6 +18,8 @@ matching.
 
 """
 
+import six
+
 class NoParameterNamesMask(object):
 
     def __init__(self, data_object):
@@ -43,7 +45,7 @@ class MaskFactory(object):
 
             # Horrible hack to silence errors on filtering unicode objects
             # until we fix the parsing
-            if type(data_object) == unicode:
+            if isinstance(data_object, six.text_type):
                 node_type = "unicode"
             else:
                 raise e
