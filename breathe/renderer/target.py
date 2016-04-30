@@ -33,7 +33,7 @@ class TargetHandlerFactory(object):
 
     def create_target_handler(self, options, project_info, document):
 
-        if options.has_key("no-link"):
+        if "no-link" in options:
             return NullTargetHandler()
 
         return TargetHandler(project_info, self.node_factory, document)

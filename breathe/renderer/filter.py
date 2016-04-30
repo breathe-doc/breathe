@@ -673,7 +673,7 @@ class FilterFactory(object):
             'private-members': 'private',
             }
 
-        for option, scope in all_options.iteritems():
+        for option, scope in all_options.items():
             if option in options:
                 allowed.add(scope)
 
