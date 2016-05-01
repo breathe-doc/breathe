@@ -30,6 +30,6 @@ flake8:
 	flake8 breathe/*.py \
 		breathe/directive/*.py \
 		breathe/finder/*.py \
-		breathe/renderer/compound.py \
+		breathe/renderer/sphinxrenderer.py \
 		breathe/renderer/filter.py \
 		breathe/parser/compound.py
