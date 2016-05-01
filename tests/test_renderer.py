@@ -3,7 +3,7 @@
 import sphinx.environment
 from breathe.node_factory import create_node_factory
 from breathe.parser.compound import linkedTextTypeSub, memberdefTypeSub, paramTypeSub, MixedContainer
-from breathe.renderer.compound import SphinxRenderer
+from breathe.renderer.sphinxrenderer import SphinxRenderer
 from breathe.renderer.filter import OpenFilter
 from docutils import frontend, nodes, parsers, utils
 from sphinx.domains import CPPDomain
