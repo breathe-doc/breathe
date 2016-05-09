@@ -2,7 +2,7 @@
 import textwrap
 
 from ..node_factory import create_node_factory
-from . import compound as compoundrenderer
+from . import sphinxrenderer
 
 from docutils import nodes
 
@@ -20,7 +20,7 @@ class DoxygenToRstRendererFactory(object):
 
     def create_renderer(self, node_stack, state, document, filter_, target_handler):
 
-        return compoundrenderer.SphinxRenderer(
+        return sphinxrenderer.SphinxRenderer(
             self.project_info,
             self,
             create_node_factory(),
