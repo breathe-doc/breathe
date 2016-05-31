@@ -835,11 +835,11 @@ def setup(app):
             app.config.breathe_doxygen_config_options
         )
 
-    app.connect("builder-inited", doxygen_hook)
-
     app.connect("builder-inited", directive_factory.get_config_values)
 
     app.connect("builder-inited", filter_factory.get_config_values)
+
+    app.connect("builder-inited", doxygen_hook)
 
     app.connect("env-get-outdated", file_state_cache.get_outdated)
 
