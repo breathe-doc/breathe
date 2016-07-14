@@ -17,6 +17,7 @@ class DomainDirectiveFactory(object):
         'slot': (cpp.CPPFunctionObject, 'function'),
         'enum': (cpp.CPPTypeObject, 'type'),
         'typedef': (cpp.CPPTypeObject, 'type'),
+        'using': (cpp.CPPTypeObject, 'type'),
         'union': (cpp.CPPTypeObject, 'type'),
         'namespace': (cpp.CPPTypeObject, 'type'),
         # Use CPPClassObject for enum values as the cpp domain doesn't have a directive for
