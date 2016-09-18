@@ -95,6 +95,6 @@ class AutoDoxygenProcessHandle(object):
         # Shell-escape the cfg file name to try to avoid any issue where the name might include
         # malicious shell character - We have to use the shell=True option to make it work on
         # Windows. See issue #271
-        self.run_process(b'doxygen %s' % quote(cfgfile), cwd=build_dir, shell=True)
+        self.run_process('doxygen %s' % quote(cfgfile), cwd=build_dir, shell=True)
 
         return self.path_handler.join(build_dir, name, "xml")
