@@ -84,6 +84,6 @@ class AutoDoxygenProcessHandle(object):
 
         self.write_file(build_dir, cfgfile, cfg)
 
-        self.run_process(['doxygen', cfgfile], cwd=build_dir)
+        self.run_process(['doxygen', cfgfile], cwd=build_dir, shell=True)
 
         return self.path_handler.join(build_dir, name, "xml")
