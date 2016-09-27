@@ -52,14 +52,15 @@ def write_file(name, text, args):
             except OSError as exc:  # Guard against race condition
                 if exc.errno != errno.EEXIST:
                     raise
-        target = open(fname, 'r')
-        try:
-            orig = target.read()
-        finally:
-            target.close()
-        if orig == text:
-            print('File %s up to date, skipping.' % fname)
-            return
+        if os.path.exists(fname):
+            target = open(fname, 'r')
+            try:
+                orig = target.read()
+            finally:
+                target.close()
+            if orig == text:
+                print('File %s up to date, skipping.' % fname)
+                return
         target = open(fname, 'w')
         try:
             target.write(text)
