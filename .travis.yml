@@ -5,10 +5,10 @@ env:
   - SPHINX_VERSION=1.4 TRAVIS_CI=True
 
 python:
-  - "2.6"
   - "2.7"
   - "3.3"
   - "3.4"
+  - "3.5"
 
 before_install:
   - sudo apt-get update -qq
@@ -28,4 +28,3 @@ script:
   - make DOXYGEN=doxygen DEBUG=""
   - make test
   - make flake8
-
