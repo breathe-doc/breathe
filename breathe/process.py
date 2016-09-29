@@ -1,4 +1,12 @@
 
+from __future__ import unicode_literals
+
+try:
+    from shlex import quote  # py3
+except ImportError:
+    from pipes import quote  # py2
+
+
 AUTOCFG_TEMPLATE = r"""
 PROJECT_NAME     = "{project_name}"
 OUTPUT_DIRECTORY = {output_dir}
@@ -84,6 +92,9 @@ class AutoDoxygenProcessHandle(object):
 
         self.write_file(build_dir, cfgfile, cfg)
 
-        self.run_process(['doxygen', cfgfile], cwd=build_dir)
+        # Shell-escape the cfg file name to try to avoid any issue where the name might include
+        # malicious shell character - We have to use the shell=True option to make it work on
+        # Windows. See issue #271
+        self.run_process('doxygen %s' % quote(cfgfile), cwd=build_dir, shell=True)
 
         return self.path_handler.join(build_dir, name, "xml")
