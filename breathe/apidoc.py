@@ -52,20 +52,18 @@ def write_file(name, text, args):
             except OSError as exc:  # Guard against race condition
                 if exc.errno != errno.EEXIST:
                     raise
-        if os.path.exists(fname):
-            target = open(fname, 'r')
-            try:
-                orig = target.read()
-            finally:
-                target.close()
-            if orig == text:
-                print('File %s up to date, skipping.' % fname)
-                return
-        target = open(fname, 'w')
         try:
+            with open(fname, 'r') as target:
+                orig = target.read()
+                if orig == text:
+                    print('File %s up to date, skipping.' % fname)
+                    return
+        except FileNotFoundError:
+            # Don't mind if it isn't there
+            pass
+
+        with open(fname, 'w') as target:
             target.write(text)
-        finally:
-            target.close()
 
 
 def format_heading(level, text):
