@@ -24,6 +24,13 @@ import xml.etree.ElementTree
 
 from breathe import __version__
 
+# Account for FileNotFoundError in Python 2
+# IOError is broader but will hopefully suffice
+try:
+    FileNotFoundError
+except NameError:
+    FileNotFoundError = IOError
+
 
 # Reference: Doxygen XSD schema file, CompoundKind only
 # Only what breathe supports are included
