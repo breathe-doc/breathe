@@ -136,6 +136,22 @@ Change Log
 
 Inspired by `Keepachangelog.com <http://keepachangelog.com/>`__.
 
+- 2016-11-05 - Breathe v4.3.0
+
+  - Rewritten rendering approach to use the visitor pattern
+
+  - Dropped support for 2.6 & added testing for 3.5
+
+  - Fixed
+
+    - Issue with running breathe-apidoc for the first time.
+
+    - Improved handling of qualifiers, eg. const & volatile.
+
+    - Supports functions in structs
+
+    - Supports auto-doxygen code path on Windows
+
 - 2016-03-19 - Breathe v4.2.0
 
   - Added
