@@ -136,6 +136,10 @@ Change Log
 
 Inspired by `Keepachangelog.com <http://keepachangelog.com/>`__.
 
+- 2016-11-05 - Breathe v4.3.1
+
+  - Version bump package confusion with wheel release
+
 - 2016-11-05 - Breathe v4.3.0
 
   - Rewritten rendering approach to use the visitor pattern
