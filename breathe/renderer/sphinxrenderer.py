@@ -597,7 +597,7 @@ class SphinxRenderer(object):
             definition_list = self.node_factory.definition_list("", *definition_nodes)
             nodelist.append(definition_list)
 
-        return [self.node_factory.inline(" ", " ", *nodelist)]
+        return [self.node_factory.paragraph("", "", *nodelist)]
 
     def visit_docimage(self, node):
         """Output docutils image node using name attribute from xml as the uri"""
@@ -1041,7 +1041,7 @@ class SphinxRenderer(object):
 
         term = self.node_factory.literal("", "", *nodelist)
 
-        separator = self.node_factory.Text(" : ")
+        separator = self.node_factory.Text(" - ")
 
         nodelist = self.render_optional(node.parameterdescription)
 
