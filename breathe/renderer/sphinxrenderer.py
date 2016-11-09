@@ -1059,7 +1059,6 @@ class SphinxRenderer(object):
 
         return [self.node_factory.list_item("", *nodelist)]
 
-
     def visit_docparamnamelist(self, node):
         """ Parameter Name Renderer"""
         return self.render_iterable(node.parametername)
