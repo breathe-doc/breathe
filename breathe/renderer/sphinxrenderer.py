@@ -1041,7 +1041,7 @@ class SphinxRenderer(object):
 
         term = self.node_factory.literal("", "", *nodelist)
 
-        separator = self.node_factory.Text(" - ")
+        separator = self.node_factory.Text(": ")
 
         nodelist = self.render_optional(node.parameterdescription)
 
