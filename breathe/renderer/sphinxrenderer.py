@@ -6,7 +6,6 @@ from sphinx.domains import cpp, c, python
 import re
 import six
 import textwrap
-import itertools
 
 
 class DomainDirectiveFactory(object):
@@ -852,22 +851,7 @@ class SphinxRenderer(object):
         return self.render_optional(node.getValue())
 
     def visit_description(self, node):
-        parent = self.context.node_stack[1]
-
-        # Handle param list item descriptions in a special way. We want extra the contents of the
-        # first paragraph and render that first and then render the rest. This keeps the first
-        # paragraph contents inline with the parameter name rather than below it isn't own
-        # paragraph.
-        if parent.node_type == 'docparamlistitem':
-            if len(node.content_) > 0 and node.content_[0].name == 'para':
-                first_para = node.content_[0].value
-                first_para_contents = first_para.content
-                rest = node.content_[1:]
-                return self.render_iterable(itertools.chain(first_para_contents, rest))
-            else:
-                return self.render_iterable(node.content_)
-        else:
-            return self.render_iterable(node.content_)
+        return self.render_iterable(node.content_)
 
     def visit_linkedtext(self, node):
         return self.render_iterable(node.content_)
@@ -1054,6 +1038,20 @@ class SphinxRenderer(object):
     def visit_docparamlistitem(self, node):
         """ Parameter Description Renderer  """
 
+        # Look at the parameter description and separate out the contents of the first paragraph,
+        # render it and then use it to create a new first paragraph further down with the term &
+        # separator. This keeps the contents of the first line of the description on the same level
+        # as the parameter name, instead of in its own list
+        first_line_nodelist = []
+        description_content = []
+        if node.parameterdescription:
+            description = node.parameterdescription
+            if len(description.content_) > 0 and description.content_[0].name == 'para':
+                first_line_nodelist = self.render_iterable(description.content_[0].value)
+                description_content = node.content_[1:]
+            else:
+                description_content = description.content_
+
         nodelist = self.render_iterable(node.parameternamelist)
 
         term = self.node_factory.literal("", "", *nodelist)
@@ -1062,7 +1060,9 @@ class SphinxRenderer(object):
 
         nodelist = self.render_optional(node.parameterdescription)
 
-        return [self.node_factory.list_item("", term, separator, *nodelist)]
+        first_line = self.node_factory.paragraph("", term, separator, *first_line_nodelist)
+
+        return [self.node_factory.list_item("", first_line, *nodelist)]
 
     def visit_docparamnamelist(self, node):
         """ Parameter Name Renderer"""
