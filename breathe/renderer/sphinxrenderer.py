@@ -1038,20 +1038,6 @@ class SphinxRenderer(object):
     def visit_docparamlistitem(self, node):
         """ Parameter Description Renderer  """
 
-        # Look at the parameter description and separate out the contents of the first paragraph,
-        # render it and then use it to create a new first paragraph further down with the term &
-        # separator. This keeps the contents of the first line of the description on the same level
-        # as the parameter name, instead of in its own list
-        first_line_nodelist = []
-        description_content = []
-        if node.parameterdescription:
-            description = node.parameterdescription
-            if len(description.content_) > 0 and description.content_[0].name == 'para':
-                first_line_nodelist = self.render_iterable(description.content_[0].value)
-                description_content = node.content_[1:]
-            else:
-                description_content = description.content_
-
         nodelist = self.render_iterable(node.parameternamelist)
 
         term = self.node_factory.literal("", "", *nodelist)
@@ -1060,9 +1046,19 @@ class SphinxRenderer(object):
 
         nodelist = self.render_optional(node.parameterdescription)
 
-        first_line = self.node_factory.paragraph("", term, separator, *first_line_nodelist)
+        # If we have some contents from the parameterdescription then we assume that first entry
+        # will be a paragraph object and we reach in and insert the term & separate to the start of
+        # that first paragraph so that the description appears inline with the term & separator
+        # instead of having it's own paragraph which feels disconnected
+        #
+        # If there is no description then render then term by itself
+        if nodelist:
+            nodelist[0].children = [term, separator] + nodelist[0].children
+        else:
+            nodelist = [term]
 
-        return [self.node_factory.list_item("", first_line, *nodelist)]
+        return [self.node_factory.list_item("", *nodelist)]
+
 
     def visit_docparamnamelist(self, node):
         """ Parameter Name Renderer"""
