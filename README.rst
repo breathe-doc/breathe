@@ -94,6 +94,13 @@ link in a github issue or get in touch on the mailing list.
 - `Robin <https://bitbucket.org/reima/robin>`_
 - `sphinxcontrib-autodoc_doxygen <https://github.com/rmcgibbo/sphinxcontrib-autodoc_doxygen>`_
 
+Release
+-------
+
+Command for releasing source bundle & wheel to PyPI:
+
+   python setup.py sdist bdist_wheel upload
+
 Credits
 -------
 
