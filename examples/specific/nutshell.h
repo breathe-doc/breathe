@@ -27,7 +27,7 @@ public:
 
     /*! Crack that shell with specified tool
 
-      \param tool - the tool with which to crack the nut
+      \param tool the tool with which to crack the nut
     */
     void crack( Tool tool );
 
