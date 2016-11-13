@@ -136,6 +136,10 @@ Change Log
 
 Inspired by `Keepachangelog.com <http://keepachangelog.com/>`__.
 
+- 2016-11-13 - Breathe v4.4.0
+
+  - Improve single line parameter documentation rendering
+
 - 2016-11-05 - Breathe v4.3.1
 
   - Version bump package confusion with wheel release
