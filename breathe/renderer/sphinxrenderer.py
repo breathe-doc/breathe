@@ -2,6 +2,7 @@
 from docutils import nodes
 from docutils.statemachine import ViewList
 from sphinx.domains import cpp, c, python
+
 import re
 import six
 import textwrap
@@ -1041,11 +1042,22 @@ class SphinxRenderer(object):
 
         term = self.node_factory.literal("", "", *nodelist)
 
-        separator = self.node_factory.Text(" - ")
+        separator = self.node_factory.Text(": ")
 
         nodelist = self.render_optional(node.parameterdescription)
 
-        return [self.node_factory.list_item("", term, separator, *nodelist)]
+        # If we have some contents from the parameterdescription then we assume that first entry
+        # will be a paragraph object and we reach in and insert the term & separate to the start of
+        # that first paragraph so that the description appears inline with the term & separator
+        # instead of having it's own paragraph which feels disconnected
+        #
+        # If there is no description then render then term by itself
+        if nodelist:
+            nodelist[0].children = [term, separator] + nodelist[0].children
+        else:
+            nodelist = [term]
+
+        return [self.node_factory.list_item("", *nodelist)]
 
     def visit_docparamnamelist(self, node):
         """ Parameter Name Renderer"""
