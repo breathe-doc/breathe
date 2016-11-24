@@ -8,3 +8,8 @@ void TestFunc() {};
 
 }
 
+class TestClass {
+public:
+    /// enum docs
+    enum Enum {};
+};
