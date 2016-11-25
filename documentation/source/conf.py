@@ -208,6 +208,7 @@ breathe_projects = {
     "qtslots":"../../examples/specific/qtslots/xml/",
     "array":"../../examples/specific/array/xml/",
     "c_enum":"../../examples/specific/c_enum/xml/",
+    "c_typedef":"../../examples/specific/c_typedef/xml/",
     }
 
 breathe_projects_source = {
@@ -225,6 +226,7 @@ breathe_domain_by_file_pattern = {
         "*/class.h" : "cpp",
         "*/alias.h" : "c",
         "*/c_enum.h" : "c",
+        "c_typedef.h" : "c",
         }
 
 
