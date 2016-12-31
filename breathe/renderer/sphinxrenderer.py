@@ -235,7 +235,7 @@ class SphinxRenderer(object):
 
         return '::'.join(names)
 
-    def create_template_node(self, decl):
+    def insert_template_node(self, signature, decl):
         """Creates a node for the ``template <...>`` part of the declaration."""
         if not decl.templateparamlist:
             return None
@@ -243,9 +243,11 @@ class SphinxRenderer(object):
         nodes = [self.node_factory.desc_annotation(template, template), self.node_factory.Text('<')]
         nodes.extend(self.render(decl.templateparamlist))
         nodes.append(self.node_factory.Text(">"))
-        signode = self.node_factory.desc_signature()
+
+        signode = type(signature)()
         signode.extend(nodes)
-        return signode
+
+        signature.parent.insert(0, signode)
 
     def run_domain_directive(self, kind, names):
         domain_directive = DomainDirectiveFactory.create(
@@ -377,9 +379,7 @@ class SphinxRenderer(object):
             finder.declarator[0] = self.node_factory.desc_annotation(kind + ' ', kind + ' ')
 
             # Check if there is template information and format it as desired
-            template_signode = self.create_template_node(file_data.compounddef)
-            if template_signode:
-                rst_node.insert(0, template_signode)
+            self.insert_template_node(finder.declarator, file_data.compounddef)
             rst_node.children[0].insert(0, doxygen_target)
             return nodes, finder.content
 
@@ -892,9 +892,7 @@ class SphinxRenderer(object):
 
         finder.content.extend(self.description(node))
 
-        template_node = self.create_template_node(node)
-        if template_node:
-            rst_node.insert(0, template_node)
+        self.insert_template_node(finder.declarator, node)
         return nodes
 
     def visit_define(self, node):
