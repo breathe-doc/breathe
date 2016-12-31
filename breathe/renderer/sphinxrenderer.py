@@ -262,7 +262,12 @@ class SphinxRenderer(object):
         nodes = domain_directive.run()
 
         # Filter out outer class names if we are rendering a member as a part of a class content.
-        signode = nodes[1].children[0]
+        rst_node = nodes[1]
+        finder = NodeFinder(rst_node.document)
+        rst_node.walk(finder)
+
+        signode = finder.declarator
+
         if len(names) > 0 and self.context.child:
             signode.children = [n for n in signode.children if not n.tagname == 'desc_addname']
         return nodes
@@ -310,9 +315,14 @@ class SphinxRenderer(object):
         if obj_type is None:
             obj_type = node.kind
         nodes = self.run_domain_directive(obj_type, [declaration.replace('\n', ' ')])
+
         rst_node = nodes[1]
-        signode = rst_node[0]
-        contentnode = rst_node[-1]
+        finder = NodeFinder(rst_node.document)
+        rst_node.walk(finder)
+
+        signode = finder.declarator
+        contentnode = finder.content
+
         update_signature = kwargs.get('update_signature', None)
         if update_signature is not None:
             update_signature(signode, obj_type)
