@@ -71,6 +71,11 @@ class NodeFinder(nodes.SparseNodeVisitor):
         # https://github.com/michaeljones/breathe/issues/242
         self.declarator = node
 
+    def visit_desc_signature_line(self, node):
+        # In sphinx 1.5, there is now a desc_signature_line node within the desc_signature
+        # This should be used instead
+        self.declarator = node
+
     def visit_desc_content(self, node):
         self.content = node
 
