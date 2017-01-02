@@ -164,6 +164,7 @@ Note: By default this script will not overwrite already created files.""",
         for key, value in TYPEDICT.items():
             create_modules_toc_file(key, value, args)
 
+
 # So program can be started with "python -m breathe.apidoc ..."
 if __name__ == "__main__":
     main()
