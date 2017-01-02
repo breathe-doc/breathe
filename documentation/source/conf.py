@@ -208,6 +208,7 @@ breathe_projects = {
     "qtslots":"../../examples/specific/qtslots/xml/",
     "array":"../../examples/specific/array/xml/",
     "c_enum":"../../examples/specific/c_enum/xml/",
+    "multifile":"../../examples/specific/multifilexml/xml/",
     }
 
 breathe_projects_source = {

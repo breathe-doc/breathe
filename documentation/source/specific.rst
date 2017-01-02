@@ -121,3 +121,11 @@ C Enum
 .. doxygenenum:: GSM_BackupFormat
    :project: c_enum
    :no-link:
+
+
+Multifile
+---------
+
+.. doxygenfunction:: TestTemplateFunction
+   :project: multifile
+   :no-link:
