@@ -995,7 +995,7 @@ class SphinxRenderer(object):
         if node.type_:
             type_nodes = self.render(node.type_)
             # Render keywords as annotations for consistency with the cpp domain.
-            if len(type_nodes) > 0:
+            if len(type_nodes) > 0 and isinstance(type_nodes[0], six.text_type):
                 first_node = type_nodes[0]
                 for keyword in ['typename', 'class']:
                     if first_node.startswith(keyword + ' '):
