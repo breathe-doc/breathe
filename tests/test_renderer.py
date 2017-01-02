@@ -245,3 +245,8 @@ def test_render_const_func():
                                virt='non-virtual', const='yes')
     signature = find_node(render(member_def), 'desc_signature')
     assert '_CPPv2NK1fEv' in signature['ids']
+
+def test_render_variable_initializer():
+    member_def = TestMemberDef(kind='variable', definition='const int EOF', initializer='= -1')
+    signature = find_node(render(member_def), 'desc_signature')
+    assert signature.astext() == 'const int EOF = -1'
