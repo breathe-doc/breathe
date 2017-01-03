@@ -707,6 +707,7 @@ class SphinxRenderer(object):
             rst_node["label"] = None
             rst_node["nowrap"] = False
             rst_node["docname"] = self.state.document.settings.env.docname
+            rst_node["number"] = None
 
             nodelist.append(rst_node)
 
