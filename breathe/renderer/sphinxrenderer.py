@@ -965,26 +965,32 @@ class SphinxRenderer(object):
         return self.render_declaration(node, declaration, objtype=obj_type,
                                        update_signature=self.update_signature)
 
+    def update_signature_with_initializer(self, signature, node):
+        initializer = node.initializer
+        if initializer:
+            nodes = self.render(initializer)
+            separator = ' '
+            if not nodes[0].startswith('='):
+                separator += '= '
+            signature.append(self.node_factory.Text(separator))
+            signature.extend(nodes)
+
     def visit_variable(self, node):
         declaration = get_definition_without_template_args(node)
         enum = 'enum '
         if declaration.startswith(enum):
             declaration = declaration[len(enum):]
-        return self.render_declaration(node, declaration)
+
+        def update_signature(signature, obj_type):
+            self.update_signature_with_initializer(signature, node)
+        return self.render_declaration(node, declaration, update_signature=update_signature)
 
     def visit_enumvalue(self, node):
         def update_signature(signature, obj_type):
             # Remove "class" from the signature. This is needed because Sphinx cpp domain doesn't
             # have an enum value directive and we use a class directive instead.
             signature.children.pop(0)
-            initializer = node.initializer
-            if initializer:
-                nodes = self.render(initializer)
-                separator = ' '
-                if not nodes[0].startswith('='):
-                    separator += '= '
-                signature.append(self.node_factory.Text(separator))
-                signature.extend(nodes)
+            self.update_signature_with_initializer(signature, node)
         return self.render_declaration(node, objtype='enumvalue', update_signature=update_signature)
 
     def visit_param(self, node):
