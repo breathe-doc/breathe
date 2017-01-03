@@ -6,7 +6,7 @@ from breathe.parser.compound import linkedTextTypeSub, memberdefTypeSub, paramTy
 from breathe.renderer.sphinxrenderer import SphinxRenderer
 from breathe.renderer.filter import OpenFilter
 from docutils import frontend, nodes, parsers, utils
-from sphinx.domains import CPPDomain
+from sphinx.domains.cpp import CPPDomain
 
 
 sphinx.locale.init([], None)
@@ -50,10 +50,15 @@ class TestParam(paramTypeSub, TestDoxygenNode):
     def __init__(self, **kwargs):
         TestDoxygenNode.__init__(self, paramTypeSub, **kwargs)
 
+class MockConfig(object):
+    cpp_id_attributes = []
+    cpp_paren_attributes = []
+    cpp_index_common_prefix = []
+
 
 class MockState:
     def __init__(self):
-        env = sphinx.environment.BuildEnvironment(None, None, None)
+        env = sphinx.environment.BuildEnvironment(None, None, MockConfig())
         CPPDomain(env)
         env.temp_data['docname'] = 'mock-doc'
         settings = frontend.OptionParser(
@@ -220,7 +225,7 @@ def test_render_func():
     member_def = TestMemberDef(kind='function', definition='void foo', argsstring='(int)', virt='non-virtual',
                                param=[TestParam(type_=TestLinkedText(content_=[TestMixedContainer(value=u'int')]))])
     signature = find_node(render(member_def), 'desc_signature')
-    assert signature[0] == 'void'
+    assert signature.astext().startswith('void')
     assert find_node(signature, 'desc_name')[0] == 'foo'
     params = find_node(signature, 'desc_parameterlist')
     assert len(params) == 1
