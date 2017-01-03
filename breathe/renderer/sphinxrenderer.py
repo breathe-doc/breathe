@@ -71,6 +71,11 @@ class NodeFinder(nodes.SparseNodeVisitor):
         # https://github.com/michaeljones/breathe/issues/242
         self.declarator = node
 
+    def visit_desc_signature_line(self, node):
+        # In sphinx 1.5, there is now a desc_signature_line node within the desc_signature
+        # This should be used instead
+        self.declarator = node
+
     def visit_desc_content(self, node):
         self.content = node
 
@@ -257,7 +262,12 @@ class SphinxRenderer(object):
         nodes = domain_directive.run()
 
         # Filter out outer class names if we are rendering a member as a part of a class content.
-        signode = nodes[1].children[0]
+        rst_node = nodes[1]
+        finder = NodeFinder(rst_node.document)
+        rst_node.walk(finder)
+
+        signode = finder.declarator
+
         if len(names) > 0 and self.context.child:
             signode.children = [n for n in signode.children if not n.tagname == 'desc_addname']
         return nodes
@@ -305,9 +315,14 @@ class SphinxRenderer(object):
         if obj_type is None:
             obj_type = node.kind
         nodes = self.run_domain_directive(obj_type, [declaration.replace('\n', ' ')])
+
         rst_node = nodes[1]
-        signode = rst_node[0]
-        contentnode = rst_node[-1]
+        finder = NodeFinder(rst_node.document)
+        rst_node.walk(finder)
+
+        signode = finder.declarator
+        contentnode = finder.content
+
         update_signature = kwargs.get('update_signature', None)
         if update_signature is not None:
             update_signature(signode, obj_type)
@@ -960,26 +975,32 @@ class SphinxRenderer(object):
         return self.render_declaration(node, declaration, objtype=obj_type,
                                        update_signature=update_signature)
 
+    def update_signature_with_initializer(self, signature, node):
+        initializer = node.initializer
+        if initializer:
+            nodes = self.render(initializer)
+            separator = ' '
+            if not nodes[0].startswith('='):
+                separator += '= '
+            signature.append(self.node_factory.Text(separator))
+            signature.extend(nodes)
+
     def visit_variable(self, node):
         declaration = get_definition_without_template_args(node)
         enum = 'enum '
         if declaration.startswith(enum):
             declaration = declaration[len(enum):]
-        return self.render_declaration(node, declaration)
+
+        def update_signature(signature, obj_type):
+            self.update_signature_with_initializer(signature, node)
+        return self.render_declaration(node, declaration, update_signature=update_signature)
 
     def visit_enumvalue(self, node):
         def update_signature(signature, obj_type):
             # Remove "class" from the signature. This is needed because Sphinx cpp domain doesn't
             # have an enum value directive and we use a class directive instead.
             signature.children.pop(0)
-            initializer = node.initializer
-            if initializer:
-                nodes = self.render(initializer)
-                separator = ' '
-                if not nodes[0].startswith('='):
-                    separator += '= '
-                signature.append(self.node_factory.Text(separator))
-                signature.extend(nodes)
+            self.update_signature_with_initializer(signature, node)
         return self.render_declaration(node, objtype='enumvalue', update_signature=update_signature)
 
     def visit_param(self, node):
@@ -990,7 +1011,7 @@ class SphinxRenderer(object):
         if node.type_:
             type_nodes = self.render(node.type_)
             # Render keywords as annotations for consistency with the cpp domain.
-            if len(type_nodes) > 0:
+            if len(type_nodes) > 0 and isinstance(type_nodes[0], six.text_type):
                 first_node = type_nodes[0]
                 for keyword in ['typename', 'class']:
                     if first_node.startswith(keyword + ' '):

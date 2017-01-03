@@ -209,6 +209,7 @@ breathe_projects = {
     "array":"../../examples/specific/array/xml/",
     "c_enum":"../../examples/specific/c_enum/xml/",
     "c_typedef":"../../examples/specific/c_typedef/xml/",
+    "multifile":"../../examples/specific/multifilexml/xml/",
     }
 
 breathe_projects_source = {
