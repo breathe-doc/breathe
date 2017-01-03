@@ -3,6 +3,11 @@ language: python
 
 env:
   - SPHINX_VERSION=1.4 TRAVIS_CI=True
+  - SPHINX_VERSION=1.5 TRAVIS_CI=True
+
+matrix:
+  allow_failures:
+    - env: SPHINX_VERSION=1.5 TRAVIS_CI=True
 
 python:
   - "2.7"
@@ -17,7 +22,7 @@ before_install:
 install:
   - pip install flake8
   - pip install nose
-  - pip install Sphinx==$SPHINX_VERSION
+  - pip install Sphinx~=$SPHINX_VERSION.0
   - pip install .
 
 # Builds all examples & html documentation
