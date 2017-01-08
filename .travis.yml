@@ -5,15 +5,11 @@ env:
   - SPHINX_VERSION=1.4 TRAVIS_CI=True
   - SPHINX_VERSION=1.5 TRAVIS_CI=True
 
-matrix:
-  allow_failures:
-    - env: SPHINX_VERSION=1.5 TRAVIS_CI=True
-
 python:
   - "2.7"
-  - "3.3"
   - "3.4"
   - "3.5"
+  - "3.6"
 
 before_install:
   - sudo apt-get update -qq
