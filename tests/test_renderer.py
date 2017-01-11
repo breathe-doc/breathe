@@ -7,6 +7,9 @@ from breathe.renderer.sphinxrenderer import SphinxRenderer
 from breathe.renderer.filter import OpenFilter
 from docutils import frontend, nodes, parsers, utils
 from sphinx.domains.cpp import CPPDomain
+from sphinx.domains.c import CDomain
+
+from nose.tools import eq_
 
 
 sphinx.locale.init([], None)
@@ -60,6 +63,7 @@ class MockState:
     def __init__(self):
         env = sphinx.environment.BuildEnvironment(None, None, MockConfig())
         CPPDomain(env)
+        CDomain(env)
         env.temp_data['docname'] = 'mock-doc'
         settings = frontend.OptionParser(
             components=(parsers.rst.Parser,)).get_default_values()
@@ -95,8 +99,8 @@ class MockMaskFactory:
 
 
 class MockContext:
-    def __init__(self, node_stack):
-        self.domain = None
+    def __init__(self, node_stack, domain=None):
+        self.domain = domain
         self.node_stack = node_stack
         self.directive_args = [
             None,  # name
@@ -207,7 +211,7 @@ def test_find_node():
                     'the number of nodes Text is 2')
 
 
-def render(member_def):
+def render(member_def, domain=None):
     """Render Doxygen *member_def* with *renderer_class*."""
     renderer = SphinxRenderer(MockProjectInfo(),
                               None,  # renderer_factory
@@ -217,7 +221,7 @@ def render(member_def):
                               MockTargetHandler(),
                               None,   # compound_parser
                               OpenFilter())
-    renderer.context = MockContext([member_def])
+    renderer.context = MockContext([member_def], domain)
     return renderer.render(member_def)
 
 
@@ -237,6 +241,22 @@ def test_render_typedef():
     member_def = TestMemberDef(kind='typedef', definition='typedef int foo')
     signature = find_node(render(member_def), 'desc_signature')
     assert signature.astext() == 'typedef int foo'
+
+
+def test_render_c_typedef():
+    member_def = TestMemberDef(kind='typedef', definition='typedef unsigned int bar')
+    signature = find_node(render(member_def, domain='c'), 'desc_signature')
+    eq_(signature.astext(), 'typedef unsigned int bar')
+
+
+def test_render_c_function_typedef():
+    member_def = TestMemberDef(kind='typedef', definition='typedef void* (*voidFuncPtr)(float, int)')
+    signature = find_node(render(member_def, domain='c'), 'desc_signature')
+    assert signature.astext().startswith('typedef void*')
+    params = find_node(signature, 'desc_parameterlist')
+    assert len(params) == 2
+    eq_(params[0].astext(), "float")
+    eq_(params[1].astext(), "int")
 
 
 def test_render_using_alias():

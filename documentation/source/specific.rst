@@ -122,7 +122,14 @@ C Enum
    :project: c_enum
    :no-link:
 
+   
+C Typedef
+---------
 
+.. doxygenfile:: c_typedef.h
+   :project: c_typedef
+   :no-link:
+   
 Multifile
 ---------
 
