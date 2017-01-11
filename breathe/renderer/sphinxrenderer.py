@@ -963,8 +963,18 @@ class SphinxRenderer(object):
         elif declaration.startswith(using):
             declaration = declaration[len(using):]
             obj_type = "using"
+
+        def update_signature(signature, obj_type):
+            """Update the signature node if necessary, e.g. add qualifiers."""
+            prefix = obj_type + ' '
+            annotation = self.node_factory.desc_annotation(prefix, prefix)
+            if signature[0].tagname != 'desc_annotation':
+                signature.insert(0, annotation)
+            else:
+                signature[0] = annotation
+
         return self.render_declaration(node, declaration, objtype=obj_type,
-                                       update_signature=self.update_signature)
+                                       update_signature=update_signature)
 
     def update_signature_with_initializer(self, signature, node):
         initializer = node.initializer
