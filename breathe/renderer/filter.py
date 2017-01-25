@@ -628,6 +628,7 @@ class FilterFactory(object):
             & (grandparent.node_type == 'compounddef') \
             & (grandparent.kind != 'class') \
             & (grandparent.kind != 'struct') \
+            & (grandparent.kind != 'interface') \
             & (node.node_type == 'memberdef')
 
         return (self.create_class_member_filter(filter_options) | non_class_memberdef) \
@@ -665,7 +666,7 @@ class FilterFactory(object):
 
         parent = Parent()
         parent_is_compounddef = parent.node_type == 'compounddef'
-        parent_is_class = parent.kind.is_one_of(['class', 'struct'])
+        parent_is_class = parent.kind.is_one_of(['class', 'struct', 'interface'])
 
         allowed = set()
         all_options = {
@@ -1061,7 +1062,8 @@ class FilterFactory(object):
             parent_matches = (parent.node_type == 'compound') \
                 & ((parent.kind == 'namespace') |
                    (parent.kind == 'class') |
-                   (parent.kind == 'struct')) \
+                   (parent.kind == 'struct') |
+                   (parent.kind == 'interface')) \
                 & (parent.name == namespace)
 
             return parent_matches & node_matches
