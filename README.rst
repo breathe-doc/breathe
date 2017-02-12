@@ -131,6 +131,10 @@ Breathe is maintained by `michaeljones <https://github.com/michaeljones>`_ &
 - `bnewbold <https://github.com/bnewbold>`_
 - `serge-sans-paille <https://github.com/serge-sans-paille>`_
 - `dean0x7d <https://github.com/dean0x7d>`_
+- `Andne <https://github.com/Andne>`_
+- `Tiwalun <https://github.com/Tiwalun>`_
+- `eric-wieser <https://github.com/eric-wieser>`_
+- `olitheolix <https://github.com/olitheolix>`_
 
 Thanks to:
 
@@ -142,6 +146,16 @@ Change Log
 ----------
 
 Inspired by `Keepachangelog.com <http://keepachangelog.com/>`__.
+
+- 2017-02-12 - Breathe v4.5.0
+
+  - Improve handling of c typedefs
+
+  - Support new `desc_signature_line` node
+
+  - Add `--project` flag to breathe-apidoc helper
+
+  - Dropped testing for Python 3.3 and added 3.6
 
 - 2016-11-13 - Breathe v4.4.0
 
