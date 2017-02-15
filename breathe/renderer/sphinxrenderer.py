@@ -922,7 +922,12 @@ class SphinxRenderer(object):
                     declaration += ", "
                 declaration += parameter.defname
             declaration += ")"
-        return self.render_declaration(node, declaration)
+
+        def update_define_signature(signature, obj_type):
+            if node.initializer:
+                signature.extend([self.node_factory.Text(" ")] + self.render(node.initializer))
+
+        return self.render_declaration(node, declaration, update_signature=update_define_signature)
 
     def visit_enum(self, node):
         # Sphinx requires a name to be a valid identifier, so replace anonymous enum name of the
