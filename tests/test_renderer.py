@@ -236,6 +236,29 @@ def test_render_func():
     param = params[0]
     assert param[0] == 'int'
 
+def test_render_func_with_func_ptr_param():
+    """Test for the github issue #309"""
+    member_def = TestMemberDef(kind='function', definition='bool something',
+                               argsstring='(T *base, uint8_t(T::*member)(long))',
+                               virt='non-virtual',
+                               name="something",
+                               param=[TestParam(type_=TestLinkedText(content_=[TestMixedContainer(value=u'T *')]),
+                                                declname="base"),
+                                      TestParam(type_=TestLinkedText(content_=[TestMixedContainer(value=u'uint8_t(T::*)(long)')]),
+                                                declname="member")])
+    signature = find_node(render(member_def), 'desc_signature')
+    assert signature.astext().startswith('bool')
+    eq_(find_node(signature, 'desc_name')[0].astext(), 'something')
+
+    # The second parameter is a function pointer, which has a parameterlist by itself.
+    params = find_nodes(signature, 'desc_parameterlist')[0]
+    assert len(params) == 2
+    eq_(params[0].astext(), 'T *base')
+    eq_(params[1].astext(), 'uint8_t (T::*member)long')  # The long parameter is actually part of a parameterlist,
+                                                        # which means that the braces are added later, and not visible
+                                                        # here yet
+
+
 
 def test_render_typedef():
     member_def = TestMemberDef(kind='typedef', definition='typedef int foo')
