@@ -275,3 +275,13 @@ def test_render_variable_initializer():
     member_def = TestMemberDef(kind='variable', definition='const int EOF', initializer=TestMixedContainer(value=u'= -1'))
     signature = find_node(render(member_def), 'desc_signature')
     assert signature.astext() == 'const int EOF = -1'
+
+def test_render_define_initializer():
+    member_def = TestMemberDef(kind='define', name='MAX_LENGTH', initializer=TestLinkedText(content_=[TestMixedContainer(value=u'100')]))
+    signature = find_node(render(member_def), 'desc_signature')
+    assert signature.astext() == 'MAX_LENGTH 100'
+
+def test_render_define_no_initializer():
+    member_def = TestMemberDef(kind='define', name='USE_MILK')
+    signature = find_node(render(member_def), 'desc_signature')
+    assert signature.astext() == 'USE_MILK'
