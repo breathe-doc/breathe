@@ -12,7 +12,9 @@ Download
 --------
 
 Breathe is available from github and `PyPI, the Python Package Index
-<http://pypi.python.org/pypi/breathe>`_
+<http://pypi.python.org/pypi/breathe>`_. It can be installed with::
+
+    pip install breathe
 
 Documentation
 -------------
@@ -24,8 +26,8 @@ excellent service.
 The source for the documentation is in the ``documentation`` folder if you want
 to built it and read it locally.
 
-Development
------------
+Note
+~~~~
 
 Breathe does not always get the attention it deserves but I am keen to keep it
 moving forward. If you report an issue, please keep reminding me about it until
@@ -35,23 +37,42 @@ things so keep reminding me.
 Testing
 -------
 
-Breathe doesn't have a set of tests at the moment. The documentation does a good
-job of running the different parts of the Breathe functionality but there is
-nothing to check that the output is appropriate.
+The testsuite can be run with::
 
-To build the documentation, run ``make`` in the root of the project. 
+    make dev-test
+
+The documentation also does a good effort of covering the available
+functionality with different examples. To build the documentation, run::
+
+    make
 
 This will run doxygen over the example code and then run the Breathe
 documentation. View the results at::
 
-   documentation/build/html/index.html
+    documentation/build/html/index.html
+
+Further to this if you want to compare the current documentation output against
+a previous state in order to check for regressions there is a ``compare`` script
+in the ``documentation`` folder. It takes two arguments which are two commit
+references that you'd like to compare. This means that all your changes have to
+be committed first. Also the script does not resolve state dependent references
+like ``HEAD`` so provide concrete commit references like sha1s or branch names.
+A typical example is to compare your current branch output to master::
+
+    # Make sure all your changes are committed first
+    cd documentation
+    ./compare master my-branch
+
+This will do a checkout and build at each commit and then run ``meld`` against
+the resulting directories so you can see the differences introduced by your
+branch.
 
 Requirements
 ------------
 
 Development is currently done with:
  
-- Python 2.7.4
+- Python 2.7
 - Docutils 0.11
 - Sphinx 1.4
 - Doxygen 1.8.4
@@ -69,6 +90,9 @@ There is a mailing list available on Google groups:
 
 The previous mailing list was on `librelist.com <http://librelist.com>`__ and the
 archives are available `here <http://librelist.com/browser/breathe/>`__.
+
+The mailing list is quieter than the Github repository so feel free to post
+questions as Github issues.
 
 Examples
 --------
@@ -97,9 +121,9 @@ link in a github issue or get in touch on the mailing list.
 Release
 -------
 
-Command for releasing source bundle & wheel to PyPI:
+Command for releasing source bundle & wheel to PyPI::
 
-   python setup.py sdist bdist_wheel upload
+    python setup.py sdist bdist_wheel upload
 
 Credits
 -------
