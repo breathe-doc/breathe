@@ -80,9 +80,11 @@ def format_heading(level, text):
     return '%s\n%s\n\n' % (text, underlining)
 
 
-def format_directive(package_type, package):
+def format_directive(package_type, package, project):
     """Create the breathe directive and add the options."""
     directive = '.. doxygen%s:: %s\n' % (package_type, package)
+    if project:
+        directive += '   :project: %s\n' % project
     return directive
 
 
@@ -92,7 +94,7 @@ def create_package_file(package, package_type, package_id, args):
     if package_type not in TYPEDICT:
         return
     text = format_heading(1, '%s %s' % (TYPEDICT[package_type], package))
-    text += format_directive(package_type, package)
+    text += format_directive(package_type, package, args.project)
 
     write_file(os.path.join(package_type, package_id), text, args)
 
@@ -142,6 +144,8 @@ Note: By default this script will not overwrite already created files.""",
                         help='Don\'t create a table of contents file')
     parser.add_argument('-s', '--suffix', action='store', dest='suffix',
                         help='file suffix (default: rst)', default='rst')
+    parser.add_argument('-p', '--project', action='store', dest='project',
+                        help='project to add to generated directives')
     parser.add_argument('--version', action='version',
                         version='Breathe (breathe-apidoc) %s' % __version__)
     parser.add_argument('rootpath', type=str,
