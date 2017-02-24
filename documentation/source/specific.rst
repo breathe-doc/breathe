@@ -129,6 +129,13 @@ C Typedef
 .. doxygenfile:: c_typedef.h
    :project: c_typedef
    :no-link:
+
+C Typedef
+---------
+
+.. doxygenfile:: define.h
+   :project: define
+   :no-link:
    
 Multifile
 ---------
