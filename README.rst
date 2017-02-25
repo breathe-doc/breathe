@@ -171,6 +171,12 @@ Change Log
 
 Inspired by `Keepachangelog.com <http://keepachangelog.com/>`__.
 
+- 2017-02-25 - Breathe v4.6.0
+
+  - Support for the Interface directive
+
+  - Display the contents of defines
+
 - 2017-02-12 - Breathe v4.5.0
 
   - Improve handling of c typedefs
