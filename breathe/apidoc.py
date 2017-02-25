@@ -36,6 +36,7 @@ except NameError:
 # Only what breathe supports are included
 # Translates identifier to English
 TYPEDICT = {'class': 'Class',
+            'interface': 'Interface',
             'struct': 'Struct',
             'union': 'Union',
             'file': 'File',

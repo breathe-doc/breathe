@@ -44,13 +44,14 @@ all: class/xml/index.xml \
      docstring/xml/index.xml \
      pyexample/xml/index.xml \
      mux/xml/index.xml \
-     manual/xml/index.xml
+     manual/xml/index.xml \
+     interface/xml/index.xml
 
 clean:
 	rm -rf  class define enum file func page relates author \
                 par overload example include qtstyle jdstyle structcmd \
 		autolink tag restypedef afterdoc template tag group diagrams \
-		memgrp docstring pyexample mux manual
+		memgrp docstring pyexample mux manual interface
 
 class/xml/index.xml: class.h class.cfg
 	$(DOXYGEN) class.cfg
@@ -131,6 +132,9 @@ manual/xml/index.xml: manual.c manual.cfg
 
 docstring/xml/index.xml: docstring.py docstring.cfg
 	$(DOXYGEN) docstring.cfg
+
+interface/xml/index.xml: interface.h interface.cfg
+	$(DOXYGEN) interface.cfg
 
 diagrams/xml/index.xml: diagrams_a.h diagrams_b.h diagrams_c.h diagrams_d.h diagrams_e.h diagrams.cfg
 ifneq ($(HAVE_DOT),)
