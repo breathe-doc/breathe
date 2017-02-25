@@ -322,6 +322,11 @@ class DoxygenStructDirective(DoxygenClassLikeDirective):
     kind = "struct"
 
 
+class DoxygenInterfaceDirective(DoxygenClassLikeDirective):
+
+    kind = "interface"
+
+
 class DoxygenContentBlockDirective(BaseDirective):
     """Base class for namespace and group directives which have very similar behaviours"""
 
@@ -573,6 +578,7 @@ class DoxygenDirectiveFactory(object):
         "doxygenfunction": DoxygenFunctionDirective,
         "doxygenstruct": DoxygenStructDirective,
         "doxygenclass": DoxygenClassDirective,
+        "doxygeninterface": DoxygenInterfaceDirective,
         "doxygenvariable": DoxygenVariableDirective,
         "doxygendefine": DoxygenDefineDirective,
         "doxygenenum": DoxygenEnumDirective,
@@ -794,6 +800,7 @@ def setup(app):
     add_directive('doxygentypedef')
     add_directive('doxygenunion')
     add_directive('doxygenclass')
+    add_directive('doxygeninterface')
     add_directive('doxygenfile')
     add_directive('doxygennamespace')
     add_directive('doxygengroup')

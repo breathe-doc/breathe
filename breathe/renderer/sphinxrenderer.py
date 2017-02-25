@@ -13,6 +13,7 @@ class DomainDirectiveFactory(object):
     cpp_classes = {
         'class': (cpp.CPPClassObject, 'class'),
         'struct': (cpp.CPPClassObject, 'class'),
+        'interface': (cpp.CPPClassObject, 'interface'),
         'function': (cpp.CPPFunctionObject, 'function'),
         'friend': (cpp.CPPFunctionObject, 'function'),
         'slot': (cpp.CPPFunctionObject, 'function'),

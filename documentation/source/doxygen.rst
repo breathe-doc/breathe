@@ -8,6 +8,11 @@ Class
 .. doxygenindex::
    :project: class
 
+Interface
+---------
+.. doxygenindex::
+   :path: ../../examples/doxygen/interface/xml
+
 Define
 ------
 

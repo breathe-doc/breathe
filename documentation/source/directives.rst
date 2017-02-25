@@ -313,6 +313,25 @@ and additionally the ``members``, ``protected-members``, ``private-members`` and
 Checkout the :ref:`example <struct-example>` to see it in action.
 
 
+doxygeninterface
+~~~~~~~~~~~~~~~~
+
+This directive generates the appropriate output for a single interface (specially-used
+class). It behaves the same as the doxygenclass directive.
+
+::
+
+   .. doxygeninterface:: <interface name>
+      :project: ...
+      :path: ...
+      :members:
+      :protected-members:
+      :private-members:
+      :undoc-members:
+      :outline:
+      :no-link:
+
+
 doxygentypedef
 ~~~~~~~~~~~~~~
 

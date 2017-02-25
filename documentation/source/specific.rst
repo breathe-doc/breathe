@@ -143,3 +143,10 @@ Multifile
 .. doxygenfunction:: TestTemplateFunction
    :project: multifile
    :no-link:
+
+Interface Class
+---------------
+
+.. doxygeninterface:: InterfaceClass
+   :project: interface
+   :no-link:
