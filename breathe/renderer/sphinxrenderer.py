@@ -172,7 +172,7 @@ class SphinxRenderer(object):
         self.target_handler = target_handler
         self.compound_parser = compound_parser
         self.filter_ = filter_
-        self.project_refids = False
+        self.project_refids = project_info.project_refids()
         self.context = None
         self.output_defname = True
         # Nesting level for lists.
