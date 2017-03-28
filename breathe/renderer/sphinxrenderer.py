@@ -925,7 +925,7 @@ class SphinxRenderer(object):
             declaration += ")"
 
         def update_define_signature(signature, obj_type):
-            if node.initializer:
+            if node.initializer and self.project_info.show_define_initializer():
                 signature.extend([self.node_factory.Text(" ")] + self.render(node.initializer))
 
         return self.render_declaration(node, declaration, update_signature=update_define_signature)

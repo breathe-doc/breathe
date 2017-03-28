@@ -637,7 +637,8 @@ class DoxygenDirectiveFactory(object):
             app.config.breathe_domain_by_extension,
             app.config.breathe_domain_by_file_pattern,
             app.config.breathe_projects_source,
-            app.config.breathe_build_directory
+            app.config.breathe_build_directory,
+            app.config.breathe_show_define_initializer
             )
 
 
@@ -822,6 +823,7 @@ def setup(app):
     app.add_config_value("breathe_projects_source", {}, True)
     app.add_config_value("breathe_build_directory", '', True)
     app.add_config_value("breathe_default_members", (), True)
+    app.add_config_value("breathe_show_define_initializer", False, 'env')
     app.add_config_value("breathe_implementation_filename_extensions", ['.c', '.cc', '.cpp'], True)
     app.add_config_value("breathe_doxygen_config_options", {}, True)
 
