@@ -25,7 +25,8 @@ class AutoProjectInfo(object):
             config_dir,
             domain_by_extension,
             domain_by_file_pattern,
-            match
+            match,
+            show_define_initializer
             ):
 
         self._name = name
@@ -37,6 +38,7 @@ class AutoProjectInfo(object):
         self._domain_by_extension = domain_by_extension
         self._domain_by_file_pattern = domain_by_file_pattern
         self._match = match
+        self._show_define_initializer = show_define_initializer
 
     def name(self):
         return self._name
@@ -65,7 +67,8 @@ class AutoProjectInfo(object):
             self._config_dir,
             self._domain_by_extension,
             self._domain_by_file_pattern,
-            self._match
+            self._match,
+            self._show_define_initializer
             )
 
 
@@ -308,7 +311,8 @@ class ProjectInfoFactory(object):
                 self.config_dir,
                 self.domain_by_extension,
                 self.domain_by_file_pattern,
-                self.match
+                self.match,
+                self.show_define_initializer
             )
 
             self.auto_project_info_store[key] = auto_project_info
