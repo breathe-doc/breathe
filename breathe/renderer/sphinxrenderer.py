@@ -172,6 +172,7 @@ class SphinxRenderer(object):
         self.target_handler = target_handler
         self.compound_parser = compound_parser
         self.filter_ = filter_
+        self.project_refids = False
         self.context = None
         self.output_defname = True
         # Nesting level for lists.
@@ -280,7 +281,11 @@ class SphinxRenderer(object):
         The default implementation should suffice most of the time.
         """
 
-        refid = "%s%s" % (self.project_info.name(), node.id)
+        if self.project_refids:
+            refid = "%s%s" % (self.project_info.name(), node.id)
+        else:
+            refid = node.id
+
         return self.target_handler.create_target(refid)
 
     def title(self, node):
@@ -399,7 +404,10 @@ class SphinxRenderer(object):
             rst_node.children[0].insert(0, doxygen_target)
             return nodes, finder.content
 
-        refid = "%s%s" % (self.project_info.name(), node.refid)
+        if self.project_refids:
+            refid = "%s%s" % (self.project_info.name(), node.refid)
+        else:
+            refid = node.refid
         render_sig = kwargs.get('render_signature', render_signature)
         nodes, contentnode = render_sig(file_data, self.target_handler.create_target(refid),
                                         name, kind)
@@ -570,7 +578,11 @@ class SphinxRenderer(object):
         nodelist = self.render_iterable(node.content_)
         nodelist.extend(self.render_iterable(node.para))
 
-        refid = "%s%s" % (self.project_info.name(), node.refid)
+        if self.project_refids:
+            refid = "%s%s" % (self.project_info.name(), node.refid)
+        else:
+            refid = node.refid
+
         nodelist = [
             self.node_factory.pending_xref(
                 "",
@@ -849,7 +861,11 @@ class SphinxRenderer(object):
 
         nodelist = self.render_iterable(node.content_)
 
-        refid = "%s%s" % (self.project_info.name(), node.refid)
+        if self.project_refids:
+            refid = "%s%s" % (self.project_info.name(), node.refid)
+        else:
+            refid = node.refid
+
         nodelist = [
             self.node_factory.pending_xref(
                 "",
