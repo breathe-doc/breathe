@@ -182,8 +182,8 @@ Note: By default this script will not overwrite already created files.""",
     args.rootpath = os.path.abspath(args.rootpath)
     recurse_tree(args)
     if not args.notoc:
-        for key, value in TYPEDICT.items():
-            create_modules_toc_file(key, value, args)
+        for key in args.outtypes:
+            create_modules_toc_file(key, TYPEDICT[key], args)
 
 
 # So program can be started with "python -m breathe.apidoc ..."
