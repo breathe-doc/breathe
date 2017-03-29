@@ -313,7 +313,8 @@ class ProjectInfoFactory(object):
                 self.config_dir,
                 self.domain_by_extension,
                 self.domain_by_file_pattern,
-                self.match
+                self.match,
+                self.project_refids
             )
 
             self.auto_project_info_store[key] = auto_project_info
