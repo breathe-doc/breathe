@@ -125,6 +125,9 @@ class MockProjectInfo:
     def name(self):
         pass
 
+    def project_refids(self):
+        pass
+
 
 class MockTargetHandler:
     def __init__(self):
