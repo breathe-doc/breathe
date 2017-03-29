@@ -38,7 +38,7 @@ class AutoProjectInfo(object):
         self._domain_by_extension = domain_by_extension
         self._domain_by_file_pattern = domain_by_file_pattern
         self._match = match
-        self._project_refids
+        self._project_refids = project_refids
 
     def name(self):
         return self._name
