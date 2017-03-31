@@ -119,11 +119,15 @@ class MockContext:
 
 
 class MockProjectInfo:
-    def __init__(self):
+    def __init__(self, show_define_initializer=False):
+        self._show_define_initializer = show_define_initializer
         pass
 
     def name(self):
         pass
+
+    def show_define_initializer(self):
+        return self._show_define_initializer
 
 
 class MockTargetHandler:
@@ -211,9 +215,9 @@ def test_find_node():
                     'the number of nodes Text is 2')
 
 
-def render(member_def, domain=None):
+def render(member_def, domain=None, show_define_initializer=False):
     """Render Doxygen *member_def* with *renderer_class*."""
-    renderer = SphinxRenderer(MockProjectInfo(),
+    renderer = SphinxRenderer(MockProjectInfo(show_define_initializer),
                               None,  # renderer_factory
                               create_node_factory(),
                               None,  # state
@@ -271,15 +275,25 @@ def test_render_const_func():
     signature = find_node(render(member_def), 'desc_signature')
     assert '_CPPv2NK1fEv' in signature['ids']
 
+
 def test_render_variable_initializer():
     member_def = TestMemberDef(kind='variable', definition='const int EOF', initializer=TestMixedContainer(value=u'= -1'))
     signature = find_node(render(member_def), 'desc_signature')
     assert signature.astext() == 'const int EOF = -1'
 
+
 def test_render_define_initializer():
-    member_def = TestMemberDef(kind='define', name='MAX_LENGTH', initializer=TestLinkedText(content_=[TestMixedContainer(value=u'100')]))
-    signature = find_node(render(member_def), 'desc_signature')
-    assert signature.astext() == 'MAX_LENGTH 100'
+    member_def = TestMemberDef(kind='define', name='MAX_LENGTH',
+                               initializer=TestLinkedText(content_=[TestMixedContainer(value=u'100')]))
+    signature_w_initializer = find_node(render(member_def, show_define_initializer=True), 'desc_signature')
+    eq_(signature_w_initializer.astext(), 'MAX_LENGTH 100')
+
+    member_def_no_show = TestMemberDef(kind='define', name='MAX_LENGTH_NO_INITIALIZER',
+                               initializer=TestLinkedText(content_=[TestMixedContainer(value=u'100')]))
+
+    signature_wo_initializer = find_node(render(member_def_no_show, show_define_initializer=False), 'desc_signature')
+    eq_(signature_wo_initializer.astext(), 'MAX_LENGTH_NO_INITIALIZER')
+
 
 def test_render_define_no_initializer():
     member_def = TestMemberDef(kind='define', name='USE_MILK')
