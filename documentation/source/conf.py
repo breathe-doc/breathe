@@ -232,6 +232,8 @@ breathe_domain_by_file_pattern = {
         "c_typedef.h" : "c",
         }
 
+breathe_use_project_refids = True
+
 
 # Options for HTML output
 # -----------------------

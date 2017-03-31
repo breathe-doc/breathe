@@ -26,7 +26,8 @@ class AutoProjectInfo(object):
             domain_by_extension,
             domain_by_file_pattern,
             match,
-            show_define_initializer
+            show_define_initializer,
+            project_refids,
             ):
 
         self._name = name
@@ -39,12 +40,16 @@ class AutoProjectInfo(object):
         self._domain_by_file_pattern = domain_by_file_pattern
         self._match = match
         self._show_define_initializer = show_define_initializer
+        self._project_refids = project_refids
 
     def name(self):
         return self._name
 
     def build_dir(self):
         return self._build_dir
+
+    def project_refids(self):
+        return self._project_refids
 
     def abs_path_to_source_file(self, file_):
         """
@@ -68,7 +73,8 @@ class AutoProjectInfo(object):
             self._domain_by_extension,
             self._domain_by_file_pattern,
             self._match,
-            self._show_define_initializer
+            self._show_define_initializer,
+            self._project_refids,
             )
 
 
@@ -85,7 +91,8 @@ class ProjectInfo(object):
             domain_by_extension,
             domain_by_file_pattern,
             match,
-            show_define_initializer
+            show_define_initializer,
+            project_refids,
             ):
 
         self._name = name
@@ -98,6 +105,7 @@ class ProjectInfo(object):
         self._domain_by_file_pattern = domain_by_file_pattern
         self._match = match
         self._show_define_initializer = show_define_initializer
+        self._project_refids = project_refids
 
     def name(self):
         return self._name
@@ -107,6 +115,9 @@ class ProjectInfo(object):
 
     def source_path(self):
         return self._source_path
+
+    def project_refids(self):
+        return self._project_refids
 
     def relative_path_to_xml_file(self, file_):
         """
@@ -168,6 +179,7 @@ class ProjectInfoFactory(object):
         self.default_project = None
         self.domain_by_extension = {}
         self.domain_by_file_pattern = {}
+        self.project_refids = False
 
         self.show_define_initializer = False
 
@@ -184,7 +196,8 @@ class ProjectInfoFactory(object):
             domain_by_file_pattern,
             projects_source,
             build_dir,
-            show_define_initializer
+            show_define_initializer,
+            project_refids,
             ):
 
         self.projects = projects
@@ -193,6 +206,7 @@ class ProjectInfoFactory(object):
         self.domain_by_file_pattern = domain_by_file_pattern
         self.projects_source = projects_source
         self.show_define_initializer = show_define_initializer
+        self.project_refids = project_refids
 
         # If the breathe config values has a non-empty value for build_dir then use that otherwise
         # stick with the default
@@ -254,7 +268,8 @@ class ProjectInfoFactory(object):
                 self.domain_by_extension,
                 self.domain_by_file_pattern,
                 self.match,
-                self.show_define_initializer
+                self.show_define_initializer,
+                self.project_refids,
             )
 
             self.project_info_store[path] = project_info
@@ -312,7 +327,8 @@ class ProjectInfoFactory(object):
                 self.domain_by_extension,
                 self.domain_by_file_pattern,
                 self.match,
-                self.show_define_initializer
+                self.show_define_initializer,
+                self.project_refids,
             )
 
             self.auto_project_info_store[key] = auto_project_info
