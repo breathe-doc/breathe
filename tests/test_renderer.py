@@ -129,6 +129,9 @@ class MockProjectInfo:
     def show_define_initializer(self):
         return self._show_define_initializer
 
+    def project_refids(self):
+        pass
+
 
 class MockTargetHandler:
     def __init__(self):

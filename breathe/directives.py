@@ -638,7 +638,8 @@ class DoxygenDirectiveFactory(object):
             app.config.breathe_domain_by_file_pattern,
             app.config.breathe_projects_source,
             app.config.breathe_build_directory,
-            app.config.breathe_show_define_initializer
+            app.config.breathe_show_define_initializer,
+            app.config.breathe_use_project_refids,
             )
 
 
@@ -826,6 +827,7 @@ def setup(app):
     app.add_config_value("breathe_show_define_initializer", False, 'env')
     app.add_config_value("breathe_implementation_filename_extensions", ['.c', '.cc', '.cpp'], True)
     app.add_config_value("breathe_doxygen_config_options", {}, True)
+    app.add_config_value("breathe_use_project_refids", False, "env")
 
     breathe_css = "breathe.css"
     if (os.path.exists(os.path.join(app.confdir, "_static", breathe_css))):
