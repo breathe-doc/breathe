@@ -25,7 +25,8 @@ class AutoProjectInfo(object):
             config_dir,
             domain_by_extension,
             domain_by_file_pattern,
-            match
+            match,
+            show_define_initializer
             ):
 
         self._name = name
@@ -37,6 +38,7 @@ class AutoProjectInfo(object):
         self._domain_by_extension = domain_by_extension
         self._domain_by_file_pattern = domain_by_file_pattern
         self._match = match
+        self._show_define_initializer = show_define_initializer
 
     def name(self):
         return self._name
@@ -65,7 +67,8 @@ class AutoProjectInfo(object):
             self._config_dir,
             self._domain_by_extension,
             self._domain_by_file_pattern,
-            self._match
+            self._match,
+            self._show_define_initializer
             )
 
 
@@ -81,7 +84,8 @@ class ProjectInfo(object):
             config_dir,
             domain_by_extension,
             domain_by_file_pattern,
-            match
+            match,
+            show_define_initializer
             ):
 
         self._name = name
@@ -93,6 +97,7 @@ class ProjectInfo(object):
         self._domain_by_extension = domain_by_extension
         self._domain_by_file_pattern = domain_by_file_pattern
         self._match = match
+        self._show_define_initializer = show_define_initializer
 
     def name(self):
         return self._name
@@ -146,6 +151,9 @@ class ProjectInfo(object):
 
         return domain
 
+    def show_define_initializer(self):
+        return self._show_define_initializer
+
 
 class ProjectInfoFactory(object):
 
@@ -161,6 +169,8 @@ class ProjectInfoFactory(object):
         self.domain_by_extension = {}
         self.domain_by_file_pattern = {}
 
+        self.show_define_initializer = False
+
         self.project_count = 0
         self.project_info_store = {}
         self.project_info_for_auto_store = {}
@@ -173,7 +183,8 @@ class ProjectInfoFactory(object):
             domain_by_extension,
             domain_by_file_pattern,
             projects_source,
-            build_dir
+            build_dir,
+            show_define_initializer
             ):
 
         self.projects = projects
@@ -181,6 +192,7 @@ class ProjectInfoFactory(object):
         self.domain_by_extension = domain_by_extension
         self.domain_by_file_pattern = domain_by_file_pattern
         self.projects_source = projects_source
+        self.show_define_initializer = show_define_initializer
 
         # If the breathe config values has a non-empty value for build_dir then use that otherwise
         # stick with the default
@@ -241,7 +253,8 @@ class ProjectInfoFactory(object):
                 self.config_dir,
                 self.domain_by_extension,
                 self.domain_by_file_pattern,
-                self.match
+                self.match,
+                self.show_define_initializer
             )
 
             self.project_info_store[path] = project_info
@@ -298,7 +311,8 @@ class ProjectInfoFactory(object):
                 self.config_dir,
                 self.domain_by_extension,
                 self.domain_by_file_pattern,
-                self.match
+                self.match,
+                self.show_define_initializer
             )
 
             self.auto_project_info_store[key] = auto_project_info

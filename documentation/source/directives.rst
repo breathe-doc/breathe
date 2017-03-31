@@ -507,3 +507,9 @@ Config Values
    would place ``EXCLUDE_SYMBOLS=abc123`` in the config file. The default value is
    the empty dictionary.
 
+.. confval:: breathe_show_define_initializer
+
+   A boolean flag which can be set to ``True`` to display the initializer of a define in the output.
+   
+   For example a define ``MAX_LENGTH 100`` would be shown with the value 100 if this is set to ``True``,
+   and without if it is set to ``False``.
