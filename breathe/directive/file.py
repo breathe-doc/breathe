@@ -4,7 +4,6 @@ from ..renderer.base import RenderContext
 from ..renderer.mask import NullMaskFactory
 from ..directive.base import BaseDirective
 from ..parser import ParserError, FileIOError
-from ..renderer import format_parser_error
 from ..project import ProjectError
 from .base import create_warning
 
