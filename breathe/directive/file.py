@@ -1,8 +1,10 @@
 
-from ..renderer import DoxygenToRstRendererFactory
+from ..renderer import format_parser_error, DoxygenToRstRendererFactory
 from ..renderer.base import RenderContext
 from ..renderer.mask import NullMaskFactory
 from ..directive.base import BaseDirective
+from ..parser import ParserError, FileIOError
+from ..renderer import format_parser_error
 from ..project import ProjectError
 from .base import create_warning
 
@@ -25,7 +27,14 @@ class BaseFileDirective(BaseDirective):
         finder_filter = self.filter_factory.create_file_finder_filter(file_)
 
         matches = []
-        finder.filter_(finder_filter, matches)
+
+        try:
+            finder.filter_(finder_filter, matches)
+        except ParserError as e:
+            return format_parser_error(self.name, e.error, e.filename, self.state,
+                                       self.lineno, True)
+        except FileIOError as e:
+            return format_parser_error(self.name, e.error, e.filename, self.state, self.lineno)
 
         if len(matches) > 1:
             warning = create_warning(None, self.state, self.lineno, file=file_,
