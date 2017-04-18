@@ -211,15 +211,25 @@ class DoxygenFunctionDirective(BaseDirective):
         if not matches:
             raise NoMatchingFunctionError()
 
-        if len(matches) == 1:
-            return matches[0]
+        # We can have multiple matches of the same signature such as finding it in a file's xml and
+        # a group's xml. In order to prevent false negatives on our match test we get a list of
+        # unique matches based on their ids from doxygen
+        unique_ids = set()
+        unique_matches = []
+        for node_stack in matches:
+            if node_stack[0].id not in unique_ids:
+                unique_ids.add(node_stack[0].id)
+                unique_matches.append(node_stack)
+
+        if len(unique_matches) == 1:
+            return unique_matches[0]
 
         node_stack = None
 
         signatures = []
 
         # Iterate over the potential matches
-        for entry in matches:
+        for entry in unique_matches:
 
             text_options = {'no-link': u'', 'outline': u''}
 
