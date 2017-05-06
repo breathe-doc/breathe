@@ -1100,7 +1100,8 @@ class SphinxRenderer(object):
         #
         # If there is no description then render then term by itself
         if nodelist:
-            nodelist[0].children = [term, separator] + nodelist[0].children
+            nodelist[0].insert(0, term)
+            nodelist[0].insert(1, separator)
         else:
             nodelist = [term]
 
