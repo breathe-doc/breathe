@@ -901,6 +901,11 @@ class SphinxRenderer(object):
         if node.volatile == 'yes' or node.argsstring.endswith('volatile'):
             signature += ' volatile'
 
+        if node.refqual == 'lvalue':
+            signature += '&'
+        elif node.refqual == 'rvalue':
+            signature += '&&'
+
         self.context.directive_args[1] = [signature]
 
         nodes = self.run_domain_directive(node.kind, self.context.directive_args[1])

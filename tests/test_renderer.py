@@ -279,6 +279,34 @@ def test_render_const_func():
     assert '_CPPv2NK1fEv' in signature['ids']
 
 
+def test_render_lvalue_func():
+    member_def = TestMemberDef(kind='function', definition='void f', argsstring='()',
+                               virt='non-virtual', refqual='lvalue')
+    signature = find_node(render(member_def), 'desc_signature')
+    assert signature.astext().endswith('&')
+
+
+def test_render_rvalue_func():
+    member_def = TestMemberDef(kind='function', definition='void f', argsstring='()',
+                               virt='non-virtual', refqual='rvalue')
+    signature = find_node(render(member_def), 'desc_signature')
+    assert signature.astext().endswith('&&')
+
+
+def test_render_const_lvalue_func():
+    member_def = TestMemberDef(kind='function', definition='void f', argsstring='()',
+                               virt='non-virtual', const='yes', refqual='lvalue')
+    signature = find_node(render(member_def), 'desc_signature')
+    assert signature.astext().endswith('const &')
+
+
+def test_render_const_rvalue_func():
+    member_def = TestMemberDef(kind='function', definition='void f', argsstring='()',
+                               virt='non-virtual', const='yes', refqual='rvalue')
+    signature = find_node(render(member_def), 'desc_signature')
+    assert signature.astext().endswith('const &&')
+
+
 def test_render_variable_initializer():
     member_def = TestMemberDef(kind='variable', definition='const int EOF', initializer=TestMixedContainer(value=u'= -1'))
     signature = find_node(render(member_def), 'desc_signature')
