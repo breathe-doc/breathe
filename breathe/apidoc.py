@@ -90,8 +90,8 @@ def format_directive(package_type, package, project):
 
 def create_package_file(package, package_type, package_id, args):
     """Build the text of the file and write the file."""
-    # Some types are unsupported by breathe
-    if package_type not in TYPEDICT:
+    # Skip over types that weren't requested
+    if package_type not in args.outtypes:
         return
     text = format_heading(1, '%s %s' % (TYPEDICT[package_type], package))
     text += format_directive(package_type, package, args.project)
@@ -124,6 +124,20 @@ def recurse_tree(args):
                             compound.get('refid'), args)
 
 
+class TypeAction(argparse.Action):
+    def __init__(self, option_strings, dest, **kwargs):
+        super(TypeAction, self).__init__(option_strings, dest, **kwargs)
+        self.default = TYPEDICT.keys()
+        self.metavar = ','.join(TYPEDICT.keys())
+
+    def __call__(self, parser, namespace, values, option_string=None):
+        value_list = values.split(',')
+        for value in value_list:
+            if value not in TYPEDICT:
+                raise ValueError("%s not a valid option" % value)
+        setattr(namespace, self.dest, value_list)
+
+
 def main():
     """Parse and check the command line arguments."""
     parser = argparse.ArgumentParser(
@@ -146,6 +160,8 @@ Note: By default this script will not overwrite already created files.""",
                         help='file suffix (default: rst)', default='rst')
     parser.add_argument('-p', '--project', action='store', dest='project',
                         help='project to add to generated directives')
+    parser.add_argument('-g', '--generate', action=TypeAction, dest='outtypes',
+                        help='types of output to generate, comma-separated list')
     parser.add_argument('--version', action='version',
                         version='Breathe (breathe-apidoc) %s' % __version__)
     parser.add_argument('rootpath', type=str,
@@ -166,8 +182,8 @@ Note: By default this script will not overwrite already created files.""",
     args.rootpath = os.path.abspath(args.rootpath)
     recurse_tree(args)
     if not args.notoc:
-        for key, value in TYPEDICT.items():
-            create_modules_toc_file(key, value, args)
+        for key in args.outtypes:
+            create_modules_toc_file(key, TYPEDICT[key], args)
 
 
 # So program can be started with "python -m breathe.apidoc ..."
