@@ -203,7 +203,7 @@ class SphinxRenderer(object):
         node = node_stack[0]
         # An enumvalue node doesn't have location, so use its parent node for detecting
         # the domain instead.
-        if isinstance(node, six.text_type) or node.node_type == "enumvalue":
+        if isinstance(node, six.string_types) or node.node_type == "enumvalue":
             node = node_stack[1]
         filename = get_filename(node)
         if not filename and node.node_type == "compound":
@@ -1197,7 +1197,7 @@ class SphinxRenderer(object):
         result = []
         if not self.filter_.allow(self.context.node_stack):
             pass
-        elif isinstance(node, six.text_type):
+        elif isinstance(node, six.string_types):
             result = self.visit_unicode(node)
         else:
             method = SphinxRenderer.methods.get(node.node_type, SphinxRenderer.visit_unknown)
