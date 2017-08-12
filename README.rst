@@ -171,6 +171,10 @@ Change Log
 
 Inspired by `Keepachangelog.com <http://keepachangelog.com/>`__.
 
+- 2017-08-13 - Breathe v4.7.1
+
+  - Fixed bug regarding code snippets inside Doxygen comments.
+
 - 2017-08-09 - Breathe v4.7.0
 
   - New `outtypes` option to prevent documenting namespace and files
