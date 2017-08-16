@@ -99,8 +99,7 @@ Examples
 
 Examples of Breathe used by other projects:
 
-- `cppformat <http://cppformat.readthedocs.org/en/latest/>`_
-  [`pdf <https://media.readthedocs.org/pdf/cppformat/master/cppformat.pdf>`__]
+- `fmt <http://fmtlib.net/latest>`_
 - `Lasso C API <http://lassoguide.com/api/lcapi-reference.html>`_
   [`pdf <http://lassoguide.com/LassoGuide9.2.pdf>`__]
 
