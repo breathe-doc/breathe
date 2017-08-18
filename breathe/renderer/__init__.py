@@ -23,7 +23,7 @@ class DoxygenToRstRendererFactory(object):
         return sphinxrenderer.SphinxRenderer(
             self.project_info,
             self,
-            create_node_factory(),
+            create_node_factory(document.attributes.get("source", None)),
             state,
             document,
             target_handler,
