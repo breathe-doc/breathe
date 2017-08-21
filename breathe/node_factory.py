@@ -24,21 +24,16 @@ class NodeFactory(object):
             try:
                 attr = getattr(source, node_name)
                 if issubclass(attr, docutils.nodes.Node):
-                    ret = globals().get(attr.__name__)
 
-                    if ret is not None:
-                        return ret
+                    def __new__(cls, *args, **kwargs):
 
-                    def __init__(s, *args, **kwargs):
+                        a = attr.__new__(attr, *args, **kwargs)
+                        attr.__init__(a, *args, **kwargs)
+                        if hasattr(a, "source") and getattr(a, "source") is None:
+                            a.source = self.source_file
+                        return a
 
-                        attr.__init__(s, *args, **kwargs)
-                        if s.source is None:
-                            s.source = self.source_file
-
-                    ret = type(attr.__name__, (attr,), {"__init__": __init__})
-                    globals()[attr.__name__] = ret
-
-                    return ret
+                    return type(attr.__name__, (attr,), {"__new__": __new__})
 
                 return attr
             except AttributeError:
