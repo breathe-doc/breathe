@@ -158,10 +158,10 @@ Which create formatted output like:
 
 We can refer to **VALUE** using::
 
-   :cpp:member:`VALUE`
+   :cpp:enumerator:`VALUE`
    
-which renders as :cpp:member:`VALUE` and to **testnamespace::FIRST** using ::
+which renders as :cpp:enumerator:`VALUE` and to **testnamespace::FIRST** using ::
 
-   :cpp:member:`testnamespace::FIRST`
+   :cpp:enumerator:`testnamespace::FIRST`
 
-which renders as :cpp:member:`testnamespace::FIRST`.
+which renders as :cpp:enumerator:`testnamespace::FIRST`.
