@@ -3,6 +3,11 @@ from docutils import nodes
 from docutils.statemachine import ViewList
 from sphinx.domains import cpp, c, python
 
+try:
+    from sphinxcontrib import phpdomain as php
+except ImportError:
+    php = None
+
 import re
 import six
 import textwrap
@@ -33,6 +38,14 @@ class DomainDirectiveFactory(object):
         'variable': (python.PyClassmember, 'attribute')
     }
 
+    if php is not None:
+        php_classes = {
+            'function': (php.PhpNamespacelevel, 'function'),
+            'class': (php.PhpClasslike, 'class'),
+            'attr': (php.PhpClassmember, 'attr'),
+            'method': (php.PhpClassmember, 'method'),
+        }
+
     @staticmethod
     def fix_python_signature(sig):
         def_ = 'def '
@@ -49,6 +62,16 @@ class DomainDirectiveFactory(object):
             cls, name = DomainDirectiveFactory.python_classes.get(
                 args[0], (python.PyClasslike, 'class'))
             args[1] = [DomainDirectiveFactory.fix_python_signature(n) for n in args[1]]
+        elif php is not None and domain == 'php':
+            separators = php.separators
+            arg_0 = args[0]
+            if any([separators['method'] in n for n in args[1]]):
+                if any([separators['attr'] in n for n in args[1]]):
+                    arg_0 = 'attr'
+                else:
+                    arg_0 = 'method'
+            cls, name = DomainDirectiveFactory.php_classes.get(
+                arg_0, (php.PhpClasslike, 'class'))
         else:
             cls, name = DomainDirectiveFactory.cpp_classes.get(
                 args[0], (cpp.CPPMemberObject, 'member'))
@@ -454,18 +477,18 @@ class SphinxRenderer(object):
         ("public-attrib", "Public Members"),
         ("public-slot", "Public Slots"),
         ("signal", "Signal"),
-        ("dcop-func",  "DCOP Function"),
-        ("property",  "Property"),
-        ("event",  "Event"),
+        ("dcop-func", "DCOP Function"),
+        ("property", "Property"),
+        ("event", "Event"),
         ("public-static-func", "Public Static Functions"),
         ("public-static-attrib", "Public Static Attributes"),
-        ("protected-type",  "Protected Types"),
-        ("protected-func",  "Protected Functions"),
-        ("protected-attrib",  "Protected Attributes"),
-        ("protected-slot",  "Protected Slots"),
-        ("protected-static-func",  "Protected Static Functions"),
-        ("protected-static-attrib",  "Protected Static Attributes"),
-        ("package-type",  "Package Types"),
+        ("protected-type", "Protected Types"),
+        ("protected-func", "Protected Functions"),
+        ("protected-attrib", "Protected Attributes"),
+        ("protected-slot", "Protected Slots"),
+        ("protected-static-func", "Protected Static Functions"),
+        ("protected-static-attrib", "Protected Static Attributes"),
+        ("package-type", "Package Types"),
         ("package-func", "Package Functions"),
         ("package-attrib", "Package Attributes"),
         ("package-static-func", "Package Static Functions"),
@@ -473,17 +496,17 @@ class SphinxRenderer(object):
         ("private-type", "Private Types"),
         ("private-func", "Private Functions"),
         ("private-attrib", "Private Members"),
-        ("private-slot",  "Private Slots"),
+        ("private-slot", "Private Slots"),
         ("private-static-func", "Private Static Functions"),
-        ("private-static-attrib",  "Private Static Attributes"),
-        ("friend",  "Friends"),
-        ("related",  "Related"),
-        ("define",  "Defines"),
-        ("prototype",  "Prototypes"),
-        ("typedef",  "Typedefs"),
-        ("enum",  "Enums"),
-        ("func",  "Functions"),
-        ("var",  "Variables"),
+        ("private-static-attrib", "Private Static Attributes"),
+        ("friend", "Friends"),
+        ("related", "Related"),
+        ("define", "Defines"),
+        ("prototype", "Prototypes"),
+        ("typedef", "Typedefs"),
+        ("enum", "Enums"),
+        ("func", "Functions"),
+        ("var", "Variables"),
     ]
 
     def visit_compounddef(self, node):
