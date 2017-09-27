@@ -859,17 +859,18 @@ class SphinxRenderer(object):
 
         refid = self.get_refid(node.refid)
 
-        nodelist = [
-            self.node_factory.pending_xref(
-                "",
-                reftype="ref",
-                refdomain="std",
-                refexplicit=True,
-                refid=refid,
-                reftarget=refid,
-                *nodelist
-            )
-        ]
+        if refid is not None:
+            nodelist = [
+                self.node_factory.pending_xref(
+                    "",
+                    reftype="ref",
+                    refdomain="std",
+                    refexplicit=True,
+                    refid=refid,
+                    reftarget=refid,
+                    *nodelist
+                )
+            ]
 
         return nodelist
 
