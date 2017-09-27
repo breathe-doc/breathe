@@ -120,12 +120,6 @@ def get_param_decl(param):
 
     def to_string(node):
         """Convert Doxygen node content to a string."""
-        # pc
-        if node is None:
-        #     # import pdb;pdb.set_trace()
-            return ' '
-        # pc end
-
         result = []
         for p in node.content_:
             value = p.value
