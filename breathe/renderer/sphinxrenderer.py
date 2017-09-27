@@ -44,6 +44,7 @@ class DomainDirectiveFactory(object):
             'class': (php.PhpClasslike, 'class'),
             'attr': (php.PhpClassmember, 'attr'),
             'method': (php.PhpClassmember, 'method'),
+            'global': (php.PhpGloballevel, 'global'),
         }
 
     @staticmethod
@@ -70,6 +71,9 @@ class DomainDirectiveFactory(object):
                     arg_0 = 'attr'
                 else:
                     arg_0 = 'method'
+            else:
+                if arg_0 in ['variable']:
+                    arg_0 = 'global'
             cls, name = DomainDirectiveFactory.php_classes.get(
                 arg_0, (php.PhpClasslike, 'class'))
         else:
@@ -116,6 +120,12 @@ def get_param_decl(param):
 
     def to_string(node):
         """Convert Doxygen node content to a string."""
+        # pc
+        if node is None:
+        #     # import pdb;pdb.set_trace()
+            return ' '
+        # pc end
+
         result = []
         for p in node.content_:
             value = p.value
