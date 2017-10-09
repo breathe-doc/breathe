@@ -8,6 +8,8 @@
 
   A link to a protected member variable of Test2: Test2#var,
 
+  A link to the global variable #globVar.
+
   A link to the global enumeration type #GlobEnum.
  
   A link to the define #ABS(x).
