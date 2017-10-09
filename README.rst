@@ -170,6 +170,15 @@ Change Log
 
 Inspired by `Keepachangelog.com <http://keepachangelog.com/>`__.
 
+- 2017-10-09 - Breathe v4.7.3
+
+  - Support for enums in the cpp domain.
+  - Handle case where compoundref does not have a refid value associated.
+
+- 2017-08-15 - Breathe v4.7.2
+
+  - Fix issue with packaging on Python 2.7 with wheels.
+
 - 2017-08-13 - Breathe v4.7.1
 
   - Fixed bug regarding code snippets inside Doxygen comments.
