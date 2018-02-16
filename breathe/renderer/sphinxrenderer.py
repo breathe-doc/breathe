@@ -8,6 +8,23 @@ import six
 import textwrap
 
 
+class WithContext(object):
+    def __init__(self, parent, context):
+        self.context = context
+        self.parent = parent
+        self.previous = None
+
+    def __enter__(self):
+        assert self.previous is None
+        self.previous = self.parent.context
+        self.parent.set_context(self.context)
+        return self
+
+    def __exit__(self, et, ev, bt):
+        self.parent.context = self.previous
+        self.previous = None
+
+
 class DomainDirectiveFactory(object):
     # A mapping from node kinds to cpp domain classes and directive names.
     cpp_classes = {
@@ -375,7 +392,9 @@ class SphinxRenderer(object):
         # Read in the corresponding xml file and process
         file_data = self.compound_parser.parse(node.refid)
 
-        rendered_data = self.render(file_data)
+        parent_context = self.context.create_child_context(file_data)
+        new_context = parent_context.create_child_context(file_data.compounddef)
+        rendered_data = self.render(file_data, parent_context)
 
         if not rendered_data and not render_empty_node:
             return []
@@ -406,11 +425,13 @@ class SphinxRenderer(object):
 
         refid = self.get_refid(node.refid)
         render_sig = kwargs.get('render_signature', render_signature)
-        nodes, contentnode = render_sig(file_data, self.target_handler.create_target(refid),
-                                        name, kind)
+        with WithContext(self, new_context):
+            # Pretend that the signature is being rendered in context of the
+            # definition, for proper domain detection
+            nodes, contentnode = render_sig(
+                    file_data, self.target_handler.create_target(refid),
+                    name, kind)
 
-        parent_context = self.context.create_child_context(file_data)
-        new_context = parent_context.create_child_context(file_data.compounddef)
         if file_data.compounddef.includes:
             for include in file_data.compounddef.includes:
                 contentnode.extend(self.render(include, new_context.create_child_context(include)))
@@ -1191,17 +1212,17 @@ class SphinxRenderer(object):
     }
 
     def render(self, node, context=None):
-        saved_context = self.context
-        self.set_context(context if context else self.context.create_child_context(node))
-        result = []
-        if not self.filter_.allow(self.context.node_stack):
-            pass
-        elif isinstance(node, six.string_types):
-            result = self.visit_unicode(node)
-        else:
-            method = SphinxRenderer.methods.get(node.node_type, SphinxRenderer.visit_unknown)
-            result = method(self, node)
-        self.context = saved_context
+        if context is None:
+            context = self.context.create_child_context(node)
+        with WithContext(self, context):
+            result = []
+            if not self.filter_.allow(self.context.node_stack):
+                pass
+            elif isinstance(node, six.string_types):
+                result = self.visit_unicode(node)
+            else:
+                method = SphinxRenderer.methods.get(node.node_type, SphinxRenderer.visit_unknown)
+                result = method(self, node)
         return result
 
     def render_optional(self, node):
