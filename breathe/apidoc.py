@@ -44,16 +44,21 @@ TYPEDICT = {'class': 'Class',
             'group': 'Group'}
 
 
+def print_info(msg, args):
+    if not args.quiet:
+        print(msg)
+
+
 def write_file(name, text, args):
     """Write the output file for module/package <name>."""
     fname = os.path.join(args.destdir, '%s.%s' % (name, args.suffix))
     if args.dryrun:
-        print('Would create file %s.' % fname)
+        print_info('Would create file %s.' % fname, args)
         return
     if not args.force and os.path.isfile(fname):
-        print('File %s already exists, skipping.' % fname)
+        print_info('File %s already exists, skipping.' % fname, args)
     else:
-        print('Creating file %s.' % fname)
+        print_info('Creating file %s.' % fname, args)
         if not os.path.exists(os.path.dirname(fname)):
             try:
                 os.makedirs(os.path.dirname(fname))
@@ -64,7 +69,7 @@ def write_file(name, text, args):
             with open(fname, 'r') as target:
                 orig = target.read()
                 if orig == text:
-                    print('File %s up to date, skipping.' % fname)
+                    print_info('File %s up to date, skipping.' % fname, args)
                     return
         except FileNotFoundError:
             # Don't mind if it isn't there
@@ -162,6 +167,8 @@ Note: By default this script will not overwrite already created files.""",
                         help='project to add to generated directives')
     parser.add_argument('-g', '--generate', action=TypeAction, dest='outtypes',
                         help='types of output to generate, comma-separated list')
+    parser.add_argument('-q', '--quiet', action='store_true', dest='quiet',
+                        help='suppress informational messages')
     parser.add_argument('--version', action='version',
                         version='Breathe (breathe-apidoc) %s' % __version__)
     parser.add_argument('rootpath', type=str,
