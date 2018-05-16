@@ -1039,7 +1039,7 @@ class sectiondefType(GeneratedsSuper):
 class memberdefType(GeneratedsSuper):
     subclass = None
     superclass = None
-    def __init__(self, initonly=None, kind=None, volatile=None, const=None, raisexx=None, virt=None, readable=None, prot=None, explicit=None, new=None, final=None, writable=None, add=None, static=None, remove=None, sealed=None, mutable=None, gettable=None, inline=None, settable=None, id=None, templateparamlist=None, type_=None, definition=None, argsstring=None, name=None, read=None, write=None, bitfield=None, reimplements=None, reimplementedby=None, param=None, enumvalue=None, initializer=None, exceptions=None, briefdescription=None, detaileddescription=None, inbodydescription=None, location=None, references=None, referencedby=None):
+    def __init__(self, initonly=None, kind=None, volatile=None, const=None, raisexx=None, virt=None, readable=None, prot=None, explicit=None, new=None, final=None, writable=None, add=None, static=None, remove=None, sealed=None, mutable=None, gettable=None, inline=None, settable=None, id=None, templateparamlist=None, type_=None, definition=None, argsstring=None, name=None, read=None, write=None, bitfield=None, reimplements=None, reimplementedby=None, param=None, enumvalue=None, initializer=None, exceptions=None, briefdescription=None, detaileddescription=None, inbodydescription=None, location=None, references=None, referencedby=None, refqual=None):
         self.initonly = initonly
         self.kind = kind
         self.volatile = volatile
@@ -1099,6 +1099,7 @@ class memberdefType(GeneratedsSuper):
             self.referencedby = []
         else:
             self.referencedby = referencedby
+        self.refqual = refqual
     def factory(*args_, **kwargs_):
         if memberdefType.subclass:
             return memberdefType.subclass(*args_, **kwargs_)
@@ -1199,6 +1200,8 @@ class memberdefType(GeneratedsSuper):
     def set_settable(self, settable): self.settable = settable
     def get_id(self): return self.id
     def set_id(self, id): self.id = id
+    def get_refqual(self): return self.refqual
+    def set_refqual(self, refqual): self.refqual = refqual
     def hasContent_(self):
         if (
             self.templateparamlist is not None or
@@ -1274,6 +1277,8 @@ class memberdefType(GeneratedsSuper):
             self.settable = attrs.get('settable').value
         if attrs.get('id'):
             self.id = attrs.get('id').value
+        if attrs.get('refqual'):
+            self.refqual = attrs.get('refqual').value
     def buildChildren(self, child_, nodeName_):
         if child_.nodeType == Node.ELEMENT_NODE and \
             nodeName_ == 'templateparamlist':

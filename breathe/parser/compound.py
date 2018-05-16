@@ -159,7 +159,8 @@ class memberdefTypeSub(supermod.memberdefType):
                  definition='', argsstring='', name='', read='', write='', bitfield='',
                  reimplements=None, reimplementedby=None, param=None, enumvalue=None,
                  initializer=None, exceptions=None, briefdescription=None, detaileddescription=None,
-                 inbodydescription=None, location=None, references=None, referencedby=None):
+                 inbodydescription=None, location=None, references=None, referencedby=None,
+                 refqual=None):
 
         supermod.memberdefType.__init__(self, initonly, kind, volatile, const, raise_, virt,
                                         readable, prot, explicit, new, final, writable, add, static,
@@ -168,7 +169,7 @@ class memberdefTypeSub(supermod.memberdefType):
                                         read, write, bitfield, reimplements, reimplementedby, param,
                                         enumvalue, initializer, exceptions, briefdescription,
                                         detaileddescription, inbodydescription, location,
-                                        references, referencedby)
+                                        references, referencedby, refqual)
 
         self.parameterlist = supermod.docParamListType.factory()
         self.parameterlist.kind = "param"
