@@ -12,7 +12,7 @@ python:
 
 before_install:
   - sudo apt-get update -qq
-  - sudo apt-get install -y doxygen texlive-latex-base texlive-latex-extra texlive-fonts-recommended
+  - sudo apt-get install -y doxygen texlive-latex-base texlive-latex-extra texlive-fonts-recommended latexmk
 
 install:
   - pip install flake8
