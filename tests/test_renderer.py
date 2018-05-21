@@ -59,9 +59,16 @@ class MockConfig(object):
     cpp_index_common_prefix = []
 
 
+class MockApp(object):
+    def __init__(self):
+        self.doctreedir = None
+        self.srcdir = None
+        self.config = MockConfig()
+
+
 class MockState:
     def __init__(self):
-        env = sphinx.environment.BuildEnvironment(None, None, MockConfig())
+        env = sphinx.environment.BuildEnvironment(MockApp())
         CPPDomain(env)
         CDomain(env)
         env.temp_data['docname'] = 'mock-doc'
