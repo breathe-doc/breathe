@@ -178,6 +178,7 @@ Inspired by `Keepachangelog.com <http://keepachangelog.com/>`__.
   - Show reference qualification for methods. #332
   - Adapt tests/CI to newest Sphinx version. #377
   - More robust name regex in renderer. #370
+  - Show base classes using Sphinx's cpp domain. #295
 
 - 2017-10-09 - Breathe v4.7.3
 
