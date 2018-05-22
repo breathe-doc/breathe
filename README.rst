@@ -170,6 +170,15 @@ Change Log
 
 Inspired by `Keepachangelog.com <http://keepachangelog.com/>`__.
 
+- Unreleased - Breathe v4.8.0
+
+  - Add quiet option to apidoc. #375
+  - Add PHP domain. #351
+  - Keep templates on adjacent lines. #300
+  - Show reference qualification for methods. #332
+  - Adapt tests/CI to newest Sphinx version. #377
+  - More robust name regex in renderer. #370
+
 - 2017-10-09 - Breathe v4.7.3
 
   - Support for enums in the cpp domain.
