@@ -81,18 +81,16 @@ Doxygen 1.5.1 seems to produce xml with repeated sections which causes Breathe
 some confusion. Not sure when this was resolved but it might be best to go for
 the latest possible.
 
-Mailing List
-------------
+Mailing List Archives
+---------------------
 
-There is a mailing list available on Google groups:
-
-    https://groups.google.com/forum/#!forum/sphinx-breathe
+The archive for the Google groups list can be found
+`here <https://groups.google.com/forum/#!forum/sphinx-breathe>`__.
 
 The previous mailing list was on `librelist.com <http://librelist.com>`__ and the
 archives are available `here <http://librelist.com/browser/breathe/>`__.
 
-The mailing list is quieter than the Github repository so feel free to post
-questions as Github issues.
+Please post new questions as GitHub issues.
 
 Examples
 --------
@@ -111,7 +109,7 @@ Alternatives
 
 Breathe is not the only solution to this problem. These are the alternatives
 that we know about. We are very happy to list others if you'd like to provide a
-link in a github issue or get in touch on the mailing list.
+link in a GitHub issue.
 
 - `Gasp <https://github.com/troelsfr/Gasp>`_
 - `Robin <https://bitbucket.org/reima/robin>`_
