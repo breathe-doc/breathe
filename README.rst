@@ -168,7 +168,7 @@ Change Log
 
 Inspired by `Keepachangelog.com <http://keepachangelog.com/>`__.
 
-- Unreleased - Breathe v4.8.0
+- 2018-05-26 - Breathe v4.8.0
 
   - Add quiet option to apidoc. #375
   - Add PHP domain. #351
