@@ -178,6 +178,7 @@ Inspired by `Keepachangelog.com <http://keepachangelog.com/>`__.
   - More robust name regex in renderer. #370
   - Show base classes using Sphinx's cpp domain. #295
   - Fix domain detection when rendering groups. #365
+  - Return parallel_{read,write}_safe true for Sphinx's -j. #376
 
 - 2017-10-09 - Breathe v4.7.3
 
