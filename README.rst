@@ -168,6 +168,10 @@ Change Log
 
 Inspired by `Keepachangelog.com <http://keepachangelog.com/>`__.
 
+- 2018-06-01 - Breathe v4.9.0
+
+  - Render newlines as separate paragraphs. #380
+
 - 2018-05-26 - Breathe v4.8.0
 
   - Add quiet option to apidoc. #375
