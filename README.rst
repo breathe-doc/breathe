@@ -168,6 +168,10 @@ Change Log
 
 Inspired by `Keepachangelog.com <http://keepachangelog.com/>`__.
 
+- 2018-06-03 - Breathe v4.9.1
+
+  - Don't append separator for paragraph type. #382
+
 - 2018-06-01 - Breathe v4.9.0
 
   - Render newlines as separate paragraphs. #380
