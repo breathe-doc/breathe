@@ -1091,12 +1091,14 @@ class SphinxRenderer(object):
     def update_signature_with_initializer(self, signature, node):
         initializer = node.initializer
         if initializer:
-            nodes = self.render(initializer)
-            separator = ' '
-            if not nodes[0].startswith('='):
-                separator += '= '
-            signature.append(self.node_factory.Text(separator))
-            signature.extend(nodes)
+            render_nodes = self.render(initializer)
+            # Do not append separators for paragraphs.
+            if not isinstance(render_nodes[0], nodes.paragraph):
+                separator = ' '
+                if not render_nodes[0].startswith('='):
+                    separator += '= '
+                signature.append(self.node_factory.Text(separator))
+            signature.extend(render_nodes)
 
     def visit_variable(self, node):
         declaration = get_definition_without_template_args(node)
