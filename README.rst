@@ -8,6 +8,12 @@ Breathe
 This is an extension to reStructuredText and Sphinx to be able to read and
 render the Doxygen xml output.
 
+Notice: History has been rewritten recently
+-------------------------------------------
+
+History has been rewritten recently to fix long-standing issue #340. Please
+update your SHA hashes. This will not happen again. Details in #384.
+
 Download
 --------
 
