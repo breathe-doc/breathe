@@ -171,6 +171,7 @@ Inspired by `Keepachangelog.com <http://keepachangelog.com/>`__.
 - Unreleased - Breathe v4.10.0
 
   - Explicitly use Sphinx 1.7.5 for CI and dev. #385
+  - Print filename when printing ParserException. #390
 
 - 2018-06-03 - Breathe v4.9.1
 
