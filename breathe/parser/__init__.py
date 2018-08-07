@@ -11,6 +11,9 @@ class ParserError(Exception):
         self.error = error
         self.filename = filename
 
+    def __str__(self):
+        return ("file %s: %s" % (self.filename, self.error))
+
 
 class FileIOError(Exception):
 
