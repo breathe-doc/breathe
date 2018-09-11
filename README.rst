@@ -168,6 +168,10 @@ Change Log
 
 Inspired by `Keepachangelog.com <http://keepachangelog.com/>`__.
 
+- Unreleased - Breathe v4.11.0
+
+  - Fix typo in quickstart. #393
+
 - 2018-08-07 - Breathe v4.10.0
 
   - Explicitly use Sphinx 1.7.5 for CI and dev. #385
