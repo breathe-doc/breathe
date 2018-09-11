@@ -35,7 +35,7 @@ The following steps are required to integrate breathe functionality:
 
     breathe_default_project = "myproject"
 
-Once this is done you may use the the following commands::
+Once this is done you may use the following commands::
 
   .. doxygenindex::
   .. doxygenfunction::
