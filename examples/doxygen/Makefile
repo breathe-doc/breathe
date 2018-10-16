@@ -26,6 +26,7 @@ all: class/xml/index.xml \
      page/xml/index.xml \
      relates/xml/index.xml \
      author/xml/index.xml \
+     anchor/xml/index.xml \
      par/xml/index.xml \
      overload/xml/index.xml \
      example/xml/index.xml \
@@ -48,7 +49,7 @@ all: class/xml/index.xml \
      interface/xml/index.xml
 
 clean:
-	rm -rf  class define enum file func page relates author \
+	rm -rf  class define enum file func page relates author anchor \
                 par overload example include qtstyle jdstyle structcmd \
 		autolink tag restypedef afterdoc template tag group diagrams \
 		memgrp docstring pyexample mux manual interface
@@ -76,6 +77,9 @@ relates/xml/index.xml: relates.cpp relates.cfg
 
 author/xml/index.xml: author.cpp author.cfg
 	$(DOXYGEN) author.cfg
+
+anchor/xml/index.xml: anchor.cpp anchor.cfg
+	$(DOXYGEN) anchor.cfg
 
 par/xml/index.xml: par.cpp par.cfg
 	$(DOXYGEN) par.cfg

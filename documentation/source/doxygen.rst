@@ -89,6 +89,11 @@ Autolink
 .. doxygenindex::
    :path: ../../examples/doxygen/autolink/xml
 
+Anchor
+--------
+.. doxygenindex::
+   :path: ../../examples/doxygen/anchor/xml
+
 ResTypeDef
 ----------
 .. doxygenindex::
