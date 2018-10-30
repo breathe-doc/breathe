@@ -221,23 +221,23 @@ It produces this output:
    :no-link:
 
 
-Qt Slots Example
-----------------
+Qt Signals & Slots Example
+--------------------------
 
-Doxygen is aware of Qt Slots and so Breathe can pick them up and display them in
-the output. They are displayed in appropriate ``Public Slots``, ``Protected
-Slots`` and ``Private Slots`` sections.
+Doxygen is aware of Qt Signals and Slots and so Breathe can pick them up and
+display them in the output. They are displayed in appropriate ``Signals``,
+``Public Slots``, ``Protected Slots`` and ``Private Slots`` sections.
 
 .. code-block:: rst
 
-   .. doxygenclass:: QtSlotExample
-      :project: qtslots
+   .. doxygenclass:: QtSignalSlotExample
+      :project: qtsignalsandslots
       :members:
 
 Produces the following output:
 
-.. doxygenclass:: QtSlotExample
-   :project: qtslots
+.. doxygenclass:: QtSignalSlotExample
+   :project: qtsignalsandslots
    :members:
    :no-link:
 

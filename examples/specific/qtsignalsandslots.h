@@ -3,7 +3,7 @@
 
 #include
 
-class QtSlotExample: public QObject
+class QtSignalSlotExample: public QObject
 {
     Q_OBJECT
 
@@ -14,6 +14,14 @@ class QtSlotExample: public QObject
      This is shown in declaration
      */
     void workingFunction( int iShownParameter ) { Q_UNUSED( iShownParameter ; ) }
+
+    signals:
+
+    /*!
+     *\param iShown
+     This is in function declaration
+     */
+    void workingSignal( int iShown );
 
     public slots:
 

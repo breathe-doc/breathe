@@ -206,7 +206,7 @@ breathe_projects = {
     "lists":"../../examples/specific/lists/xml/",
     "group":"../../examples/specific/group/xml/",
     "union":"../../examples/specific/union/xml/",
-    "qtslots":"../../examples/specific/qtslots/xml/",
+    "qtsignalsandslots":"../../examples/specific/qtsignalsandslots/xml/",
     "array":"../../examples/specific/array/xml/",
     "c_enum":"../../examples/specific/c_enum/xml/",
     "c_typedef":"../../examples/specific/c_typedef/xml/",
