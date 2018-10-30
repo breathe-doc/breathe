@@ -799,7 +799,7 @@ class SphinxRenderer(object):
                 rst_node = self.node_factory.displaymath()
 
             # Or multiline
-            if latex.startswith("\[") and latex.endswith("\]"):
+            if latex.startswith("\\[") and latex.endswith("\\]"):
                 latex = latex[2:-2:]
 
             # Here we steal the core of the mathbase "math" directive handling code from:
