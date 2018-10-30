@@ -72,6 +72,7 @@ class DomainDirectiveFactory(object):
         'interface': (DoxyCPPClassObject, 'interface'),
         'function': (cpp.CPPFunctionObject, 'function'),
         'friend': (cpp.CPPFunctionObject, 'function'),
+        'signal': (cpp.CPPFunctionObject, 'function'),
         'slot': (cpp.CPPFunctionObject, 'function'),
         'enum': (cpp.CPPTypeObject, 'type'),
         'typedef': (cpp.CPPTypeObject, 'type'),
@@ -547,7 +548,7 @@ class SphinxRenderer(object):
         ("public-func", "Public Functions"),
         ("public-attrib", "Public Members"),
         ("public-slot", "Public Slots"),
-        ("signal", "Signal"),
+        ("signal", "Signals"),
         ("dcop-func", "DCOP Function"),
         ("property", "Property"),
         ("event", "Event"),
@@ -1236,7 +1237,7 @@ class SphinxRenderer(object):
 
     def dispatch_memberdef(self, node):
         """Dispatch handling of a memberdef node to a suitable visit method."""
-        if node.kind in ("function", "slot") or \
+        if node.kind in ("function", "signal", "slot") or \
                 (node.kind == 'friend' and node.argsstring):
             return self.visit_function(node)
         if node.kind == "enum":
