@@ -171,6 +171,7 @@ Inspired by `Keepachangelog.com <http://keepachangelog.com/>`__.
 - Unreleased - Breathe v4.11.0
 
   - Fix typo in quickstart. #393
+  - Add support for QtSignals. #401
 
 - 2018-08-07 - Breathe v4.10.0
 
