@@ -171,7 +171,7 @@ def get_param_decl(param):
     def to_string(node):
         """Convert Doxygen node content to a string."""
         result = []
-        if not isinstance(node, NoneType):
+        if not node is None:
             for p in node.content_:
                 value = p.value
                 if not isinstance(value, six.text_type):
