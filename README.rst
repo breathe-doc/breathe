@@ -168,7 +168,7 @@ Change Log
 
 Inspired by `Keepachangelog.com <http://keepachangelog.com/>`__.
 
-- Unreleased - Breathe v4.11.1
+- 2018-12-11 - Breathe v4.11.1
 
   - Sphinxrenderer: handle typeless parameters gracefully. #404
 
