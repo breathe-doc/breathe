@@ -168,6 +168,10 @@ Change Log
 
 Inspired by `Keepachangelog.com <http://keepachangelog.com/>`__.
 
+- Unreleased - Breathe v4.11.1
+
+  - Sphinxrenderer: handle typeless parameters gracefully. #404
+
 - 2018-10-31 - Breathe v4.11.0
 
   - Fix typo in quickstart. #393
