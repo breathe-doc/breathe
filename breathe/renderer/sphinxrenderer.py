@@ -30,16 +30,14 @@ class WithContext(object):
         self.previous = None
 
 
-class DoxyCPPClassObject(cpp.CPPClassObject):
+class DoxyCPPInterfaceObject(cpp.CPPClassObject):
+    object_type = 'class'
 
     @property
     def display_object_type(self):
-        # override because we also have the 'interface' type
-        assert self.objtype in ('class', 'struct', 'interface')
-        # TODO: remove this if it should be rendered as 'interface' as well
-        if self.objtype == 'interface':
-            return 'class'
-        return self.objtype
+        # override because we have the 'interface' type
+        assert self.objtype == 'interface'
+        return 'class'  # TODO: change to 'interface' if that is the desired rendering
 
     def parse_definition(self, parser):
         return parser.parse_declaration("class", "class")
@@ -48,9 +46,9 @@ class DoxyCPPClassObject(cpp.CPPClassObject):
 class DomainDirectiveFactory(object):
     # A mapping from node kinds to cpp domain classes and directive names.
     cpp_classes = {
-        'class': (DoxyCPPClassObject, 'class'),
-        'struct': (DoxyCPPClassObject, 'struct'),
-        'interface': (DoxyCPPClassObject, 'interface'),
+        'class': (cpp.CPPClassObject, 'class'),
+        'struct': (cpp.CPPClassObject, 'struct'),
+        'interface': (DoxyCPPInterfaceObject, 'interface'),
         'function': (cpp.CPPFunctionObject, 'function'),
         'friend': (cpp.CPPFunctionObject, 'function'),
         'signal': (cpp.CPPFunctionObject, 'function'),
@@ -494,9 +492,10 @@ class SphinxRenderer(object):
             finder = NodeFinder(rst_node.document)
             rst_node.walk(finder)
 
-            # The cpp domain in Sphinx doesn't support structs at the moment, so change the text
-            # from "class " to the correct kind which can be "class " or "struct ".
-            finder.declarator[0] = self.node_factory.desc_annotation(kind + ' ', kind + ' ')
+            if kind in ('interface', 'namespace'):
+                # This is not a real C++ declaration type that Sphinx supports,
+                # so we hax the replacement of it.
+                finder.declarator[0] = self.node_factory.desc_annotation(kind + ' ', kind + ' ')
 
             rst_node.children[0].insert(0, doxygen_target)
             return nodes, finder.content
