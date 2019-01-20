@@ -1002,6 +1002,10 @@ class SphinxRenderer(object):
         elif node.refqual == 'rvalue':
             signature += '&&'
 
+        # Add `= 0` for pure virtual members.
+        if node.virt == 'pure-virtual':
+            signature += '= 0'
+
         self.context.directive_args[1] = [signature]
 
         nodes = self.run_domain_directive(node.kind, self.context.directive_args[1])
@@ -1012,10 +1016,6 @@ class SphinxRenderer(object):
         # Templates have multiple signature nodes in recent versions of Sphinx.
         # Insert Doxygen target into the first signature node.
         rst_node.children[0].insert(0, self.create_doxygen_target(node))
-
-        # Add `= 0` for pure virtual members.
-        if node.virt == 'pure-virtual':
-            finder.declarator.append(self.node_factory.Text(' = 0'))
 
         finder.content.extend(self.description(node))
 
