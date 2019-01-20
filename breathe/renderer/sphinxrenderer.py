@@ -74,7 +74,7 @@ class DomainDirectiveFactory(object):
         'friend': (cpp.CPPFunctionObject, 'function'),
         'signal': (cpp.CPPFunctionObject, 'function'),
         'slot': (cpp.CPPFunctionObject, 'function'),
-        'enum': (cpp.CPPTypeObject, 'type'),
+        'enum': (cpp.CPPEnumObject, 'enum'),
         'typedef': (cpp.CPPTypeObject, 'type'),
         'using': (cpp.CPPTypeObject, 'type'),
         'union': (cpp.CPPUnionObject, 'union'),
@@ -1050,20 +1050,7 @@ class SphinxRenderer(object):
         description_nodes.append(title)
         enums = self.render_iterable(node.enumvalue)
         description_nodes.extend(enums)
-
-        def update_signature(signature, obj_type):
-            first_node = signature.children[0]
-            if isinstance(first_node, self.node_factory.desc_annotation):
-                # Replace "type" with "enum" in the signature. This is needed because older
-                # versions of Sphinx cpp domain didn't have an enum directive and we use a type
-                # directive instead.
-                first_node[0] = self.node_factory.Text("enum ")
-            else:
-                # If there is no "type" annotation, insert "enum".
-                first_node.insert(0, self.node_factory.desc_annotation("enum ", "enum "))
-
-        return self.render_declaration(node, declaration, description_nodes,
-                                       update_signature=update_signature)
+        return self.render_declaration(node, declaration, description_nodes)
 
     def visit_typedef(self, node):
         declaration = get_definition_without_template_args(node)
