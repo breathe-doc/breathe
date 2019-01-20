@@ -77,7 +77,7 @@ class DomainDirectiveFactory(object):
         'enum': (cpp.CPPTypeObject, 'type'),
         'typedef': (cpp.CPPTypeObject, 'type'),
         'using': (cpp.CPPTypeObject, 'type'),
-        'union': (cpp.CPPTypeObject, 'type'),
+        'union': (cpp.CPPUnionObject, 'union'),
         'namespace': (cpp.CPPTypeObject, 'type'),
         'enumvalue': (cpp.CPPEnumeratorObject, 'enumerator'),
         'define': (c.CObject, 'macro')
