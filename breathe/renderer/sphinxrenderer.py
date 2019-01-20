@@ -49,7 +49,7 @@ class DomainDirectiveFactory(object):
     # A mapping from node kinds to cpp domain classes and directive names.
     cpp_classes = {
         'class': (DoxyCPPClassObject, 'class'),
-        'struct': (DoxyCPPClassObject, 'class'),
+        'struct': (DoxyCPPClassObject, 'struct'),
         'interface': (DoxyCPPClassObject, 'interface'),
         'function': (cpp.CPPFunctionObject, 'function'),
         'friend': (cpp.CPPFunctionObject, 'function'),
