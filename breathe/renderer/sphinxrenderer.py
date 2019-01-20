@@ -33,9 +33,18 @@ class WithContext(object):
 class DoxyCPPClassObject(cpp.CPPClassObject):
     __bases = []
 
+    @property
+    def display_object_type(self):
+        # override because we also have the 'interface' type
+        assert self.objtype in ('class', 'struct', 'interface')
+        # TODO: remove this if it should be rendered as 'interface' as well
+        if self.objtype == 'interface':
+            return 'class'
+        return self.objtype
+
     def parse_definition(self, parser):
         # add the base classes
-        ast = parser.parse_declaration("class")
+        ast = parser.parse_declaration("class", "class")
 
         bases = []
 
