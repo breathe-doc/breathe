@@ -326,19 +326,11 @@ class SphinxRenderer(object):
 
         return '::'.join(names)
 
-    def insert_template_node(self, signature, decl):
-        """Creates a node for the ``template <...>`` part of the declaration."""
+    def create_template_prefix(self, decl):
         if not decl.templateparamlist:
-            return None
-        template = 'template '
-        nodes = [self.node_factory.desc_annotation(template, template), self.node_factory.Text('<')]
-        nodes.extend(self.render(decl.templateparamlist))
-        nodes.append(self.node_factory.Text(">"))
-
-        signode = type(signature)()
-        signode.extend(nodes)
-
-        signature.parent.insert(0, signode)
+            return ""
+        nodes = self.render(decl.templateparamlist)
+        return 'template<' + ''.join(n.astext() for n in nodes) + '>'
 
     def run_domain_directive(self, kind, names, augment=None):
         domain_directive = DomainDirectiveFactory.create(
@@ -478,13 +470,16 @@ class SphinxRenderer(object):
 
         def render_signature(file_data, doxygen_target, name, kind):
             # Defer to domains specific directive.
-            self.context.directive_args[1] = [self.get_fully_qualified_name()]
+
+            templatePrefix = self.create_template_prefix(file_data.compounddef)
+            arg = "%s %s" % (templatePrefix, self.get_fully_qualified_name())
 
             if kind in ('class', 'struct'):
                 augment = dict(bases=file_data.compounddef.basecompoundref)
             else:
                 augment = None
 
+            self.context.directive_args[1] = [arg]
             nodes = self.run_domain_directive(kind, self.context.directive_args[1], augment=augment)
             rst_node = nodes[1]
 
@@ -495,8 +490,6 @@ class SphinxRenderer(object):
             # from "class " to the correct kind which can be "class " or "struct ".
             finder.declarator[0] = self.node_factory.desc_annotation(kind + ' ', kind + ' ')
 
-            # Check if there is template information and format it as desired
-            self.insert_template_node(finder.declarator, file_data.compounddef)
             rst_node.children[0].insert(0, doxygen_target)
             return nodes, finder.content
 
@@ -985,8 +978,11 @@ class SphinxRenderer(object):
             param = self.context.mask_factory.mask(param)
             param_decl = get_param_decl(param)
             param_list.append(param_decl)
-        signature = '{0}({1})'.format(get_definition_without_template_args(node),
-                                      ', '.join(param_list))
+        templatePrefix = self.create_template_prefix(node)
+        signature = '{0}{1}({2})'.format(
+            templatePrefix,
+            get_definition_without_template_args(node),
+            ', '.join(param_list))
 
         # Add CV-qualifiers.
         if node.const == 'yes':
@@ -1018,8 +1014,6 @@ class SphinxRenderer(object):
         rst_node.children[0].insert(0, self.create_doxygen_target(node))
 
         finder.content.extend(self.description(node))
-
-        self.insert_template_node(finder.declarator, node)
         return nodes
 
     def visit_define(self, node):
