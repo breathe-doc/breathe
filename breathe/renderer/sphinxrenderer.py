@@ -31,7 +31,6 @@ class WithContext(object):
 
 
 class DoxyCPPClassObject(cpp.CPPClassObject):
-    __bases = []
 
     @property
     def display_object_type(self):
@@ -43,32 +42,7 @@ class DoxyCPPClassObject(cpp.CPPClassObject):
         return self.objtype
 
     def parse_definition(self, parser):
-        # add the base classes
-        ast = parser.parse_declaration("class", "class")
-
-        bases = []
-
-        for base in self.__bases:
-            namestr = base.content_[0].value
-
-            # build a name object
-            # TODO: work out if we can use base.refid in a pending_xref somewhere
-            parser = cpp.DefinitionParser(namestr,
-                                          location=self.get_source_info(),
-                                          config=self.env.config)
-            name = parser._parse_nested_name()
-            parser.assert_end()
-
-            bases.append(
-                cpp.ASTBaseClass(name, base.prot, base.virt == 'virtual', False)
-            )
-
-        ast.declaration.bases = bases
-
-        return ast
-
-    def augment(self, bases):
-        self.__bases = bases or []
+        return parser.parse_declaration("class", "class")
 
 
 class DomainDirectiveFactory(object):
@@ -358,12 +332,9 @@ class SphinxRenderer(object):
         nodes = self.render(decl.templateparamlist)
         return 'template<' + ''.join(n.astext() for n in nodes) + '>'
 
-    def run_domain_directive(self, kind, names, augment=None):
+    def run_domain_directive(self, kind, names):
         domain_directive = DomainDirectiveFactory.create(
             self.context.domain, [kind, names] + self.context.directive_args[2:])
-
-        if hasattr(domain_directive, 'augment') and augment is not None:
-            domain_directive.augment(**augment)
 
         # Translate Breathe's no-link option into the standard noindex option.
         if 'no-link' in self.context.directive_args[2]:
@@ -500,13 +471,24 @@ class SphinxRenderer(object):
             templatePrefix = self.create_template_prefix(file_data.compounddef)
             arg = "%s %s" % (templatePrefix, self.get_fully_qualified_name())
 
+            # add base classes
             if kind in ('class', 'struct'):
-                augment = dict(bases=file_data.compounddef.basecompoundref)
-            else:
-                augment = None
+                bs = []
+                for base in file_data.compounddef.basecompoundref:
+                    b = []
+                    if base.prot is not None:
+                        b.append(base.prot)
+                    if base.virt == 'virtual':
+                        b.append("virtual")
+                    b.append(base.content_[0].value)
+                    bs.append(" ".join(b))
+                if len(bs) != 0:
+                    arg += " : "
+                    arg += ", ".join(bs)
 
             self.context.directive_args[1] = [arg]
-            nodes = self.run_domain_directive(kind, self.context.directive_args[1], augment=augment)
+
+            nodes = self.run_domain_directive(kind, self.context.directive_args[1])
             rst_node = nodes[1]
 
             finder = NodeFinder(rst_node.document)
