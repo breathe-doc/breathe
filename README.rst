@@ -168,6 +168,10 @@ Change Log
 
 Inspired by `Keepachangelog.com <http://keepachangelog.com/>`__.
 
+- Unreleased - Breathe v4.12.0
+
+  - Adapt to Sphinx 1.8. #410
+
 - 2018-12-11 - Breathe v4.11.1
 
   - Sphinxrenderer: handle typeless parameters gracefully. #404
