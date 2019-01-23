@@ -6,6 +6,7 @@ from breathe.parser.compound import linkedTextTypeSub, memberdefTypeSub, paramTy
 from breathe.renderer.sphinxrenderer import SphinxRenderer
 from breathe.renderer.filter import OpenFilter
 from docutils import frontend, nodes, parsers, utils
+from sphinx.config import Config
 from sphinx.domains.cpp import CPPDomain
 from sphinx.domains.c import CDomain
 
@@ -53,17 +54,26 @@ class TestParam(paramTypeSub, TestDoxygenNode):
     def __init__(self, **kwargs):
         TestDoxygenNode.__init__(self, paramTypeSub, **kwargs)
 
-class MockConfig(object):
-    cpp_id_attributes = []
-    cpp_paren_attributes = []
-    cpp_index_common_prefix = []
+
+class MockRegistry(object):
+    def get_envversion(self, app):
+        return None
+
+    def create_domains(self, env):
+        return []
 
 
 class MockApp(object):
     def __init__(self):
         self.doctreedir = None
         self.srcdir = None
-        self.config = MockConfig()
+        self.config = Config()
+        self.config.pre_init_values()
+        self.config.init_values()
+        self.config.add('cpp_id_attributes', [], 'env', ())
+        self.config.add('cpp_paren_attributes', [], 'env', ())
+        self.config.add('cpp_index_common_prefix', [], 'env', ())
+        self.registry = MockRegistry()
 
 
 class MockState:
