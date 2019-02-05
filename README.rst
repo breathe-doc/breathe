@@ -171,6 +171,7 @@ Inspired by `Keepachangelog.com <http://keepachangelog.com/>`__.
 - Unreleased - Breathe v4.12.0
 
   - Adapt to Sphinx 1.8. #410
+  - Let Sphinx handle more things. #412
 
 - 2018-12-11 - Breathe v4.11.1
 
