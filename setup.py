@@ -13,11 +13,11 @@ from distutils import log
 import breathe
 
 long_desc = '''
-Breathe is an extension to reStructuredText and Sphinx to be able to read and 
-render `Doxygen <http://www.doxygen.org>`__ xml output.
+Breathe is an extension to reStructuredText and Sphinx to be able to read and
+ render `Doxygen <http://www.doxygen.org>`__ xml output.
 '''
 
-requires = ['Sphinx>=1.4', 'docutils>=0.5', 'six>=1.4']
+requires = ['Sphinx>=1.8', 'docutils>=0.12', 'six>=1.9']
 
 if sys.version_info < (2, 4):
     print('ERROR: Sphinx requires at least Python 2.4 to run.')
