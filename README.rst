@@ -172,6 +172,7 @@ Inspired by `Keepachangelog.com <http://keepachangelog.com/>`__.
 
   - Adapt to Sphinx 1.8. #410
   - Let Sphinx handle more things. #412
+  - Use standard windows EOL for batch file. #417
 
 - 2018-12-11 - Breathe v4.11.1
 
