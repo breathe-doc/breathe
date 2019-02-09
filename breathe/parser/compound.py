@@ -602,7 +602,7 @@ class docListTypeSub(supermod.docListType):
 
     def __init__(self, listitem=None, subtype=""):
         self.node_subtype = "itemized"
-        if subtype is not "":
+        if subtype != "":
             self.node_subtype = subtype
         supermod.docListType.__init__(self, listitem)
 

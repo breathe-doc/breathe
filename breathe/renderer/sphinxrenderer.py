@@ -931,10 +931,10 @@ class SphinxRenderer(object):
         decorator around the generic render function.
         Render all the children depth-first. """
         """ Call the wrapped render function. Update the nesting level for the enumerated lists. """
-        if node.node_subtype is "itemized":
+        if node.node_subtype == "itemized":
             val = self.render_iterable(node.listitem)
             return self.render_unordered(children=val)
-        elif node.node_subtype is "ordered":
+        elif node.node_subtype == "ordered":
             self.nesting_level += 1
             val = self.render_iterable(node.listitem)
             self.nesting_level -= 1
