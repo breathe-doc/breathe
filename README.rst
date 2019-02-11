@@ -174,6 +174,7 @@ Inspired by `Keepachangelog.com <http://keepachangelog.com/>`__.
   - Let Sphinx handle more things. #412
   - Use standard windows EOL for batch file. #417
   - Fix flake8 F632 warnings. #418
+  - Update dep versions in readme, setup, requirements. #419
 
 - 2018-12-11 - Breathe v4.11.1
 
