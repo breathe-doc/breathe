@@ -175,6 +175,7 @@ Inspired by `Keepachangelog.com <http://keepachangelog.com/>`__.
   - Use standard windows EOL for batch file. #417
   - Fix flake8 F632 warnings. #418
   - Update dep versions in readme, setup, requirements. #419
+  - Add option to render function parameters after the description. #421
 
 - 2018-12-11 - Breathe v4.11.1
 
