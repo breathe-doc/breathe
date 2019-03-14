@@ -701,10 +701,15 @@ class SphinxRenderer(object):
         nodelist = self.render_iterable(node.content)
         nodelist.extend(self.render_iterable(node.images))
 
-        # Returns, user par's, etc
-        definition_nodes = self.render_iterable(node.simplesects)
-        # Parameters/Exceptions
-        definition_nodes.extend(self.render_iterable(node.parameterlist))
+        if self.project_info.order_parameters_first():
+            # Order parameters before simplesects, which mainly are return/warnings/remarks
+            definition_nodes = self.render_iterable(node.parameterlist)
+            definition_nodes.extend(self.render_iterable(node.simplesects))
+        else:
+            # Returns, user par's, etc
+            definition_nodes = self.render_iterable(node.simplesects)
+            # Parameters/Exceptions
+            definition_nodes.extend(self.render_iterable(node.parameterlist))
 
         if definition_nodes:
             definition_list = self.node_factory.definition_list("", *definition_nodes)

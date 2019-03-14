@@ -28,6 +28,7 @@ class AutoProjectInfo(object):
             match,
             show_define_initializer,
             project_refids,
+            order_parameters_first,
             ):
 
         self._name = name
@@ -41,6 +42,7 @@ class AutoProjectInfo(object):
         self._match = match
         self._show_define_initializer = show_define_initializer
         self._project_refids = project_refids
+        self._order_parameters_first = order_parameters_first
 
     def name(self):
         return self._name
@@ -75,6 +77,7 @@ class AutoProjectInfo(object):
             self._match,
             self._show_define_initializer,
             self._project_refids,
+            self._order_parameters_first,
             )
 
 
@@ -93,7 +96,8 @@ class ProjectInfo(object):
             match,
             show_define_initializer,
             project_refids,
-            ):
+            order_parameters_first
+    ):
 
         self._name = name
         self._project_path = path
@@ -106,6 +110,7 @@ class ProjectInfo(object):
         self._match = match
         self._show_define_initializer = show_define_initializer
         self._project_refids = project_refids
+        self._order_parameters_first = order_parameters_first
 
     def name(self):
         return self._name
@@ -165,6 +170,9 @@ class ProjectInfo(object):
     def show_define_initializer(self):
         return self._show_define_initializer
 
+    def order_parameters_first(self):
+        return self._order_parameters_first
+
 
 class ProjectInfoFactory(object):
 
@@ -182,6 +190,7 @@ class ProjectInfoFactory(object):
         self.project_refids = False
 
         self.show_define_initializer = False
+        self.order_parameters_first = False
 
         self.project_count = 0
         self.project_info_store = {}
@@ -198,6 +207,7 @@ class ProjectInfoFactory(object):
             build_dir,
             show_define_initializer,
             project_refids,
+            order_parameters_first,
             ):
 
         self.projects = projects
@@ -207,6 +217,7 @@ class ProjectInfoFactory(object):
         self.projects_source = projects_source
         self.show_define_initializer = show_define_initializer
         self.project_refids = project_refids
+        self.order_parameters_first = order_parameters_first
 
         # If the breathe config values has a non-empty value for build_dir then use that otherwise
         # stick with the default
@@ -270,6 +281,7 @@ class ProjectInfoFactory(object):
                 self.match,
                 self.show_define_initializer,
                 self.project_refids,
+                self.order_parameters_first
             )
 
             self.project_info_store[path] = project_info
@@ -329,6 +341,7 @@ class ProjectInfoFactory(object):
                 self.match,
                 self.show_define_initializer,
                 self.project_refids,
+                self.order_parameters_first
             )
 
             self.auto_project_info_store[key] = auto_project_info
