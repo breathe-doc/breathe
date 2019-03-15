@@ -1060,6 +1060,10 @@ class SphinxRenderer(object):
             declaration = declaration[len(typedef):]
         elif declaration.startswith(using):
             declaration = declaration[len(using):]
+            # remove the spurious "typedef " on right hand side added
+            # by Doxygen observed when type is declared inside a namespace
+            # See examples/specific/using_in_ns
+            declaration = declaration.replace(" = typedef ", " = ")
             obj_type = "using"
 
         def update_signature(signature, obj_type):
