@@ -19,3 +19,11 @@ const char *Test6::member(char c,int n) throw(std::out_of_range) {}
  *  \exception std::out_of_range parameter is out of range.
  *  \return a character pointer.
  */
+
+/*! \brief Doing important things with parameter directions
+ *
+ *  \param[out]     a output
+ *  \param[in]      b input
+ *  \param[in, out] c input but gets rewritten
+ */
+void myFunc(int * a, int * b, int * c);

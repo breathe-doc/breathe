@@ -5445,6 +5445,11 @@ class docParamName(GeneratedsSuper):
             obj_ = self.mixedclass_(MixedContainer.CategoryText,
                 MixedContainer.TypeNone, '', child_.nodeValue)
             self.content_.append(obj_)
+            d = child_.parentNode.attributes.get('direction')
+            if d is not None:
+                self.content_.insert(0, self.mixedclass_(MixedContainer.CategoryText,
+                                                         MixedContainer.TypeNone,
+                                                         '', '[{}] '.format(d.value)))
 # end class docParamName
 
 
