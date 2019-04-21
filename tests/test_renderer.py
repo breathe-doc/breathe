@@ -1,5 +1,6 @@
 # Renderer tests
 
+import sphinx.addnodes
 import sphinx.environment
 from breathe.node_factory import create_node_factory
 from breathe.parser.compound import linkedTextTypeSub, memberdefTypeSub, paramTypeSub, MixedContainer
@@ -9,6 +10,7 @@ from docutils import frontend, nodes, parsers, utils
 from sphinx.config import Config
 from sphinx.domains.cpp import CPPDomain
 from sphinx.domains.c import CDomain
+from sphinx.util import docutils
 
 from nose.tools import eq_
 
@@ -65,6 +67,7 @@ class MockRegistry(object):
 
 class MockApp(object):
     def __init__(self):
+        self.project = None
         self.doctreedir = None
         self.srcdir = None
         self.config = Config()
@@ -74,6 +77,10 @@ class MockApp(object):
         self.config.add('cpp_paren_attributes', [], 'env', ())
         self.config.add('cpp_index_common_prefix', [], 'env', ())
         self.registry = MockRegistry()
+
+    def add_node(self, node):
+        if not docutils.is_node_registered(node):
+            docutils.register_node(node)
 
 
 class MockState:
@@ -250,6 +257,8 @@ def render(member_def, domain=None, show_define_initializer=False):
 
 
 def test_render_func():
+    app = MockApp()
+    sphinx.addnodes.setup(app)
     member_def = TestMemberDef(kind='function', definition='void foo', argsstring='(int)', virt='non-virtual',
                                param=[TestParam(type_=TestLinkedText(content_=[TestMixedContainer(value=u'int')]))])
     signature = find_node(render(member_def), 'desc_signature')
@@ -262,18 +271,24 @@ def test_render_func():
 
 
 def test_render_typedef():
+    app = MockApp()
+    sphinx.addnodes.setup(app)
     member_def = TestMemberDef(kind='typedef', definition='typedef int foo')
     signature = find_node(render(member_def), 'desc_signature')
     assert signature.astext() == 'typedef int foo'
 
 
 def test_render_c_typedef():
+    app = MockApp()
+    sphinx.addnodes.setup(app)
     member_def = TestMemberDef(kind='typedef', definition='typedef unsigned int bar')
     signature = find_node(render(member_def, domain='c'), 'desc_signature')
     eq_(signature.astext(), 'typedef unsigned int bar')
 
 
 def test_render_c_function_typedef():
+    app = MockApp()
+    sphinx.addnodes.setup(app)
     member_def = TestMemberDef(kind='typedef', definition='typedef void* (*voidFuncPtr)(float, int)')
     signature = find_node(render(member_def, domain='c'), 'desc_signature')
     assert signature.astext().startswith('typedef void*')
@@ -284,12 +299,16 @@ def test_render_c_function_typedef():
 
 
 def test_render_using_alias():
+    app = MockApp()
+    sphinx.addnodes.setup(app)
     member_def = TestMemberDef(kind='typedef', definition='using foo = int')
     signature = find_node(render(member_def), 'desc_signature')
     assert signature.astext() == 'using foo = int'
 
 
 def test_render_const_func():
+    app = MockApp()
+    sphinx.addnodes.setup(app)
     member_def = TestMemberDef(kind='function', definition='void f', argsstring='() const',
                                virt='non-virtual', const='yes')
     signature = find_node(render(member_def), 'desc_signature')
@@ -297,6 +316,8 @@ def test_render_const_func():
 
 
 def test_render_lvalue_func():
+    app = MockApp()
+    sphinx.addnodes.setup(app)
     member_def = TestMemberDef(kind='function', definition='void f', argsstring='()',
                                virt='non-virtual', refqual='lvalue')
     signature = find_node(render(member_def), 'desc_signature')
@@ -304,6 +325,8 @@ def test_render_lvalue_func():
 
 
 def test_render_rvalue_func():
+    app = MockApp()
+    sphinx.addnodes.setup(app)
     member_def = TestMemberDef(kind='function', definition='void f', argsstring='()',
                                virt='non-virtual', refqual='rvalue')
     signature = find_node(render(member_def), 'desc_signature')
@@ -311,6 +334,8 @@ def test_render_rvalue_func():
 
 
 def test_render_const_lvalue_func():
+    app = MockApp()
+    sphinx.addnodes.setup(app)
     member_def = TestMemberDef(kind='function', definition='void f', argsstring='()',
                                virt='non-virtual', const='yes', refqual='lvalue')
     signature = find_node(render(member_def), 'desc_signature')
@@ -318,6 +343,8 @@ def test_render_const_lvalue_func():
 
 
 def test_render_const_rvalue_func():
+    app = MockApp()
+    sphinx.addnodes.setup(app)
     member_def = TestMemberDef(kind='function', definition='void f', argsstring='()',
                                virt='non-virtual', const='yes', refqual='rvalue')
     signature = find_node(render(member_def), 'desc_signature')
@@ -325,12 +352,16 @@ def test_render_const_rvalue_func():
 
 
 def test_render_variable_initializer():
+    app = MockApp()
+    sphinx.addnodes.setup(app)
     member_def = TestMemberDef(kind='variable', definition='const int EOF', initializer=TestMixedContainer(value=u'= -1'))
     signature = find_node(render(member_def), 'desc_signature')
     assert signature.astext() == 'const int EOF = -1'
 
 
 def test_render_define_initializer():
+    app = MockApp()
+    sphinx.addnodes.setup(app)
     member_def = TestMemberDef(kind='define', name='MAX_LENGTH',
                                initializer=TestLinkedText(content_=[TestMixedContainer(value=u'100')]))
     signature_w_initializer = find_node(render(member_def, show_define_initializer=True), 'desc_signature')
@@ -344,6 +375,8 @@ def test_render_define_initializer():
 
 
 def test_render_define_no_initializer():
+    app = MockApp()
+    sphinx.addnodes.setup(app)
     member_def = TestMemberDef(kind='define', name='USE_MILK')
     signature = find_node(render(member_def), 'desc_signature')
     assert signature.astext() == 'USE_MILK'
