@@ -168,6 +168,10 @@ Change Log
 
 Inspired by `Keepachangelog.com <http://keepachangelog.com/>`__.
 
+- Unreleased - Breathe v4.13.0
+
+  - Adapt to upcoming Sphinx 2.0. #411
+
 - 2019-03-15 - Breathe v4.12.0
 
   - Adapt to Sphinx 1.8. #410
