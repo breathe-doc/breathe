@@ -168,7 +168,7 @@ Change Log
 
 Inspired by `Keepachangelog.com <http://keepachangelog.com/>`__.
 
-- Unreleased - Breathe v4.13.0
+- 2019-04-21 - Breathe v4.13.0
 
   - Adapt to upcoming Sphinx 2.0. #411
   - Add support for rendering parameter direction information. #428
