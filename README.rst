@@ -168,6 +168,10 @@ Change Log
 
 Inspired by `Keepachangelog.com <http://keepachangelog.com/>`__.
 
+- Unreleased - Breathe v4.13.0.post0
+
+  - Drop support for python 2, require Sphinx >= 2.0. #432
+
 - 2019-04-21 - Breathe v4.13.0
 
   - Adapt to upcoming Sphinx 2.0. #411
