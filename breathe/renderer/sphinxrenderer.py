@@ -1012,6 +1012,18 @@ class SphinxRenderer(object):
         elif node.refqual == 'rvalue':
             signature += '&&'
 
+        # Add trailing return type manually:
+        # https://github.com/michaeljones/breathe/issues/441
+        if 'auto' in node.definition and '->' in node.argsstring:
+            index = node.argsstring.find('->')
+            trailing_return_type = node.argsstring[index:]
+
+            # Remove unnecessary default/delete/pure specifier which comes from doxygen's argsstring
+            if '=' in trailing_return_type:
+                index = len(trailing_return_type) - (trailing_return_type.find('='))
+                trailing_return_type = trailing_return_type[:-index]
+            signature += ' ' + trailing_return_type
+
         # Add `= 0` for pure virtual members.
         if node.virt == 'pure-virtual':
             signature += '= 0'
