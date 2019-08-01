@@ -168,7 +168,7 @@ Change Log
 
 Inspired by `Keepachangelog.com <http://keepachangelog.com/>`__.
 
-- Unreleased - Breathe v4.13.1
+- 2019-08-01 - Breathe v4.13.1
 
   - Fix for template method pointer parameter issue. #449
 
