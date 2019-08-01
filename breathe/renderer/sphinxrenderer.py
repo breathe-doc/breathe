@@ -193,7 +193,8 @@ def get_param_decl(param):
     if not param_name:
         param_decl = param_type
     else:
-        param_decl, number_of_subs = re.subn(r'(\([*&]+)(\))', r'\g<1>' + param_name + r'\g<2>',
+        param_decl, number_of_subs = re.subn(r'(\((?:\w+::)*[*&]+)(\))',
+                                             r'\g<1>' + param_name + r'\g<2>',
                                              param_type)
         if number_of_subs == 0:
             param_decl = param_type + ' ' + param_name
