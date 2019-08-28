@@ -77,6 +77,7 @@ class MockApp(object):
         self.config.add('cpp_paren_attributes', [], 'env', ())
         self.config.add('cpp_index_common_prefix', [], 'env', ())
         self.registry = MockRegistry()
+        self.events = None
 
     def add_node(self, node):
         if not docutils.is_node_registered(node):
