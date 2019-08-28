@@ -168,6 +168,10 @@ Change Log
 
 Inspired by `Keepachangelog.com <http://keepachangelog.com/>`__.
 
+- Unreleased - Breathe v4.13.2
+
+  - Add events attribute to MockApp. #452
+
 - 2019-08-01 - Breathe v4.13.1
 
   - Fix for template method pointer parameter issue. #449
