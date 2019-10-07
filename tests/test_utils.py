@@ -62,18 +62,25 @@ class TestUtils(TestCase):
 
     def test_definition_without_template_args(self):
 
-        def get_definition(definition, name):
+        def get_definition(definition, name, bitfield=''):
             class MockDataObject:
-                def __init__(self, definition, name):
+                def __init__(self, definition, name, bitfield):
                     self.definition = definition
                     self.name = name
-            return get_definition_without_template_args(MockDataObject(definition, name))
+                    self.bitfield = bitfield
+
+            return get_definition_without_template_args(
+                MockDataObject(definition, name, bitfield)
+            )
 
         self.assertEqual('void A::foo', get_definition('void A<T>::foo', 'foo'))
         # Template arguments in the return type should be preserved:
         self.assertEqual('Result<T> A::f', get_definition('Result<T> A::f', 'f'))
         # Nested template arguments:
         self.assertEqual('Result<T> A::f', get_definition('Result<T> A< B<C> >::f', 'f'))
+
+        # Bit fields
+        self.assertEqual('int f : 3', get_definition('int f', 'f', '3'))
 
 
 class TestPathHandler(TestCase):
