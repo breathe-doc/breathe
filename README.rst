@@ -168,7 +168,7 @@ Change Log
 
 Inspired by `Keepachangelog.com <http://keepachangelog.com/>`__.
 
-- Unreleased - Breathe v4.14.0
+- 2019-11-26 - Breathe v4.14.0
 
   - Add events attribute to MockApp. #452
   - Add bit field support for C/C++. #454
