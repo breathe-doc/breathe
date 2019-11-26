@@ -1085,6 +1085,7 @@ class SphinxRenderer(object):
             else:
                 signature[0] = annotation
 
+        declaration = self.create_template_prefix(node) + declaration
         return self.render_declaration(node, declaration, objtype=obj_type,
                                        update_signature=update_signature)
 
@@ -1108,6 +1109,7 @@ class SphinxRenderer(object):
         if declaration.startswith(enum):
             declaration = declaration[len(enum):]
         declaration += self.make_initializer(node)
+        declaration = self.create_template_prefix(node) + declaration
         return self.render_declaration(node, declaration)
 
     def visit_enumvalue(self, node):
