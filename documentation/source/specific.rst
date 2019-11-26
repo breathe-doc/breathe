@@ -3,6 +3,17 @@ Specific Examples Test Suite
 ============================
 
 
+Template Type Alias
+-------------------
+
+.. doxygentypedef:: IsFurry
+   :path: ../../examples/specific/template_type_alias/xml
+   :no-link:
+      
+.. doxygentypedef:: IsFuzzy
+   :path: ../../examples/specific/template_type_alias/xml
+   :no-link:
+      
 Typedef Examples
 ----------------
 
