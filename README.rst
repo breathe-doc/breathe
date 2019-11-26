@@ -172,6 +172,7 @@ Inspired by `Keepachangelog.com <http://keepachangelog.com/>`__.
 
   - Add events attribute to MockApp. #452
   - Add bit field support for C/C++. #454
+  - Add alias and variable template support. #461
 
 - 2019-08-01 - Breathe v4.13.1
 
