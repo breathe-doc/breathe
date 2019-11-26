@@ -214,6 +214,8 @@ def get_definition_without_template_args(data_object):
     For example in 'Result<T> A< B<C> >::f' we want to remove the '< B<C> >' part.
     """
     definition = data_object.definition
+    if (len(data_object.bitfield) > 0):
+        definition += " : " + data_object.bitfield
     qual_name = '::' + data_object.name
     if definition.endswith(qual_name):
         qual_name_start = len(definition) - len(qual_name)
