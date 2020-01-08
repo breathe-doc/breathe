@@ -1,6 +1,5 @@
 
 import docutils.nodes
-import collections
 import sphinx.addnodes
 
 from .exception import BreatheError
