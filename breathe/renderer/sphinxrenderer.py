@@ -807,7 +807,7 @@ class SphinxRenderer(object):
                 rst_node = self.node_factory.math()
             else:
                 # Else we're multiline
-                rst_node = self.node_factory.displaymath()
+                rst_node = self.node_factory.math_block()
 
             # Or multiline
             if latex.startswith("\\[") and latex.endswith("\\]"):
