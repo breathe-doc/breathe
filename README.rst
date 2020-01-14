@@ -168,6 +168,10 @@ Change Log
 
 Inspired by `Keepachangelog.com <http://keepachangelog.com/>`__.
 
+- Unreleased - Breathe v4.14.1
+
+  - Use sphinx core instead of mathbase ext. #469
+
 - 2019-11-26 - Breathe v4.14.0
 
   - Add events attribute to MockApp. #452
