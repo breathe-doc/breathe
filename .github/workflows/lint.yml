@@ -1,0 +1,25 @@
+name: lint using flake8
+on: [push, pull_request]
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/cache@v1
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('requirements/*.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+      - name: set up python
+        uses: actions/setup-python@v1
+
+      - name: install dependencies
+        run: |
+          pip install -r requirements/development.txt
+          pip install flake8
+
+      - name: lint the source code
+        run: make flake8
