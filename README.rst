@@ -171,6 +171,7 @@ Inspired by `Keepachangelog.com <http://keepachangelog.com/>`__.
 - Unreleased - Breathe v4.14.1
 
   - Use sphinx core instead of mathbase ext. #469
+  - Fix test failure for Sphinx >= 2.2.2. #472
 
 - 2019-11-26 - Breathe v4.14.0
 
