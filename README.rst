@@ -74,7 +74,7 @@ Development is currently done with:
 
 - Python 3.5
 - Docutils 0.12
-- Sphinx 2.0.1
+- Sphinx 2.3.1
 - Doxygen 1.8.4
 
 Doxygen 1.5.1 seems to produce xml with repeated sections which causes Breathe
