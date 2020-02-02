@@ -1,8 +1,7 @@
-
 language: python
 
 env:
-  - SPHINX_VERSION=2.0.1 TRAVIS_CI=True
+  - SPHINX_VERSION=2.3.1 TRAVIS_CI=True
 
 python:
   - "3.5"
