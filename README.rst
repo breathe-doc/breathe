@@ -125,8 +125,10 @@ Command for releasing source bundle & wheel to PyPI::
 Credits
 -------
 
-Breathe is maintained by `michaeljones <https://github.com/michaeljones>`_ &
-`vitaut <https://github.com/vitaut>`_ with contributions from:
+Breathe is currently maintained by `melvinvermeeren
+<https://github.com/melvinvermeeren>`_ and was formerly maintained by
+`michaeljones <https://github.com/michaeljones>`_ & `vitaut
+<https://github.com/vitaut>`_, contributors include:
 
 - `nijel <https://github.com/nijel>`_
 - `sebastianschaetz <https://github.com/sebastianschaetz>`_
@@ -156,6 +158,7 @@ Breathe is maintained by `michaeljones <https://github.com/michaeljones>`_ &
 - `Tiwalun <https://github.com/Tiwalun>`_
 - `eric-wieser <https://github.com/eric-wieser>`_
 - `olitheolix <https://github.com/olitheolix>`_
+- Many more, this list is rather outdated. Refer to the git history.
 
 Thanks to:
 
