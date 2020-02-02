@@ -62,7 +62,7 @@ class MockRegistry(object):
         return None
 
     def create_domains(self, env):
-        return []
+        return [CDomain(env), CPPDomain(env)]
 
 
 class MockApp(object):
@@ -86,9 +86,9 @@ class MockApp(object):
 
 class MockState:
     def __init__(self):
-        env = sphinx.environment.BuildEnvironment(MockApp())
-        CPPDomain(env)
-        CDomain(env)
+        app = MockApp()
+        env = sphinx.environment.BuildEnvironment(app)
+        env.setup(app)
         env.temp_data['docname'] = 'mock-doc'
         settings = frontend.OptionParser(
             components=(parsers.rst.Parser,)).get_default_values()
