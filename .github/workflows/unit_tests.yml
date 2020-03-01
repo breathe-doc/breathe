@@ -1,0 +1,55 @@
+name: unit tests
+on: [push, pull_request]
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.5, 3.6, 3.7, 3.8]
+        sphinx-version:
+          - 2.0.0
+          - 2.0.1
+          - 2.1.0
+          - 2.1.1
+          - 2.1.2
+          - 2.2.0
+          - 2.2.1
+          - 2.2.2
+          - 2.3.0
+          - 2.3.1
+          # FIXME: the unit tests are currently failing in the development
+          # branches
+          # development branch for sphinx 2.4
+          # - git+https://github.com/sphinx-doc/sphinx.git@2.0
+          # development branch for sphinx 3
+          # - git+https://github.com/sphinx-doc/sphinx.git@master
+
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/cache@v1
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('requirements/*.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+      - name: set up python ${{ matrix.python-version }}
+        uses: actions/setup-python@v1
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: install sphinx from PyPI or from git
+        run: |
+          if echo "${{ matrix.sphinx-version }}"|grep -q git; then
+              pip install ${{ matrix.sphinx-version }}
+          else
+              pip install -Iv Sphinx==${{ matrix.sphinx-version }}
+          fi
+
+      - name: install dependencies
+        run: |
+          pip install -r requirements/development.txt
+          pip install nose
+
+      - name: run the unit tests
+        run: make dev-test
