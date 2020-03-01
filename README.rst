@@ -174,6 +174,10 @@ Change Log
 
 Inspired by `Keepachangelog.com <http://keepachangelog.com/>`__.
 
+- Unreleased - Breathe v4.14.2
+
+  - Add GitHub actions. #474
+
 - 2020-02-02 - Breathe v4.14.1
 
   - Use sphinx core instead of mathbase ext. #469
