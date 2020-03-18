@@ -110,6 +110,9 @@ class MockStateMachine:
     def __init__(self):
         self.reporter = MockReporter()
 
+    def get_source_and_line(self, lineno: int):
+        return 'mock-doc', lineno
+
 
 class MockMaskFactory:
     def __init__(self):
