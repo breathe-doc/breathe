@@ -283,7 +283,7 @@ def test_render_c_typedef(app):
 def test_render_c_function_typedef(app):
     member_def = WrappedMemberDef(kind='typedef', definition='typedef void* (*voidFuncPtr)(float, int)')
     signature = find_node(render(app, member_def, domain='c'), 'desc_signature')
-    assert signature.astext().startswith('typedef void*')
+    assert signature.astext().startswith('typedef void *')
     params = find_node(signature, 'desc_parameterlist')
     assert len(params) == 2
     assert params[0].astext() == "float"
