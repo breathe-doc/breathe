@@ -53,11 +53,9 @@ class DoxyCPPClassObject(cpp.CPPClassObject):
 
             # build a name object
             # TODO: work out if we can use base.refid in a pending_xref somewhere
-            try:
-                parser = cpp.DefinitionParser(namestr, self, self.env.config)
-            except TypeError:
-                # sphinx < 1.5
-                parser = cpp.DefinitionParser(namestr, self)
+            parser = cpp.DefinitionParser(namestr,
+                                          location=self.get_source_info(),
+                                          config=self.env.config)
             name = parser._parse_nested_name()
             parser.assert_end()
 
