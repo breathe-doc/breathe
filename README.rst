@@ -179,6 +179,7 @@ Inspired by `Keepachangelog.com <http://keepachangelog.com/>`__.
   - Add GitHub actions. #474
   - Fixes to use Sphinx 2.4.4. #486
   - Add nose to python development requirements. #484.
+  - Switch to pytest from nose. #487
 
 - 2020-02-02 - Breathe v4.14.1
 
