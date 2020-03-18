@@ -83,6 +83,9 @@ class MockApp(object):
         if not docutils.is_node_registered(node):
             docutils.register_node(node)
 
+    def emit(self, name, *args):
+        print('[MockApp] was supposed to emit event: %r%s' % (name, repr(args)[:100]))
+
 
 class MockState:
     def __init__(self):
