@@ -21,10 +21,10 @@ clean:
 	$(MAKE) -C examples/specific $@
 
 test:
-	cd tests && nosetests
+	cd tests && pytest -v
 
 dev-test:
-	cd tests && PYTHONPATH=../:$(PYTHONPATH) nosetests
+	cd tests && PYTHONPATH=../:$(PYTHONPATH) pytest -v
 
 flake8:
 	flake8 breathe/*.py \

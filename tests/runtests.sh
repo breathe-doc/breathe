@@ -2,4 +2,4 @@
 
 export PYTHONPATH=../
 
-nosetests
+pytest -v

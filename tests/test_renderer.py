@@ -1,5 +1,7 @@
 # Renderer tests
 
+import pytest
+
 import sphinx.addnodes
 import sphinx.environment
 from breathe.node_factory import create_node_factory
@@ -7,18 +9,40 @@ from breathe.parser.compound import linkedTextTypeSub, memberdefTypeSub, paramTy
 from breathe.renderer.sphinxrenderer import SphinxRenderer
 from breathe.renderer.filter import OpenFilter
 from docutils import frontend, nodes, parsers, utils
-from sphinx.config import Config
-from sphinx.domains.cpp import CPPDomain
-from sphinx.domains.c import CDomain
-from sphinx.util import docutils
 
-from nose.tools import eq_
-
+from sphinx.testing.fixtures import (
+    test_params, app_params, make_app, shared_result,
+    sphinx_test_tempdir, rootdir
+)
+from sphinx.testing.path import path
 
 sphinx.locale.init([], None)
 
 
-class TestDoxygenNode:
+@pytest.fixture(scope='function')
+def app(test_params, app_params, make_app, shared_result):
+    """
+    Based on sphinx.testing.fixtures.app
+    """
+    args, kwargs = app_params
+    assert 'srcdir' in kwargs
+    kwargs['srcdir'].makedirs(exist_ok=True)
+    (kwargs['srcdir'] / 'conf.py').write_text('')
+    app_ = make_app(*args, **kwargs)
+    yield app_
+
+    print('# testroot:', kwargs.get('testroot', 'root'))
+    print('# builder:', app_.builder.name)
+    print('# srcdir:', app_.srcdir)
+    print('# outdir:', app_.outdir)
+    print('# status:', '\n' + app_._status.getvalue())
+    print('# warning:', '\n' + app_._warning.getvalue())
+
+    if test_params['shared_result']:
+        shared_result.store(test_params['shared_result'], app_)
+
+
+class WrappedDoxygenNode:
     """
     A base class for test wrappers of Doxygen nodes. It allows setting all attributes via keyword arguments
     in the constructor.
@@ -32,64 +56,33 @@ class TestDoxygenNode:
             setattr(self, name, value)
 
 
-class TestMixedContainer(MixedContainer, TestDoxygenNode):
+class WrappedMixedContainer(MixedContainer, WrappedDoxygenNode):
     """A test wrapper of Doxygen mixed container."""
     def __init__(self, **kwargs):
         MixedContainer.__init__(self, None, None, None, None)
-        TestDoxygenNode.__init__(self, None, **kwargs)
+        WrappedDoxygenNode.__init__(self, None, **kwargs)
 
 
-class TestLinkedText(linkedTextTypeSub, TestDoxygenNode):
+class WrappedLinkedText(linkedTextTypeSub, WrappedDoxygenNode):
     """A test wrapper of Doxygen linked text."""
     def __init__(self, **kwargs):
-        TestDoxygenNode.__init__(self, linkedTextTypeSub, **kwargs)
+        WrappedDoxygenNode.__init__(self, linkedTextTypeSub, **kwargs)
 
 
-class TestMemberDef(memberdefTypeSub, TestDoxygenNode):
+class WrappedMemberDef(memberdefTypeSub, WrappedDoxygenNode):
     """A test wrapper of Doxygen class/file/namespace member symbol such as a function declaration."""
     def __init__(self, **kwargs):
-        TestDoxygenNode.__init__(self, memberdefTypeSub, **kwargs)
+        WrappedDoxygenNode.__init__(self, memberdefTypeSub, **kwargs)
 
 
-class TestParam(paramTypeSub, TestDoxygenNode):
+class WrappedParam(paramTypeSub, WrappedDoxygenNode):
     """A test wrapper of Doxygen parameter."""
     def __init__(self, **kwargs):
-        TestDoxygenNode.__init__(self, paramTypeSub, **kwargs)
-
-
-class MockRegistry(object):
-    def get_envversion(self, app):
-        return None
-
-    def create_domains(self, env):
-        return [CDomain(env), CPPDomain(env)]
-
-
-class MockApp(object):
-    def __init__(self):
-        self.project = None
-        self.doctreedir = None
-        self.srcdir = None
-        self.config = Config()
-        self.config.pre_init_values()
-        self.config.init_values()
-        self.config.add('cpp_id_attributes', [], 'env', ())
-        self.config.add('cpp_paren_attributes', [], 'env', ())
-        self.config.add('cpp_index_common_prefix', [], 'env', ())
-        self.registry = MockRegistry()
-        self.events = None
-
-    def add_node(self, node):
-        if not docutils.is_node_registered(node):
-            docutils.register_node(node)
-
-    def emit(self, name, *args):
-        print('[MockApp] was supposed to emit event: %r%s' % (name, repr(args)[:100]))
+        WrappedDoxygenNode.__init__(self, paramTypeSub, **kwargs)
 
 
 class MockState:
-    def __init__(self):
-        app = MockApp()
+    def __init__(self, app):
         env = sphinx.environment.BuildEnvironment(app)
         env.setup(app)
         env.temp_data['docname'] = 'mock-doc'
@@ -127,7 +120,7 @@ class MockMaskFactory:
 
 
 class MockContext:
-    def __init__(self, node_stack, domain=None):
+    def __init__(self, app, node_stack, domain=None):
         self.domain = domain
         self.node_stack = node_stack
         self.directive_args = [
@@ -138,7 +131,7 @@ class MockContext:
             None,  # lineno
             None,  # content_offset
             None,  # block_text
-            MockState(), MockStateMachine()]
+            MockState(app), MockStateMachine()]
         self.child = None
         self.mask_factory = MockMaskFactory()
 
@@ -246,7 +239,7 @@ def test_find_node():
                     'the number of nodes Text is 2')
 
 
-def render(member_def, domain=None, show_define_initializer=False):
+def render(app, member_def, domain=None, show_define_initializer=False):
     """Render Doxygen *member_def* with *renderer_class*."""
     renderer = SphinxRenderer(MockProjectInfo(show_define_initializer),
                               None,  # renderer_factory
@@ -256,16 +249,14 @@ def render(member_def, domain=None, show_define_initializer=False):
                               MockTargetHandler(),
                               None,   # compound_parser
                               OpenFilter())
-    renderer.context = MockContext([member_def], domain)
+    renderer.context = MockContext(app, [member_def], domain)
     return renderer.render(member_def)
 
 
-def test_render_func():
-    app = MockApp()
-    sphinx.addnodes.setup(app)
-    member_def = TestMemberDef(kind='function', definition='void foo', argsstring='(int)', virt='non-virtual',
-                               param=[TestParam(type_=TestLinkedText(content_=[TestMixedContainer(value=u'int')]))])
-    signature = find_node(render(member_def), 'desc_signature')
+def test_render_func(app):
+    member_def = WrappedMemberDef(kind='function', definition='void foo', argsstring='(int)', virt='non-virtual',
+                               param=[WrappedParam(type_=WrappedLinkedText(content_=[WrappedMixedContainer(value=u'int')]))])
+    signature = find_node(render(app, member_def), 'desc_signature')
     assert signature.astext().startswith('void')
     assert find_node(signature, 'desc_name')[0] == 'foo'
     params = find_node(signature, 'desc_parameterlist')
@@ -274,113 +265,90 @@ def test_render_func():
     assert param[0] == 'int'
 
 
-def test_render_typedef():
-    app = MockApp()
-    sphinx.addnodes.setup(app)
-    member_def = TestMemberDef(kind='typedef', definition='typedef int foo')
-    signature = find_node(render(member_def), 'desc_signature')
+def test_render_typedef(app):
+    member_def = WrappedMemberDef(kind='typedef', definition='typedef int foo')
+    signature = find_node(render(app, member_def), 'desc_signature')
     assert signature.astext() == 'typedef int foo'
 
 
-def test_render_c_typedef():
-    app = MockApp()
-    sphinx.addnodes.setup(app)
-    member_def = TestMemberDef(kind='typedef', definition='typedef unsigned int bar')
-    signature = find_node(render(member_def, domain='c'), 'desc_signature')
-    eq_(signature.astext(), 'typedef unsigned int bar')
+def test_render_c_typedef(app):
+    member_def = WrappedMemberDef(kind='typedef', definition='typedef unsigned int bar')
+    signature = find_node(render(app, member_def, domain='c'), 'desc_signature')
+    assert signature.astext() == 'typedef unsigned int bar'
 
 
-def test_render_c_function_typedef():
-    app = MockApp()
-    sphinx.addnodes.setup(app)
-    member_def = TestMemberDef(kind='typedef', definition='typedef void* (*voidFuncPtr)(float, int)')
-    signature = find_node(render(member_def, domain='c'), 'desc_signature')
+def test_render_c_function_typedef(app):
+    member_def = WrappedMemberDef(kind='typedef', definition='typedef void* (*voidFuncPtr)(float, int)')
+    signature = find_node(render(app, member_def, domain='c'), 'desc_signature')
     assert signature.astext().startswith('typedef void*')
     params = find_node(signature, 'desc_parameterlist')
     assert len(params) == 2
-    eq_(params[0].astext(), "float")
-    eq_(params[1].astext(), "int")
+    assert params[0].astext() == "float"
+    assert params[1].astext() == "int"
 
 
-def test_render_using_alias():
-    app = MockApp()
-    sphinx.addnodes.setup(app)
-    member_def = TestMemberDef(kind='typedef', definition='using foo = int')
-    signature = find_node(render(member_def), 'desc_signature')
+def test_render_using_alias(app):
+    member_def = WrappedMemberDef(kind='typedef', definition='using foo = int')
+    signature = find_node(render(app, member_def), 'desc_signature')
     assert signature.astext() == 'using foo = int'
 
 
-def test_render_const_func():
-    app = MockApp()
-    sphinx.addnodes.setup(app)
-    member_def = TestMemberDef(kind='function', definition='void f', argsstring='() const',
+def test_render_const_func(app):
+    member_def = WrappedMemberDef(kind='function', definition='void f', argsstring='() const',
                                virt='non-virtual', const='yes')
-    signature = find_node(render(member_def), 'desc_signature')
+    signature = find_node(render(app, member_def), 'desc_signature')
     assert '_CPPv2NK1fEv' in signature['ids']
 
 
-def test_render_lvalue_func():
-    app = MockApp()
-    sphinx.addnodes.setup(app)
-    member_def = TestMemberDef(kind='function', definition='void f', argsstring='()',
+def test_render_lvalue_func(app):
+    member_def = WrappedMemberDef(kind='function', definition='void f', argsstring='()',
                                virt='non-virtual', refqual='lvalue')
-    signature = find_node(render(member_def), 'desc_signature')
+    signature = find_node(render(app, member_def), 'desc_signature')
     assert signature.astext().endswith('&')
 
 
-def test_render_rvalue_func():
-    app = MockApp()
-    sphinx.addnodes.setup(app)
-    member_def = TestMemberDef(kind='function', definition='void f', argsstring='()',
+def test_render_rvalue_func(app):
+    member_def = WrappedMemberDef(kind='function', definition='void f', argsstring='()',
                                virt='non-virtual', refqual='rvalue')
-    signature = find_node(render(member_def), 'desc_signature')
+    signature = find_node(render(app, member_def), 'desc_signature')
     assert signature.astext().endswith('&&')
 
 
-def test_render_const_lvalue_func():
-    app = MockApp()
-    sphinx.addnodes.setup(app)
-    member_def = TestMemberDef(kind='function', definition='void f', argsstring='()',
+def test_render_const_lvalue_func(app):
+    member_def = WrappedMemberDef(kind='function', definition='void f', argsstring='()',
                                virt='non-virtual', const='yes', refqual='lvalue')
-    signature = find_node(render(member_def), 'desc_signature')
+    signature = find_node(render(app, member_def), 'desc_signature')
     assert signature.astext().endswith('const &')
 
 
-def test_render_const_rvalue_func():
-    app = MockApp()
-    sphinx.addnodes.setup(app)
-    member_def = TestMemberDef(kind='function', definition='void f', argsstring='()',
+def test_render_const_rvalue_func(app):
+    member_def = WrappedMemberDef(kind='function', definition='void f', argsstring='()',
                                virt='non-virtual', const='yes', refqual='rvalue')
-    signature = find_node(render(member_def), 'desc_signature')
+    signature = find_node(render(app, member_def), 'desc_signature')
     assert signature.astext().endswith('const &&')
 
 
-def test_render_variable_initializer():
-    app = MockApp()
-    sphinx.addnodes.setup(app)
-    member_def = TestMemberDef(kind='variable', definition='const int EOF', initializer=TestMixedContainer(value=u'= -1'))
-    signature = find_node(render(member_def), 'desc_signature')
+def test_render_variable_initializer(app):
+    member_def = WrappedMemberDef(kind='variable', definition='const int EOF', initializer=WrappedMixedContainer(value=u'= -1'))
+    signature = find_node(render(app, member_def), 'desc_signature')
     assert signature.astext() == 'const int EOF = -1'
 
 
-def test_render_define_initializer():
-    app = MockApp()
+def test_render_define_initializer(app):
+    member_def = WrappedMemberDef(kind='define', name='MAX_LENGTH',
+                               initializer=WrappedLinkedText(content_=[WrappedMixedContainer(value=u'100')]))
+    signature_w_initializer = find_node(render(app, member_def, show_define_initializer=True), 'desc_signature')
+    assert signature_w_initializer.astext() == 'MAX_LENGTH 100'
+
+    member_def_no_show = WrappedMemberDef(kind='define', name='MAX_LENGTH_NO_INITIALIZER',
+                               initializer=WrappedLinkedText(content_=[WrappedMixedContainer(value=u'100')]))
+
+    signature_wo_initializer = find_node(render(app, member_def_no_show, show_define_initializer=False), 'desc_signature')
+    assert signature_wo_initializer.astext() == 'MAX_LENGTH_NO_INITIALIZER'
+
+
+def test_render_define_no_initializer(app):
     sphinx.addnodes.setup(app)
-    member_def = TestMemberDef(kind='define', name='MAX_LENGTH',
-                               initializer=TestLinkedText(content_=[TestMixedContainer(value=u'100')]))
-    signature_w_initializer = find_node(render(member_def, show_define_initializer=True), 'desc_signature')
-    eq_(signature_w_initializer.astext(), 'MAX_LENGTH 100')
-
-    member_def_no_show = TestMemberDef(kind='define', name='MAX_LENGTH_NO_INITIALIZER',
-                               initializer=TestLinkedText(content_=[TestMixedContainer(value=u'100')]))
-
-    signature_wo_initializer = find_node(render(member_def_no_show, show_define_initializer=False), 'desc_signature')
-    eq_(signature_wo_initializer.astext(), 'MAX_LENGTH_NO_INITIALIZER')
-
-
-def test_render_define_no_initializer():
-    app = MockApp()
-    sphinx.addnodes.setup(app)
-    member_def = TestMemberDef(kind='define', name='USE_MILK')
-    signature = find_node(render(member_def), 'desc_signature')
+    member_def = WrappedMemberDef(kind='define', name='USE_MILK')
+    signature = find_node(render(app, member_def), 'desc_signature')
     assert signature.astext() == 'USE_MILK'
