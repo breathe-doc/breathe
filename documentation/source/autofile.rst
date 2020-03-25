@@ -22,4 +22,3 @@ It produces this output:
 
 .. autodoxygenfile:: auto_class.h
    :project: auto
-   :no-link:

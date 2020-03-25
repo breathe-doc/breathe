@@ -6,158 +6,149 @@ Specific Examples Test Suite
 Template Type Alias
 -------------------
 
+.. cpp:namespace:: @ex_specific_alias_template
+
 .. doxygentypedef:: IsFurry
    :path: ../../examples/specific/template_type_alias/xml
-   :no-link:
       
 .. doxygentypedef:: IsFuzzy
    :path: ../../examples/specific/template_type_alias/xml
-   :no-link:
       
 Typedef Examples
 ----------------
 
+.. cpp:namespace:: @ex_specific_typedef
+
 .. doxygenindex::
    :path: ../../examples/specific/typedef/xml
-   :no-link:
-
 
 Namespaced Function Examples
 ----------------------------
 
+.. cpp:namespace:: @ex_specific_namespaced_function
+
 .. doxygenfunction:: testnamespace::NamespacedClassTest::function
    :path: ../../examples/specific/class/xml
-   :no-link:
 
 .. doxygenfunction:: testnamespace::ClassTest::function
    :path: ../../examples/specific/class/xml
-   :no-link:
 
 .. doxygenfunction:: testnamespace::ClassTest::anotherFunction
    :path: ../../examples/specific/class/xml
-   :no-link:
 
 .. doxygenfunction:: ClassTest::function
    :path: ../../examples/specific/class/xml
-   :no-link:
 
 .. doxygenfunction:: ClassTest::anotherFunction
    :path: ../../examples/specific/class/xml
-   :no-link:
 
 Alias Example
 -------------
 
+.. cpp:namespace:: @ex_specific_alias
+
 .. doxygenfunction:: frob_foos
    :path: ../../examples/specific/alias/xml
-   :no-link:
 
 Fixed Width Font
 ----------------
 
+.. cpp:namespace:: @ex_specific_fixed_width
+
 .. doxygenclass:: Out
    :path: ../../examples/specific/fixedwidthfont/xml
    :members:
-   :no-link:
 
 Function Overloads
 ------------------
 
+.. cpp:namespace:: @ex_specific_function_overloads
+
 .. doxygenfunction:: f(int, int)
    :project: functionOverload
-   :no-link:
 
 .. doxygenfunction:: f(double, double)
    :project: functionOverload
-   :no-link:
 
 .. doxygenfunction:: test::g(int,int)
    :project: functionOverload
-   :no-link:
 
 .. doxygenfunction:: test::g(double, double)
    :project: functionOverload
-   :no-link:
 
 .. doxygenfunction:: h(std::string, MyType)
    :project: functionOverload
-   :no-link:
 
 .. doxygenfunction:: h(std::string, MyOtherType)
    :project: functionOverload
-   :no-link:
 
 .. doxygenfunction:: h(std::string, const int)
    :project: functionOverload
-   :no-link:
 
 .. doxygenfunction:: h(std::string, const T, const U)
    :project: functionOverload
-   :no-link:
 
 Program Listing
 ---------------
 
+.. cpp:namespace:: @ex_specific_program_listing
+
 .. doxygenclass:: Vector
    :project: programlisting
-   :no-link:
 
 .. doxygenfunction:: center
    :project: programlisting
-   :no-link:
 
 Image
 -----
 
+.. cpp:namespace:: @ex_specific_image
+
 .. doxygenclass:: ImageClass
    :project: image
-   :no-link:
-
 
 Array Parameter
 ---------------
 
+.. this should be switch to the C domain,
+   as C++ does not support these array declarators
+
 .. doxygenfunction:: foo
    :project: array
-   :no-link:
 
 .. doxygenfunction:: bar
    :project: array
-   :no-link:
-
 
 C Enum
 ------
 
 .. doxygenenum:: GSM_BackupFormat
    :project: c_enum
-   :no-link:
-
    
 C Typedef
 ---------
 
 .. doxygenfile:: c_typedef.h
    :project: c_typedef
-   :no-link:
 
 C Typedef
 ---------
 
 .. doxygenfile:: define.h
    :project: define
-   :no-link:
    
 Multifile
 ---------
 
+.. cpp:namespace:: @ex_specific_multifile
+
 .. doxygenfunction:: TestTemplateFunction
    :project: multifile
-   :no-link:
 
 Interface Class
 ---------------
 
+.. cpp:namespace:: @ex_specific_interface
+
 .. doxygeninterface:: InterfaceClass
    :project: interface
-   :no-link:

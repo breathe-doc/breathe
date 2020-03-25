@@ -7,6 +7,8 @@ doxygenenum Directive Example
 Working Example
 ---------------
 
+.. cpp:namespace:: @ex_enum_example
+
 This should work::
 
    .. doxygenenum:: NodeType
@@ -16,10 +18,11 @@ It produces this output:
 
 .. doxygenenum:: NodeType
   :project: tinyxml
-  :no-link:
 
 Example with Namespace
 ----------------------
+
+.. cpp:namespace:: @ex_enum_namespace
 
 This should work::
 
@@ -30,10 +33,11 @@ It produces this output:
 
 .. doxygenenum:: foo::ns::Letters
    :project: namespace
-   :no-link:
 
 Failing Example
 ---------------
+
+.. cpp:namespace:: @ex_enum_failing
 
 This intentionally fails::
 

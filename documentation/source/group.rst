@@ -50,6 +50,8 @@ variable to set it in the ``conf.py``.
 Basic Example
 -------------
 
+.. cpp:namespace:: @ex_group_basic
+
 The plain ``doxygengroup`` directive will output the group name and description
 and any top level publicly visible members of the group.
 
@@ -62,10 +64,11 @@ It produces this output:
 
 .. doxygengroup:: mygroup
    :project: group
-   :no-link:
 
 Content-Only Example
 --------------------
+
+.. cpp:namespace:: @ex_group_content_only
 
 The ``content-only`` option changes the output to only include the content of
 the group and not the group name or description. So this:
@@ -81,7 +84,6 @@ Produces this output:
 .. doxygengroup:: mygroup
    :project: group
    :content-only:
-   :no-link:
 
 .. note::
 
@@ -92,6 +94,8 @@ Produces this output:
 
 Members Example
 ---------------
+
+.. cpp:namespace:: @ex_group_members
 
 The ``members`` option changes the output to include the public members of any
 classes. The output for any class in the group should be the same as if it had
@@ -109,11 +113,12 @@ It produces this output:
 .. doxygengroup:: mygroup
    :project: group
    :members:
-   :no-link:
 
 
 Protected Members Example
 -------------------------
+
+.. cpp:namespace:: @ex_group_members_protected
 
 The ``protected-members`` option changes the output to include the protected
 members of any classes. The output for any class in the group should be the same
@@ -131,11 +136,12 @@ It produces this output:
 .. doxygengroup:: mygroup
    :project: group
    :protected-members:
-   :no-link:
 
 
 Private-Members Example
 -----------------------
+
+.. cpp:namespace:: @ex_group_members_private
 
 The ``private-members`` option changes the output to include the private members
 of any classes. The output for any class in the group should be the same as if
@@ -153,11 +159,12 @@ Produces this output:
 .. doxygengroup:: mygroup
    :project: group
    :private-members:
-   :no-link:
 
 
 Undocumented Members Example
 ----------------------------
+
+.. cpp:namespace:: @ex_group_members_undocumented
 
 The ``undoc-members`` option changes the output to include any undocumentated
 members from the sections (public, protected, private) that are being displayed
@@ -176,7 +183,6 @@ Produces this output:
    :project: group
    :private-members:
    :undoc-members:
-   :no-link:
 
 .. note::
 
@@ -186,6 +192,8 @@ Produces this output:
 
 Outline Example
 ---------------
+
+.. cpp:namespace:: @ex_group_outline
 
 This displays only the names of the members of the group and not their
 documentation. The other options determine which members are displayed.
@@ -203,11 +211,12 @@ It produces this output:
    :project: group
    :members:
    :outline:
-   :no-link:
 
 
 Failing Example
 ---------------
+
+.. cpp:namespace:: @ex_group_failing
 
 This intentionally fails:
 

@@ -43,6 +43,8 @@ specified class.
 Basic Example
 -------------
 
+.. cpp:namespace:: @ex_class_basic
+
 This displays the class documentation without any members:
 
 .. code-block:: rst
@@ -54,11 +56,12 @@ It produces this output:
 
 .. doxygenclass:: Nutshell
    :project: nutshell
-   :no-link:
 
 
 Template Specialisation Example
 -------------------------------
+
+.. cpp:namespace:: @ex_class_template_spec
 
 You can reference class template specialisations by include the specialisation
 in the name:
@@ -72,7 +75,6 @@ Produces this output:
 
 .. doxygenclass:: TemplateClass< T * >
    :project: template_specialisation
-   :no-link:
 
 Where as without the specialisation, the directive references the generic
 declaration:
@@ -86,11 +88,12 @@ Produces this output:
 
 .. doxygenclass:: TemplateClass
    :project: template_specialisation
-   :no-link:
 
 
 Members Example
 ---------------
+
+.. cpp:namespace:: @ex_class_members
 
 This directive call will display the class documentation with all the public
 members:
@@ -106,11 +109,12 @@ It produces this output:
 .. doxygenclass:: Nutshell
    :project: nutshell
    :members:
-   :no-link:
 
 
 Specific Members Example
 ------------------------
+
+.. cpp:namespace:: @ex_class_members_specific
 
 This displays the class documentation with only the members listed in the
 ``:members:`` option:
@@ -126,11 +130,12 @@ It produces this output:
 .. doxygenclass:: Nutshell
    :project: nutshell
    :members: crack, isCracked
-   :no-link:
 
 
 Protected Members
 -----------------
+
+.. cpp:namespace:: @ex_class_members_protected
 
 This displays only the protected members of the class. Normally this is combined
 with the ``:members:`` option to show the public members as well.
@@ -146,11 +151,12 @@ It produces this output:
 .. doxygenclass:: GroupedClassTest
    :project: group
    :protected-members:
-   :no-link:
 
 
 Private Members
 ---------------
+
+.. cpp:namespace:: @ex_class_members_private
 
 This displays only the private members of the class. Normally this is combined
 with the ``:members:`` option to show the public members as well.
@@ -166,10 +172,11 @@ It produces this output:
 .. doxygenclass:: Nutshell
    :project: nutshell
    :private-members:
-   :no-link:
 
 Undocumented Members
 --------------------
+
+.. cpp:namespace:: @ex_class_members_undocumented
 
 This displays the undocumented members of the class which are suppressed by
 default. Undocumented public members are only shown if the ``:members:`` option
@@ -191,7 +198,6 @@ It produces this output:
    :members:
    :private-members:
    :undoc-members:
-   :no-link:
 
 .. note::
 
@@ -200,6 +206,8 @@ It produces this output:
 
 Outline Example
 ---------------
+
+.. cpp:namespace:: @ex_class_outline
 
 This displays only the names of the class members and not their
 documentation. The ``:members:`` and ``:private-members:`` options determine
@@ -218,11 +226,12 @@ It produces this output:
    :project: nutshell
    :members:
    :outline:
-   :no-link:
 
 
 Qt Signals & Slots Example
 --------------------------
+
+.. cpp:namespace:: @ex_class_qt
 
 Doxygen is aware of Qt Signals and Slots and so Breathe can pick them up and
 display them in the output. They are displayed in appropriate ``Signals``,
@@ -239,10 +248,11 @@ Produces the following output:
 .. doxygenclass:: QtSignalSlotExample
    :project: qtsignalsandslots
    :members:
-   :no-link:
 
 Failing Example
 ---------------
+
+.. cpp:namespace:: @ex_class_failing
 
 This intentionally fails:
 

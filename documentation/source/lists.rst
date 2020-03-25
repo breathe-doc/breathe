@@ -4,6 +4,8 @@ Lists
 Breathe has support for lists in the doxygen documentation. They are output as
 follows.
 
+.. cpp:namespace:: @ex_lists_plus
+
 For unordered lists with list items prefixed with **+** ::
 
    .. doxygenclass:: SimpleList_1
@@ -18,6 +20,8 @@ It renders as:
 
 ----
 
+.. cpp:namespace:: @ex_lists_dash
+
 Unordered lists with list items prefixed with **-** render as:
 
 ----
@@ -26,6 +30,8 @@ Unordered lists with list items prefixed with **-** render as:
    :project: lists
 
 ----
+
+.. cpp:namespace:: @ex_lists_star
 
 Unordered lists with list items prefixed with **\*** render as:
 
@@ -36,6 +42,8 @@ Unordered lists with list items prefixed with **\*** render as:
 
 ----
 
+.. cpp:namespace:: @ex_lists_html
+
 Unordered lists defined using HTML tags **<ul><li>** render as:
 
 ----
@@ -45,6 +53,8 @@ Unordered lists defined using HTML tags **<ul><li>** render as:
 
 ----
 
+.. cpp:namespace:: @ex_lists_auto
+
 Auto-numbered lists with list items prefixed with **-#** render as:
 
 ----
@@ -53,6 +63,8 @@ Auto-numbered lists with list items prefixed with **-#** render as:
    :project: lists
 
 ----
+
+.. cpp:namespace:: @ex_lists_arabic
 
 Numbered lists with list items prefixed with Arabic numerals **1. 2. ...** render as:
 
@@ -70,6 +82,8 @@ Nested lists are supported in all combinations, as long as they are valid doxyge
 Below are a couple of examples of different nested lists documentation and their corresponding 
 breathe output.
 
+.. cpp:namespace:: @ex_lists_nested_1
+
 Documentation looking like this:
 
 .. literalinclude:: code/nested_list_1.h
@@ -83,6 +97,8 @@ renders as:
    :project: lists
 
 ----
+
+.. cpp:namespace:: @ex_lists_nested_2
 
 Documentation looking like this:
 
@@ -98,6 +114,8 @@ renders as:
 
 ----
 
+.. cpp:namespace:: @ex_lists_nested_3
+
 Documentation looking like this:
 
 .. literalinclude:: code/nested_list_3.h
@@ -112,6 +130,8 @@ renders as:
 
 ----
 
+.. cpp:namespace:: @ex_lists_nested_4
+
 Documentation looking like this:
 
 .. literalinclude:: code/nested_list_4.h
@@ -125,6 +145,8 @@ renders as:
    :project: lists
 
 ----
+
+.. cpp:namespace:: @ex_lists_nested_5
 
 Documentation looking like this:
 

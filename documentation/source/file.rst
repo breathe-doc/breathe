@@ -7,6 +7,8 @@ doxygenfile Directive Example
 Example
 -------
 
+.. cpp:namespace:: @ex_file_example
+
 This should work::
 
    .. doxygenfile:: nutshell.h
@@ -18,10 +20,11 @@ It produces this output:
 
 .. doxygenfile:: nutshell.h
    :project: nutshell
-   :no-link:
 
 Example with Nested Namespaces
 ------------------------------
+
+.. cpp:namespace:: @ex_file_namespace
 
 This should work::
 
@@ -38,6 +41,8 @@ It produces this output:
 
 Example for Multiple Files
 --------------------------
+
+.. cpp:namespace:: @ex_file_multiple_files
 
 When there are multiple files with the same name in the project, you need to be
 more specific with the filename you provide. For example, in a project with the
@@ -56,6 +61,8 @@ To uniquely identify them.
 
 Failing Example
 ---------------
+
+.. cpp:namespace:: @ex_file_failing
 
 This intentionally fails::
 

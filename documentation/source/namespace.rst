@@ -47,6 +47,8 @@ variable to set it in the ``conf.py``.
 Basic Example
 -------------
 
+.. cpp:namespace:: @ex_namespace_basic
+
 The plain ``doxygennamespace`` directive will output the namespace name and
 description and any top level publicly visible members of the namespace.
 
@@ -59,10 +61,11 @@ It produces this output:
 
 .. doxygennamespace:: foo
    :project: namespace
-   :no-link:
 
 Content-Only Example
 --------------------
+
+.. cpp:namespace:: @ex_namespace_content_only
 
 The ``content-only`` option changes the output to only include the content of
 the namespace and not the namespace name or description. So this:
@@ -78,7 +81,6 @@ Produces this output:
 .. doxygennamespace:: foo
    :project: namespace
    :content-only:
-   :no-link:
 
 .. note::
 
@@ -89,6 +91,8 @@ Produces this output:
 
 Members Example
 ---------------
+
+.. cpp:namespace:: @ex_namespace_members
 
 The ``members`` option changes the output to include the public members of any
 classes. The output for any class in the namespace should be the same as if it had
@@ -106,11 +110,12 @@ It produces this output:
 .. doxygennamespace:: foo
    :project: namespace
    :members:
-   :no-link:
 
 
 Protected Members Example
 -------------------------
+
+.. cpp:namespace:: @ex_namespace_members_protected
 
 The ``protected-members`` option changes the output to include the protected
 members of any classes. The output for any class in the namespace should be the same
@@ -128,11 +133,12 @@ It produces this output:
 .. doxygennamespace:: foo
    :project: namespace
    :protected-members:
-   :no-link:
 
 
 Private-Members Example
 -----------------------
+
+.. cpp:namespace:: @ex_namespace_members_private
 
 The ``private-members`` option changes the output to include the private members
 of any classes. The output for any class in the namespace should be the same as if
@@ -150,11 +156,12 @@ Produces this output:
 .. doxygennamespace:: foo
    :project: namespace
    :private-members:
-   :no-link:
 
 
 Undocumented Members Example
 ----------------------------
+
+.. cpp:namespace:: @ex_namespace_members_undocumented
 
 The ``undoc-members`` option changes the output to include any undocumentated
 members from the sections (public, protected, private) that are being displayed
@@ -173,7 +180,6 @@ Produces this output:
    :project: namespace
    :private-members:
    :undoc-members:
-   :no-link:
 
 .. note::
 
@@ -184,6 +190,8 @@ Produces this output:
 
 Outline Example
 ---------------
+
+.. cpp:namespace:: @ex_namespace_outline
 
 This displays only the names of the members of the namespace and not their
 documentation. The other options determine which members are displayed.
@@ -201,11 +209,12 @@ It produces this output:
    :project: namespace
    :members:
    :outline:
-   :no-link:
 
 
 Nested Example
 --------------
+
+.. cpp:namespace:: @ex_namespace_nested
 
 The referenced namespace can be nested in another namespace.
 
@@ -218,11 +227,12 @@ Produces this output:
 
 .. doxygennamespace:: foo::ns
    :project: namespace
-   :no-link:
 
 
 Failing Example
 ---------------
+
+.. cpp:namespace:: @ex_namespace_failing
 
 This intentionally fails:
 

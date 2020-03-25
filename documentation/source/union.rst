@@ -7,6 +7,8 @@ doxygenunion Directive Example
 Working Example
 ---------------
 
+.. cpp:namespace:: @ex_union_example
+
 This should work::
 
    .. doxygenunion:: SeparateUnion
@@ -16,10 +18,11 @@ It produces this output:
 
 .. doxygenunion:: SeparateUnion
   :project: union
-  :no-link:
 
 Example with Namespace
 ----------------------
+
+.. cpp:namespace:: @ex_union_namespace
 
 This should work::
 
@@ -30,10 +33,11 @@ It produces this output:
 
 .. doxygenunion:: foo::MyUnion
    :project: union
-   :no-link:
 
 Failing Example
 ---------------
+
+.. cpp:namespace:: @ex_union_failing
 
 This intentionally fails::
 

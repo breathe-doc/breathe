@@ -25,11 +25,12 @@ class with a comment like::
 
 Will be renderer as:
 
+.. cpp:namespace:: @ex_latexmath
+
 .. doxygenclass:: MathHelper
    :project: latexmath
    :members:
    :undoc-members:
-   :no-link:
 
 
 Without any additional configuration except for including a math extension in
