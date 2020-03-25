@@ -37,8 +37,8 @@ travis_build = os.environ.get('TRAVIS_CI', None) == 'True'
 # Get a description of the current position. Use Popen for 2.6 compat
 git_tag = subprocess.Popen(['git', 'describe', '--tags'], stdout=subprocess.PIPE).communicate()[0]
 
-# Convert to unicode for python3
-git_tag = unicode(git_tag)
+# convert from bytes to string
+git_tag = git_tag.decode('ascii')
 
 if travis_build:
 
@@ -317,8 +317,8 @@ htmlhelp_basename = 'BreatheExampledoc'
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title, author, document class [howto/manual]).
 latex_documents = [
-  ('index', 'BreatheExample.tex', ur'BreatheExample Documentation',
-   ur'Michael Jones', 'manual'),
+  ('index', 'BreatheExample.tex', 'BreatheExample Documentation',
+   'Michael Jones', 'manual'),
 ]
 
 # The name of an image file (relative to this directory) to place at the top of
