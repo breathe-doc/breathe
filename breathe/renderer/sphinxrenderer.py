@@ -148,11 +148,13 @@ class DomainDirectiveFactory(object):
             cls, name = DomainDirectiveFactory.php_classes.get(
                 arg_0, (php.PhpClasslike, 'class'))
         else:
+            domain = 'cpp'
             cls, name = DomainDirectiveFactory.cpp_classes.get(
                 args[0], (cpp.CPPMemberObject, 'member'))
         # Replace the directive name because domain directives don't know how to handle
         # Breathe's "doxygen" directives.
-        args = [name] + args[1:]
+        assert ':' not in name
+        args = [domain + ':' + name] + args[1:]
         return cls(*args)
 
 
