@@ -118,6 +118,18 @@ Array Parameter
 
 .. doxygenfunction:: bar
    :project: array
+   
+C Struct
+--------
+
+.. doxygenfile:: c_struct.h
+   :project: c_struct
+   
+C Union
+-------
+
+.. doxygenfile:: c_union.h
+   :project: c_union
 
 C Enum
 ------
@@ -131,7 +143,13 @@ C Typedef
 .. doxygenfile:: c_typedef.h
    :project: c_typedef
 
-C Typedef
+C Macro
+-------
+
+.. doxygenfile:: c_macro.h
+   :project: c_macro
+
+C++ Macro
 ---------
 
 .. doxygenfile:: define.h

@@ -208,8 +208,11 @@ breathe_projects = {
     "union":"../../examples/specific/union/xml/",
     "qtsignalsandslots":"../../examples/specific/qtsignalsandslots/xml/",
     "array":"../../examples/specific/array/xml/",
+    "c_struct":"../../examples/specific/c_struct/xml/",
     "c_enum":"../../examples/specific/c_enum/xml/",
     "c_typedef":"../../examples/specific/c_typedef/xml/",
+    "c_macro":"../../examples/specific/c_macro/xml/",
+    "c_union":"../../examples/specific/c_union/xml/",
     "define":"../../examples/specific/define/xml/",
     "multifile":"../../examples/specific/multifilexml/xml/",
     }
@@ -228,8 +231,7 @@ breathe_domain_by_extension = {
 breathe_domain_by_file_pattern = {
         "class.h" : "cpp",
         "alias.h" : "c",
-        "c_enum.h" : "c",
-        "c_typedef.h" : "c",
+        "c_*.h" : "c",
         }
 
 breathe_use_project_refids = True
