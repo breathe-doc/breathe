@@ -170,3 +170,11 @@ Interface Class
 
 .. doxygeninterface:: InterfaceClass
    :project: interface
+
+C++ Anonymous Entities
+----------------------
+
+.. cpp:namespace:: @ex_specific_cpp_anon
+
+.. doxygenfile:: cpp_anon.h
+   :project: cpp_anon
