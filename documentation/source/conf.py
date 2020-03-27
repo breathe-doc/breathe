@@ -226,9 +226,9 @@ breathe_domain_by_extension = {
         }
 
 breathe_domain_by_file_pattern = {
-        "*/class.h" : "cpp",
-        "*/alias.h" : "c",
-        "*/c_enum.h" : "c",
+        "class.h" : "cpp",
+        "alias.h" : "c",
+        "c_enum.h" : "c",
         "c_typedef.h" : "c",
         }
 
