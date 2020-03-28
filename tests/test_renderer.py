@@ -334,7 +334,8 @@ def test_render_const_rvalue_func(app):
 
 
 def test_render_variable_initializer(app):
-    member_def = WrappedMemberDef(kind='variable', definition='const int EOF', initializer=WrappedMixedContainer(value=u'= -1'))
+    member_def = WrappedMemberDef(kind='variable', definition='const int EOF', type_='const int', name='EOF',
+                                  initializer=WrappedMixedContainer(value=u'= -1'))
     signature = find_node(render(app, member_def), 'desc_signature')
     assert signature.astext() == 'const int EOF = -1'
 

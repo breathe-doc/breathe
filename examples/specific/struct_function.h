@@ -10,6 +10,8 @@ struct MyClass
 
     //! \brief struct copy constructor
     MyClass(const MyClass&);
+
+    int myMemberVar;
 };
 
 }

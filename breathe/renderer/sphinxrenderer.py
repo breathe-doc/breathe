@@ -50,6 +50,10 @@ class BaseObject:
 
 # ----------------------------------------------------------------------------
 
+class CPPMemberObject(BaseObject, cpp.CPPMemberObject):
+    pass
+
+
 class CPPTypeObject(BaseObject, cpp.CPPTypeObject):
     pass
 
@@ -63,6 +67,10 @@ class CPPEnumeratorObject(BaseObject, cpp.CPPEnumeratorObject):
 
 
 # ----------------------------------------------------------------------------
+
+class CMemberObject(BaseObject, c.CMemberObject):
+    pass
+
 
 class CTypeObject(BaseObject, c.CTypeObject):
     pass
@@ -110,7 +118,7 @@ class DomainDirectiveFactory(object):
         'define': (c.CMacroObject, 'macro'),
     }
     c_classes = {
-        'variable': (c.CMemberObject, 'var'),
+        'variable': (CMemberObject, 'var'),
         'function': (c.CFunctionObject, 'function'),
         'define': (c.CMacroObject, 'macro'),
         'struct': (c.CStructObject, 'struct'),
@@ -169,7 +177,7 @@ class DomainDirectiveFactory(object):
         else:
             domain = 'cpp'
             cls, name = DomainDirectiveFactory.cpp_classes.get(
-                args[0], (cpp.CPPMemberObject, 'member'))
+                args[0], (CPPMemberObject, 'member'))
         # Replace the directive name because domain directives don't know how to handle
         # Breathe's "doxygen" directives.
         assert ':' not in name
@@ -1286,13 +1294,21 @@ class SphinxRenderer(object):
         return ''.join(n.astext() for n in signature)
 
     def visit_variable(self, node):
-        declaration = get_definition_without_template_args(node)
-        enum = 'enum '
-        if declaration.startswith(enum):
-            declaration = declaration[len(enum):]
-        declaration += self.make_initializer(node)
-        declaration = self.create_template_prefix(node) + declaration
-        return self.render_declaration(node, declaration)
+        names = self.get_qualification()
+        names.append(node.name)
+        name = self.join_nested_name(names)
+        declaration = ' '.join([
+            self.create_template_prefix(node),
+            ''.join(n.astext() for n in self.render(node.get_type())),
+            name,
+            node.get_argsstring(),
+            self.make_initializer(node)
+        ])
+        dom = self.get_domain()
+        if not dom or dom in ('c', 'cpp'):
+            return self.handle_declaration(node, declaration)
+        else:
+            return self.render_declaration(node, declaration)
 
     def visit_param(self, node):
 

@@ -38,3 +38,6 @@ Struct Members
 
 .. doxygenfunction:: testnamespace::MyClass::MyClass(const MyClass&)
    :path: ../../examples/specific/struct_function/xml
+
+.. doxygenvariable:: testnamespace::MyClass::myMemberVar
+   :path: ../../examples/specific/struct_function/xml
