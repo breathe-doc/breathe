@@ -217,6 +217,7 @@ breathe_projects = {
     "multifile":"../../examples/specific/multifilexml/xml/",
     "cpp_anon":"../../examples/specific/cpp_anon/xml/",
     "cpp_enum":"../../examples/specific/cpp_enum/xml/",
+    "cpp_union":"../../examples/specific/cpp_union/xml/",
     }
 
 breathe_projects_source = {

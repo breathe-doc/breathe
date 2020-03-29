@@ -50,6 +50,10 @@ class BaseObject:
 
 # ----------------------------------------------------------------------------
 
+class CPPUnionObject(BaseObject, cpp.CPPUnionObject):
+    pass
+
+
 class CPPMemberObject(BaseObject, cpp.CPPMemberObject):
     pass
 
@@ -67,6 +71,10 @@ class CPPEnumeratorObject(BaseObject, cpp.CPPEnumeratorObject):
 
 
 # ----------------------------------------------------------------------------
+
+class CUnionObject(BaseObject, c.CUnionObject):
+    pass
+
 
 class CMemberObject(BaseObject, c.CMemberObject):
     pass
@@ -112,7 +120,7 @@ class DomainDirectiveFactory(object):
         'enum': (CPPEnumObject, 'enum'),
         'typedef': (CPPTypeObject, 'type'),
         'using': (CPPTypeObject, 'type'),
-        'union': (cpp.CPPUnionObject, 'union'),
+        'union': (CPPUnionObject, 'union'),
         'namespace': (cpp.CPPTypeObject, 'type'),
         'enumvalue': (CPPEnumeratorObject, 'enumerator'),
         'define': (c.CMacroObject, 'macro'),
@@ -122,7 +130,7 @@ class DomainDirectiveFactory(object):
         'function': (c.CFunctionObject, 'function'),
         'define': (c.CMacroObject, 'macro'),
         'struct': (c.CStructObject, 'struct'),
-        'union': (c.CUnionObject, 'union'),
+        'union': (CUnionObject, 'union'),
         'enum': (CEnumObject, 'enum'),
         'enumvalue': (CEnumeratorObject, 'enumerator'),
         'typedef': (CTypeObject, 'type'),
@@ -403,10 +411,27 @@ class SphinxRenderer(object):
                 print("{}Doxygen target: {}".format(
                     '  ' * debug_trace_directives_indent, ts[0]['ids']))
 
-        rst_node = nodes[1]
-        finder = NodeFinder(rst_node.document)
-        rst_node.walk(finder)
-        finder.declarator.insert(0, self.create_doxygen_target(node))
+        # <desc><desc_signature> and then one or more <desc_signature_line>
+        # each <desc_signature_line> has a sphinx_line_type which hints what is present in that line
+        assert len(nodes) >= 1
+        desc = nodes[1]
+        assert desc.__class__.__name__ == "desc"
+        assert len(desc) >= 1
+        sig = desc[0]
+        assert sig.__class__.__name__ == "desc_signature"
+        # if may or may not be a multiline signature
+        isMultiline = sig.get('is_multiline', False)
+        if isMultiline:
+            declarator = None
+            for line in sig:
+                assert line.__class__.__name__ == "desc_signature_line"
+                if line.sphinx_line_type == 'declarator':
+                    declarator = line
+        else:
+            declarator = sig
+        assert declarator is not None
+        target = self.create_doxygen_target(node)
+        declarator.insert(0, target)
         return nodes
 
     def get_qualification(self):
@@ -632,10 +657,44 @@ class SphinxRenderer(object):
     def visit_doxygendef(self, node):
         return self.render(node.compounddef)
 
+    def visit_union(self, node):
+        # Read in the corresponding xml file and process
+        file_data = self.compound_parser.parse(node.refid)
+        nodeDef = file_data.compounddef
+
+        parent_context = self.context.create_child_context(file_data)
+        new_context = parent_context.create_child_context(nodeDef)
+
+        with WithContext(self, new_context):
+            names = self.get_qualification()
+            if self.nesting_level == 0:
+                names.extend(nodeDef.compoundname.split('::'))
+            else:
+                names.append(nodeDef.compoundname.split('::')[-1])
+            declaration = self.join_nested_name(names)
+
+            def content(contentnode):
+                if nodeDef.includes:
+                    for include in nodeDef.includes:
+                        contentnode.extend(self.render(include,
+                                                       new_context.create_child_context(include)))
+                rendered_data = self.render(file_data, parent_context)
+                contentnode.extend(rendered_data)
+            nodes = self.handle_declaration(nodeDef, declaration, content_callback=content)
+        return nodes
+
     def visit_compound(self, node, render_empty_node=True, **kwargs):
 
         # Read in the corresponding xml file and process
         file_data = self.compound_parser.parse(node.refid)
+
+        def get_node_info(file_data):
+            return node.name, node.kind
+        name, kind = kwargs.get('get_node_info', get_node_info)(file_data)
+        if kind == 'union':
+            dom = self.get_domain()
+            assert not dom or dom in ('c', 'cpp')
+            return self.visit_union(node)
 
         parent_context = self.context.create_child_context(file_data)
         new_context = parent_context.create_child_context(file_data.compounddef)
@@ -643,10 +702,6 @@ class SphinxRenderer(object):
 
         if not rendered_data and not render_empty_node:
             return []
-
-        def get_node_info(file_data):
-            return node.name, node.kind
-        name, kind = kwargs.get('get_node_info', get_node_info)(file_data)
 
         def render_signature(file_data, doxygen_target, name, kind):
             # Defer to domains specific directive.
