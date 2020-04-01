@@ -50,6 +50,10 @@ class BaseObject:
 
 # ----------------------------------------------------------------------------
 
+class CPPClassObject(BaseObject, cpp.CPPClassObject):
+    pass
+
+
 class CPPUnionObject(BaseObject, cpp.CPPUnionObject):
     pass
 
@@ -71,6 +75,10 @@ class CPPEnumeratorObject(BaseObject, cpp.CPPEnumeratorObject):
 
 
 # ----------------------------------------------------------------------------
+
+class CStructObject(BaseObject, c.CStructObject):
+    pass
+
 
 class CUnionObject(BaseObject, c.CUnionObject):
     pass
@@ -94,25 +102,12 @@ class CEnumeratorObject(BaseObject, c.CEnumeratorObject):
 
 # ----------------------------------------------------------------------------
 
-class DoxyCPPInterfaceObject(cpp.CPPClassObject):
-    object_type = 'class'
-
-    @property
-    def display_object_type(self):
-        # override because we have the 'interface' type
-        assert self.objtype == 'interface'
-        return 'class'  # TODO: change to 'interface' if that is the desired rendering
-
-    def parse_definition(self, parser):
-        return parser.parse_declaration("class", "class")
-
-
 class DomainDirectiveFactory(object):
     # A mapping from node kinds to domain directives and their names.
     cpp_classes = {
-        'class': (cpp.CPPClassObject, 'class'),
-        'struct': (cpp.CPPClassObject, 'struct'),
-        'interface': (DoxyCPPInterfaceObject, 'interface'),
+        'class': (CPPClassObject, 'class'),
+        'struct': (CPPClassObject, 'struct'),
+        'interface': (CPPClassObject, 'class'),
         'function': (cpp.CPPFunctionObject, 'function'),
         'friend': (cpp.CPPFunctionObject, 'function'),
         'signal': (cpp.CPPFunctionObject, 'function'),
@@ -129,7 +124,7 @@ class DomainDirectiveFactory(object):
         'variable': (CMemberObject, 'var'),
         'function': (c.CFunctionObject, 'function'),
         'define': (c.CMacroObject, 'macro'),
-        'struct': (c.CStructObject, 'struct'),
+        'struct': (CStructObject, 'struct'),
         'union': (CUnionObject, 'union'),
         'enum': (CEnumObject, 'enum'),
         'enumvalue': (CEnumeratorObject, 'enumerator'),
@@ -393,7 +388,8 @@ class SphinxRenderer(object):
             signode.children = [n for n in signode.children if not n.tagname == 'desc_addname']
         return nodes
 
-    def handle_declaration(self, node, declaration, *, obj_type=None, content_callback=None):
+    def handle_declaration(self, node, declaration, *, obj_type=None, content_callback=None,
+                           display_obj_type=None):
         if obj_type is None:
             obj_type = node.kind
         if content_callback is None:
@@ -430,6 +426,12 @@ class SphinxRenderer(object):
         else:
             declarator = sig
         assert declarator is not None
+        if display_obj_type is not None:
+            n = declarator[0]
+            assert n.__class__.__name__ == "desc_annotation"
+            assert n.astext()[-1] == " "
+            txt = display_obj_type + ' '
+            declarator[0] = self.node_factory.desc_annotation(txt, txt)
         target = self.create_doxygen_target(node)
         declarator.insert(0, target)
         return nodes
@@ -683,8 +685,62 @@ class SphinxRenderer(object):
             nodes = self.handle_declaration(nodeDef, declaration, content_callback=content)
         return nodes
 
-    def visit_compound(self, node, render_empty_node=True, **kwargs):
+    def visit_class(self, node):
+        # Read in the corresponding xml file and process
+        file_data = self.compound_parser.parse(node.refid)
+        nodeDef = file_data.compounddef
 
+        parent_context = self.context.create_child_context(file_data)
+        new_context = parent_context.create_child_context(nodeDef)
+
+        with WithContext(self, new_context):
+            # Pretend that the signature is being rendered in context of the
+            # definition, for proper domain detection
+            kind = nodeDef.kind
+            # Defer to domains specific directive.
+
+            names = self.get_qualification()
+            # TODO: this breaks if it's a template specialization
+            #       and one of the arguments contain '::'
+            if self.nesting_level == 0:
+                names.extend(nodeDef.compoundname.split('::'))
+            else:
+                names.append(nodeDef.compoundname.split('::')[-1])
+            decls = [
+                self.create_template_prefix(nodeDef),
+                self.join_nested_name(names),
+            ]
+            # add base classes
+            if len(nodeDef.basecompoundref) != 0:
+                decls.append(':')
+            first = True
+            for base in nodeDef.basecompoundref:
+                if not first:
+                    decls.append(',')
+                else:
+                    first = False
+                if base.prot is not None:
+                    decls.append(base.prot)
+                if base.virt == 'virtual':
+                    decls.append('virtual')
+                decls.append(base.content_[0].value)
+            declaration = ' '.join(decls)
+
+            def content(contentnode):
+                if nodeDef.includes:
+                    for include in nodeDef.includes:
+                        contentnode.extend(self.render(include,
+                                                       new_context.create_child_context(include)))
+                rendered_data = self.render(file_data, parent_context)
+                contentnode.extend(rendered_data)
+
+            assert kind in ('class', 'struct', 'interface')
+            display_obj_type = 'interface' if kind == 'interface' else None
+            nodes = self.handle_declaration(nodeDef, declaration, content_callback=content,
+                                            display_obj_type=display_obj_type)
+        return nodes
+
+    def visit_compound(self, node, render_empty_node=True, **kwargs):
         # Read in the corresponding xml file and process
         file_data = self.compound_parser.parse(node.refid)
 
@@ -695,6 +751,10 @@ class SphinxRenderer(object):
             dom = self.get_domain()
             assert not dom or dom in ('c', 'cpp')
             return self.visit_union(node)
+        if kind in ('struct', 'class', 'interface'):
+            dom = self.get_domain()
+            if not dom or dom in ('c', 'cpp'):
+                return self.visit_class(node)
 
         parent_context = self.context.create_child_context(file_data)
         new_context = parent_context.create_child_context(file_data.compounddef)
