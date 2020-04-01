@@ -194,3 +194,11 @@ C++ Enums
 
 .. doxygenfile:: cpp_enum.h
    :project: cpp_enum
+
+C++ Functions
+-------------
+
+.. cpp:namespace:: @ex_specific_cpp_function
+
+.. doxygenfile:: cpp_function.h
+   :project: cpp_function

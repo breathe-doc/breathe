@@ -258,8 +258,9 @@ def render(app, member_def, domain=None, show_define_initializer=False):
 
 
 def test_render_func(app):
-    member_def = WrappedMemberDef(kind='function', definition='void foo', argsstring='(int)', virt='non-virtual',
-                               param=[WrappedParam(type_=WrappedLinkedText(content_=[WrappedMixedContainer(value=u'int')]))])
+    member_def = WrappedMemberDef(kind='function', definition='void foo', type_='void', name='foo', argsstring='(int)',
+                                  virt='non-virtual',
+                                  param=[WrappedParam(type_=WrappedLinkedText(content_=[WrappedMixedContainer(value=u'int')]))])
     signature = find_node(render(app, member_def), 'desc_signature')
     assert signature.astext().startswith('void')
     assert find_node(signature, 'desc_name')[0] == 'foo'
@@ -299,35 +300,35 @@ def test_render_using_alias(app):
 
 
 def test_render_const_func(app):
-    member_def = WrappedMemberDef(kind='function', definition='void f', argsstring='() const',
+    member_def = WrappedMemberDef(kind='function', definition='void f', type_='void', name='f', argsstring='() const',
                                virt='non-virtual', const='yes')
     signature = find_node(render(app, member_def), 'desc_signature')
     assert '_CPPv2NK1fEv' in signature['ids']
 
 
 def test_render_lvalue_func(app):
-    member_def = WrappedMemberDef(kind='function', definition='void f', argsstring='()',
+    member_def = WrappedMemberDef(kind='function', definition='void f', type_='void', name='f', argsstring='() &',
                                virt='non-virtual', refqual='lvalue')
     signature = find_node(render(app, member_def), 'desc_signature')
     assert signature.astext().endswith('&')
 
 
 def test_render_rvalue_func(app):
-    member_def = WrappedMemberDef(kind='function', definition='void f', argsstring='()',
+    member_def = WrappedMemberDef(kind='function', definition='void f', type_='void', name='f', argsstring='() &&',
                                virt='non-virtual', refqual='rvalue')
     signature = find_node(render(app, member_def), 'desc_signature')
     assert signature.astext().endswith('&&')
 
 
 def test_render_const_lvalue_func(app):
-    member_def = WrappedMemberDef(kind='function', definition='void f', argsstring='()',
+    member_def = WrappedMemberDef(kind='function', definition='void f', type_='void', name='f',argsstring='() const &',
                                virt='non-virtual', const='yes', refqual='lvalue')
     signature = find_node(render(app, member_def), 'desc_signature')
     assert signature.astext().endswith('const &')
 
 
 def test_render_const_rvalue_func(app):
-    member_def = WrappedMemberDef(kind='function', definition='void f', argsstring='()',
+    member_def = WrappedMemberDef(kind='function', definition='void f', type_='void', name='f', argsstring='() const &&',
                                virt='non-virtual', const='yes', refqual='rvalue')
     signature = find_node(render(app, member_def), 'desc_signature')
     assert signature.astext().endswith('const &&')

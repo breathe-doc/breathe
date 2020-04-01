@@ -58,6 +58,10 @@ class CPPUnionObject(BaseObject, cpp.CPPUnionObject):
     pass
 
 
+class CPPFunctionObject(BaseObject, cpp.CPPFunctionObject):
+    pass
+
+
 class CPPMemberObject(BaseObject, cpp.CPPMemberObject):
     pass
 
@@ -81,6 +85,10 @@ class CStructObject(BaseObject, c.CStructObject):
 
 
 class CUnionObject(BaseObject, c.CUnionObject):
+    pass
+
+
+class CFunctionObject(BaseObject, c.CFunctionObject):
     pass
 
 
@@ -108,10 +116,10 @@ class DomainDirectiveFactory(object):
         'class': (CPPClassObject, 'class'),
         'struct': (CPPClassObject, 'struct'),
         'interface': (CPPClassObject, 'class'),
-        'function': (cpp.CPPFunctionObject, 'function'),
-        'friend': (cpp.CPPFunctionObject, 'function'),
-        'signal': (cpp.CPPFunctionObject, 'function'),
-        'slot': (cpp.CPPFunctionObject, 'function'),
+        'function': (CPPFunctionObject, 'function'),
+        'friend': (CPPFunctionObject, 'function'),
+        'signal': (CPPFunctionObject, 'function'),
+        'slot': (CPPFunctionObject, 'function'),
         'enum': (CPPEnumObject, 'enum'),
         'typedef': (CPPTypeObject, 'type'),
         'using': (CPPTypeObject, 'type'),
@@ -122,7 +130,7 @@ class DomainDirectiveFactory(object):
     }
     c_classes = {
         'variable': (CMemberObject, 'var'),
-        'function': (c.CFunctionObject, 'function'),
+        'function': (CFunctionObject, 'function'),
         'define': (c.CMacroObject, 'macro'),
         'struct': (CStructObject, 'struct'),
         'union': (CUnionObject, 'union'),
@@ -1292,58 +1300,71 @@ class SphinxRenderer(object):
         return self.render_iterable(node.content_)
 
     def visit_function(self, node):
-        # Get full function signature for the domain directive.
-        param_list = []
-        for param in node.param:
-            param = self.context.mask_factory.mask(param)
-            param_decl = get_param_decl(param)
-            param_list.append(param_decl)
-        templatePrefix = self.create_template_prefix(node)
-        signature = '{0}{1}({2})'.format(
-            templatePrefix,
-            get_definition_without_template_args(node),
-            ', '.join(param_list))
+        dom = self.get_domain()
+        if not dom or dom in ('c', 'cpp'):
+            names = self.get_qualification()
+            names.append(node.get_name())
+            declaration = ' '.join([
+                self.create_template_prefix(node),
+                ''.join(n.astext() for n in self.render(node.get_type())),
+                self.join_nested_name(names),
+                node.get_argsstring()
+            ])
+            nodes = self.handle_declaration(node, declaration)
+            return nodes
+        else:
+            # Get full function signature for the domain directive.
+            param_list = []
+            for param in node.param:
+                param = self.context.mask_factory.mask(param)
+                param_decl = get_param_decl(param)
+                param_list.append(param_decl)
+            templatePrefix = self.create_template_prefix(node)
+            signature = '{0}{1}({2})'.format(
+                templatePrefix,
+                get_definition_without_template_args(node),
+                ', '.join(param_list))
 
-        # Add CV-qualifiers.
-        if node.const == 'yes':
-            signature += ' const'
-        # The doxygen xml output doesn't register 'volatile' as the xml attribute for functions
-        # until version 1.8.8 so we also check argsstring:
-        #     https://bugzilla.gnome.org/show_bug.cgi?id=733451
-        if node.volatile == 'yes' or node.argsstring.endswith('volatile'):
-            signature += ' volatile'
+            # Add CV-qualifiers.
+            if node.const == 'yes':
+                signature += ' const'
+            # The doxygen xml output doesn't register 'volatile' as the xml attribute for functions
+            # until version 1.8.8 so we also check argsstring:
+            #     https://bugzilla.gnome.org/show_bug.cgi?id=733451
+            if node.volatile == 'yes' or node.argsstring.endswith('volatile'):
+                signature += ' volatile'
 
-        if node.refqual == 'lvalue':
-            signature += '&'
-        elif node.refqual == 'rvalue':
-            signature += '&&'
+            if node.refqual == 'lvalue':
+                signature += '&'
+            elif node.refqual == 'rvalue':
+                signature += '&&'
 
-        # Add `= 0` for pure virtual members.
-        if node.virt == 'pure-virtual':
-            signature += '= 0'
+            # Add `= 0` for pure virtual members.
+            if node.virt == 'pure-virtual':
+                signature += '= 0'
 
-        self.context.directive_args[1] = [signature]
+            self.context.directive_args[1] = [signature]
 
-        nodes = self.run_domain_directive(node.kind, self.context.directive_args[1])
-        if debug_trace_doxygen_ids:
-            ts = self.create_doxygen_target(node)
-            if len(ts) == 0:
-                print("{}Doxygen target (old): (none)".format(
-                    '  ' * debug_trace_directives_indent))
-            else:
-                print("{}Doxygen target (old): {}".format(
-                    '  ' * debug_trace_directives_indent, ts[0]['ids']))
+            nodes = self.run_domain_directive(node.kind, self.context.directive_args[1])
+            if debug_trace_doxygen_ids:
+                ts = self.create_doxygen_target(node)
+                if len(ts) == 0:
+                    print("{}Doxygen target (old): (none)".format(
+                        '  ' * debug_trace_directives_indent))
+                else:
+                    print("{}Doxygen target (old): {}".format(
+                        '  ' * debug_trace_directives_indent, ts[0]['ids']))
 
-        rst_node = nodes[1]
-        finder = NodeFinder(rst_node.document)
-        rst_node.walk(finder)
+            rst_node = nodes[1]
+            finder = NodeFinder(rst_node.document)
+            rst_node.walk(finder)
 
-        # Templates have multiple signature nodes in recent versions of Sphinx.
-        # Insert Doxygen target into the first signature node.
-        rst_node.children[0].insert(0, self.create_doxygen_target(node))
+            # Templates have multiple signature nodes in recent versions of Sphinx.
+            # Insert Doxygen target into the first signature node.
+            rst_node.children[0].insert(0, self.create_doxygen_target(node))
 
-        finder.content.extend(self.description(node))
-        return nodes
+            finder.content.extend(self.description(node))
+            return nodes
 
     def visit_define(self, node):
         declaration = node.name

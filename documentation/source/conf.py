@@ -218,6 +218,7 @@ breathe_projects = {
     "cpp_anon":"../../examples/specific/cpp_anon/xml/",
     "cpp_enum":"../../examples/specific/cpp_enum/xml/",
     "cpp_union":"../../examples/specific/cpp_union/xml/",
+    "cpp_function":"../../examples/specific/cpp_function/xml/",
     }
 
 breathe_projects_source = {
