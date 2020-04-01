@@ -124,7 +124,7 @@ class DomainDirectiveFactory(object):
         'typedef': (CPPTypeObject, 'type'),
         'using': (CPPTypeObject, 'type'),
         'union': (CPPUnionObject, 'union'),
-        'namespace': (cpp.CPPTypeObject, 'type'),
+        'namespace': (CPPTypeObject, 'type'),
         'enumvalue': (CPPEnumeratorObject, 'enumerator'),
         'define': (c.CMacroObject, 'macro'),
     }
@@ -748,6 +748,35 @@ class SphinxRenderer(object):
                                             display_obj_type=display_obj_type)
         return nodes
 
+    def visit_namespace(self, node):
+        # Read in the corresponding xml file and process
+        file_data = self.compound_parser.parse(node.refid)
+        nodeDef = file_data.compounddef
+
+        parent_context = self.context.create_child_context(file_data)
+        new_context = parent_context.create_child_context(file_data.compounddef)
+
+        with WithContext(self, new_context):
+            # Pretend that the signature is being rendered in context of the
+            # definition, for proper domain detection
+            names = self.get_qualification()
+            if self.nesting_level == 0:
+                names.extend(nodeDef.compoundname.split('::'))
+            else:
+                names.append(nodeDef.compoundname.split('::')[-1])
+            declaration = self.join_nested_name(names)
+
+            def content(contentnode):
+                if nodeDef.includes:
+                    for include in nodeDef.includes:
+                        contentnode.extend(self.render(include,
+                                                       new_context.create_child_context(include)))
+                rendered_data = self.render(file_data, parent_context)
+                contentnode.extend(rendered_data)
+            nodes = self.handle_declaration(nodeDef, declaration, content_callback=content,
+                                            display_obj_type='namespace')
+        return nodes
+
     def visit_compound(self, node, render_empty_node=True, **kwargs):
         # Read in the corresponding xml file and process
         file_data = self.compound_parser.parse(node.refid)
@@ -759,10 +788,14 @@ class SphinxRenderer(object):
             dom = self.get_domain()
             assert not dom or dom in ('c', 'cpp')
             return self.visit_union(node)
-        if kind in ('struct', 'class', 'interface'):
+        elif kind in ('struct', 'class', 'interface'):
             dom = self.get_domain()
             if not dom or dom in ('c', 'cpp'):
                 return self.visit_class(node)
+        elif kind == 'namespace':
+            dom = self.get_domain()
+            if not dom or dom in ('c', 'cpp'):
+                return self.visit_namespace(node)
 
         parent_context = self.context.create_child_context(file_data)
         new_context = parent_context.create_child_context(file_data.compounddef)
