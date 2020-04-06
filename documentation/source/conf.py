@@ -220,6 +220,7 @@ breathe_projects = {
     "cpp_union":"../../examples/specific/cpp_union/xml/",
     "cpp_function":"../../examples/specific/cpp_function/xml/",
     "cpp_inherited_members":"../../examples/specific/cpp_inherited_members/xml/",
+    "cpp_trailing_return_type":"../../examples/specific/cpp_trailing_return_type/xml/",
     }
 
 breathe_projects_source = {

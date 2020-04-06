@@ -210,3 +210,11 @@ C++ Inherited Members
 
 .. doxygenfile:: cpp_inherited_members.h
    :project: cpp_inherited_members
+
+C++ Trailing Return Type
+------------------------
+
+.. cpp:namespace:: @ex_specific_cpp_trailing_return_type
+
+.. doxygenfile:: cpp_trailing_return_type.h
+   :project: cpp_trailing_return_type

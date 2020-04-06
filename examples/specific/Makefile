@@ -25,6 +25,7 @@ projects  = nutshell alias rst inline namespacefile array inheritance \
 			template_function template_type_alias template_specialisation \
 			enum define interface \
 			cpp_anon cpp_enum cpp_union cpp_function cpp_inherited_members \
+			cpp_trailing_return_type \
 			c_file c_struct c_enum c_typedef c_macro c_union
 
 special   = programlisting decl_impl multifilexml auto class typedef
