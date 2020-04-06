@@ -202,3 +202,11 @@ C++ Functions
 
 .. doxygenfile:: cpp_function.h
    :project: cpp_function
+
+C++ Inherited Members
+---------------------
+
+.. cpp:namespace:: @ex_specific_cpp_inherited_members
+
+.. doxygenfile:: cpp_inherited_members.h
+   :project: cpp_inherited_members
