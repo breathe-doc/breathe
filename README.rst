@@ -173,6 +173,10 @@ Change Log
 
 Inspired by `Keepachangelog.com <http://keepachangelog.com/>`__.
 
+- Unreleased - Breathe v4.14.3
+
+  - Add license file to distribution. #492
+
 - 2020-04-07 - Breathe v4.14.2
 
   - Add GitHub actions. #474
