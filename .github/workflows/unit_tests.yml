@@ -8,22 +8,10 @@ jobs:
       matrix:
         python-version: [3.5, 3.6, 3.7, 3.8]
         sphinx-version:
-          - 2.0.0
-          - 2.0.1
-          - 2.1.0
-          - 2.1.1
-          - 2.1.2
-          - 2.2.0
-          - 2.2.1
-          - 2.2.2
-          - 2.3.0
-          - 2.4.0
-          - 2.4.1
-          - 2.4.2
-          - 2.4.3
-          - 2.4.4
-          - git+https://github.com/sphinx-doc/sphinx.git@2.x
-          #- git+https://github.com/sphinx-doc/sphinx.git@3.x
+          - 3.0.0
+          - git+https://github.com/sphinx-doc/sphinx.git@3.0.x
+          - git+https://github.com/sphinx-doc/sphinx.git@3.x
+          # master (Sphinx 4) will require at least Python 3.6, so disable it for now
           #- git+https://github.com/sphinx-doc/sphinx.git@master
 
     steps:

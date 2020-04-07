@@ -20,7 +20,8 @@ With the following config value::
 
 It produces this output:
 
+.. cpp:namespace:: @ex_autoindex
+
 .. autodoxygenindex::
    :project: auto
-   :no-link:
 

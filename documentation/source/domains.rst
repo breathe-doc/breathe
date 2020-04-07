@@ -15,6 +15,8 @@ The following targets are supported:
 Class Example
 -------------
 
+.. cpp:namespace:: @ex_domains_class
+
 Given the following Breathe directives::
 
    .. doxygenclass:: testnamespace::NamespacedClassTest
@@ -38,6 +40,8 @@ which renders as: :cpp:class:`another reference <testnamespace::NamespacedClassT
 Inner Class Example
 -------------------
 
+.. cpp:namespace:: @ex_domains_inner_class
+
 Given the following Breathe directive::
 
    .. doxygenclass:: OuterClass
@@ -58,6 +62,8 @@ which renders as :cpp:class:`OuterClass::InnerClass`.
 
 Function Examples
 -----------------
+
+.. cpp:namespace:: @ex_domains_function
 
 Given the following Breathe directives::
 
@@ -99,6 +105,8 @@ which renders as: :c:func:`another reference <frob_foos()>`. Note the use of the
 Typedef Examples
 ----------------
 
+.. cpp:namespace:: @ex_domains_typedef
+
 Given the following Breathe directives::
 
    .. doxygentypedef:: TestTypedef
@@ -139,6 +147,8 @@ which renders as :cpp:type:`TestClass::MemberTypedef`.
 
 Enum Value Examples
 -------------------
+
+.. cpp:namespace:: @ex_domains_enum
 
 Given the following Breathe directives::
 

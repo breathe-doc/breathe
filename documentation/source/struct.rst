@@ -42,6 +42,8 @@ variable to set it in the ``conf.py``.
 Basic Example
 -------------
 
+.. cpp:namespace:: @ex_struct_basic
+
 This displays the struct documentation without any members:
 
 .. code-block:: rst
@@ -53,11 +55,12 @@ It produces this output:
 
 .. doxygenstruct:: StructTest
    :project: struct
-   :no-link:
 
 
 Members Example
 ---------------
+
+.. cpp:namespace:: @ex_struct_members
 
 This directive call will display the struct documentation with all the public
 members:
@@ -73,11 +76,12 @@ It produces this output:
 .. doxygenstruct:: StructTest
    :project: struct
    :members:
-   :no-link:
 
 
 Specific Members Example
 ------------------------
+
+.. cpp:namespace:: @ex_struct_members_specific
 
 This displays the struct documentation with only the members listed in the
 ``:members:`` option:
@@ -93,11 +97,12 @@ It produces this output:
 .. doxygenstruct:: StructTest
    :project: struct
    :members: publicFunction, protectedFunction
-   :no-link:
 
 
 Protected Members
 -----------------
+
+.. cpp:namespace:: @ex_struct_members_protected
 
 This displays only the protected members of the struct. Normally this is combined
 with the ``:members:`` option to show the public members as well.
@@ -113,11 +118,12 @@ It produces this output:
 .. doxygenstruct:: StructTest
    :project: struct
    :protected-members:
-   :no-link:
 
 
 Private Members
 ---------------
+
+.. cpp:namespace:: @ex_struct_members_private
 
 This displays only the private members of the struct. Normally this is combined
 with the ``:members:`` option to show the public members as well.
@@ -133,11 +139,12 @@ It produces this output:
 .. doxygenstruct:: StructTest
    :project: struct
    :private-members:
-   :no-link:
 
 
 Undocumented Members
 --------------------
+
+.. cpp:namespace:: @ex_struct_members_undocumented
 
 This displays the undocumented members of the struct which are suppressed by
 default. Undocumented public members are only shown if the ``:members:`` option
@@ -159,7 +166,6 @@ It produces this output:
    :members:
    :private-members:
    :undoc-members:
-   :no-link:
 
 .. note::
 
@@ -170,6 +176,8 @@ It produces this output:
 
 Outline Example
 ---------------
+
+.. cpp:namespace:: @ex_struct_outline
 
 This displays only the names of the struct members and not their
 documentation. The ``:members:`` and ``:private-members:`` options determine
@@ -188,11 +196,12 @@ It produces this output:
    :project: struct
    :members:
    :outline:
-   :no-link:
 
 
 Failing Example
 ---------------
+
+.. cpp:namespace:: @ex_struct_failing
 
 This intentionally fails:
 

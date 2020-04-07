@@ -18,6 +18,8 @@ extensions listed in the :ref:`breathe_implementation_filename_extensions
 Working Example
 ---------------
 
+.. cpp:namespace:: @ex_function_example
+
 This should work::
 
    .. doxygenfunction:: open
@@ -27,10 +29,11 @@ It produces this output:
 
 .. doxygenfunction:: open
    :project: structcmd
-   :no-link:
 
 Separated Declaration & Implementation Example
 ----------------------------------------------
+
+.. cpp:namespace:: @ex_function_separated
 
 This should work::
 
@@ -41,10 +44,11 @@ It produces this output:
 
 .. doxygenfunction:: open_di
    :project: decl_impl
-   :no-link:
 
 Failing Example
 ---------------
+
+.. cpp:namespace:: @ex_function_failing
 
 This intentionally fails::
 

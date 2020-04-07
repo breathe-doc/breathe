@@ -13,9 +13,9 @@ description text ends have failed. Something for future work.
 Example
 -------
 
+.. cpp:namespace:: @ex_inline
 
 .. doxygenindex:: 
    :path: ../../examples/specific/inline/xml
-   :no-link:
 
 

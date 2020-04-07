@@ -13,6 +13,8 @@ within appropriately demarcated sections.
 reStructuredText
 ----------------
 
+.. cpp:namespace:: @ex_markups_rst
+
 Breathe supports reStructuredText within doxygen **verbatim** blocks which begin
 with the markup **embed:rst**. This means that a comment block like this::
 
@@ -29,10 +31,11 @@ Will be rendered as:
 
 .. doxygenfunction:: TestClass::rawVerbatim
    :project: rst
-   :no-link:
 
 Handling Leading Asterisks
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. cpp:namespace:: @ex_markups_leading_star
 
 Note that doxygen captures **all** content in a **verbatim** block.  This can
 be rather an annoyance if you use a leading-asterisk style of comment block
@@ -86,12 +89,13 @@ This will appropriately handle the leading asterisks and render as:
 
 .. doxygenfunction:: TestClass::rawLeadingAsteriskVerbatim
    :project: rst
-   :no-link:
 
 ----
 
 Handling Leading Slashes
 ~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. cpp:namespace:: @ex_markups_leading_slash
 
 Similar troubles can be encountered when using comment blocks that start with a
 triple forward slash. For example::
@@ -120,12 +124,13 @@ This will appropriately handle the leading slashes and render as:
 
 .. doxygenfunction:: TestClass::rawLeadingSlashesVerbatim
    :project: rst
-   :no-link:
 
 ----
 
 Aliases
 ~~~~~~~
+
+.. cpp:namespace:: @ex_markups_aliases
 
 To make these blocks appears as more appropriate doxygen-like markup in your
 comments you can add the following aliases to your doxygen configuration file::
@@ -165,6 +170,5 @@ Which will be rendered as:
 
 .. doxygenfunction:: TestClass::function
    :project: rst
-   :no-link:
 
 

@@ -2,6 +2,8 @@
 Groups
 ======
 
+.. cpp:namespace:: @ex_groups
+
 Breathe has basic support for the grouping functionality that Doxygen provides.
 
 Using the example from the Doxygen docs:

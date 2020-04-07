@@ -18,12 +18,13 @@ DOCDIR    = $(INSTALL)/share/doc/packages/doxygen
 QTDIR     = 
 HAVE_DOT  = /usr/bin/dot
 
-projects  = nutshell alias rst inline namespacefile c_file array c_enum inheritance \
+projects  = nutshell alias rst inline namespacefile array inheritance \
 			members userdefined fixedwidthfont latexmath functionOverload \
 			image name union group struct struct_function qtsignalsandslots lists \
 			headings links parameters template_class template_class_non_type \
 			template_function template_type_alias template_specialisation \
-			enum c_typedef define interface
+			enum define interface \
+			c_file c_struct c_enum c_typedef c_macro c_union
 
 special   = programlisting decl_impl multifilexml auto class typedef
 

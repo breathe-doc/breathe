@@ -37,8 +37,8 @@ travis_build = os.environ.get('TRAVIS_CI', None) == 'True'
 # Get a description of the current position. Use Popen for 2.6 compat
 git_tag = subprocess.Popen(['git', 'describe', '--tags'], stdout=subprocess.PIPE).communicate()[0]
 
-# Convert to unicode for python3
-git_tag = unicode(git_tag)
+# convert from bytes to string
+git_tag = git_tag.decode('ascii')
 
 if travis_build:
 
@@ -208,8 +208,11 @@ breathe_projects = {
     "union":"../../examples/specific/union/xml/",
     "qtsignalsandslots":"../../examples/specific/qtsignalsandslots/xml/",
     "array":"../../examples/specific/array/xml/",
+    "c_struct":"../../examples/specific/c_struct/xml/",
     "c_enum":"../../examples/specific/c_enum/xml/",
     "c_typedef":"../../examples/specific/c_typedef/xml/",
+    "c_macro":"../../examples/specific/c_macro/xml/",
+    "c_union":"../../examples/specific/c_union/xml/",
     "define":"../../examples/specific/define/xml/",
     "multifile":"../../examples/specific/multifilexml/xml/",
     }
@@ -226,10 +229,9 @@ breathe_domain_by_extension = {
         }
 
 breathe_domain_by_file_pattern = {
-        "*/class.h" : "cpp",
-        "*/alias.h" : "c",
-        "*/c_enum.h" : "c",
-        "c_typedef.h" : "c",
+        "class.h" : "cpp",
+        "alias.h" : "c",
+        "c_*.h" : "c",
         }
 
 breathe_use_project_refids = True
@@ -317,8 +319,8 @@ htmlhelp_basename = 'BreatheExampledoc'
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title, author, document class [howto/manual]).
 latex_documents = [
-  ('index', 'BreatheExample.tex', ur'BreatheExample Documentation',
-   ur'Michael Jones', 'manual'),
+  ('index', 'BreatheExample.tex', 'BreatheExample Documentation',
+   'Michael Jones', 'manual'),
 ]
 
 # The name of an image file (relative to this directory) to place at the top of

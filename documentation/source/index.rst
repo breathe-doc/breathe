@@ -139,6 +139,8 @@ You get something like this:
 
 ----
 
+.. cpp:namespace:: @ex_index
+
 .. doxygenclass:: Nutshell
    :project: nutshell
    :members:

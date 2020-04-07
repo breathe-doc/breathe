@@ -7,6 +7,8 @@ doxygentypedef Directive Example
 Working Example
 ---------------
 
+.. cpp:namespace:: @ex_typedef_example
+
 This should work::
 
    .. doxygentypedef:: UINT32
@@ -16,10 +18,11 @@ It produces this output:
 
 .. doxygentypedef:: UINT32
   :project: structcmd
-  :no-link:
 
 Example with Namespace
 ----------------------
+
+.. cpp:namespace:: @ex_typedef_namespace
 
 This should work::
 
@@ -30,10 +33,11 @@ It produces this output:
 
 .. doxygentypedef:: foo::ns::MyInt
    :project: namespace
-   :no-link:
 
 Failing Example
 ---------------
+
+.. cpp:namespace:: @ex_typedef_failing
 
 This intentionally fails::
 

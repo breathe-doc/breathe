@@ -53,11 +53,9 @@ class DoxyCPPClassObject(cpp.CPPClassObject):
 
             # build a name object
             # TODO: work out if we can use base.refid in a pending_xref somewhere
-            try:
-                parser = cpp.DefinitionParser(namestr, self, self.env.config)
-            except TypeError:
-                # sphinx < 1.5
-                parser = cpp.DefinitionParser(namestr, self)
+            parser = cpp.DefinitionParser(namestr,
+                                          location=self.get_source_info(),
+                                          config=self.env.config)
             name = parser._parse_nested_name()
             parser.assert_end()
 
@@ -89,7 +87,17 @@ class DomainDirectiveFactory(object):
         'union': (cpp.CPPUnionObject, 'union'),
         'namespace': (cpp.CPPTypeObject, 'type'),
         'enumvalue': (cpp.CPPEnumeratorObject, 'enumerator'),
-        'define': (c.CObject, 'macro')
+        'define': (c.CMacroObject, 'macro'),
+    }
+    c_classes = {
+        'variable': (c.CMemberObject, 'var'),
+        'function': (c.CFunctionObject, 'function'),
+        'define': (c.CMacroObject, 'macro'),
+        'struct': (c.CStructObject, 'struct'),
+        'union': (c.CUnionObject, 'union'),
+        'enum': (c.CEnumObject, 'enum'),
+        'enumvalue': (c.CEnumeratorObject, 'enumerator'),
+        'typedef': (c.CTypeObject, 'type'),
     }
 
     python_classes = {
@@ -117,8 +125,12 @@ class DomainDirectiveFactory(object):
     @staticmethod
     def create(domain, args):
         if domain == 'c':
-            return c.CObject(*args)
-        if domain == 'py':
+            if args[0] not in DomainDirectiveFactory.c_classes:
+                print("Unknown C directive:", args[0])
+                print("args:", args)
+            cls, name = DomainDirectiveFactory.c_classes[args[0]]
+            args[1] = [n.replace('::', '.') for n in args[1]]
+        elif domain == 'py':
             cls, name = DomainDirectiveFactory.python_classes.get(
                 args[0], (python.PyClasslike, 'class'))
             args[1] = [DomainDirectiveFactory.fix_python_signature(n) for n in args[1]]

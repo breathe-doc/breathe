@@ -1,6 +1,8 @@
 Template
 ========
 
+.. cpp:namespace:: @ex_template_first
+
 Breathe has support for class and function templates. They are output as
 follows. For a class with a single template parameter::
 
@@ -18,6 +20,8 @@ It renders as:
 
 ----
 
+.. cpp:namespace:: @ex_template_multiple
+
 With multiple template parameters it renders as:
 
 ----
@@ -28,6 +32,8 @@ With multiple template parameters it renders as:
 
 ----
 
+.. cpp:namespace:: @ex_template_function_single
+
 A function with single template parameter renders as:
 
 ----
@@ -36,6 +42,8 @@ A function with single template parameter renders as:
    :project: template_function
 
 ----
+
+.. cpp:namespace:: @ex_template_function_multiple
 
 With multiple template parameters it renders as:
 

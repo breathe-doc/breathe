@@ -7,6 +7,8 @@ doxygenenumvalue Directive Example
 Working Example
 ---------------
 
+.. cpp:namespace:: @ex_enumvalue_example
+
 This should work::
 
    .. doxygenenumvalue:: TIXML_NO_ERROR
@@ -16,10 +18,11 @@ It produces this output:
 
 .. doxygenenumvalue:: TIXML_NO_ERROR
   :project: tinyxml
-  :no-link:
 
 Example with Namespace
 ----------------------
+
+.. cpp:namespace:: @ex_enumvalue_namespace
 
 This should work::
 
@@ -30,10 +33,11 @@ It produces this output:
 
 .. doxygenenumvalue:: foo::ns::A
    :project: namespace
-   :no-link:
 
 Failing Example
 ---------------
+
+.. cpp:namespace:: @ex_enumvalue_failing
 
 This intentionally fails::
 

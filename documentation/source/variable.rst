@@ -7,6 +7,8 @@ doxygenvariable Directive Example
 Working Example
 ---------------
 
+.. cpp:namespace:: @ex_variable_example
+
 This should work::
 
    .. doxygenvariable:: global_cache_tree
@@ -19,6 +21,8 @@ It produces this output:
 
 Failing Example
 ---------------
+
+.. cpp:namespace:: @ex_variable_failing
 
 This intentionally fails::
 
