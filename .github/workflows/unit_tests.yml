@@ -11,7 +11,8 @@ jobs:
           - 3.0.0
           - git+https://github.com/sphinx-doc/sphinx.git@3.0.x
           - git+https://github.com/sphinx-doc/sphinx.git@3.x
-          - git+https://github.com/sphinx-doc/sphinx.git@master
+          # master (Sphinx 4) will require at least Python 3.6, so disable it for now
+          #- git+https://github.com/sphinx-doc/sphinx.git@master
 
     steps:
       - uses: actions/checkout@v2
