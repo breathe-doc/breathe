@@ -173,9 +173,10 @@ Change Log
 
 Inspired by `Keepachangelog.com <http://keepachangelog.com/>`__.
 
-- Unreleased - Breathe v4.14.3
+- Unreleased - Breathe v4.15.0
 
   - Add license file to distribution. #492
+  - Update for Sphinx 3. #491
 
 - 2020-04-07 - Breathe v4.14.2
 
