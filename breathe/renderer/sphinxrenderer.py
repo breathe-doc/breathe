@@ -117,6 +117,7 @@ class CMacroObject(BaseObject, c.CMacroObject):
 class DomainDirectiveFactory(object):
     # A mapping from node kinds to domain directives and their names.
     cpp_classes = {
+        'variable': (CPPMemberObject, 'var'),
         'class': (CPPClassObject, 'class'),
         'struct': (CPPClassObject, 'struct'),
         'interface': (CPPClassObject, 'class'),
@@ -191,8 +192,7 @@ class DomainDirectiveFactory(object):
                 arg_0, (php.PhpClasslike, 'class'))
         else:
             domain = 'cpp'
-            cls, name = DomainDirectiveFactory.cpp_classes.get(
-                args[0], (CPPMemberObject, 'member'))
+            cls, name = DomainDirectiveFactory.cpp_classes[args[0]]
         # Replace the directive name because domain directives don't know how to handle
         # Breathe's "doxygen" directives.
         assert ':' not in name
