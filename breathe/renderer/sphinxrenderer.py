@@ -114,6 +114,12 @@ class CMacroObject(BaseObject, c.CMacroObject):
 
 # ----------------------------------------------------------------------------
 
+class PyFunction(BaseObject, python.PyFunction):
+    pass
+
+
+# ----------------------------------------------------------------------------
+
 class DomainDirectiveFactory(object):
     # A mapping from node kinds to domain directives and their names.
     cpp_classes = {
@@ -144,8 +150,10 @@ class DomainDirectiveFactory(object):
         'typedef': (CTypeObject, 'type'),
     }
     python_classes = {
-        'function': (python.PyModulelevel, 'function'),
-        'variable': (python.PyClassmember, 'attribute')
+        'function': (PyFunction, 'function'),
+        'variable': (python.PyClassmember, 'attribute'),
+        'class': (python.PyClasslike, 'class'),
+        'namespace': (python.PyClasslike, 'class'),
     }
 
     if php is not None:
@@ -158,14 +166,6 @@ class DomainDirectiveFactory(object):
         }
 
     @staticmethod
-    def fix_python_signature(sig):
-        def_ = 'def '
-        if sig.startswith(def_):
-            sig = sig[len(def_):]
-        # Doxygen uses an invalid separator ('::') in Python signatures. Replace them with '.'.
-        return sig.replace('::', '.')
-
-    @staticmethod
     def create(domain, args):
         if domain == 'c':
             if args[0] not in DomainDirectiveFactory.c_classes:
@@ -174,9 +174,8 @@ class DomainDirectiveFactory(object):
             cls, name = DomainDirectiveFactory.c_classes[args[0]]
             args[1] = [n.replace('::', '.') for n in args[1]]
         elif domain == 'py':
-            cls, name = DomainDirectiveFactory.python_classes.get(
-                args[0], (python.PyClasslike, 'class'))
-            args[1] = [DomainDirectiveFactory.fix_python_signature(n) for n in args[1]]
+            cls, name = DomainDirectiveFactory.python_classes[args[0]]
+            args[1] = [n.replace('::', '.') for n in args[1]]
         elif php is not None and domain == 'php':
             separators = php.separators
             arg_0 = args[0]
@@ -1340,15 +1339,19 @@ class SphinxRenderer(object):
 
     def visit_function(self, node):
         dom = self.get_domain()
-        if not dom or dom in ('c', 'cpp'):
+        if not dom or dom in ('c', 'cpp', 'py'):
             names = self.get_qualification()
             names.append(node.get_name())
-            declaration = ' '.join([
-                self.create_template_prefix(node),
-                ''.join(n.astext() for n in self.render(node.get_type())),
-                self.join_nested_name(names),
-                node.get_argsstring()
-            ])
+            name = self.join_nested_name(names)
+            if dom == 'py':
+                declaration = name + node.get_argsstring()
+            else:
+                declaration = ' '.join([
+                    self.create_template_prefix(node),
+                    ''.join(n.astext() for n in self.render(node.get_type())),
+                    name,
+                    node.get_argsstring()
+                ])
             nodes = self.handle_declaration(node, declaration)
             return nodes
         else:
