@@ -118,6 +118,10 @@ class PyFunction(BaseObject, python.PyFunction):
     pass
 
 
+class PyAttribute(BaseObject, python.PyAttribute):
+    pass
+
+
 # ----------------------------------------------------------------------------
 
 class DomainDirectiveFactory(object):
@@ -150,8 +154,12 @@ class DomainDirectiveFactory(object):
         'typedef': (CTypeObject, 'type'),
     }
     python_classes = {
+        # TODO: PyFunction is meant for module-level functions
+        #       and PyAttribute is meant for class attributes, not module-level variables.
+        #       Somehow there should be made a distinction at some point to get the correct
+        #       index-text and whatever other things are different.
         'function': (PyFunction, 'function'),
-        'variable': (python.PyClassmember, 'attribute'),
+        'variable': (PyAttribute, 'attribute'),
         'class': (python.PyClasslike, 'class'),
         'namespace': (python.PyClasslike, 'class'),
     }
@@ -364,7 +372,7 @@ class SphinxRenderer(object):
         sep = '::' if not dom or dom == 'cpp' else '.'
         return sep.join(names)
 
-    def run_directive(self, obj_type, names, contentCallback):
+    def run_directive(self, obj_type, names, contentCallback, options={}):
         args = [obj_type, names] + self.context.directive_args[2:]
         directive = DomainDirectiveFactory.create(self.context.domain, args)
         assert issubclass(type(directive), BaseObject)
@@ -373,6 +381,8 @@ class SphinxRenderer(object):
         # Translate Breathe's no-link option into the standard noindex option.
         if 'no-link' in self.context.directive_args[2]:
             directive.options['noindex'] = True
+        for k, v in options.items():
+            directive.options[k] = v
 
         if debug_trace_directives:
             global debug_trace_directives_indent
@@ -384,6 +394,12 @@ class SphinxRenderer(object):
         self.nesting_level += 1
         nodes = directive.run()
         self.nesting_level -= 1
+
+        # TODO: the directive_args seems to be reused between different run_directives
+        #       so for now, reset the options.
+        #       Remove this once the args are given in a different manner.
+        for k, v in options.items():
+            del directive.options[k]
 
         if debug_trace_directives:
             debug_trace_directives_indent -= 1
@@ -400,7 +416,7 @@ class SphinxRenderer(object):
         return nodes
 
     def handle_declaration(self, node, declaration, *, obj_type=None, content_callback=None,
-                           display_obj_type=None, declarator_callback=None):
+                           display_obj_type=None, declarator_callback=None, options={}):
         if obj_type is None:
             obj_type = node.kind
         if content_callback is None:
@@ -408,7 +424,7 @@ class SphinxRenderer(object):
                 contentnode.extend(self.description(node))
             content_callback = content
         declaration = declaration.replace('\n', ' ')
-        nodes = self.run_directive(obj_type, [declaration], content_callback)
+        nodes = self.run_directive(obj_type, [declaration], content_callback, options)
         if debug_trace_doxygen_ids:
             ts = self.create_doxygen_target(node)
             if len(ts) == 0:
@@ -1476,16 +1492,23 @@ class SphinxRenderer(object):
         names = self.get_qualification()
         names.append(node.name)
         name = self.join_nested_name(names)
-        declaration = ' '.join([
-            self.create_template_prefix(node),
-            ''.join(n.astext() for n in self.render(node.get_type())),
-            name,
-            node.get_argsstring(),
-            self.make_initializer(node)
-        ])
         dom = self.get_domain()
-        if not dom or dom in ('c', 'cpp'):
-            return self.handle_declaration(node, declaration)
+        options = {}
+        if dom == 'py':
+            declaration = name
+            initializer = self.make_initializer(node).strip().lstrip('=').strip()
+            if len(initializer) != 0:
+                options['value'] = initializer
+        else:
+            declaration = ' '.join([
+                self.create_template_prefix(node),
+                ''.join(n.astext() for n in self.render(node.get_type())),
+                name,
+                node.get_argsstring(),
+                self.make_initializer(node)
+            ])
+        if not dom or dom in ('c', 'cpp', 'py'):
+            return self.handle_declaration(node, declaration, options=options)
         else:
             return self.render_declaration(node, declaration)
 

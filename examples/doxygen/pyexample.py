@@ -24,7 +24,7 @@ class PyClass:
         pass
      
     ## A class variable.
-    classVar = 0;
+    classVar = 0
 
     ## @var _memVar
     #  a member variable
