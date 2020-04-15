@@ -108,6 +108,10 @@ class CEnumeratorObject(BaseObject, c.CEnumeratorObject):
     pass
 
 
+class CMacroObject(BaseObject, c.CMacroObject):
+    pass
+
+
 # ----------------------------------------------------------------------------
 
 class DomainDirectiveFactory(object):
@@ -126,12 +130,12 @@ class DomainDirectiveFactory(object):
         'union': (CPPUnionObject, 'union'),
         'namespace': (CPPTypeObject, 'type'),
         'enumvalue': (CPPEnumeratorObject, 'enumerator'),
-        'define': (c.CMacroObject, 'macro'),
+        'define': (CMacroObject, 'macro'),
     }
     c_classes = {
         'variable': (CMemberObject, 'var'),
         'function': (CFunctionObject, 'function'),
-        'define': (c.CMacroObject, 'macro'),
+        'define': (CMacroObject, 'macro'),
         'struct': (CStructObject, 'struct'),
         'union': (CUnionObject, 'union'),
         'enum': (CEnumObject, 'enum'),
@@ -397,7 +401,7 @@ class SphinxRenderer(object):
         return nodes
 
     def handle_declaration(self, node, declaration, *, obj_type=None, content_callback=None,
-                           display_obj_type=None):
+                           display_obj_type=None, declarator_callback=None):
         if obj_type is None:
             obj_type = node.kind
         if content_callback is None:
@@ -442,6 +446,8 @@ class SphinxRenderer(object):
             declarator[0] = self.node_factory.desc_annotation(txt, txt)
         target = self.create_doxygen_target(node)
         declarator.insert(0, target)
+        if declarator_callback:
+            declarator_callback(declarator)
         return nodes
 
     def get_qualification(self):
@@ -1409,11 +1415,12 @@ class SphinxRenderer(object):
                 declaration += parameter.defname
             declaration += ")"
 
-        def update_define_signature(signature, obj_type):
+        # TODO: remove this once Sphinx supports definitions for macros
+        def add_definition(declarator):
             if node.initializer and self.project_info.show_define_initializer():
-                signature.extend([self.node_factory.Text(" ")] + self.render(node.initializer))
+                declarator.extend([self.node_factory.Text(" ")] + self.render(node.initializer))
 
-        return self.render_declaration(node, declaration, update_signature=update_define_signature)
+        return self.handle_declaration(node, declaration, declarator_callback=add_definition)
 
     def visit_enum(self, node):
         def content(contentnode):
