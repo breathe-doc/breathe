@@ -122,6 +122,10 @@ class PyAttribute(BaseObject, python.PyAttribute):
     pass
 
 
+class PyClasslike(BaseObject, python.PyClasslike):
+    pass
+
+
 # ----------------------------------------------------------------------------
 
 class DomainDirectiveFactory(object):
@@ -160,7 +164,7 @@ class DomainDirectiveFactory(object):
         #       index-text and whatever other things are different.
         'function': (PyFunction, 'function'),
         'variable': (PyAttribute, 'attribute'),
-        'class': (python.PyClasslike, 'class'),
+        'class': (PyClasslike, 'class'),
         'namespace': (python.PyClasslike, 'class'),
     }
 
@@ -811,7 +815,7 @@ class SphinxRenderer(object):
             return self.visit_union(node)
         elif kind in ('struct', 'class', 'interface'):
             dom = self.get_domain()
-            if not dom or dom in ('c', 'cpp'):
+            if not dom or dom in ('c', 'cpp', 'py'):
                 return self.visit_class(node)
         elif kind == 'namespace':
             dom = self.get_domain()
