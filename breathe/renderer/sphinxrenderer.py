@@ -165,7 +165,7 @@ class DomainDirectiveFactory(object):
         'function': (PyFunction, 'function'),
         'variable': (PyAttribute, 'attribute'),
         'class': (PyClasslike, 'class'),
-        'namespace': (python.PyClasslike, 'class'),
+        'namespace': (PyClasslike, 'class'),
     }
 
     if php is not None:
@@ -798,8 +798,9 @@ class SphinxRenderer(object):
                                                        new_context.create_child_context(include)))
                 rendered_data = self.render(file_data, parent_context)
                 contentnode.extend(rendered_data)
+            display_obj_type = 'namespace' if self.get_domain() != 'py' else 'module'
             nodes = self.handle_declaration(nodeDef, declaration, content_callback=content,
-                                            display_obj_type='namespace')
+                                            display_obj_type=display_obj_type)
         return nodes
 
     def visit_compound(self, node, render_empty_node=True, **kwargs):
@@ -819,7 +820,7 @@ class SphinxRenderer(object):
                 return self.visit_class(node)
         elif kind == 'namespace':
             dom = self.get_domain()
-            if not dom or dom in ('c', 'cpp'):
+            if not dom or dom in ('c', 'cpp', 'py'):
                 return self.visit_namespace(node)
 
         parent_context = self.context.create_child_context(file_data)
