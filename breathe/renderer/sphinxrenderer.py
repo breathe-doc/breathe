@@ -180,14 +180,9 @@ class DomainDirectiveFactory(object):
     @staticmethod
     def create(domain, args):
         if domain == 'c':
-            if args[0] not in DomainDirectiveFactory.c_classes:
-                print("Unknown C directive:", args[0])
-                print("args:", args)
             cls, name = DomainDirectiveFactory.c_classes[args[0]]
-            args[1] = [n.replace('::', '.') for n in args[1]]
         elif domain == 'py':
             cls, name = DomainDirectiveFactory.python_classes[args[0]]
-            args[1] = [n.replace('::', '.') for n in args[1]]
         elif php is not None and domain == 'php':
             separators = php.separators
             arg_0 = args[0]
