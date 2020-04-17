@@ -30,53 +30,25 @@ class WithContext(object):
         self.previous = None
 
 
-class DoxyCPPClassObject(cpp.CPPClassObject):
-    __bases = []
+class DoxyCPPInterfaceObject(cpp.CPPClassObject):
+    object_type = 'class'
 
     @property
     def display_object_type(self):
-        # override because we also have the 'interface' type
-        assert self.objtype in ('class', 'struct', 'interface')
-        # TODO: remove this if it should be rendered as 'interface' as well
-        if self.objtype == 'interface':
-            return 'class'
-        return self.objtype
+        # override because we have the 'interface' type
+        assert self.objtype == 'interface'
+        return 'class'  # TODO: change to 'interface' if that is the desired rendering
 
     def parse_definition(self, parser):
-        # add the base classes
-        ast = parser.parse_declaration("class", "class")
-
-        bases = []
-
-        for base in self.__bases:
-            namestr = base.content_[0].value
-
-            # build a name object
-            # TODO: work out if we can use base.refid in a pending_xref somewhere
-            parser = cpp.DefinitionParser(namestr,
-                                          location=self.get_source_info(),
-                                          config=self.env.config)
-            name = parser._parse_nested_name()
-            parser.assert_end()
-
-            bases.append(
-                cpp.ASTBaseClass(name, base.prot, base.virt == 'virtual', False)
-            )
-
-        ast.declaration.bases = bases
-
-        return ast
-
-    def augment(self, bases):
-        self.__bases = bases or []
+        return parser.parse_declaration("class", "class")
 
 
 class DomainDirectiveFactory(object):
     # A mapping from node kinds to cpp domain classes and directive names.
     cpp_classes = {
-        'class': (DoxyCPPClassObject, 'class'),
-        'struct': (DoxyCPPClassObject, 'class'),
-        'interface': (DoxyCPPClassObject, 'interface'),
+        'class': (cpp.CPPClassObject, 'class'),
+        'struct': (cpp.CPPClassObject, 'struct'),
+        'interface': (DoxyCPPInterfaceObject, 'interface'),
         'function': (cpp.CPPFunctionObject, 'function'),
         'friend': (cpp.CPPFunctionObject, 'function'),
         'signal': (cpp.CPPFunctionObject, 'function'),
@@ -148,11 +120,13 @@ class DomainDirectiveFactory(object):
             cls, name = DomainDirectiveFactory.php_classes.get(
                 arg_0, (php.PhpClasslike, 'class'))
         else:
+            domain = 'cpp'
             cls, name = DomainDirectiveFactory.cpp_classes.get(
                 args[0], (cpp.CPPMemberObject, 'member'))
         # Replace the directive name because domain directives don't know how to handle
         # Breathe's "doxygen" directives.
-        args = [name] + args[1:]
+        assert ':' not in name
+        args = [domain + ':' + name] + args[1:]
         return cls(*args)
 
 
@@ -356,12 +330,9 @@ class SphinxRenderer(object):
         nodes = self.render(decl.templateparamlist)
         return 'template<' + ''.join(n.astext() for n in nodes) + '>'
 
-    def run_domain_directive(self, kind, names, augment=None):
+    def run_domain_directive(self, kind, names):
         domain_directive = DomainDirectiveFactory.create(
             self.context.domain, [kind, names] + self.context.directive_args[2:])
-
-        if hasattr(domain_directive, 'augment') and augment is not None:
-            domain_directive.augment(**augment)
 
         # Translate Breathe's no-link option into the standard noindex option.
         if 'no-link' in self.context.directive_args[2]:
@@ -498,21 +469,33 @@ class SphinxRenderer(object):
             templatePrefix = self.create_template_prefix(file_data.compounddef)
             arg = "%s %s" % (templatePrefix, self.get_fully_qualified_name())
 
+            # add base classes
             if kind in ('class', 'struct'):
-                augment = dict(bases=file_data.compounddef.basecompoundref)
-            else:
-                augment = None
+                bs = []
+                for base in file_data.compounddef.basecompoundref:
+                    b = []
+                    if base.prot is not None:
+                        b.append(base.prot)
+                    if base.virt == 'virtual':
+                        b.append("virtual")
+                    b.append(base.content_[0].value)
+                    bs.append(" ".join(b))
+                if len(bs) != 0:
+                    arg += " : "
+                    arg += ", ".join(bs)
 
             self.context.directive_args[1] = [arg]
-            nodes = self.run_domain_directive(kind, self.context.directive_args[1], augment=augment)
+
+            nodes = self.run_domain_directive(kind, self.context.directive_args[1])
             rst_node = nodes[1]
 
             finder = NodeFinder(rst_node.document)
             rst_node.walk(finder)
 
-            # The cpp domain in Sphinx doesn't support structs at the moment, so change the text
-            # from "class " to the correct kind which can be "class " or "struct ".
-            finder.declarator[0] = self.node_factory.desc_annotation(kind + ' ', kind + ' ')
+            if kind in ('interface', 'namespace'):
+                # This is not a real C++ declaration type that Sphinx supports,
+                # so we hax the replacement of it.
+                finder.declarator[0] = self.node_factory.desc_annotation(kind + ' ', kind + ' ')
 
             rst_node.children[0].insert(0, doxygen_target)
             return nodes, finder.content
@@ -1062,10 +1045,8 @@ class SphinxRenderer(object):
         return self.render_declaration(node, declaration, update_signature=update_define_signature)
 
     def visit_enum(self, node):
-        # Sphinx requires a name to be a valid identifier, so replace anonymous enum name of the
-        # form @id generated by Doxygen with "@anon_id".
         name = self.get_fully_qualified_name()
-        declaration = name.replace("@", "@anon_") if node.name.startswith("@") else name
+        declaration = name
 
         description_nodes = self.description(node)
         name = self.node_factory.emphasis("", self.node_factory.Text("Values:"))
