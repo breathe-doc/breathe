@@ -1512,6 +1512,25 @@ class SphinxRenderer(object):
         else:
             return self.render_declaration(node, declaration)
 
+    def visit_friendclass(self, node):
+        dom = self.get_domain()
+        assert not dom or dom == 'cpp'
+
+        assert ''.join(n.astext() for n in self.render(node.get_type())) == "friend class"
+        desc = self.node_factory.desc()
+        desc['objtype'] = 'friendclass'
+        signode = self.node_factory.desc_signature()
+        desc += signode
+
+        signode += self.node_factory.desc_annotation('friend class')
+        signode += self.node_factory.Text(' ')
+        # expr = cpp.CPPExprRole(asCode=False)
+        # expr.text = node.name
+        # TODO: set most of the things that SphinxRole.__call__ sets
+        # signode.extend(expr.run())
+        signode += self.node_factory.Text(node.name)
+        return [desc]
+
     def visit_param(self, node):
 
         nodelist = []
@@ -1641,6 +1660,9 @@ class SphinxRenderer(object):
             return self.visit_variable(node)
         if node.kind == "define":
             return self.visit_define(node)
+        if node.kind == "friend":
+            # note, friend functions should be dispatched further up
+            return self.visit_friendclass(node)
         return self.render_declaration(node, update_signature=self.update_signature)
 
     # A mapping from node types to corresponding dispatch and visit methods.
