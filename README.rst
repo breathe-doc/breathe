@@ -176,6 +176,7 @@ Inspired by `Keepachangelog.com <http://keepachangelog.com/>`__.
 - Unreleased - Breathe v4.15.1
 
   - Strictly depend on Sphinx's minor version. #498
+  - Simplifications and fixes, use more of modern Sphinx natively. #503
 
 - 2020-04-07 - Breathe v4.15.0
 
