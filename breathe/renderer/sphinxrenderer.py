@@ -50,6 +50,10 @@ class BaseObject:
 
 # ----------------------------------------------------------------------------
 
+class CPPTypeObject(BaseObject, cpp.CPPTypeObject):
+    pass
+
+
 class CPPEnumObject(BaseObject, cpp.CPPEnumObject):
     pass
 
@@ -59,6 +63,10 @@ class CPPEnumeratorObject(BaseObject, cpp.CPPEnumeratorObject):
 
 
 # ----------------------------------------------------------------------------
+
+class CTypeObject(BaseObject, c.CTypeObject):
+    pass
+
 
 class CEnumObject(BaseObject, c.CEnumObject):
     pass
@@ -94,8 +102,8 @@ class DomainDirectiveFactory(object):
         'signal': (cpp.CPPFunctionObject, 'function'),
         'slot': (cpp.CPPFunctionObject, 'function'),
         'enum': (CPPEnumObject, 'enum'),
-        'typedef': (cpp.CPPTypeObject, 'type'),
-        'using': (cpp.CPPTypeObject, 'type'),
+        'typedef': (CPPTypeObject, 'type'),
+        'using': (CPPTypeObject, 'type'),
         'union': (cpp.CPPUnionObject, 'union'),
         'namespace': (cpp.CPPTypeObject, 'type'),
         'enumvalue': (CPPEnumeratorObject, 'enumerator'),
@@ -109,7 +117,7 @@ class DomainDirectiveFactory(object):
         'union': (c.CUnionObject, 'union'),
         'enum': (CEnumObject, 'enum'),
         'enumvalue': (CEnumeratorObject, 'enumerator'),
-        'typedef': (c.CTypeObject, 'type'),
+        'typedef': (CTypeObject, 'type'),
     }
     python_classes = {
         'function': (python.PyModulelevel, 'function'),
@@ -1250,32 +1258,18 @@ class SphinxRenderer(object):
         return self.handle_declaration(node, declaration, obj_type='enumvalue')
 
     def visit_typedef(self, node):
-        declaration = get_definition_without_template_args(node)
-        typedef = "typedef "
-        using = "using "
-        obj_type = node.kind
-        if declaration.startswith(typedef):
-            declaration = declaration[len(typedef):]
-        elif declaration.startswith(using):
-            declaration = declaration[len(using):]
-            # remove the spurious "typedef " on right hand side added
-            # by Doxygen observed when type is declared inside a namespace
-            # See examples/specific/using_in_ns
-            declaration = declaration.replace(" = typedef ", " = ")
-            obj_type = "using"
-
-        def update_signature(signature, obj_type):
-            """Update the signature node if necessary, e.g. add qualifiers."""
-            prefix = obj_type + ' '
-            annotation = self.node_factory.desc_annotation(prefix, prefix)
-            if signature[0].tagname != 'desc_annotation':
-                signature.insert(0, annotation)
-            else:
-                signature[0] = annotation
-
-        declaration = self.create_template_prefix(node) + declaration
-        return self.render_declaration(node, declaration, objtype=obj_type,
-                                       update_signature=update_signature)
+        type_ = ''.join(n.astext() for n in self.render(node.get_type()))
+        names = self.get_qualification()
+        names.append(node.get_name())
+        name = self.join_nested_name(names)
+        if node.definition.startswith('typedef '):
+            declaration = ' '.join([type_, name, node.get_argsstring()])
+        elif node.definition.startswith('using '):
+            # TODO: looks like Doxygen does not generate the proper XML
+            #       for the template paramter list
+            declaration = self.create_template_prefix(node)
+            declaration += ' ' + name + " = " + type_
+        return self.handle_declaration(node, declaration)
 
     def make_initializer(self, node):
         initializer = node.initializer

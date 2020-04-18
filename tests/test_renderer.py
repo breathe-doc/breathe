@@ -270,19 +270,20 @@ def test_render_func(app):
 
 
 def test_render_typedef(app):
-    member_def = WrappedMemberDef(kind='typedef', definition='typedef int foo')
+    member_def = WrappedMemberDef(kind='typedef', definition='typedef int foo', type_='int', name='foo')
     signature = find_node(render(app, member_def), 'desc_signature')
     assert signature.astext() == 'typedef int foo'
 
 
 def test_render_c_typedef(app):
-    member_def = WrappedMemberDef(kind='typedef', definition='typedef unsigned int bar')
+    member_def = WrappedMemberDef(kind='typedef', definition='typedef unsigned int bar', type_='unsigned int', name='bar')
     signature = find_node(render(app, member_def, domain='c'), 'desc_signature')
     assert signature.astext() == 'typedef unsigned int bar'
 
 
 def test_render_c_function_typedef(app):
-    member_def = WrappedMemberDef(kind='typedef', definition='typedef void* (*voidFuncPtr)(float, int)')
+    member_def = WrappedMemberDef(kind='typedef', definition='typedef void* (*voidFuncPtr)(float, int)',
+                                  type_='void* (*', name='voidFuncPtr', argsstring=')(float, int)')
     signature = find_node(render(app, member_def, domain='c'), 'desc_signature')
     assert signature.astext().startswith('typedef void *')
     params = find_node(signature, 'desc_parameterlist')
@@ -292,7 +293,7 @@ def test_render_c_function_typedef(app):
 
 
 def test_render_using_alias(app):
-    member_def = WrappedMemberDef(kind='typedef', definition='using foo = int')
+    member_def = WrappedMemberDef(kind='typedef', definition='using foo = int', type_='int', name='foo')
     signature = find_node(render(app, member_def), 'desc_signature')
     assert signature.astext() == 'using foo = int'
 
