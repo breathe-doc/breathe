@@ -804,35 +804,22 @@ class SphinxRenderer(object):
 
             latex = item.getValue()
 
-            # Somewhat hacky if statements to strip out the doxygen markup that slips through
-
-            rst_node = None
-
-            # Either inline
+            # Strip out the doxygen markup that slips through
             if latex.startswith("$") and latex.endswith("$"):
                 latex = latex[1:-1]
-
-                # If we're inline create a math node like the :math: role
-                rst_node = self.node_factory.math()
-            else:
-                # Else we're multiline
-                rst_node = self.node_factory.math_block()
-
-            # Or multiline
-            if latex.startswith("\\[") and latex.endswith("\\]"):
+                nodelist.append(self.node_factory.math(text=latex,
+                                                       label=None,
+                                                       nowrap=False,
+                                                       docname=self.state.document.settings.env.docname,
+                                                       number=None))
+            elif latex.startswith("\\[") and latex.endswith("\\]"):
                 latex = latex[2:-2:]
 
-            # Here we steal the core of the mathbase "math" directive handling code from:
-            #    sphinx.ext.mathbase
-            rst_node["latex"] = latex
-
-            # Required parameters which we don't have values for
-            rst_node["label"] = None
-            rst_node["nowrap"] = False
-            rst_node["docname"] = self.state.document.settings.env.docname
-            rst_node["number"] = None
-
-            nodelist.append(rst_node)
+            nodelist.append(self.node_factory.math_block(text=latex,
+                                                         label=None,
+                                                         nowrap=False,
+                                                         docname=self.state.document.settings.env.docname,
+                                                         number=None))
 
         return nodelist
 
