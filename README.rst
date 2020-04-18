@@ -179,6 +179,7 @@ Inspired by `Keepachangelog.com <http://keepachangelog.com/>`__.
   - Simplifications and fixes, use more of modern Sphinx natively. #503
   - Add section option to the doxygenfile directive. #501
   - Fix link generation when enum is inside a group (enum FQDN). #508
+  - Fix creation of LaTeX math formulas. #506
 
 - 2020-04-07 - Breathe v4.15.0
 
