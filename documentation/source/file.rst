@@ -31,7 +31,7 @@ sections, in that order::
 
    .. doxygenfile:: nutshell.h
       :project: nutshell
-      :sections: briefdescription public-type
+      :sections: briefdescription innerclass public-type
 
 It produces this output:
 
@@ -39,7 +39,7 @@ It produces this output:
 
 .. doxygenfile:: nutshell.h
    :project: nutshell
-   :sections: briefdescription public-type
+   :sections: briefdescription innerclass public-type
 
 Example with Nested Namespaces
 ------------------------------
