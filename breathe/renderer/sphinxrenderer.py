@@ -305,7 +305,8 @@ class SphinxRenderer(object):
         for node in node_stack:
             if node.node_type == 'ref' and len(names) == 0:
                 return node.valueOf_
-            if (node.node_type == 'compound' and node.kind not in ['file', 'namespace']) or \
+            if (node.node_type == 'compound' and
+                    node.kind not in ['file', 'namespace', 'group']) or \
                     node.node_type == 'memberdef':
                 # We skip the 'file' entries because the file name doesn't form part of the
                 # qualified name for the identifier. We skip the 'namespace' entries because if we
