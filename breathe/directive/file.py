@@ -68,12 +68,13 @@ class DoxygenFileDirective(BaseFileDirective):
     directive_name = 'doxygenfile'
 
     required_arguments = 0
-    optional_arguments = 2
+    optional_arguments = 3
     option_spec = {
         "path": unchanged_required,
         "project": unchanged_required,
         "outline": flag,
         "no-link": flag,
+        "sections": unchanged_required,
         }
     has_content = False
 
@@ -100,6 +101,7 @@ class AutoDoxygenFileDirective(BaseFileDirective):
         "project": unchanged_required,
         "outline": flag,
         "no-link": flag,
+        "sections": unchanged_required,
         }
     has_content = False
 

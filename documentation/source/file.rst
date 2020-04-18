@@ -21,6 +21,23 @@ It produces this output:
 .. doxygenfile:: nutshell.h
    :project: nutshell
 
+Example with Selected and Ordered Sections
+------------------------------------------
+
+.. cpp:namespace:: @ex_file_section
+
+The following will only show the **briefdescription** and **public-type** sections, in that order.
+
+  .. doxygenfile:: nutshell.h
+     :project: nutshell
+     :sections: briefdescription public-type
+
+----
+
+.. doxygenfile:: nutshell.h
+   :project: nutshell
+   :sections: briefdescription public-type
+
 Example with Nested Namespaces
 ------------------------------
 

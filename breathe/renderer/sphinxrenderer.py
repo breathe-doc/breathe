@@ -584,26 +584,35 @@ class SphinxRenderer(object):
 
     def visit_compounddef(self, node):
 
-        nodelist = []
+        options = self.context.directive_args[2]
+        section_order = None
+        if 'sections' in options:
+            section_order = {sec: i for i, sec in enumerate(options['sections'].split(' '))}
+        nodemap = {}
 
-        nodelist.extend(self.render_optional(node.briefdescription))
-        nodelist.extend(self.render_optional(node.detaileddescription))
+        def addnode(kind, lam):
+            if section_order is None:
+                nodemap[len(nodemap)] = lam()
+            elif kind in section_order:
+                nodemap.setdefault(section_order[kind], []).extend(lam())
 
-        def render_list(node, prefix):
+        addnode('briefdescription', lambda: self.render_optional(node.briefdescription))
+        addnode('detaileddescription', lambda: self.render_optional(node.detaileddescription))
+
+        def render_derivedcompoundref(node):
             if node is None:
-                return
+                return []
             output = self.render_iterable(node)
             if not output:
-                return
-            nodelist.append(
-                self.node_factory.paragraph(
-                    '',
-                    '',
-                    self.node_factory.Text(prefix),
-                    *intersperse(output, self.node_factory.Text(', '))
-                )
-            )
-        render_list(node.derivedcompoundref, 'Subclassed by ')
+                return []
+            return [self.node_factory.paragraph(
+                '',
+                '',
+                self.node_factory.Text('Subclassed by '),
+                *intersperse(output, self.node_factory.Text(', '))
+            )]
+
+        addnode('derivedcompoundref', lambda: render_derivedcompoundref(node.derivedcompoundref))
 
         section_nodelists = {}
 
@@ -614,6 +623,8 @@ class SphinxRenderer(object):
                 # Skip empty section
                 continue
             kind = sectiondef.kind
+            if section_order is not None and kind not in section_order:
+                continue
             rst_node = self.node_factory.container(classes=['breathe-sectiondef'])
             rst_node.document = self.state.document
             rst_node['objtype'] = kind
@@ -621,16 +632,19 @@ class SphinxRenderer(object):
             # We store the nodes as a list against the kind in a dictionary as the kind can be
             # 'user-edited' and that can repeat so this allows us to collect all the 'user-edited'
             # entries together
-            nodes = section_nodelists.setdefault(kind, [])
-            nodes += [rst_node]
+            section_nodelists.setdefault(kind, []).append(rst_node)
 
         # Order the results in an appropriate manner
         for kind, _ in self.sections:
-            nodelist.extend(section_nodelists.get(kind, []))
+            addnode(kind, lambda: section_nodelists.get(kind, []))
 
         # Take care of innerclasses
-        nodelist.extend(self.render_iterable(node.innerclass))
-        nodelist.extend(self.render_iterable(node.innernamespace))
+        addnode('innerclass', lambda: self.render_iterable(node.innerclass))
+        addnode('innernamespace', lambda: self.render_iterable(node.innernamespace))
+
+        nodelist = []
+        for i, nodes_ in sorted(nodemap.items()):
+            nodelist += nodes_
 
         return nodelist
 
