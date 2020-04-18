@@ -24,6 +24,7 @@ class DoxygenToRstRendererFactory(object):
             self.project_info,
             self,
             create_node_factory(),
+            node_stack,
             state,
             document,
             target_handler,

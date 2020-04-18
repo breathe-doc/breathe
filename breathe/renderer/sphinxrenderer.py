@@ -15,6 +15,7 @@ import textwrap
 
 debug_trace_directives = False
 debug_trace_doxygen_ids = False
+debug_trace_qualification = False
 debug_trace_directives_indent = 0
 
 
@@ -35,6 +36,40 @@ class WithContext(object):
         self.previous = None
 
 
+class BaseObject:
+    # Use this class as the first base class to make sure the overrides are used.
+    # Set the content_callback attribute to a function taking a docutils node.
+
+    def transform_content(self, contentnode):
+        super().transform_content(contentnode)
+        callback = getattr(self, "breathe_content_callback", None)
+        if callback is None:
+            return
+        callback(contentnode)
+
+
+# ----------------------------------------------------------------------------
+
+class CPPEnumObject(BaseObject, cpp.CPPEnumObject):
+    pass
+
+
+class CPPEnumeratorObject(BaseObject, cpp.CPPEnumeratorObject):
+    pass
+
+
+# ----------------------------------------------------------------------------
+
+class CEnumObject(BaseObject, c.CEnumObject):
+    pass
+
+
+class CEnumeratorObject(BaseObject, c.CEnumeratorObject):
+    pass
+
+
+# ----------------------------------------------------------------------------
+
 class DoxyCPPInterfaceObject(cpp.CPPClassObject):
     object_type = 'class'
 
@@ -49,7 +84,7 @@ class DoxyCPPInterfaceObject(cpp.CPPClassObject):
 
 
 class DomainDirectiveFactory(object):
-    # A mapping from node kinds to cpp domain classes and directive names.
+    # A mapping from node kinds to domain directives and their names.
     cpp_classes = {
         'class': (cpp.CPPClassObject, 'class'),
         'struct': (cpp.CPPClassObject, 'struct'),
@@ -58,12 +93,12 @@ class DomainDirectiveFactory(object):
         'friend': (cpp.CPPFunctionObject, 'function'),
         'signal': (cpp.CPPFunctionObject, 'function'),
         'slot': (cpp.CPPFunctionObject, 'function'),
-        'enum': (cpp.CPPEnumObject, 'enum'),
+        'enum': (CPPEnumObject, 'enum'),
         'typedef': (cpp.CPPTypeObject, 'type'),
         'using': (cpp.CPPTypeObject, 'type'),
         'union': (cpp.CPPUnionObject, 'union'),
         'namespace': (cpp.CPPTypeObject, 'type'),
-        'enumvalue': (cpp.CPPEnumeratorObject, 'enumerator'),
+        'enumvalue': (CPPEnumeratorObject, 'enumerator'),
         'define': (c.CMacroObject, 'macro'),
     }
     c_classes = {
@@ -72,11 +107,10 @@ class DomainDirectiveFactory(object):
         'define': (c.CMacroObject, 'macro'),
         'struct': (c.CStructObject, 'struct'),
         'union': (c.CUnionObject, 'union'),
-        'enum': (c.CEnumObject, 'enum'),
-        'enumvalue': (c.CEnumeratorObject, 'enumerator'),
+        'enum': (CEnumObject, 'enum'),
+        'enumvalue': (CEnumeratorObject, 'enumerator'),
         'typedef': (c.CTypeObject, 'type'),
     }
-
     python_classes = {
         'function': (python.PyModulelevel, 'function'),
         'variable': (python.PyClassmember, 'attribute')
@@ -238,6 +272,7 @@ class SphinxRenderer(object):
             project_info,
             renderer_factory,
             node_factory,
+            node_stack,
             state,
             document,
             target_handler,
@@ -248,6 +283,8 @@ class SphinxRenderer(object):
         self.project_info = project_info
         self.renderer_factory = renderer_factory
         self.node_factory = node_factory
+        self.qualification_stack = node_stack
+        self.nesting_level = 0
         self.state = state
         self.document = document
         self.target_handler = target_handler
@@ -292,16 +329,123 @@ class SphinxRenderer(object):
             filename = get_filename(file_data.compounddef)
         return self.project_info.domain_for_file(filename) if filename else ''
 
+    def join_nested_name(self, names):
+        dom = self.get_domain()
+        sep = '::' if not dom or dom == 'cpp' else '.'
+        return sep.join(names)
+
+    def run_directive(self, obj_type, names, contentCallback):
+        args = [obj_type, names] + self.context.directive_args[2:]
+        directive = DomainDirectiveFactory.create(self.context.domain, args)
+        assert issubclass(type(directive), BaseObject)
+        directive.breathe_content_callback = contentCallback
+
+        # Translate Breathe's no-link option into the standard noindex option.
+        if 'no-link' in self.context.directive_args[2]:
+            directive.options['noindex'] = True
+
+        if debug_trace_directives:
+            global debug_trace_directives_indent
+            print("{}Running directive: .. {}:: {}".format(
+                '  ' * debug_trace_directives_indent,
+                directive.name, ''.join(names)))
+            debug_trace_directives_indent += 1
+
+        self.nesting_level += 1
+        nodes = directive.run()
+        self.nesting_level -= 1
+
+        if debug_trace_directives:
+            debug_trace_directives_indent -= 1
+
+        # Filter out outer class names if we are rendering a member as a part of a class content.
+        rst_node = nodes[1]
+        finder = NodeFinder(rst_node.document)
+        rst_node.walk(finder)
+
+        signode = finder.declarator
+
+        if len(names) > 0 and self.context.child:
+            signode.children = [n for n in signode.children if not n.tagname == 'desc_addname']
+        return nodes
+
+    def handle_declaration(self, node, declaration, *, obj_type=None, content_callback=None):
+        if obj_type is None:
+            obj_type = node.kind
+        if content_callback is None:
+            def content(contentnode):
+                contentnode.extend(self.description(node))
+            content_callback = content
+        declaration = declaration.replace('\n', ' ')
+        nodes = self.run_directive(obj_type, [declaration], content_callback)
+        if debug_trace_doxygen_ids:
+            ts = self.create_doxygen_target(node)
+            if len(ts) == 0:
+                print("{}Doxygen target: (none)".format(
+                    '  ' * debug_trace_directives_indent))
+            else:
+                print("{}Doxygen target: {}".format(
+                    '  ' * debug_trace_directives_indent, ts[0]['ids']))
+
+        rst_node = nodes[1]
+        finder = NodeFinder(rst_node.document)
+        rst_node.walk(finder)
+        finder.declarator.insert(0, self.create_doxygen_target(node))
+        return nodes
+
+    def get_qualification(self):
+        if self.nesting_level > 0:
+            return []
+
+        if debug_trace_qualification:
+            def debug_print_node(n):
+                return "node_type={}".format(n.node_type)
+
+            global debug_trace_directives_indent
+            print("{}{}".format(debug_trace_directives_indent * '  ',
+                                debug_print_node(self.qualification_stack[0])))
+            debug_trace_directives_indent += 1
+
+        names = []
+        for node in self.qualification_stack[1:]:
+            if debug_trace_qualification:
+                print("{}{}".format(debug_trace_directives_indent * '  ', debug_print_node(node)))
+            if node.node_type == 'ref' and len(names) == 0:
+                if debug_trace_qualification:
+                    print("{}{}".format(debug_trace_directives_indent * '  ', 'res='))
+                return []
+            if (node.node_type == 'compound' and
+                    node.kind not in ['file', 'namespace', 'group']) or \
+                    node.node_type == 'memberdef':
+                # We skip the 'file' entries because the file name doesn't form part of the
+                # qualified name for the identifier. We skip the 'namespace' entries because if we
+                # find an object through the namespace 'compound' entry in the index.xml then we'll
+                # also have the 'compounddef' entry in our node stack and we'll get it from that. We
+                # need the 'compounddef' entry because if we find the object through the 'file'
+                # entry in the index.xml file then we need to get the namespace name from somewhere
+                names.append(node.name)
+            if (node.node_type == 'compounddef' and node.kind == 'namespace'):
+                # Nested namespaces include their parent namespace(s) in compoundname. ie,
+                # compoundname is 'foo::bar' instead of just 'bar' for namespace 'bar' nested in
+                # namespace 'foo'. We need full compoundname because node_stack doesn't necessarily
+                # include parent namespaces and we stop here in case it does.
+                names.extend(node.compoundname.split('::'))
+                break
+
+        names.reverse()
+
+        if debug_trace_qualification:
+            print("{}res={}".format(debug_trace_directives_indent * '  ', names))
+            debug_trace_directives_indent -= 1
+        return names
+
+    # ===================================================================================
+
     def get_fully_qualified_name(self):
 
         names = []
         node_stack = self.context.node_stack
         node = node_stack[0]
-        if node.node_type == 'enumvalue':
-            names.append(node.name)
-            # Skip the name of the containing enum because it is not a part of the
-            # fully qualified name.
-            node_stack = node_stack[2:]
 
         # If the node is a namespace, use its name because namespaces are skipped in the main loop.
         if node.node_type == 'compound' and node.kind == 'namespace':
@@ -1087,16 +1231,23 @@ class SphinxRenderer(object):
         return self.render_declaration(node, declaration, update_signature=update_define_signature)
 
     def visit_enum(self, node):
-        name = self.get_fully_qualified_name()
-        declaration = name
+        def content(contentnode):
+            contentnode.extend(self.description(node))
+            values = self.node_factory.emphasis("", self.node_factory.Text("Values:"))
+            title = self.node_factory.paragraph("", "", values)
+            contentnode += title
+            enums = self.render_iterable(node.enumvalue)
+            contentnode.extend(enums)
+        # TODO: scopedness, Doxygen doesn't seem to generate the xml for that
+        # TODO: underlying type, Doxygen doesn't seem to generate the xml for that
+        names = self.get_qualification()
+        names.append(node.name)
+        declaration = self.join_nested_name(names)
+        return self.handle_declaration(node, declaration, content_callback=content)
 
-        description_nodes = self.description(node)
-        name = self.node_factory.emphasis("", self.node_factory.Text("Values:"))
-        title = self.node_factory.paragraph("", "", name)
-        description_nodes.append(title)
-        enums = self.render_iterable(node.enumvalue)
-        description_nodes.extend(enums)
-        return self.render_declaration(node, declaration, description_nodes)
+    def visit_enumvalue(self, node):
+        declaration = node.name + self.make_initializer(node)
+        return self.handle_declaration(node, declaration, obj_type='enumvalue')
 
     def visit_typedef(self, node):
         declaration = get_definition_without_template_args(node)
@@ -1148,14 +1299,6 @@ class SphinxRenderer(object):
         declaration += self.make_initializer(node)
         declaration = self.create_template_prefix(node) + declaration
         return self.render_declaration(node, declaration)
-
-    def visit_enumvalue(self, node):
-        def update_signature(signature, obj_type):
-            # TODO: should the prefix still be removed after Sphinx supoprts enumerators?
-            signature.children.pop(0)
-        declaration = self.get_fully_qualified_name() + self.make_initializer(node)
-        return self.render_declaration(node, declaration=declaration,
-                                       objtype='enumvalue', update_signature=update_signature)
 
     def visit_param(self, node):
 

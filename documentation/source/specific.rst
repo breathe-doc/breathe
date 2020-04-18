@@ -178,3 +178,11 @@ C++ Anonymous Entities
 
 .. doxygenfile:: cpp_anon.h
    :project: cpp_anon
+
+C++ Enums
+---------
+
+.. cpp:namespace:: @ex_specific_cpp_enum
+
+.. doxygenfile:: cpp_enum.h
+   :project: cpp_enum

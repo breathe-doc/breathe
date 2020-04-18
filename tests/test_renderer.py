@@ -247,6 +247,7 @@ def render(app, member_def, domain=None, show_define_initializer=False):
     renderer = SphinxRenderer(MockProjectInfo(show_define_initializer),
                               None,  # renderer_factory
                               create_node_factory(),
+                              [],    # node_stack
                               None,  # state
                               None,  # document
                               MockTargetHandler(),
