@@ -1,8 +1,68 @@
 
 .. _file-example:
 
-doxygenfile Directive Example
-=============================
+doxygenfile Directive
+=====================
+
+This directive generates the appropriate output for a single source file. It
+takes the standard ``project``, ``path``, ``outline`` and ``no-link`` options
+and additionally the ``sections`` options.
+
+For the standard option refer to the documentation on the main directives page.
+The directive-specific options are documented below.
+
+``sections``
+   Limit the sections to render for the given source file to the given list.
+   Many of the names come from Doxygen and Breathe internals and may not make
+   sense from an external point of view. Nevertheless it is hoped this table is
+   useful.
+
+   .. csv-table:: Section types
+      :header: "Type", "Description"
+
+      "briefdescription", "Brief description"
+      "dcop-func", "DCOP Function"
+      "define", "Define"
+      "derivedcompoundref", "Derived compound reference"
+      "detaileddescription", "Detailed description"
+      "enum", "Enumerator"
+      "event", "Event"
+      "friend", "Friend"
+      "func", "Function"
+      "innerclass", "**Must be given to show sections inside a class**"
+      "innernamespace", "**Must be given to show sections inside a namespace**"
+      "package-attrib", "Package attribute"
+      "package-func", "Package function"
+      "package-static-attrib", "Package static attribute"
+      "package-static-func", "Package static function"
+      "package-type", "Package type"
+      "private-attrib", "Private attribute"
+      "private-func", "Private function"
+      "private-slot", "Private slot"
+      "private-static-attrib", "Private static attribute"
+      "private-static-func", "Private static function"
+      "private-type", "Private type"
+      "property", "Property"
+      "protected-attrib", "Protected attribute"
+      "protected-func", "Protected function"
+      "protected-slot", "Protected slot"
+      "protected-static-attrib", "Protected static attribute"
+      "protected-static-func", "Protected static function"
+      "protected-type", "Protected type"
+      "prototype", "Prototype"
+      "public-attrib", "Public attribute"
+      "public-func", "Public function"
+      "public-slot", "Public slot"
+      "public-static-attrib", "Public static attribute"
+      "public-static-func", "Public static function"
+      "public-type", "Public type"
+      "related", "Related"
+      "signal", "Signal"
+      "typedef", "Type definition"
+      "user-defined", "User defined"
+      "var", "Variable"
+
+.. contents::
 
 Example
 -------

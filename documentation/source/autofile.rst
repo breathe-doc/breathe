@@ -4,6 +4,9 @@
 autodoxygenfile Directive Example
 =================================
 
+For more details and directive documentation please see :ref:`file-example`,
+which is very similar to this directive.
+
 Working Example
 ---------------
 
