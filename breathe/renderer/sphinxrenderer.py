@@ -13,6 +13,11 @@ import six
 import textwrap
 
 
+debug_trace_directives = False
+debug_trace_doxygen_ids = False
+debug_trace_directives_indent = 0
+
+
 class WithContext(object):
     def __init__(self, parent, context):
         self.context = context
@@ -338,7 +343,18 @@ class SphinxRenderer(object):
         # Translate Breathe's no-link option into the standard noindex option.
         if 'no-link' in self.context.directive_args[2]:
             domain_directive.options['noindex'] = True
+
+        if debug_trace_directives:
+            global debug_trace_directives_indent
+            print("{}Running directive (old): .. {}:: {}".format(
+                '  ' * debug_trace_directives_indent,
+                domain_directive.name, ''.join(names)))
+            debug_trace_directives_indent += 1
+
         nodes = domain_directive.run()
+
+        if debug_trace_directives:
+            debug_trace_directives_indent -= 1
 
         # Filter out outer class names if we are rendering a member as a part of a class content.
         rst_node = nodes[1]
@@ -394,6 +410,14 @@ class SphinxRenderer(object):
         if obj_type is None:
             obj_type = node.kind
         nodes = self.run_domain_directive(obj_type, [declaration.replace('\n', ' ')])
+        if debug_trace_doxygen_ids:
+            ts = self.create_doxygen_target(node)
+            if len(ts) == 0:
+                print("{}Doxygen target (old): (none)".format(
+                    '  ' * debug_trace_directives_indent))
+            else:
+                print("{}Doxygen target (old): {}".format(
+                    '  ' * debug_trace_directives_indent, ts[0]['ids']))
 
         rst_node = nodes[1]
         finder = NodeFinder(rst_node.document)
@@ -1026,6 +1050,15 @@ class SphinxRenderer(object):
         self.context.directive_args[1] = [signature]
 
         nodes = self.run_domain_directive(node.kind, self.context.directive_args[1])
+        if debug_trace_doxygen_ids:
+            ts = self.create_doxygen_target(node)
+            if len(ts) == 0:
+                print("{}Doxygen target (old): (none)".format(
+                    '  ' * debug_trace_directives_indent))
+            else:
+                print("{}Doxygen target (old): {}".format(
+                    '  ' * debug_trace_directives_indent, ts[0]['ids']))
+
         rst_node = nodes[1]
         finder = NodeFinder(rst_node.document)
         rst_node.walk(finder)
