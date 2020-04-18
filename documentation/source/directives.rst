@@ -147,7 +147,9 @@ file.
    .. doxygenfile:: <filename>
       :project: ...
       :path: ...
+      :outline:
       :no-link:
+      :sections: ...
 
 Checkout the :ref:`example <file-example>` to see it in action.
 
@@ -164,6 +166,7 @@ It handles the doxygen xml generation for you like the other auto directives.
       :project: ...
       :outline:
       :no-link:
+      :sections: ...
 
 Checkout the :ref:`example <autodoxygenfile-example>` to see it in action.
 
