@@ -177,6 +177,7 @@ Inspired by `Keepachangelog.com <http://keepachangelog.com/>`__.
 
   - Strictly depend on Sphinx's minor version. #498
   - Simplifications and fixes, use more of modern Sphinx natively. #503
+  - Add section option to the doxygenfile directive. #501
 
 - 2020-04-07 - Breathe v4.15.0
 
