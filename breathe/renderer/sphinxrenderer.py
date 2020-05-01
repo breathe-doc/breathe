@@ -2,6 +2,7 @@
 from docutils import nodes
 from docutils.statemachine import ViewList
 from sphinx.domains import cpp, c, python
+from sphinx.util.nodes import nested_parse_with_titles
 
 try:
     from sphinxcontrib import phpdomain as php
@@ -1263,7 +1264,7 @@ class SphinxRenderer(object):
         rst_node.document = self.state.document
 
         # Generate node subtree
-        self.state.nested_parse(rst, 0, rst_node)
+        nested_parse_with_titles(self.state, rst, rst_node)
 
         return rst_node
 
