@@ -173,6 +173,10 @@ Change Log
 
 Inspired by `Keepachangelog.com <http://keepachangelog.com/>`__.
 
+- Unreleased - Breathe v4.17.0
+
+  - Scoped rendering, better integration with Sphinx, misc fixes. #512
+
 - 2020-04-19 - Breathe v4.16.0
 
   - Strictly depend on Sphinx's minor version. #498
