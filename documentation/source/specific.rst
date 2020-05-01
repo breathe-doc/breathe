@@ -178,3 +178,43 @@ C++ Anonymous Entities
 
 .. doxygenfile:: cpp_anon.h
    :project: cpp_anon
+   
+C++ Union
+---------
+
+.. cpp:namespace:: @ex_specific_cpp_union
+
+.. doxygenfile:: cpp_union.h
+   :project: cpp_union
+
+C++ Enums
+---------
+
+.. cpp:namespace:: @ex_specific_cpp_enum
+
+.. doxygenfile:: cpp_enum.h
+   :project: cpp_enum
+
+C++ Functions
+-------------
+
+.. cpp:namespace:: @ex_specific_cpp_function
+
+.. doxygenfile:: cpp_function.h
+   :project: cpp_function
+
+C++ Inherited Members
+---------------------
+
+.. cpp:namespace:: @ex_specific_cpp_inherited_members
+
+.. doxygenfile:: cpp_inherited_members.h
+   :project: cpp_inherited_members
+
+C++ Trailing Return Type
+------------------------
+
+.. cpp:namespace:: @ex_specific_cpp_trailing_return_type
+
+.. doxygenfile:: cpp_trailing_return_type.h
+   :project: cpp_trailing_return_type

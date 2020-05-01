@@ -247,6 +247,7 @@ def render(app, member_def, domain=None, show_define_initializer=False):
     renderer = SphinxRenderer(MockProjectInfo(show_define_initializer),
                               None,  # renderer_factory
                               create_node_factory(),
+                              [],    # node_stack
                               None,  # state
                               None,  # document
                               MockTargetHandler(),
@@ -257,8 +258,9 @@ def render(app, member_def, domain=None, show_define_initializer=False):
 
 
 def test_render_func(app):
-    member_def = WrappedMemberDef(kind='function', definition='void foo', argsstring='(int)', virt='non-virtual',
-                               param=[WrappedParam(type_=WrappedLinkedText(content_=[WrappedMixedContainer(value=u'int')]))])
+    member_def = WrappedMemberDef(kind='function', definition='void foo', type_='void', name='foo', argsstring='(int)',
+                                  virt='non-virtual',
+                                  param=[WrappedParam(type_=WrappedLinkedText(content_=[WrappedMixedContainer(value=u'int')]))])
     signature = find_node(render(app, member_def), 'desc_signature')
     assert signature.astext().startswith('void')
     assert find_node(signature, 'desc_name')[0] == 'foo'
@@ -269,19 +271,20 @@ def test_render_func(app):
 
 
 def test_render_typedef(app):
-    member_def = WrappedMemberDef(kind='typedef', definition='typedef int foo')
+    member_def = WrappedMemberDef(kind='typedef', definition='typedef int foo', type_='int', name='foo')
     signature = find_node(render(app, member_def), 'desc_signature')
     assert signature.astext() == 'typedef int foo'
 
 
 def test_render_c_typedef(app):
-    member_def = WrappedMemberDef(kind='typedef', definition='typedef unsigned int bar')
+    member_def = WrappedMemberDef(kind='typedef', definition='typedef unsigned int bar', type_='unsigned int', name='bar')
     signature = find_node(render(app, member_def, domain='c'), 'desc_signature')
     assert signature.astext() == 'typedef unsigned int bar'
 
 
 def test_render_c_function_typedef(app):
-    member_def = WrappedMemberDef(kind='typedef', definition='typedef void* (*voidFuncPtr)(float, int)')
+    member_def = WrappedMemberDef(kind='typedef', definition='typedef void* (*voidFuncPtr)(float, int)',
+                                  type_='void* (*', name='voidFuncPtr', argsstring=')(float, int)')
     signature = find_node(render(app, member_def, domain='c'), 'desc_signature')
     assert signature.astext().startswith('typedef void *')
     params = find_node(signature, 'desc_parameterlist')
@@ -291,48 +294,49 @@ def test_render_c_function_typedef(app):
 
 
 def test_render_using_alias(app):
-    member_def = WrappedMemberDef(kind='typedef', definition='using foo = int')
+    member_def = WrappedMemberDef(kind='typedef', definition='using foo = int', type_='int', name='foo')
     signature = find_node(render(app, member_def), 'desc_signature')
     assert signature.astext() == 'using foo = int'
 
 
 def test_render_const_func(app):
-    member_def = WrappedMemberDef(kind='function', definition='void f', argsstring='() const',
+    member_def = WrappedMemberDef(kind='function', definition='void f', type_='void', name='f', argsstring='() const',
                                virt='non-virtual', const='yes')
     signature = find_node(render(app, member_def), 'desc_signature')
     assert '_CPPv2NK1fEv' in signature['ids']
 
 
 def test_render_lvalue_func(app):
-    member_def = WrappedMemberDef(kind='function', definition='void f', argsstring='()',
+    member_def = WrappedMemberDef(kind='function', definition='void f', type_='void', name='f', argsstring='() &',
                                virt='non-virtual', refqual='lvalue')
     signature = find_node(render(app, member_def), 'desc_signature')
     assert signature.astext().endswith('&')
 
 
 def test_render_rvalue_func(app):
-    member_def = WrappedMemberDef(kind='function', definition='void f', argsstring='()',
+    member_def = WrappedMemberDef(kind='function', definition='void f', type_='void', name='f', argsstring='() &&',
                                virt='non-virtual', refqual='rvalue')
     signature = find_node(render(app, member_def), 'desc_signature')
     assert signature.astext().endswith('&&')
 
 
 def test_render_const_lvalue_func(app):
-    member_def = WrappedMemberDef(kind='function', definition='void f', argsstring='()',
+    member_def = WrappedMemberDef(kind='function', definition='void f', type_='void', name='f',argsstring='() const &',
                                virt='non-virtual', const='yes', refqual='lvalue')
     signature = find_node(render(app, member_def), 'desc_signature')
     assert signature.astext().endswith('const &')
 
 
 def test_render_const_rvalue_func(app):
-    member_def = WrappedMemberDef(kind='function', definition='void f', argsstring='()',
+    member_def = WrappedMemberDef(kind='function', definition='void f', type_='void', name='f', argsstring='() const &&',
                                virt='non-virtual', const='yes', refqual='rvalue')
     signature = find_node(render(app, member_def), 'desc_signature')
     assert signature.astext().endswith('const &&')
 
 
 def test_render_variable_initializer(app):
-    member_def = WrappedMemberDef(kind='variable', definition='const int EOF', initializer=WrappedMixedContainer(value=u'= -1'))
+    member_def = WrappedMemberDef(kind='variable', definition='const int EOF', type_='const int', name='EOF',
+                                  initializer=WrappedMixedContainer(value=u'= -1'))
     signature = find_node(render(app, member_def), 'desc_signature')
     assert signature.astext() == 'const int EOF = -1'
 

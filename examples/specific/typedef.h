@@ -23,4 +23,8 @@ class TestClass {
  public:
   /** A typedef defined in a class. */
   typedef void *MemberTypedef;
+
+  typedef void (*MemberTypedefFuncPointer)(int, double);
 };
+
+using TypeAlias = int;

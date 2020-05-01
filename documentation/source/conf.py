@@ -216,6 +216,11 @@ breathe_projects = {
     "define":"../../examples/specific/define/xml/",
     "multifile":"../../examples/specific/multifilexml/xml/",
     "cpp_anon":"../../examples/specific/cpp_anon/xml/",
+    "cpp_enum":"../../examples/specific/cpp_enum/xml/",
+    "cpp_union":"../../examples/specific/cpp_union/xml/",
+    "cpp_function":"../../examples/specific/cpp_function/xml/",
+    "cpp_inherited_members":"../../examples/specific/cpp_inherited_members/xml/",
+    "cpp_trailing_return_type":"../../examples/specific/cpp_trailing_return_type/xml/",
     }
 
 breathe_projects_source = {
