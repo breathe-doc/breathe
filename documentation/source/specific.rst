@@ -203,6 +203,14 @@ C++ Functions
 .. doxygenfile:: cpp_function.h
    :project: cpp_function
 
+C++ Friend Classes
+------------------
+
+.. cpp:namespace:: @ex_specific_cpp_friendclass
+
+.. doxygenfile:: cpp_friendclass.h
+   :project: cpp_friendclass
+
 C++ Inherited Members
 ---------------------
 
