@@ -5,7 +5,7 @@ from sphinx.domains import cpp, c, python
 from sphinx.util.nodes import nested_parse_with_titles
 
 try:
-    from sphinxcontrib import phpdomain as php
+    from sphinxcontrib import phpdomain as php  # type: ignore
 except ImportError:
     php = None
 

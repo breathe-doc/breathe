@@ -23,3 +23,6 @@ jobs:
 
       - name: lint the source code
         run: make flake8
+
+      - name: type check the source code
+        run: make type-check
