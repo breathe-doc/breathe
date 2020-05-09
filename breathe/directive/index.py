@@ -67,7 +67,6 @@ class BaseIndexDirective(BaseDirective):
 
 
 class DoxygenIndexDirective(BaseIndexDirective):
-
     required_arguments = 0
     optional_arguments = 2
     option_spec = {

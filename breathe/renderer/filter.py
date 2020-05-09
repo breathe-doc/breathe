@@ -201,6 +201,8 @@ We have to write:
 
 from breathe import path_handler
 
+from sphinx.application import Sphinx
+
 import os
 import six
 
@@ -593,9 +595,8 @@ class FilterFactory:
         "public-static-attrib",
     ])
 
-    def __init__(self):
-        self.default_members = ()
-        self.implementation_filename_extensions = ()
+    def __init__(self, app: Sphinx):
+        self.app = app
 
     def create_render_filter(self, kind, options):
         """Render filter for group & namespace blocks"""
@@ -604,7 +605,8 @@ class FilterFactory:
             raise UnrecognisedKindError(kind)
 
         # Generate new dictionary from defaults
-        filter_options = dict((entry, u'') for entry in self.default_members)
+        filter_options = dict((entry, u'')
+                              for entry in self.app.config.breathe_default_members)
 
         # Update from the actual options
         filter_options.update(options)
@@ -634,7 +636,8 @@ class FilterFactory:
         """Content filter for classes based on various directive options"""
 
         # Generate new dictionary from defaults
-        filter_options = dict((entry, u'') for entry in self.default_members)
+        filter_options = dict((entry, u'')
+                              for entry in self.app.config.breathe_default_members)
 
         # Update from the actual options
         filter_options.update(options)
@@ -1063,7 +1066,8 @@ class FilterFactory:
             return parent_matches & node_matches
 
         else:
-            is_implementation_file = parent.name.endswith(self.implementation_filename_extensions)
+            is_implementation_file = parent.name.endswith(
+                self.app.config.breathe_implementation_filename_extensions)
             parent_is_compound = parent.node_type == 'compound'
             parent_is_file = (parent.kind == 'file') & (~ is_implementation_file)
             parent_is_not_file = parent.kind != 'file'
@@ -1119,13 +1123,3 @@ class FilterFactory:
                 )
 
         return filter_
-
-    def get_config_values(self, app):
-        """Extract the breathe_default_members config value and store it.
-
-        This method is called on the 'builder-init' event in Sphinx"""
-
-        self.default_members = app.config.breathe_default_members
-
-        self.implementation_filename_extensions = \
-            app.config.breathe_implementation_filename_extensions

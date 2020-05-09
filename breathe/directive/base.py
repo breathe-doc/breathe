@@ -46,7 +46,6 @@ def create_warning(project_info, state, lineno, **kwargs):
 
 
 class BaseDirective(SphinxDirective):
-
     def __init__(self, finder_factory,
                  project_info_factory, filter_factory, target_handler_factory, parser_factory,
                  *args):

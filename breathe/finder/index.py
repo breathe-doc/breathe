@@ -1,9 +1,12 @@
 
 from .base import ItemFinder, stack
 
+from breathe.renderer.filter import FilterFactory
+
+from sphinx.application import Sphinx
+
 
 class DoxygenTypeSubItemFinder(ItemFinder):
-
     def filter_(self, ancestors, filter_, matches):
         """Find nodes which match the filter. Doesn't test this node, only its children"""
 
@@ -18,11 +21,10 @@ class DoxygenTypeSubItemFinder(ItemFinder):
 
 
 class CompoundTypeSubItemFinder(ItemFinder):
+    def __init__(self, app: Sphinx, compound_parser, *args):
+        super().__init__(*args)
 
-    def __init__(self, filter_factory, compound_parser, *args):
-        ItemFinder.__init__(self, *args)
-
-        self.filter_factory = filter_factory
+        self.filter_factory = FilterFactory(app)
         self.compound_parser = compound_parser
 
     def filter_(self, ancestors, filter_, matches):

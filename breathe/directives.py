@@ -9,7 +9,7 @@ from .renderer.mask import MaskFactory, NullMaskFactory, NoParameterNamesMask
 from .renderer.sphinxrenderer import WithContext
 
 from .finder.core import DoxygenItemFinderFactoryCreator
-from .directive.base import BaseDirective, create_warning
+from .directive.base import create_warning
 from .directive.index import DoxygenIndexDirective, AutoDoxygenIndexDirective
 from .directive.file import DoxygenFileDirective, AutoDoxygenFileDirective
 from .process import AutoDoxygenProcessHandle
@@ -17,6 +17,7 @@ from .exception import BreatheError
 from .project import ProjectInfoFactory, ProjectError
 from .node_factory import create_node_factory
 
+from breathe.directive.base import BaseDirective
 from breathe.file_state_cache import MTimeError
 
 from sphinx.application import Sphinx
@@ -30,6 +31,8 @@ import os
 import fnmatch
 import re
 import subprocess
+
+from typing import Dict, Type
 
 
 class NoMatchingFunctionError(BreatheError):
@@ -574,8 +577,8 @@ class DoxygenUnionDirective(DoxygenBaseItemDirective):
 # Setup Administration
 # --------------------
 
-class DirectiveContainer(object):
-    def __init__(self, directive, *args):
+class DirectiveContainer:
+    def __init__(self, directive: Type[BaseDirective], *args):
         self.directive = directive
         self.args = args
 
@@ -594,7 +597,8 @@ class DirectiveContainer(object):
         return self.directive(*call_args)
 
 
-class DoxygenDirectiveFactory(object):
+class DoxygenDirectiveFactory:
+    directives: Dict[str, Type[BaseDirective]]
     directives = {
         "doxygenindex": DoxygenIndexDirective,
         "autodoxygenindex": AutoDoxygenIndexDirective,
@@ -612,15 +616,15 @@ class DoxygenDirectiveFactory(object):
         "doxygengroup": DoxygenGroupDirective,
         "doxygenfile": DoxygenFileDirective,
         "autodoxygenfile": AutoDoxygenFileDirective,
-        }
+    }
 
-    def __init__(self, node_factory, text_renderer, finder_factory,
-                 project_info_factory, filter_factory, target_handler_factory, parser_factory):
+    def __init__(self, app: Sphinx, node_factory, text_renderer, finder_factory,
+                 project_info_factory, target_handler_factory, parser_factory):
+        self.app = app
         self.node_factory = node_factory
         self.text_renderer = text_renderer
         self.finder_factory = finder_factory
         self.project_info_factory = project_info_factory
-        self.filter_factory = filter_factory
         self.target_handler_factory = target_handler_factory
         self.parser_factory = parser_factory
 
@@ -632,7 +636,7 @@ class DoxygenDirectiveFactory(object):
             self.text_renderer,
             self.finder_factory,
             self.project_info_factory,
-            self.filter_factory,
+            FilterFactory(self.app),
             self.target_handler_factory,
             self.parser_factory
             )
@@ -642,7 +646,7 @@ class DoxygenDirectiveFactory(object):
             self.directives[type_],
             self.finder_factory,
             self.project_info_factory,
-            self.filter_factory,
+            FilterFactory(self.app),
             self.target_handler_factory,
             self.parser_factory
             )
@@ -675,8 +679,7 @@ def write_file(directory, filename, content):
 
 def setup(app: Sphinx):
     parser_factory = DoxygenParserFactory(app)
-    filter_factory = FilterFactory()
-    item_finder_factory_creator = DoxygenItemFinderFactoryCreator(parser_factory, filter_factory)
+    item_finder_factory_creator = DoxygenItemFinderFactoryCreator(app, parser_factory)
     index_parser = parser_factory.create_index_parser()
     finder_factory = FinderFactory(index_parser, item_finder_factory_creator)
 
@@ -691,11 +694,11 @@ def setup(app: Sphinx):
     text_renderer = TextRenderer(app)
 
     directive_factory = DoxygenDirectiveFactory(
+        app,
         node_factory,
         text_renderer,
         finder_factory,
         project_info_factory,
-        filter_factory,
         target_handler_factory,
         parser_factory
         )
@@ -754,5 +757,4 @@ def setup(app: Sphinx):
         )
 
     app.connect("builder-inited", directive_factory.get_config_values)
-    app.connect("builder-inited", filter_factory.get_config_values)
     app.connect("builder-inited", doxygen_hook)
