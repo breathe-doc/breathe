@@ -199,6 +199,9 @@ We have to write:
 
 """
 
+from breathe import path_handler
+
+import os
 import six
 
 
@@ -438,31 +441,26 @@ class GlobFilter(Filter):
 
 
 class FilePathFilter(Filter):
-
-    def __init__(self, accessor, target_file, path_handler):
-
+    def __init__(self, accessor, target_file):
         self.accessor = accessor
         self.target_file = target_file
-        self.path_handler = path_handler
 
-    def allow(self, node_stack):
-
+    def allow(self, node_stack) -> bool:
         location = self.accessor(node_stack).file
 
-        if self.path_handler.includes_directory(self.target_file):
+        if path_handler.includes_directory(self.target_file):
             # If the target_file contains directory separators then
             # match against the same length at the end of the location
             #
             location_match = location[-len(self.target_file):]
             return location_match == self.target_file
-
         else:
             # If there are no separators, match against the whole filename
             # at the end of the location
             #
             # This is to prevent "Util.cpp" matching "PathUtil.cpp"
             #
-            location_basename = self.path_handler.basename(location)
+            location_basename = os.path.basename(location)
             return location_basename == self.target_file
 
 
@@ -584,8 +582,7 @@ class Gather(object):
         return False
 
 
-class FilterFactory(object):
-
+class FilterFactory:
     # C++ style public entries
     public_kinds = set([
         "public-type",
@@ -596,9 +593,7 @@ class FilterFactory(object):
         "public-static-attrib",
     ])
 
-    def __init__(self, path_handler):
-
-        self.path_handler = path_handler
+    def __init__(self):
         self.default_members = ()
         self.implementation_filename_extensions = ()
 
@@ -891,7 +886,7 @@ class FilterFactory(object):
                     InFilter(KindAccessor(Node()), ["file"]),
                     FilePathFilter(
                         LambdaAccessor(Node(), lambda x: x.location),
-                        filename, self.path_handler
+                        filename
                         ),
                     Gather(LambdaAccessor(Node(), lambda x: x.namespaces), valid_names)
                     )
@@ -939,7 +934,7 @@ class FilterFactory(object):
                     InFilter(NodeTypeAccessor(Node()), ["memberdef"]),
                     NotFilter(
                         FilePathFilter(LambdaAccessor(Node(), lambda x: x.location),
-                                       filename, self.path_handler)
+                                       filename)
                         )
                     )
                 ),
@@ -957,7 +952,7 @@ class FilterFactory(object):
                     NotFilter(InFilter(KindAccessor(Node()), ["namespace"])),
                     NotFilter(
                         FilePathFilter(LambdaAccessor(Node(), lambda x: x.location),
-                                       filename, self.path_handler)
+                                       filename)
                         )
                     )
                 )
@@ -1042,8 +1037,7 @@ class FilterFactory(object):
         filter_ = AndFilter(
             InFilter(NodeTypeAccessor(Node()), ["compounddef"]),
             InFilter(KindAccessor(Node()), ["file"]),
-            FilePathFilter(LambdaAccessor(Node(), lambda x: x.location), filename,
-                           self.path_handler)
+            FilePathFilter(LambdaAccessor(Node(), lambda x: x.location), filename)
             )
 
         return filter_

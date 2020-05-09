@@ -2,6 +2,7 @@ from . import index
 from . import compound
 
 from breathe import file_state_cache
+from breathe import path_handler
 from breathe.parser.compoundsuper import DoxygenType
 
 from sphinx.application import Sphinx
@@ -28,21 +29,17 @@ class FileIOError(Exception):
 
 
 class Parser:
-    def __init__(self, app: Sphinx, cache: Dict[str, DoxygenType], path_handler):
+    def __init__(self, app: Sphinx, cache: Dict[str, DoxygenType]):
         self.app = app
         self.cache = cache
-        self.path_handler = path_handler
 
 
 class DoxygenIndexParser(Parser):
-    def __init__(self, app: Sphinx, cache: Dict[str, DoxygenType], path_handler):
-        super().__init__(app, cache, path_handler)
+    def __init__(self, app: Sphinx, cache: Dict[str, DoxygenType]):
+        super().__init__(app, cache)
 
     def parse(self, project_info):
-        filename = self.path_handler.resolve_path(
-            project_info.project_path(),
-            "index.xml"
-        )
+        filename = path_handler.resolve_path(self.app, project_info.project_path(), "index.xml")
 
         file_state_cache.update(self.app, filename)
 
@@ -63,13 +60,14 @@ class DoxygenIndexParser(Parser):
 
 
 class DoxygenCompoundParser(Parser):
-    def __init__(self, app: Sphinx, cache, path_handler, project_info):
-        super().__init__(app, cache, path_handler)
+    def __init__(self, app: Sphinx, cache, project_info):
+        super().__init__(app, cache)
 
         self.project_info = project_info
 
     def parse(self, refid) -> DoxygenType:
-        filename = self.path_handler.resolve_path(
+        filename = path_handler.resolve_path(
+            self.app,
             self.project_info.project_path(),
             "%s.xml" % refid
         )
@@ -92,18 +90,16 @@ class DoxygenCompoundParser(Parser):
 
 
 class DoxygenParserFactory:
-    def __init__(self, app: Sphinx, path_handler):
+    def __init__(self, app: Sphinx):
         self.app = app
         self.cache = {}  # type: Dict[str, DoxygenType]
-        self.path_handler = path_handler
 
     def create_index_parser(self):
-        return DoxygenIndexParser(self.app, self.cache, self.path_handler)
+        return DoxygenIndexParser(self.app, self.cache)
 
     def create_compound_parser(self, project_info):
         return DoxygenCompoundParser(
             self.app,
             self.cache,
-            self.path_handler,
             project_info
         )

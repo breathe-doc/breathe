@@ -663,28 +663,6 @@ class DoxygenDirectiveFactory(object):
             )
 
 
-class PathHandler(object):
-    def __init__(self, config_directory, sep, basename, join):
-        self.config_directory = config_directory
-
-        self.sep = sep
-        self.basename = basename
-        self.join = join
-
-    def includes_directory(self, file_path):
-        # Check for backslash or forward slash as we don't know what platform we're on and sometimes
-        # the doxygen paths will have forward slash even on Windows.
-        return bool(file_path.count('\\')) or bool(file_path.count('/'))
-
-    def resolve_path(self, directory, filename):
-        """Returns a full path to the filename in the given directory assuming that if the directory
-        path is relative, then it is relative to the conf.py directory.
-        """
-
-        # os.path.join does the appropriate handling if _project_path is an absolute path
-        return self.join(self.config_directory, directory, filename)
-
-
 def write_file(directory, filename, content):
     # Check the directory exists
     if not os.path.exists(directory):
@@ -696,9 +674,8 @@ def write_file(directory, filename, content):
 
 
 def setup(app: Sphinx):
-    path_handler = PathHandler(app.confdir, os.sep, os.path.basename, os.path.join)
-    parser_factory = DoxygenParserFactory(app, path_handler)
-    filter_factory = FilterFactory(path_handler)
+    parser_factory = DoxygenParserFactory(app)
+    filter_factory = FilterFactory()
     item_finder_factory_creator = DoxygenItemFinderFactoryCreator(parser_factory, filter_factory)
     index_parser = parser_factory.create_index_parser()
     finder_factory = FinderFactory(index_parser, item_finder_factory_creator)
@@ -766,11 +743,9 @@ def setup(app: Sphinx):
         app.add_stylesheet(breathe_css)
 
     doxygen_handle = AutoDoxygenProcessHandle(
-        path_handler,
         subprocess.check_call,
         write_file,
-        project_info_factory
-        )
+        project_info_factory)
 
     def doxygen_hook(app):
         doxygen_handle.generate_xml(
