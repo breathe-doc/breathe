@@ -1,6 +1,8 @@
+from breathe.project import ProjectInfo
 
 from docutils import nodes
 from docutils.statemachine import ViewList
+from sphinx.application import Sphinx
 from sphinx.domains import cpp, c, python
 from sphinx.util.nodes import nested_parse_with_titles
 
@@ -299,24 +301,23 @@ def get_definition_without_template_args(data_object):
     return definition
 
 
-class SphinxRenderer(object):
+class SphinxRenderer:
     """
     Doxygen node visitor that converts input into Sphinx/RST representation.
     Each visit method takes a Doxygen node as an argument and returns a list of RST nodes.
     """
 
-    def __init__(
-            self,
-            project_info,
-            renderer_factory,
-            node_factory,
-            node_stack,
-            state,
-            document,
-            target_handler,
-            compound_parser,
-            filter_
-    ):
+    def __init__(self, app: Sphinx,
+                 project_info: ProjectInfo,
+                 renderer_factory,
+                 node_factory,
+                 node_stack,
+                 state,
+                 document,
+                 target_handler,
+                 compound_parser,
+                 filter_):
+        self.app = app
 
         self.project_info = project_info
         self.renderer_factory = renderer_factory
@@ -328,7 +329,6 @@ class SphinxRenderer(object):
         self.target_handler = target_handler
         self.compound_parser = compound_parser
         self.filter_ = filter_
-        self.project_refids = project_info.project_refids()
         self.context = None
         self.output_defname = True
         # Nesting level for lists.
@@ -340,7 +340,7 @@ class SphinxRenderer(object):
             self.context.domain = self.get_domain()
 
     def get_refid(self, refid):
-        if self.project_refids:
+        if self.app.config.breathe_use_project_refids:
             return "%s%s" % (self.project_info.name(), refid)
         else:
             return refid
@@ -1088,7 +1088,7 @@ class SphinxRenderer(object):
         nodelist = self.render_iterable(node.content)
         nodelist.extend(self.render_iterable(node.images))
 
-        if self.project_info.order_parameters_first():
+        if self.app.config.breathe_order_parameters_first:
             # Order parameters before simplesects, which mainly are return/warnings/remarks
             definition_nodes = self.render_iterable(node.parameterlist)
             definition_nodes.extend(self.render_iterable(node.simplesects))
@@ -1437,7 +1437,7 @@ class SphinxRenderer(object):
 
         # TODO: remove this once Sphinx supports definitions for macros
         def add_definition(declarator):
-            if node.initializer and self.project_info.show_define_initializer():
+            if node.initializer and self.app.config.breathe_show_define_initializer:
                 declarator.extend([self.node_factory.Text(" ")] + self.render(node.initializer))
 
         return self.handle_declaration(node, declaration, declarator_callback=add_definition)

@@ -633,21 +633,6 @@ class DoxygenDirectiveFactory:
             self.parser_factory
             )
 
-    def get_config_values(self, app):
-        # All DirectiveContainers maintain references to this project info factory
-        # so we can update this to update them
-        self.project_info_factory.update(
-            app.config.breathe_projects,
-            app.config.breathe_default_project,
-            app.config.breathe_domain_by_extension,
-            app.config.breathe_domain_by_file_pattern,
-            app.config.breathe_projects_source,
-            app.config.breathe_build_directory,
-            app.config.breathe_show_define_initializer,
-            app.config.breathe_use_project_refids,
-            app.config.breathe_order_parameters_first
-            )
-
 
 def write_file(directory, filename, content):
     # Check the directory exists
@@ -687,11 +672,11 @@ def setup(app: Sphinx):
         directive_factory.create_function_directive_container(),
         )
 
-    app.add_config_value("breathe_projects", {}, True)
-    app.add_config_value("breathe_default_project", "", True)
+    app.add_config_value("breathe_projects", {}, True)  # Dict[str, str]
+    app.add_config_value("breathe_default_project", "", True)  # str
     # Provide reasonable defaults for domain_by_extension mapping. Can be overridden by users.
-    app.add_config_value("breathe_domain_by_extension", {'py': 'py'}, True)
-    app.add_config_value("breathe_domain_by_file_pattern", {}, True)
+    app.add_config_value("breathe_domain_by_extension", {'py': 'py'}, True)  # Dict[str, str]
+    app.add_config_value("breathe_domain_by_file_pattern", {}, True)  # Dict[str, str]
     app.add_config_value("breathe_projects_source", {}, True)
     app.add_config_value("breathe_build_directory", '', True)
     app.add_config_value("breathe_default_members", (), True)
@@ -715,6 +700,4 @@ def setup(app: Sphinx):
             app.config.breathe_projects_source,
             app.config.breathe_doxygen_config_options
         )
-
-    app.connect("builder-inited", directive_factory.get_config_values)
     app.connect("builder-inited", doxygen_hook)

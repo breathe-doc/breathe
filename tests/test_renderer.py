@@ -142,21 +142,6 @@ class MockContext:
         return self
 
 
-class MockProjectInfo:
-    def __init__(self, show_define_initializer=False):
-        self._show_define_initializer = show_define_initializer
-        pass
-
-    def name(self):
-        pass
-
-    def show_define_initializer(self):
-        return self._show_define_initializer
-
-    def project_refids(self):
-        pass
-
-
 class MockTargetHandler:
     def __init__(self):
         pass
@@ -244,7 +229,11 @@ def test_find_node():
 
 def render(app, member_def, domain=None, show_define_initializer=False):
     """Render Doxygen *member_def* with *renderer_class*."""
-    renderer = SphinxRenderer(MockProjectInfo(show_define_initializer),
+
+    app.config.breathe_use_project_refids = False
+    app.config.breathe_show_define_initializer = show_define_initializer
+    renderer = SphinxRenderer(app,
+                              None,  # project_info
                               None,  # renderer_factory
                               create_node_factory(),
                               [],    # node_stack

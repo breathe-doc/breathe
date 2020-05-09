@@ -1,5 +1,6 @@
-
 from __future__ import unicode_literals
+
+from breathe.project import ProjectInfoFactory
 
 try:
     from shlex import quote  # py3
@@ -39,7 +40,7 @@ class ProjectData(object):
 
 
 class AutoDoxygenProcessHandle:
-    def __init__(self, run_process, write_file, project_info_factory):
+    def __init__(self, run_process, write_file, project_info_factory: ProjectInfoFactory):
         self.run_process = run_process
         self.write_file = write_file
         self.project_info_factory = project_info_factory
