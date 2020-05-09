@@ -2,11 +2,13 @@
 from . import index as indexfinder
 from . import compound as compoundfinder
 
+from breathe.parser import DoxygenParserFactory
+
 from sphinx.application import Sphinx
 
 
-class CreateCompoundTypeSubFinder(object):
-    def __init__(self, app: Sphinx, parser_factory):
+class CreateCompoundTypeSubFinder:
+    def __init__(self, app: Sphinx, parser_factory: DoxygenParserFactory):
         self.app = app
         self.parser_factory = parser_factory
 
@@ -28,8 +30,8 @@ class DoxygenItemFinderFactory(object):
         return self.finders[data_object.node_type](self.project_info, data_object, self)
 
 
-class DoxygenItemFinderFactoryCreator(object):
-    def __init__(self, app: Sphinx, parser_factory):
+class DoxygenItemFinderFactoryCreator:
+    def __init__(self, app: Sphinx, parser_factory: DoxygenParserFactory):
         self.app = app
         self.parser_factory = parser_factory
 
@@ -70,22 +72,16 @@ class Finder(object):
         return self._root
 
 
-class FinderFactory(object):
-
-    def __init__(self, parser, item_finder_factory_creator):
-
-        self.parser = parser
-        self.item_finder_factory_creator = item_finder_factory_creator
+class FinderFactory:
+    def __init__(self, app: Sphinx, parser_factory: DoxygenParserFactory):
+        self.parser = parser_factory.create_index_parser()
+        self.item_finder_factory_creator = DoxygenItemFinderFactoryCreator(app, parser_factory)
 
     def create_finder(self, project_info):
-
         root = self.parser.parse(project_info)
         item_finder_factory = self.item_finder_factory_creator.create_factory(project_info)
-
         return Finder(root, item_finder_factory)
 
     def create_finder_from_root(self, root, project_info):
-
         item_finder_factory = self.item_finder_factory_creator.create_factory(project_info)
-
         return Finder(root, item_finder_factory)

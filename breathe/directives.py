@@ -8,7 +8,6 @@ from .renderer.target import TargetHandlerFactory
 from .renderer.mask import MaskFactory, NullMaskFactory, NoParameterNamesMask
 from .renderer.sphinxrenderer import WithContext
 
-from .finder.core import DoxygenItemFinderFactoryCreator
 from .directive.base import create_warning
 from .directive.index import DoxygenIndexDirective, AutoDoxygenIndexDirective
 from .directive.file import DoxygenFileDirective, AutoDoxygenFileDirective
@@ -51,15 +50,12 @@ class FakeDestination(object):
         return output
 
 
-class TextRenderer(object):
-
-    def __init__(self, app):
+class TextRenderer:
+    def __init__(self, app: Sphinx):
         self.app = app
 
     def render(self, nodes, document):
-
         new_document = document.copy()
-
         new_document.children = nodes
 
         writer = TextWriter(TextBuilder(self.app))
@@ -618,15 +614,16 @@ class DoxygenDirectiveFactory:
         "autodoxygenfile": AutoDoxygenFileDirective,
     }
 
-    def __init__(self, app: Sphinx, node_factory, text_renderer, finder_factory,
-                 project_info_factory, target_handler_factory, parser_factory):
+    def __init__(self, app: Sphinx, node_factory, project_info_factory, target_handler_factory):
         self.app = app
-        self.node_factory = node_factory
-        self.text_renderer = text_renderer
-        self.finder_factory = finder_factory
         self.project_info_factory = project_info_factory
         self.target_handler_factory = target_handler_factory
-        self.parser_factory = parser_factory
+
+        self.node_factory = node_factory
+        self.text_renderer = TextRenderer(app)
+        # note: the parser factory contains a cache of the parsed XML
+        self.parser_factory = DoxygenParserFactory(app)
+        self.finder_factory = FinderFactory(app, self.parser_factory)
 
     def create_function_directive_container(self):
         # Pass text_renderer to the function directive
@@ -678,11 +675,6 @@ def write_file(directory, filename, content):
 
 
 def setup(app: Sphinx):
-    parser_factory = DoxygenParserFactory(app)
-    item_finder_factory_creator = DoxygenItemFinderFactoryCreator(app, parser_factory)
-    index_parser = parser_factory.create_index_parser()
-    finder_factory = FinderFactory(index_parser, item_finder_factory_creator)
-
     # Assume general build directory is the doctree directory without the last component. We strip
     # off any trailing slashes so that dirname correctly drops the last part. This can be overriden
     # with the breathe_build_directory config variable
@@ -691,17 +683,11 @@ def setup(app: Sphinx):
     node_factory = create_node_factory()
     target_handler_factory = TargetHandlerFactory(node_factory)
 
-    text_renderer = TextRenderer(app)
-
     directive_factory = DoxygenDirectiveFactory(
         app,
         node_factory,
-        text_renderer,
-        finder_factory,
         project_info_factory,
-        target_handler_factory,
-        parser_factory
-        )
+        target_handler_factory)
 
     def add_directive(name):
         app.add_directive(name, directive_factory.create_directive_container(name))

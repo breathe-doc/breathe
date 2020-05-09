@@ -94,7 +94,7 @@ class DoxygenParserFactory:
         self.app = app
         self.cache = {}  # type: Dict[str, DoxygenType]
 
-    def create_index_parser(self):
+    def create_index_parser(self) -> DoxygenIndexParser:
         return DoxygenIndexParser(self.app, self.cache)
 
     def create_compound_parser(self, project_info):
