@@ -27,7 +27,6 @@ from sphinx.domains import cpp
 from docutils.parsers.rst.directives import unchanged_required, unchanged, flag
 
 import os
-import fnmatch
 import re
 import subprocess
 
@@ -661,11 +660,7 @@ def write_file(directory, filename, content):
 
 
 def setup(app: Sphinx):
-    # Assume general build directory is the doctree directory without the last component. We strip
-    # off any trailing slashes so that dirname correctly drops the last part. This can be overriden
-    # with the breathe_build_directory config variable
-    build_dir = os.path.dirname(app.doctreedir.rstrip(os.sep))
-    project_info_factory = ProjectInfoFactory(app.srcdir, build_dir, app.confdir, fnmatch.fnmatch)
+    project_info_factory = ProjectInfoFactory(app)
     directive_factory = DoxygenDirectiveFactory(app, project_info_factory)
 
     def add_directive(name):

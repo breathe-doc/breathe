@@ -1,7 +1,14 @@
 
 from .exception import BreatheError
 
+from sphinx.application import Sphinx
+
 import os
+import fnmatch
+
+if False:
+    # For type annotation
+    from typing import Dict, Optional  # noqa
 
 
 class ProjectError(BreatheError):
@@ -12,7 +19,7 @@ class NoDefaultProjectError(ProjectError):
     pass
 
 
-class AutoProjectInfo(object):
+class AutoProjectInfo:
     """Created as a temporary step in the automatic xml generation process"""
 
     def __init__(
@@ -25,7 +32,6 @@ class AutoProjectInfo(object):
             config_dir,
             domain_by_extension,
             domain_by_file_pattern,
-            match,
             show_define_initializer,
             project_refids,
             order_parameters_first,
@@ -39,7 +45,6 @@ class AutoProjectInfo(object):
         self._config_dir = config_dir
         self._domain_by_extension = domain_by_extension
         self._domain_by_file_pattern = domain_by_file_pattern
-        self._match = match
         self._show_define_initializer = show_define_initializer
         self._project_refids = project_refids
         self._order_parameters_first = order_parameters_first
@@ -74,15 +79,13 @@ class AutoProjectInfo(object):
             self._config_dir,
             self._domain_by_extension,
             self._domain_by_file_pattern,
-            self._match,
             self._show_define_initializer,
             self._project_refids,
             self._order_parameters_first,
             )
 
 
-class ProjectInfo(object):
-
+class ProjectInfo:
     def __init__(
             self,
             name,
@@ -93,7 +96,6 @@ class ProjectInfo(object):
             config_dir,
             domain_by_extension,
             domain_by_file_pattern,
-            match,
             show_define_initializer,
             project_refids,
             order_parameters_first
@@ -107,7 +109,7 @@ class ProjectInfo(object):
         self._config_dir = config_dir
         self._domain_by_extension = domain_by_extension
         self._domain_by_file_pattern = domain_by_file_pattern
-        self._match = match
+        self._match = fnmatch.fnmatch
         self._show_define_initializer = show_define_initializer
         self._project_refids = project_refids
         self._order_parameters_first = order_parameters_first
@@ -174,28 +176,29 @@ class ProjectInfo(object):
         return self._order_parameters_first
 
 
-class ProjectInfoFactory(object):
+class ProjectInfoFactory:
+    def __init__(self, app: Sphinx):
+        self.app = app
+        self.source_dir = app.srcdir
+        # Assume general build directory is the doctree directory without the last component.
+        # We strip off any trailing slashes so that dirname correctly drops the last part.
+        # This can be overriden with the breathe_build_directory config variable
+        self.build_dir = os.path.dirname(app.doctreedir.rstrip(os.sep))
+        self.config_dir = app.confdir
 
-    def __init__(self, source_dir, build_dir, config_dir, match):
-
-        self.source_dir = source_dir
-        self.build_dir = build_dir
-        self.config_dir = config_dir
-        self.match = match
-
-        self.projects = {}
-        self.default_project = None
-        self.domain_by_extension = {}
-        self.domain_by_file_pattern = {}
+        self.projects = {}  # type: Dict[str, str]
+        self.default_project = None  # type: Optional[str]
+        self.domain_by_extension = {}  # type: Dict[str, str]
+        self.domain_by_file_pattern = {}  # type: Dict[str, str]
         self.project_refids = False
 
         self.show_define_initializer = False
         self.order_parameters_first = False
 
         self.project_count = 0
-        self.project_info_store = {}
-        self.project_info_for_auto_store = {}
-        self.auto_project_info_store = {}
+        self.project_info_store = {}  # type: Dict[str, ProjectInfo]
+        self.project_info_for_auto_store = {}  # type: Dict[str, AutoProjectInfo]
+        self.auto_project_info_store = {}  # type: Dict[str, AutoProjectInfo]
 
     def update(
             self,
@@ -224,8 +227,7 @@ class ProjectInfoFactory(object):
         if build_dir:
             self.build_dir = build_dir
 
-    def default_path(self):
-
+    def default_path(self) -> str:
         if not self.default_project:
             raise NoDefaultProjectError(
                 "No breathe_default_project config setting to fall back on "
@@ -240,8 +242,7 @@ class ProjectInfoFactory(object):
                  "breathe_projects dictionary") % self.default_project
             )
 
-    def create_project_info(self, options):
-
+    def create_project_info(self, options) -> ProjectInfo:
         name = self.default_project
 
         if "project" in options:
@@ -278,7 +279,6 @@ class ProjectInfoFactory(object):
                 self.config_dir,
                 self.domain_by_extension,
                 self.domain_by_file_pattern,
-                self.match,
                 self.show_define_initializer,
                 self.project_refids,
                 self.order_parameters_first
@@ -288,7 +288,7 @@ class ProjectInfoFactory(object):
 
             return project_info
 
-    def store_project_info_for_auto(self, name, project_info):
+    def store_project_info_for_auto(self, name: str, project_info: AutoProjectInfo) -> None:
         """Stores the project info by name for later extraction by the auto directives.
 
         Stored separately to the non-auto project info objects as they should never overlap.
@@ -296,7 +296,7 @@ class ProjectInfoFactory(object):
 
         self.project_info_for_auto_store[name] = project_info
 
-    def retrieve_project_info_for_auto(self, options):
+    def retrieve_project_info_for_auto(self, options) -> AutoProjectInfo:
         """Retrieves the project info by name for later extraction by the auto directives.
 
         Looks for the 'project' entry in the options dictionary. This is a less than ideal API but
@@ -314,8 +314,7 @@ class ProjectInfoFactory(object):
 
         return self.project_info_for_auto_store[name]
 
-    def create_auto_project_info(self, name, source_path):
-
+    def create_auto_project_info(self, name: str, source_path) -> AutoProjectInfo:
         key = source_path
 
         try:
@@ -338,7 +337,6 @@ class ProjectInfoFactory(object):
                 self.config_dir,
                 self.domain_by_extension,
                 self.domain_by_file_pattern,
-                self.match,
                 self.show_define_initializer,
                 self.project_refids,
                 self.order_parameters_first
