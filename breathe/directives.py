@@ -3,7 +3,6 @@ from .finder.core import FinderFactory
 from .parser import DoxygenParserFactory, ParserError, FileIOError
 from .renderer import format_parser_error, DoxygenToRstRendererFactory
 from .renderer.base import RenderContext
-from .renderer.filter import FilterFactory
 from .renderer.mask import MaskFactory, NullMaskFactory, NoParameterNamesMask
 from .renderer.sphinxrenderer import WithContext
 
@@ -13,7 +12,6 @@ from .directive.file import DoxygenFileDirective, AutoDoxygenFileDirective
 from .process import AutoDoxygenProcessHandle
 from .exception import BreatheError
 from .project import ProjectInfoFactory, ProjectError
-from .node_factory import create_node_factory
 
 from breathe.directive.base import BaseDirective
 from breathe.file_state_cache import MTimeError
@@ -24,13 +22,14 @@ from sphinx.writers.text import TextWriter
 from sphinx.builders.text import TextBuilder
 from sphinx.domains import cpp
 
+from docutils import nodes
 from docutils.parsers.rst.directives import unchanged_required, unchanged, flag
 
 import os
 import re
 import subprocess
 
-from typing import Dict, Type
+from typing import Type
 
 
 class NoMatchingFunctionError(BreatheError):
@@ -78,14 +77,7 @@ class DoxygenFunctionDirective(BaseDirective):
     has_content = False
     final_argument_whitespace = True
 
-    def __init__(self, node_factory, text_renderer, *args, **kwargs):
-        BaseDirective.__init__(self, *args, **kwargs)
-
-        self.node_factory = node_factory
-        self.text_renderer = text_renderer
-
     def run(self):
-
         # Separate possible arguments (delimited by a "(") from the namespace::name
         match = re.match(r"([^(]*)(.*)", self.arguments[0])
         namespaced_function, args = match.group(1), match.group(2)
@@ -153,15 +145,12 @@ class DoxygenFunctionDirective(BaseDirective):
                 # alignment for our simple plain text list
                 literal_text += '- %s' % entry.replace('\n', '\n  ')
                 raw_text += '    - %s\n' % entry.replace('\n', '\n      ')
-            block = self.node_factory.literal_block('', '', self.node_factory.Text(literal_text))
+            block = nodes.literal_block('', '', nodes.Text(literal_text))
             formatted_message = warning.format(message)
             warning_nodes = [
-                self.node_factory.paragraph(
-                    "", "",
-                    self.node_factory.Text(formatted_message)
-                    ),
+                nodes.paragraph("", "", nodes.Text(formatted_message)),
                 block
-                ]
+            ]
             result = warning.warn(raw_text, warning_nodes)
             return result
 
@@ -564,9 +553,14 @@ class DoxygenUnionDirective(DoxygenBaseItemDirective):
 # --------------------
 
 class DirectiveContainer:
-    def __init__(self, directive: Type[BaseDirective], *args):
+    def __init__(self, app: Sphinx, directive: Type[BaseDirective],
+                 finder_factory: FinderFactory, project_info_factory: ProjectInfoFactory,
+                 parser_factory: DoxygenParserFactory):
+        self.app = app
         self.directive = directive
-        self.args = args
+        self.finder_factory = finder_factory
+        self.project_info_factory = project_info_factory
+        self.parser_factory = parser_factory
 
         # Required for sphinx to inspect
         self.required_arguments = directive.required_arguments
@@ -576,15 +570,26 @@ class DirectiveContainer:
         self.final_argument_whitespace = directive.final_argument_whitespace
 
     def __call__(self, *args):
-        call_args = []
-        call_args.extend(self.args)
+        call_args = [
+            self.finder_factory,
+            self.project_info_factory,
+            self.parser_factory
+        ]
         call_args.extend(args)
-
         return self.directive(*call_args)
 
 
-class DoxygenDirectiveFactory:
-    directives: Dict[str, Type[BaseDirective]]
+def write_file(directory, filename, content):
+    # Check the directory exists
+    if not os.path.exists(directory):
+        os.makedirs(directory)
+
+    # Write the file with the provided contents
+    with open(os.path.join(directory, filename), "w") as f:
+        f.write(content)
+
+
+def setup(app: Sphinx):
     directives = {
         "doxygenindex": DoxygenIndexDirective,
         "autodoxygenindex": AutoDoxygenIndexDirective,
@@ -604,73 +609,20 @@ class DoxygenDirectiveFactory:
         "autodoxygenfile": AutoDoxygenFileDirective,
     }
 
-    def __init__(self, app: Sphinx, project_info_factory: ProjectInfoFactory):
-        self.app = app
-        self.project_info_factory = project_info_factory
-
-        # note: the parser factory contains a cache of the parsed XML
-        self.parser_factory = DoxygenParserFactory(app)
-        self.finder_factory = FinderFactory(app, self.parser_factory)
-
-    def create_function_directive_container(self):
-        # Pass text_renderer to the function directive
-        return DirectiveContainer(
-            self.directives["doxygenfunction"],
-            create_node_factory(),
-            TextRenderer(self.app),
-            self.finder_factory,
-            self.project_info_factory,
-            FilterFactory(self.app),
-            self.parser_factory
-            )
-
-    def create_directive_container(self, type_):
-        return DirectiveContainer(
-            self.directives[type_],
-            self.finder_factory,
-            self.project_info_factory,
-            FilterFactory(self.app),
-            self.parser_factory
-            )
-
-
-def write_file(directory, filename, content):
-    # Check the directory exists
-    if not os.path.exists(directory):
-        os.makedirs(directory)
-
-    # Write the file with the provided contents
-    with open(os.path.join(directory, filename), "w") as f:
-        f.write(content)
-
-
-def setup(app: Sphinx):
     project_info_factory = ProjectInfoFactory(app)
-    directive_factory = DoxygenDirectiveFactory(app, project_info_factory)
-
-    def add_directive(name):
-        app.add_directive(name, directive_factory.create_directive_container(name))
-
-    add_directive('doxygenindex')
-    add_directive('doxygenstruct')
-    add_directive('doxygenenum')
-    add_directive('doxygenenumvalue')
-    add_directive('doxygentypedef')
-    add_directive('doxygenunion')
-    add_directive('doxygenclass')
-    add_directive('doxygeninterface')
-    add_directive('doxygenfile')
-    add_directive('doxygennamespace')
-    add_directive('doxygengroup')
-    add_directive('doxygenvariable')
-    add_directive('doxygendefine')
-    add_directive('autodoxygenindex')
-    add_directive('autodoxygenfile')
-
-    app.add_directive(
-        "doxygenfunction",
-        directive_factory.create_function_directive_container(),
-        )
+    # note: the parser factory contains a cache of the parsed XML
+    parser_factory = DoxygenParserFactory(app)
+    finder_factory = FinderFactory(app, parser_factory)
+    for name, directive in directives.items():
+        # ordinarily app.add_directive takes a class it self, but we need to inject extra arguments
+        # so we give a DirectiveContainer object which has an overloaded __call__ operator.
+        app.add_directive(name, DirectiveContainer(  # type: ignore
+            app,
+            directive,
+            finder_factory,
+            project_info_factory,
+            parser_factory
+            ))
 
     app.add_config_value("breathe_projects", {}, True)  # Dict[str, str]
     app.add_config_value("breathe_default_project", "", True)  # str

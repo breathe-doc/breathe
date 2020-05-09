@@ -3,6 +3,11 @@ from ..renderer.base import RenderContext
 from ..renderer import format_parser_error, DoxygenToRstRendererFactory
 from ..parser import ParserError, FileIOError
 
+from breathe.project import ProjectInfoFactory
+from breathe.finder.core import FinderFactory
+from breathe.parser import DoxygenParserFactory
+from breathe.renderer.filter import FilterFactory
+
 from sphinx.directives import SphinxDirective
 
 from docutils import nodes
@@ -46,15 +51,16 @@ def create_warning(project_info, state, lineno, **kwargs):
 
 
 class BaseDirective(SphinxDirective):
-    def __init__(self, finder_factory,
-                 project_info_factory, filter_factory, parser_factory,
+    def __init__(self, finder_factory: FinderFactory,
+                 project_info_factory: ProjectInfoFactory,
+                 parser_factory: DoxygenParserFactory,
                  *args):
         super().__init__(*args)
         self.directive_args = list(args)  # Convert tuple to list to allow modification.
 
         self.finder_factory = finder_factory
         self.project_info_factory = project_info_factory
-        self.filter_factory = filter_factory
+        self.filter_factory = FilterFactory(self.env.app)
         self.parser_factory = parser_factory
 
     def render(self, node_stack, project_info, filter_, target_handler, mask_factory,
