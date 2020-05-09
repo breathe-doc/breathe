@@ -17,10 +17,14 @@ from .exception import BreatheError
 from .project import ProjectInfoFactory, ProjectError
 from .node_factory import create_node_factory
 
-from docutils.parsers.rst.directives import unchanged_required, unchanged, flag
+from breathe.file_state_cache import MTimeError
+
+from sphinx.application import Sphinx
 from sphinx.writers.text import TextWriter
 from sphinx.builders.text import TextBuilder
 from sphinx.domains import cpp
+
+from docutils.parsers.rst.directives import unchanged_required, unchanged, flag
 
 import os
 import fnmatch
@@ -102,7 +106,7 @@ class DoxygenFunctionDirective(BaseDirective):
 
         try:
             finder = self.finder_factory.create_finder(project_info)
-        except MTimerError as e:
+        except MTimeError as e:
             warning = create_warning(None, self.state, self.lineno)
             return warning.warn('doxygenfunction: %s' % e)
 
@@ -321,7 +325,7 @@ class DoxygenClassLikeDirective(BaseDirective):
 
         try:
             finder = self.finder_factory.create_finder(project_info)
-        except MTimerError as e:
+        except MTimeError as e:
             warning = create_warning(None, self.state, self.lineno, kind=self.kind)
             return warning.warn('doxygen{kind}: %s' % e)
 
@@ -390,7 +394,7 @@ class DoxygenContentBlockDirective(BaseDirective):
 
         try:
             finder = self.finder_factory.create_finder(project_info)
-        except MTimerError as e:
+        except MTimeError as e:
             warning = create_warning(None, self.state, self.lineno, kind=self.kind)
             return warning.warn('doxygen{kind}: %s' % e)
 
@@ -498,7 +502,7 @@ class DoxygenBaseItemDirective(BaseDirective):
 
         try:
             finder = self.finder_factory.create_finder(project_info)
-        except MTimerError as e:
+        except MTimeError as e:
             warning = create_warning(None, self.state, self.lineno, kind=self.kind)
             return warning.warn('doxygen{kind}: %s' % e)
 
@@ -571,9 +575,7 @@ class DoxygenUnionDirective(DoxygenBaseItemDirective):
 # --------------------
 
 class DirectiveContainer(object):
-
     def __init__(self, directive, *args):
-
         self.directive = directive
         self.args = args
 
@@ -585,7 +587,6 @@ class DirectiveContainer(object):
         self.final_argument_whitespace = directive.final_argument_whitespace
 
     def __call__(self, *args):
-
         call_args = []
         call_args.extend(self.args)
         call_args.extend(args)
@@ -594,7 +595,6 @@ class DirectiveContainer(object):
 
 
 class DoxygenDirectiveFactory(object):
-
     directives = {
         "doxygenindex": DoxygenIndexDirective,
         "autodoxygenindex": AutoDoxygenIndexDirective,
@@ -616,7 +616,6 @@ class DoxygenDirectiveFactory(object):
 
     def __init__(self, node_factory, text_renderer, finder_factory,
                  project_info_factory, filter_factory, target_handler_factory, parser_factory):
-
         self.node_factory = node_factory
         self.text_renderer = text_renderer
         self.finder_factory = finder_factory
@@ -626,7 +625,6 @@ class DoxygenDirectiveFactory(object):
         self.parser_factory = parser_factory
 
     def create_function_directive_container(self):
-
         # Pass text_renderer to the function directive
         return DirectiveContainer(
             self.directives["doxygenfunction"],
@@ -640,7 +638,6 @@ class DoxygenDirectiveFactory(object):
             )
 
     def create_directive_container(self, type_):
-
         return DirectiveContainer(
             self.directives[type_],
             self.finder_factory,
@@ -651,7 +648,6 @@ class DoxygenDirectiveFactory(object):
             )
 
     def get_config_values(self, app):
-
         # All DirectiveContainers maintain references to this project info factory
         # so we can update this to update them
         self.project_info_factory.update(
@@ -668,9 +664,7 @@ class DoxygenDirectiveFactory(object):
 
 
 class PathHandler(object):
-
     def __init__(self, config_directory, sep, basename, join):
-
         self.config_directory = config_directory
 
         self.sep = sep
@@ -678,7 +672,6 @@ class PathHandler(object):
         self.join = join
 
     def includes_directory(self, file_path):
-
         # Check for backslash or forward slash as we don't know what platform we're on and sometimes
         # the doxygen paths will have forward slash even on Windows.
         return bool(file_path.count('\\')) or bool(file_path.count('/'))
@@ -693,7 +686,6 @@ class PathHandler(object):
 
 
 def write_file(directory, filename, content):
-
     # Check the directory exists
     if not os.path.exists(directory):
         os.makedirs(directory)
@@ -703,94 +695,9 @@ def write_file(directory, filename, content):
         f.write(content)
 
 
-class MTimerError(Exception):
-    pass
-
-
-class MTimer(object):
-
-    def __init__(self, getmtime):
-        self.getmtime = getmtime
-
-    def get_mtime(self, filename):
-
-        try:
-            return self.getmtime(filename)
-        except OSError:
-            raise MTimerError('Cannot find file: %s' % os.path.realpath(filename))
-
-
-class FileStateCache(object):
-    """
-    Stores the modified time of the various doxygen xml files against the
-    reStructuredText file that they are referenced from so that we know which
-    reStructuredText files to rebuild if the doxygen xml is modified.
-
-    We store the information in the environment object so that it is pickled
-    down and stored between builds as Sphinx is designed to do.
-    """
-
-    def __init__(self, mtimer, app):
-
-        self.app = app
-        self.mtimer = mtimer
-
-    def update(self, source_file):
-
-        if not hasattr(self.app.env, "breathe_file_state"):
-            self.app.env.breathe_file_state = {}
-
-        new_mtime = self.mtimer.get_mtime(source_file)
-
-        mtime, docnames = self.app.env.breathe_file_state.setdefault(
-            source_file, (new_mtime, set())
-            )
-
-        docnames.add(self.app.env.docname)
-
-        self.app.env.breathe_file_state[source_file] = (new_mtime, docnames)
-
-    def get_outdated(self, app, env, added, changed, removed):
-
-        if not hasattr(self.app.env, "breathe_file_state"):
-            return []
-
-        stale = []
-
-        for filename, info in self.app.env.breathe_file_state.items():
-            old_mtime, docnames = info
-            if self.mtimer.get_mtime(filename) > old_mtime:
-                stale.extend(docnames)
-
-        return list(set(stale).difference(removed))
-
-    def purge_doc(self, app, env, docname):
-
-        if not hasattr(self.app.env, "breathe_file_state"):
-            return
-
-        toremove = []
-
-        for filename, info in self.app.env.breathe_file_state.items():
-
-            _, docnames = info
-            docnames.discard(docname)
-            if not docnames:
-                toremove.append(filename)
-
-        for filename in toremove:
-            del self.app.env.breathe_file_state[filename]
-
-
-# Setup
-# -----
-
-def setup(app):
-
+def setup(app: Sphinx):
     path_handler = PathHandler(app.confdir, os.sep, os.path.basename, os.path.join)
-    mtimer = MTimer(os.path.getmtime)
-    file_state_cache = FileStateCache(mtimer, app)
-    parser_factory = DoxygenParserFactory(path_handler, file_state_cache)
+    parser_factory = DoxygenParserFactory(app, path_handler)
     filter_factory = FilterFactory(path_handler)
     item_finder_factory_creator = DoxygenItemFinderFactoryCreator(parser_factory, filter_factory)
     index_parser = parser_factory.create_index_parser()
@@ -872,11 +779,5 @@ def setup(app):
         )
 
     app.connect("builder-inited", directive_factory.get_config_values)
-
     app.connect("builder-inited", filter_factory.get_config_values)
-
     app.connect("builder-inited", doxygen_hook)
-
-    app.connect("env-get-outdated", file_state_cache.get_outdated)
-
-    app.connect("env-purge-doc", file_state_cache.purge_doc)

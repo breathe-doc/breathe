@@ -1,10 +1,14 @@
-
 from . import index
 from . import compound
 
+from breathe import file_state_cache
+from breathe.parser.compoundsuper import DoxygenType
+
+from sphinx.application import Sphinx
+
+from typing import Dict
 
 class ParserError(Exception):
-
     def __init__(self, error, filename):
         Exception.__init__(self, error)
 
@@ -16,7 +20,6 @@ class ParserError(Exception):
 
 
 class FileIOError(Exception):
-
     def __init__(self, error, filename):
         Exception.__init__(self, error)
 
@@ -24,28 +27,24 @@ class FileIOError(Exception):
         self.filename = filename
 
 
-class Parser(object):
-
-    def __init__(self, cache, path_handler, file_state_cache):
-
+class Parser:
+    def __init__(self, app: Sphinx, cache: Dict[str, DoxygenType], path_handler):
+        self.app = app
         self.cache = cache
         self.path_handler = path_handler
-        self.file_state_cache = file_state_cache
 
 
 class DoxygenIndexParser(Parser):
-
-    def __init__(self, cache, path_handler, file_state_cache):
-        Parser.__init__(self, cache, path_handler, file_state_cache)
+    def __init__(self, app: Sphinx, cache: Dict[str, DoxygenType], path_handler):
+        super().__init__(app, cache, path_handler)
 
     def parse(self, project_info):
-
         filename = self.path_handler.resolve_path(
             project_info.project_path(),
             "index.xml"
         )
 
-        self.file_state_cache.update(filename)
+        file_state_cache.update(self.app, filename)
 
         try:
             # Try to get from our cache
@@ -64,26 +63,23 @@ class DoxygenIndexParser(Parser):
 
 
 class DoxygenCompoundParser(Parser):
-
-    def __init__(self, cache, path_handler, file_state_cache, project_info):
-        Parser.__init__(self, cache, path_handler, file_state_cache)
+    def __init__(self, app: Sphinx, cache, path_handler, project_info):
+        super().__init__(app, cache, path_handler)
 
         self.project_info = project_info
 
-    def parse(self, refid):
-
+    def parse(self, refid) -> DoxygenType:
         filename = self.path_handler.resolve_path(
             self.project_info.project_path(),
             "%s.xml" % refid
         )
 
-        self.file_state_cache.update(filename)
+        file_state_cache.update(self.app, filename)
 
         try:
             # Try to get from our cache
             return self.cache[filename]
         except KeyError:
-
             # If that fails, parse it afresh
             try:
                 result = compound.parse(filename)
@@ -95,23 +91,19 @@ class DoxygenCompoundParser(Parser):
                 raise FileIOError(e, filename)
 
 
-class DoxygenParserFactory(object):
-
-    def __init__(self, path_handler, file_state_cache):
-
-        self.cache = {}
+class DoxygenParserFactory:
+    def __init__(self, app: Sphinx, path_handler):
+        self.app = app
+        self.cache = {}  # type: Dict[str, DoxygenType]
         self.path_handler = path_handler
-        self.file_state_cache = file_state_cache
 
     def create_index_parser(self):
-
-        return DoxygenIndexParser(self.cache, self.path_handler, self.file_state_cache)
+        return DoxygenIndexParser(self.app, self.cache, self.path_handler)
 
     def create_compound_parser(self, project_info):
-
         return DoxygenCompoundParser(
+            self.app,
             self.cache,
             self.path_handler,
-            self.file_state_cache,
             project_info
         )

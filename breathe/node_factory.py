@@ -10,13 +10,10 @@ class NodeNotFoundError(BreatheError):
 
 
 class NodeFactory(object):
-
     def __init__(self, *args):
-
         self.sources = args
 
     def __getattr__(self, node_name):
-
         for source in self.sources:
             try:
                 return getattr(source, node_name)
@@ -26,6 +23,5 @@ class NodeFactory(object):
         raise NodeNotFoundError(node_name)
 
 
-def create_node_factory():
-
+def create_node_factory() -> NodeFactory:
     return NodeFactory(docutils.nodes, sphinx.addnodes)
