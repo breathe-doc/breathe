@@ -6,6 +6,8 @@ from ..directive.base import BaseDirective
 from ..project import ProjectError
 from .base import create_warning
 
+from breathe.renderer.target import create_target_handler
+
 from docutils.parsers.rst.directives import unchanged_required, flag
 
 
@@ -19,9 +21,7 @@ class BaseFileDirective(BaseDirective):
     # pass way too much stuff to a helper object to be reasonable.
 
     def handle_contents(self, file_, project_info):
-
         finder = self.finder_factory.create_finder(project_info)
-
         finder_filter = self.filter_factory.create_file_finder_filter(file_)
 
         matches = []
@@ -37,8 +37,7 @@ class BaseFileDirective(BaseDirective):
                                      directivename=self.directive_name)
             return warning.warn('{directivename}: Cannot find file "{file} {tail}')
 
-        target_handler = self.target_handler_factory.create_target_handler(
-            self.options, project_info, self.state.document)
+        target_handler = create_target_handler(self.options, project_info, self.state.document)
         filter_ = self.filter_factory.create_file_filter(file_, self.options)
 
         renderer_factory = DoxygenToRstRendererFactory(

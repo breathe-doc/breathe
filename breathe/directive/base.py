@@ -47,7 +47,7 @@ def create_warning(project_info, state, lineno, **kwargs):
 
 class BaseDirective(SphinxDirective):
     def __init__(self, finder_factory,
-                 project_info_factory, filter_factory, target_handler_factory, parser_factory,
+                 project_info_factory, filter_factory, parser_factory,
                  *args):
         super().__init__(*args)
         self.directive_args = list(args)  # Convert tuple to list to allow modification.
@@ -55,7 +55,6 @@ class BaseDirective(SphinxDirective):
         self.finder_factory = finder_factory
         self.project_info_factory = project_info_factory
         self.filter_factory = filter_factory
-        self.target_handler_factory = target_handler_factory
         self.parser_factory = parser_factory
 
     def render(self, node_stack, project_info, filter_, target_handler, mask_factory,

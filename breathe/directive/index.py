@@ -7,6 +7,8 @@ from ..project import ProjectError
 from ..parser import ParserError, FileIOError
 from .base import create_warning
 
+from breathe.renderer.target import create_target_handler
+
 from docutils.parsers.rst.directives import unchanged_required, flag
 
 
@@ -35,8 +37,7 @@ class BaseIndexDirective(BaseDirective):
 
         data_object = finder.root()
 
-        target_handler = self.target_handler_factory.create_target_handler(
-            self.options, project_info, self.state.document)
+        target_handler = create_target_handler(self.options, project_info, self.state.document)
         filter_ = self.filter_factory.create_index_filter(self.options)
 
         renderer_factory = DoxygenToRstRendererFactory(

@@ -4,7 +4,6 @@ from .parser import DoxygenParserFactory, ParserError, FileIOError
 from .renderer import format_parser_error, DoxygenToRstRendererFactory
 from .renderer.base import RenderContext
 from .renderer.filter import FilterFactory
-from .renderer.target import TargetHandlerFactory
 from .renderer.mask import MaskFactory, NullMaskFactory, NoParameterNamesMask
 from .renderer.sphinxrenderer import WithContext
 
@@ -18,6 +17,7 @@ from .node_factory import create_node_factory
 
 from breathe.directive.base import BaseDirective
 from breathe.file_state_cache import MTimeError
+from breathe.renderer.target import create_target_handler
 
 from sphinx.application import Sphinx
 from sphinx.writers.text import TextWriter
@@ -166,9 +166,7 @@ class DoxygenFunctionDirective(BaseDirective):
             result = warning.warn(raw_text, warning_nodes)
             return result
 
-        target_handler = self.target_handler_factory.create_target_handler(
-            self.options, project_info, self.state.document
-            )
+        target_handler = create_target_handler(self.options, project_info, self.state.document)
         filter_ = self.filter_factory.create_outline_filter(self.options)
 
         return self.render(node_stack, project_info, filter_, target_handler, NullMaskFactory(),
@@ -268,9 +266,8 @@ class DoxygenFunctionDirective(BaseDirective):
             text_options = {'no-link': u'', 'outline': u''}
 
             # Render the matches to docutils nodes
-            target_handler = self.target_handler_factory.create_target_handler(
-                {'no-link': u''}, project_info, self.state.document
-                )
+            target_handler = create_target_handler({'no-link': u''},
+                                                   project_info, self.state.document)
             filter_ = self.filter_factory.create_outline_filter(text_options)
             mask_factory = MaskFactory({'param': NoParameterNamesMask})
 
@@ -338,9 +335,7 @@ class DoxygenClassLikeDirective(BaseDirective):
                                      kind=self.kind)
             return warning.warn('doxygen{kind}: Cannot find class "{name}" {tail}')
 
-        target_handler = self.target_handler_factory.create_target_handler(
-            self.options, project_info, self.state.document
-            )
+        target_handler = create_target_handler(self.options, project_info, self.state.document)
         filter_ = self.filter_factory.create_class_filter(name, self.options)
 
         mask_factory = NullMaskFactory()
@@ -426,9 +421,7 @@ class DoxygenContentBlockDirective(BaseDirective):
             # Replaces matches with our new starting points
             matches = contents
 
-        target_handler = self.target_handler_factory.create_target_handler(
-            self.options, project_info, self.state.document
-            )
+        target_handler = create_target_handler(self.options, project_info, self.state.document)
         filter_ = self.filter_factory.create_render_filter(self.kind, self.options)
 
         renderer_factory = DoxygenToRstRendererFactory(
@@ -516,9 +509,7 @@ class DoxygenBaseItemDirective(BaseDirective):
                                      display_name=display_name)
             return warning.warn('doxygen{kind}: Cannot find {kind} "{display_name}" {tail}')
 
-        target_handler = self.target_handler_factory.create_target_handler(
-            self.options, project_info, self.state.document
-            )
+        target_handler = create_target_handler(self.options, project_info, self.state.document)
         filter_ = self.filter_factory.create_outline_filter(self.options)
 
         node_stack = matches[0]
@@ -614,13 +605,10 @@ class DoxygenDirectiveFactory:
         "autodoxygenfile": AutoDoxygenFileDirective,
     }
 
-    def __init__(self, app: Sphinx, node_factory, project_info_factory, target_handler_factory):
+    def __init__(self, app: Sphinx, project_info_factory: ProjectInfoFactory):
         self.app = app
         self.project_info_factory = project_info_factory
-        self.target_handler_factory = target_handler_factory
 
-        self.node_factory = node_factory
-        self.text_renderer = TextRenderer(app)
         # note: the parser factory contains a cache of the parsed XML
         self.parser_factory = DoxygenParserFactory(app)
         self.finder_factory = FinderFactory(app, self.parser_factory)
@@ -629,12 +617,11 @@ class DoxygenDirectiveFactory:
         # Pass text_renderer to the function directive
         return DirectiveContainer(
             self.directives["doxygenfunction"],
-            self.node_factory,
-            self.text_renderer,
+            create_node_factory(),
+            TextRenderer(self.app),
             self.finder_factory,
             self.project_info_factory,
             FilterFactory(self.app),
-            self.target_handler_factory,
             self.parser_factory
             )
 
@@ -644,7 +631,6 @@ class DoxygenDirectiveFactory:
             self.finder_factory,
             self.project_info_factory,
             FilterFactory(self.app),
-            self.target_handler_factory,
             self.parser_factory
             )
 
@@ -680,14 +666,7 @@ def setup(app: Sphinx):
     # with the breathe_build_directory config variable
     build_dir = os.path.dirname(app.doctreedir.rstrip(os.sep))
     project_info_factory = ProjectInfoFactory(app.srcdir, build_dir, app.confdir, fnmatch.fnmatch)
-    node_factory = create_node_factory()
-    target_handler_factory = TargetHandlerFactory(node_factory)
-
-    directive_factory = DoxygenDirectiveFactory(
-        app,
-        node_factory,
-        project_info_factory,
-        target_handler_factory)
+    directive_factory = DoxygenDirectiveFactory(app, project_info_factory)
 
     def add_directive(name):
         app.add_directive(name, directive_factory.create_directive_container(name))
