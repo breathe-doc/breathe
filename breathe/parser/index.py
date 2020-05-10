@@ -45,7 +45,6 @@ class FileIOError(Exception):
     pass
 
 def parse(inFilename):
-
     try:
         doc = minidom.parse(inFilename)
     except IOError as e:
@@ -56,5 +55,4 @@ def parse(inFilename):
     rootNode = doc.documentElement
     rootObj = supermod.DoxygenType.factory()
     rootObj.build(rootNode)
-
     return rootObj

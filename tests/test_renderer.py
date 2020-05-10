@@ -234,8 +234,6 @@ def render(app, member_def, domain=None, show_define_initializer=False):
     app.config.breathe_show_define_initializer = show_define_initializer
     renderer = SphinxRenderer(app,
                               None,  # project_info
-                              None,  # renderer_factory
-                              create_node_factory(),
                               [],    # node_stack
                               None,  # state
                               None,  # document

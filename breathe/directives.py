@@ -1,9 +1,6 @@
-
-from .finder.core import FinderFactory
 from .parser import DoxygenParserFactory, ParserError, FileIOError
-from .renderer import format_parser_error, DoxygenToRstRendererFactory
+from .renderer import DoxygenToRstRendererFactory, format_parser_error
 from .renderer.base import RenderContext
-from .renderer.mask import MaskFactory, NullMaskFactory, NoParameterNamesMask
 from .renderer.sphinxrenderer import WithContext
 
 from .directive.base import create_warning
@@ -13,8 +10,12 @@ from .process import AutoDoxygenProcessHandle
 from .exception import BreatheError
 from .project import ProjectInfoFactory, ProjectError
 
+from breathe.finder.core import Filter, FinderFactory
 from breathe.directive.base import BaseDirective
 from breathe.file_state_cache import MTimeError
+from breathe.renderer.mask import (
+    MaskFactory, NullMaskFactory, NoParameterNamesMask
+)
 from breathe.renderer.target import create_target_handler
 
 from sphinx.application import Sphinx
@@ -23,13 +24,14 @@ from sphinx.builders.text import TextBuilder
 from sphinx.domains import cpp
 
 from docutils import nodes
+from docutils.nodes import Node
 from docutils.parsers.rst.directives import unchanged_required, unchanged, flag
 
 import os
 import re
 import subprocess
 
-from typing import Type
+from typing import Any, List, Type  # noqa
 
 
 class NoMatchingFunctionError(BreatheError):
@@ -37,7 +39,7 @@ class NoMatchingFunctionError(BreatheError):
 
 
 class UnableToResolveFunctionError(BreatheError):
-    def __init__(self, signatures):
+    def __init__(self, signatures: List[str]) -> None:
         self.signatures = signatures
 
 
@@ -50,12 +52,12 @@ class TextRenderer:
     def __init__(self, app: Sphinx):
         self.app = app
 
-    def render(self, nodes, document):
+    def render(self, nodes, document) -> str:
         new_document = document.copy()
         new_document.children = nodes
 
         writer = TextWriter(TextBuilder(self.app))
-        output = writer.write(new_document, FakeDestination())
+        output = writer.write(new_document, FakeDestination())  # type: ignore
         return output.strip()
 
 
@@ -73,9 +75,10 @@ class DoxygenFunctionDirective(BaseDirective):
     has_content = False
     final_argument_whitespace = True
 
-    def run(self):
+    def run(self) -> List[Node]:
         # Separate possible arguments (delimited by a "(") from the namespace::name
         match = re.match(r"([^(]*)(.*)", self.arguments[0])
+        assert match is not None  # TODO: this is probably not appropriate, for now it fixes typing
         namespaced_function, args = match.group(1), match.group(2)
 
         # Split the namespace and the function name
@@ -101,7 +104,8 @@ class DoxygenFunctionDirective(BaseDirective):
 
         finder_filter = self.filter_factory.create_function_finder_filter(namespace, function_name)
 
-        matches = []
+        # TODO: find a more specific type for the Doxygen nodes
+        matches = []  # type: List[Any]
         finder.filter_(finder_filter, matches)
 
         # Create it ahead of time as it is cheap and it is ugly to declare it for both exception
@@ -289,7 +293,7 @@ class DoxygenClassLikeDirective(BaseDirective):
     }
     has_content = False
 
-    def run(self):
+    def run(self) -> List[Node]:
         name = self.arguments[0]
 
         try:
@@ -306,7 +310,8 @@ class DoxygenClassLikeDirective(BaseDirective):
 
         finder_filter = self.filter_factory.create_compound_finder_filter(name, self.kind)
 
-        matches = []
+        # TODO: find a more specific type for the Doxygen nodes
+        matches = []  # type: List[Any]
         finder.filter_(finder_filter, matches)
 
         if len(matches) == 0:
@@ -352,7 +357,7 @@ class DoxygenContentBlockDirective(BaseDirective):
     }
     has_content = False
 
-    def run(self):
+    def run(self) -> List[Node]:
         name = self.arguments[0]
 
         try:
@@ -369,7 +374,8 @@ class DoxygenContentBlockDirective(BaseDirective):
 
         finder_filter = self.filter_factory.create_finder_filter(self.kind, name)
 
-        matches = []
+        # TODO: find a more specific type for the Doxygen nodes
+        matches = []  # type: List[Any]
         finder.filter_(finder_filter, matches)
 
         # It shouldn't be possible to have too many matches as namespaces & groups in their nature
@@ -389,7 +395,8 @@ class DoxygenContentBlockDirective(BaseDirective):
             # the contents of it which match the filter
             contents_finder = self.finder_factory.create_finder_from_root(node_stack[0],
                                                                           project_info)
-            contents = []
+            # TODO: find a more specific type for the Doxygen nodes
+            contents = []  # type: List[Any]
             contents_finder.filter_(filter_, contents)
 
             # Replaces matches with our new starting points
@@ -398,10 +405,7 @@ class DoxygenContentBlockDirective(BaseDirective):
         target_handler = create_target_handler(self.options, project_info, self.state.document)
         filter_ = self.filter_factory.create_render_filter(self.kind, self.options)
 
-        renderer_factory = DoxygenToRstRendererFactory(
-            self.parser_factory,
-            project_info
-            )
+        renderer_factory = DoxygenToRstRendererFactory(self.parser_factory, project_info)
         node_list = []
 
         for node_stack in matches:
@@ -444,13 +448,13 @@ class DoxygenBaseItemDirective(BaseDirective):
         }
     has_content = False
 
-    def create_finder_filter(self, namespace, name):
+    def create_finder_filter(self, namespace: str, name: str) -> Filter:
         """Creates a filter to find the node corresponding to this item."""
 
         return self.filter_factory.create_member_finder_filter(
             namespace, name, self.kind)
 
-    def run(self):
+    def run(self) -> List[Node]:
         try:
             namespace, name = self.arguments[0].rsplit("::", 1)
         except ValueError:
@@ -470,7 +474,8 @@ class DoxygenBaseItemDirective(BaseDirective):
 
         finder_filter = self.create_finder_filter(namespace, name)
 
-        matches = []
+        # TODO: find a more specific type for the Doxygen nodes
+        matches = []  # type: List[Any]
         finder.filter_(finder_filter, matches)
 
         if len(matches) == 0:
@@ -503,7 +508,7 @@ class DoxygenEnumDirective(DoxygenBaseItemDirective):
 class DoxygenEnumValueDirective(DoxygenBaseItemDirective):
     kind = "enumvalue"
 
-    def create_finder_filter(self, namespace, name):
+    def create_finder_filter(self, namespace: str, name: str) -> Filter:
         return self.filter_factory.create_enumvalue_finder_filter(name)
 
 
@@ -514,7 +519,7 @@ class DoxygenTypedefDirective(DoxygenBaseItemDirective):
 class DoxygenUnionDirective(DoxygenBaseItemDirective):
     kind = "union"
 
-    def create_finder_filter(self, namespace, name):
+    def create_finder_filter(self, namespace: str, name: str) -> Filter:
         # Unions are stored in the xml file with their fully namespaced name
         # We're using C++ namespaces here, it might be best to make this file
         # type dependent
@@ -553,7 +558,7 @@ class DirectiveContainer:
         return self.directive(*call_args)
 
 
-def setup(app: Sphinx):
+def setup(app: Sphinx) -> None:
     directives = {
         "doxygenindex": DoxygenIndexDirective,
         "autodoxygenindex": AutoDoxygenIndexDirective,

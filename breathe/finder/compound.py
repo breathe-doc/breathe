@@ -14,7 +14,6 @@ class DoxygenTypeSubItemFinder(ItemFinder):
 
 
 class CompoundDefTypeSubItemFinder(ItemFinder):
-
     def filter_(self, ancestors, filter_, matches):
         """Finds nodes which match the filter and continues checks to children"""
 
@@ -48,9 +47,7 @@ class SectionDefTypeSubItemFinder(ItemFinder):
 
 
 class MemberDefTypeSubItemFinder(ItemFinder):
-
     def filter_(self, ancestors, filter_, matches):
-
         data_object = self.data_object
         node_stack = stack(data_object, ancestors)
 

@@ -20,29 +20,29 @@ matching.
 
 import six
 
-class NoParameterNamesMask(object):
-
+class NoParameterNamesMask:
     def __init__(self, data_object):
         self.data_object = data_object
 
     def __getattr__(self, attr):
-
         if attr in ['declname', 'defname', 'defval']:
             return None
-
         return getattr(self.data_object, attr)
 
-class MaskFactory(object):
 
+class MaskFactoryBase:
+    def mask(self, data_object):
+        raise NotImplementedError
+
+
+class MaskFactory(MaskFactoryBase):
     def __init__(self, lookup):
         self.lookup = lookup
 
     def mask(self, data_object):
-
         try:
             node_type = data_object.node_type
         except AttributeError as e:
-
             # Horrible hack to silence errors on filtering unicode objects
             # until we fix the parsing
             if isinstance(data_object, six.text_type):
@@ -53,11 +53,9 @@ class MaskFactory(object):
         if node_type in self.lookup:
             Mask = self.lookup[node_type]
             return Mask(data_object)
-
         return data_object
 
 
-class NullMaskFactory(object):
-
+class NullMaskFactory(MaskFactoryBase):
     def mask(self, data_object):
         return data_object

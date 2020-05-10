@@ -40,13 +40,9 @@ class BaseFileDirective(BaseDirective):
         target_handler = create_target_handler(self.options, project_info, self.state.document)
         filter_ = self.filter_factory.create_file_filter(file_, self.options)
 
-        renderer_factory = DoxygenToRstRendererFactory(
-            self.parser_factory,
-            project_info
-            )
+        renderer_factory = DoxygenToRstRendererFactory(self.parser_factory, project_info)
         node_list = []
         for node_stack in matches:
-
             object_renderer = renderer_factory.create_renderer(
                 node_stack,
                 self.state,

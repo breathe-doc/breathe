@@ -1,25 +1,25 @@
-
-import textwrap
-
-from ..node_factory import create_node_factory
 from . import sphinxrenderer
 
 from breathe.parser import DoxygenParserFactory
+from breathe.project import ProjectInfo
+from breathe.renderer.filter import Filter
+from breathe.renderer.target import TargetHandler
 
 from docutils import nodes
 
+import textwrap
+
 
 class DoxygenToRstRendererFactory:
-    def __init__(self, parser_factory: DoxygenParserFactory, project_info):
+    def __init__(self, parser_factory: DoxygenParserFactory, project_info: ProjectInfo) -> None:
         self.parser_factory = parser_factory
         self.project_info = project_info
 
-    def create_renderer(self, node_stack, state, document, filter_, target_handler):
+    def create_renderer(self, node_stack, state, document, filter_: Filter,
+                        target_handler: TargetHandler) -> sphinxrenderer.SphinxRenderer:
         return sphinxrenderer.SphinxRenderer(
             self.parser_factory.app,
             self.project_info,
-            self,
-            create_node_factory(),
             node_stack,
             state,
             document,
@@ -30,7 +30,6 @@ class DoxygenToRstRendererFactory:
 
 
 def format_parser_error(name, error, filename, state, lineno, do_unicode_warning):
-
     warning = '%s: Unable to parse xml file "%s". ' % (name, filename)
     explanation = 'Reported error: %s. ' % error
 

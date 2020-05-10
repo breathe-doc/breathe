@@ -40,10 +40,7 @@ class BaseIndexDirective(BaseDirective):
         target_handler = create_target_handler(self.options, project_info, self.state.document)
         filter_ = self.filter_factory.create_index_filter(self.options)
 
-        renderer_factory = DoxygenToRstRendererFactory(
-            self.parser_factory,
-            project_info
-            )
+        renderer_factory = DoxygenToRstRendererFactory(self.parser_factory, project_info)
         object_renderer = renderer_factory.create_renderer(
             [data_object],
             self.state,
