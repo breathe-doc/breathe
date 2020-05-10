@@ -177,6 +177,7 @@ Inspired by `Keepachangelog.com <http://keepachangelog.com/>`__.
 
   - Fix friend class rendering and allow friend struct. #522
   - Add extern examples to doc and remove variable hack. #526
+  - Render function candidates without using Sphinx directives. #524
 
 - 2020-05-02 - Breathe v4.18.0
 
