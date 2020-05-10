@@ -1,13 +1,12 @@
-
-from ..renderer.base import RenderContext
-from ..renderer import format_parser_error, DoxygenToRstRendererFactory
 from ..parser import ParserError, FileIOError
 
 from breathe.project import ProjectInfoFactory, ProjectInfo
 from breathe.finder.core import FinderFactory, Filter
 from breathe.parser import DoxygenParserFactory
+from breathe.renderer import format_parser_error, RenderContext
 from breathe.renderer.filter import FilterFactory
 from breathe.renderer.mask import MaskFactoryBase
+from breathe.renderer.sphinxrenderer import SphinxRenderer
 from breathe.renderer.target import TargetHandler
 
 from sphinx.directives import SphinxDirective
@@ -75,15 +74,17 @@ class BaseDirective(SphinxDirective):
                directive_args) -> List[Node]:
         "Standard render process used by subclasses"
 
-        renderer_factory = DoxygenToRstRendererFactory(self.parser_factory, project_info)
         try:
-            object_renderer = renderer_factory.create_renderer(
+            object_renderer = SphinxRenderer(
+                self.parser_factory.app,
+                project_info,
                 node_stack,
                 self.state,
                 self.state.document,
-                filter_,
                 target_handler,
-                )
+                self.parser_factory.create_compound_parser(project_info),
+                filter_
+            )
         except ParserError as e:
             return format_parser_error("doxygenclass", e.error, e.filename, self.state,
                                        self.lineno, True)

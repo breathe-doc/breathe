@@ -205,12 +205,16 @@ from sphinx.application import Sphinx
 
 import os
 import six
-from typing import Any, Dict, List
+from typing import Any, Callable, Dict, List
 
 
 class UnrecognisedKindError(Exception):
     pass
 
+
+###############################################################################
+# Selectors
+###############################################################################
 
 class Selector:
     def __call__(self, node_stack):
@@ -271,6 +275,10 @@ class Node(Selector):
         return node_stack[0]
 
 
+###############################################################################
+# Accessors
+###############################################################################
+
 class Accessor:
     def __init__(self, selector: Selector) -> None:
         self.selector = selector
@@ -284,13 +292,13 @@ class Accessor:
     def __ne__(self, value: str) -> "NotFilter":  # type: ignore
         return NotFilter(InFilter(self, [value]))
 
-    def is_one_of(self, collection):
+    def is_one_of(self, collection: List[str]) -> "InFilter":
         return InFilter(self, collection)
 
     def has_content(self) -> "HasContentFilter":
         return HasContentFilter(self)
 
-    def endswith(self, options) -> "EndsWithFilter":
+    def endswith(self, options: List[str]) -> "EndsWithFilter":
         return EndsWithFilter(self, options)
 
 
@@ -310,7 +318,7 @@ class NodeNameAccessor(Accessor):
 
 
 class NodeTypeAccessor(Accessor):
-    def __call__(self, node_stack):
+    def __call__(self, node_stack) -> str:
         data_object = self.selector(node_stack)
         try:
             return data_object.node_type
@@ -324,7 +332,7 @@ class NodeTypeAccessor(Accessor):
 
 
 class KindAccessor(Accessor):
-    def __call__(self, node_stack):
+    def __call__(self, node_stack) -> str:
         return self.selector(node_stack).kind
 
 
@@ -338,12 +346,12 @@ class AttributeAccessor(Accessor):
         super().__init__(selector)
         self.attribute_name = attribute_name
 
-    def __call__(self, node_stack):
+    def __call__(self, node_stack) -> Any:
         return getattr(self.selector(node_stack), self.attribute_name)
 
 
 class LambdaAccessor(Accessor):
-    def __init__(self, selector, func):
+    def __init__(self, selector: Selector, func: Callable[[Any], str]):
         super().__init__(selector)
         self.func = func
 
@@ -355,6 +363,10 @@ class NamespaceAccessor(Accessor):
     def __call__(self, node_stack):
         return self.selector(node_stack).namespaces
 
+
+###############################################################################
+# Filters
+###############################################################################
 
 class Filter:
     def allow(self, node_stack) -> bool:
@@ -371,7 +383,7 @@ class Filter:
 
 
 class HasAncestorFilter(Filter):
-    def __init__(self, generations):
+    def __init__(self, generations: int) -> None:
         self.generations = generations
 
     def allow(self, node_stack) -> bool:
@@ -383,8 +395,7 @@ class HasContentFilter(Filter):
         self.accessor = accessor
 
     def allow(self, node_stack) -> bool:
-        """Detects if the node in questions has an empty .content_ property.
-        """
+        """Detects if the node in questions has an empty .content_ property."""
 
         return bool(self.accessor(node_stack).content_)
 
@@ -394,7 +405,7 @@ class EndsWithFilter(Filter):
     iterable parameter.
     """
 
-    def __init__(self, accessor, options):
+    def __init__(self, accessor: Accessor, options: List[str]):
         self.accessor = accessor
         self.options = options
 
@@ -419,7 +430,7 @@ class InFilter(Filter):
 
 
 class GlobFilter(Filter):
-    def __init__(self, accessor, glob):
+    def __init__(self, accessor: Accessor, glob):
         self.accessor = accessor
         self.glob = glob
 
@@ -429,7 +440,7 @@ class GlobFilter(Filter):
 
 
 class FilePathFilter(Filter):
-    def __init__(self, accessor, target_file):
+    def __init__(self, accessor: Accessor, target_file: str):
         self.accessor = accessor
         self.target_file = target_file
 
@@ -453,7 +464,7 @@ class FilePathFilter(Filter):
 
 
 class NamespaceFilter(Filter):
-    def __init__(self, namespace_accessor, name_accessor):
+    def __init__(self, namespace_accessor: Accessor, name_accessor: Accessor):
         self.namespace_accessor = namespace_accessor
         self.name_accessor = name_accessor
 
@@ -480,20 +491,18 @@ class ClosedFilter(Filter):
 
 
 class NotFilter(Filter):
-
-    def __init__(self, child_filter):
+    def __init__(self, child_filter: Filter):
         self.child_filter = child_filter
 
-    def allow(self, node_stack):
-
+    def allow(self, node_stack) -> bool:
         return not self.child_filter.allow(node_stack)
 
 
 class AndFilter(Filter):
-    def __init__(self, *filters):
+    def __init__(self, *filters: Filter):
         self.filters = filters
 
-    def allow(self, node_stack):
+    def allow(self, node_stack) -> bool:
         # If any filter returns False then return False
         for filter_ in self.filters:
             if not filter_.allow(node_stack):
@@ -504,55 +513,51 @@ class AndFilter(Filter):
 class OrFilter(Filter):
     """Provides a short-cutted 'or' operation between two filters"""
 
-    def __init__(self, *filters):
-
+    def __init__(self, *filters: Filter):
         self.filters = filters
 
-    def allow(self, node_stack):
-
+    def allow(self, node_stack) -> bool:
         # If any filter returns True then return True
         for filter_ in self.filters:
             if filter_.allow(node_stack):
                 return True
-
         return False
 
 
 class IfFilter(Filter):
-
     def __init__(self, condition, if_true, if_false):
         self.condition = condition
         self.if_true = if_true
         self.if_false = if_false
 
-    def allow(self, node_stack):
-
+    def allow(self, node_stack) -> bool:
         if self.condition.allow(node_stack):
             return self.if_true.allow(node_stack)
         else:
             return self.if_false.allow(node_stack)
 
 
-class Glob(object):
-
-    def __init__(self, method, pattern):
-
-        self.method = method
-        self.pattern = pattern
-
-    def match(self, name):
-
-        return self.method(name, self.pattern)
-
-
-class Gather:
-    def __init__(self, accessor: Accessor, names):
+class Gather(Filter):
+    def __init__(self, accessor: Accessor, names: List[str]):
         self.accessor = accessor
         self.names = names
 
     def allow(self, node_stack) -> bool:
         self.names.extend(self.accessor(node_stack))
         return False
+
+
+###############################################################################
+# Other stuff
+###############################################################################
+
+class Glob:
+    def __init__(self, method, pattern):
+        self.method = method
+        self.pattern = pattern
+
+    def match(self, name):
+        return self.method(name, self.pattern)
 
 
 class FilterFactory:

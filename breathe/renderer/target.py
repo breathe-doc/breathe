@@ -12,7 +12,7 @@ class TargetHandler:
 
 
 class _RealTargetHandler(TargetHandler):
-    def __init__(self, project_info: ProjectInfo, document):
+    def __init__(self, project_info: ProjectInfo, document: nodes.document):
         self.project_info = project_info
         self.document = document
 
@@ -33,7 +33,8 @@ class _NullTargetHandler(TargetHandler):
         return []
 
 
-def create_target_handler(options: Dict[str, Any], project_info: ProjectInfo, document) -> TargetHandler:
+def create_target_handler(options: Dict[str, Any], project_info: ProjectInfo,
+                          document: nodes.document) -> TargetHandler:
     if "no-link" in options:
         return _NullTargetHandler()
     return _RealTargetHandler(project_info, document)

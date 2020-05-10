@@ -20,8 +20,9 @@ matching.
 
 import six
 
+
 class NoParameterNamesMask:
-    def __init__(self, data_object):
+    def __init__(self, data_object) -> None:
         self.data_object = data_object
 
     def __getattr__(self, attr):

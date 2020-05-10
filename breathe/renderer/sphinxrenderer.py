@@ -1,7 +1,7 @@
 from breathe.node_factory import create_node_factory
 from breathe.parser import DoxygenCompoundParser
 from breathe.project import ProjectInfo
-from breathe.renderer.base import RenderContext
+from breathe.renderer import RenderContext
 from breathe.renderer.filter import Filter
 from breathe.renderer.target import TargetHandler
 
@@ -329,7 +329,7 @@ class SphinxRenderer:
                  project_info: ProjectInfo,
                  node_stack,
                  state,
-                 document,
+                 document: nodes.document,
                  target_handler: TargetHandler,
                  compound_parser: DoxygenCompoundParser,
                  filter_: Filter):
