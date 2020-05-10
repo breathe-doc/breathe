@@ -173,6 +173,10 @@ Change Log
 
 Inspired by `Keepachangelog.com <http://keepachangelog.com/>`__.
 
+- Unreleased - Breathe v4.18.1
+
+  - Fix friend class rendering and allow friend struct. #522
+
 - 2020-05-02 - Breathe v4.18.0
 
   - Support tiles in verbatim blocks. #517
