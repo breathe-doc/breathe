@@ -84,7 +84,8 @@ class BaseDirective(SphinxDirective):
             return format_parser_error("doxygenclass", e.error, e.filename, self.state,
                                        self.lineno, True)
         except FileIOError as e:
-            return format_parser_error("doxygenclass", e.error, e.filename, self.state, self.lineno)
+            return format_parser_error("doxygenclass", e.error, e.filename, self.state,
+                                       self.lineno, True)
 
         context = RenderContext(node_stack, mask_factory, directive_args)
         return object_renderer.render(node_stack[0], context)
