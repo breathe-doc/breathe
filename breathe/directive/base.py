@@ -3,8 +3,9 @@ from ..renderer.base import RenderContext
 from ..renderer import format_parser_error, DoxygenToRstRendererFactory
 from ..parser import ParserError, FileIOError
 
+from sphinx.directives import SphinxDirective
+
 from docutils import nodes
-from docutils.parsers import rst
 
 
 class WarningHandler(object):
@@ -44,12 +45,12 @@ def create_warning(project_info, state, lineno, **kwargs):
     return WarningHandler(state, context)
 
 
-class BaseDirective(rst.Directive):
+class BaseDirective(SphinxDirective):
 
     def __init__(self, finder_factory,
                  project_info_factory, filter_factory, target_handler_factory, parser_factory,
                  *args):
-        rst.Directive.__init__(self, *args)
+        super().__init__(*args)
         self.directive_args = list(args)  # Convert tuple to list to allow modification.
 
         self.finder_factory = finder_factory

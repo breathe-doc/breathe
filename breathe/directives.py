@@ -1,11 +1,12 @@
 
 from .finder.core import FinderFactory
-from .parser import DoxygenParserFactory
-from .renderer import DoxygenToRstRendererFactory
+from .parser import DoxygenParserFactory, ParserError, FileIOError
+from .renderer import format_parser_error, DoxygenToRstRendererFactory
 from .renderer.base import RenderContext
 from .renderer.filter import FilterFactory
 from .renderer.target import TargetHandlerFactory
 from .renderer.mask import MaskFactory, NullMaskFactory, NoParameterNamesMask
+from .renderer.sphinxrenderer import WithContext
 
 from .finder.core import DoxygenItemFinderFactoryCreator
 from .directive.base import BaseDirective, create_warning
@@ -19,6 +20,7 @@ from .node_factory import create_node_factory
 from docutils.parsers.rst.directives import unchanged_required, unchanged, flag
 from sphinx.writers.text import TextWriter
 from sphinx.builders.text import TextBuilder
+from sphinx.domains import cpp
 
 import os
 import fnmatch
@@ -206,6 +208,47 @@ class DoxygenFunctionDirective(BaseDirective):
 
             return args
 
+    def create_function_signature(self, node_stack, project_info, filter_, target_handler,
+                                  mask_factory, directive_args):
+        "Standard render process used by subclasses"
+
+        renderer_factory = DoxygenToRstRendererFactory(
+            self.parser_factory,
+            project_info
+            )
+
+        try:
+            object_renderer = renderer_factory.create_renderer(
+                node_stack,
+                self.state,
+                self.state.document,
+                filter_,
+                target_handler,
+                )
+        except ParserError as e:
+            return format_parser_error("doxygenclass", e.error, e.filename, self.state,
+                                       self.lineno, True)
+        except FileIOError as e:
+            return format_parser_error("doxygenclass", e.error, e.filename, self.state, self.lineno)
+
+        context = RenderContext(node_stack, mask_factory, directive_args)
+        node = node_stack[0]
+        with WithContext(object_renderer, context):
+            # this part should be kept in sync with visit_function in sphinxrenderer
+            name = node.get_name()
+            # assume we are only doing this for C++ declarations
+            declaration = ' '.join([
+                object_renderer.create_template_prefix(node),
+                ''.join(n.astext() for n in object_renderer.render(node.get_type())),
+                name,
+                node.get_argsstring()
+            ])
+        parser = cpp.DefinitionParser(declaration,
+                                      location=self.get_source_info(),
+                                      config=self.config)
+        ast = parser.parse_declaration('function', 'function')
+        return str(ast)
+
     def resolve_function(self, matches, args, project_info):
 
         if not matches:
@@ -213,8 +256,6 @@ class DoxygenFunctionDirective(BaseDirective):
 
         if len(matches) == 1:
             return matches[0]
-
-        node_stack = None
 
         signatures = []
 
@@ -234,11 +275,8 @@ class DoxygenFunctionDirective(BaseDirective):
             directive_args = self.directive_args[:]
             directive_args[2] = text_options
 
-            nodes = self.render(entry, project_info, filter_, target_handler, mask_factory,
-                                directive_args)
-
-            # Render the nodes to text
-            signature = self.text_renderer.render(nodes, self.state.document)
+            signature = self.create_function_signature(entry, project_info, filter_, target_handler,
+                                                       mask_factory, directive_args)
             signatures.append(signature)
 
             match = re.match(r"([^(]*)(.*)", signature)
@@ -249,13 +287,8 @@ class DoxygenFunctionDirective(BaseDirective):
 
             # Match them against the arg spec
             if args == match_args:
-                node_stack = entry
-                break
-
-        if not node_stack:
-            raise UnableToResolveFunctionError(signatures)
-
-        return node_stack
+                return entry
+        raise UnableToResolveFunctionError(signatures)
 
 
 class DoxygenClassLikeDirective(BaseDirective):
