@@ -1,10 +1,7 @@
-# Renderer tests
-
-import pytest
+import pytest  # type: ignore
 
 import sphinx.addnodes
 import sphinx.environment
-from breathe.node_factory import create_node_factory
 from breathe.parser.compound import linkedTextTypeSub, memberdefTypeSub, paramTypeSub, MixedContainer
 from breathe.renderer.sphinxrenderer import SphinxRenderer
 from breathe.renderer.filter import OpenFilter
@@ -16,7 +13,7 @@ from sphinx.testing.fixtures import (
 )
 from sphinx.testing.path import path
 
-sphinx.locale.init([], None)
+sphinx.locale.init([], '')
 
 
 @pytest.fixture(scope='function')

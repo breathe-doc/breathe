@@ -45,4 +45,4 @@ flake8:
 
 .PHONY: type-check
 type-check:
-	mypy breathe
+	mypy breathe tests
