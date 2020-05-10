@@ -1,10 +1,9 @@
-from ..parser import ParserError, FileIOError
-
-from breathe.project import ProjectInfoFactory, ProjectInfo
-from breathe.finder.core import FinderFactory, Filter
+from breathe.finder.factory import FinderFactory
 from breathe.parser import DoxygenParserFactory
+from breathe.parser import FileIOError, ParserError
+from breathe.project import ProjectInfoFactory, ProjectInfo
 from breathe.renderer import format_parser_error, RenderContext
-from breathe.renderer.filter import FilterFactory
+from breathe.renderer.filter import Filter, FilterFactory
 from breathe.renderer.mask import MaskFactoryBase
 from breathe.renderer.sphinxrenderer import SphinxRenderer
 from breathe.renderer.target import TargetHandler

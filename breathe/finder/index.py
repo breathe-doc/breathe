@@ -1,4 +1,4 @@
-from breathe.finder.base import ItemFinder, stack
+from breathe.finder import ItemFinder, stack
 from breathe.renderer.filter import Filter, FilterFactory
 from breathe.parser import DoxygenCompoundParser
 

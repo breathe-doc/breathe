@@ -9,10 +9,11 @@ from .process import AutoDoxygenProcessHandle
 from .exception import BreatheError
 from .project import ProjectInfoFactory, ProjectError
 
-from breathe.finder.core import Filter, FinderFactory
+from breathe.finder.factory import FinderFactory
 from breathe.directive.base import BaseDirective
 from breathe.file_state_cache import MTimeError
 from breathe.renderer import RenderContext
+from breathe.renderer.filter import Filter
 from breathe.renderer.mask import (
     MaskFactory, NullMaskFactory, NoParameterNamesMask
 )

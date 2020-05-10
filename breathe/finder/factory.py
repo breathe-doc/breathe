@@ -1,6 +1,6 @@
+from breathe.finder import ItemFinder
 from breathe.finder import index as indexfinder
 from breathe.finder import compound as compoundfinder
-from breathe.finder.base import ItemFinder
 from breathe.parser import DoxygenParserFactory
 from breathe.project import ProjectInfo
 from breathe.renderer.filter import Filter
@@ -10,7 +10,7 @@ from sphinx.application import Sphinx
 from typing import Dict, Type
 
 
-class CreateCompoundTypeSubFinder:
+class _CreateCompoundTypeSubFinder:
     def __init__(self, app: Sphinx, parser_factory: DoxygenParserFactory):
         self.app = app
         self.parser_factory = parser_factory
@@ -30,7 +30,7 @@ class DoxygenItemFinderFactory:
         return self.finders[data_object.node_type](self.project_info, data_object, self)
 
 
-class FakeParentNode:
+class _FakeParentNode:
     node_type = "fakeparent"
 
 
@@ -43,7 +43,7 @@ class Finder:
         """Adds all nodes which match the filter into the matches list"""
 
         item_finder = self.item_finder_factory.create_finder(self._root)
-        item_finder.filter_([FakeParentNode()], filter_, matches)
+        item_finder.filter_([_FakeParentNode()], filter_, matches)
 
     def root(self):
         return self._root
@@ -62,7 +62,7 @@ class FinderFactory:
     def create_finder_from_root(self, root, project_info: ProjectInfo) -> Finder:
         finders = {
             "doxygen": indexfinder.DoxygenTypeSubItemFinder,
-            "compound": CreateCompoundTypeSubFinder(self.app, self.parser_factory),  # type: ignore
+            "compound": _CreateCompoundTypeSubFinder(self.app, self.parser_factory),  # type: ignore
             "member": indexfinder.MemberTypeSubItemFinder,
             "doxygendef": compoundfinder.DoxygenTypeSubItemFinder,
             "compounddef": compoundfinder.CompoundDefTypeSubItemFinder,
