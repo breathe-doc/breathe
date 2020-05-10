@@ -42,6 +42,18 @@ Namespaced Function Examples
 .. doxygenfunction:: ClassTest::anotherFunction
    :path: ../../examples/specific/class/xml
 
+Extern Examples
+---------------
+
+.. cpp:namespace:: @ex_specific_extern_examples
+
+.. doxygenfunction:: cache_tree_matches_traversal
+   :project: c_file
+
+.. doxygenvariable:: global_cache_tree
+   :project: c_file
+
+
 Alias Example
 -------------
 
