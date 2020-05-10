@@ -1,18 +1,15 @@
-from .parser import DoxygenParserFactory, ParserError, FileIOError
-from .renderer import format_parser_error
-from .renderer.sphinxrenderer import WithContext
-
-from .directive.base import create_warning
-from .directive.index import DoxygenIndexDirective, AutoDoxygenIndexDirective
-from .directive.file import DoxygenFileDirective, AutoDoxygenFileDirective
-from .process import AutoDoxygenProcessHandle
-from .exception import BreatheError
-from .project import ProjectInfoFactory, ProjectError
-
+from breathe.directive.base import create_warning
+from breathe.directive.file import DoxygenFileDirective, AutoDoxygenFileDirective
+from breathe.directive.index import DoxygenIndexDirective, AutoDoxygenIndexDirective
+from breathe.exception import BreatheError
 from breathe.finder.factory import FinderFactory
 from breathe.directive.base import BaseDirective
 from breathe.file_state_cache import MTimeError
-from breathe.renderer import RenderContext
+from breathe.parser import DoxygenParserFactory, ParserError, FileIOError
+from breathe.process import AutoDoxygenProcessHandle
+from breathe.project import ProjectInfoFactory, ProjectError
+from breathe.renderer import format_parser_error, RenderContext
+from breathe.renderer.sphinxrenderer import WithContext
 from breathe.renderer.filter import Filter
 from breathe.renderer.mask import (
     MaskFactory, NullMaskFactory, NoParameterNamesMask
@@ -21,8 +18,6 @@ from breathe.renderer.sphinxrenderer import SphinxRenderer
 from breathe.renderer.target import create_target_handler
 
 from sphinx.application import Sphinx
-from sphinx.writers.text import TextWriter
-from sphinx.builders.text import TextBuilder
 from sphinx.domains import cpp
 
 from docutils import nodes
@@ -44,27 +39,6 @@ class UnableToResolveFunctionError(BreatheError):
     def __init__(self, signatures: List[str]) -> None:
         self.signatures = signatures
 
-
-class FakeDestination:
-    def write(self, output):
-        return output
-
-
-class TextRenderer:
-    def __init__(self, app: Sphinx):
-        self.app = app
-
-    def render(self, nodes, document) -> str:
-        new_document = document.copy()
-        new_document.children = nodes
-
-        writer = TextWriter(TextBuilder(self.app))
-        output = writer.write(new_document, FakeDestination())  # type: ignore
-        return output.strip()
-
-
-# Directives
-# ----------
 
 class DoxygenFunctionDirective(BaseDirective):
     required_arguments = 1
@@ -276,7 +250,7 @@ class DoxygenFunctionDirective(BaseDirective):
         raise UnableToResolveFunctionError(signatures)
 
 
-class DoxygenClassLikeDirective(BaseDirective):
+class _DoxygenClassLikeDirective(BaseDirective):
     required_arguments = 1
     optional_arguments = 0
     final_argument_whitespace = True
@@ -327,19 +301,19 @@ class DoxygenClassLikeDirective(BaseDirective):
                            self.directive_args)
 
 
-class DoxygenClassDirective(DoxygenClassLikeDirective):
+class DoxygenClassDirective(_DoxygenClassLikeDirective):
     kind = "class"
 
 
-class DoxygenStructDirective(DoxygenClassLikeDirective):
+class DoxygenStructDirective(_DoxygenClassLikeDirective):
     kind = "struct"
 
 
-class DoxygenInterfaceDirective(DoxygenClassLikeDirective):
+class DoxygenInterfaceDirective(_DoxygenClassLikeDirective):
     kind = "interface"
 
 
-class DoxygenContentBlockDirective(BaseDirective):
+class _DoxygenContentBlockDirective(BaseDirective):
     """Base class for namespace and group directives which have very similar behaviours"""
 
     required_arguments = 1
@@ -425,20 +399,21 @@ class DoxygenContentBlockDirective(BaseDirective):
         return node_list
 
 
-class DoxygenNamespaceDirective(DoxygenContentBlockDirective):
+class DoxygenNamespaceDirective(_DoxygenContentBlockDirective):
     kind = "namespace"
 
 
-class DoxygenGroupDirective(DoxygenContentBlockDirective):
+class DoxygenGroupDirective(_DoxygenContentBlockDirective):
     kind = "group"
 
 
+# TODO: is this comment still relevant?
 # This class was the same as the DoxygenBaseDirective above, except that it
 # wraps the output in a definition_list before passing it back. This should be
 # abstracted in a far nicer way to avoid repeating so much code
 #
 # Now we've removed the definition_list wrap so we really need to refactor this!
-class DoxygenBaseItemDirective(BaseDirective):
+class _DoxygenBaseItemDirective(BaseDirective):
     required_arguments = 1
     optional_arguments = 1
     option_spec = {
@@ -494,30 +469,30 @@ class DoxygenBaseItemDirective(BaseDirective):
                            self.directive_args)
 
 
-class DoxygenVariableDirective(DoxygenBaseItemDirective):
+class DoxygenVariableDirective(_DoxygenBaseItemDirective):
     kind = "variable"
 
 
-class DoxygenDefineDirective(DoxygenBaseItemDirective):
+class DoxygenDefineDirective(_DoxygenBaseItemDirective):
     kind = "define"
 
 
-class DoxygenEnumDirective(DoxygenBaseItemDirective):
+class DoxygenEnumDirective(_DoxygenBaseItemDirective):
     kind = "enum"
 
 
-class DoxygenEnumValueDirective(DoxygenBaseItemDirective):
+class DoxygenEnumValueDirective(_DoxygenBaseItemDirective):
     kind = "enumvalue"
 
     def create_finder_filter(self, namespace: str, name: str) -> Filter:
         return self.filter_factory.create_enumvalue_finder_filter(name)
 
 
-class DoxygenTypedefDirective(DoxygenBaseItemDirective):
+class DoxygenTypedefDirective(_DoxygenBaseItemDirective):
     kind = "typedef"
 
 
-class DoxygenUnionDirective(DoxygenBaseItemDirective):
+class DoxygenUnionDirective(_DoxygenBaseItemDirective):
     kind = "union"
 
     def create_finder_filter(self, namespace: str, name: str) -> Filter:
