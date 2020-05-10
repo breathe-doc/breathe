@@ -1517,13 +1517,14 @@ class SphinxRenderer(object):
         dom = self.get_domain()
         assert not dom or dom == 'cpp'
 
-        assert ''.join(n.astext() for n in self.render(node.get_type())) == "friend class"
         desc = self.node_factory.desc()
         desc['objtype'] = 'friendclass'
         signode = self.node_factory.desc_signature()
         desc += signode
 
-        signode += self.node_factory.desc_annotation('friend class')
+        typ = ''.join(n.astext() for n in self.render(node.get_type()))
+        assert typ in ("friend class", "friend struct")
+        signode += self.node_factory.desc_annotation(typ, typ)
         signode += self.node_factory.Text(' ')
         # expr = cpp.CPPExprRole(asCode=False)
         # expr.text = node.name
