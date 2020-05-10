@@ -37,13 +37,11 @@ class NoMatchingFunctionError(BreatheError):
 
 
 class UnableToResolveFunctionError(BreatheError):
-
     def __init__(self, signatures):
         self.signatures = signatures
 
 
-class FakeDestination(object):
-
+class FakeDestination:
     def write(self, output):
         return output
 
@@ -58,7 +56,6 @@ class TextRenderer:
 
         writer = TextWriter(TextBuilder(self.app))
         output = writer.write(new_document, FakeDestination())
-
         return output.strip()
 
 
@@ -66,14 +63,13 @@ class TextRenderer:
 # ----------
 
 class DoxygenFunctionDirective(BaseDirective):
-
     required_arguments = 1
     option_spec = {
         "path": unchanged_required,
         "project": unchanged_required,
         "outline": flag,
         "no-link": flag,
-        }
+    }
     has_content = False
     final_argument_whitespace = True
 
@@ -194,7 +190,6 @@ class DoxygenFunctionDirective(BaseDirective):
                     args.append(function_description[start:i].strip())
                     start = i + 1
             args.append(function_description[start:-1].strip())
-
             return args
 
     def create_function_signature(self, node_stack, project_info, filter_, target_handler,
@@ -239,7 +234,6 @@ class DoxygenFunctionDirective(BaseDirective):
         return str(ast)
 
     def resolve_function(self, matches, args, project_info):
-
         if not matches:
             raise NoMatchingFunctionError()
 
@@ -250,7 +244,6 @@ class DoxygenFunctionDirective(BaseDirective):
 
         # Iterate over the potential matches
         for entry in matches:
-
             text_options = {'no-link': u'', 'outline': u''}
 
             # Render the matches to docutils nodes
@@ -280,7 +273,6 @@ class DoxygenFunctionDirective(BaseDirective):
 
 
 class DoxygenClassLikeDirective(BaseDirective):
-
     required_arguments = 1
     optional_arguments = 0
     final_argument_whitespace = True
@@ -294,11 +286,10 @@ class DoxygenClassLikeDirective(BaseDirective):
         "show": unchanged_required,
         "outline": flag,
         "no-link": flag,
-        }
+    }
     has_content = False
 
     def run(self):
-
         name = self.arguments[0]
 
         try:
@@ -332,17 +323,14 @@ class DoxygenClassLikeDirective(BaseDirective):
 
 
 class DoxygenClassDirective(DoxygenClassLikeDirective):
-
     kind = "class"
 
 
 class DoxygenStructDirective(DoxygenClassLikeDirective):
-
     kind = "struct"
 
 
 class DoxygenInterfaceDirective(DoxygenClassLikeDirective):
-
     kind = "interface"
 
 
@@ -361,11 +349,10 @@ class DoxygenContentBlockDirective(BaseDirective):
         "private-members": flag,
         "undoc-members": flag,
         "no-link": flag
-        }
+    }
     has_content = False
 
     def run(self):
-
         name = self.arguments[0]
 
         try:
@@ -393,7 +380,6 @@ class DoxygenContentBlockDirective(BaseDirective):
             return warning.warn('doxygen{kind}: Cannot find namespace "{name}" {tail}')
 
         if 'content-only' in self.options:
-
             # Unpack the single entry in the matches list
             (node_stack,) = matches
 
@@ -435,12 +421,10 @@ class DoxygenContentBlockDirective(BaseDirective):
 
 
 class DoxygenNamespaceDirective(DoxygenContentBlockDirective):
-
     kind = "namespace"
 
 
 class DoxygenGroupDirective(DoxygenContentBlockDirective):
-
     kind = "group"
 
 
@@ -450,7 +434,6 @@ class DoxygenGroupDirective(DoxygenContentBlockDirective):
 #
 # Now we've removed the definition_list wrap so we really need to refactor this!
 class DoxygenBaseItemDirective(BaseDirective):
-
     required_arguments = 1
     optional_arguments = 1
     option_spec = {
@@ -468,7 +451,6 @@ class DoxygenBaseItemDirective(BaseDirective):
             namespace, name, self.kind)
 
     def run(self):
-
         try:
             namespace, name = self.arguments[0].rsplit("::", 1)
         except ValueError:
@@ -507,40 +489,32 @@ class DoxygenBaseItemDirective(BaseDirective):
 
 
 class DoxygenVariableDirective(DoxygenBaseItemDirective):
-
     kind = "variable"
 
 
 class DoxygenDefineDirective(DoxygenBaseItemDirective):
-
     kind = "define"
 
 
 class DoxygenEnumDirective(DoxygenBaseItemDirective):
-
     kind = "enum"
 
 
 class DoxygenEnumValueDirective(DoxygenBaseItemDirective):
-
     kind = "enumvalue"
 
     def create_finder_filter(self, namespace, name):
-
         return self.filter_factory.create_enumvalue_finder_filter(name)
 
 
 class DoxygenTypedefDirective(DoxygenBaseItemDirective):
-
     kind = "typedef"
 
 
 class DoxygenUnionDirective(DoxygenBaseItemDirective):
-
     kind = "union"
 
     def create_finder_filter(self, namespace, name):
-
         # Unions are stored in the xml file with their fully namespaced name
         # We're using C++ namespaces here, it might be best to make this file
         # type dependent
@@ -579,16 +553,6 @@ class DirectiveContainer:
         return self.directive(*call_args)
 
 
-def write_file(directory, filename, content):
-    # Check the directory exists
-    if not os.path.exists(directory):
-        os.makedirs(directory)
-
-    # Write the file with the provided contents
-    with open(os.path.join(directory, filename), "w") as f:
-        f.write(content)
-
-
 def setup(app: Sphinx):
     directives = {
         "doxygenindex": DoxygenIndexDirective,
@@ -609,8 +573,10 @@ def setup(app: Sphinx):
         "autodoxygenfile": AutoDoxygenFileDirective,
     }
 
-    project_info_factory = ProjectInfoFactory(app)
     # note: the parser factory contains a cache of the parsed XML
+    # note: the project_info_factory also contains some caching stuff
+    # TODO: is that actually safe for when reading in parallel?
+    project_info_factory = ProjectInfoFactory(app)
     parser_factory = DoxygenParserFactory(app)
     finder_factory = FinderFactory(app, parser_factory)
     for name, directive in directives.items():
@@ -641,6 +607,15 @@ def setup(app: Sphinx):
     breathe_css = "breathe.css"
     if (os.path.exists(os.path.join(app.confdir, "_static", breathe_css))):
         app.add_stylesheet(breathe_css)
+
+    def write_file(directory, filename, content):
+        # Check the directory exists
+        if not os.path.exists(directory):
+            os.makedirs(directory)
+
+        # Write the file with the provided contents
+        with open(os.path.join(directory, filename), "w") as f:
+            f.write(content)
 
     doxygen_handle = AutoDoxygenProcessHandle(
         subprocess.check_call,
