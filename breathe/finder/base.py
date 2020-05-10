@@ -8,7 +8,7 @@ class ItemFinder:
         self.item_finder_factory = item_finder_factory
         self.project_info = project_info
 
-    def filter_(self, ancestors, filter_: Filter, matches):
+    def filter_(self, ancestors, filter_: Filter, matches) -> None:
         raise NotImplementedError
 
 

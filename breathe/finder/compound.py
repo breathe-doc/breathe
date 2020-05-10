@@ -1,24 +1,21 @@
-
-from .base import ItemFinder, stack
+from breathe.finder.base import ItemFinder, stack
+from breathe.renderer.filter import Filter
 
 
 class DoxygenTypeSubItemFinder(ItemFinder):
-
-    def filter_(self, ancestors, filter_, matches):
+    def filter_(self, ancestors, filter_: Filter, matches) -> None:
         """Find nodes which match the filter. Doesn't test this node, only its children"""
 
         node_stack = stack(self.data_object, ancestors)
-
         compound_finder = self.item_finder_factory.create_finder(self.data_object.compounddef)
         compound_finder.filter_(node_stack, filter_, matches)
 
 
 class CompoundDefTypeSubItemFinder(ItemFinder):
-    def filter_(self, ancestors, filter_, matches):
+    def filter_(self, ancestors, filter_: Filter, matches) -> None:
         """Finds nodes which match the filter and continues checks to children"""
 
         node_stack = stack(self.data_object, ancestors)
-
         if filter_.allow(node_stack):
             matches.append(node_stack)
 
@@ -32,12 +29,10 @@ class CompoundDefTypeSubItemFinder(ItemFinder):
 
 
 class SectionDefTypeSubItemFinder(ItemFinder):
-
-    def filter_(self, ancestors, filter_, matches):
+    def filter_(self, ancestors, filter_: Filter, matches) -> None:
         """Find nodes which match the filter. Doesn't test this node, only its children"""
 
         node_stack = stack(self.data_object, ancestors)
-
         if filter_.allow(node_stack):
             matches.append(node_stack)
 
@@ -47,7 +42,7 @@ class SectionDefTypeSubItemFinder(ItemFinder):
 
 
 class MemberDefTypeSubItemFinder(ItemFinder):
-    def filter_(self, ancestors, filter_, matches):
+    def filter_(self, ancestors, filter_: Filter, matches) -> None:
         data_object = self.data_object
         node_stack = stack(data_object, ancestors)
 
@@ -62,10 +57,7 @@ class MemberDefTypeSubItemFinder(ItemFinder):
 
 
 class RefTypeSubItemFinder(ItemFinder):
-
-    def filter_(self, ancestors, filter_, matches):
-
+    def filter_(self, ancestors, filter_: Filter, matches) -> None:
         node_stack = stack(self.data_object, ancestors)
-
         if filter_.allow(node_stack):
             matches.append(node_stack)

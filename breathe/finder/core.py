@@ -1,7 +1,5 @@
-
-from . import index as indexfinder
-from . import compound as compoundfinder
-
+from breathe.finder import index as indexfinder
+from breathe.finder import compound as compoundfinder
 from breathe.finder.base import ItemFinder
 from breathe.parser import DoxygenParserFactory
 from breathe.project import ProjectInfo
@@ -32,25 +30,6 @@ class DoxygenItemFinderFactory:
         return self.finders[data_object.node_type](self.project_info, data_object, self)
 
 
-class DoxygenItemFinderFactoryCreator:
-    def __init__(self, app: Sphinx, parser_factory: DoxygenParserFactory):
-        self.app = app
-        self.parser_factory = parser_factory
-
-    def create_factory(self, project_info: ProjectInfo) -> DoxygenItemFinderFactory:
-        finders = {
-            "doxygen": indexfinder.DoxygenTypeSubItemFinder,
-            "compound": CreateCompoundTypeSubFinder(self.app, self.parser_factory),  # type: ignore
-            "member": indexfinder.MemberTypeSubItemFinder,
-            "doxygendef": compoundfinder.DoxygenTypeSubItemFinder,
-            "compounddef": compoundfinder.CompoundDefTypeSubItemFinder,
-            "sectiondef": compoundfinder.SectionDefTypeSubItemFinder,
-            "memberdef": compoundfinder.MemberDefTypeSubItemFinder,
-            "ref": compoundfinder.RefTypeSubItemFinder,
-        }  # type: Dict[str, Type[ItemFinder]]
-        return DoxygenItemFinderFactory(finders, project_info)
-
-
 class FakeParentNode:
     node_type = "fakeparent"
 
@@ -72,14 +51,24 @@ class Finder:
 
 class FinderFactory:
     def __init__(self, app: Sphinx, parser_factory: DoxygenParserFactory):
+        self.app = app
+        self.parser_factory = parser_factory
         self.parser = parser_factory.create_index_parser()
-        self.item_finder_factory_creator = DoxygenItemFinderFactoryCreator(app, parser_factory)
 
     def create_finder(self, project_info: ProjectInfo) -> Finder:
         root = self.parser.parse(project_info)
-        item_finder_factory = self.item_finder_factory_creator.create_factory(project_info)
-        return Finder(root, item_finder_factory)
+        return self.create_finder_from_root(root, project_info)
 
     def create_finder_from_root(self, root, project_info: ProjectInfo) -> Finder:
-        item_finder_factory = self.item_finder_factory_creator.create_factory(project_info)
+        finders = {
+            "doxygen": indexfinder.DoxygenTypeSubItemFinder,
+            "compound": CreateCompoundTypeSubFinder(self.app, self.parser_factory),  # type: ignore
+            "member": indexfinder.MemberTypeSubItemFinder,
+            "doxygendef": compoundfinder.DoxygenTypeSubItemFinder,
+            "compounddef": compoundfinder.CompoundDefTypeSubItemFinder,
+            "sectiondef": compoundfinder.SectionDefTypeSubItemFinder,
+            "memberdef": compoundfinder.MemberDefTypeSubItemFinder,
+            "ref": compoundfinder.RefTypeSubItemFinder,
+        }  # type: Dict[str, Type[ItemFinder]]
+        item_finder_factory = DoxygenItemFinderFactory(finders, project_info)
         return Finder(root, item_finder_factory)
