@@ -21,6 +21,8 @@ from docutils.parsers.rst.directives import unchanged_required, unchanged, flag
 from sphinx.writers.text import TextWriter
 from sphinx.builders.text import TextBuilder
 from sphinx.domains import cpp
+from sphinx.transforms.post_transforms import SphinxPostTransform
+from sphinx import addnodes
 
 import os
 import fnmatch
@@ -782,6 +784,38 @@ class FileStateCache(object):
             del self.app.env.breathe_file_state[filename]
 
 
+class DoxygenIdentifierReferenceResolver(SphinxPostTransform):
+
+    # must run before sphinx ReferenceResolver
+    default_priority = 5
+    # only resolve identifier xrefs for these domains
+    domains = set(['c', 'cpp'])
+
+    def run(self, **kwargs):
+        for node in self.document.traverse(addnodes.pending_xref):
+            if node['reftype'] != 'identifier':
+                continue
+
+            if 'refdomain' not in node or node['refdomain'] not in self.domains:
+                continue
+
+            # skip when information required by intersphinx is available already
+            if 'refdoc' in node:
+                continue
+
+            nodecopy = node.deepcopy()
+            contnode = node[0].deepcopy()
+
+            # 'refdoc' is used by intersphinx to correctly adjust relative
+            # paths when resolving external references
+            nodecopy['refdoc'] = self.env.docname
+
+            newnode = self.app.emit_firstresult('missing-reference', self.env,
+                                                nodecopy, contnode)
+            if newnode is not None:
+                node.replace_self(newnode)
+
+
 # Setup
 # -----
 
@@ -839,6 +873,8 @@ def setup(app):
         "doxygenfunction",
         directive_factory.create_function_directive_container(),
         )
+
+    app.add_post_transform(DoxygenIdentifierReferenceResolver)
 
     app.add_config_value("breathe_projects", {}, True)
     app.add_config_value("breathe_default_project", "", True)
