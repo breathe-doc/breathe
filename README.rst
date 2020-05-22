@@ -173,6 +173,10 @@ Change Log
 
 Inspired by `Keepachangelog.com <http://keepachangelog.com/>`__.
 
+- Unreleased - Breathe v4.19.0
+
+  - Refactoring. #528
+
 - 2020-05-10 - Breathe v4.18.1
 
   - Fix friend class rendering and allow friend struct. #522
