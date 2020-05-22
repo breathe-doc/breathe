@@ -1,39 +1,40 @@
+from breathe.project import ProjectInfo
 
-class TargetHandler(object):
+from docutils import nodes
+from docutils.nodes import Element
 
-    def __init__(self, project_info, node_factory, document):
+from typing import Any, Dict, List
 
+
+class TargetHandler:
+    def create_target(self, refid: str) -> List[Element]:
+        raise NotImplementedError
+
+
+class _RealTargetHandler(TargetHandler):
+    def __init__(self, project_info: ProjectInfo, document: nodes.document):
         self.project_info = project_info
-        self.node_factory = node_factory
         self.document = document
 
-    def create_target(self, id_):
+    def create_target(self, refid: str) -> List[Element]:
         """Creates a target node and registers it with the document and returns it in a list"""
 
-        target = self.node_factory.target(ids=[id_], names=[id_])
-
+        target = nodes.target(ids=[refid], names=[refid])
         try:
             self.document.note_explicit_target(target)
         except Exception:
             # TODO: We should really return a docutils warning node here
-            print("Warning: Duplicate target detected: %s" % id_)
-
+            print("Warning: Duplicate target detected: %s" % refid)
         return [target]
 
-class NullTargetHandler(object):
 
-    def create_target(self, refid):
+class _NullTargetHandler(TargetHandler):
+    def create_target(self, refid: str) -> List[Element]:
         return []
 
-class TargetHandlerFactory(object):
 
-    def __init__(self, node_factory):
-
-        self.node_factory = node_factory
-
-    def create_target_handler(self, options, project_info, document):
-
-        if "no-link" in options:
-            return NullTargetHandler()
-
-        return TargetHandler(project_info, self.node_factory, document)
+def create_target_handler(options: Dict[str, Any], project_info: ProjectInfo,
+                          document: nodes.document) -> TargetHandler:
+    if "no-link" in options:
+        return _NullTargetHandler()
+    return _RealTargetHandler(project_info, document)

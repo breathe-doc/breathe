@@ -1,10 +1,7 @@
-# Renderer tests
-
-import pytest
+import pytest  # type: ignore
 
 import sphinx.addnodes
 import sphinx.environment
-from breathe.node_factory import create_node_factory
 from breathe.parser.compound import linkedTextTypeSub, memberdefTypeSub, paramTypeSub, MixedContainer
 from breathe.renderer.sphinxrenderer import SphinxRenderer
 from breathe.renderer.filter import OpenFilter
@@ -16,7 +13,7 @@ from sphinx.testing.fixtures import (
 )
 from sphinx.testing.path import path
 
-sphinx.locale.init([], None)
+sphinx.locale.init([], '')
 
 
 @pytest.fixture(scope='function')
@@ -142,21 +139,6 @@ class MockContext:
         return self
 
 
-class MockProjectInfo:
-    def __init__(self, show_define_initializer=False):
-        self._show_define_initializer = show_define_initializer
-        pass
-
-    def name(self):
-        pass
-
-    def show_define_initializer(self):
-        return self._show_define_initializer
-
-    def project_refids(self):
-        pass
-
-
 class MockTargetHandler:
     def __init__(self):
         pass
@@ -244,9 +226,11 @@ def test_find_node():
 
 def render(app, member_def, domain=None, show_define_initializer=False):
     """Render Doxygen *member_def* with *renderer_class*."""
-    renderer = SphinxRenderer(MockProjectInfo(show_define_initializer),
-                              None,  # renderer_factory
-                              create_node_factory(),
+
+    app.config.breathe_use_project_refids = False
+    app.config.breathe_show_define_initializer = show_define_initializer
+    renderer = SphinxRenderer(app,
+                              None,  # project_info
                               [],    # node_stack
                               None,  # state
                               None,  # document

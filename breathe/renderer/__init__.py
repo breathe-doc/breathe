@@ -1,40 +1,11 @@
-
-import textwrap
-
-from ..node_factory import create_node_factory
-from . import sphinxrenderer
+from breathe.renderer.filter import Filter
+from breathe.renderer.target import TargetHandler
 
 from docutils import nodes
-
-
-class DoxygenToRstRendererFactory(object):
-
-    def __init__(
-            self,
-            parser_factory,
-            project_info
-            ):
-
-        self.parser_factory = parser_factory
-        self.project_info = project_info
-
-    def create_renderer(self, node_stack, state, document, filter_, target_handler):
-
-        return sphinxrenderer.SphinxRenderer(
-            self.project_info,
-            self,
-            create_node_factory(),
-            node_stack,
-            state,
-            document,
-            target_handler,
-            self.parser_factory.create_compound_parser(self.project_info),
-            filter_
-        )
+import textwrap
 
 
 def format_parser_error(name, error, filename, state, lineno, do_unicode_warning):
-
     warning = '%s: Unable to parse xml file "%s". ' % (name, filename)
     explanation = 'Reported error: %s. ' % error
 
@@ -57,3 +28,18 @@ def format_parser_error(name, error, filename, state, lineno, do_unicode_warning
         state.document.reporter.warning(
             warning + explanation + unicode_explanation_text, line=lineno)
     ]
+
+
+class RenderContext:
+    def __init__(self, node_stack, mask_factory, directive_args,
+                 domain: str='', child: bool=False) -> None:
+        self.node_stack = node_stack
+        self.mask_factory = mask_factory
+        self.directive_args = directive_args
+        self.domain = domain
+        self.child = child
+
+    def create_child_context(self, data_object) -> "RenderContext":
+        node_stack = self.node_stack[:]
+        node_stack.insert(0, self.mask_factory.mask(data_object))
+        return RenderContext(node_stack, self.mask_factory, self.directive_args, self.domain, True)

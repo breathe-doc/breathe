@@ -1,11 +1,12 @@
-
-from ..renderer.base import RenderContext
 from ..renderer.mask import NullMaskFactory
-from ..renderer import format_parser_error, DoxygenToRstRendererFactory
 from ..directive.base import BaseDirective
 from ..project import ProjectError
 from ..parser import ParserError, FileIOError
 from .base import create_warning
+
+from breathe.renderer import format_parser_error, RenderContext
+from breathe.renderer.sphinxrenderer import SphinxRenderer
+from breathe.renderer.target import create_target_handler
 
 from docutils.parsers.rst.directives import unchanged_required, flag
 
@@ -35,21 +36,19 @@ class BaseIndexDirective(BaseDirective):
 
         data_object = finder.root()
 
-        target_handler = self.target_handler_factory.create_target_handler(
-            self.options, project_info, self.state.document)
+        target_handler = create_target_handler(self.options, project_info, self.state.document)
         filter_ = self.filter_factory.create_index_filter(self.options)
 
-        renderer_factory = DoxygenToRstRendererFactory(
-            self.parser_factory,
-            project_info
-            )
-        object_renderer = renderer_factory.create_renderer(
+        object_renderer = SphinxRenderer(
+            self.parser_factory.app,
+            project_info,
             [data_object],
             self.state,
             self.state.document,
-            filter_,
             target_handler,
-            )
+            self.parser_factory.create_compound_parser(project_info),
+            filter_
+        )
 
         mask_factory = NullMaskFactory()
         context = RenderContext([data_object, RootDataObject()], mask_factory,
@@ -67,7 +66,6 @@ class BaseIndexDirective(BaseDirective):
 
 
 class DoxygenIndexDirective(BaseIndexDirective):
-
     required_arguments = 0
     optional_arguments = 2
     option_spec = {

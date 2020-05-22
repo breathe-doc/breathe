@@ -1,7 +1,14 @@
 
 from .exception import BreatheError
 
+from sphinx.application import Sphinx
+
 import os
+import fnmatch
+
+if False:
+    # For type annotation
+    from typing import Dict, Optional  # noqa
 
 
 class ProjectError(BreatheError):
@@ -12,46 +19,22 @@ class NoDefaultProjectError(ProjectError):
     pass
 
 
-class AutoProjectInfo(object):
+class AutoProjectInfo:
     """Created as a temporary step in the automatic xml generation process"""
 
-    def __init__(
-            self,
-            name,
-            source_path,
-            build_dir,
-            reference,
-            source_dir,
-            config_dir,
-            domain_by_extension,
-            domain_by_file_pattern,
-            match,
-            show_define_initializer,
-            project_refids,
-            order_parameters_first,
-            ):
+    def __init__(self, app: Sphinx, name: str, source_path: str, build_dir: str, reference: str):
+        self.app = app
 
         self._name = name
         self._source_path = source_path
         self._build_dir = build_dir
         self._reference = reference
-        self._source_dir = source_dir
-        self._config_dir = config_dir
-        self._domain_by_extension = domain_by_extension
-        self._domain_by_file_pattern = domain_by_file_pattern
-        self._match = match
-        self._show_define_initializer = show_define_initializer
-        self._project_refids = project_refids
-        self._order_parameters_first = order_parameters_first
 
     def name(self):
         return self._name
 
     def build_dir(self):
         return self._build_dir
-
-    def project_refids(self):
-        return self._project_refids
 
     def abs_path_to_source_file(self, file_):
         """
@@ -60,59 +43,28 @@ class AutoProjectInfo(object):
         """
 
         # os.path.join does the appropriate handling if _source_path is an absolute path
-        return os.path.join(self._config_dir, self._source_path, file_)
+        return os.path.join(self.app.confdir, self._source_path, file_)
 
     def create_project_info(self, project_path):
         """Creates a proper ProjectInfo object based on the information in this AutoProjectInfo"""
 
-        return ProjectInfo(
-            self._name,
-            project_path,
-            self._source_path,
-            self._reference,
-            self._source_dir,
-            self._config_dir,
-            self._domain_by_extension,
-            self._domain_by_file_pattern,
-            self._match,
-            self._show_define_initializer,
-            self._project_refids,
-            self._order_parameters_first,
-            )
+        return ProjectInfo(self.app,
+                           self._name,
+                           project_path,
+                           self._source_path,
+                           self._reference)
 
 
-class ProjectInfo(object):
-
-    def __init__(
-            self,
-            name,
-            path,
-            source_path,
-            reference,
-            source_dir,
-            config_dir,
-            domain_by_extension,
-            domain_by_file_pattern,
-            match,
-            show_define_initializer,
-            project_refids,
-            order_parameters_first
-    ):
+class ProjectInfo:
+    def __init__(self, app: Sphinx, name: str, path: str, source_path: str, reference: str):
+        self.app = app
 
         self._name = name
         self._project_path = path
         self._source_path = source_path
         self._reference = reference
-        self._source_dir = source_dir
-        self._config_dir = config_dir
-        self._domain_by_extension = domain_by_extension
-        self._domain_by_file_pattern = domain_by_file_pattern
-        self._match = match
-        self._show_define_initializer = show_define_initializer
-        self._project_refids = project_refids
-        self._order_parameters_first = order_parameters_first
 
-    def name(self):
+    def name(self) -> str:
         return self._name
 
     def project_path(self):
@@ -120,9 +72,6 @@ class ProjectInfo(object):
 
     def source_path(self):
         return self._source_path
-
-    def project_refids(self):
-        return self._project_refids
 
     def relative_path_to_xml_file(self, file_):
         """
@@ -132,12 +81,8 @@ class ProjectInfo(object):
         """
 
         # os.path.join does the appropriate handling if _project_path is an absolute path
-        full_xml_project_path = os.path.join(self._config_dir, self._project_path, file_)
-
-        return os.path.relpath(
-            full_xml_project_path,
-            self._source_dir
-        )
+        full_xml_project_path = os.path.join(self.app.confdir, self._project_path, file_)
+        return os.path.relpath(full_xml_project_path, self.app.srcdir)
 
     def sphinx_abs_path_to_file(self, file_):
         """
@@ -151,144 +96,93 @@ class ProjectInfo(object):
     def reference(self):
         return self._reference
 
-    def domain_for_file(self, file_):
-
-        domain = ""
+    def domain_for_file(self, file_: str) -> str:
         extension = file_.split(".")[-1]
-
         try:
-            domain = self._domain_by_extension[extension]
+            domain = self.app.config.breathe_domain_by_extension[extension]  # type: ignore
         except KeyError:
-            pass
+            domain = ""
 
-        for pattern, pattern_domain in self._domain_by_file_pattern.items():
-            if self._match(file_, pattern):
+        domainFromFilePattern = self.app.config.breathe_domain_by_file_pattern  # type: ignore
+        for pattern, pattern_domain in domainFromFilePattern.items():
+            if fnmatch.fnmatch(file_, pattern):
                 domain = pattern_domain
 
         return domain
 
-    def show_define_initializer(self):
-        return self._show_define_initializer
 
-    def order_parameters_first(self):
-        return self._order_parameters_first
+class ProjectInfoFactory:
+    def __init__(self, app: Sphinx):
+        self.app = app
+        # note: don't access self.app.config now, as we are instantiated at setup-time.
 
-
-class ProjectInfoFactory(object):
-
-    def __init__(self, source_dir, build_dir, config_dir, match):
-
-        self.source_dir = source_dir
-        self.build_dir = build_dir
-        self.config_dir = config_dir
-        self.match = match
-
-        self.projects = {}
-        self.default_project = None
-        self.domain_by_extension = {}
-        self.domain_by_file_pattern = {}
-        self.project_refids = False
-
-        self.show_define_initializer = False
-        self.order_parameters_first = False
-
+        # Assume general build directory is the doctree directory without the last component.
+        # We strip off any trailing slashes so that dirname correctly drops the last part.
+        # This can be overridden with the breathe_build_directory config variable
+        self._default_build_dir = os.path.dirname(app.doctreedir.rstrip(os.sep))
         self.project_count = 0
-        self.project_info_store = {}
-        self.project_info_for_auto_store = {}
-        self.auto_project_info_store = {}
+        self.project_info_store = {}  # type: Dict[str, ProjectInfo]
+        self.project_info_for_auto_store = {}  # type: Dict[str, AutoProjectInfo]
+        self.auto_project_info_store = {}  # type: Dict[str, AutoProjectInfo]
 
-    def update(
-            self,
-            projects,
-            default_project,
-            domain_by_extension,
-            domain_by_file_pattern,
-            projects_source,
-            build_dir,
-            show_define_initializer,
-            project_refids,
-            order_parameters_first,
-            ):
+    @property
+    def build_dir(self) -> str:
+        config = self.app.config  # type: ignore
+        if config.breathe_build_directory:
+            return config.breathe_build_directory
+        else:
+            return self._default_build_dir
 
-        self.projects = projects
-        self.default_project = default_project
-        self.domain_by_extension = domain_by_extension
-        self.domain_by_file_pattern = domain_by_file_pattern
-        self.projects_source = projects_source
-        self.show_define_initializer = show_define_initializer
-        self.project_refids = project_refids
-        self.order_parameters_first = order_parameters_first
-
-        # If the breathe config values has a non-empty value for build_dir then use that otherwise
-        # stick with the default
-        if build_dir:
-            self.build_dir = build_dir
-
-    def default_path(self):
-
-        if not self.default_project:
+    def default_path(self) -> str:
+        config = self.app.config  # type: ignore
+        if not config.breathe_default_project:
             raise NoDefaultProjectError(
                 "No breathe_default_project config setting to fall back on "
                 "for directive with no 'project' or 'path' specified."
             )
 
         try:
-            return self.projects[self.default_project]
+            return config.breathe_projects[config.breathe_default_project]
         except KeyError:
             raise ProjectError(
                 ("breathe_default_project value '%s' does not seem to be a valid key for the "
-                 "breathe_projects dictionary") % self.default_project
+                 "breathe_projects dictionary") % config.breathe_default_project
             )
 
-    def create_project_info(self, options):
-
-        name = self.default_project
+    def create_project_info(self, options) -> ProjectInfo:
+        config = self.app.config  # type: ignore
+        name = config.breathe_default_project
 
         if "project" in options:
             try:
-                path = self.projects[options["project"]]
+                path = config.breathe_projects[options["project"]]
                 name = options["project"]
             except KeyError:
                 raise ProjectError("Unable to find project '%s' in breathe_projects dictionary"
                                    % options["project"])
-
         elif "path" in options:
             path = options["path"]
-
         else:
             path = self.default_path()
 
         try:
             return self.project_info_store[path]
         except KeyError:
-
             reference = name
-
             if not name:
                 name = "project%s" % self.project_count
                 reference = path
                 self.project_count += 1
 
-            project_info = ProjectInfo(
-                name,
-                path,
-                "NoSourcePath",
-                reference,
-                self.source_dir,
-                self.config_dir,
-                self.domain_by_extension,
-                self.domain_by_file_pattern,
-                self.match,
-                self.show_define_initializer,
-                self.project_refids,
-                self.order_parameters_first
-            )
-
+            project_info = ProjectInfo(self.app,
+                                       name,
+                                       path,
+                                       "NoSourcePath",
+                                       reference)
             self.project_info_store[path] = project_info
-
             return project_info
 
-    def store_project_info_for_auto(self, name, project_info):
+    def store_project_info_for_auto(self, name: str, project_info: AutoProjectInfo) -> None:
         """Stores the project info by name for later extraction by the auto directives.
 
         Stored separately to the non-auto project info objects as they should never overlap.
@@ -296,7 +190,7 @@ class ProjectInfoFactory(object):
 
         self.project_info_for_auto_store[name] = project_info
 
-    def retrieve_project_info_for_auto(self, options):
+    def retrieve_project_info_for_auto(self, options) -> AutoProjectInfo:
         """Retrieves the project info by name for later extraction by the auto directives.
 
         Looks for the 'project' entry in the options dictionary. This is a less than ideal API but
@@ -304,46 +198,29 @@ class ProjectInfoFactory(object):
         sense.
         """
 
-        name = options.get('project', self.default_project)
-
+        name = options.get('project', self.app.config.breathe_default_project)  # type: ignore
         if name is None:
             raise NoDefaultProjectError(
                 "No breathe_default_project config setting to fall back on "
                 "for directive with no 'project' or 'path' specified."
             )
-
         return self.project_info_for_auto_store[name]
 
-    def create_auto_project_info(self, name, source_path):
-
+    def create_auto_project_info(self, name: str, source_path) -> AutoProjectInfo:
         key = source_path
-
         try:
             return self.auto_project_info_store[key]
         except KeyError:
-
             reference = name
-
             if not name:
                 name = "project%s" % self.project_count
                 reference = source_path
                 self.project_count += 1
 
-            auto_project_info = AutoProjectInfo(
-                name,
-                source_path,
-                self.build_dir,
-                reference,
-                self.source_dir,
-                self.config_dir,
-                self.domain_by_extension,
-                self.domain_by_file_pattern,
-                self.match,
-                self.show_define_initializer,
-                self.project_refids,
-                self.order_parameters_first
-            )
-
+            auto_project_info = AutoProjectInfo(self.app,
+                                                name,
+                                                source_path,
+                                                self.build_dir,
+                                                reference)
             self.auto_project_info_store[key] = auto_project_info
-
             return auto_project_info

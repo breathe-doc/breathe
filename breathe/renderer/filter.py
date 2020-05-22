@@ -199,14 +199,26 @@ We have to write:
 
 """
 
+from breathe import path_handler
+
+from sphinx.application import Sphinx
+
+import os
 import six
+from typing import Any, Callable, Dict, List
 
 
 class UnrecognisedKindError(Exception):
     pass
 
 
-class Selector(object):
+###############################################################################
+# Selectors
+###############################################################################
+
+class Selector:
+    def __call__(self, node_stack):
+        raise NotImplementedError
 
     @property
     def node_type(self):
@@ -246,7 +258,6 @@ class Selector(object):
 
 
 class Ancestor(Selector):
-
     def __init__(self, generations):
         self.generations = generations
 
@@ -255,41 +266,44 @@ class Ancestor(Selector):
 
 
 class Parent(Selector):
-
     def __call__(self, node_stack):
         return node_stack[1]
 
 
 class Node(Selector):
-
     def __call__(self, node_stack):
         return node_stack[0]
 
 
-class Accessor(object):
+###############################################################################
+# Accessors
+###############################################################################
 
-    def __init__(self, selector):
+class Accessor:
+    def __init__(self, selector: Selector) -> None:
         self.selector = selector
 
-    def __eq__(self, value):
+    def __call__(self, node_stack):
+        raise NotImplementedError
+
+    def __eq__(self, value: str) -> "InFilter":  # type: ignore
         return InFilter(self, [value])
 
-    def __ne__(self, value):
+    def __ne__(self, value: str) -> "NotFilter":  # type: ignore
         return NotFilter(InFilter(self, [value]))
 
-    def is_one_of(self, collection):
+    def is_one_of(self, collection: List[str]) -> "InFilter":
         return InFilter(self, collection)
 
-    def has_content(self):
+    def has_content(self) -> "HasContentFilter":
         return HasContentFilter(self)
 
-    def endswith(self, options):
+    def endswith(self, options: List[str]) -> "EndsWithFilter":
         return EndsWithFilter(self, options)
 
 
 class NameAccessor(Accessor):
-
-    def __call__(self, node_stack):
+    def __call__(self, node_stack) -> str:
         return self.selector(node_stack).name
 
 
@@ -299,19 +313,16 @@ class NodeNameAccessor(Accessor):
     It distinguishes between innerclass, innernamespace, etc.
     """
 
-    def __call__(self, node_stack):
+    def __call__(self, node_stack) -> str:
         return self.selector(node_stack).node_name
 
 
 class NodeTypeAccessor(Accessor):
-
-    def __call__(self, node_stack):
-
+    def __call__(self, node_stack) -> str:
         data_object = self.selector(node_stack)
         try:
             return data_object.node_type
         except AttributeError as e:
-
             # Horrible hack to silence errors on filtering unicode objects
             # until we fix the parsing
             if type(data_object) == six.text_type:
@@ -321,8 +332,7 @@ class NodeTypeAccessor(Accessor):
 
 
 class KindAccessor(Accessor):
-
-    def __call__(self, node_stack):
+    def __call__(self, node_stack) -> str:
         return self.selector(node_stack).kind
 
 
@@ -332,20 +342,17 @@ class AttributeAccessor(Accessor):
     AttributeAccessor(Node(), 'name') returns the value of ``node.name``.
     """
 
-    def __init__(self, selector, attribute_name):
-        Accessor.__init__(self, selector)
-
+    def __init__(self, selector: Selector, attribute_name: str) -> None:
+        super().__init__(selector)
         self.attribute_name = attribute_name
 
-    def __call__(self, node_stack):
+    def __call__(self, node_stack) -> Any:
         return getattr(self.selector(node_stack), self.attribute_name)
 
 
 class LambdaAccessor(Accessor):
-
-    def __init__(self, selector, func):
-        Accessor.__init__(self, selector)
-
+    def __init__(self, selector: Selector, func: Callable[[Any], str]):
+        super().__init__(selector)
         self.func = func
 
     def __call__(self, node_stack):
@@ -353,40 +360,42 @@ class LambdaAccessor(Accessor):
 
 
 class NamespaceAccessor(Accessor):
-
     def __call__(self, node_stack):
         return self.selector(node_stack).namespaces
 
 
-class Filter(object):
+###############################################################################
+# Filters
+###############################################################################
 
-    def __and__(self, other):
+class Filter:
+    def allow(self, node_stack) -> bool:
+        raise NotImplementedError
+
+    def __and__(self, other: "Filter") -> "AndFilter":
         return AndFilter(self, other)
 
-    def __or__(self, other):
+    def __or__(self, other: "Filter") -> "OrFilter":
         return OrFilter(self, other)
 
-    def __invert__(self):
+    def __invert__(self) -> "NotFilter":
         return NotFilter(self)
 
 
 class HasAncestorFilter(Filter):
-
-    def __init__(self, generations):
+    def __init__(self, generations: int) -> None:
         self.generations = generations
 
-    def allow(self, node_stack):
+    def allow(self, node_stack) -> bool:
         return len(node_stack) > self.generations
 
 
 class HasContentFilter(Filter):
-
-    def __init__(self, accessor):
+    def __init__(self, accessor: Accessor):
         self.accessor = accessor
 
-    def allow(self, node_stack):
-        """Detects if the node in questions has an empty .content_ property.
-        """
+    def allow(self, node_stack) -> bool:
+        """Detects if the node in questions has an empty .content_ property."""
 
         return bool(self.accessor(node_stack).content_)
 
@@ -396,85 +405,70 @@ class EndsWithFilter(Filter):
     iterable parameter.
     """
 
-    def __init__(self, accessor, options):
+    def __init__(self, accessor: Accessor, options: List[str]):
         self.accessor = accessor
         self.options = options
 
-    def allow(self, node_stack):
+    def allow(self, node_stack) -> bool:
         string = self.accessor(node_stack)
         for entry in self.options:
             if string.endswith(entry):
                 return True
-
         return False
 
 
 class InFilter(Filter):
     """Checks if what is returned from the accessor is 'in' in the members"""
 
-    def __init__(self, accessor, members):
-
+    def __init__(self, accessor: Accessor, members: List[str]) -> None:
         self.accessor = accessor
         self.members = members
 
-    def allow(self, node_stack):
-
+    def allow(self, node_stack) -> bool:
         name = self.accessor(node_stack)
-
         return name in self.members
 
 
 class GlobFilter(Filter):
-
-    def __init__(self, accessor, glob):
-
+    def __init__(self, accessor: Accessor, glob):
         self.accessor = accessor
         self.glob = glob
 
-    def allow(self, node_stack):
-
+    def allow(self, node_stack) -> bool:
         text = self.accessor(node_stack)
         return self.glob.match(text)
 
 
 class FilePathFilter(Filter):
-
-    def __init__(self, accessor, target_file, path_handler):
-
+    def __init__(self, accessor: Accessor, target_file: str):
         self.accessor = accessor
         self.target_file = target_file
-        self.path_handler = path_handler
 
-    def allow(self, node_stack):
-
+    def allow(self, node_stack) -> bool:
         location = self.accessor(node_stack).file
 
-        if self.path_handler.includes_directory(self.target_file):
+        if path_handler.includes_directory(self.target_file):
             # If the target_file contains directory separators then
             # match against the same length at the end of the location
             #
             location_match = location[-len(self.target_file):]
             return location_match == self.target_file
-
         else:
             # If there are no separators, match against the whole filename
             # at the end of the location
             #
             # This is to prevent "Util.cpp" matching "PathUtil.cpp"
             #
-            location_basename = self.path_handler.basename(location)
+            location_basename = os.path.basename(location)
             return location_basename == self.target_file
 
 
 class NamespaceFilter(Filter):
-
-    def __init__(self, namespace_accessor, name_accessor):
-
+    def __init__(self, namespace_accessor: Accessor, name_accessor: Accessor):
         self.namespace_accessor = namespace_accessor
         self.name_accessor = name_accessor
 
-    def allow(self, node_stack):
-
+    def allow(self, node_stack) -> bool:
         namespaces = self.namespace_accessor(node_stack)
         name = self.name_accessor(node_stack)
 
@@ -487,105 +481,86 @@ class NamespaceFilter(Filter):
 
 
 class OpenFilter(Filter):
-
-    def allow(self, node_stack):
-
+    def allow(self, node_stack) -> bool:
         return True
 
 
 class ClosedFilter(Filter):
-
-    def allow(self, node_stack):
-
+    def allow(self, node_stack) -> bool:
         return False
 
 
 class NotFilter(Filter):
-
-    def __init__(self, child_filter):
+    def __init__(self, child_filter: Filter):
         self.child_filter = child_filter
 
-    def allow(self, node_stack):
-
+    def allow(self, node_stack) -> bool:
         return not self.child_filter.allow(node_stack)
 
 
 class AndFilter(Filter):
-
-    def __init__(self, *filters):
-
+    def __init__(self, *filters: Filter):
         self.filters = filters
 
-    def allow(self, node_stack):
-
+    def allow(self, node_stack) -> bool:
         # If any filter returns False then return False
         for filter_ in self.filters:
             if not filter_.allow(node_stack):
                 return False
-
         return True
 
 
 class OrFilter(Filter):
     """Provides a short-cutted 'or' operation between two filters"""
 
-    def __init__(self, *filters):
-
+    def __init__(self, *filters: Filter):
         self.filters = filters
 
-    def allow(self, node_stack):
-
+    def allow(self, node_stack) -> bool:
         # If any filter returns True then return True
         for filter_ in self.filters:
             if filter_.allow(node_stack):
                 return True
-
         return False
 
 
 class IfFilter(Filter):
-
     def __init__(self, condition, if_true, if_false):
         self.condition = condition
         self.if_true = if_true
         self.if_false = if_false
 
-    def allow(self, node_stack):
-
+    def allow(self, node_stack) -> bool:
         if self.condition.allow(node_stack):
             return self.if_true.allow(node_stack)
         else:
             return self.if_false.allow(node_stack)
 
 
-class Glob(object):
+class Gather(Filter):
+    def __init__(self, accessor: Accessor, names: List[str]):
+        self.accessor = accessor
+        self.names = names
 
+    def allow(self, node_stack) -> bool:
+        self.names.extend(self.accessor(node_stack))
+        return False
+
+
+###############################################################################
+# Other stuff
+###############################################################################
+
+class Glob:
     def __init__(self, method, pattern):
-
         self.method = method
         self.pattern = pattern
 
     def match(self, name):
-
         return self.method(name, self.pattern)
 
 
-class Gather(object):
-
-    def __init__(self, accessor, names):
-
-        self.accessor = accessor
-        self.names = names
-
-    def allow(self, node_stack):
-
-        self.names.extend(self.accessor(node_stack))
-
-        return False
-
-
-class FilterFactory(object):
-
+class FilterFactory:
     # C++ style public entries
     public_kinds = set([
         "public-type",
@@ -596,20 +571,18 @@ class FilterFactory(object):
         "public-static-attrib",
     ])
 
-    def __init__(self, path_handler):
+    def __init__(self, app: Sphinx) -> None:
+        self.app = app
 
-        self.path_handler = path_handler
-        self.default_members = ()
-        self.implementation_filename_extensions = ()
-
-    def create_render_filter(self, kind, options):
+    def create_render_filter(self, kind: str, options: Dict[str, Any]) -> Filter:
         """Render filter for group & namespace blocks"""
 
         if kind not in ['group', 'namespace']:
             raise UnrecognisedKindError(kind)
 
         # Generate new dictionary from defaults
-        filter_options = dict((entry, u'') for entry in self.default_members)
+        filter_options = dict((entry, '')
+                              for entry in self.app.config.breathe_default_members)  # type: ignore
 
         # Update from the actual options
         filter_options.update(options)
@@ -617,7 +590,7 @@ class FilterFactory(object):
         # Convert the doxygengroup members flag (which just stores None as the value) to an empty
         # string to allow the create_class_member_filter to process it properly
         if 'members' in filter_options:
-            filter_options['members'] = u''
+            filter_options['members'] = ''
 
         node = Node()
         grandparent = Ancestor(2)
@@ -635,11 +608,12 @@ class FilterFactory(object):
             & self.create_innerclass_filter(filter_options) \
             & self.create_outline_filter(filter_options)
 
-    def create_class_filter(self, target, options):
+    def create_class_filter(self, target: str, options: Dict[str, Any]) -> Filter:
         """Content filter for classes based on various directive options"""
 
         # Generate new dictionary from defaults
-        filter_options = dict((entry, u'') for entry in self.default_members)
+        filter_options = dict((entry, '')
+                              for entry in self.app.config.breathe_default_members)  # type: ignore
 
         # Update from the actual options
         filter_options.update(options)
@@ -651,7 +625,7 @@ class FilterFactory(object):
             self.create_show_filter(filter_options),
             )
 
-    def create_innerclass_filter(self, options, outerclass=''):
+    def create_innerclass_filter(self, options: Dict[str, Any], outerclass: str = '') -> Filter:
         """
         :param outerclass: Should be the class/struct being target by the directive calling this
                            code. If it is a group or namespace directive then it should be left
@@ -683,16 +657,12 @@ class FilterFactory(object):
         public_innerclass_filter = ClosedFilter()
 
         if 'members' in options:
-
             if options['members'].strip():
-
                 text = options["members"]
-
                 prefix = ('%s::' % outerclass) if outerclass else ''
 
                 # Matches sphinx-autodoc behaviour of comma separated values
                 members = set(['%s%s' % (prefix, x.strip()) for x in text.split(",")])
-
                 node_valueOf_is_in_members = node.valueOf.is_one_of(members)
 
                 # Accept any nodes which don't have a "sectiondef" as a parent or, if they do, only
@@ -711,7 +681,7 @@ class FilterFactory(object):
         # to check the parent's type as well
         return innerclass | public_innerclass_filter | description
 
-    def create_show_filter(self, options):
+    def create_show_filter(self, options: Dict[str, Any]) -> Filter:
         """Currently only handles the header-file entry"""
 
         try:
@@ -733,7 +703,8 @@ class FilterFactory(object):
             NotFilter(InFilter(NodeTypeAccessor(Node()), ["inc"]))
             )
 
-    def _create_description_filter(self, allow, level, options):
+    def _create_description_filter(self, allow: bool, level: str,
+                                   options: Dict[str, Any]) -> Filter:
         """Whether or not we allow descriptions is determined by the calling function and we just do
         whatever the 'allow' function parameter tells us.
         """
@@ -748,14 +719,12 @@ class FilterFactory(object):
 
         # Let through any description children of sectiondefs if we output any kind members
         if allow:
-
             description_filter = \
                 (parent_is_level & node_is_description) | ~ parent_is_level
 
         return description_filter
 
-    def _create_public_members_filter(self, options):
-
+    def _create_public_members_filter(self, options: Dict[str, Any]) -> Filter:
         node = Node()
         node_is_memberdef = node.node_type == "memberdef"
         node_is_public = node.prot == "public"
@@ -770,9 +739,7 @@ class FilterFactory(object):
         # If the user has specified the 'members' option with arguments then we only pay attention
         # to that and not to any other member settings
         if "members" in options:
-
             if options['members'].strip():
-
                 text = options["members"]
 
                 # Matches sphinx-autodoc behaviour of comma separated values
@@ -784,17 +751,15 @@ class FilterFactory(object):
                 # accept them if their names are in the members list
                 public_members_filter = \
                     (parent_is_sectiondef & node_name_is_in_members) | ~ parent_is_sectiondef
-
             else:
-
                 # Select anything that doesn't have a parent which is a sectiondef, or, if it does,
                 # only select the public ones
                 public_members_filter = \
                     (is_memberdef & node_is_public) | ~ is_memberdef
-
         return public_members_filter
 
-    def _create_non_public_members_filter(self, prot, option_name, options):
+    def _create_non_public_members_filter(self, prot: str, option_name: str,
+                                          options: Dict[str, Any]) -> Filter:
         """'prot' is the doxygen xml term for 'public', 'protected' and 'private' categories."""
 
         node = Node()
@@ -809,14 +774,11 @@ class FilterFactory(object):
         filter_ = ~ is_memberdef
 
         if option_name in options:
-
             # Allow anything that isn't a memberdef, or if it is only allow the public ones
             filter_ = ~ is_memberdef | node_is_public
-
         return filter_
 
-    def _create_undoc_members_filter(self, options):
-
+    def _create_undoc_members_filter(self, options: Dict[str, Any]) -> Filter:
         node = Node()
         node_is_memberdef = node.node_type == 'memberdef'
 
@@ -827,12 +789,10 @@ class FilterFactory(object):
         undoc_members_filter = ~ node_is_memberdef | node_has_description
 
         if 'undoc-members' in options:
-
             undoc_members_filter = OpenFilter()
-
         return undoc_members_filter
 
-    def create_class_member_filter(self, options):
+    def create_class_member_filter(self, options: Dict[str, Any]) -> Filter:
         """Content filter based on :members: and :private-members: classes"""
 
         # I can't fully explain the filtering of descriptions here. More testing needed to figure
@@ -866,16 +826,15 @@ class FilterFactory(object):
         allowed_members = (public_members | protected_members | private_members) & undoc_members
         return allowed_members | description
 
-    def create_outline_filter(self, options):
+    def create_outline_filter(self, options: Dict[str, Any]) -> Filter:
         if 'outline' in options:
             node = Node()
             return ~ node.node_type.is_one_of(["description", "inc"])
         else:
             return OpenFilter()
 
-    def create_file_filter(self, filename, options):
-
-        valid_names = []
+    def create_file_filter(self, filename: str, options: Dict[str, Any]) -> Filter:
+        valid_names = []  # type: List[str]
 
         filter_ = AndFilter(
             NotFilter(
@@ -891,7 +850,7 @@ class FilterFactory(object):
                     InFilter(KindAccessor(Node()), ["file"]),
                     FilePathFilter(
                         LambdaAccessor(Node(), lambda x: x.location),
-                        filename, self.path_handler
+                        filename
                         ),
                     Gather(LambdaAccessor(Node(), lambda x: x.namespaces), valid_names)
                     )
@@ -939,7 +898,7 @@ class FilterFactory(object):
                     InFilter(NodeTypeAccessor(Node()), ["memberdef"]),
                     NotFilter(
                         FilePathFilter(LambdaAccessor(Node(), lambda x: x.location),
-                                       filename, self.path_handler)
+                                       filename)
                         )
                     )
                 ),
@@ -957,18 +916,14 @@ class FilterFactory(object):
                     NotFilter(InFilter(KindAccessor(Node()), ["namespace"])),
                     NotFilter(
                         FilePathFilter(LambdaAccessor(Node(), lambda x: x.location),
-                                       filename, self.path_handler)
+                                       filename)
                         )
                     )
                 )
             )
+        return AndFilter(self.create_outline_filter(options), filter_)
 
-        return AndFilter(
-            self.create_outline_filter(options),
-            filter_
-            )
-
-    def create_content_filter(self, kind, options):
+    def create_content_filter(self, kind: str, options: Dict[str, Any]) -> Filter:
         """Returns a filter which matches the contents of the or namespace but not the group or
         namepace name or description.
 
@@ -1002,8 +957,7 @@ class FilterFactory(object):
 
         return public_members | public_innerclass
 
-    def create_index_filter(self, options):
-
+    def create_index_filter(self, options: Dict[str, Any]) -> Filter:
         filter_ = AndFilter(
             NotFilter(
                 AndFilter(
@@ -1027,28 +981,24 @@ class FilterFactory(object):
             filter_
             )
 
-    def create_open_filter(self):
+    def create_open_filter(self) -> Filter:
         """Returns a completely open filter which matches everything"""
 
         return OpenFilter()
 
-    def create_id_filter(self, node_type, refid):
-
+    def create_id_filter(self, node_type: str, refid: str) -> Filter:
         node = Node()
         return (node.node_type == node_type) & (node.id == refid)
 
-    def create_file_finder_filter(self, filename):
-
+    def create_file_finder_filter(self, filename: str) -> Filter:
         filter_ = AndFilter(
             InFilter(NodeTypeAccessor(Node()), ["compounddef"]),
             InFilter(KindAccessor(Node()), ["file"]),
-            FilePathFilter(LambdaAccessor(Node(), lambda x: x.location), filename,
-                           self.path_handler)
-            )
-
+            FilePathFilter(LambdaAccessor(Node(), lambda x: x.location), filename)
+        )
         return filter_
 
-    def create_member_finder_filter(self, namespace, name, kind):
+    def create_member_finder_filter(self, namespace: str, name: str, kind: str) -> Filter:
         """Returns a filter which looks for a member with the specified name and kind."""
 
         node = Node()
@@ -1065,11 +1015,10 @@ class FilterFactory(object):
                    (parent.kind == 'struct') |
                    (parent.kind == 'interface')) \
                 & (parent.name == namespace)
-
             return parent_matches & node_matches
-
         else:
-            is_implementation_file = parent.name.endswith(self.implementation_filename_extensions)
+            is_implementation_file = parent.name.endswith(
+                self.app.config.breathe_implementation_filename_extensions)  # type: ignore
             parent_is_compound = parent.node_type == 'compound'
             parent_is_file = (parent.kind == 'file') & (~ is_implementation_file)
             parent_is_not_file = parent.kind != 'file'
@@ -1077,8 +1026,7 @@ class FilterFactory(object):
             return (parent_is_compound & parent_is_file & node_matches) \
                 | (parent_is_compound & parent_is_not_file & node_matches)
 
-    def create_function_finder_filter(self, namespace, name):
-
+    def create_function_finder_filter(self, namespace: str, name: str) -> Filter:
         parent = Parent()
         parent_is_compound = parent.node_type == 'compound'
         parent_is_group = parent.kind == 'group'
@@ -1089,19 +1037,19 @@ class FilterFactory(object):
         # elsewhere and having more than one match is confusing for our logic later on.
         return function_filter & ~(parent_is_compound & parent_is_group)
 
-    def create_enumvalue_finder_filter(self, name):
+    def create_enumvalue_finder_filter(self, name: str) -> Filter:
         """Returns a filter which looks for an enumvalue with the specified name."""
 
         node = Node()
         return (node.node_type == 'enumvalue') & (node.name == name)
 
-    def create_compound_finder_filter(self, name, kind):
+    def create_compound_finder_filter(self, name: str, kind: str) -> Filter:
         """Returns a filter which looks for a compound with the specified name and kind."""
 
         node = Node()
         return (node.node_type == 'compound') & (node.kind == kind) & (node.name == name)
 
-    def create_finder_filter(self, kind, name):
+    def create_finder_filter(self, kind: str, name: str) -> Filter:
         """Returns a filter which looks for the compound node from the index which is a group node
         (kind=group) and has the appropriate name
 
@@ -1110,7 +1058,6 @@ class FilterFactory(object):
         """
 
         if kind == 'group':
-
             filter_ = AndFilter(
                 InFilter(NodeTypeAccessor(Node()), ["compound"]),
                 InFilter(KindAccessor(Node()), ["group"]),
@@ -1123,15 +1070,4 @@ class FilterFactory(object):
                 InFilter(KindAccessor(Node()), ["namespace"]),
                 InFilter(NameAccessor(Node()), [name])
                 )
-
         return filter_
-
-    def get_config_values(self, app):
-        """Extract the breathe_default_members config value and store it.
-
-        This method is called on the 'builder-init' event in Sphinx"""
-
-        self.default_members = app.config.breathe_default_members
-
-        self.implementation_filename_extensions = \
-            app.config.breathe_implementation_filename_extensions

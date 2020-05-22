@@ -1,31 +1,34 @@
+from breathe.directive.base import create_warning
+from breathe.directive.file import DoxygenFileDirective, AutoDoxygenFileDirective
+from breathe.directive.index import DoxygenIndexDirective, AutoDoxygenIndexDirective
+from breathe.exception import BreatheError
+from breathe.finder.factory import FinderFactory
+from breathe.directive.base import BaseDirective
+from breathe.file_state_cache import MTimeError
+from breathe.parser import DoxygenParserFactory, ParserError, FileIOError
+from breathe.process import AutoDoxygenProcessHandle
+from breathe.project import ProjectInfoFactory, ProjectError
+from breathe.renderer import format_parser_error, RenderContext
+from breathe.renderer.sphinxrenderer import WithContext
+from breathe.renderer.filter import Filter
+from breathe.renderer.mask import (
+    MaskFactory, NullMaskFactory, NoParameterNamesMask
+)
+from breathe.renderer.sphinxrenderer import SphinxRenderer
+from breathe.renderer.target import create_target_handler
 
-from .finder.core import FinderFactory
-from .parser import DoxygenParserFactory, ParserError, FileIOError
-from .renderer import format_parser_error, DoxygenToRstRendererFactory
-from .renderer.base import RenderContext
-from .renderer.filter import FilterFactory
-from .renderer.target import TargetHandlerFactory
-from .renderer.mask import MaskFactory, NullMaskFactory, NoParameterNamesMask
-from .renderer.sphinxrenderer import WithContext
-
-from .finder.core import DoxygenItemFinderFactoryCreator
-from .directive.base import BaseDirective, create_warning
-from .directive.index import DoxygenIndexDirective, AutoDoxygenIndexDirective
-from .directive.file import DoxygenFileDirective, AutoDoxygenFileDirective
-from .process import AutoDoxygenProcessHandle
-from .exception import BreatheError
-from .project import ProjectInfoFactory, ProjectError
-from .node_factory import create_node_factory
-
-from docutils.parsers.rst.directives import unchanged_required, unchanged, flag
-from sphinx.writers.text import TextWriter
-from sphinx.builders.text import TextBuilder
+from sphinx.application import Sphinx
 from sphinx.domains import cpp
 
+from docutils import nodes
+from docutils.nodes import Node
+from docutils.parsers.rst.directives import unchanged_required, unchanged, flag
+
 import os
-import fnmatch
 import re
 import subprocess
+
+from typing import Any, List, Type  # noqa
 
 
 class NoMatchingFunctionError(BreatheError):
@@ -33,59 +36,25 @@ class NoMatchingFunctionError(BreatheError):
 
 
 class UnableToResolveFunctionError(BreatheError):
-
-    def __init__(self, signatures):
+    def __init__(self, signatures: List[str]) -> None:
         self.signatures = signatures
 
 
-class FakeDestination(object):
-
-    def write(self, output):
-        return output
-
-
-class TextRenderer(object):
-
-    def __init__(self, app):
-        self.app = app
-
-    def render(self, nodes, document):
-
-        new_document = document.copy()
-
-        new_document.children = nodes
-
-        writer = TextWriter(TextBuilder(self.app))
-        output = writer.write(new_document, FakeDestination())
-
-        return output.strip()
-
-
-# Directives
-# ----------
-
 class DoxygenFunctionDirective(BaseDirective):
-
     required_arguments = 1
     option_spec = {
         "path": unchanged_required,
         "project": unchanged_required,
         "outline": flag,
         "no-link": flag,
-        }
+    }
     has_content = False
     final_argument_whitespace = True
 
-    def __init__(self, node_factory, text_renderer, *args, **kwargs):
-        BaseDirective.__init__(self, *args, **kwargs)
-
-        self.node_factory = node_factory
-        self.text_renderer = text_renderer
-
-    def run(self):
-
+    def run(self) -> List[Node]:
         # Separate possible arguments (delimited by a "(") from the namespace::name
         match = re.match(r"([^(]*)(.*)", self.arguments[0])
+        assert match is not None  # TODO: this is probably not appropriate, for now it fixes typing
         namespaced_function, args = match.group(1), match.group(2)
 
         # Split the namespace and the function name
@@ -102,7 +71,7 @@ class DoxygenFunctionDirective(BaseDirective):
 
         try:
             finder = self.finder_factory.create_finder(project_info)
-        except MTimerError as e:
+        except MTimeError as e:
             warning = create_warning(None, self.state, self.lineno)
             return warning.warn('doxygenfunction: %s' % e)
 
@@ -111,7 +80,8 @@ class DoxygenFunctionDirective(BaseDirective):
 
         finder_filter = self.filter_factory.create_function_finder_filter(namespace, function_name)
 
-        matches = []
+        # TODO: find a more specific type for the Doxygen nodes
+        matches = []  # type: List[Any]
         finder.filter_(finder_filter, matches)
 
         # Create it ahead of time as it is cheap and it is ugly to declare it for both exception
@@ -151,21 +121,16 @@ class DoxygenFunctionDirective(BaseDirective):
                 # alignment for our simple plain text list
                 literal_text += '- %s' % entry.replace('\n', '\n  ')
                 raw_text += '    - %s\n' % entry.replace('\n', '\n      ')
-            block = self.node_factory.literal_block('', '', self.node_factory.Text(literal_text))
+            block = nodes.literal_block('', '', nodes.Text(literal_text))
             formatted_message = warning.format(message)
             warning_nodes = [
-                self.node_factory.paragraph(
-                    "", "",
-                    self.node_factory.Text(formatted_message)
-                    ),
+                nodes.paragraph("", "", nodes.Text(formatted_message)),
                 block
-                ]
+            ]
             result = warning.warn(raw_text, warning_nodes)
             return result
 
-        target_handler = self.target_handler_factory.create_target_handler(
-            self.options, project_info, self.state.document
-            )
+        target_handler = create_target_handler(self.options, project_info, self.state.document)
         filter_ = self.filter_factory.create_outline_filter(self.options)
 
         return self.render(node_stack, project_info, filter_, target_handler, NullMaskFactory(),
@@ -205,26 +170,23 @@ class DoxygenFunctionDirective(BaseDirective):
                     args.append(function_description[start:i].strip())
                     start = i + 1
             args.append(function_description[start:-1].strip())
-
             return args
 
     def create_function_signature(self, node_stack, project_info, filter_, target_handler,
                                   mask_factory, directive_args):
         "Standard render process used by subclasses"
 
-        renderer_factory = DoxygenToRstRendererFactory(
-            self.parser_factory,
-            project_info
-            )
-
         try:
-            object_renderer = renderer_factory.create_renderer(
+            object_renderer = SphinxRenderer(
+                self.parser_factory.app,
+                project_info,
                 node_stack,
                 self.state,
                 self.state.document,
-                filter_,
                 target_handler,
-                )
+                self.parser_factory.create_compound_parser(project_info),
+                filter_,
+            )
         except ParserError as e:
             return format_parser_error("doxygenclass", e.error, e.filename, self.state,
                                        self.lineno, True)
@@ -250,7 +212,6 @@ class DoxygenFunctionDirective(BaseDirective):
         return str(ast)
 
     def resolve_function(self, matches, args, project_info):
-
         if not matches:
             raise NoMatchingFunctionError()
 
@@ -261,13 +222,11 @@ class DoxygenFunctionDirective(BaseDirective):
 
         # Iterate over the potential matches
         for entry in matches:
-
             text_options = {'no-link': u'', 'outline': u''}
 
             # Render the matches to docutils nodes
-            target_handler = self.target_handler_factory.create_target_handler(
-                {'no-link': u''}, project_info, self.state.document
-                )
+            target_handler = create_target_handler({'no-link': u''},
+                                                   project_info, self.state.document)
             filter_ = self.filter_factory.create_outline_filter(text_options)
             mask_factory = MaskFactory({'param': NoParameterNamesMask})
 
@@ -291,8 +250,7 @@ class DoxygenFunctionDirective(BaseDirective):
         raise UnableToResolveFunctionError(signatures)
 
 
-class DoxygenClassLikeDirective(BaseDirective):
-
+class _DoxygenClassLikeDirective(BaseDirective):
     required_arguments = 1
     optional_arguments = 0
     final_argument_whitespace = True
@@ -306,11 +264,10 @@ class DoxygenClassLikeDirective(BaseDirective):
         "show": unchanged_required,
         "outline": flag,
         "no-link": flag,
-        }
+    }
     has_content = False
 
-    def run(self):
-
+    def run(self) -> List[Node]:
         name = self.arguments[0]
 
         try:
@@ -321,13 +278,14 @@ class DoxygenClassLikeDirective(BaseDirective):
 
         try:
             finder = self.finder_factory.create_finder(project_info)
-        except MTimerError as e:
+        except MTimeError as e:
             warning = create_warning(None, self.state, self.lineno, kind=self.kind)
             return warning.warn('doxygen{kind}: %s' % e)
 
         finder_filter = self.filter_factory.create_compound_finder_filter(name, self.kind)
 
-        matches = []
+        # TODO: find a more specific type for the Doxygen nodes
+        matches = []  # type: List[Any]
         finder.filter_(finder_filter, matches)
 
         if len(matches) == 0:
@@ -335,9 +293,7 @@ class DoxygenClassLikeDirective(BaseDirective):
                                      kind=self.kind)
             return warning.warn('doxygen{kind}: Cannot find class "{name}" {tail}')
 
-        target_handler = self.target_handler_factory.create_target_handler(
-            self.options, project_info, self.state.document
-            )
+        target_handler = create_target_handler(self.options, project_info, self.state.document)
         filter_ = self.filter_factory.create_class_filter(name, self.options)
 
         mask_factory = NullMaskFactory()
@@ -345,22 +301,19 @@ class DoxygenClassLikeDirective(BaseDirective):
                            self.directive_args)
 
 
-class DoxygenClassDirective(DoxygenClassLikeDirective):
-
+class DoxygenClassDirective(_DoxygenClassLikeDirective):
     kind = "class"
 
 
-class DoxygenStructDirective(DoxygenClassLikeDirective):
-
+class DoxygenStructDirective(_DoxygenClassLikeDirective):
     kind = "struct"
 
 
-class DoxygenInterfaceDirective(DoxygenClassLikeDirective):
-
+class DoxygenInterfaceDirective(_DoxygenClassLikeDirective):
     kind = "interface"
 
 
-class DoxygenContentBlockDirective(BaseDirective):
+class _DoxygenContentBlockDirective(BaseDirective):
     """Base class for namespace and group directives which have very similar behaviours"""
 
     required_arguments = 1
@@ -375,11 +328,10 @@ class DoxygenContentBlockDirective(BaseDirective):
         "private-members": flag,
         "undoc-members": flag,
         "no-link": flag
-        }
+    }
     has_content = False
 
-    def run(self):
-
+    def run(self) -> List[Node]:
         name = self.arguments[0]
 
         try:
@@ -390,13 +342,14 @@ class DoxygenContentBlockDirective(BaseDirective):
 
         try:
             finder = self.finder_factory.create_finder(project_info)
-        except MTimerError as e:
+        except MTimeError as e:
             warning = create_warning(None, self.state, self.lineno, kind=self.kind)
             return warning.warn('doxygen{kind}: %s' % e)
 
         finder_filter = self.filter_factory.create_finder_filter(self.kind, name)
 
-        matches = []
+        # TODO: find a more specific type for the Doxygen nodes
+        matches = []  # type: List[Any]
         finder.filter_(finder_filter, matches)
 
         # It shouldn't be possible to have too many matches as namespaces & groups in their nature
@@ -407,7 +360,6 @@ class DoxygenContentBlockDirective(BaseDirective):
             return warning.warn('doxygen{kind}: Cannot find namespace "{name}" {tail}')
 
         if 'content-only' in self.options:
-
             # Unpack the single entry in the matches list
             (node_stack,) = matches
 
@@ -417,31 +369,28 @@ class DoxygenContentBlockDirective(BaseDirective):
             # the contents of it which match the filter
             contents_finder = self.finder_factory.create_finder_from_root(node_stack[0],
                                                                           project_info)
-            contents = []
+            # TODO: find a more specific type for the Doxygen nodes
+            contents = []  # type: List[Any]
             contents_finder.filter_(filter_, contents)
 
             # Replaces matches with our new starting points
             matches = contents
 
-        target_handler = self.target_handler_factory.create_target_handler(
-            self.options, project_info, self.state.document
-            )
+        target_handler = create_target_handler(self.options, project_info, self.state.document)
         filter_ = self.filter_factory.create_render_filter(self.kind, self.options)
 
-        renderer_factory = DoxygenToRstRendererFactory(
-            self.parser_factory,
-            project_info
-            )
         node_list = []
-
         for node_stack in matches:
-            object_renderer = renderer_factory.create_renderer(
+            object_renderer = SphinxRenderer(
+                self.parser_factory.app,
+                project_info,
                 node_stack,
                 self.state,
                 self.state.document,
-                filter_,
                 target_handler,
-                )
+                self.parser_factory.create_compound_parser(project_info),
+                filter_
+            )
 
             mask_factory = NullMaskFactory()
             context = RenderContext(node_stack, mask_factory, self.directive_args)
@@ -450,23 +399,21 @@ class DoxygenContentBlockDirective(BaseDirective):
         return node_list
 
 
-class DoxygenNamespaceDirective(DoxygenContentBlockDirective):
-
+class DoxygenNamespaceDirective(_DoxygenContentBlockDirective):
     kind = "namespace"
 
 
-class DoxygenGroupDirective(DoxygenContentBlockDirective):
-
+class DoxygenGroupDirective(_DoxygenContentBlockDirective):
     kind = "group"
 
 
+# TODO: is this comment still relevant?
 # This class was the same as the DoxygenBaseDirective above, except that it
 # wraps the output in a definition_list before passing it back. This should be
 # abstracted in a far nicer way to avoid repeating so much code
 #
 # Now we've removed the definition_list wrap so we really need to refactor this!
-class DoxygenBaseItemDirective(BaseDirective):
-
+class _DoxygenBaseItemDirective(BaseDirective):
     required_arguments = 1
     optional_arguments = 1
     option_spec = {
@@ -477,14 +424,13 @@ class DoxygenBaseItemDirective(BaseDirective):
         }
     has_content = False
 
-    def create_finder_filter(self, namespace, name):
+    def create_finder_filter(self, namespace: str, name: str) -> Filter:
         """Creates a filter to find the node corresponding to this item."""
 
         return self.filter_factory.create_member_finder_filter(
             namespace, name, self.kind)
 
-    def run(self):
-
+    def run(self) -> List[Node]:
         try:
             namespace, name = self.arguments[0].rsplit("::", 1)
         except ValueError:
@@ -498,13 +444,14 @@ class DoxygenBaseItemDirective(BaseDirective):
 
         try:
             finder = self.finder_factory.create_finder(project_info)
-        except MTimerError as e:
+        except MTimeError as e:
             warning = create_warning(None, self.state, self.lineno, kind=self.kind)
             return warning.warn('doxygen{kind}: %s' % e)
 
         finder_filter = self.create_finder_filter(namespace, name)
 
-        matches = []
+        # TODO: find a more specific type for the Doxygen nodes
+        matches = []  # type: List[Any]
         finder.filter_(finder_filter, matches)
 
         if len(matches) == 0:
@@ -513,9 +460,7 @@ class DoxygenBaseItemDirective(BaseDirective):
                                      display_name=display_name)
             return warning.warn('doxygen{kind}: Cannot find {kind} "{display_name}" {tail}')
 
-        target_handler = self.target_handler_factory.create_target_handler(
-            self.options, project_info, self.state.document
-            )
+        target_handler = create_target_handler(self.options, project_info, self.state.document)
         filter_ = self.filter_factory.create_outline_filter(self.options)
 
         node_stack = matches[0]
@@ -524,41 +469,33 @@ class DoxygenBaseItemDirective(BaseDirective):
                            self.directive_args)
 
 
-class DoxygenVariableDirective(DoxygenBaseItemDirective):
-
+class DoxygenVariableDirective(_DoxygenBaseItemDirective):
     kind = "variable"
 
 
-class DoxygenDefineDirective(DoxygenBaseItemDirective):
-
+class DoxygenDefineDirective(_DoxygenBaseItemDirective):
     kind = "define"
 
 
-class DoxygenEnumDirective(DoxygenBaseItemDirective):
-
+class DoxygenEnumDirective(_DoxygenBaseItemDirective):
     kind = "enum"
 
 
-class DoxygenEnumValueDirective(DoxygenBaseItemDirective):
-
+class DoxygenEnumValueDirective(_DoxygenBaseItemDirective):
     kind = "enumvalue"
 
-    def create_finder_filter(self, namespace, name):
-
+    def create_finder_filter(self, namespace: str, name: str) -> Filter:
         return self.filter_factory.create_enumvalue_finder_filter(name)
 
 
-class DoxygenTypedefDirective(DoxygenBaseItemDirective):
-
+class DoxygenTypedefDirective(_DoxygenBaseItemDirective):
     kind = "typedef"
 
 
-class DoxygenUnionDirective(DoxygenBaseItemDirective):
-
+class DoxygenUnionDirective(_DoxygenBaseItemDirective):
     kind = "union"
 
-    def create_finder_filter(self, namespace, name):
-
+    def create_finder_filter(self, namespace: str, name: str) -> Filter:
         # Unions are stored in the xml file with their fully namespaced name
         # We're using C++ namespaces here, it might be best to make this file
         # type dependent
@@ -570,12 +507,15 @@ class DoxygenUnionDirective(DoxygenBaseItemDirective):
 # Setup Administration
 # --------------------
 
-class DirectiveContainer(object):
-
-    def __init__(self, directive, *args):
-
+class DirectiveContainer:
+    def __init__(self, app: Sphinx, directive: Type[BaseDirective],
+                 finder_factory: FinderFactory, project_info_factory: ProjectInfoFactory,
+                 parser_factory: DoxygenParserFactory):
+        self.app = app
         self.directive = directive
-        self.args = args
+        self.finder_factory = finder_factory
+        self.project_info_factory = project_info_factory
+        self.parser_factory = parser_factory
 
         # Required for sphinx to inspect
         self.required_arguments = directive.required_arguments
@@ -585,16 +525,16 @@ class DirectiveContainer(object):
         self.final_argument_whitespace = directive.final_argument_whitespace
 
     def __call__(self, *args):
-
-        call_args = []
-        call_args.extend(self.args)
+        call_args = [
+            self.finder_factory,
+            self.project_info_factory,
+            self.parser_factory
+        ]
         call_args.extend(args)
-
         return self.directive(*call_args)
 
 
-class DoxygenDirectiveFactory(object):
-
+def setup(app: Sphinx) -> None:
     directives = {
         "doxygenindex": DoxygenIndexDirective,
         "autodoxygenindex": AutoDoxygenIndexDirective,
@@ -612,239 +552,30 @@ class DoxygenDirectiveFactory(object):
         "doxygengroup": DoxygenGroupDirective,
         "doxygenfile": DoxygenFileDirective,
         "autodoxygenfile": AutoDoxygenFileDirective,
-        }
+    }
 
-    def __init__(self, node_factory, text_renderer, finder_factory,
-                 project_info_factory, filter_factory, target_handler_factory, parser_factory):
+    # note: the parser factory contains a cache of the parsed XML
+    # note: the project_info_factory also contains some caching stuff
+    # TODO: is that actually safe for when reading in parallel?
+    project_info_factory = ProjectInfoFactory(app)
+    parser_factory = DoxygenParserFactory(app)
+    finder_factory = FinderFactory(app, parser_factory)
+    for name, directive in directives.items():
+        # ordinarily app.add_directive takes a class it self, but we need to inject extra arguments
+        # so we give a DirectiveContainer object which has an overloaded __call__ operator.
+        app.add_directive(name, DirectiveContainer(  # type: ignore
+            app,
+            directive,
+            finder_factory,
+            project_info_factory,
+            parser_factory
+            ))
 
-        self.node_factory = node_factory
-        self.text_renderer = text_renderer
-        self.finder_factory = finder_factory
-        self.project_info_factory = project_info_factory
-        self.filter_factory = filter_factory
-        self.target_handler_factory = target_handler_factory
-        self.parser_factory = parser_factory
-
-    def create_function_directive_container(self):
-
-        # Pass text_renderer to the function directive
-        return DirectiveContainer(
-            self.directives["doxygenfunction"],
-            self.node_factory,
-            self.text_renderer,
-            self.finder_factory,
-            self.project_info_factory,
-            self.filter_factory,
-            self.target_handler_factory,
-            self.parser_factory
-            )
-
-    def create_directive_container(self, type_):
-
-        return DirectiveContainer(
-            self.directives[type_],
-            self.finder_factory,
-            self.project_info_factory,
-            self.filter_factory,
-            self.target_handler_factory,
-            self.parser_factory
-            )
-
-    def get_config_values(self, app):
-
-        # All DirectiveContainers maintain references to this project info factory
-        # so we can update this to update them
-        self.project_info_factory.update(
-            app.config.breathe_projects,
-            app.config.breathe_default_project,
-            app.config.breathe_domain_by_extension,
-            app.config.breathe_domain_by_file_pattern,
-            app.config.breathe_projects_source,
-            app.config.breathe_build_directory,
-            app.config.breathe_show_define_initializer,
-            app.config.breathe_use_project_refids,
-            app.config.breathe_order_parameters_first
-            )
-
-
-class PathHandler(object):
-
-    def __init__(self, config_directory, sep, basename, join):
-
-        self.config_directory = config_directory
-
-        self.sep = sep
-        self.basename = basename
-        self.join = join
-
-    def includes_directory(self, file_path):
-
-        # Check for backslash or forward slash as we don't know what platform we're on and sometimes
-        # the doxygen paths will have forward slash even on Windows.
-        return bool(file_path.count('\\')) or bool(file_path.count('/'))
-
-    def resolve_path(self, directory, filename):
-        """Returns a full path to the filename in the given directory assuming that if the directory
-        path is relative, then it is relative to the conf.py directory.
-        """
-
-        # os.path.join does the appropriate handling if _project_path is an absolute path
-        return self.join(self.config_directory, directory, filename)
-
-
-def write_file(directory, filename, content):
-
-    # Check the directory exists
-    if not os.path.exists(directory):
-        os.makedirs(directory)
-
-    # Write the file with the provided contents
-    with open(os.path.join(directory, filename), "w") as f:
-        f.write(content)
-
-
-class MTimerError(Exception):
-    pass
-
-
-class MTimer(object):
-
-    def __init__(self, getmtime):
-        self.getmtime = getmtime
-
-    def get_mtime(self, filename):
-
-        try:
-            return self.getmtime(filename)
-        except OSError:
-            raise MTimerError('Cannot find file: %s' % os.path.realpath(filename))
-
-
-class FileStateCache(object):
-    """
-    Stores the modified time of the various doxygen xml files against the
-    reStructuredText file that they are referenced from so that we know which
-    reStructuredText files to rebuild if the doxygen xml is modified.
-
-    We store the information in the environment object so that it is pickled
-    down and stored between builds as Sphinx is designed to do.
-    """
-
-    def __init__(self, mtimer, app):
-
-        self.app = app
-        self.mtimer = mtimer
-
-    def update(self, source_file):
-
-        if not hasattr(self.app.env, "breathe_file_state"):
-            self.app.env.breathe_file_state = {}
-
-        new_mtime = self.mtimer.get_mtime(source_file)
-
-        mtime, docnames = self.app.env.breathe_file_state.setdefault(
-            source_file, (new_mtime, set())
-            )
-
-        docnames.add(self.app.env.docname)
-
-        self.app.env.breathe_file_state[source_file] = (new_mtime, docnames)
-
-    def get_outdated(self, app, env, added, changed, removed):
-
-        if not hasattr(self.app.env, "breathe_file_state"):
-            return []
-
-        stale = []
-
-        for filename, info in self.app.env.breathe_file_state.items():
-            old_mtime, docnames = info
-            if self.mtimer.get_mtime(filename) > old_mtime:
-                stale.extend(docnames)
-
-        return list(set(stale).difference(removed))
-
-    def purge_doc(self, app, env, docname):
-
-        if not hasattr(self.app.env, "breathe_file_state"):
-            return
-
-        toremove = []
-
-        for filename, info in self.app.env.breathe_file_state.items():
-
-            _, docnames = info
-            docnames.discard(docname)
-            if not docnames:
-                toremove.append(filename)
-
-        for filename in toremove:
-            del self.app.env.breathe_file_state[filename]
-
-
-# Setup
-# -----
-
-def setup(app):
-
-    path_handler = PathHandler(app.confdir, os.sep, os.path.basename, os.path.join)
-    mtimer = MTimer(os.path.getmtime)
-    file_state_cache = FileStateCache(mtimer, app)
-    parser_factory = DoxygenParserFactory(path_handler, file_state_cache)
-    filter_factory = FilterFactory(path_handler)
-    item_finder_factory_creator = DoxygenItemFinderFactoryCreator(parser_factory, filter_factory)
-    index_parser = parser_factory.create_index_parser()
-    finder_factory = FinderFactory(index_parser, item_finder_factory_creator)
-
-    # Assume general build directory is the doctree directory without the last component. We strip
-    # off any trailing slashes so that dirname correctly drops the last part. This can be overriden
-    # with the breathe_build_directory config variable
-    build_dir = os.path.dirname(app.doctreedir.rstrip(os.sep))
-    project_info_factory = ProjectInfoFactory(app.srcdir, build_dir, app.confdir, fnmatch.fnmatch)
-    node_factory = create_node_factory()
-    target_handler_factory = TargetHandlerFactory(node_factory)
-
-    text_renderer = TextRenderer(app)
-
-    directive_factory = DoxygenDirectiveFactory(
-        node_factory,
-        text_renderer,
-        finder_factory,
-        project_info_factory,
-        filter_factory,
-        target_handler_factory,
-        parser_factory
-        )
-
-    def add_directive(name):
-        app.add_directive(name, directive_factory.create_directive_container(name))
-
-    add_directive('doxygenindex')
-    add_directive('doxygenstruct')
-    add_directive('doxygenenum')
-    add_directive('doxygenenumvalue')
-    add_directive('doxygentypedef')
-    add_directive('doxygenunion')
-    add_directive('doxygenclass')
-    add_directive('doxygeninterface')
-    add_directive('doxygenfile')
-    add_directive('doxygennamespace')
-    add_directive('doxygengroup')
-    add_directive('doxygenvariable')
-    add_directive('doxygendefine')
-    add_directive('autodoxygenindex')
-    add_directive('autodoxygenfile')
-
-    app.add_directive(
-        "doxygenfunction",
-        directive_factory.create_function_directive_container(),
-        )
-
-    app.add_config_value("breathe_projects", {}, True)
-    app.add_config_value("breathe_default_project", "", True)
+    app.add_config_value("breathe_projects", {}, True)  # Dict[str, str]
+    app.add_config_value("breathe_default_project", "", True)  # str
     # Provide reasonable defaults for domain_by_extension mapping. Can be overridden by users.
-    app.add_config_value("breathe_domain_by_extension", {'py': 'py'}, True)
-    app.add_config_value("breathe_domain_by_file_pattern", {}, True)
+    app.add_config_value("breathe_domain_by_extension", {'py': 'py'}, True)  # Dict[str, str]
+    app.add_config_value("breathe_domain_by_file_pattern", {}, True)  # Dict[str, str]
     app.add_config_value("breathe_projects_source", {}, True)
     app.add_config_value("breathe_build_directory", '', True)
     app.add_config_value("breathe_default_members", (), True)
@@ -858,25 +589,23 @@ def setup(app):
     if (os.path.exists(os.path.join(app.confdir, "_static", breathe_css))):
         app.add_stylesheet(breathe_css)
 
+    def write_file(directory, filename, content):
+        # Check the directory exists
+        if not os.path.exists(directory):
+            os.makedirs(directory)
+
+        # Write the file with the provided contents
+        with open(os.path.join(directory, filename), "w") as f:
+            f.write(content)
+
     doxygen_handle = AutoDoxygenProcessHandle(
-        path_handler,
         subprocess.check_call,
         write_file,
-        project_info_factory
-        )
+        project_info_factory)
 
     def doxygen_hook(app):
         doxygen_handle.generate_xml(
             app.config.breathe_projects_source,
             app.config.breathe_doxygen_config_options
         )
-
-    app.connect("builder-inited", directive_factory.get_config_values)
-
-    app.connect("builder-inited", filter_factory.get_config_values)
-
     app.connect("builder-inited", doxygen_hook)
-
-    app.connect("env-get-outdated", file_state_cache.get_outdated)
-
-    app.connect("env-purge-doc", file_state_cache.purge_doc)

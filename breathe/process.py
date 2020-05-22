@@ -1,10 +1,13 @@
-
 from __future__ import unicode_literals
+
+from breathe.project import ProjectInfoFactory
 
 try:
     from shlex import quote  # py3
 except ImportError:
     from pipes import quote  # py2
+
+import os
 
 
 AUTOCFG_TEMPLATE = r"""
@@ -36,11 +39,8 @@ class ProjectData(object):
         self.files = files
 
 
-class AutoDoxygenProcessHandle(object):
-
-    def __init__(self, path_handler, run_process, write_file, project_info_factory):
-
-        self.path_handler = path_handler
+class AutoDoxygenProcessHandle:
+    def __init__(self, run_process, write_file, project_info_factory: ProjectInfoFactory):
         self.run_process = run_process
         self.write_file = write_file
         self.project_info_factory = project_info_factory
@@ -84,7 +84,7 @@ class AutoDoxygenProcessHandle(object):
             extra='\n'.join("%s=%s" % pair for pair in doxygen_options.items())
             )
 
-        build_dir = self.path_handler.join(
+        build_dir = os.path.join(
             auto_project_info.build_dir(),
             "breathe",
             "doxygen"
@@ -97,4 +97,4 @@ class AutoDoxygenProcessHandle(object):
         # Windows. See issue #271
         self.run_process('doxygen %s' % quote(cfgfile), cwd=build_dir, shell=True)
 
-        return self.path_handler.join(build_dir, name, "xml")
+        return os.path.join(build_dir, name, "xml")

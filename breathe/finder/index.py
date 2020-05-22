@@ -1,31 +1,31 @@
+from breathe.finder import ItemFinder, stack
+from breathe.renderer.filter import Filter, FilterFactory
+from breathe.parser import DoxygenCompoundParser
 
-from .base import ItemFinder, stack
+from sphinx.application import Sphinx
+
+from typing import Any, List  # noqa
 
 
 class DoxygenTypeSubItemFinder(ItemFinder):
-
-    def filter_(self, ancestors, filter_, matches):
+    def filter_(self, ancestors, filter_: Filter, matches) -> None:
         """Find nodes which match the filter. Doesn't test this node, only its children"""
 
         compounds = self.data_object.get_compound()
-
         node_stack = stack(self.data_object, ancestors)
-
         for compound in compounds:
-
             compound_finder = self.item_finder_factory.create_finder(compound)
             compound_finder.filter_(node_stack, filter_, matches)
 
 
 class CompoundTypeSubItemFinder(ItemFinder):
+    def __init__(self, app: Sphinx, compound_parser: DoxygenCompoundParser, *args):
+        super().__init__(*args)
 
-    def __init__(self, filter_factory, compound_parser, *args):
-        ItemFinder.__init__(self, *args)
-
-        self.filter_factory = filter_factory
+        self.filter_factory = FilterFactory(app)
         self.compound_parser = compound_parser
 
-    def filter_(self, ancestors, filter_, matches):
+    def filter_(self, ancestors, filter_: Filter, matches) -> None:
         """Finds nodes which match the filter and continues checks to children
 
         Requires parsing the xml files referenced by the children for which we use the compound
@@ -41,7 +41,8 @@ class CompoundTypeSubItemFinder(ItemFinder):
 
         # Descend to member children
         members = self.data_object.get_member()
-        member_matches = []
+        # TODO: find a more precise type for the Doxygen nodes
+        member_matches = []  # type: List[Any]
         for member in members:
             member_finder = self.item_finder_factory.create_finder(member)
             member_finder.filter_(node_stack, filter_, member_matches)
@@ -49,7 +50,6 @@ class CompoundTypeSubItemFinder(ItemFinder):
         # If there are members in this compound that match the criteria
         # then load up the file for this compound and get the member data objects
         if member_matches:
-
             file_data = self.compound_parser.parse(self.data_object.refid)
             finder = self.item_finder_factory.create_finder(file_data)
 
@@ -57,20 +57,15 @@ class CompoundTypeSubItemFinder(ItemFinder):
                 ref_filter = self.filter_factory.create_id_filter(
                     'memberdef', member_stack[0].refid)
                 finder.filter_(node_stack, ref_filter, matches)
-
         else:
-
             # Read in the xml file referenced by the compound and descend into that as well
             file_data = self.compound_parser.parse(self.data_object.refid)
             finder = self.item_finder_factory.create_finder(file_data)
-
             finder.filter_(node_stack, filter_, matches)
 
 
 class MemberTypeSubItemFinder(ItemFinder):
-
-    def filter_(self, ancestors, filter_, matches):
-
+    def filter_(self, ancestors, filter_: Filter, matches) -> None:
         node_stack = stack(self.data_object, ancestors)
 
         # Match against member object

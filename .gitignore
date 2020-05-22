@@ -4,6 +4,7 @@
 build/
 /dist
 /breathe.egg-info
+/.mypy_cache
 
 # Folder for placing stuff to be ignored
 /ignored

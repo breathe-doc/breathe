@@ -1,10 +1,10 @@
 
 from unittest import TestCase
-from xml.dom import minidom
+from xml.dom import minidom  # type: ignore
 
 from breathe.renderer.sphinxrenderer import get_param_decl, get_definition_without_template_args
 from breathe.parser.compoundsuper import memberdefType
-from breathe.directives import PathHandler
+from breathe import path_handler
 
 class TestUtils(TestCase):
 
@@ -84,11 +84,7 @@ class TestUtils(TestCase):
 
 
 class TestPathHandler(TestCase):
-
     def test_path_handler(self):
-
-        path_handler = PathHandler(None, None, None, None)
-
         self.assertEqual(path_handler.includes_directory('directory/file.h'), True)
         self.assertEqual(path_handler.includes_directory('directory\\file.h'), True)
         self.assertEqual(path_handler.includes_directory('file.h'), False)
