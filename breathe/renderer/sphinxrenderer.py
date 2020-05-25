@@ -29,10 +29,8 @@ ContentCallback = Callable[[addnodes.desc_content], None]
 Declarator = Union[addnodes.desc_signature, addnodes.desc_signature_line]
 DeclaratorCallback = Callable[[Declarator], None]
 
-debug_trace_directives = False
-debug_trace_doxygen_ids = False
-debug_trace_qualification = False
-debug_trace_directives_indent = 0
+
+_debug_indent = 0
 
 
 class WithContext:
@@ -401,12 +399,14 @@ class SphinxRenderer:
         for k, v in options.items():
             directive.options[k] = v
 
-        if debug_trace_directives:
-            global debug_trace_directives_indent
+        config = self.app.env.config
+
+        if config.breathe_debug_trace_directives:
+            global _debug_indent
             print("{}Running directive: .. {}:: {}".format(
-                '  ' * debug_trace_directives_indent,
+                '  ' * _debug_indent,
                 directive.name, declaration))
-            debug_trace_directives_indent += 1
+            _debug_indent += 1
 
         self.nesting_level += 1
         nodes = directive.run()
@@ -418,8 +418,8 @@ class SphinxRenderer:
         for k, v in options.items():
             del directive.options[k]
 
-        if debug_trace_directives:
-            debug_trace_directives_indent -= 1
+        if config.breathe_debug_trace_directives:
+            _debug_indent -= 1
 
         # Filter out outer class names if we are rendering a member as a part of a class content.
         rst_node = nodes[1]
@@ -445,14 +445,12 @@ class SphinxRenderer:
             content_callback = content
         declaration = declaration.replace('\n', ' ')
         nodes_ = self.run_directive(obj_type, declaration, content_callback, options)
-        if debug_trace_doxygen_ids:
+        if self.app.env.config.breathe_debug_trace_doxygen_ids:
             ts = self.create_doxygen_target(node)
             if len(ts) == 0:
-                print("{}Doxygen target: (none)".format(
-                    '  ' * debug_trace_directives_indent))
+                print("{}Doxygen target: (none)".format('  ' * _debug_indent))
             else:
-                print("{}Doxygen target: {}".format(
-                    '  ' * debug_trace_directives_indent, ts[0]['ids']))
+                print("{}Doxygen target: {}".format('  ' * _debug_indent, ts[0]['ids']))
 
         # <desc><desc_signature> and then one or more <desc_signature_line>
         # each <desc_signature_line> has a sphinx_line_type which hints what is present in that line
@@ -489,22 +487,23 @@ class SphinxRenderer:
         if self.nesting_level > 0:
             return []
 
-        if debug_trace_qualification:
+        config = self.app.env.config
+        if config.breathe_debug_trace_qualification:
             def debug_print_node(n):
                 return "node_type={}".format(n.node_type)
 
-            global debug_trace_directives_indent
-            print("{}{}".format(debug_trace_directives_indent * '  ',
+            global _debug_indent
+            print("{}{}".format(_debug_indent * '  ',
                                 debug_print_node(self.qualification_stack[0])))
-            debug_trace_directives_indent += 1
+            _debug_indent += 1
 
         names = []  # type: List[str]
         for node in self.qualification_stack[1:]:
-            if debug_trace_qualification:
-                print("{}{}".format(debug_trace_directives_indent * '  ', debug_print_node(node)))
+            if config.breathe_debug_trace_qualification:
+                print("{}{}".format(_debug_indent * '  ', debug_print_node(node)))
             if node.node_type == 'ref' and len(names) == 0:
-                if debug_trace_qualification:
-                    print("{}{}".format(debug_trace_directives_indent * '  ', 'res='))
+                if config.breathe_debug_trace_qualification:
+                    print("{}{}".format(_debug_indent * '  ', 'res='))
                 return []
             if (node.node_type == 'compound' and
                     node.kind not in ['file', 'namespace', 'group']) or \
@@ -526,9 +525,9 @@ class SphinxRenderer:
 
         names.reverse()
 
-        if debug_trace_qualification:
-            print("{}res={}".format(debug_trace_directives_indent * '  ', names))
-            debug_trace_directives_indent -= 1
+        if config.breathe_debug_trace_qualification:
+            print("{}res={}".format(_debug_indent * '  ', names))
+            _debug_indent -= 1
         return names
 
     # ===================================================================================
@@ -580,17 +579,18 @@ class SphinxRenderer:
         if 'no-link' in self.context.directive_args[2]:
             domain_directive.options['noindex'] = True
 
-        if debug_trace_directives:
-            global debug_trace_directives_indent
+        config = self.app.env.config
+        if config.breathe_debug_trace_directives:
+            global _debug_indent
             print("{}Running directive (old): .. {}:: {}".format(
-                '  ' * debug_trace_directives_indent,
+                '  ' * _debug_indent,
                 domain_directive.name, ''.join(names)))
-            debug_trace_directives_indent += 1
+            _debug_indent += 1
 
         nodes = domain_directive.run()
 
-        if debug_trace_directives:
-            debug_trace_directives_indent -= 1
+        if config.breathe_debug_trace_directives:
+            _debug_indent -= 1
 
         # Filter out outer class names if we are rendering a member as a part of a class content.
         rst_node = nodes[1]
@@ -643,14 +643,12 @@ class SphinxRenderer:
         if obj_type is None:
             obj_type = node.kind
         nodes = self.run_domain_directive(obj_type, [declaration.replace('\n', ' ')])
-        if debug_trace_doxygen_ids:
+        if self.app.env.config.breathe_debug_trace_doxygen_ids:
             ts = self.create_doxygen_target(node)
             if len(ts) == 0:
-                print("{}Doxygen target (old): (none)".format(
-                    '  ' * debug_trace_directives_indent))
+                print("{}Doxygen target (old): (none)".format('  ' * _debug_indent))
             else:
-                print("{}Doxygen target (old): {}".format(
-                    '  ' * debug_trace_directives_indent, ts[0]['ids']))
+                print("{}Doxygen target (old): {}".format('  ' * _debug_indent, ts[0]['ids']))
 
         rst_node = nodes[1]
         finder = NodeFinder(rst_node.document)
@@ -1397,14 +1395,12 @@ class SphinxRenderer:
             self.context.directive_args[1] = [signature]
 
             nodes = self.run_domain_directive(node.kind, self.context.directive_args[1])
-            if debug_trace_doxygen_ids:
+            if self.app.env.config.breathe_debug_trace_doxygen_ids:
                 ts = self.create_doxygen_target(node)
                 if len(ts) == 0:
-                    print("{}Doxygen target (old): (none)".format(
-                        '  ' * debug_trace_directives_indent))
+                    print("{}Doxygen target (old): (none)".format('  ' * _debug_indent))
                 else:
-                    print("{}Doxygen target (old): {}".format(
-                        '  ' * debug_trace_directives_indent, ts[0]['ids']))
+                    print("{}Doxygen target (old): {}".format('  ' * _debug_indent, ts[0]['ids']))
 
             rst_node = nodes[1]
             finder = NodeFinder(rst_node.document)
@@ -1719,3 +1715,9 @@ class SphinxRenderer:
         for entry in iterable:
             output.extend(self.render(entry))
         return output
+
+
+def setup(app: Sphinx) -> None:
+    app.add_config_value('breathe_debug_trace_directives', False, '')
+    app.add_config_value('breathe_debug_trace_doxygen_ids', False, '')
+    app.add_config_value('breathe_debug_trace_qualification', False, '')

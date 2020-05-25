@@ -243,6 +243,10 @@ breathe_domain_by_file_pattern = {
 
 breathe_use_project_refids = True
 
+#breathe_debug_trace_directives = True
+#breathe_debug_trace_doxygen_ids = True
+#breathe_debug_trace_qualification = True
+
 
 # Options for HTML output
 # -----------------------

@@ -1,5 +1,6 @@
 from . import directives
 from . import file_state_cache
+from .renderer import sphinxrenderer
 
 from sphinx.application import Sphinx
 
@@ -9,6 +10,7 @@ __version__ = '4.18.1'
 def setup(app: Sphinx):
     directives.setup(app)
     file_state_cache.setup(app)
+    sphinxrenderer.setup(app)
 
     return {
         'version': __version__,
