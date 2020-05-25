@@ -176,6 +176,7 @@ Inspired by `Keepachangelog.com <http://keepachangelog.com/>`__.
 - Unreleased - Breathe v4.19.0
 
   - Refactoring. #528
+  - Make debug config variables available in conf.py. #533
 
 - 2020-05-10 - Breathe v4.18.1
 
