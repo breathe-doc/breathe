@@ -13,41 +13,42 @@ from sphinx.directives import SphinxDirective
 from docutils import nodes
 from docutils.nodes import Node
 
-from typing import List
+from typing import Any, Dict, List, Optional, Sequence
 
 
 class WarningHandler:
-    def __init__(self, state, context):
+    def __init__(self, state, context: Dict[str, Any]) -> None:
         self.state = state
         self.context = context
 
-    def warn(self, raw_text, rendered_nodes=None):
-        raw_text = self.format(raw_text)
+    def warn(self, raw_text: str, *, rendered_nodes: Sequence[nodes.Node] = None,
+             unformatted_suffix: str = '') -> List[nodes.Node]:
+        raw_text = self.format(raw_text) + unformatted_suffix
         if rendered_nodes is None:
             rendered_nodes = [nodes.paragraph("", "", nodes.Text(raw_text))]
         return [
             nodes.warning("", *rendered_nodes),
             self.state.document.reporter.warning(raw_text, line=self.context['lineno'])
-            ]
+        ]
 
-    def format(self, text):
+    def format(self, text: str) -> str:
         return text.format(**self.context)
 
 
-def create_warning(project_info, state, lineno, **kwargs):
+def create_warning(project_info: Optional[ProjectInfo], state, lineno: int,
+                   **kwargs) -> WarningHandler:
     tail = ''
     if project_info:
         tail = 'in doxygen xml output for project "{project}" from directory: {path}'.format(
             project=project_info.name(),
             path=project_info.project_path()
-            )
+        )
 
     context = dict(
         lineno=lineno,
         tail=tail,
         **kwargs
-        )
-
+    )
     return WarningHandler(state, context)
 
 

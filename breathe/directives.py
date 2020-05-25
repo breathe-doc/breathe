@@ -105,29 +105,30 @@ class DoxygenFunctionDirective(BaseDirective):
                 '"{namespace}{function}" with arguments ({args}) {tail}.\n' \
                 'Potential matches:\n'
 
-            # We want to create a raw_text string for the console output and a set of docutils nodes
+            # We want to create a string for the console output and a set of docutils nodes
             # for rendering into the final output. We handle the final output as a literal string
             # with a txt based list of the options.
-            raw_text = message
             literal_text = ''
 
             # TODO: We're cheating here with the set() as signatures has repeating entries for some
             # reason (failures in the matcher_stack code) so we consolidate them by shoving them in
             # a set to remove duplicates. Should be fixed!
+            signatures = ''
             for i, entry in enumerate(sorted(set(error.signatures))):
                 if i:
                     literal_text += '\n'
                 # Replace new lines with a new line & enough spacing to reach the appropriate
                 # alignment for our simple plain text list
                 literal_text += '- %s' % entry.replace('\n', '\n  ')
-                raw_text += '    - %s\n' % entry.replace('\n', '\n      ')
+                signatures += '    - %s\n' % entry.replace('\n', '\n      ')
             block = nodes.literal_block('', '', nodes.Text(literal_text))
             formatted_message = warning.format(message)
             warning_nodes = [
                 nodes.paragraph("", "", nodes.Text(formatted_message)),
                 block
             ]
-            result = warning.warn(raw_text, warning_nodes)
+            result = warning.warn(message, rendered_nodes=warning_nodes,
+                                  unformatted_suffix=signatures)
             return result
 
         target_handler = create_target_handler(self.options, project_info, self.state.document)
