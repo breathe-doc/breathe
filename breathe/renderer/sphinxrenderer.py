@@ -520,7 +520,7 @@ class SphinxRenderer:
                 # compoundname is 'foo::bar' instead of just 'bar' for namespace 'bar' nested in
                 # namespace 'foo'. We need full compoundname because node_stack doesn't necessarily
                 # include parent namespaces and we stop here in case it does.
-                names.extend(node.compoundname.split('::'))
+                names.extend(reversed(node.compoundname.split('::')))
                 break
 
         names.reverse()
