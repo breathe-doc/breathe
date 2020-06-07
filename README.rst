@@ -178,6 +178,7 @@ Inspired by `Keepachangelog.com <http://keepachangelog.com/>`__.
   - Refactoring. #528
   - Make debug config variables available in conf.py. #533
   - Fix warning formatting for function lookup. #535
+  - Correctly reverse nested namespaces in get_qualification. #540
 
 - 2020-05-10 - Breathe v4.18.1
 
