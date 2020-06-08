@@ -173,7 +173,7 @@ Change Log
 
 Inspired by `Keepachangelog.com <http://keepachangelog.com/>`__.
 
-- Unreleased - Breathe v4.19.1
+- 2020-06-08 - Breathe v4.19.1
 
   - Mark package as compatible with Sphinx 3.1.
 
