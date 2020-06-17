@@ -1455,13 +1455,18 @@ class SphinxRenderer:
         names = self.get_qualification()
         names.append(node.get_name())
         name = self.join_nested_name(names)
-        if node.definition.startswith('typedef '):
-            declaration = ' '.join([type_, name, node.get_argsstring()])
-        elif node.definition.startswith('using '):
+        if node.definition.startswith('using '):
             # TODO: looks like Doxygen does not generate the proper XML
-            #       for the template paramter list
+            #       for the template parameter list
             declaration = self.create_template_prefix(node)
             declaration += ' ' + name + " = " + type_
+        else:
+            # TODO: Both "using" and "typedef" keywords get into this function,
+            #   and if no @typedef comment was added, the definition should
+            #   contain the full text. If a @typedef was used instead, the
+            #   definition has only the typename, which makes it impossible to
+            #   distinguish between them so fallback to "typedef" behavior here.
+            declaration = ' '.join([type_, name, node.get_argsstring()])
         return self.handle_declaration(node, declaration)
 
     def make_initializer(self, node) -> str:
