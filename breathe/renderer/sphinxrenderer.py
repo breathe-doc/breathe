@@ -19,6 +19,11 @@ try:
 except ImportError:
     php = None
 
+try:
+    from sphinx_csharp import csharp as cs  # type: ignore
+except ImportError:
+    cs = None
+
 import re
 import six
 import textwrap
@@ -142,6 +147,55 @@ class PyClasslike(BaseObject, python.PyClasslike):
 
 # ----------------------------------------------------------------------------
 
+if cs is not None:
+    class CSharpCurrentNamespace(BaseObject, cs.CSharpCurrentNamespace):
+        pass
+
+    class CSharpNamespacePlain(BaseObject, cs.CSharpNamespacePlain):
+        pass
+
+    class CSharpClass(BaseObject, cs.CSharpClass):
+        pass
+
+    class CSharpStruct(BaseObject, cs.CSharpStruct):
+        pass
+
+    class CSharpInterface(BaseObject, cs.CSharpInterface):
+        pass
+
+    class CSharpInherits(BaseObject, cs.CSharpInherits):
+        pass
+
+    class CSharpMethod(BaseObject, cs.CSharpMethod):
+        pass
+
+    class CSharpVariable(BaseObject, cs.CSharpVariable):
+        pass
+
+    class CSharpProperty(BaseObject, cs.CSharpProperty):
+        pass
+
+    class CSharpEvent(BaseObject, cs.CSharpEvent):
+        pass
+
+    class CSharpEnum(BaseObject, cs.CSharpEnum):
+        pass
+
+    class CSharpEnumValue(BaseObject, cs.CSharpEnumValue):
+        pass
+
+    class CSharpAttribute(BaseObject, cs.CSharpAttribute):
+        pass
+
+    class CSharpIndexer(BaseObject, cs.CSharpIndexer):
+        pass
+
+    class CSharpXRefRole(BaseObject, cs.CSharpXRefRole):
+        pass
+
+
+# ----------------------------------------------------------------------------
+
 class DomainDirectiveFactory:
     # A mapping from node kinds to domain directives and their names.
     cpp_classes = {
@@ -191,6 +245,30 @@ class DomainDirectiveFactory:
             'global': (php.PhpGloballevel, 'global'),
         }
 
+    if cs is not None:
+        cs_classes = {
+            # 'doxygen-name': (CSharp class, key in CSharpDomain.object_types)
+            'namespace': (CSharpNamespacePlain, 'namespace'),
+
+            'class': (CSharpClass, 'class'),
+            'struct': (CSharpStruct, 'struct'),
+            'interface': (CSharpInterface, 'interface'),
+
+            'function': (CSharpMethod, 'function'),
+            'method': (CSharpMethod, 'method'),
+
+            'variable': (CSharpVariable, 'var'),
+            'property': (CSharpProperty, 'property'),
+            'event': (CSharpEvent, 'event'),
+
+            'enum': (CSharpEnum, 'enum'),
+            'enumvalue': (CSharpEnumValue, 'enumerator'),
+            'attribute': (CSharpAttribute, 'attr'),
+
+            # Fallback to cpp domain
+            'typedef': (CPPTypeObject, 'type'),
+        }
+
     @staticmethod
     def create(domain: str, args) -> ObjectDescription:
         cls = cast(Type[ObjectDescription], None)
@@ -214,6 +292,8 @@ class DomainDirectiveFactory:
                     arg_0 = 'global'
             cls, name = DomainDirectiveFactory.php_classes.get(
                 arg_0, (php.PhpClasslike, 'class'))
+        elif cs is not None and domain == 'cs':
+            cls, name = DomainDirectiveFactory.cs_classes[args[0]]  # type: ignore
         else:
             domain = 'cpp'
             cls, name = DomainDirectiveFactory.cpp_classes[args[0]]  # type: ignore
@@ -827,11 +907,11 @@ class SphinxRenderer:
             return self.visit_union(node)
         elif kind in ('struct', 'class', 'interface'):
             dom = self.get_domain()
-            if not dom or dom in ('c', 'cpp', 'py'):
+            if not dom or dom in ('c', 'cpp', 'py', 'cs'):
                 return self.visit_class(node)
         elif kind == 'namespace':
             dom = self.get_domain()
-            if not dom or dom in ('c', 'cpp', 'py'):
+            if not dom or dom in ('c', 'cpp', 'py', 'cs'):
                 return self.visit_namespace(node)
 
         self.context = cast(RenderContext, self.context)
@@ -933,8 +1013,8 @@ class SphinxRenderer:
         ("public-slot", "Public Slots"),
         ("signal", "Signals"),
         ("dcop-func", "DCOP Function"),
-        ("property", "Property"),
-        ("event", "Event"),
+        ("property", "Properties"),
+        ("event", "Events"),
         ("public-static-func", "Public Static Functions"),
         ("public-static-attrib", "Public Static Attributes"),
         ("protected-type", "Protected Types"),
@@ -1344,7 +1424,7 @@ class SphinxRenderer:
 
     def visit_function(self, node) -> List[Node]:
         dom = self.get_domain()
-        if not dom or dom in ('c', 'cpp', 'py'):
+        if not dom or dom in ('c', 'cpp', 'py', 'cs'):
             names = self.get_qualification()
             names.append(node.get_name())
             name = self.join_nested_name(names)
@@ -1502,7 +1582,7 @@ class SphinxRenderer:
                 node.get_argsstring(),
                 self.make_initializer(node)
             ])
-        if not dom or dom in ('c', 'cpp', 'py'):
+        if not dom or dom in ('c', 'cpp', 'py', 'cs'):
             return self.handle_declaration(node, declaration, options=options)
         else:
             return self.render_declaration(node, declaration)
@@ -1646,6 +1726,12 @@ class SphinxRenderer:
         if node.kind == "typedef":
             return self.visit_typedef(node)
         if node.kind == "variable":
+            return self.visit_variable(node)
+        if node.kind == "property":
+            # Note: visit like variable for now
+            return self.visit_variable(node)
+        if node.kind == "event":
+            # Note: visit like variable for now
             return self.visit_variable(node)
         if node.kind == "define":
             return self.visit_define(node)
