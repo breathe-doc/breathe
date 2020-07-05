@@ -452,7 +452,7 @@ Config Values
    Then your ``autodoxygenfile`` usage can look like this::
 
       .. autodoxygenfile:: file.c
-         :source: myprojectsource
+         :project: myprojectsource
 
    The directory entry in the tuple can be an empty string if the entries in the
    list are full paths.
