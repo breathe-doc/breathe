@@ -10,7 +10,7 @@ source comments as cover in the `doxygen documentation`_.
 
 It takes the standard ``project``, ``path``, ``outline`` and ``no-link`` options
 and additionally the ``content-only``, ``members``, ``protected-members``,
-``private-members`` and ``undoc-members`` options.
+``private-members``, ``undoc-members`` and ``inner`` options.
 
 ``content-only``
    If this flag is specified, then the directive does not output the name of the
@@ -41,6 +41,11 @@ If you would like to always specify some combination of ``members``,
 ``protected-members``, ``private-members`` and ``undoc-members`` then you can
 use the :ref:`breathe_default_members <breathe-default-members>` configuration
 variable to set it in the ``conf.py``.
+
+``inner``
+   If specified, the groups that were defined inside this group, by either
+   defining them inside the scope of another group, or by using the Doxygen
+   \ingroup command, are also parsed and loaded.
 
 .. _doxygen documentation: http://www.stack.nl/~dimitri/doxygen/manual/grouping.html
 
@@ -188,6 +193,27 @@ Produces this output:
 
    Undocumented classes are still not shown in the output due to an implementation
    issue. Please post an issue on github if you would like this resolved.
+
+
+Inner Example
+-------------
+
+.. cpp:namespace:: @ex_group_inner
+
+The ``inner`` option changes the output to include groups that are defined
+inside other groups.
+
+.. code-block:: rst
+
+   .. doxygengroup:: mygroup
+      :project: group
+      :inner:
+
+Produces this output:
+
+.. doxygengroup:: mygroup
+   :project: group
+   :inner:
 
 
 Outline Example
