@@ -446,11 +446,12 @@ class SphinxRenderer:
         declaration = declaration.replace('\n', ' ')
         nodes_ = self.run_directive(obj_type, declaration, content_callback, options)
         if self.app.env.config.breathe_debug_trace_doxygen_ids:
-            ts = self.create_doxygen_target(node)
-            if len(ts) == 0:
+            target = self.create_doxygen_target(node)
+            if len(target) == 0:
                 print("{}Doxygen target: (none)".format('  ' * _debug_indent))
             else:
-                print("{}Doxygen target: {}".format('  ' * _debug_indent, ts[0]['ids']))
+                print("{}Doxygen target: {}".format('  ' * _debug_indent,
+                                                    target[0]['ids']))
 
         # <desc><desc_signature> and then one or more <desc_signature_line>
         # each <desc_signature_line> has a sphinx_line_type which hints what is present in that line
@@ -477,7 +478,8 @@ class SphinxRenderer:
             assert n.astext()[-1] == " "
             txt = display_obj_type + ' '
             declarator[0] = addnodes.desc_annotation(txt, txt)
-        target = self.create_doxygen_target(node)
+        if not self.app.env.config.breathe_debug_trace_doxygen_ids:
+            target = self.create_doxygen_target(node)
         declarator.insert(0, target)
         if declarator_callback:
             declarator_callback(declarator)
@@ -644,11 +646,11 @@ class SphinxRenderer:
             obj_type = node.kind
         nodes = self.run_domain_directive(obj_type, [declaration.replace('\n', ' ')])
         if self.app.env.config.breathe_debug_trace_doxygen_ids:
-            ts = self.create_doxygen_target(node)
-            if len(ts) == 0:
+            target = self.create_doxygen_target(node)
+            if len(target) == 0:
                 print("{}Doxygen target (old): (none)".format('  ' * _debug_indent))
             else:
-                print("{}Doxygen target (old): {}".format('  ' * _debug_indent, ts[0]['ids']))
+                print("{}Doxygen target (old): {}".format('  ' * _debug_indent, target[0]['ids']))
 
         rst_node = nodes[1]
         finder = NodeFinder(rst_node.document)
@@ -662,7 +664,9 @@ class SphinxRenderer:
             update_signature(signode, obj_type)
         if description is None:
             description = self.description(node)
-        signode.insert(0, self.create_doxygen_target(node))
+        if not self.app.env.config.breathe_debug_trace_doxygen_ids:
+            target = self.create_doxygen_target(node)
+        signode.insert(0, target)
         contentnode.extend(description)
         return nodes
 
@@ -1396,11 +1400,12 @@ class SphinxRenderer:
 
             nodes = self.run_domain_directive(node.kind, self.context.directive_args[1])
             if self.app.env.config.breathe_debug_trace_doxygen_ids:
-                ts = self.create_doxygen_target(node)
-                if len(ts) == 0:
+                target = self.create_doxygen_target(node)
+                if len(target) == 0:
                     print("{}Doxygen target (old): (none)".format('  ' * _debug_indent))
                 else:
-                    print("{}Doxygen target (old): {}".format('  ' * _debug_indent, ts[0]['ids']))
+                    print("{}Doxygen target (old): {}".format('  ' * _debug_indent,
+                                                              target[0]['ids']))
 
             rst_node = nodes[1]
             finder = NodeFinder(rst_node.document)
@@ -1408,7 +1413,9 @@ class SphinxRenderer:
 
             # Templates have multiple signature nodes in recent versions of Sphinx.
             # Insert Doxygen target into the first signature node.
-            rst_node.children[0].insert(0, self.create_doxygen_target(node))  # type: ignore
+            if not self.app.env.config.breathe_debug_trace_doxygen_ids:
+                target = self.create_doxygen_target(node)
+            rst_node.children[0].insert(0, target)  # type: ignore
 
             finder.content.extend(self.description(node))
             return nodes
