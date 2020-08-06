@@ -173,6 +173,10 @@ Change Log
 
 Inspired by `Keepachangelog.com <http://keepachangelog.com/>`__.
 
+- Unreleased - Breathe v4.19.3
+
+  - Allow Sphinx 3.2. #561
+
 - 2020-06-17 - Breathe v4.19.2
 
   - Fix crash when visiting typedef. #547
