@@ -260,6 +260,7 @@ def render(app, member_def, domain=None, show_define_initializer=False,
            compound_parser=None, options=[]):
     """Render Doxygen *member_def* with *renderer_class*."""
 
+    app.config.breathe_separate_member_pages = False
     app.config.breathe_use_project_refids = False
     app.config.breathe_show_define_initializer = show_define_initializer
     app.config.breathe_debug_trace_directives = False
