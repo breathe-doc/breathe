@@ -8,8 +8,6 @@ except ImportError:
 
 import sys
 
-import breathe
-
 long_desc = '''
 Breathe is an extension to reStructuredText and Sphinx to be able to read and
  render `Doxygen <http://www.doxygen.org>`__ xml output.
@@ -24,7 +22,7 @@ if sys.version_info < (3, 5):
 
 setup(
     name='breathe',
-    version=breathe.__version__,
+    version='4.19.2',
     url='https://github.com/michaeljones/breathe',
     download_url='https://github.com/michaeljones/breathe',
     license='BSD',

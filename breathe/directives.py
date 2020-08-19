@@ -575,7 +575,8 @@ def setup(app: Sphinx) -> None:
     app.add_config_value("breathe_projects", {}, True)  # Dict[str, str]
     app.add_config_value("breathe_default_project", "", True)  # str
     # Provide reasonable defaults for domain_by_extension mapping. Can be overridden by users.
-    app.add_config_value("breathe_domain_by_extension", {'py': 'py'}, True)  # Dict[str, str]
+    app.add_config_value("breathe_domain_by_extension",
+                         {'py': 'py', 'cs': 'cs'}, True)  # Dict[str, str]
     app.add_config_value("breathe_domain_by_file_pattern", {}, True)  # Dict[str, str]
     app.add_config_value("breathe_projects_source", {}, True)
     app.add_config_value("breathe_build_directory", '', True)
