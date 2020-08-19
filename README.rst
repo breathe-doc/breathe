@@ -180,6 +180,7 @@ Inspired by `Keepachangelog.com <http://keepachangelog.com/>`__.
   - Add support for C# using sphinx-csharp. #550
   - Doc, fix typo, :source: -> :project:. #551
   - Add support for innergroup. #556
+  - Avoid duplicate doxygen targets when debug tracing. #563
 
 - 2020-06-17 - Breathe v4.19.2
 
