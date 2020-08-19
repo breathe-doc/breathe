@@ -178,6 +178,7 @@ Inspired by `Keepachangelog.com <http://keepachangelog.com/>`__.
   - Doc, fix typo, :source: -> :project:. #551
   - Add support for innergroup. #556
   - Avoid duplicate doxygen targets when debug tracing. #563
+  - Remove Travis badge from README file. #564
 
 - 2020-06-17 - Breathe v4.19.2
 
