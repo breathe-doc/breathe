@@ -178,6 +178,7 @@ Inspired by `Keepachangelog.com <http://keepachangelog.com/>`__.
   - Allow Sphinx 3.2. #561
   - Update CI scripts with new Sphinx versions. #552
   - Add support for C# using sphinx-csharp. #550
+  - Doc, fix typo, :source: -> :project:. #551
 
 - 2020-06-17 - Breathe v4.19.2
 
