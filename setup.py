@@ -22,7 +22,7 @@ if sys.version_info < (3, 5):
 
 setup(
     name='breathe',
-    version='4.19.2',
+    version='4.20.0',
     url='https://github.com/michaeljones/breathe',
     download_url='https://github.com/michaeljones/breathe',
     license='BSD',

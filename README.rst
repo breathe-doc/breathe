@@ -170,7 +170,7 @@ Change Log
 
 Inspired by `Keepachangelog.com <http://keepachangelog.com/>`__.
 
-- Unreleased - Breathe v4.20.0
+- 2020-08-19 - Breathe v4.20.0
 
   - Allow Sphinx 3.2. #561
   - Update CI scripts with new Sphinx versions. #552
