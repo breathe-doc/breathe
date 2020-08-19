@@ -1004,7 +1004,7 @@ class SphinxRenderer:
     # having two lists in case they fall out of sync
     #
     # If this list is edited, also change the sections option documentation for
-    # the doxygen(auto)file directive in documentation/source/autofile.rst.
+    # the doxygen(auto)file directive in documentation/source/file.rst.
     sections = [
         ("user-defined", "User Defined"),
         ("public-type", "Public Types"),
