@@ -13,7 +13,7 @@ Working Example
 This should work::
 
    .. autodoxygenfile:: auto_class.h
-      :source: auto
+      :project: auto
 
 With the following config value::
 
