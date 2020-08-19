@@ -2,9 +2,6 @@
 Breathe
 =======
 
-.. image:: https://travis-ci.org/michaeljones/breathe.svg?branch=master
-    :target: https://travis-ci.org/michaeljones/breathe
-
 .. image:: https://github.com/michaeljones/breathe/workflows/unit%20tests/badge.svg
     :target: https://github.com/michaeljones/breathe/actions?query=workflow%3A%22unit+tests%22
 
