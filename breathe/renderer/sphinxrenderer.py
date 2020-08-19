@@ -1104,6 +1104,12 @@ class SphinxRenderer:
         addnode('innerclass', lambda: self.render_iterable(node.innerclass))
         addnode('innernamespace', lambda: self.render_iterable(node.innernamespace))
 
+        if 'inner' in options:
+            for node in node.innergroup:
+                file_data = self.compound_parser.parse(node.refid)
+                inner = file_data.compounddef
+                addnode('innergroup', lambda: self.visit_compounddef(inner))
+
         nodelist = []
         for i, nodes_ in sorted(nodemap.items()):
             nodelist += nodes_

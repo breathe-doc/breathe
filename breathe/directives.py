@@ -406,6 +406,10 @@ class DoxygenNamespaceDirective(_DoxygenContentBlockDirective):
 
 class DoxygenGroupDirective(_DoxygenContentBlockDirective):
     kind = "group"
+    option_spec = {
+        **_DoxygenContentBlockDirective.option_spec,
+        "inner": flag,
+    }
 
 
 # TODO: is this comment still relevant?

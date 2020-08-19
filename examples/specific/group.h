@@ -48,6 +48,28 @@ void groupedFunction();
 
 /** @} */ // end of mygroup
 
+/** @defgroup innergroup Inner Group
+ *  @ingroup mygroup
+ *  This is an inner group
+ *  @{
+ */
+
+//! \brief inner class inside of namespace
+class InnerGroupClassTest {
+
+public:
+    //! \brief inner namespaced class function
+    void function() {};
+
+private:
+
+    //! A private function
+    void innerGroupPrivateFunction() {};
+
+    class PrivateClass {};
+};
+
+/** @} */ // end of innergroup
 
 //! \brief second class inside of namespace
 class UngroupedClassTest {

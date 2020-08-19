@@ -2,7 +2,10 @@ import pytest  # type: ignore
 
 import sphinx.addnodes
 import sphinx.environment
-from breathe.parser.compound import linkedTextTypeSub, memberdefTypeSub, paramTypeSub, MixedContainer
+from breathe.parser.compound import (
+    compounddefTypeSub, linkedTextTypeSub, memberdefTypeSub, paramTypeSub,
+    refTypeSub, MixedContainer
+)
 from breathe.renderer.sphinxrenderer import SphinxRenderer
 from breathe.renderer.filter import OpenFilter
 from docutils import frontend, nodes, parsers, utils
@@ -44,9 +47,9 @@ class WrappedDoxygenNode:
     A base class for test wrappers of Doxygen nodes. It allows setting all attributes via keyword arguments
     in the constructor.
     """
-    def __init__(self, cls, **kwargs):
+    def __init__(self, cls, *args, **kwargs):
         if cls:
-            cls.__init__(self)
+            cls.__init__(self, args)
         for name, value in kwargs.items():
             if not hasattr(self, name):
                 raise AttributeError('invalid attribute ' + name)
@@ -76,6 +79,18 @@ class WrappedParam(paramTypeSub, WrappedDoxygenNode):
     """A test wrapper of Doxygen parameter."""
     def __init__(self, **kwargs):
         WrappedDoxygenNode.__init__(self, paramTypeSub, **kwargs)
+
+
+class WrappedRef(refTypeSub, WrappedDoxygenNode):
+    """A test wrapper of Doxygen ref."""
+    def __init__(self, node_name, **kwargs):
+        WrappedDoxygenNode.__init__(self, refTypeSub, node_name, **kwargs)
+
+
+class WrappedCompoundDef(compounddefTypeSub, WrappedDoxygenNode):
+    """A test wrapper of Doxygen compound definition."""
+    def __init__(self, **kwargs):
+        WrappedDoxygenNode.__init__(self, compounddefTypeSub, **kwargs)
 
 
 class MockState:
@@ -120,17 +135,17 @@ class MockMaskFactory:
 
 
 class MockContext:
-    def __init__(self, app, node_stack, domain=None):
+    def __init__(self, app, node_stack, domain=None, options=[]):
         self.domain = domain
         self.node_stack = node_stack
         self.directive_args = [
-            None,  # name
-            None,  # arguments
-            [],    # options
-            None,  # content
-            None,  # lineno
-            None,  # content_offset
-            None,  # block_text
+            None,     # name
+            None,     # arguments
+            options,  # options
+            None,     # content
+            None,     # lineno
+            None,     # content_offset
+            None,     # block_text
             MockState(app), MockStateMachine()]
         self.child = None
         self.mask_factory = MockMaskFactory()
@@ -150,6 +165,23 @@ class MockTargetHandler:
 class MockDocument:
     def __init__(self):
         self.reporter = MockReporter()
+
+
+class MockCompoundParser:
+    """
+    A compound parser reads a doxygen XML file from disk; this mock implements
+    a mapping of what would be the file name on disk to data using a dict.
+    """
+    def __init__(self, compound_dict):
+        self.compound_dict = compound_dict
+
+    class MockFileData:
+        def __init__(self, compounddef):
+            self.compounddef = compounddef
+
+    def parse(self, compoundname):
+        compounddef = self.compound_dict[compoundname]
+        return self.MockFileData(compounddef)
 
 
 class NodeFinder(nodes.NodeVisitor):
@@ -224,7 +256,8 @@ def test_find_node():
                     'the number of nodes Text is 2')
 
 
-def render(app, member_def, domain=None, show_define_initializer=False):
+def render(app, member_def, domain=None, show_define_initializer=False,
+           compound_parser=None, options=[]):
     """Render Doxygen *member_def* with *renderer_class*."""
 
     app.config.breathe_use_project_refids = False
@@ -238,9 +271,9 @@ def render(app, member_def, domain=None, show_define_initializer=False):
                               None,  # state
                               None,  # document
                               MockTargetHandler(),
-                              None,   # compound_parser
+                              compound_parser,
                               OpenFilter())
-    renderer.context = MockContext(app, [member_def], domain)
+    renderer.context = MockContext(app, [member_def], domain, options)
     return renderer.render(member_def)
 
 
@@ -346,3 +379,24 @@ def test_render_define_no_initializer(app):
     member_def = WrappedMemberDef(kind='define', name='USE_MILK')
     signature = find_node(render(app, member_def), 'desc_signature')
     assert signature.astext() == 'USE_MILK'
+
+
+def test_render_innergroup(app):
+    refid = 'group__innergroup'
+    mock_compound_parser = MockCompoundParser({
+        refid: WrappedCompoundDef(kind='group',
+                                  compoundname='InnerGroup',
+                                  briefdescription='InnerGroup')
+    })
+    ref = WrappedRef('InnerGroup', refid=refid)
+    compound_def = WrappedCompoundDef(kind='group',
+                                      compoundname='OuterGroup',
+                                      briefdescription='OuterGroup',
+                                      innergroup=[ref])
+    assert all(el.astext() != 'InnerGroup'
+               for el in render(app, compound_def,
+                                compound_parser=mock_compound_parser))
+    assert any(el.astext() == 'InnerGroup'
+               for el in render(app, compound_def,
+                                compound_parser=mock_compound_parser,
+                                options=['inner']))
