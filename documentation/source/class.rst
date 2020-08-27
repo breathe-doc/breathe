@@ -89,6 +89,8 @@ Produces this output:
 .. doxygenclass:: TemplateClass
    :project: template_specialisation
 
+Note the spacing inside the ``<>``, it's important: there must be a
+space after the ``<`` and before the ``>``.
 
 Members Example
 ---------------
