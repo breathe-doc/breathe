@@ -7,6 +7,7 @@ except ImportError:
     from setuptools import setup, find_packages
 
 import sys
+from breathe import __version__
 
 long_desc = '''
 Breathe is an extension to reStructuredText and Sphinx to be able to read and
@@ -22,7 +23,7 @@ if sys.version_info < (3, 5):
 
 setup(
     name='breathe',
-    version='4.20.0',
+    version=__version__,
     url='https://github.com/michaeljones/breathe',
     download_url='https://github.com/michaeljones/breathe',
     license='BSD',
