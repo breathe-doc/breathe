@@ -211,6 +211,7 @@ and additionally the ``content-only``, ``members``, ``protected-members``,
       :private-members:
       :undoc-members:
       :no-link:
+      :inner:
 
 Checkout the :ref:`doxygengroup documentation <group-example>` for more details
 and to see it in action.
