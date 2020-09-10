@@ -170,6 +170,10 @@ Change Log
 
 Inspired by `Keepachangelog.com <http://keepachangelog.com/>`__.
 
+- Unreleased - Breathe v4.21.1
+
+  - Fix Read the Docs build (again). #576
+
 - 2020-09-10 - Breathe v4.21.0
 
   - Fix Read the Docs build. #567
