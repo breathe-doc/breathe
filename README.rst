@@ -170,7 +170,7 @@ Change Log
 
 Inspired by `Keepachangelog.com <http://keepachangelog.com/>`__.
 
-- Unreleased - Breathe v4.21.0
+- 2020-09-10 - Breathe v4.21.0
 
   - Fix Read the Docs build. #567
   - Document doxygenclass template specialisation spacing. #570
