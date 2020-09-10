@@ -170,13 +170,14 @@ Change Log
 
 Inspired by `Keepachangelog.com <http://keepachangelog.com/>`__.
 
-- Unreleased - Breathe v4.20.1
+- Unreleased - Breathe v4.21.0
 
   - Fix Read the Docs build. #567
   - Document doxygenclass template specialisation spacing. #570
   - Update upper Sphinx release to <3.4. #571
   - Reuse breathe.__version__ in setup.py. #572
   - Document :inner: for the doxygengroup section. #573
+  - Add support for verbatim inline elements. #560
 
 - 2020-08-19 - Breathe v4.20.0
 
