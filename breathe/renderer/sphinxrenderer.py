@@ -12,7 +12,8 @@ from sphinx.util.nodes import nested_parse_with_titles
 
 from docutils import nodes
 from docutils.nodes import Element, Node, TextElement  # noqa
-from docutils.statemachine import StringList
+from docutils.statemachine import StringList, UnexpectedIndentationError
+from docutils.parsers.rst.states import Text
 
 try:
     from sphinxcontrib import phpdomain as php  # type: ignore
@@ -394,6 +395,49 @@ def get_definition_without_template_args(data_object):
                         break
                 pos -= 1
     return definition
+
+
+class InlineText(Text):
+    """
+    Add a custom docutils class to allow parsing inline text. This is to be
+    used inside a @verbatim/@endverbatim block but only the first line is
+    consumed and a inline element is generated as the parent, instead of the
+    paragraph used by Text.
+    """
+    patterns = {'inlinetext': r''}
+    initial_transitions = [('inlinetext', )]
+
+    def indent(self, match, context, next_state):
+        """
+        Avoid Text's indent from detecting space prefixed text and
+        doing "funny" stuff; always rely on inlinetext for parsing.
+        """
+        return self.inlinetext(match, context, next_state)
+
+    def eof(self, context):
+        """
+        Text.eof() inserts a paragraph, so override it to skip adding elements.
+        """
+        return []
+
+    def inlinetext(self, match, context, next_state):
+        """
+        Called by the StateMachine when an inline element is found (which is
+        any text when this class is added as the single transition.
+        """
+        startline = self.state_machine.abs_line_number() - 1
+        msg = None
+        try:
+            block = self.state_machine.get_text_block()
+        except UnexpectedIndentationError as err:
+            block, src, srcline = err.args
+            msg = self.reporter.error('Unexpected indentation.',
+                                      source=src, line=srcline)
+        lines = context + list(block)
+        text, _ = self.inline_text(lines[0], startline)
+        self.parent += text
+        self.parent += msg
+        return [], next_state, []
 
 
 class SphinxRenderer:
@@ -1307,6 +1351,25 @@ class SphinxRenderer:
     def visit_highlight(self, node) -> List[Node]:
         return self.render_iterable(node.content_)
 
+    def _nested_inline_parse_with_titles(self, content, node) -> str:
+        """
+        This code is basically a customized nested_parse_with_titles from
+        docutils, using the InlineText class on the statemachine.
+        """
+        surrounding_title_styles = self.state.memo.title_styles
+        surrounding_section_level = self.state.memo.section_level
+        self.state.memo.title_styles = []
+        self.state.memo.section_level = 0
+        try:
+            return self.state.nested_parse(content, 0, node, match_titles=1,
+                                           state_machine_kwargs={
+                                               'state_classes': (InlineText,),
+                                               'initial_state': 'InlineText'
+                                           })
+        finally:
+            self.state.memo.title_styles = surrounding_title_styles
+            self.state.memo.section_level = surrounding_section_level
+
     def visit_verbatim(self, node) -> List[Node]:
         if not node.text.strip().startswith("embed:rst"):
             # Remove trailing new lines. Purely subjective call from viewing results
@@ -1314,6 +1377,8 @@ class SphinxRenderer:
 
             # Handle has a preformatted text
             return [nodes.literal_block(text, text)]
+
+        is_inline = False
 
         # do we need to strip leading asterisks?
         # NOTE: We could choose to guess this based on every line starting with '*'.
@@ -1333,11 +1398,19 @@ class SphinxRenderer:
             lines = map(lambda text: text.replace("///", "   ", 1), lines)
             node.text = "\n".join(lines)
 
-        # Remove the first line which is "embed:rst[:leading-asterisk]"
-        text = "\n".join(node.text.split(u"\n")[1:])
+        elif node.text.strip().startswith("embed:rst:inline"):
+            # Inline all text inside the verbatim
+            node.text = "".join(node.text.splitlines())
+            is_inline = True
 
-        # Remove starting whitespace
-        text = textwrap.dedent(text)
+        if is_inline:
+            text = node.text.replace("embed:rst:inline", "", 1)
+        else:
+            # Remove the first line which is "embed:rst[:leading-asterisk]"
+            text = "\n".join(node.text.split(u"\n")[1:])
+
+            # Remove starting whitespace
+            text = textwrap.dedent(text)
 
         # Inspired by autodoc.py in Sphinx
         rst = StringList()
@@ -1345,13 +1418,19 @@ class SphinxRenderer:
             rst.append(line, "<breathe>")
 
         # Parent node for the generated node subtree
-        rst_node = nodes.paragraph()
+        if is_inline:
+            rst_node = nodes.inline()
+        else:
+            rst_node = nodes.paragraph()
         rst_node.document = self.state.document
 
         # Generate node subtree
-        nested_parse_with_titles(self.state, rst, rst_node)
-        # TODO: hmm, what is supposed to be returned? something is strange with the types
-        return rst_node  # type: ignore
+        if is_inline:
+            self._nested_inline_parse_with_titles(rst, rst_node)
+        else:
+            nested_parse_with_titles(self.state, rst, rst_node)
+
+        return [rst_node]
 
     def visit_inc(self, node) -> List[Node]:
         if node.local == u"yes":

@@ -12,7 +12,7 @@ public:
     This is some funky non-XML compliant text: <& !><
 
     .. note::
-        
+
        This reStructuredText has been handled correctly.
     \endrst
 
@@ -66,6 +66,12 @@ public:
     /// @endverbatim
     //////////////////////////////////////////////////////////////
     virtual void rawLeadingSlashesVerbatim(int something) const = 0;
+
+    /*!
+    Inserting an inline reStructuredText snippet.
+    Linking to another function: \inlinerst :cpp:func:`TestClass::rawVerbatim` \endrst
+    */
+    virtual void rawInlineVerbatim() const = 0;
 
     //! Brief description
     virtual void testFunction() const {};

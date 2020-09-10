@@ -127,6 +127,38 @@ This will appropriately handle the leading slashes and render as:
 
 ----
 
+Inline rST
+~~~~~~~~~~
+
+.. cpp:namespace:: @ex_markups_inline
+
+Normal verbatim elements result in block elements. But sometimes you'll want
+to generate rST references where they need to be rendered inline with the text.
+For example::
+
+   /// Some kind of method
+   ///
+   /// @param something a parameter
+   /// @returns the same value provided in something param
+   ///
+   /// @verbatim embed:rst:inline some inline text @endverbatim
+
+For these kinds of references, you can use an **embed:rst:inline** tag as
+shown in the above example.
+
+This will appropriately handle the leading slashes and render as:
+
+----
+
+.. doxygenfunction:: TestClass::rawInlineVerbatim
+   :project: rst
+
+.. doxygenfunction:: TestClass::rawVerbatim
+   :project: rst
+   :outline:
+
+----
+
 Aliases
 ~~~~~~~
 

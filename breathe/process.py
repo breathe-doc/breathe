@@ -26,6 +26,7 @@ GENERATE_HTML = NO
 GENERATE_XML = YES
 ALIASES = "rst=\verbatim embed:rst"
 ALIASES += "endrst=\endverbatim"
+ALIASES += "inlinerst=\verbatim embed:rst:inline"
 {extra}
 """.strip()
 
