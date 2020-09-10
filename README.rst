@@ -178,6 +178,7 @@ Inspired by `Keepachangelog.com <http://keepachangelog.com/>`__.
   - Reuse breathe.__version__ in setup.py. #572
   - Document :inner: for the doxygengroup section. #573
   - Add support for verbatim inline elements. #560
+  - Fix wrong refid when Doxygen SEPARATE_MEMBER_PAGES is YES. #566
 
 - 2020-08-19 - Breathe v4.20.0
 
