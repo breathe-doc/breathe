@@ -1656,7 +1656,10 @@ class SphinxRenderer:
         return self.handle_declaration(node, declaration, content_callback=content)
 
     def visit_enumvalue(self, node) -> List[Node]:
-        declaration = node.name + self.make_initializer(node)
+        if self.app.config.breathe_show_enumvalue_initializer:  # type: ignore
+            declaration = node.name + self.make_initializer(node)
+        else:
+            declaration = node.name
         return self.handle_declaration(node, declaration, obj_type='enumvalue')
 
     def visit_typedef(self, node) -> List[Node]:

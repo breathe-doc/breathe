@@ -173,6 +173,8 @@ Inspired by `Keepachangelog.com <http://keepachangelog.com/>`__.
 - Unreleased - Breathe v4.21.1
 
   - Fix Read the Docs build (again). #576
+  - New boolean `breathe_show_enumvalue_initializer` option specifying
+    whether value of enumvalue should be displayed. #581
 
 - 2020-09-10 - Breathe v4.21.0
 
