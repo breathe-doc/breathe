@@ -170,7 +170,7 @@ Change Log
 
 Inspired by `Keepachangelog.com <http://keepachangelog.com/>`__.
 
-- Unreleased - Breathe v4.21.1
+- 2020-09-19 - Breathe v4.22.0
 
   - Fix Read the Docs build (again). #576
   - New boolean `breathe_show_enumvalue_initializer` option specifying
