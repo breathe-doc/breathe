@@ -170,7 +170,7 @@ Change Log
 
 Inspired by `Keepachangelog.com <http://keepachangelog.com/>`__.
 
-- Unreleased - Breathe v4.22.1
+- 2020-09-26 - Breathe v4.22.1
 
   - Fix anonymous struct/union usage in C domain. #585
 
