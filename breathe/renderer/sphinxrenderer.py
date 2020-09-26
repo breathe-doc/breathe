@@ -1707,9 +1707,12 @@ class SphinxRenderer:
             if len(initializer) != 0:
                 options['value'] = initializer
         else:
+            typename = ''.join(n.astext() for n in self.render(node.get_type()))
+            if dom == 'c' and '::' in typename:
+                typename = typename.replace('::', '.')
             declaration = ' '.join([
                 self.create_template_prefix(node),
-                ''.join(n.astext() for n in self.render(node.get_type())),  # type: ignore
+                typename,
                 name,
                 node.get_argsstring(),
                 self.make_initializer(node)
