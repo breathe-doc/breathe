@@ -1005,6 +1005,10 @@ class docParaTypeSub(supermod.docParaType):
             obj_ = supermod.docURLLink.factory()
             obj_.build(child_)
             self.content.append(obj_)
+        elif child_.nodeType == Node.ELEMENT_NODE and nodeName_ == "xrefsect":
+            obj_ = supermod.docXRefSectType.factory()
+            obj_.build(child_)
+            self.content.append(obj_)
 
 
 supermod.docParaType.subclass = docParaTypeSub
