@@ -8,7 +8,7 @@ from sphinx import addnodes
 from sphinx.application import Sphinx
 from sphinx.directives import ObjectDescription
 from sphinx.domains import cpp, c, python
-from sphinx.util.nodes import nested_parse_with_titles
+from sphinx.util.nodes import nested_parse_with_titles, make_refnode
 
 from docutils import nodes
 from docutils.nodes import Element, Node, TextElement  # noqa
@@ -469,6 +469,16 @@ class SphinxRenderer:
         self.output_defname = True
         # Nesting level for lists.
         self.nesting_level = 0
+
+        if app.config.breathe_xrefsect_pages:
+            app.connect("env-merge-info",
+                        SphinxRenderer.env_merge_info)
+            app.connect("missing-reference",
+                        SphinxRenderer.missing_reference)
+            app.connect("doctree-resolved",
+                        SphinxRenderer.doctree_resolved)
+            app.connect("html-collect-pages",
+                        SphinxRenderer.collect_pages)
 
     def set_context(self, context: RenderContext) -> None:
         self.context = context
@@ -1539,11 +1549,142 @@ class SphinxRenderer:
             ]
         return nodelist
 
+    @staticmethod
+    def collect_pages(app):
+        env = app.builder.env
+        if not hasattr(env, '_breathe_xrefitems') or \
+                not hasattr(env, '_breathe_xrefidmap'):
+            return
+        xrefitems = env._breathe_xrefitems
+        urito = app.builder.get_relative_uri
+        for docname, data in xrefitems.items():
+            context = {}
+            lines = []
+            if app.config.breathe_xrefsect_root != "":
+                pagename = app.config.breathe_xrefsect_root + '/' + docname
+            else:
+                pagename = docname
+            for title, content in data.items():
+                lines.append(f'<h1>{title}</h1>')
+                lines.append('<div>')
+                for refdoc, id_, description in content:
+                    xrefid = docname + '_1' + id_
+                    if not hasattr(env, '_breathe_xrefids') or \
+                            xrefid not in env._breathe_xrefids:
+                        continue
+
+                    refid, prefix, sym, suffix = env._breathe_xrefids[xrefid]
+
+                    lines.append('<dl>')
+                    lines.append('<dt>')
+                    page = urito(pagename, refdoc)
+
+                    if refid in env._breathe_xrefidmap:
+                        backid = '#' + env._breathe_xrefidmap[refid]
+                    else:
+                        backid = ''
+
+                    lines.append(f'<span class="target" id={id_}></span>')
+                    lines.append(f'{prefix} <a href="{page}{backid}">{sym}</a> {suffix}')
+                    lines.append('</dt>')
+                    lines.append('<dd>')
+                    lines.append(description)
+                    lines.append('</dd>')
+                    lines.append('</dl>')
+                lines.append('</div>')
+            context = {
+                'title': docname.capitalize(),
+                'body': ''.join(lines),
+            }
+            yield (pagename, context, 'page.html')
+
+    @staticmethod
+    def env_merge_info(app, env, docnames, other):
+        if not hasattr(other, '_breathe_xrefitems'):
+            return
+        if not hasattr(env, '_breathe_xrefitems'):
+            env._breathe_xrefitems = {}
+        env._breathe_xrefitems.update(other._breathe_xrefitems)
+
+    @staticmethod
+    def doctree_resolved(app, doctree, docname):
+        env = app.builder.env
+        if not hasattr(env, '_breathe_xrefidmap'):
+            env._breathe_xrefidmap = {}
+        xref_id_map = env._breathe_xrefidmap
+        for descnode in doctree.traverse(addnodes.desc):
+            if 'domain' not in descnode or \
+                    descnode['domain'] not in set(['c', 'cpp']):
+                continue
+            xrefid, retrid = "", ""
+            for node in descnode.traverse():
+                if isinstance(node, addnodes.desc_signature) and 'ids' in node:
+                    if len(node['ids']) > 0:
+                        retrid = node['ids'][0]
+                if isinstance(node, nodes.target) and 'ids' in node:
+                    if len(node['ids']) > 0:
+                        xrefid = node['ids'][0]
+                if retrid != "" and xrefid != "":
+                    break
+            xref_id_map[xrefid] = retrid
+
+    @staticmethod
+    def missing_reference(app, env, node, contnode):
+        if node['reftype'] == 'xrefsect':
+            refdoc = node['refdoc']
+            reftarget = node['reftarget']
+            refid = node['refid']
+            id_ = reftarget + '_1' + refid
+            if not hasattr(env, '_breathe_docxrefsect'):
+                return
+            if id_ not in env._breathe_docxrefsect:
+                return
+            title, description = env._breathe_docxrefsect[id_]
+            if not hasattr(env, '_breathe_xrefitems'):
+                env._breathe_xrefitems = {}
+            xrefitems = env._breathe_xrefitems
+            if reftarget not in xrefitems:
+                xrefitems[reftarget] = {}
+            if title not in xrefitems[reftarget]:
+                xrefitems[reftarget][title] = set()
+            xrefitems[reftarget][title].add((refdoc, refid, description))
+            if app.config.breathe_xrefsect_root != "":
+                pagename = app.config.breathe_xrefsect_root + '/' + reftarget
+            else:
+                pagename = reftarget
+            return make_refnode(app.builder, refdoc, pagename, refid, contnode)
+
+    def parse_xrefsect_doc(self, docname):
+        file_data = self.compound_parser.parse(docname)
+        xref = file_data.compounddef
+        return self.visit_compounddef(xref)
+
     def visit_docxrefsect(self, node) -> List[Node]:
         signode = addnodes.desc_signature()
         title = node.xreftitle[0] + ':'
         titlenode = nodes.emphasis(text=title)
-        signode += titlenode
+        if self.app.config.breathe_xrefsect_pages:
+            parts = node.id.split('_1')
+            assert(len(parts) == 2)
+            ref = addnodes.pending_xref(
+                "",
+                reftype="xrefsect",
+                refdomain="std",
+                refexplicit=False,
+                refid=parts[1],
+                reftarget=parts[0],
+                refdoc=self.app.env.docname,
+                *[titlenode])
+            self.parse_xrefsect_doc(parts[0])
+            env = self.app.builder.env
+            if not hasattr(env, '_breathe_docxrefsect'):
+                env._breathe_docxrefsect = {}
+            env._breathe_docxrefsect[node.id] = (
+                node.xreftitle[0],
+                node.xrefdescription.content_[0].value.valueOf_)
+            signode += ref
+        else:
+            signode += titlenode
 
         nodelist = self.render(node.xrefdescription)
         contentnode = addnodes.desc_content()
@@ -1555,6 +1696,45 @@ class SphinxRenderer:
         descnode += contentnode
 
         return [descnode]
+
+    def visit_docvariablelist(self, node) -> List[Node]:
+        return self.render_iterable(node.varlistentries)
+
+    def visit_docvarlistentry(self, node) -> List[Node]:
+        nodelist = self.render_iterable(node.term.content_)
+        if self.app.config.breathe_xrefsect_pages:
+            xrefid, retrid = None, None
+            prefix, sym, suffix = "", "", ""
+            for n in nodelist:
+                if 'reftype' in n and n['reftype'] == 'anchor':
+                    xrefid = n['reftarget'] + '_1' + n['refid']
+                if 'reftype' in n and n['reftype'] == 'ref':
+                    retrid = n['refid']
+                    sym = n.astext()
+                    continue
+                if sym == "":
+                    prefix += n.astext()
+                else:
+                    suffix += n.astext()
+            if xrefid is not None and retrid is not None:
+                env = self.app.builder.env
+                if not hasattr(env, '_breathe_xrefids'):
+                    env._breathe_xrefids = {}
+                env._breathe_xrefids[xrefid] = (retrid, prefix, sym, suffix)
+        return nodelist
+
+    def visit_docanchor(self, node) -> List[Node]:
+        parts = node.id.split('_1')
+        if len(parts) != 2:
+            return []
+        return [addnodes.pending_xref(
+            "",
+            reftype="anchor",
+            refdomain="std",
+            refexplicit=False,
+            refid=parts[1],
+            reftarget=parts[0],
+            refdoc=self.app.env.docname)]
 
     def visit_mixedcontainer(self, node) -> List[Node]:
         return self.render_optional(node.getValue())
@@ -1932,6 +2112,9 @@ class SphinxRenderer:
         "docparamname": visit_docparamname,
         "templateparamlist": visit_templateparamlist,
         "docxrefsect": visit_docxrefsect,
+        "docvariablelist": visit_docvariablelist,
+        "docvarlistentry": visit_docvarlistentry,
+        "docanchor": visit_docanchor,
     }
 
     def render(self, node, context: Optional[RenderContext] = None) -> List[Node]:
