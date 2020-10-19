@@ -552,3 +552,8 @@ Config Values
    to NO which generates XML that allows Breathe to resolve all references. When set
    to YES the refid/id of elements get an extra element which Breathe tries to get rid
    of when this setting is True.
+
+.. confval:: breathe_xrefsect_into_env
+
+   True or False setting to control if the parsing Doxygen xrefitems should populate
+   the env with data that can later be used to generate cross-reference pages.

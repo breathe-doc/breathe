@@ -8,6 +8,7 @@ from sphinx import addnodes
 from sphinx.application import Sphinx
 from sphinx.directives import ObjectDescription
 from sphinx.domains import cpp, c, python
+from sphinx.errors import SphinxError
 from sphinx.util.nodes import nested_parse_with_titles
 
 from docutils import nodes
@@ -1539,10 +1540,34 @@ class SphinxRenderer:
             ]
         return nodelist
 
+    def parse_xrefsect_doc(self, docname):
+        file_data = self.compound_parser.parse(docname)
+        xref = file_data.compounddef
+        return self.visit_compounddef(xref)
+
+    def update_env_from_docxrefsect(self, node):
+        parts = node.id.split('_1')
+        assert(len(parts) == 2)
+        self.parse_xrefsect_doc(parts[0])
+        env = self.app.env
+        if not hasattr(env, '_breathe_xrefsect'):
+            env._breathe_xrefsect = {}
+        xrefsect = env._breathe_xrefsect
+        if node.id not in xrefsect:
+            xrefsect[node.id] = {}
+        xrefsect[node.id]['docxrefsect'] = (
+            node.xreftitle[0],
+            node.xrefdescription.content_[0].value.valueOf_,
+            self.state.document.settings.env.docname)
+
     def visit_docxrefsect(self, node) -> List[Node]:
         signode = addnodes.desc_signature()
         title = node.xreftitle[0] + ':'
         titlenode = nodes.emphasis(text=title)
+        # make it easy to later traverse and update to a reference
+        titlenode['objtype'] = 'xrefsect_title'
+        if self.app.config.breathe_xrefsect_into_env:  # type: ignore
+            self.update_env_from_docxrefsect(node)
         signode += titlenode
 
         nodelist = self.render(node.xrefdescription)
@@ -1563,8 +1588,46 @@ class SphinxRenderer:
             output.extend(self.render_optional(listitem))
         return output
 
+    def update_env_from_docvarlistentry(self, docvarlistentry):
+        refid, backid = None, None
+        prefix, sym, suffix = "", "", ""
+        for node in docvarlistentry:
+            if node.node_type == 'docanchor':
+                refid = node.id
+                continue
+            elif node.node_type == 'docreftext':
+                # XXX: suffix may contain as many "docreftext" elements as there
+                #      are parameters; the first found should be the correct one
+                if backid is None:
+                    backid = node.refid
+                    sym = node.valueOf_
+                    continue
+                else:
+                    value = node.valueOf_
+            elif node.node_type == 'mixedcontainer':
+                value = node.value
+            else:
+                raise SphinxError(
+                    "Unexpected element \"%s\" in docvarlistentry" % (
+                        node.node_type,))
+            if sym == "":
+                prefix += value
+            else:
+                suffix += value
+        if refid is not None and backid is not None:
+            env = self.app.env
+            if not hasattr(env, '_breathe_xrefsect'):
+                env._breathe_xrefsect = {}
+            xrefsect = env._breathe_xrefsect
+            if refid not in xrefsect:
+                xrefsect[refid] = {}
+            xrefsect[refid]['varlistentry'] = (backid, prefix, sym, suffix)
+
     def visit_docvarlistentry(self, node) -> List[Node]:
-        return self.render_iterable(node.term.content_)
+        content = node.term.content_
+        if self.app.config.breathe_xrefsect_into_env:  # type: ignore
+            self.update_env_from_docvarlistentry(content)
+        return self.render_iterable(content)
 
     def visit_mixedcontainer(self, node) -> List[Node]:
         return self.render_optional(node.getValue())
