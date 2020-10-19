@@ -642,6 +642,12 @@ class docVarListEntryTypeSub(supermod.docVarListEntryType):
     def __init__(self, term=None):
         supermod.docVarListEntryType.__init__(self, term)
 
+    def buildChildren(self, child_, nodeName_):
+        if child_.nodeType == Node.ELEMENT_NODE and nodeName_ == 'term':
+            obj_ = supermod.docTitleType.factory()
+            obj_.build(child_)
+            self.set_term(obj_)
+
 
 supermod.docVarListEntryType.subclass = docVarListEntryTypeSub
 # end class docVarListEntryTypeSub
@@ -858,6 +864,33 @@ supermod.docXRefSectType.subclass = docXRefSectTypeSub
 # end class docXRefSectTypeSub
 
 
+class docVariableListTypeSub(supermod.docVariableListType):
+
+    node_type = "docvariablelist"
+
+    def __init__(self, valueOf_=''):
+        supermod.docVariableListType.__init__(self, valueOf_)
+
+        self.varlistentries = []
+        self.listitems = []
+
+    def buildChildren(self, child_, nodeName_):
+        supermod.docVariableListType.buildChildren(self, child_, nodeName_)
+
+        if child_.nodeType == Node.ELEMENT_NODE and nodeName_ == "varlistentry":
+            obj_ = supermod.docVarListEntryType.factory()
+            obj_.build(child_)
+            self.varlistentries.append(obj_)
+        elif child_.nodeType == Node.ELEMENT_NODE and nodeName_ == "listitem":
+            obj_ = supermod.docListItemType.factory()
+            obj_.build(child_)
+            self.listitems.append(obj_)
+
+
+supermod.docVariableListType.subclass = docVariableListTypeSub
+# end class docVariableListTypeSub
+
+
 class docCopyTypeSub(supermod.docCopyType):
 
     node_type = "doccopy"
@@ -1009,6 +1042,10 @@ class docParaTypeSub(supermod.docParaType):
             obj_ = supermod.docXRefSectType.factory()
             obj_.build(child_)
             self.content.append(obj_)
+        elif child_.nodeType == Node.ELEMENT_NODE and nodeName_ == "variablelist":
+            obj_ = supermod.docVariableListType.factory()
+            obj_.build(child_)
+            self.content.append(obj_)
 
 
 supermod.docParaType.subclass = docParaTypeSub
@@ -1051,6 +1088,19 @@ class docTitleTypeSub(supermod.docTitleType):
     def __init__(self, valueOf_='', mixedclass_=None, content_=None):
         supermod.docTitleType.__init__(self, valueOf_, mixedclass_, content_)
         self.type_ = None
+
+    def buildChildren(self, child_, nodeName_):
+        supermod.docTitleType.buildChildren(self, child_, nodeName_)
+
+        if child_.nodeType == Node.ELEMENT_NODE and nodeName_ == "ref":
+            obj_ = supermod.docRefTextType.factory()
+            obj_.build(child_)
+            self.content_.append(obj_)
+            self.valueOf_ += obj_.valueOf_
+        elif child_.nodeType == Node.ELEMENT_NODE and nodeName_ == "anchor":
+            obj_ = supermod.docAnchorType.factory()
+            obj_.build(child_)
+            self.content_.append(obj_)
 
 
 supermod.docTitleType.subclass = docTitleTypeSub
