@@ -1556,6 +1556,16 @@ class SphinxRenderer:
 
         return [descnode]
 
+    def visit_docvariablelist(self, node) -> List[Node]:
+        output = []
+        for varlistentry, listitem in zip(node.varlistentries, node.listitems):
+            output.extend(self.render_optional(varlistentry))
+            output.extend(self.render_optional(listitem))
+        return output
+
+    def visit_docvarlistentry(self, node) -> List[Node]:
+        return self.render_iterable(node.term.content_)
+
     def visit_mixedcontainer(self, node) -> List[Node]:
         return self.render_optional(node.getValue())
 
@@ -1932,6 +1942,8 @@ class SphinxRenderer:
         "docparamname": visit_docparamname,
         "templateparamlist": visit_templateparamlist,
         "docxrefsect": visit_docxrefsect,
+        "docvariablelist": visit_docvariablelist,
+        "docvarlistentry": visit_docvarlistentry,
     }
 
     def render(self, node, context: Optional[RenderContext] = None) -> List[Node]:
