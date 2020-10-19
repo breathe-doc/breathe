@@ -10,10 +10,10 @@ Template Type Alias
 
 .. doxygentypedef:: IsFurry
    :path: ../../examples/specific/template_type_alias/xml
-      
+
 .. doxygentypedef:: IsFuzzy
    :path: ../../examples/specific/template_type_alias/xml
-      
+
 Typedef Examples
 ----------------
 
@@ -130,13 +130,13 @@ Array Parameter
 
 .. doxygenfunction:: bar
    :project: array
-   
+
 C Struct
 --------
 
 .. doxygenfile:: c_struct.h
    :project: c_struct
-   
+
 C Union
 -------
 
@@ -148,7 +148,7 @@ C Enum
 
 .. doxygenenum:: GSM_BackupFormat
    :project: c_enum
-   
+
 C Typedef
 ---------
 
@@ -166,7 +166,7 @@ C++ Macro
 
 .. doxygenfile:: define.h
    :project: define
-   
+
 Multifile
 ---------
 
@@ -190,7 +190,7 @@ C++ Anonymous Entities
 
 .. doxygenfile:: cpp_anon.h
    :project: cpp_anon
-   
+
 C++ Union
 ---------
 
@@ -238,3 +238,9 @@ C++ Trailing Return Type
 
 .. doxygenfile:: cpp_trailing_return_type.h
    :project: cpp_trailing_return_type
+
+Doxygen xrefsect
+----------------
+
+.. doxygenfile:: xrefsect.h
+   :project: xrefsect
