@@ -172,7 +172,7 @@ Change Log
 
 Inspired by `Keepachangelog.com <http://keepachangelog.com/>`__.
 
-- Unreleased - Breathe v4.23.0
+- 2020-10-20 - Breathe v4.23.0
 
   - Add initial xrefsect support. #589
 
