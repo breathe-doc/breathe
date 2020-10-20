@@ -1539,6 +1539,23 @@ class SphinxRenderer:
             ]
         return nodelist
 
+    def visit_docxrefsect(self, node) -> List[Node]:
+        signode = addnodes.desc_signature()
+        title = node.xreftitle[0] + ':'
+        titlenode = nodes.emphasis(text=title)
+        signode += titlenode
+
+        nodelist = self.render(node.xrefdescription)
+        contentnode = addnodes.desc_content()
+        contentnode += nodelist
+
+        descnode = addnodes.desc()
+        descnode['objtype'] = 'xrefsect'
+        descnode += signode
+        descnode += contentnode
+
+        return [descnode]
+
     def visit_mixedcontainer(self, node) -> List[Node]:
         return self.render_optional(node.getValue())
 
@@ -1913,7 +1930,8 @@ class SphinxRenderer:
         "docparamlistitem": visit_docparamlistitem,
         "docparamnamelist": visit_docparamnamelist,
         "docparamname": visit_docparamname,
-        "templateparamlist": visit_templateparamlist
+        "templateparamlist": visit_templateparamlist,
+        "docxrefsect": visit_docxrefsect,
     }
 
     def render(self, node, context: Optional[RenderContext] = None) -> List[Node]:
