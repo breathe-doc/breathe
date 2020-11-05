@@ -11,7 +11,7 @@ jobs:
           - 3.0.4
           - 3.1.2
           - 3.2.0
-          - git+https://github.com/sphinx-doc/sphinx.git@3.2.x
+          - git+https://github.com/sphinx-doc/sphinx.git@3.3.x
           - git+https://github.com/sphinx-doc/sphinx.git@3.x
           # master (Sphinx 4) will require at least Python 3.6, so disable it for now
           #- git+https://github.com/sphinx-doc/sphinx.git@master
