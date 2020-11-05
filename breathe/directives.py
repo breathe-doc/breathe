@@ -358,7 +358,7 @@ class _DoxygenContentBlockDirective(BaseDirective):
         if not matches:
             warning = create_warning(project_info, self.state, self.lineno, name=name,
                                      kind=self.kind)
-            return warning.warn('doxygen{kind}: Cannot find namespace "{name}" {tail}')
+            return warning.warn('doxygen{kind}: Cannot find {kind} "{name}" {tail}')
 
         if 'content-only' in self.options:
             # Unpack the single entry in the matches list
