@@ -577,7 +577,7 @@ class FilterFactory:
     def create_render_filter(self, kind: str, options: Dict[str, Any]) -> Filter:
         """Render filter for group & namespace blocks"""
 
-        if kind not in ['group', 'namespace']:
+        if kind not in ['group', 'page', 'namespace']:
             raise UnrecognisedKindError(kind)
 
         # Generate new dictionary from defaults
@@ -933,7 +933,7 @@ class FilterFactory:
         As a finder/content filter we only need to match exactly what we're interested in.
         """
 
-        if kind not in ['group', 'namespace']:
+        if kind not in ['group', 'page', 'namespace']:
             raise UnrecognisedKindError(kind)
 
         node = Node()
@@ -1061,6 +1061,12 @@ class FilterFactory:
             filter_ = AndFilter(
                 InFilter(NodeTypeAccessor(Node()), ["compound"]),
                 InFilter(KindAccessor(Node()), ["group"]),
+                InFilter(NameAccessor(Node()), [name])
+                )
+        elif kind == 'page':
+            filter_ = AndFilter(
+                InFilter(NodeTypeAccessor(Node()), ["compound"]),
+                InFilter(KindAccessor(Node()), ["page"]),
                 InFilter(NameAccessor(Node()), [name])
                 )
         else:

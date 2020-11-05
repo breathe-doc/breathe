@@ -387,6 +387,28 @@ It behaves the same as the doxygenstruct directive.
 Checkout the :ref:`example <variable-example>` to see it in action.
 
 
+doxygenpage
+~~~~~~~~~~~
+
+This directive generates the appropriate output for the contents of a doxygen
+page. A doxygen page is created for each "key" of every \\xrefitem command used
+for markup in the source comments. For more information check the
+`doxygen xrefitem documentation`_.
+
+It takes the standard ``project`` and ``path`` options.
+
+::
+
+   .. doxygenpage:: <page name>
+      :project: ...
+      :path: ...
+
+Checkout the :ref:`doxygenpage documentation <page-example>` for more details
+and to see it in action.
+
+.. _doxygen xrefitem documentation: https://www.doxygen.nl/manual/commands.html#cmdxrefitem
+
+
 
 Config Values
 -------------

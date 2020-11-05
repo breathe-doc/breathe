@@ -412,6 +412,14 @@ class DoxygenGroupDirective(_DoxygenContentBlockDirective):
     }
 
 
+class DoxygenPageDirective(_DoxygenContentBlockDirective):
+    kind = "page"
+    option_spec = {
+        "path": unchanged_required,
+        "project": unchanged_required,
+    }
+
+
 # TODO: is this comment still relevant?
 # This class was the same as the DoxygenBaseDirective above, except that it
 # wraps the output in a definition_list before passing it back. This should be
@@ -557,6 +565,7 @@ def setup(app: Sphinx) -> None:
         "doxygengroup": DoxygenGroupDirective,
         "doxygenfile": DoxygenFileDirective,
         "autodoxygenfile": AutoDoxygenFileDirective,
+        "doxygenpage": DoxygenPageDirective,
     }
 
     # note: the parser factory contains a cache of the parsed XML
