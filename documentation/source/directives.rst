@@ -18,6 +18,7 @@ Directives & Config Variables
    file
    group
    autofile
+   page
 
 .. contents:: Table of Contents
 
