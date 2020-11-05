@@ -6,7 +6,7 @@ doxygengroup Directive
 
 This directive generates the appropriate output for the contents of a doxygen
 group. A doxygen group can be declared with specific doxygen markup in the
-source comments as cover in the `doxygen documentation`_.
+source comments as cover in the `doxygen grouping documentation`_.
 
 It takes the standard ``project``, ``path``, ``outline`` and ``no-link`` options
 and additionally the ``content-only``, ``members``, ``protected-members``,
@@ -47,7 +47,7 @@ variable to set it in the ``conf.py``.
    defining them inside the scope of another group, or by using the Doxygen
    \ingroup command, are also parsed and loaded.
 
-.. _doxygen documentation: http://www.stack.nl/~dimitri/doxygen/manual/grouping.html
+.. _doxygen grouping documentation: https://www.doxygen.nl/manual/grouping.html
 
 .. contents::
 

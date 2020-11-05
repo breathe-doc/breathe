@@ -193,7 +193,7 @@ doxygengroup
 
 This directive generates the appropriate output for the contents of a doxygen
 group. A doxygen group can be declared with specific doxygen markup in the
-source comments as covered in the `doxygen documentation`_.
+source comments as covered in the `doxygen grouping documentation`_.
 
 It takes the standard ``project``, ``path``, ``outline`` and ``no-link`` options
 and additionally the ``content-only``, ``members``, ``protected-members``,
@@ -216,7 +216,7 @@ and additionally the ``content-only``, ``members``, ``protected-members``,
 Checkout the :ref:`doxygengroup documentation <group-example>` for more details
 and to see it in action.
 
-.. _doxygen documentation: http://www.stack.nl/~dimitri/doxygen/manual/grouping.html
+.. _doxygen grouping documentation: https://www.doxygen.nl/manual/grouping.html
 
 
 .. _doxygenindex:
