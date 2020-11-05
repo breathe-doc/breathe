@@ -123,6 +123,8 @@ class MockStateMachine:
         self.reporter = MockReporter()
 
     def get_source_and_line(self, lineno: int):
+        if lineno is None:
+            lineno = 42
         return 'mock-doc', lineno
 
 
