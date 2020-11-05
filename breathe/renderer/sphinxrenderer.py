@@ -1543,7 +1543,15 @@ class SphinxRenderer:
         signode = addnodes.desc_signature()
         title = node.xreftitle[0] + ':'
         titlenode = nodes.emphasis(text=title)
-        signode += titlenode
+        ref = addnodes.pending_xref(
+            "",
+            reftype="ref",
+            refdomain="std",
+            refexplicit=True,
+            reftarget=node.id,
+            refdoc=self.app.env.docname,
+            *[titlenode])
+        signode += ref
 
         nodelist = self.render(node.xrefdescription)
         contentnode = addnodes.desc_content()
