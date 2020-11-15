@@ -172,9 +172,10 @@ Change Log
 
 Inspired by `Keepachangelog.com <http://keepachangelog.com/>`__.
 
-- Unreleased - Breathe v4.23.1
+- Unreleased - Breathe v4.24.0
 
   - Update CI for Sphinx 3.3.x and fix test mock. #597
+  - Add support for xrefitem based page generation (doxygenpage). #596
 
 - 2020-10-20 - Breathe v4.23.0
 
