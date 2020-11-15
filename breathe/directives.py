@@ -358,7 +358,7 @@ class _DoxygenContentBlockDirective(BaseDirective):
         if not matches:
             warning = create_warning(project_info, self.state, self.lineno, name=name,
                                      kind=self.kind)
-            return warning.warn('doxygen{kind}: Cannot find namespace "{name}" {tail}')
+            return warning.warn('doxygen{kind}: Cannot find {kind} "{name}" {tail}')
 
         if 'content-only' in self.options:
             # Unpack the single entry in the matches list
@@ -409,6 +409,14 @@ class DoxygenGroupDirective(_DoxygenContentBlockDirective):
     option_spec = {
         **_DoxygenContentBlockDirective.option_spec,
         "inner": flag,
+    }
+
+
+class DoxygenPageDirective(_DoxygenContentBlockDirective):
+    kind = "page"
+    option_spec = {
+        "path": unchanged_required,
+        "project": unchanged_required,
     }
 
 
@@ -557,6 +565,7 @@ def setup(app: Sphinx) -> None:
         "doxygengroup": DoxygenGroupDirective,
         "doxygenfile": DoxygenFileDirective,
         "autodoxygenfile": AutoDoxygenFileDirective,
+        "doxygenpage": DoxygenPageDirective,
     }
 
     # note: the parser factory contains a cache of the parsed XML
