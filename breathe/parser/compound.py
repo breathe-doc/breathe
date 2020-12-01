@@ -1046,6 +1046,10 @@ class docParaTypeSub(supermod.docParaType):
             obj_ = supermod.docVariableListType.factory()
             obj_.build(child_)
             self.content.append(obj_)
+        elif child_.nodeType == Node.ELEMENT_NODE and nodeName_ == "anchor":
+            obj_ = supermod.docAnchorType.factory()
+            obj_.build(child_)
+            self.content.append(obj_)
 
 
 supermod.docParaType.subclass = docParaTypeSub
