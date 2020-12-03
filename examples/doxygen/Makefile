@@ -27,6 +27,7 @@ all: class/xml/index.xml \
      relates/xml/index.xml \
      author/xml/index.xml \
      par/xml/index.xml \
+     parblock/xml/index.xml \
      overload/xml/index.xml \
      example/xml/index.xml \
      include/xml/index.xml \
@@ -49,7 +50,7 @@ all: class/xml/index.xml \
 
 clean:
 	rm -rf  class define enum file func page relates author \
-                par overload example include qtstyle jdstyle structcmd \
+		par parblock overload example include qtstyle jdstyle structcmd \
 		autolink tag restypedef afterdoc template tag group diagrams \
 		memgrp docstring pyexample mux manual interface
 
@@ -79,6 +80,9 @@ author/xml/index.xml: author.cpp author.cfg
 
 par/xml/index.xml: par.cpp par.cfg
 	$(DOXYGEN) par.cfg
+
+parblock/xml/index.xml: parblock.cpp parblock.cfg
+	$(DOXYGEN) parblock.cfg
 
 overload/xml/index.xml: overload.cpp overload.cfg
 	$(DOXYGEN) overload.cfg
@@ -140,4 +144,3 @@ diagrams/xml/index.xml: diagrams_a.h diagrams_b.h diagrams_c.h diagrams_d.h diag
 ifneq ($(HAVE_DOT),)
 	$(DOXYGEN) diagrams.cfg
 endif
-

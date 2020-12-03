@@ -84,6 +84,14 @@ Par
 .. doxygenindex::
    :path: ../../examples/doxygen/par/xml
 
+Parblock
+--------
+
+.. cpp:namespace:: @ex_doxygen_parblock
+
+.. doxygenindex::
+   :path: ../../examples/doxygen/parblock/xml
+
 Overload
 --------
 

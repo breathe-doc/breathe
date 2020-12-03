@@ -1050,10 +1050,29 @@ class docParaTypeSub(supermod.docParaType):
             obj_ = supermod.docAnchorType.factory()
             obj_.build(child_)
             self.content.append(obj_)
+        elif child_.nodeType == Node.ELEMENT_NODE and nodeName_ == "parblock":
+            obj_ = supermod.docParBlockType.factory()
+            obj_.build(child_)
+            self.content.append(obj_)
 
 
 supermod.docParaType.subclass = docParaTypeSub
 # end class docParaTypeSub
+
+
+class docParBlockTypeSub(supermod.docParBlockType):
+
+    node_type = "docparblock"
+
+    def __init__(self, para=None):
+        supermod.docParBlockType.__init__(self, para)
+
+    def buildChildren(self, child_, nodeName_):
+        supermod.docParBlockType.buildChildren(self, child_, nodeName_)
+
+
+supermod.docParBlockType.subclass = docParBlockTypeSub
+# end class docParBlockTypeSub
 
 
 class docMarkupTypeSub(supermod.docMarkupType):

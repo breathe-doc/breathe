@@ -1284,6 +1284,9 @@ class SphinxRenderer:
 
         return [nodes.paragraph("", "", *nodelist)]
 
+    def visit_docparblock(self, node) -> List[Node]:
+        return self.render_iterable(node.para)
+
     def visit_docimage(self, node) -> List[Node]:
         """Output docutils image node using name attribute from xml as the uri"""
 
@@ -1934,6 +1937,7 @@ class SphinxRenderer:
         "docreftext": visit_docreftext,
         "docheading": visit_docheading,
         "docpara": visit_docpara,
+        "docparblock": visit_docparblock,
         "docimage": visit_docimage,
         "docurllink": visit_docurllink,
         "docmarkup": visit_docmarkup,
