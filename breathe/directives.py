@@ -9,12 +9,13 @@ from breathe.parser import DoxygenParserFactory, ParserError, FileIOError
 from breathe.process import AutoDoxygenProcessHandle
 from breathe.project import ProjectInfoFactory, ProjectError
 from breathe.renderer import format_parser_error, RenderContext
-from breathe.renderer.sphinxrenderer import WithContext
+from breathe.renderer.sphinxrenderer import (
+    SphinxRenderer, WithContext, get_param_decl,
+)
 from breathe.renderer.filter import Filter
 from breathe.renderer.mask import (
     MaskFactory, NullMaskFactory, NoParameterNamesMask
 )
-from breathe.renderer.sphinxrenderer import SphinxRenderer
 from breathe.renderer.target import create_target_handler
 
 from sphinx.application import Sphinx
@@ -199,12 +200,17 @@ class DoxygenFunctionDirective(BaseDirective):
         with WithContext(object_renderer, context):
             # this part should be kept in sync with visit_function in sphinxrenderer
             name = node.get_name()
-            # assume we are only doing this for C++ declarations
+            param_list = []
+            # assume we are only doing this for C++ declarations, but use the mask
+            for param in node.param:
+                param = context.mask_factory.mask(param)
+                param_decl = get_param_decl(param)
+                param_list.append(param_decl)
             declaration = ' '.join([
                 object_renderer.create_template_prefix(node),
                 ''.join(n.astext() for n in object_renderer.render(node.get_type())),
                 name,
-                node.get_argsstring()
+                '(' + ','.join(param_list) + ')'
             ])
         parser = cpp.DefinitionParser(declaration,
                                       location=self.get_source_info(),
