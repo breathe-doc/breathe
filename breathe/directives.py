@@ -137,7 +137,7 @@ class DoxygenFunctionDirective(BaseDirective):
         return self.render(node_stack, project_info, filter_, target_handler, NullMaskFactory(),
                            self.directive_args)
 
-    def parse_args(self, function_description, strip_init=False):
+    def parse_args(self, function_description):
         if function_description == '':
             function_description = '()'
 
@@ -152,8 +152,7 @@ class DoxygenFunctionDirective(BaseDirective):
                 declarator = declarator.next
             assert hasattr(declarator, 'declId')
             declarator.declId = None
-            if strip_init:
-                p.arg.init = None
+            p.arg.init = None
         return paramQual
 
     def create_function_signature(self, node_stack, project_info, filter_, target_handler,
@@ -232,10 +231,6 @@ class DoxygenFunctionDirective(BaseDirective):
             if args == match_args:
                 return entry
 
-            # Try again without initial arguments
-            match_args = self.parse_args(_match_args, strip_init=True)
-            if args == match_args:
-                return entry
         raise UnableToResolveFunctionError(signatures)
 
 

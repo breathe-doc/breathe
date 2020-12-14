@@ -450,8 +450,3 @@ def test_resolve_function(app):
     for args in argsstrings:
         ast_param = cls.parse_args(args)
         ret = cls.resolve_function(matches, ast_param, None)
-
-    # Make sure matching will suceed even if the initializers are missing
-    # Take the default argument off argsstrings[0] to test
-    ast_param = cls.parse_args('(Scalar end, const TensorOptions &options)')
-    ret = cls.resolve_function(matches, ast_param, None)
