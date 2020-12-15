@@ -175,6 +175,7 @@ Inspired by `Keepachangelog.com <http://keepachangelog.com/>`__.
 - Unreleased - Breathe v4.25.0
 
   - Add support for \parblock parsing and rendering. #603
+  - Allow lookup in doxygenfunction without writing param names. #606
 
 - 2020-12-01 - Breathe v4.24.1
 
