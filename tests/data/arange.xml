@@ -1,0 +1,149 @@
+<sectiondef kind="typedef">
+<memberdef kind="function" id="1" prot="public" static="no" const="yes" explicit="no" inline="no" virt="non-virtual">
+  <type><ref refid="classat_1_1_tensor" kindref="compound">Tensor</ref></type>
+  <definition>Tensor at::arange</definition>
+  <argsstring>(Scalar end, const TensorOptions &amp;options={})</argsstring>
+  <name>arange</name>
+  <param>
+    <type>Scalar</type>
+    <declname>end</declname>
+  </param>
+  <param>
+    <type>const TensorOptions &amp;</type>
+    <declname>options</declname>
+    <defval>{}</defval>
+  </param>
+</memberdef>
+<memberdef kind="function" id="2" prot="public" static="no" const="yes" explicit="no" inline="no" virt="non-virtual">
+  <type><ref refid="classat_1_1_tensor" kindref="compound">Tensor</ref></type>
+  <definition>Tensor at::arange</definition>
+  <argsstring>(Scalar end, c10::optional&lt; ScalarType &gt; dtype, c10::optional&lt; Layout &gt; layout, c10::optional&lt; Device &gt; device, c10::optional&lt; bool &gt; pin_memory)</argsstring>
+  <name>arange</name>
+  <param>
+    <type>Scalar</type>
+    <declname>end</declname>
+  </param>
+  <param>
+    <type><ref refid="classc10_1_1optional" kindref="compound">c10::optional</ref>&lt; ScalarType &gt;</type>
+    <declname>dtype</declname>
+  </param>
+  <param>
+    <type><ref refid="classc10_1_1optional" kindref="compound">c10::optional</ref>&lt; Layout &gt;</type>
+    <declname>layout</declname>
+  </param>
+  <param>
+    <type><ref refid="classc10_1_1optional" kindref="compound">c10::optional</ref>&lt; Device &gt;</type>
+    <declname>device</declname>
+  </param>
+  <param>
+    <type><ref refid="classc10_1_1optional" kindref="compound">c10::optional</ref>&lt; bool &gt;</type>
+    <declname>pin_memory</declname>
+  </param>
+</memberdef>
+<memberdef kind="function" id="3" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+  <type><ref refid="classat_1_1_tensor" kindref="compound">Tensor</ref></type>
+  <definition>Tensor at::arange</definition>
+  <argsstring>(Scalar start, Scalar end, const TensorOptions &amp;options={})</argsstring>
+  <name>arange</name>
+  <param>
+    <type>Scalar</type>
+    <declname>start</declname>
+  </param>
+  <param>
+    <type>Scalar</type>
+    <declname>end</declname>
+  </param>
+  <param>
+    <type>const TensorOptions &amp;</type>
+    <declname>options</declname>
+    <defval>{}</defval>
+  </param>
+</memberdef>
+<memberdef kind="function" id="4" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+  <type><ref refid="classat_1_1_tensor" kindref="compound">Tensor</ref></type>
+  <definition>Tensor at::arange</definition>
+  <argsstring>(Scalar start, Scalar end, c10::optional&lt; ScalarType &gt; dtype, c10::optional&lt; Layout &gt; layout, c10::optional&lt; Device &gt; device, c10::optional&lt; bool &gt; pin_memory)</argsstring>
+  <name>arange</name>
+  <param>
+    <type>Scalar</type>
+    <declname>start</declname>
+  </param>
+  <param>
+    <type>Scalar</type>
+    <declname>end</declname>
+  </param>
+  <param>
+    <type><ref refid="classc10_1_1optional" kindref="compound">c10::optional</ref>&lt; ScalarType &gt;</type>
+    <declname>dtype</declname>
+  </param>
+  <param>
+    <type><ref refid="classc10_1_1optional" kindref="compound">c10::optional</ref>&lt; Layout &gt;</type>
+    <declname>layout</declname>
+  </param>
+  <param>
+    <type><ref refid="classc10_1_1optional" kindref="compound">c10::optional</ref>&lt; Device &gt;</type>
+    <declname>device</declname>
+  </param>
+  <param>
+    <type><ref refid="classc10_1_1optional" kindref="compound">c10::optional</ref>&lt; bool &gt;</type>
+    <declname>pin_memory</declname>
+  </param>
+</memberdef>
+<memberdef kind="function" id="5" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+  <type><ref refid="classat_1_1_tensor" kindref="compound">Tensor</ref></type>
+  <definition>Tensor at::arange</definition>
+  <argsstring>(Scalar start, Scalar end, Scalar step, const TensorOptions &amp;options={})</argsstring>
+  <name>range</name>
+  <param>
+    <type>Scalar</type>
+    <declname>start</declname>
+  </param>
+  <param>
+    <type>Scalar</type>
+    <declname>end</declname>
+  </param>
+  <param>
+    <type>Scalar</type>
+    <declname>step</declname>
+  </param>
+  <param>
+    <type>const TensorOptions &amp;</type>
+    <declname>options</declname>
+    <defval>{}</defval>
+  </param>
+</memberdef>
+<memberdef kind="function" id="6" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+  <type><ref refid="classat_1_1_tensor" kindref="compound">Tensor</ref></type>
+  <definition>Tensor at::arange</definition>
+  <argsstring>(Scalar start, Scalar end, Scalar step, c10::optional&lt; ScalarType &gt; dtype, c10::optional&lt; Layout &gt; layout, c10::optional&lt; Device &gt; device, c10::optional&lt; bool &gt; pin_memory)</argsstring>
+  <name>range</name>
+  <param>
+    <type>Scalar</type>
+    <declname>start</declname>
+  </param>
+  <param>
+    <type>Scalar</type>
+    <declname>end</declname>
+  </param>
+  <param>
+    <type>Scalar</type>
+    <declname>step</declname>
+  </param>
+  <param>
+    <type><ref refid="classc10_1_1optional" kindref="compound">c10::optional</ref>&lt; ScalarType &gt;</type>
+    <declname>dtype</declname>
+  </param>
+  <param>
+    <type><ref refid="classc10_1_1optional" kindref="compound">c10::optional</ref>&lt; Layout &gt;</type>
+    <declname>layout</declname>
+  </param>
+  <param>
+    <type><ref refid="classc10_1_1optional" kindref="compound">c10::optional</ref>&lt; Device &gt;</type>
+    <declname>device</declname>
+  </param>
+  <param>
+    <type><ref refid="classc10_1_1optional" kindref="compound">c10::optional</ref>&lt; bool &gt;</type>
+    <declname>pin_memory</declname>
+  </param>
+</memberdef>
+</sectiondef>
