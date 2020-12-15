@@ -92,7 +92,7 @@ class DoxygenFunctionDirective(BaseDirective):
             self.lineno,
             namespace='%s::' % namespace if namespace else '',
             function=function_name,
-            args=', '.join(args)
+            args=str(args)
             )
 
         try:
@@ -138,40 +138,22 @@ class DoxygenFunctionDirective(BaseDirective):
                            self.directive_args)
 
     def parse_args(self, function_description):
-        # Strip off trailing qualifiers
-        pattern = re.compile(r'''(?<= \)) \s*
-                             (?: = \s* 0)? \s* $ ''',
-                             re.VERBOSE)
+        if function_description == '':
+            function_description = '()'
 
-        function_description = re.sub(pattern,
-                                      '',
-                                      function_description)
-
-        paren_index = function_description.find('(')
-        if paren_index == -1:
-            return []
-        # If it is empty parenthesis, then return empty list as we want empty parenthesis coming
-        # from the xml file to match the user's function when the user doesn't provide parenthesis
-        # ie. when there are no args anyway
-        elif function_description == '()':
-            return []
-        else:
-            # Parse the function name string, eg. f(int, float) to
-            # extract the types so we can use them for matching
-            args = []
-            num_open_brackets = -1
-            start = paren_index + 1
-            for i in range(paren_index, len(function_description)):
-                c = function_description[i]
-                if c == '(' or c == '<':
-                    num_open_brackets += 1
-                elif c == ')' or c == '>':
-                    num_open_brackets -= 1
-                elif c == ',' and num_open_brackets == 0:
-                    args.append(function_description[start:i].strip())
-                    start = i + 1
-            args.append(function_description[start:-1].strip())
-            return args
+        parser = cpp.DefinitionParser(function_description,
+                                      location=self.get_source_info(),
+                                      config=self.config)
+        paramQual = parser._parse_parameters_and_qualifiers(paramMode='function')
+        # now erase the parameter names
+        for p in paramQual.args:
+            declarator = p.arg.type.decl
+            while hasattr(declarator, 'next'):
+                declarator = declarator.next
+            assert hasattr(declarator, 'declId')
+            declarator.declId = None
+            p.arg.init = None
+        return paramQual
 
     def create_function_signature(self, node_stack, project_info, filter_, target_handler,
                                   mask_factory, directive_args):
@@ -240,14 +222,15 @@ class DoxygenFunctionDirective(BaseDirective):
             signatures.append(signature)
 
             match = re.match(r"([^(]*)(.*)", signature)
-            match_args = match.group(2)
+            _match_args = match.group(2)
 
             # Parse the text to find the arguments
-            match_args = self.parse_args(match_args)
+            match_args = self.parse_args(_match_args)
 
             # Match them against the arg spec
             if args == match_args:
                 return entry
+
         raise UnableToResolveFunctionError(signatures)
 
 

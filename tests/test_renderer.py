@@ -1,3 +1,4 @@
+import os
 import pytest  # type: ignore
 
 import sphinx.addnodes
@@ -403,3 +404,49 @@ def test_render_innergroup(app):
                for el in render(app, compound_def,
                                 compound_parser=mock_compound_parser,
                                 options=['inner']))
+
+def test_resolve_function(app):
+    from breathe.directives import DoxygenFunctionDirective
+    from breathe.project import ProjectInfoFactory
+    from breathe.parser import DoxygenParserFactory
+    from breathe.parser.compoundsuper import sectiondefType
+    from breathe.finder.factory import FinderFactory
+    from docutils.statemachine import StringList
+    from xml.dom import minidom
+
+    app.config.breathe_separate_member_pages = False
+    app.config.breathe_default_project = 'test_project'
+    app.config.breathe_domain_by_extension = {}
+    app.config.breathe_domain_by_file_pattern = {}
+    app.config.breathe_use_project_refids = False
+    project_info_factory = ProjectInfoFactory(app)
+    parser_factory = DoxygenParserFactory(app)
+    finder_factory = FinderFactory(app, parser_factory)
+    cls_args = ('doxygenclass', ['at::Tensor'],
+                {'members': '', 'protected-members': None, 'undoc-members': None},
+                StringList([], items=[]),
+                20, 24,
+                ('.. doxygenclass:: at::Tensor\n   :members:\n'
+                        '   :protected-members:\n   :undoc-members:'),
+                MockState(app),
+                MockStateMachine(),
+               )
+    cls = DoxygenFunctionDirective(finder_factory, project_info_factory, parser_factory, *cls_args)
+
+    argsstrings = []
+    with open(os.path.join(os.path.dirname(__file__), 'data', 'arange.xml')) as fid:
+        xml = fid.read()
+    doc = minidom.parseString(xml)
+
+    sectiondef = sectiondefType.factory()
+    for child in doc.documentElement.childNodes:
+        sectiondef.buildChildren(child, 'memberdef')
+        if getattr(child, 'tagName', None) == 'memberdef':
+            # Get the argsstring function declaration
+            argsstrings.append(child.getElementsByTagName('argsstring')[0].childNodes[0].data)
+
+    # Verify that parsing the exact same argument works
+    matches = [[m, sectiondef] for m in sectiondef.memberdef]
+    for args in argsstrings:
+        ast_param = cls.parse_args(args)
+        ret = cls.resolve_function(matches, ast_param, None)
