@@ -1,0 +1,20 @@
+<sectiondef kind="typedef">
+<memberdef kind="function" id="0" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+  <type>double</type>
+  <definition>double amici::spline_pos</definition>
+  <argsstring>(double t, int num,...)</argsstring>
+  <name>spline_pos</name>
+  <param>
+    <type>double</type>
+    <declname>t</declname>
+  </param>
+  <param>
+    <type>int</type>
+    <declname>num</declname>
+  </param>
+  <param>
+    <type>...</type>
+  </param>
+</memberdef>
+</sectiondef>
+

@@ -405,15 +405,12 @@ def test_render_innergroup(app):
                                 compound_parser=mock_compound_parser,
                                 options=['inner']))
 
-def test_resolve_function(app):
+def get_directive(app):
     from breathe.directives import DoxygenFunctionDirective
     from breathe.project import ProjectInfoFactory
     from breathe.parser import DoxygenParserFactory
-    from breathe.parser.compoundsuper import sectiondefType
     from breathe.finder.factory import FinderFactory
     from docutils.statemachine import StringList
-    from xml.dom import minidom
-
     app.config.breathe_separate_member_pages = False
     app.config.breathe_default_project = 'test_project'
     app.config.breathe_domain_by_extension = {}
@@ -431,10 +428,15 @@ def test_resolve_function(app):
                 MockState(app),
                 MockStateMachine(),
                )
-    cls = DoxygenFunctionDirective(finder_factory, project_info_factory, parser_factory, *cls_args)
+    return DoxygenFunctionDirective(finder_factory, project_info_factory, parser_factory, *cls_args)
+
+
+def get_matches(datafile):
+    from breathe.parser.compoundsuper import sectiondefType
+    from xml.dom import minidom
 
     argsstrings = []
-    with open(os.path.join(os.path.dirname(__file__), 'data', 'arange.xml')) as fid:
+    with open(os.path.join(os.path.dirname(__file__), 'data', datafile)) as fid:
         xml = fid.read()
     doc = minidom.parseString(xml)
 
@@ -444,9 +446,25 @@ def test_resolve_function(app):
         if getattr(child, 'tagName', None) == 'memberdef':
             # Get the argsstring function declaration
             argsstrings.append(child.getElementsByTagName('argsstring')[0].childNodes[0].data)
-
-    # Verify that parsing the exact same argument works
     matches = [[m, sectiondef] for m in sectiondef.memberdef]
+    return argsstrings, matches
+
+
+def test_resolve_overrides(app):
+    # Test that multiple function overrides works
+    argsstrings, matches = get_matches('arange.xml')
+    cls = get_directive(app)
+
+    # Verify that the exact arguments returns one override
     for args in argsstrings:
         ast_param = cls.parse_args(args)
         ret = cls.resolve_function(matches, ast_param, None)
+
+def test_ellipsis(app):
+    argsstrings, matches = get_matches('ellipsis.xml')
+    cls = get_directive(app)
+
+    # Verify that parsing an ellipsis works
+    ast_param = cls.parse_args(argsstrings[0])
+    ret = cls.resolve_function(matches, ast_param, None)
+
