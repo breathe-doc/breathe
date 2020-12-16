@@ -147,6 +147,9 @@ class DoxygenFunctionDirective(BaseDirective):
         paramQual = parser._parse_parameters_and_qualifiers(paramMode='function')
         # now erase the parameter names
         for p in paramQual.args:
+            if p.arg is None:
+                assert p.ellipsis
+                continue
             declarator = p.arg.type.decl
             while hasattr(declarator, 'next'):
                 declarator = declarator.next
