@@ -589,7 +589,7 @@ def setup(app: Sphinx) -> None:
     app.add_config_value("breathe_separate_member_pages", False, 'env')
 
     breathe_css = "breathe.css"
-    if (os.path.exists(os.path.join(app.confdir, "_static", breathe_css))):
+    if (os.path.exists(os.path.join(app.confdir, "_static", breathe_css))):  # type: ignore
         app.add_stylesheet(breathe_css)
 
     def write_file(directory, filename, content):
