@@ -1781,7 +1781,11 @@ class SphinxRenderer:
         desc += signode
 
         typ = ''.join(n.astext() for n in self.render(node.get_type()))  # type: ignore
-        assert typ in ("friend class", "friend struct")
+        # in Doxygen < 1.9 the 'friend' part is there, but afterwards not
+        # https://github.com/michaeljones/breathe/issues/616
+        assert typ in ("friend class", "friend struct", "class", "struct")
+        if not typ.startswith('friend '):
+            typ = 'friend ' + typ
         signode += addnodes.desc_annotation(typ, typ)
         signode += nodes.Text(' ')
         # expr = cpp.CPPExprRole(asCode=False)
