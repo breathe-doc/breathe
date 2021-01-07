@@ -176,6 +176,7 @@ Inspired by `Keepachangelog.com <http://keepachangelog.com/>`__.
 
   - Add test for ellipsis ('...') in args. #610
   - Sphinx 3.4.x compatibility. #617
+  - Adapt friendclass to Doxygen 1.9. #618
 
 - 2020-12-16 - Breathe v4.25.1
 
