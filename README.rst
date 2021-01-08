@@ -172,7 +172,7 @@ Change Log
 
 Inspired by `Keepachangelog.com <http://keepachangelog.com/>`__.
 
-- Unreleased - Breathe v4.26.0
+- 2021-01-08 - Breathe v4.26.0
 
   - Add test for ellipsis ('...') in args. #610
   - Sphinx 3.4.x compatibility. #617
