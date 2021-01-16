@@ -78,11 +78,20 @@ class DoxygenFunctionDirective(BaseDirective):
         # Extract arguments from the function name.
         args = self._parse_args(args)
 
-        finder_filter = self.filter_factory.create_function_finder_filter(namespace, function_name)
+        finder_filter = self.filter_factory.create_function_and_all_friend_finder_filter(
+            namespace, function_name)
 
         # TODO: find a more specific type for the Doxygen nodes
-        matches = []  # type: List[Any]
-        finder.filter_(finder_filter, matches)
+        matchesAll = []  # type: List[Any]
+        finder.filter_(finder_filter, matchesAll)
+        matches = []
+        for m in matchesAll:
+            # only take functions and friend functions
+            # ignore friend classes
+            node = m[0]
+            if node.kind == 'friend' and not node.argsstring:
+                continue
+            matches.append(m)
 
         # Create it ahead of time as it is cheap and it is ugly to declare it for both exception
         # clauses below
@@ -105,30 +114,17 @@ class DoxygenFunctionDirective(BaseDirective):
                 '"{namespace}{function}" with arguments {args} {tail}.\n' \
                 'Potential matches:\n'
 
-            # We want to create a string for the console output and a set of docutils nodes
-            # for rendering into the final output. We handle the final output as a literal string
-            # with a txt based list of the options.
-            literal_text = ''
-
-            # TODO: We're cheating here with the set() as signatures has repeating entries for some
-            # reason (failures in the matcher_stack code) so we consolidate them by shoving them in
-            # a set to remove duplicates. Should be fixed!
-            signatures = ''
-            for i, entry in enumerate(sorted(set(error.signatures))):
-                if i:
-                    literal_text += '\n'
-                # Replace new lines with a new line & enough spacing to reach the appropriate
-                # alignment for our simple plain text list
-                literal_text += '- %s' % entry.replace('\n', '\n  ')
-                signatures += '    - %s\n' % entry.replace('\n', '\n      ')
-            block = nodes.literal_block('', '', nodes.Text(literal_text))
+            text = ''
+            for i, entry in enumerate(sorted(error.signatures)):
+                text += '- %s\n' % entry
+            block = nodes.literal_block('', '', nodes.Text(text))
             formatted_message = warning.format(message)
             warning_nodes = [
                 nodes.paragraph("", "", nodes.Text(formatted_message)),
                 block
             ]
             result = warning.warn(message, rendered_nodes=warning_nodes,
-                                  unformatted_suffix=signatures)
+                                  unformatted_suffix=text)
             return result
 
         target_handler = create_target_handler(self.options, project_info, self.state.document)
@@ -217,7 +213,8 @@ class DoxygenFunctionDirective(BaseDirective):
             directive_args = self.directive_args[:]
             directive_args[2] = text_options
 
-            signature = self._create_function_signature(entry, project_info, filter_, target_handler,
+            signature = self._create_function_signature(entry, project_info, filter_,
+                                                        target_handler,
                                                         mask_factory, directive_args)
             candSignatures.append(signature)
 
