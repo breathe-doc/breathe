@@ -457,14 +457,14 @@ def test_resolve_overrides(app):
 
     # Verify that the exact arguments returns one override
     for args in argsstrings:
-        ast_param = cls.parse_args(args)
-        ret = cls.resolve_function(matches, ast_param, None)
+        ast_param = cls._parse_args(args)
+        ret = cls._resolve_function(matches, ast_param, None)
 
 def test_ellipsis(app):
     argsstrings, matches = get_matches('ellipsis.xml')
     cls = get_directive(app)
 
     # Verify that parsing an ellipsis works
-    ast_param = cls.parse_args(argsstrings[0])
-    ret = cls.resolve_function(matches, ast_param, None)
+    ast_param = cls._parse_args(argsstrings[0])
+    ret = cls._resolve_function(matches, ast_param, None)
 
