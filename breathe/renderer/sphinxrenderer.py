@@ -1606,12 +1606,14 @@ class SphinxRenderer:
             if dom == 'py':
                 declaration = name + node.get_argsstring()
             else:
-                declaration = ' '.join([
-                    self.create_template_prefix(node),
-                    ''.join(n.astext() for n in self.render(node.get_type())),  # type: ignore
-                    name,
-                    node.get_argsstring()
-                ])
+                elements = [self.create_template_prefix(node)]
+                if node.kind == 'friend':
+                    elements.append('friend')
+                elements.append(''.join(n.astext()
+                                        for n in self.render(node.get_type())))  # type: ignore
+                elements.append(name)
+                elements.append(node.get_argsstring())
+                declaration = ' '.join(elements)
             nodes = self.handle_declaration(node, declaration)
             return nodes
         else:
