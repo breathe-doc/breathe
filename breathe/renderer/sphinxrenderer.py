@@ -1165,12 +1165,12 @@ class SphinxRenderer:
 
         # Get all sub sections
         for sectiondef in node.sectiondef:
+            kind = sectiondef.kind
+            if section_order is not None and kind not in section_order:
+                continue
             child_nodes = self.render(sectiondef)
             if not child_nodes:
                 # Skip empty section
-                continue
-            kind = sectiondef.kind
-            if section_order is not None and kind not in section_order:
                 continue
             rst_node = nodes.container(classes=['breathe-sectiondef'])
             rst_node.document = self.state.document
