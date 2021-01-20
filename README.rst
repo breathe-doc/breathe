@@ -172,6 +172,10 @@ Change Log
 
 Inspired by `Keepachangelog.com <http://keepachangelog.com/>`__.
 
+- Unreleased - Breathe v4.26.1
+
+  - Fix doxygenfile causing duplicate IDs for unspecified sections. #622
+
 - 2021-01-08 - Breathe v4.26.0
 
   - Add test for ellipsis ('...') in args. #610
