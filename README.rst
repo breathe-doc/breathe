@@ -172,7 +172,7 @@ Change Log
 
 Inspired by `Keepachangelog.com <http://keepachangelog.com/>`__.
 
-- Unreleased - Breathe v4.26.1
+- 2021-01-21 - Breathe v4.26.1
 
   - Fix doxygenfile causing duplicate IDs for unspecified sections. #622
   - Fixes for doxygenfunction (friend keyword, friend class, arg checks). #623
