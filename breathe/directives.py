@@ -28,7 +28,7 @@ import os
 import re
 import subprocess
 
-from typing import Any, List, Type  # noqa
+from typing import Any, List, Optional, Type  # noqa
 
 
 class NoMatchingFunctionError(BreatheError):
@@ -76,13 +76,22 @@ class DoxygenFunctionDirective(BaseDirective):
             return warning.warn('doxygenfunction: %s' % e)
 
         # Extract arguments from the function name.
-        args = self.parse_args(args)
+        args = self._parse_args(args)
 
-        finder_filter = self.filter_factory.create_function_finder_filter(namespace, function_name)
+        finder_filter = self.filter_factory.create_function_and_all_friend_finder_filter(
+            namespace, function_name)
 
         # TODO: find a more specific type for the Doxygen nodes
-        matches = []  # type: List[Any]
-        finder.filter_(finder_filter, matches)
+        matchesAll = []  # type: List[Any]
+        finder.filter_(finder_filter, matchesAll)
+        matches = []
+        for m in matchesAll:
+            # only take functions and friend functions
+            # ignore friend classes
+            node = m[0]
+            if node.kind == 'friend' and not node.argsstring:
+                continue
+            matches.append(m)
 
         # Create it ahead of time as it is cheap and it is ugly to declare it for both exception
         # clauses below
@@ -96,39 +105,26 @@ class DoxygenFunctionDirective(BaseDirective):
             )
 
         try:
-            node_stack = self.resolve_function(matches, args, project_info)
+            node_stack = self._resolve_function(matches, args, project_info)
         except NoMatchingFunctionError:
             return warning.warn('doxygenfunction: Cannot find function "{namespace}{function}" '
                                 '{tail}')
         except UnableToResolveFunctionError as error:
-            message = 'doxygenfunction: Unable to resolve multiple matches for function ' \
-                '"{namespace}{function}" with arguments ({args}) {tail}.\n' \
+            message = 'doxygenfunction: Unable to resolve function ' \
+                '"{namespace}{function}" with arguments {args} {tail}.\n' \
                 'Potential matches:\n'
 
-            # We want to create a string for the console output and a set of docutils nodes
-            # for rendering into the final output. We handle the final output as a literal string
-            # with a txt based list of the options.
-            literal_text = ''
-
-            # TODO: We're cheating here with the set() as signatures has repeating entries for some
-            # reason (failures in the matcher_stack code) so we consolidate them by shoving them in
-            # a set to remove duplicates. Should be fixed!
-            signatures = ''
-            for i, entry in enumerate(sorted(set(error.signatures))):
-                if i:
-                    literal_text += '\n'
-                # Replace new lines with a new line & enough spacing to reach the appropriate
-                # alignment for our simple plain text list
-                literal_text += '- %s' % entry.replace('\n', '\n  ')
-                signatures += '    - %s\n' % entry.replace('\n', '\n      ')
-            block = nodes.literal_block('', '', nodes.Text(literal_text))
+            text = ''
+            for i, entry in enumerate(sorted(error.signatures)):
+                text += '- %s\n' % entry
+            block = nodes.literal_block('', '', nodes.Text(text))
             formatted_message = warning.format(message)
             warning_nodes = [
                 nodes.paragraph("", "", nodes.Text(formatted_message)),
                 block
             ]
             result = warning.warn(message, rendered_nodes=warning_nodes,
-                                  unformatted_suffix=signatures)
+                                  unformatted_suffix=text)
             return result
 
         target_handler = create_target_handler(self.options, project_info, self.state.document)
@@ -137,9 +133,9 @@ class DoxygenFunctionDirective(BaseDirective):
         return self.render(node_stack, project_info, filter_, target_handler, NullMaskFactory(),
                            self.directive_args)
 
-    def parse_args(self, function_description):
+    def _parse_args(self, function_description: str) -> Optional[cpp.ASTParametersQualifiers]:
         if function_description == '':
-            function_description = '()'
+            return None
 
         parser = cpp.DefinitionParser(function_description,
                                       location=self.get_source_info(),
@@ -152,14 +148,14 @@ class DoxygenFunctionDirective(BaseDirective):
                 continue
             declarator = p.arg.type.decl
             while hasattr(declarator, 'next'):
-                declarator = declarator.next
+                declarator = declarator.next  # type: ignore
             assert hasattr(declarator, 'declId')
-            declarator.declId = None
-            p.arg.init = None
+            declarator.declId = None  # type: ignore
+            p.arg.init = None  # type: ignore
         return paramQual
 
-    def create_function_signature(self, node_stack, project_info, filter_, target_handler,
-                                  mask_factory, directive_args):
+    def _create_function_signature(self, node_stack, project_info, filter_, target_handler,
+                                   mask_factory, directive_args) -> str:
         "Standard render process used by subclasses"
 
         try:
@@ -177,7 +173,8 @@ class DoxygenFunctionDirective(BaseDirective):
             return format_parser_error("doxygenclass", e.error, e.filename, self.state,
                                        self.lineno, True)
         except FileIOError as e:
-            return format_parser_error("doxygenclass", e.error, e.filename, self.state, self.lineno)
+            return format_parser_error("doxygenclass", e.error, e.filename, self.state,
+                                       self.lineno, False)
 
         context = RenderContext(node_stack, mask_factory, directive_args)
         node = node_stack[0]
@@ -197,16 +194,12 @@ class DoxygenFunctionDirective(BaseDirective):
         ast = parser.parse_declaration('function', 'function')
         return str(ast)
 
-    def resolve_function(self, matches, args, project_info):
+    def _resolve_function(self, matches, args: Optional[cpp.ASTParametersQualifiers], project_info):
         if not matches:
             raise NoMatchingFunctionError()
 
-        if len(matches) == 1:
-            return matches[0]
-
-        signatures = []
-
-        # Iterate over the potential matches
+        res = []
+        candSignatures = []
         for entry in matches:
             text_options = {'no-link': u'', 'outline': u''}
 
@@ -220,21 +213,29 @@ class DoxygenFunctionDirective(BaseDirective):
             directive_args = self.directive_args[:]
             directive_args[2] = text_options
 
-            signature = self.create_function_signature(entry, project_info, filter_, target_handler,
-                                                       mask_factory, directive_args)
-            signatures.append(signature)
+            signature = self._create_function_signature(entry, project_info, filter_,
+                                                        target_handler,
+                                                        mask_factory, directive_args)
+            candSignatures.append(signature)
 
-            match = re.match(r"([^(]*)(.*)", signature)
-            _match_args = match.group(2)
+            if args is not None:
+                match = re.match(r"([^(]*)(.*)", signature)
+                assert match
+                _match_args = match.group(2)
 
-            # Parse the text to find the arguments
-            match_args = self.parse_args(_match_args)
+                # Parse the text to find the arguments
+                match_args = self._parse_args(_match_args)
 
-            # Match them against the arg spec
-            if args == match_args:
-                return entry
+                # Match them against the arg spec
+                if args != match_args:
+                    continue
 
-        raise UnableToResolveFunctionError(signatures)
+            res.append((entry, signature))
+
+        if len(res) == 1:
+            return res[0][0]
+        else:
+            raise UnableToResolveFunctionError(candSignatures)
 
 
 class _DoxygenClassLikeDirective(BaseDirective):
