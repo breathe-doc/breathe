@@ -1607,8 +1607,19 @@ class SphinxRenderer:
                 declaration = name + node.get_argsstring()
             else:
                 elements = [self.create_template_prefix(node)]
+                if node.static == 'yes':
+                    elements.append('static')
+                if node.inline == 'yes':
+                    elements.append('inline')
                 if node.kind == 'friend':
                     elements.append('friend')
+                if node.virt in ('virtual', 'pure-virtual'):
+                    elements.append('virtual')
+                if node.explicit == 'yes':
+                    elements.append('explicit')
+                if 'constexpr' in dir(node):
+                    assert node.constexpr == 'yes'
+                    elements.append('constexpr')
                 elements.append(''.join(n.astext()
                                         for n in self.render(node.get_type())))  # type: ignore
                 elements.append(name)
@@ -1758,16 +1769,19 @@ class SphinxRenderer:
             if len(initializer) != 0:
                 options['value'] = initializer
         else:
+            elements = [self.create_template_prefix(node)]
+            if node.static == 'yes':
+                elements.append('static')
+            if node.mutable == 'yes':
+                elements.append('mutable')
             typename = ''.join(n.astext() for n in self.render(node.get_type()))
             if dom == 'c' and '::' in typename:
                 typename = typename.replace('::', '.')
-            declaration = ' '.join([
-                self.create_template_prefix(node),
-                typename,
-                name,
-                node.get_argsstring(),
-                self.make_initializer(node)
-            ])
+            elements.append(typename)
+            elements.append(name)
+            elements.append(node.get_argsstring())
+            elements.append(self.make_initializer(node))
+            declaration = ' '.join(elements)
         if not dom or dom in ('c', 'cpp', 'py', 'cs'):
             return self.handle_declaration(node, declaration, options=options)
         else:
