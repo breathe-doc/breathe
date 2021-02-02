@@ -172,6 +172,10 @@ Change Log
 
 Inspired by `Keepachangelog.com <http://keepachangelog.com/>`__.
 
+- Unreleased - Breathe v4.27.0
+
+  -  Add various specifiers to functions and variables. #628
+
 - 2021-01-21 - Breathe v4.26.1
 
   - Fix doxygenfile causing duplicate IDs for unspecified sections. #622
