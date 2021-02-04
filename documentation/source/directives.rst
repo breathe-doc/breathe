@@ -438,6 +438,12 @@ Config Values
               "h" : "cpp",
               }
 
+   You can also use this to enable support for Doxygen XML generated from PHP code::
+
+      breathe_domain_by_extension = {
+              "php" : "php",
+              }
+
 .. confval:: breathe_domain_by_file_pattern
 
    Allows you to specify domains for particular files by wildcard syntax. This

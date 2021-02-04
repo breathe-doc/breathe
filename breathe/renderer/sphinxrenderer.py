@@ -148,6 +148,26 @@ class PyClasslike(BaseObject, python.PyClasslike):
 
 # ----------------------------------------------------------------------------
 
+# Create multi-inheritance classes to merge BaseObject from Breathe with
+# classes from phpdomain.
+# We use capitalization (and the namespace) to differentiate between the two
+
+if php is not None:
+    class PHPNamespaceLevel(BaseObject, php.PhpNamespacelevel):
+        """Description of a PHP item *in* a namespace (not the space itself)."""
+        pass
+
+    class PHPClassLike(BaseObject, php.PhpClasslike):
+        pass
+
+    class PHPClassMember(BaseObject, php.PhpClassmember):
+        pass
+
+    class PHPGlobalLevel(BaseObject, php.PhpGloballevel):
+        pass
+
+# ----------------------------------------------------------------------------
+
 if cs is not None:
     class CSharpCurrentNamespace(BaseObject, cs.CSharpCurrentNamespace):
         pass
@@ -239,12 +259,13 @@ class DomainDirectiveFactory:
 
     if php is not None:
         php_classes = {
-            'function': (php.PhpNamespacelevel, 'function'),
-            'class': (php.PhpClasslike, 'class'),
-            'attr': (php.PhpClassmember, 'attr'),
-            'method': (php.PhpClassmember, 'method'),
-            'global': (php.PhpGloballevel, 'global'),
+            'function': (PHPNamespaceLevel, 'function'),
+            'class': (PHPClassLike, 'class'),
+            'attr': (PHPClassMember, 'attr'),
+            'method': (PHPClassMember, 'method'),
+            'global': (PHPGlobalLevel, 'global'),
         }
+        php_classes_default = php_classes['class']  # Directive when no matching ones were found
 
     if cs is not None:
         cs_classes = {
@@ -291,8 +312,12 @@ class DomainDirectiveFactory:
             else:
                 if arg_0 in ['variable']:
                     arg_0 = 'global'
-            cls, name = DomainDirectiveFactory.php_classes.get(
-                arg_0, (php.PhpClasslike, 'class'))
+
+            if arg_0 in DomainDirectiveFactory.php_classes:
+                cls, name = DomainDirectiveFactory.php_classes[arg_0]  # type: ignore
+            else:
+                cls, name = DomainDirectiveFactory.php_classes_default  # type: ignore
+
         elif cs is not None and domain == 'cs':
             cls, name = DomainDirectiveFactory.cs_classes[args[0]]  # type: ignore
         else:
