@@ -1054,6 +1054,10 @@ class docParaTypeSub(supermod.docParaType):
             obj_ = supermod.docParBlockType.factory()
             obj_.build(child_)
             self.content.append(obj_)
+        elif child_.nodeType == Node.ELEMENT_NODE and nodeName_ == "table":
+            obj_ = supermod.docTableType.factory()
+            obj_.build(child_)
+            self.content.append(obj_)
 
 
 supermod.docParaType.subclass = docParaTypeSub

@@ -1585,8 +1585,38 @@ class SphinxRenderer:
         content = node.term.content_
         return self.render_iterable(content)
 
-    def visit_docanchor(self, node) -> List[None]:
+    def visit_docanchor(self, node) -> List[Node]:
         return self.create_doxygen_target(node)
+
+    def visit_docentry(self, node) -> List[Node]:
+        col = nodes.entry()
+        col += self.render_iterable(node.para)
+        if node.thead == 'yes':
+            col['heading'] = True
+        return [col]
+
+    def visit_docrow(self, node) -> List[Node]:
+        row = nodes.row()
+        cols = self.render_iterable(node.entry)
+        if all(col.get('heading', False) for col in cols):
+            elem = nodes.thead()
+        else:
+            elem = nodes.tbody()
+        row += cols
+        elem += row
+        return [elem]
+
+    def visit_doctable(self, node) -> List[Node]:
+        table = nodes.table()
+        table['classes'] += ['colwidths-auto']
+        tgroup = nodes.tgroup(cols=node.cols)
+        for _ in range(node.cols):
+            colspec = nodes.colspec()
+            colspec.attributes['colwidth'] = 'auto'
+            tgroup += colspec
+        table += tgroup
+        tgroup += self.render_iterable(node.row)
+        return [table]
 
     def visit_mixedcontainer(self, node) -> List[Node]:
         return self.render_optional(node.getValue())
@@ -1988,6 +2018,9 @@ class SphinxRenderer:
         "docvariablelist": visit_docvariablelist,
         "docvarlistentry": visit_docvarlistentry,
         "docanchor": visit_docanchor,
+        "doctable": visit_doctable,
+        "docrow": visit_docrow,
+        "docentry": visit_docentry,
     }
 
     def render(self, node, context: Optional[RenderContext] = None) -> List[Node]:
