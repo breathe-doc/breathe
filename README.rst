@@ -174,7 +174,8 @@ Inspired by `Keepachangelog.com <http://keepachangelog.com/>`__.
 
 - Unreleased - Breathe v4.27.0
 
-  -  Add various specifiers to functions and variables. #628
+  - Add various specifiers to functions and variables. #628
+  - Add multiply inherited class for PHP objects. #630
 
 - 2021-01-21 - Breathe v4.26.1
 
