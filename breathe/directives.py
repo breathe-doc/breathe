@@ -246,6 +246,8 @@ class _DoxygenClassLikeDirective(BaseDirective):
         "path": unchanged_required,
         "project": unchanged_required,
         "members": unchanged,
+        "membergroups": unchanged_required,
+        "members-only": flag,
         "protected-members": flag,
         "private-members": flag,
         "undoc-members": flag,

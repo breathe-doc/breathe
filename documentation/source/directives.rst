@@ -70,8 +70,8 @@ doxygenclass
 
 This directive generates the appropriate output for a single class. It takes the
 standard ``project``, ``path``, ``outline`` and ``no-link`` options and
-additionally the ``members``, ``protected-members``, ``private-members`` and
-``undoc-members`` options::
+additionally the ``members``, ``protected-members``, ``private-members``,
+``undoc-members``, ``membergroups`` and ``members-only`` options::
 
    .. doxygenclass:: <class name>
       :project: ...
@@ -80,6 +80,8 @@ additionally the ``members``, ``protected-members``, ``private-members`` and
       :protected-members:
       :private-members:
       :undoc-members:
+      :membergroups: ...
+      :members-only:
       :outline:
       :no-link:
 
@@ -300,8 +302,8 @@ This directive generates the appropriate output for a single struct. The struct
 name is required to be unique in the project.
 
 It takes the standard ``project``, ``path``, ``outline`` and ``no-link`` options
-and additionally the ``members``, ``protected-members``, ``private-members`` and
-``undoc-members`` options.
+and additionally the ``members``, ``protected-members``, ``private-members``,
+``membergroups``, ``members-only`` and ``undoc-members`` options.
 
 ::
 
@@ -312,6 +314,8 @@ and additionally the ``members``, ``protected-members``, ``private-members`` and
       :protected-members:
       :private-members:
       :undoc-members:
+      :membergroups: ...
+      :members-only:
       :outline:
       :no-link:
 
@@ -333,6 +337,8 @@ class). It behaves the same as the doxygenclass directive.
       :protected-members:
       :private-members:
       :undoc-members:
+      :membergroups: ...
+      :members-only:
       :outline:
       :no-link:
 

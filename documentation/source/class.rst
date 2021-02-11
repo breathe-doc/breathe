@@ -6,8 +6,8 @@ doxygenclass Directive
 
 This directive generates the appropriate output for a single class. It takes the
 standard ``project``, ``path``, ``outline`` and ``no-link`` options and
-additionally the ``members``, ``protected-members``, ``private-members`` and
-``undoc-members`` options.
+additionally the ``members``, ``protected-members``, ``private-members``,
+``undoc-members``, ``membergroups`` and ``members-only`` options.
 
 ``members``
    Designed to behavior in a similar manner to the ``members`` option for the
@@ -28,6 +28,14 @@ additionally the ``members``, ``protected-members``, ``private-members`` and
 
 ``undoc-members``
    If specified, the undocumented members of the class will be displayed.
+
+``membergroups``
+  If specified, only the groups in a space-delimited list following this
+  directive will be displayed.
+
+``members-only``
+  This will allow to show only the members, not the class information. Child
+  classes and structs are also not shown.
 
 If you would like to always specify some combination of ``members``,
 ``protected-members``, ``private-members`` and ``undoc-members`` then you can
@@ -205,6 +213,98 @@ It produces this output:
 
    Undocumented classes are still not shown in the output due to an implementation
    issue. Please post an issue on github if you would like this resolved.
+
+
+.. _class-example-membergroups:
+
+Membergroups
+------------
+
+.. cpp:namespace:: @ex_class_membergroups
+
+This will show only members in the specified member group(s).
+
+.. code-block:: rst
+
+   .. doxygenclass:: GroupedMembers
+      :project: membergroups
+      :members:
+      :membergroups: myGroup
+
+It produces this output:
+
+.. doxygenclass:: GroupedMembers
+   :project: membergroups
+   :members:
+   :membergroups: myGroup
+
+Without ``:membergroups: myGroup`` it would produce:
+
+.. doxygenclass:: GroupedMembers
+   :project: membergroups
+   :members:
+
+
+.. _class-example-membersonly:
+
+Members-only
+------------
+
+.. cpp:namespace:: @ex_class_members_only
+
+This will only show the members of a class, and not the class name, child
+classes or structs, or any information about the class.
+
+.. code-block:: rst
+
+   .. doxygenclass:: ClassTest
+      :project: class
+      :members:
+      :members-only:
+
+It produces this output:
+
+.. doxygenclass:: ClassTest
+   :project: classtest
+   :members:
+   :members-only:
+
+Without ``:members-only:`` it would produce:
+
+.. doxygenclass:: ClassTest
+   :project: classtest
+   :members:
+
+.. note::
+
+   The members will be shown at the indentation normally reserver for class
+   definitions. To prevent this, you may want to indent the block by indenting
+   the ``.. doxygenclass`` directive.
+
+.. note::
+
+   In the ``readthedocs`` theme, the members will show up in the color scheme of the
+   class definitions. If you would like them rendered as the other members,
+   indent like above, create a ``_static/css/custom.css`` file containing
+   
+   .. code-block:: css
+
+      /* render as functions not classes when indented (for :members-only:) */
+      html.writer-html4 .rst-content blockquote dl:not(.field-list)>dt, html.writer-html5 .rst-content blockquote dl[class]:not(.option-list):not(.field-list):not(.footnote):not(.glossary):not(.simple)>dt {
+        margin-bottom: 6px;
+        border: none;
+        border-left: 3px solid #ccc;
+        background: #f0f0f0;
+        color: #555;
+      }
+
+   and add the following to your ``conf.py``
+    
+   .. code-block:: python
+
+      html_static_path = ['_static']
+      
+      html_css_files = ['css/custom.css']
 
 Outline Example
 ---------------

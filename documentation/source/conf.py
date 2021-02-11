@@ -119,7 +119,7 @@ spelling_lang='en_US'
 
 
 # Configuration for mathjax extension
-# 
+#
 # Set path for mathjax js to a https URL as sometimes the Breathe docs are displayed under https
 # and we can't load an http mathjax file from an https view of the docs. So we change to a https
 # mathjax file which we can load from http or https. We break the url over two lines.
@@ -224,6 +224,7 @@ breathe_projects = {
     "cpp_inherited_members":"../../examples/specific/cpp_inherited_members/xml/",
     "cpp_trailing_return_type":"../../examples/specific/cpp_trailing_return_type/xml/",
     "xrefsect": "../../examples/specific/xrefsect/xml/",
+    "membergroups": "../../examples/specific/membergroups/xml/",
     }
 
 breathe_projects_source = {
