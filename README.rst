@@ -177,6 +177,7 @@ Inspired by `Keepachangelog.com <http://keepachangelog.com/>`__.
   - Add various specifiers to functions and variables. #628
   - Add multiply inherited class for PHP objects. #630
   - Initial support for table rendering. #632
+  - Add rendering of \section, \subsection and \subsubsection. #635
 
 - 2021-01-21 - Breathe v4.26.1
 
