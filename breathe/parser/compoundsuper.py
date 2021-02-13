@@ -2888,6 +2888,10 @@ class docSect1Type(GeneratedsSuper):
             self.content_ = []
         else:
             self.content_ = content_
+        if title is None:
+            self.title = ""
+        else:
+            self.title = title
     def factory(*args_, **kwargs_):
         if docSect1Type.subclass:
             return docSect1Type.subclass(*args_, **kwargs_)
@@ -2943,11 +2947,7 @@ class docSect1Type(GeneratedsSuper):
     def buildChildren(self, child_, nodeName_):
         if child_.nodeType == Node.ELEMENT_NODE and \
             nodeName_ == 'title':
-            childobj_ = docTitleType.factory()
-            childobj_.build(child_)
-            obj_ = self.mixedclass_(MixedContainer.CategoryComplex,
-                MixedContainer.TypeNone, 'title', childobj_)
-            self.content_.append(obj_)
+            self.title = child_.childNodes[0].nodeValue
         elif child_.nodeType == Node.ELEMENT_NODE and \
             nodeName_ == 'para':
             childobj_ = docParaType.factory()
@@ -2989,6 +2989,10 @@ class docSect2Type(GeneratedsSuper):
             self.content_ = []
         else:
             self.content_ = content_
+        if title is None:
+            title = ""
+        else:
+            title = title
     def factory(*args_, **kwargs_):
         if docSect2Type.subclass:
             return docSect2Type.subclass(*args_, **kwargs_)
@@ -3044,11 +3048,7 @@ class docSect2Type(GeneratedsSuper):
     def buildChildren(self, child_, nodeName_):
         if child_.nodeType == Node.ELEMENT_NODE and \
             nodeName_ == 'title':
-            childobj_ = docTitleType.factory()
-            childobj_.build(child_)
-            obj_ = self.mixedclass_(MixedContainer.CategoryComplex,
-                MixedContainer.TypeNone, 'title', childobj_)
-            self.content_.append(obj_)
+            self.title = child_.childNodes[0].nodeValue
         elif child_.nodeType == Node.ELEMENT_NODE and \
             nodeName_ == 'para':
             childobj_ = docParaType.factory()
@@ -3090,6 +3090,10 @@ class docSect3Type(GeneratedsSuper):
             self.content_ = []
         else:
             self.content_ = content_
+        if title is None:
+            self.title = ""
+        else:
+            self.title = title
     def factory(*args_, **kwargs_):
         if docSect3Type.subclass:
             return docSect3Type.subclass(*args_, **kwargs_)
@@ -3145,11 +3149,7 @@ class docSect3Type(GeneratedsSuper):
     def buildChildren(self, child_, nodeName_):
         if child_.nodeType == Node.ELEMENT_NODE and \
             nodeName_ == 'title':
-            childobj_ = docTitleType.factory()
-            childobj_.build(child_)
-            obj_ = self.mixedclass_(MixedContainer.CategoryComplex,
-                MixedContainer.TypeNone, 'title', childobj_)
-            self.content_.append(obj_)
+            self.title = child_.childNodes[0].nodeValue
         elif child_.nodeType == Node.ELEMENT_NODE and \
             nodeName_ == 'para':
             childobj_ = docParaType.factory()

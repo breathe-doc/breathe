@@ -1344,8 +1344,19 @@ class SphinxRenderer:
             print("Warning: does not currently handle 'small' text display")
         return [creator("", "", *nodelist)]
 
-    def visit_docsect1(self, node) -> List[Node]:
-        return []
+    def visit_docsectN(self, node) -> List[Node]:
+        '''
+        Docutils titles are defined by their level inside the document so
+        the proper structure is only guaranteed by the Doxygen XML.
+
+        Doxygen command mapping to XML element name:
+        @section == sect1, @subsection == sect2, @subsubsection == sect3
+        '''
+        section = nodes.section()
+        section['ids'].append(node.id)
+        section += nodes.title(node.title, node.title)
+        section += self.render_iterable(node.content_)
+        return [section]
 
     def visit_docsimplesect(self, node) -> List[Node]:
         """Other Type documentation such as Warning, Note, Returns, etc"""
@@ -2016,7 +2027,9 @@ class SphinxRenderer:
         "docimage": visit_docimage,
         "docurllink": visit_docurllink,
         "docmarkup": visit_docmarkup,
-        "docsect1": visit_docsect1,
+        "docsect1": visit_docsectN,
+        "docsect2": visit_docsectN,
+        "docsect3": visit_docsectN,
         "docsimplesect": visit_docsimplesect,
         "doctitle": visit_doctitle,
         "docformula": visit_docformula,
