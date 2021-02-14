@@ -1353,7 +1353,8 @@ class SphinxRenderer:
         @section == sect1, @subsection == sect2, @subsubsection == sect3
         '''
         section = nodes.section()
-        section['ids'].append(node.id)
+        section['ids'].append(self.get_refid(node.id))
+        section += self.create_doxygen_target(node)
         section += nodes.title(node.title, node.title)
         section += self.render_iterable(node.content_)
         return [section]
