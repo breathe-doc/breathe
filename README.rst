@@ -178,6 +178,7 @@ Inspired by `Keepachangelog.com <http://keepachangelog.com/>`__.
   - Add multiply inherited class for PHP objects. #630
   - Initial support for table rendering. #632
   - Add rendering of \section, \subsection and \subsubsection. #635
+  - Sphinx 3.5 compatibility. #640
 
 - 2021-01-21 - Breathe v4.26.1
 
