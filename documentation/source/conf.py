@@ -204,6 +204,7 @@ breathe_projects = {
     "programlisting":"../../examples/specific/programlisting/xml/",
     "image":"../../examples/specific/image/xml/",
     "lists":"../../examples/specific/lists/xml/",
+    "tables":"../../examples/specific/tables/xml/",
     "group":"../../examples/specific/group/xml/",
     "union":"../../examples/specific/union/xml/",
     "qtsignalsandslots":"../../examples/specific/qtsignalsandslots/xml/",

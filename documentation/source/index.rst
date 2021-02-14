@@ -69,6 +69,7 @@ Features
    customcss
    groups
    lists
+   tables
    template
 
 Contributing
