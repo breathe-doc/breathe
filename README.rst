@@ -179,6 +179,7 @@ Inspired by `Keepachangelog.com <http://keepachangelog.com/>`__.
   - Initial support for table rendering. #632
   - Add rendering of \section, \subsection and \subsubsection. #635
   - Sphinx 3.5 compatibility. #640
+  - Fix linking to sections. #639
 
 - 2021-01-21 - Breathe v4.26.1
 
