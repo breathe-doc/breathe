@@ -1666,6 +1666,10 @@ class SphinxRenderer:
         col += self.render_iterable(node.para)
         if node.thead == 'yes':
             col['heading'] = True
+        if node.rowspan:
+            col['morerows'] = int(node.rowspan) - 1
+        if node.colspan:
+            col['morecols'] = int(node.colspan) - 1
         return [col]
 
     def visit_docrow(self, node) -> List[Node]:
