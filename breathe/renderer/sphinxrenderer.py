@@ -1692,7 +1692,26 @@ class SphinxRenderer:
             colspec.attributes['colwidth'] = 'auto'
             tgroup += colspec
         table += tgroup
-        tgroup += self.render_iterable(node.row)
+        rows = self.render_iterable(node.row)
+
+        # this code depends on visit_docrow(), and expects the same elements used to
+        # "envelop" rows there, namely thead and tbody (eg it will need to be updated
+        # if Doxygen one day adds support for tfoot)
+
+        tags = {row.starttag(): [] for row in rows}  # type: Dict[str, List]
+        for row in rows:
+            tags[row.starttag()].append(row.next_node())
+
+        def merge_row_types(root, elem, elems):
+            for node in elems:
+                elem += node
+            root += elem
+
+        for klass in [nodes.thead, nodes.tbody]:
+            obj = klass()
+            if obj.starttag() in tags:
+                merge_row_types(tgroup, obj, tags[obj.starttag()])
+
         return [table]
 
     def visit_mixedcontainer(self, node) -> List[Node]:
