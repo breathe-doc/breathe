@@ -396,13 +396,15 @@ page. A doxygen page is created for each "key" of every \\xrefitem command used
 for markup in the source comments. For more information check the
 `doxygen xrefitem documentation`_.
 
-It takes the standard ``project`` and ``path`` options.
+It takes the standard ``project`` and ``path`` options and additionally the
+``content-only`` option.
 
 ::
 
    .. doxygenpage:: <page name>
       :project: ...
       :path: ...
+      :content-only:
 
 Checkout the :ref:`doxygenpage documentation <page-example>` for more details
 and to see it in action.
