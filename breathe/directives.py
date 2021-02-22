@@ -347,12 +347,11 @@ class _DoxygenContentBlockDirective(BaseDirective):
                                      kind=self.kind)
             return warning.warn('doxygen{kind}: Cannot find {kind} "{name}" {tail}')
 
-        if 'content-only' in self.options:
+        if 'content-only' in self.options and self.kind != "page":
             # Unpack the single entry in the matches list
             (node_stack,) = matches
 
             filter_ = self.filter_factory.create_content_filter(self.kind, self.options)
-
             # Having found the compound node for the namespace or group in the index we want to grab
             # the contents of it which match the filter
             contents_finder = self.finder_factory.create_finder_from_root(node_stack[0],
@@ -404,6 +403,7 @@ class DoxygenPageDirective(_DoxygenContentBlockDirective):
     option_spec = {
         "path": unchanged_required,
         "project": unchanged_required,
+        "content-only": flag,
     }
 
 
