@@ -968,6 +968,8 @@ class docParaTypeSub(supermod.docParaType):
         self.programlisting = []
         self.images = []
 
+        self.ordered_children = []
+
     def buildChildren(self, child_, nodeName_):
         supermod.docParaType.buildChildren(self, child_, nodeName_)
 
@@ -1058,6 +1060,11 @@ class docParaTypeSub(supermod.docParaType):
             obj_ = supermod.docTableType.factory()
             obj_.build(child_)
             self.content.append(obj_)
+        else:
+            obj_ = None
+
+        if obj_:
+            self.ordered_children.append(obj_)
 
 
 supermod.docParaType.subclass = docParaTypeSub
