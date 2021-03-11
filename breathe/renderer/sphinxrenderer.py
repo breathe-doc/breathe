@@ -1277,7 +1277,10 @@ class SphinxRenderer:
 
             # Use rubric for the title because, unlike the docutils element "section",
             # it doesn't interfere with the document structure.
-            rubric = nodes.rubric(text=text, classes=['breathe-sectiondef-title'])
+            idtext = text.replace(' ', '-').lower()
+            rubric = nodes.rubric(text=text,
+                                  classes=['breathe-sectiondef-title'],
+                                  ids=['breathe-section-title-'+idtext])
             res = [rubric]  # type: List[Node]
             return res + node_list
         return []
