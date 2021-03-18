@@ -1844,9 +1844,19 @@ class SphinxRenderer:
             typename = ''.join(n.astext() for n in self.render(node.get_type()))
             if dom == 'c' and '::' in typename:
                 typename = typename.replace('::', '.')
+            elif dom == 'cs':
+                typename = typename.replace(' ', '')
             elements.append(typename)
             elements.append(name)
             elements.append(node.get_argsstring())
+            if dom == 'cs':
+                if node.get_gettable() or node.get_settable():
+                    elements.append('{')
+                    if node.get_gettable():
+                        elements.append('get;')
+                    if node.get_settable():
+                        elements.append('set;')
+                    elements.append('}')
             elements.append(self.make_initializer(node))
             declaration = ' '.join(elements)
         if not dom or dom in ('c', 'cpp', 'py', 'cs'):
