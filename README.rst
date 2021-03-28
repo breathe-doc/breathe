@@ -172,6 +172,10 @@ Change Log
 
 Inspired by `Keepachangelog.com <http://keepachangelog.com/>`__.
 
+- Unreleased - Breathe v4.28.0
+
+  - Code and documentation for membergroups and members-only options. #637
+
 - 2021-02-16 - Breathe v4.27.0
 
   - Add various specifiers to functions and variables. #628
