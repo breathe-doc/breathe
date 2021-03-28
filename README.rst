@@ -175,6 +175,7 @@ Inspired by `Keepachangelog.com <http://keepachangelog.com/>`__.
 - Unreleased - Breathe v4.28.0
 
   - Code and documentation for membergroups and members-only options. #637
+  - Add example.tag to gitignore as it gets modified during build process. #644
 
 - 2021-02-16 - Breathe v4.27.0
 
