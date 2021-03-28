@@ -8,8 +8,8 @@ doxygenstruct Directive
 
 This directive generates the appropriate output for a single struct. It takes the
 standard ``project``, ``path``, ``outline`` and ``no-link`` options and
-additionally the ``members``, ``protected-members``, ``private-members`` and
-``undoc-members`` options.
+additionally the ``members``, ``protected-members``, ``private-members``,
+``undoc-members``, ``membergroups`` and ``members-only`` options.
 
 ``members``
    Designed to behavior in a similar manner to the ``members`` option for the
@@ -30,6 +30,14 @@ additionally the ``members``, ``protected-members``, ``private-members`` and
 
 ``undoc-members``
    If specified, the undocumented members of the struct will be displayed.
+
+``membergroups``
+  If specified, only the groups in a space-delimited list following this
+  directive will be displayed.
+
+``members-only``
+  This will allow to show only the members, not the struct information. Child
+  classes and structs are also not shown.
 
 If you would like to always specify some combination of ``members``,
 ``protected-members``, ``private-members`` and ``undoc-members`` then you can
@@ -171,7 +179,23 @@ It produces this output:
 
    Undocumented internal classes are still not shown in the output due to an
    implementation issue. Please post an issue on github if you would like this
-   resolved.  
+   resolved.
+
+
+Membergroups
+------------
+
+.. cpp:namespace:: @ex_struct_membersgroups
+
+Lists one or more names member groups.
+
+See the :ref:`doxygenclass documentation <class-example-membergroups>`.
+
+
+Members-only
+------------
+
+See the :ref:`doxygenclass documentation <class-example-membersonly>`.
 
 
 Outline Example

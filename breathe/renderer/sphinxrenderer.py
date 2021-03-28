@@ -971,6 +971,12 @@ class SphinxRenderer:
             display_obj_type = 'interface' if kind == 'interface' else None
             nodes = self.handle_declaration(nodeDef, declaration, content_callback=content,
                                             display_obj_type=display_obj_type)
+            if 'members-only' in self.context.directive_args[2]:
+                assert len(nodes) >= 2
+                assert isinstance(nodes[1], addnodes.desc)
+                assert len(nodes[1]) >= 2
+                assert isinstance(nodes[1][1], addnodes.desc_content)
+                return nodes[1][1].children
         return nodes
 
     def visit_namespace(self, node) -> List[Node]:
@@ -1160,6 +1166,9 @@ class SphinxRenderer:
         section_order = None
         if 'sections' in options:
             section_order = {sec: i for i, sec in enumerate(options['sections'].split(' '))}
+        membergroup_order = None
+        if 'membergroups' in options:
+            membergroup_order = {sec: i for i, sec in enumerate(options['membergroups'].split(' '))}
         nodemap = {}  # type: Dict[int, List[Node]]
 
         def addnode(kind, lam):
@@ -1168,23 +1177,25 @@ class SphinxRenderer:
             elif kind in section_order:
                 nodemap.setdefault(section_order[kind], []).extend(lam())
 
-        addnode('briefdescription', lambda: self.render_optional(node.briefdescription))
-        addnode('detaileddescription', lambda: self.render_optional(node.detaileddescription))
+        if 'members-only' not in options:
+            addnode('briefdescription', lambda: self.render_optional(node.briefdescription))
+            addnode('detaileddescription', lambda: self.render_optional(node.detaileddescription))
 
-        def render_derivedcompoundref(node):
-            if node is None:
-                return []
-            output = self.render_iterable(node)
-            if not output:
-                return []
-            return [nodes.paragraph(
-                '',
-                '',
-                nodes.Text('Subclassed by '),
-                *intersperse(output, nodes.Text(', '))
-            )]
+            def render_derivedcompoundref(node):
+                if node is None:
+                    return []
+                output = self.render_iterable(node)
+                if not output:
+                    return []
+                return [nodes.paragraph(
+                    '',
+                    '',
+                    nodes.Text('Subclassed by '),
+                    *intersperse(output, nodes.Text(', '))
+                )]
 
-        addnode('derivedcompoundref', lambda: render_derivedcompoundref(node.derivedcompoundref))
+            addnode('derivedcompoundref',
+                    lambda: render_derivedcompoundref(node.derivedcompoundref))
 
         section_nodelists = {}  # type: Dict[str, List[Node]]
 
@@ -1192,6 +1203,9 @@ class SphinxRenderer:
         for sectiondef in node.sectiondef:
             kind = sectiondef.kind
             if section_order is not None and kind not in section_order:
+                continue
+            header = sectiondef.header
+            if membergroup_order is not None and header not in membergroup_order:
                 continue
             child_nodes = self.render(sectiondef)
             if not child_nodes:
@@ -1229,6 +1243,8 @@ class SphinxRenderer:
     section_titles = dict(sections)
 
     def visit_sectiondef(self, node) -> List[Node]:
+        self.context = cast(RenderContext, self.context)
+        options = self.context.directive_args[2]
         node_list = []
         node_list.extend(self.render_optional(node.description))
 
@@ -1236,6 +1252,9 @@ class SphinxRenderer:
         node_list.extend(self.render_iterable(node.memberdef))
 
         if node_list:
+            if 'members-only' in options:
+                return node_list
+
             text = self.section_titles[node.kind]
             # Override default name for user-defined sections. Use "Unnamed
             # Group" if the user didn't name the section
