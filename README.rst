@@ -177,6 +177,7 @@ Inspired by `Keepachangelog.com <http://keepachangelog.com/>`__.
   - When rendering a section, add target after title. #647
   - Render pages content in order. #651
   - Adds an ID to the rubric created for each section of a group. #658
+  - Add missing getter and setter for C#. #661
 
 - 2021-02-16 - Breathe v4.27.0
 
