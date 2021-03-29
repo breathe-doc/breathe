@@ -1093,25 +1093,34 @@ class SphinxRenderer:
 
     def visit_file(self, node) -> List[Node]:
         def render_signature(file_data, doxygen_target, name, kind):
-            # Build targets for linking
-            targets = []
-            targets.extend(doxygen_target)
+            self.context = cast(RenderContext, self.context)
+            options = self.context.directive_args[2]
 
-            title_signode = addnodes.desc_signature()
-            title_signode.extend(targets)
+            if "content-only" in options:
+                rst_node = nodes.container()
+            else:
+                rst_node = addnodes.desc()
 
-            # Set up the title
-            title_signode.append(nodes.emphasis(text=kind))
-            title_signode.append(nodes.Text(" "))
-            title_signode.append(addnodes.desc_name(text=name))
+                # Build targets for linking
+                targets = []
+                targets.extend(doxygen_target)
 
-            contentnode = addnodes.desc_content()
+                title_signode = addnodes.desc_signature()
+                title_signode.extend(targets)
 
-            rst_node = addnodes.desc()
+                # Set up the title
+                title_signode.append(nodes.emphasis(text=kind))
+                title_signode.append(nodes.Text(" "))
+                title_signode.append(addnodes.desc_name(text=name))
+
+                rst_node.append(title_signode)
+
             rst_node.document = self.state.document
             rst_node['objtype'] = kind
-            rst_node.append(title_signode)
+
+            contentnode = addnodes.desc_content()
             rst_node.append(contentnode)
+
             return [rst_node], contentnode
         return self.visit_compound(node, render_signature=render_signature)
 
