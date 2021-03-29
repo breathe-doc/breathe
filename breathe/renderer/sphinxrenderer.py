@@ -1318,22 +1318,27 @@ class SphinxRenderer:
         neighbouring instances of these things tend to each be in a separate neighbouring para tag.
         """
 
-        nodelist = self.render_iterable(node.content)
-        nodelist.extend(self.render_iterable(node.images))
+        nodelist = []
 
-        if self.app.config.breathe_order_parameters_first:  # type: ignore
-            # Order parameters before simplesects, which mainly are return/warnings/remarks
-            definition_nodes = self.render_iterable(node.parameterlist)
-            definition_nodes.extend(self.render_iterable(node.simplesects))
+        if self.context and self.context.directive_args[0] == "doxygenpage":
+            nodelist.extend(self.render_iterable(node.ordered_children))
         else:
-            # Returns, user par's, etc
-            definition_nodes = self.render_iterable(node.simplesects)
-            # Parameters/Exceptions
-            definition_nodes.extend(self.render_iterable(node.parameterlist))
+            nodelist.extend(self.render_iterable(node.content))
+            nodelist.extend(self.render_iterable(node.images))
 
-        if definition_nodes:
-            definition_list = nodes.definition_list("", *definition_nodes)
-            nodelist.append(definition_list)
+            if self.app.config.breathe_order_parameters_first:  # type: ignore
+                # Order parameters before simplesects, which mainly are return/warnings/remarks
+                definition_nodes = self.render_iterable(node.parameterlist)
+                definition_nodes.extend(self.render_iterable(node.simplesects))
+            else:
+                # Returns, user par's, etc
+                definition_nodes = self.render_iterable(node.simplesects)
+                # Parameters/Exceptions
+                definition_nodes.extend(self.render_iterable(node.parameterlist))
+
+            if definition_nodes:
+                definition_list = nodes.definition_list("", *definition_nodes)
+                nodelist.append(definition_list)
 
         return [nodes.paragraph("", "", *nodelist)]
 
