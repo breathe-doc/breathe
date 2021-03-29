@@ -179,6 +179,7 @@ Inspired by `Keepachangelog.com <http://keepachangelog.com/>`__.
   - Add support for content-only flag when rendering pages. #645
   - When rendering a section, add target after title. #647
   - Render pages content in order. #651
+  - Adds an ID to the rubric created for each section of a group. #658
 
 - 2021-02-16 - Breathe v4.27.0
 
