@@ -117,9 +117,13 @@ link in a GitHub issue.
 Release
 -------
 
-Command for releasing source bundle & wheel to PyPI::
+Commands for releasing source bundle & wheel to PyPI::
 
-    python setup.py sdist bdist_wheel upload
+    python setup.py sdist bdist_wheel
+    cd dist
+    # Verify files are file manually.
+    for i in *; do gpg -ba -- "$i"; done
+    twine upload *
 
 Credits
 -------
