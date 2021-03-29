@@ -4641,8 +4641,11 @@ class docRowType(GeneratedsSuper):
 class docEntryType(GeneratedsSuper):
     subclass = None
     superclass = None
-    def __init__(self, thead=None, para=None):
+    def __init__(self, thead=None, align=None, rowspan=None, colspan=None, para=None):
         self.thead = thead
+        self.align = align
+        self.rowspan = rowspan
+        self.colspan = colspan
         if para is None:
             self.para = []
         else:
@@ -4659,6 +4662,12 @@ class docEntryType(GeneratedsSuper):
     def insert_para(self, index, value): self.para[index] = value
     def get_thead(self): return self.thead
     def set_thead(self, thead): self.thead = thead
+    def get_align(self): return self.align
+    def set_align(self, align): self.align = align
+    def get_rowspan(self): return self.rowspan
+    def set_rowspan(self, rowspan): self.rowspan = rowspan
+    def get_colspan(self): return self.colspan
+    def set_colspan(self, colspan): self.colspan = colspan
     def export(self, outfile, level, namespace_='', name_='docEntryType', namespacedef_=''):
         showIndent(outfile, level)
         outfile.write('<%s%s %s' % (namespace_, name_, namespacedef_, ))
@@ -4673,6 +4682,12 @@ class docEntryType(GeneratedsSuper):
     def exportAttributes(self, outfile, level, namespace_='', name_='docEntryType'):
         if self.thead is not None:
             outfile.write(' thead=%s' % (quote_attrib(self.thead), ))
+        if self.align is not None:
+            outfile.write(' align=%s' % (quote_attrib(self.align), ))
+        if self.rowspan is not None:
+            outfile.write(' rowspan=%s' % (quote_attrib(self.rowspan), ))
+        if self.colspan is not None:
+            outfile.write(' colspan=%s' % (quote_attrib(self.colspan), ))
     def exportChildren(self, outfile, level, namespace_='', name_='docEntryType'):
         for para_ in self.para:
             para_.export(outfile, level, namespace_, name_='para')
@@ -4692,6 +4707,12 @@ class docEntryType(GeneratedsSuper):
     def buildAttributes(self, attrs):
         if attrs.get('thead'):
             self.thead = attrs.get('thead').value
+        if attrs.get('align'):
+            self.align = attrs.get('align').value
+        if attrs.get('rowspan'):
+            self.rowspan = attrs.get('rowspan').value
+        if attrs.get('colspan'):
+            self.colspan = attrs.get('colspan').value
     def buildChildren(self, child_, nodeName_):
         if child_.nodeType == Node.ELEMENT_NODE and \
             nodeName_ == 'para':

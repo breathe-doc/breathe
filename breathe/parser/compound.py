@@ -704,8 +704,8 @@ class docEntryTypeSub(supermod.docEntryType):
 
     node_type = "docentry"
 
-    def __init__(self, thead=None, para=None):
-        supermod.docEntryType.__init__(self, thead, para)
+    def __init__(self, thead=None, align=None, rowspan=None, colspan=None, para=None):
+        supermod.docEntryType.__init__(self, thead, align, rowspan, colspan, para)
 
 
 supermod.docEntryType.subclass = docEntryTypeSub
