@@ -178,6 +178,7 @@ Inspired by `Keepachangelog.com <http://keepachangelog.com/>`__.
   - Render pages content in order. #651
   - Adds an ID to the rubric created for each section of a group. #658
   - Add missing getter and setter for C#. #661
+  - Add support for rowspan/colspan to tables. #642
 
 - 2021-02-16 - Breathe v4.27.0
 
