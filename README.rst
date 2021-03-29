@@ -1,9 +1,6 @@
 Breathe
 =======
 
-**Packagers:** PGP signing key changes for Breathe >= v4.23.0.
-https://github.com/michaeljones/breathe/issues/591
-
 .. image:: https://github.com/michaeljones/breathe/workflows/unit%20tests/badge.svg
     :target: https://github.com/michaeljones/breathe/actions?query=workflow%3A%22unit+tests%22
 
