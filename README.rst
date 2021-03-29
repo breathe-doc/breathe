@@ -177,6 +177,7 @@ Inspired by `Keepachangelog.com <http://keepachangelog.com/>`__.
   - Code and documentation for membergroups and members-only options. #637
   - Add example.tag to gitignore as it gets modified during build process. #644
   - Add support for content-only flag when rendering pages. #645
+  - When rendering a section, add target after title. #647
 
 - 2021-02-16 - Breathe v4.27.0
 
