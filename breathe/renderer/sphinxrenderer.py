@@ -1735,7 +1735,7 @@ class SphinxRenderer:
                 elements = [self.create_template_prefix(node)]
                 if node.static == 'yes':
                     elements.append('static')
-                if node.inline == 'yes':
+                if node.inline == 'yes' and dom != 'cs':
                     elements.append('inline')
                 if node.kind == 'friend':
                     elements.append('friend')
