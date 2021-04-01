@@ -30,11 +30,9 @@ import six
 import textwrap
 from typing import Callable, cast, Dict, List, Optional, Tuple, Type, Union  # noqa
 
-
 ContentCallback = Callable[[addnodes.desc_content], None]
 Declarator = Union[addnodes.desc_signature, addnodes.desc_signature_line]
 DeclaratorCallback = Callable[[Declarator], None]
-
 
 _debug_indent = 0
 
@@ -362,7 +360,6 @@ def intersperse(iterable, delimiter):
 
 
 def get_param_decl(param):
-
     def to_string(node):
         """Convert Doxygen node content to a string."""
         result = []
@@ -430,7 +427,7 @@ class InlineText(Text):
     paragraph used by Text.
     """
     patterns = {'inlinetext': r''}
-    initial_transitions = [('inlinetext', )]
+    initial_transitions = [('inlinetext',)]
 
     def indent(self, match, context, next_state):
         """
@@ -628,6 +625,7 @@ class SphinxRenderer:
         if content_callback is None:
             def content(contentnode):
                 contentnode.extend(self.description(node))
+
             content_callback = content
         declaration = declaration.replace('\n', ' ')
         nodes_ = self.run_directive(obj_type, declaration, content_callback, options)
@@ -694,7 +692,7 @@ class SphinxRenderer:
                     print("{}{}".format(_debug_indent * '  ', 'res='))
                 return []
             if (node.node_type == 'compound' and
-                    node.kind not in ['file', 'namespace', 'group']) or \
+                node.kind not in ['file', 'namespace', 'group']) or \
                     node.node_type == 'memberdef':
                 # We skip the 'file' entries because the file name doesn't form part of the
                 # qualified name for the identifier. We skip the 'namespace' entries because if we
@@ -734,7 +732,7 @@ class SphinxRenderer:
             if node.node_type == 'ref' and len(names) == 0:
                 return node.valueOf_
             if (node.node_type == 'compound' and
-                    node.kind not in ['file', 'namespace', 'group']) or \
+                node.kind not in ['file', 'namespace', 'group']) or \
                     node.node_type == 'memberdef':
                 # We skip the 'file' entries because the file name doesn't form part of the
                 # qualified name for the identifier. We skip the 'namespace' entries because if we
@@ -812,8 +810,43 @@ class SphinxRenderer:
         return nodes_
 
     def description(self, node) -> List[Node]:
-        return self.render_optional(node.briefdescription) + \
-               self.render_optional(node.detaileddescription)
+        brief = self.render_optional(node.briefdescription)
+        detailedCand = self.render_optional(node.detaileddescription)
+        # all field_lists must be at the top-level of the desc_content, so pull them up
+        fieldLists = []  # type: List[nodes.field_list]
+        admonitions = []  # type: List[Union[nodes.warning, nodes.note]]
+
+        def pullup(node, typ, dest):
+            for n in node.traverse(typ):
+                del n.parent[n.parent.index(n)]
+                dest.append(n)
+
+        detailed = []
+        for candNode in detailedCand:
+            pullup(candNode, nodes.field_list, fieldLists)
+            pullup(candNode, nodes.note, admonitions)
+            pullup(candNode, nodes.warning, admonitions)
+            # and collapse paragraphs
+            for para in candNode.traverse(nodes.paragraph):
+                if para.parent and len(para.parent) == 1 \
+                        and isinstance(para.parent, nodes.paragraph):
+                    para.replace_self(para.children)
+
+            # and remove empty top-level paragraphs
+            if isinstance(candNode, nodes.paragraph) and len(candNode) == 0:
+                continue
+            detailed.append(candNode)
+
+        # make one big field list instead to the Sphinx transformer can make it pretty
+        if len(fieldLists) > 1:
+            fieldList = nodes.field_list()
+            for fl in fieldLists:
+                fieldList.extend(fl)
+            fieldLists = [fieldList]
+        if self.app.config.breathe_order_parameters_first:  # type: ignore
+            return brief + detailed + fieldLists + admonitions
+        else:
+            return brief + detailed + admonitions + fieldLists
 
     def update_signature(self, signature, obj_type):
         """Update the signature node if necessary, e.g. add qualifiers."""
@@ -914,6 +947,7 @@ class SphinxRenderer:
                                                        new_context.create_child_context(include)))
                 rendered_data = self.render(file_data, parent_context)
                 contentnode.extend(rendered_data)
+
             nodes = self.handle_declaration(nodeDef, declaration, content_callback=content)
         return nodes
 
@@ -1005,6 +1039,7 @@ class SphinxRenderer:
                                                        new_context.create_child_context(include)))
                 rendered_data = self.render(file_data, parent_context)
                 contentnode.extend(rendered_data)
+
             display_obj_type = 'namespace' if self.get_domain() != 'py' else 'module'
             nodes = self.handle_declaration(nodeDef, declaration, content_callback=content,
                                             display_obj_type=display_obj_type)
@@ -1016,6 +1051,7 @@ class SphinxRenderer:
 
         def get_node_info(file_data):
             return node.name, node.kind
+
         name, kind = kwargs.get('get_node_info', get_node_info)(file_data)
         if kind == 'union':
             dom = self.get_domain()
@@ -1081,8 +1117,8 @@ class SphinxRenderer:
             # Pretend that the signature is being rendered in context of the
             # definition, for proper domain detection
             nodes, contentnode = render_sig(
-                    file_data, self.target_handler.create_target(refid),
-                    name, kind)
+                file_data, self.target_handler.create_target(refid),
+                name, kind)
 
         if file_data.compounddef.includes:
             for include in file_data.compounddef.includes:
@@ -1122,6 +1158,7 @@ class SphinxRenderer:
             rst_node.append(contentnode)
 
             return [rst_node], contentnode
+
         return self.visit_compound(node, render_signature=render_signature)
 
     # We store both the identified and appropriate title text here as we want to define the order
@@ -1280,7 +1317,7 @@ class SphinxRenderer:
             idtext = text.replace(' ', '-').lower()
             rubric = nodes.rubric(text=text,
                                   classes=['breathe-sectiondef-title'],
-                                  ids=['breathe-section-title-'+idtext])
+                                  ids=['breathe-section-title-' + idtext])
             res = [rubric]  # type: List[Node]
             return res + node_list
         return []
@@ -1329,19 +1366,23 @@ class SphinxRenderer:
             nodelist.extend(self.render_iterable(node.content))
             nodelist.extend(self.render_iterable(node.images))
 
-            if self.app.config.breathe_order_parameters_first:  # type: ignore
-                # Order parameters before simplesects, which mainly are return/warnings/remarks
-                definition_nodes = self.render_iterable(node.parameterlist)
-                definition_nodes.extend(self.render_iterable(node.simplesects))
-            else:
-                # Returns, user par's, etc
-                definition_nodes = self.render_iterable(node.simplesects)
-                # Parameters/Exceptions
-                definition_nodes.extend(self.render_iterable(node.parameterlist))
+            paramList = self.render_iterable(node.parameterlist)
+            defs = []
+            fields = []
+            for n in self.render_iterable(node.simplesects):
+                if isinstance(n, nodes.definition_list_item):
+                    defs.append(n)
+                elif isinstance(n, nodes.field_list):
+                    fields.append(n)
+                else:
+                    nodelist.append(n)
 
-            if definition_nodes:
-                definition_list = nodes.definition_list("", *definition_nodes)
-                nodelist.append(definition_list)
+            # note: all these gets pulled up and reordered in description()
+            if len(defs) != 0:
+                deflist = nodes.definition_list('', *defs)
+                nodelist.append(deflist)
+            nodelist.extend(paramList)
+            nodelist.extend(fields)
 
         return [nodes.paragraph("", "", *nodelist)]
 
@@ -1398,7 +1439,21 @@ class SphinxRenderer:
     def visit_docsimplesect(self, node) -> List[Node]:
         """Other Type documentation such as Warning, Note, Returns, etc"""
 
+        # for those that should go into a field list, just render them as that,
+        # and it will be pulled up later
+
         nodelist = self.render_iterable(node.para)
+
+        if node.kind in ('pre', 'post', 'return'):
+            return [nodes.field_list('', nodes.field(
+                '',
+                nodes.field_name('', nodes.Text(node.kind)),
+                nodes.field_body('', *nodelist)
+            ))]
+        elif node.kind == 'warning':
+            return [nodes.warning('', *nodelist)]
+        elif node.kind == 'note':
+            return [nodes.note('', *nodelist)]
 
         if node.kind == "par":
             text = self.render(node.title)
@@ -1558,6 +1613,7 @@ class SphinxRenderer:
             name = node.content_[0].getValue()
             name = name.rsplit("::", 1)[-1]
             return name, file_data.compounddef.kind
+
         return self.visit_compound(node, False, get_node_info=get_node_info)
 
     def visit_doclistitem(self, node) -> List[Node]:
@@ -1836,6 +1892,7 @@ class SphinxRenderer:
             contentnode += title
             enums = self.render_iterable(node.enumvalue)
             contentnode.extend(enums)
+
         # TODO: scopedness, Doxygen doesn't seem to generate the xml for that
         # TODO: underlying type, Doxygen doesn't seem to generate the xml for that
         names = self.get_qualification()
@@ -1987,47 +2044,26 @@ class SphinxRenderer:
 
         return nodelist
 
-    lookup = {
-        "param": "Parameters",
-        "exception": "Exceptions",
-        "templateparam": "Template Parameters",
-        "retval": "Return Value",
-    }
-
     def visit_docparamlist(self, node) -> List[Node]:
-        """Parameter/Exception documentation"""
+        """Parameter/Exception/TemplateParameter documentation"""
 
-        nodelist = self.render_iterable(node.parameteritem)
+        fieldListName = {
+            "param": "param",
+            "exception": "throws",
+            "templateparam": "tparam",
+            "retval": "returns",
+        }
 
-        # Fild list entry
-        nodelist_list = nodes.bullet_list("", classes=["breatheparameterlist"], *nodelist)
-
-        term_text = self.lookup[node.kind]
-        term = nodes.term("", "", nodes.strong("", term_text))
-        definition = nodes.definition('', nodelist_list)
-
-        return [nodes.definition_list_item('', term, definition)]
-
-    def visit_docparamlistitem(self, node) -> List[Node]:
-        """ Parameter Description Renderer  """
-
-        nodelist = self.render_iterable(node.parameternamelist)
-        term = nodes.literal("", "", *nodelist)
-        separator = nodes.Text(": ")
-        nodelist = self.render_optional(node.parameterdescription)
-
-        # If we have some contents from the parameterdescription then we assume that first entry
-        # will be a paragraph object and we reach in and insert the term & separate to the start of
-        # that first paragraph so that the description appears inline with the term & separator
-        # instead of having it's own paragraph which feels disconnected
-        #
-        # If there is no description then render then term by itself
-        if nodelist:
-            nodelist[0].insert(0, term)  # type: ignore
-            nodelist[0].insert(1, separator)    # type: ignore
-        else:
-            nodelist = [term]
-        return [nodes.list_item("", *nodelist)]
+        # https://docutils.sourceforge.io/docs/ref/doctree.html#field-list
+        fieldList = nodes.field_list()
+        for item in node.parameteritem:
+            name = nodes.field_name(
+                '', nodes.Text(fieldListName[node.kind] + ' '),
+                *self.render_iterable(item.parameternamelist))
+            body = nodes.field_body('', *self.render_optional(item.parameterdescription))
+            field = nodes.field('', name, body)
+            fieldList += field
+        return [fieldList]
 
     def visit_docparamnamelist(self, node) -> List[Node]:
         """ Parameter Name Renderer"""
@@ -2118,7 +2154,6 @@ class SphinxRenderer:
         "description": visit_description,
         "param": visit_param,
         "docparamlist": visit_docparamlist,
-        "docparamlistitem": visit_docparamlistitem,
         "docparamnamelist": visit_docparamnamelist,
         "docparamname": visit_docparamname,
         "templateparamlist": visit_templateparamlist,
