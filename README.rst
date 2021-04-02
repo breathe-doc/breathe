@@ -175,10 +175,11 @@ Change Log
 
 Inspired by `Keepachangelog.com <http://keepachangelog.com/>`__.
 
-- Unreleased - Breathe v4.28.1
+- Unreleased - Breathe v4.29.0
 
   - Do not add inline modifier for C#. #668
   - Use add_css_file instead of deprecated/removed add_stylesheet. #669
+  - Use native docutils for field lists, notes, and warnings. #670
 
 - 2021-03-29 - Breathe v4.28.0
 
