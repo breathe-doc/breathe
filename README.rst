@@ -175,6 +175,10 @@ Change Log
 
 Inspired by `Keepachangelog.com <http://keepachangelog.com/>`__.
 
+- Unreleased - Breathe v4.28.1
+
+  - Do not add inline modifier for C#. #668
+
 - 2021-03-29 - Breathe v4.28.0
 
   - Code and documentation for membergroups and members-only options. #637
