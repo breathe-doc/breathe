@@ -593,7 +593,7 @@ def setup(app: Sphinx) -> None:
 
     breathe_css = "breathe.css"
     if (os.path.exists(os.path.join(app.confdir, "_static", breathe_css))):  # type: ignore
-        app.add_stylesheet(breathe_css)
+        app.add_css_file(breathe_css)
 
     def write_file(directory, filename, content):
         # Check the directory exists
