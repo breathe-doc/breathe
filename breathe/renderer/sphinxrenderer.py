@@ -605,14 +605,19 @@ class SphinxRenderer:
             _debug_indent -= 1
 
         # Filter out outer class names if we are rendering a member as a part of a class content.
-        rst_node = nodes[1]
-        finder = NodeFinder(rst_node.document)
-        rst_node.walk(finder)
+        # In some cases of errors with a declaration there are no nodes
+        # (e.g., variable in function), so perhaps skip (see #671).
+        # If there are nodes, there should be at least 2.
+        if len(nodes) != 0:
+            assert len(nodes) >= 2, nodes
+            rst_node = nodes[1]
+            finder = NodeFinder(rst_node.document)
+            rst_node.walk(finder)
 
-        signode = finder.declarator
+            signode = finder.declarator
 
-        if self.context.child:
-            signode.children = [n for n in signode.children if not n.tagname == 'desc_addname']
+            if self.context.child:
+                signode.children = [n for n in signode.children if not n.tagname == 'desc_addname']
         return nodes
 
     def handle_declaration(self, node, declaration: str, *, obj_type: str = None,
@@ -639,7 +644,11 @@ class SphinxRenderer:
 
         # <desc><desc_signature> and then one or more <desc_signature_line>
         # each <desc_signature_line> has a sphinx_line_type which hints what is present in that line
-        assert len(nodes_) >= 1
+        # In some cases of errors with a declaration there are no nodes
+        # (e.g., variable in function), so perhaps skip (see #671).
+        if len(nodes_) == 0:
+            return []
+        assert len(nodes_) >= 2, nodes_
         desc = nodes_[1]
         assert isinstance(desc, addnodes.desc)
         assert len(desc) >= 1
