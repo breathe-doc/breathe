@@ -1,0 +1,121 @@
+#!/bin/sh
+
+set -eu
+
+hash cd
+hash git
+hash gpg
+hash mkdir
+hash printf
+hash python3
+hash rm
+hash tar
+hash twine
+
+# Melvin Vermeeren <vermeeren@vermwa.re>
+PGP_KEY='8AED 5802 1FEA CDD5 F27B  A0E6 A72F 6277 16EA 9D96'
+
+REPO_WWW='https://github.com/michaeljones/breathe'
+
+help()
+{
+	printf 'Usage: %s pack\n' "$0"
+	printf 'Usage: %s sign\n' "$0"
+	printf 'Usage: %s upload\n' "$0"
+	printf 'Usage: %s clean\n' "$0"
+	return 0
+}
+
+pack()
+(
+	mkdir -- mkrelease_tmp
+
+	git archive \
+		--format=tar.gz \
+		--prefix="breathe-$version/" \
+		-o "mkrelease_tmp/breathe-$version.tar.gz" \
+		-- "v$version" \
+
+	cd -- mkrelease_tmp
+	tar -xf "breathe-$version.tar.gz"
+
+	cd -- "breathe-$version"
+	python3 setup.py sdist bdist_wheel
+	mv -- dist ..
+
+	cd -- ..
+	rm -r -- "breathe-$version"
+
+	exit 0
+)
+
+sign()
+(
+	cd -- mkrelease_tmp
+
+	gpg -bu "$PGP_KEY" -- "breathe-$version.tar.gz"
+
+	for file in dist/*; do
+		gpg -bau "$PGP_KEY" -- "$file"
+	done
+
+	exit 0
+)
+
+upload()
+(
+	cd -- mkrelease_tmp
+
+	twine upload -- dist/*
+
+	{
+	printf 'Note: Source tarball signature must be uploaded manually.\n'
+	printf '\tCreate a new release on GitHub for version: %s\n' "$version"
+	printf '\tThe source tarball itself must not be uploaded.\n'
+	printf '\t%s\n' "$REPO_WWW/releases/new?tag=v$version"
+	} >&2
+
+	exit 0
+)
+
+clean()
+(
+	if [ -d mkrelease_tmp ]; then
+		rm -r -- mkrelease_tmp
+	fi
+
+	exit 0
+)
+
+if [ "$#" -eq 0 ]; then
+	help >&2
+	exit 1
+fi
+
+if [ ! -d .git ]; then
+	printf 'Error: Not executed from repository root\n' >&2
+	exit 1
+fi
+
+if ! version="$(git describe --tags --exact)"; then
+	printf 'Error: Cannot retrieve version from git.\n' >&2
+	exit 1
+fi
+version="${version#v}"
+
+command="$1"
+
+case "$command" in
+pack|sign|upload|clean)
+	"$command"
+	;;
+*)
+	{
+	printf 'Error: Unknown command: %s\n' "$command"
+	printf '\n'
+	help
+	} >&2
+	exit 1
+esac
+
+exit 0

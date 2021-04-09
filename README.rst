@@ -119,13 +119,7 @@ link in a GitHub issue.
 Release
 -------
 
-Commands for releasing source bundle & wheel to PyPI::
-
-    python setup.py sdist bdist_wheel
-    cd dist
-    # Verify files are file manually.
-    for i in *; do gpg -ba -- "$i"; done
-    twine upload *
+See the mkrelease utility in the root of the repository.
 
 Credits
 -------
