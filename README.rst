@@ -1,7 +1,8 @@
 Breathe
 =======
 
-**Packagers:** Breathe packages on PyPI are PGP signed for Breathe >= v4.28.0.\
+**Packagers:** Breathe packages on PyPI are PGP signed for Breathe >= v4.28.0.
+
 **Packagers:** Breathe tarballs on GitHub are PGP signed for Breathe >= v4.29.0.
 
 .. image:: https://github.com/michaeljones/breathe/workflows/unit%20tests/badge.svg
