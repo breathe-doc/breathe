@@ -180,6 +180,7 @@ Inspired by `Keepachangelog.com <http://keepachangelog.com/>`__.
   - Do not add inline modifier for C#. #668
   - Use add_css_file instead of deprecated/removed add_stylesheet. #669
   - Use native docutils for field lists, notes, and warnings. #670
+  - Handle directives returning no nodes on error. #672
 
 - 2021-03-29 - Breathe v4.28.0
 
