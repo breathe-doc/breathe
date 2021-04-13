@@ -2066,20 +2066,43 @@ class SphinxRenderer:
         # https://docutils.sourceforge.io/docs/ref/doctree.html#field-list
         fieldList = nodes.field_list()
         for item in node.parameteritem:
+            # TODO: does item.parameternamelist really have more than 1 parametername?
+            assert len(item.parameternamelist) <= 1, item.parameternamelist
+            nameNodes = []
+            parameterDirectionNodes = []
+            if len(item.parameternamelist) != 0:
+                paramNameNodes = item.parameternamelist[0].parametername
+                # TODO: how many elements can paramNameNodes have?
+                assert len(paramNameNodes) <= 1, paramNameNodes
+                if len(paramNameNodes) != 0:
+                    content = paramNameNodes[0].content_
+                    # this is really a list of MixedContainer objects, i.e., a generic object
+                    # we assume there is either 1 or 2 elements, if there is 2 the first is the
+                    # parameter direction
+                    assert len(content) == 1 or len(content) == 2, content
+                    nameNodes = self.render(content[-1])
+                    if len(content) == 2:
+                        dir = ''.join(n.astext() for n in self.render(content[0])).strip()
+                        assert dir in ('[in]', '[out]', '[inout]'), ">" + dir + "<"
+                        parameterDirectionNodes = [
+                            nodes.strong(dir, dir),
+                            nodes.Text(' ', ' ')
+                        ]
+
             name = nodes.field_name(
                 '', nodes.Text(fieldListName[node.kind] + ' '),
-                *self.render_iterable(item.parameternamelist))
-            body = nodes.field_body('', *self.render_optional(item.parameterdescription))
+                *nameNodes)
+            bodyNodes = self.render_optional(item.parameterdescription)
+            # TODO: is it correct that bodyNodes is either empty or a single paragraph?
+            assert len(bodyNodes) <= 1, bodyNodes
+            if len(bodyNodes) == 1:
+                assert isinstance(bodyNodes[0], nodes.paragraph)
+                bodyNodes = [nodes.paragraph(
+                    '', '', *(parameterDirectionNodes + bodyNodes[0].children))]
+            body = nodes.field_body('', *bodyNodes)
             field = nodes.field('', name, body)
             fieldList += field
         return [fieldList]
-
-    def visit_docparamnamelist(self, node) -> List[Node]:
-        """ Parameter Name Renderer"""
-        return self.render_iterable(node.parametername)
-
-    def visit_docparamname(self, node) -> List[Node]:
-        return self.render_iterable(node.content_)
 
     def visit_templateparamlist(self, node) -> List[Node]:
         nodelist = []  # type: List[Node]
@@ -2163,8 +2186,6 @@ class SphinxRenderer:
         "description": visit_description,
         "param": visit_param,
         "docparamlist": visit_docparamlist,
-        "docparamnamelist": visit_docparamnamelist,
-        "docparamname": visit_docparamname,
         "templateparamlist": visit_templateparamlist,
         "docxrefsect": visit_docxrefsect,
         "docvariablelist": visit_docvariablelist,
