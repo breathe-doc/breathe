@@ -288,11 +288,21 @@ def test_render_func(app):
                                   param=[WrappedParam(type_=WrappedLinkedText(content_=[WrappedMixedContainer(value=u'int')]))])
     signature = find_node(render(app, member_def), 'desc_signature')
     assert signature.astext().startswith('void')
-    assert find_node(signature, 'desc_name')[0] == 'foo'
+    if sphinx.version_info[0] < 4:
+        assert find_node(signature, 'desc_name')[0] == 'foo'
+    else:
+        n = find_node(signature, 'desc_name')[0]
+        assert isinstance(n, sphinx.addnodes.desc_sig_name)
+        assert len(n) == 1
+        assert n[0] == 'foo'
     params = find_node(signature, 'desc_parameterlist')
     assert len(params) == 1
     param = params[0]
-    assert param[0] == 'int'
+    if sphinx.version_info[0] < 4:
+        assert param[0] == 'int'
+    else:
+        assert isinstance(param[0], sphinx.addnodes.desc_sig_keyword_type)
+        assert param[0][0] == 'int'
 
 
 def test_render_typedef(app):
@@ -312,10 +322,15 @@ def test_render_c_function_typedef(app):
                                   type_='void* (*', name='voidFuncPtr', argsstring=')(float, int)')
     signature = find_node(render(app, member_def, domain='c'), 'desc_signature')
     assert signature.astext().startswith('typedef void *')
-    params = find_node(signature, 'desc_parameterlist')
-    assert len(params) == 2
-    assert params[0].astext() == "float"
-    assert params[1].astext() == "int"
+    if sphinx.version_info[0] < 4:
+        params = find_node(signature, 'desc_parameterlist')
+        assert len(params) == 2
+        assert params[0].astext() == "float"
+        assert params[1].astext() == "int"
+    else:
+        # the use of desc_parameterlist in this case was not correct,
+        # it should only be used for a top-level function
+        pass
 
 
 def test_render_using_alias(app):

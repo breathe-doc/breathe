@@ -14,10 +14,10 @@ Breathe is an extension to reStructuredText and Sphinx to be able to read and
  render `Doxygen <http://www.doxygen.org>`__ xml output.
 '''
 
-requires = ['Sphinx>=3.0,<3.6', 'docutils>=0.12', 'six>=1.9']
+requires = ['Sphinx>=3.0,<5', 'docutils>=0.12', 'six>=1.9']
 
-if sys.version_info < (3, 5):
-    print('ERROR: Sphinx requires at least Python 3.5 to run.')
+if sys.version_info < (3, 6):
+    print('ERROR: Sphinx requires at least Python 3.6 to run.')
     sys.exit(1)
 
 
