@@ -26,7 +26,6 @@ except ImportError:
     cs = None
 
 import re
-import six
 import textwrap
 from typing import Callable, cast, Dict, List, Optional, Tuple, Type, Union  # noqa
 
@@ -366,7 +365,7 @@ def get_param_decl(param):
         if node is not None:
             for p in node.content_:
                 value = p.value
-                if not isinstance(value, six.text_type):
+                if not isinstance(value, str):
                     value = value.valueOf_
                 result.append(value)
         return ' '.join(result)
@@ -555,7 +554,7 @@ class SphinxRenderer:
         node = node_stack[0]
         # An enumvalue node doesn't have location, so use its parent node for detecting
         # the domain instead.
-        if isinstance(node, six.string_types) or node.node_type == "enumvalue":
+        if isinstance(node, str) or node.node_type == "enumvalue":
             node = node_stack[1]
         filename = get_filename(node)
         if not filename and node.node_type == "compound":
@@ -917,7 +916,7 @@ class SphinxRenderer:
                 return [nodes.paragraph('', '', nodes.Text(line))
                         for line in node.split(delimiter) if line.strip()]
             return [nodes.Text(node)]
-        if node == six.u(" "):
+        if node == " ":
             return [nodes.Text(node)]
         return []
 
@@ -2020,7 +2019,7 @@ class SphinxRenderer:
         if node.type_:
             type_nodes = self.render(node.type_)
             # Render keywords as annotations for consistency with the cpp domain.
-            if len(type_nodes) > 0 and isinstance(type_nodes[0], six.text_type):
+            if len(type_nodes) > 0 and isinstance(type_nodes[0], str):
                 first_node = type_nodes[0]
                 for keyword in ['typename', 'class']:
                     if first_node.startswith(keyword + ' '):
@@ -2184,7 +2183,7 @@ class SphinxRenderer:
             self.context = cast(RenderContext, self.context)
             if not self.filter_.allow(self.context.node_stack):
                 pass
-            elif isinstance(node, six.string_types):
+            elif isinstance(node, str):
                 result = self.visit_unicode(node)
             else:
                 method = SphinxRenderer.methods.get(node.node_type, SphinxRenderer.visit_unknown)
