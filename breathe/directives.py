@@ -62,6 +62,8 @@ class DoxygenFunctionDirective(BaseDirective):
             (namespace, function_name) = namespaced_function.rsplit("::", 1)
         except ValueError:
             (namespace, function_name) = "", namespaced_function
+        namespace = namespace.strip()
+        function_name = function_name.strip()
 
         try:
             project_info = self.project_info_factory.create_project_info(self.options)
