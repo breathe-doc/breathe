@@ -1,4 +1,4 @@
-from breathe.parser import DoxygenCompoundParser
+from breathe.parser import DoxygenCompoundParser, compoundsuper
 from breathe.project import ProjectInfo
 from breathe.renderer import RenderContext
 from breathe.renderer.filter import Filter
@@ -897,29 +897,6 @@ class SphinxRenderer:
         contentnode.extend(description)
         return nodes
 
-    def visit_unicode(self, node) -> List[Node]:
-        # Skip any nodes that are pure whitespace
-        # Probably need a better way to do this as currently we're only doing
-        # it skip whitespace between higher-level nodes, but this will also
-        # skip any pure whitespace entries in actual content nodes
-        #
-        # We counter that second issue slightly by allowing through single white spaces
-        #
-        if node.strip():
-            delimiter = None
-            if "<linebreak>" in node:
-                delimiter = "<linebreak>"
-            elif "\n" in node:
-                delimiter = "\n"
-            if delimiter:
-                # Render lines as paragraphs because RST doesn't have line breaks.
-                return [nodes.paragraph('', '', nodes.Text(line))
-                        for line in node.split(delimiter) if line.strip()]
-            return [nodes.Text(node)]
-        if node == " ":
-            return [nodes.Text(node)]
-        return []
-
     def visit_doxygen(self, node) -> List[Node]:
         nodelist = []
 
@@ -1371,7 +1348,18 @@ class SphinxRenderer:
         if self.context and self.context.directive_args[0] == "doxygenpage":
             nodelist.extend(self.render_iterable(node.ordered_children))
         else:
-            nodelist.extend(self.render_iterable(node.content))
+            contentNodeCands = self.render_iterable(node.content)
+            # if there are consecutive nodes.Text we should collapse them
+            # and rerender them to ensure the right paragraphifaction
+            contentNodes = []  # type: List[Node]
+            for n in contentNodeCands:
+                if len(contentNodes) != 0 and isinstance(contentNodes[-1], nodes.Text):
+                    if isinstance(n, nodes.Text):
+                        prev = contentNodes.pop()
+                        contentNodes.extend(self.render_string(prev.astext() + n.astext()))
+                        continue  # we have handled this node
+                contentNodes.append(n)
+            nodelist.extend(contentNodes)
             nodelist.extend(self.render_iterable(node.images))
 
             paramList = self.render_iterable(node.parameterlist)
@@ -1778,7 +1766,7 @@ class SphinxRenderer:
 
         return [table]
 
-    def visit_mixedcontainer(self, node) -> List[Node]:
+    def visit_mixedcontainer(self, node: compoundsuper.MixedContainer) -> List[Node]:
         return self.render_optional(node.getValue())
 
     def visit_description(self, node) -> List[Node]:
@@ -2174,7 +2162,33 @@ class SphinxRenderer:
         "docentry": visit_docentry,
     }
 
-    def render(self, node, context: Optional[RenderContext] = None) -> List[Node]:
+    def render_string(self, node: str) -> List[Union[nodes.Text, nodes.paragraph]]:
+        # Skip any nodes that are pure whitespace
+        # Probably need a better way to do this as currently we're only doing
+        # it skip whitespace between higher-level nodes, but this will also
+        # skip any pure whitespace entries in actual content nodes
+        #
+        # We counter that second issue slightly by allowing through single white spaces
+        #
+        stripped = node.strip()
+        if stripped:
+            delimiter = None
+            if "<linebreak>" in stripped:
+                delimiter = "<linebreak>"
+            elif "\n" in stripped:
+                delimiter = "\n"
+            if delimiter:
+                # Render lines as paragraphs because RST doesn't have line breaks.
+                return [nodes.paragraph('', '', nodes.Text(line.strip()))
+                        for line in node.split(delimiter) if line.strip()]
+            # importantly, don't strip whitespace as visit_docpara uses it to collapse
+            # consecutive nodes.Text and rerender them with this function.
+            return [nodes.Text(node)]
+        if node == " ":
+            return [nodes.Text(node)]
+        return []
+
+    def render(self, node: Node, context: Optional[RenderContext] = None) -> List[Node]:
         if context is None:
             self.context = cast(RenderContext, self.context)
             context = self.context.create_child_context(node)
@@ -2184,17 +2198,17 @@ class SphinxRenderer:
             if not self.filter_.allow(self.context.node_stack):
                 pass
             elif isinstance(node, str):
-                result = self.visit_unicode(node)
+                result = self.render_string(node)
             else:
                 method = SphinxRenderer.methods.get(node.node_type, SphinxRenderer.visit_unknown)
                 result = method(self, node)
         return result
 
-    def render_optional(self, node) -> List[Node]:
+    def render_optional(self, node: Node) -> List[Node]:
         """Render a node that can be None."""
         return self.render(node) if node else []
 
-    def render_iterable(self, iterable) -> List[Node]:
+    def render_iterable(self, iterable: List[Node]) -> List[Node]:
         output = []
         for entry in iterable:
             output.extend(self.render(entry))
