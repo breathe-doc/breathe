@@ -1,6 +1,6 @@
 import sphinx
 
-from breathe.parser import DoxygenCompoundParser, compoundsuper
+from breathe.parser import compound, compoundsuper, DoxygenCompoundParser
 from breathe.project import ProjectInfo
 from breathe.renderer import RenderContext
 from breathe.renderer.filter import Filter
@@ -916,8 +916,8 @@ class SphinxRenderer:
         nodelist = []
 
         # Process all the compound children
-        for compound in node.get_compound():
-            nodelist.extend(self.render(compound))
+        for n in node.get_compound():
+            nodelist.extend(self.render(n))
         return nodelist
 
     def visit_doxygendef(self, node) -> List[Node]:
@@ -2019,7 +2019,8 @@ class SphinxRenderer:
         signode += nodes.Text(node.name)
         return [desc]
 
-    def visit_param(self, node) -> List[Node]:
+    def visit_param(self, node: compound.paramTypeSub, *,
+                    insertDeclNameByParsing: bool = False) -> List[Node]:
         nodelist = []
 
         # Parameter type
@@ -2037,10 +2038,30 @@ class SphinxRenderer:
 
         # Parameter name
         if node.declname:
-            if nodelist:
-                nodelist.append(nodes.Text(" "))
-            nodelist.append(nodes.emphasis(text=node.declname))
+            dom = self.get_domain()
+            if not dom:
+                dom = 'cpp'
+            appendDeclName = True
+            if insertDeclNameByParsing:
+                if dom == 'cpp' and sphinx.version_info >= (4, 1, 0):
+                    parser = cpp.DefinitionParser(
+                        ''.join(n.astext() for n in nodelist),
+                        location=self.state.state_machine.get_source_and_line(),
+                        config=self.app.config)
+                    ast = parser._parse_type(named='single', outer='templateParam')
+                    assert ast.name is None
+                    nn = cpp.ASTNestedName(
+                        names=[cpp.ASTNestedNameElement(cpp.ASTIdentifier(node.declname), None)],
+                        templates=[False], rooted=False)
+                    ast.name = nn
+                    # the actual nodes don't matter, as it is astext()-ed later
+                    nodelist = [nodes.Text(str(ast))]
+                    appendDeclName = False
 
+            if appendDeclName:
+                if nodelist:
+                    nodelist.append(nodes.Text(" "))
+                nodelist.append(nodes.emphasis(text=node.declname))
         elif self.output_defname and node.defname:
             # We only want to output the definition name (from the cpp file) if the declaration name
             # (from header file) isn't present
@@ -2057,6 +2078,16 @@ class SphinxRenderer:
             nodelist.append(nodes.Text(" = "))
             nodelist.extend(self.render(node.defval))
 
+        return nodelist
+
+    def visit_templateparamlist(self, node: compound.templateparamlistTypeSub) -> List[Node]:
+        nodelist = []  # type: List[Node]
+        self.output_defname = False
+        for i, item in enumerate(node.param):
+            if i:
+                nodelist.append(nodes.Text(", "))
+            nodelist.extend(self.visit_param(item, insertDeclNameByParsing=True))
+        self.output_defname = True
         return nodelist
 
     def visit_docparamlist(self, node) -> List[Node]:
@@ -2109,16 +2140,6 @@ class SphinxRenderer:
             field = nodes.field('', name, body)
             fieldList += field
         return [fieldList]
-
-    def visit_templateparamlist(self, node) -> List[Node]:
-        nodelist = []  # type: List[Node]
-        self.output_defname = False
-        for i, item in enumerate(node.param):
-            if i:
-                nodelist.append(nodes.Text(", "))
-            nodelist.extend(self.render(item))
-        self.output_defname = True
-        return nodelist
 
     def visit_unknown(self, node) -> List[Node]:
         """Visit a node of unknown type."""
@@ -2191,8 +2212,8 @@ class SphinxRenderer:
         "mixedcontainer": visit_mixedcontainer,
         "description": visit_description,
         "param": visit_param,
-        "docparamlist": visit_docparamlist,
         "templateparamlist": visit_templateparamlist,
+        "docparamlist": visit_docparamlist,
         "docxrefsect": visit_docxrefsect,
         "docvariablelist": visit_docvariablelist,
         "docvarlistentry": visit_docvarlistentry,
@@ -2241,7 +2262,7 @@ class SphinxRenderer:
                 result = self.render_string(node)
             else:
                 method = SphinxRenderer.methods.get(node.node_type, SphinxRenderer.visit_unknown)
-                result = method(self, node)
+                result = method(self, node)  # type: ignore
         return result
 
     def render_optional(self, node: Node) -> List[Node]:
