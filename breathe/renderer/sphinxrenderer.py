@@ -1,3 +1,5 @@
+import sphinx
+
 from breathe.parser import DoxygenCompoundParser
 from breathe.project import ProjectInfo
 from breathe.renderer import RenderContext
@@ -667,10 +669,23 @@ class SphinxRenderer:
         assert declarator is not None
         if display_obj_type is not None:
             n = declarator[0]
-            assert isinstance(n, addnodes.desc_annotation)
-            assert n.astext()[-1] == " "
-            txt = display_obj_type + ' '
-            declarator[0] = addnodes.desc_annotation(txt, txt)
+            newStyle = True
+            # the new style was introduced in Sphinx v4
+            if sphinx.version_info[0] < 4:
+                newStyle = False
+            # but only for the C and C++ domains
+            if self.get_domain() and self.get_domain() not in ('c', 'cpp'):
+                newStyle = False
+            if newStyle:
+                # TODO: remove the "type: ignore" when Sphinx >= 4 is required
+                assert isinstance(n, addnodes.desc_sig_keyword)  # type: ignore
+                declarator[0] = addnodes.desc_sig_keyword(  # type: ignore
+                    display_obj_type, display_obj_type)
+            else:
+                assert isinstance(n, addnodes.desc_annotation)
+                assert n.astext()[-1] == " "
+                txt = display_obj_type + ' '
+                declarator[0] = addnodes.desc_annotation(txt, txt)
         if not self.app.env.config.breathe_debug_trace_doxygen_ids:
             target = self.create_doxygen_target(node)
         declarator.insert(0, target)
@@ -1162,6 +1177,7 @@ class SphinxRenderer:
 
             rst_node.document = self.state.document
             rst_node['objtype'] = kind
+            rst_node['domain'] = self.get_domain() if self.get_domain() else 'cpp'
 
             contentnode = addnodes.desc_content()
             rst_node.append(contentnode)
@@ -1700,6 +1716,7 @@ class SphinxRenderer:
 
         descnode = addnodes.desc()
         descnode['objtype'] = 'xrefsect'
+        descnode['domain'] = self.get_domain() if self.get_domain() else 'cpp'
         descnode += signode
         descnode += contentnode
 
@@ -1710,6 +1727,7 @@ class SphinxRenderer:
         for varlistentry, listitem in zip(node.varlistentries, node.listitems):
             descnode = addnodes.desc()
             descnode['objtype'] = 'varentry'
+            descnode['domain'] = self.get_domain() if self.get_domain() else 'cpp'
             signode = addnodes.desc_signature()
             signode += self.render_optional(varlistentry)
             descnode += signode
@@ -1995,6 +2013,7 @@ class SphinxRenderer:
 
         desc = addnodes.desc()
         desc['objtype'] = 'friendclass'
+        desc['domain'] = self.get_domain() if self.get_domain() else 'cpp'
         signode = addnodes.desc_signature()
         desc += signode
 
