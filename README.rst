@@ -171,6 +171,10 @@ Change Log
 
 Inspired by `Keepachangelog.com <http://keepachangelog.com/>`__.
 
+- Unreleased - Breathe v4.29.1
+
+  - Splice out parameter direction in field lists. #675
+
 - 2021-04-09 - Breathe v4.29.0
 
   - Do not add inline modifier for C#. #668
