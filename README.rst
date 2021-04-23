@@ -177,6 +177,7 @@ Inspired by `Keepachangelog.com <http://keepachangelog.com/>`__.
   - Fixes for Sphinx v4. #676
   - Fix paragraph in paragraph rendering. #678
   - Strip names before lookup in doxygenfunction. #679
+  - When rendering template params, insert name by parsing. #681
 
 - 2021-04-09 - Breathe v4.29.0
 
