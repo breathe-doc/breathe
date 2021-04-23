@@ -171,7 +171,7 @@ Change Log
 
 Inspired by `Keepachangelog.com <http://keepachangelog.com/>`__.
 
-- Unreleased - Breathe v4.29.1
+- 2021-04-23 - Breathe v4.29.1
 
   - Splice out parameter direction in field lists. #675
   - Fixes for Sphinx v4. #676
