@@ -176,6 +176,7 @@ Inspired by `Keepachangelog.com <http://keepachangelog.com/>`__.
   - Splice out parameter direction in field lists. #675
   - Fixes for Sphinx v4. #676
   - Fix paragraph in paragraph rendering. #678
+  - Strip names before lookup in doxygenfunction. #679
 
 - 2021-04-09 - Breathe v4.29.0
 
