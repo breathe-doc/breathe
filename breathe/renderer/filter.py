@@ -204,7 +204,6 @@ from breathe import path_handler
 from sphinx.application import Sphinx
 
 import os
-import six
 from typing import Any, Callable, Dict, List
 
 
@@ -325,7 +324,7 @@ class NodeTypeAccessor(Accessor):
         except AttributeError as e:
             # Horrible hack to silence errors on filtering unicode objects
             # until we fix the parsing
-            if type(data_object) == six.text_type:
+            if type(data_object) == str:
                 return "unicode"
             else:
                 raise e

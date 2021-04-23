@@ -1730,7 +1730,7 @@ public:
 	void SetIndent( const char* _indent )			{ indent = _indent ? _indent : "" ; }
 	/// Query the indention string.
 	const char* Indent()							{ return indent.c_str(); }
-	/** Set the line breaking string. By default set to newline (\n). 
+	/** Set the line breaking string. By default set to newline (\c \n).
 		Some operating systems prefer other characters, or can be
 		set to the null/empty string for no indentation.
 	*/
