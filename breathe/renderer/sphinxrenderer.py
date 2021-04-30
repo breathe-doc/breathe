@@ -2105,26 +2105,38 @@ class SphinxRenderer:
         for item in node.parameteritem:
             # TODO: does item.parameternamelist really have more than 1 parametername?
             assert len(item.parameternamelist) <= 1, item.parameternamelist
-            nameNodes = []
+            nameNodes: List[Node] = []
             parameterDirectionNodes = []
             if len(item.parameternamelist) != 0:
                 paramNameNodes = item.parameternamelist[0].parametername
-                # TODO: how many elements can paramNameNodes have?
-                assert len(paramNameNodes) <= 1, paramNameNodes
                 if len(paramNameNodes) != 0:
-                    content = paramNameNodes[0].content_
-                    # this is really a list of MixedContainer objects, i.e., a generic object
-                    # we assume there is either 1 or 2 elements, if there is 2 the first is the
-                    # parameter direction
-                    assert len(content) == 1 or len(content) == 2, content
-                    nameNodes = self.render(content[-1])
-                    if len(content) == 2:
-                        dir = ''.join(n.astext() for n in self.render(content[0])).strip()
-                        assert dir in ('[in]', '[out]', '[inout]'), ">" + dir + "<"
-                        parameterDirectionNodes = [
-                            nodes.strong(dir, dir),
-                            nodes.Text(' ', ' ')
-                        ]
+                    nameNodes = []
+                    for paramName in paramNameNodes:
+                        content = paramName.content_
+                        # this is really a list of MixedContainer objects, i.e., a generic object
+                        # we assume there is either 1 or 2 elements, if there is 2 the first is the
+                        # parameter direction
+                        assert len(content) == 1 or len(content) == 2, content
+                        thisName = self.render(content[-1])
+                        if len(nameNodes) != 0:
+                            if node.kind == 'exception':
+                                msg = "Doxygen \\exception commands with multiple names can not be"
+                                msg += " converted to a single :throws: field in Sphinx."
+                                msg += " Exception '{}' suppresed from output.".format(
+                                    ''.join(n.astext() for n in thisName))
+                                self.state.document.reporter.warning(msg)
+                                continue
+                            nameNodes.append(nodes.Text(", "))
+                        nameNodes.extend(thisName)
+                        if len(content) == 2:
+                            # note, each paramName node seems to have the same direction,
+                            # so just use the last one
+                            dir = ''.join(n.astext() for n in self.render(content[0])).strip()
+                            assert dir in ('[in]', '[out]', '[inout]'), ">" + dir + "<"
+                            parameterDirectionNodes = [
+                                nodes.strong(dir, dir),
+                                nodes.Text(' ', ' ')
+                            ]
 
             name = nodes.field_name(
                 '', nodes.Text(fieldListName[node.kind] + ' '),
