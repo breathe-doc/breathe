@@ -1,5 +1,5 @@
 #!/bin/sh
 
-export PYTHONPATH=../
+export PYTHONPATH="../${PYTHONPATH:+:$PYTHONPATH}"
 
-pytest -v
+python3 -m pytest -v
