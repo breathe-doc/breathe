@@ -174,6 +174,7 @@ Inspired by `Keepachangelog.com <http://keepachangelog.com/>`__.
 - Unreleased - Breathe v4.29.2
 
   - Remove stale six dep. #682
+  - Render fields with multiple names instead of crashing. #685
 
 - 2021-04-23 - Breathe v4.29.1
 
