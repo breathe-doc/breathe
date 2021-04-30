@@ -28,11 +28,11 @@ clean:
 
 .PHONY: test
 test:
-	cd tests && pytest -v
+	cd tests && python3 -m pytest -v
 
 .PHONY: dev-test
 dev-test:
-	cd tests && PYTHONPATH=../:$(PYTHONPATH) pytest -v
+	cd tests && PYTHONPATH=../:$(PYTHONPATH) python3 -m pytest -v
 
 .PHONY: flake8
 flake8:
