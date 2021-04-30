@@ -175,6 +175,7 @@ Inspired by `Keepachangelog.com <http://keepachangelog.com/>`__.
 
   - Remove stale six dep. #682
   - Render fields with multiple names instead of crashing. #685
+  - Start pytest via module instead of exe. #686
 
 - 2021-04-23 - Breathe v4.29.1
 
