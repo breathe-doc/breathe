@@ -2137,10 +2137,12 @@ class SphinxRenderer:
                                 nodes.strong(dir, dir),
                                 nodes.Text(' ', ' ')
                             ]
-
-            name = nodes.field_name(
-                '', nodes.Text(fieldListName[node.kind] + ' '),
-                *nameNodes)
+            # it seems that Sphinx expects the name to be a single node,
+            # so let's make it that
+            txt = fieldListName[node.kind] + ' '
+            for n in nameNodes:
+                txt += n.astext()
+            name = nodes.field_name('', nodes.Text(txt))
             bodyNodes = self.render_optional(item.parameterdescription)
             # TODO: is it correct that bodyNodes is either empty or a single paragraph?
             assert len(bodyNodes) <= 1, bodyNodes
