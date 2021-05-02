@@ -1,5 +1,5 @@
 from breathe.directives import (
-    DoxygenFunctionDirective, DoxygenStructDirective, DoxygenClassDirective,
+    DoxygenStructDirective, DoxygenClassDirective,
     DoxygenInterfaceDirective, DoxygenVariableDirective, DoxygenDefineDirective,
     DoxygenEnumDirective, DoxygenEnumValueDirective, DoxygenTypedefDirective,
     DoxygenUnionDirective, DoxygenNamespaceDirective, DoxygenGroupDirective,
@@ -7,6 +7,7 @@ from breathe.directives import (
 )
 from breathe.directive import BaseDirective
 from breathe.directive.file import DoxygenFileDirective, AutoDoxygenFileDirective
+from breathe.directive.function import DoxygenFunctionDirective
 from breathe.directive.index import DoxygenIndexDirective, AutoDoxygenIndexDirective
 from breathe.finder.factory import FinderFactory
 from breathe.parser import DoxygenParserFactory

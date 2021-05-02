@@ -422,7 +422,7 @@ def test_render_innergroup(app):
                                 options=['inner']))
 
 def get_directive(app):
-    from breathe.directives import DoxygenFunctionDirective
+    from breathe.directive.function import DoxygenFunctionDirective
     from breathe.project import ProjectInfoFactory
     from breathe.parser import DoxygenParserFactory
     from breathe.finder.factory import FinderFactory
