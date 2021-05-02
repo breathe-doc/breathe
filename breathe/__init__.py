@@ -1,6 +1,6 @@
-from . import directives
-from . import file_state_cache
-from .renderer import sphinxrenderer
+from breathe.directive.setup import setup as directive_setup
+from breathe.file_state_cache import setup as file_state_cache_setup
+from breathe.renderer.sphinxrenderer import setup as renderer_setup
 
 from sphinx.application import Sphinx
 
@@ -8,9 +8,9 @@ __version__ = '4.30.0'
 
 
 def setup(app: Sphinx):
-    directives.setup(app)
-    file_state_cache.setup(app)
-    sphinxrenderer.setup(app)
+    directive_setup(app)
+    file_state_cache_setup(app)
+    renderer_setup(app)
 
     return {
         'version': __version__,
