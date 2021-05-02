@@ -1,5 +1,5 @@
 from ..renderer.mask import NullMaskFactory
-from ..directive.base import BaseDirective
+from ..directive import BaseDirective
 from ..project import ProjectError
 
 from breathe.renderer import RenderContext

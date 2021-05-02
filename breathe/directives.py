@@ -1,8 +1,8 @@
+from breathe.directive import BaseDirective
 from breathe.directive.file import DoxygenFileDirective, AutoDoxygenFileDirective
 from breathe.directive.index import DoxygenIndexDirective, AutoDoxygenIndexDirective
 from breathe.exception import BreatheError
 from breathe.finder.factory import FinderFactory
-from breathe.directive.base import BaseDirective
 from breathe.file_state_cache import MTimeError
 from breathe.parser import DoxygenParserFactory, ParserError, FileIOError
 from breathe.process import AutoDoxygenProcessHandle
