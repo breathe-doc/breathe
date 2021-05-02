@@ -37,7 +37,7 @@ dev-test:
 .PHONY: flake8
 flake8:
 	flake8 breathe/*.py \
-		breathe/directive/*.py \
+		breathe/directives/*.py \
 		breathe/finder/*.py \
 		breathe/renderer/sphinxrenderer.py \
 		breathe/renderer/filter.py \

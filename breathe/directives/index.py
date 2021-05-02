@@ -1,5 +1,5 @@
 from ..renderer.mask import NullMaskFactory
-from ..directive import BaseDirective
+from ..directives import BaseDirective
 from ..project import ProjectError
 from ..parser import ParserError, FileIOError
 

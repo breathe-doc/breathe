@@ -1,4 +1,4 @@
-from breathe.directive import BaseDirective
+from breathe.directives import BaseDirective
 from breathe.exception import BreatheError
 from breathe.file_state_cache import MTimeError
 from breathe.parser import ParserError, FileIOError

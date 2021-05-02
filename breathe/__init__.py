@@ -1,4 +1,4 @@
-from breathe.directive.setup import setup as directive_setup
+from breathe.directives.setup import setup as directive_setup
 from breathe.file_state_cache import setup as file_state_cache_setup
 from breathe.renderer.sphinxrenderer import setup as renderer_setup
 
