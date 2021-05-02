@@ -16,7 +16,7 @@ from docutils.nodes import Node
 from typing import Any, Dict, List, Optional, Sequence
 
 
-class WarningHandler:
+class _WarningHandler:
     def __init__(self, state, context: Dict[str, Any]) -> None:
         self.state = state
         self.context = context
@@ -36,7 +36,7 @@ class WarningHandler:
 
 
 def create_warning(project_info: Optional[ProjectInfo], state, lineno: int,
-                   **kwargs) -> WarningHandler:
+                   **kwargs) -> _WarningHandler:
     tail = ''
     if project_info:
         tail = 'in doxygen xml output for project "{project}" from directory: {path}'.format(
@@ -49,7 +49,7 @@ def create_warning(project_info: Optional[ProjectInfo], state, lineno: int,
         tail=tail,
         **kwargs
     )
-    return WarningHandler(state, context)
+    return _WarningHandler(state, context)
 
 
 class BaseDirective(SphinxDirective):
