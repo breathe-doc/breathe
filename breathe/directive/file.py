@@ -9,7 +9,7 @@ from breathe.renderer.target import create_target_handler
 from docutils.parsers.rst.directives import unchanged_required, flag  # type: ignore
 
 
-class BaseFileDirective(BaseDirective):
+class _BaseFileDirective(BaseDirective):
     """Base class handle the main work when given the appropriate file and project info to work
     from.
     """
@@ -55,7 +55,7 @@ class BaseFileDirective(BaseDirective):
         return node_list
 
 
-class DoxygenFileDirective(BaseFileDirective):
+class DoxygenFileDirective(_BaseFileDirective):
     directive_name = 'doxygenfile'
 
     required_arguments = 0
@@ -66,7 +66,7 @@ class DoxygenFileDirective(BaseFileDirective):
         "outline": flag,
         "no-link": flag,
         "sections": unchanged_required,
-        }
+    }
     has_content = False
 
     def run(self):
@@ -82,7 +82,7 @@ class DoxygenFileDirective(BaseFileDirective):
         return self.handle_contents(file_, project_info)
 
 
-class AutoDoxygenFileDirective(BaseFileDirective):
+class AutoDoxygenFileDirective(_BaseFileDirective):
     directive_name = 'autodoxygenfile'
 
     required_arguments = 1

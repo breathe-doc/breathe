@@ -14,7 +14,7 @@ class RootDataObject:
     node_type = "root"
 
 
-class BaseIndexDirective(BaseDirective):
+class _BaseIndexDirective(BaseDirective):
     """Base class handle the main work when given the appropriate project info to work from.
     """
 
@@ -62,7 +62,7 @@ class BaseIndexDirective(BaseDirective):
         return node_list
 
 
-class DoxygenIndexDirective(BaseIndexDirective):
+class DoxygenIndexDirective(_BaseIndexDirective):
     required_arguments = 0
     optional_arguments = 2
     option_spec = {
@@ -85,7 +85,7 @@ class DoxygenIndexDirective(BaseIndexDirective):
         return self.handle_contents(project_info)
 
 
-class AutoDoxygenIndexDirective(BaseIndexDirective):
+class AutoDoxygenIndexDirective(_BaseIndexDirective):
     required_arguments = 0
     final_argument_whitespace = True
     option_spec = {
