@@ -35,23 +35,6 @@ class _WarningHandler:
         return text.format(**self.context)
 
 
-def create_warning(project_info: Optional[ProjectInfo], state, lineno: int,
-                   **kwargs) -> _WarningHandler:
-    tail = ''
-    if project_info:
-        tail = 'in doxygen xml output for project "{project}" from directory: {path}'.format(
-            project=project_info.name(),
-            path=project_info.project_path()
-        )
-
-    context = dict(
-        lineno=lineno,
-        tail=tail,
-        **kwargs
-    )
-    return _WarningHandler(state, context)
-
-
 class BaseDirective(SphinxDirective):
     required_arguments: int
     optional_arguments: int
@@ -74,6 +57,22 @@ class BaseDirective(SphinxDirective):
     @property
     def kind(self) -> str:
         raise NotImplementedError
+
+    def create_warning(self, project_info: Optional[ProjectInfo], **kwargs) -> _WarningHandler:
+        if project_info:
+            tail = 'in doxygen xml output for project "{project}" from directory: {path}'.format(
+                project=project_info.name(),
+                path=project_info.project_path()
+            )
+        else:
+            tail = ''
+
+        context = dict(
+            lineno=self.lineno,
+            tail=tail,
+            **kwargs
+        )
+        return _WarningHandler(self.state, context)
 
     def render(self, node_stack, project_info: ProjectInfo, filter_: Filter,
                target_handler: TargetHandler, mask_factory: MaskFactoryBase,

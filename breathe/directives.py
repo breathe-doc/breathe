@@ -1,4 +1,3 @@
-from breathe.directive.base import create_warning
 from breathe.directive.file import DoxygenFileDirective, AutoDoxygenFileDirective
 from breathe.directive.index import DoxygenIndexDirective, AutoDoxygenIndexDirective
 from breathe.exception import BreatheError
@@ -68,13 +67,13 @@ class DoxygenFunctionDirective(BaseDirective):
         try:
             project_info = self.project_info_factory.create_project_info(self.options)
         except ProjectError as e:
-            warning = create_warning(None, self.state, self.lineno)
+            warning = self.create_warning(None)
             return warning.warn('doxygenfunction: %s' % e)
 
         try:
             finder = self.finder_factory.create_finder(project_info)
         except MTimeError as e:
-            warning = create_warning(None, self.state, self.lineno)
+            warning = self.create_warning(None)
             return warning.warn('doxygenfunction: %s' % e)
 
         # Extract arguments from the function name.
@@ -97,14 +96,12 @@ class DoxygenFunctionDirective(BaseDirective):
 
         # Create it ahead of time as it is cheap and it is ugly to declare it for both exception
         # clauses below
-        warning = create_warning(
+        warning = self.create_warning(
             project_info,
-            self.state,
-            self.lineno,
             namespace='%s::' % namespace if namespace else '',
             function=function_name,
             args=str(args)
-            )
+        )
 
         try:
             node_stack = self._resolve_function(matches, args, project_info)
@@ -265,13 +262,13 @@ class _DoxygenClassLikeDirective(BaseDirective):
         try:
             project_info = self.project_info_factory.create_project_info(self.options)
         except ProjectError as e:
-            warning = create_warning(None, self.state, self.lineno, kind=self.kind)
+            warning = self.create_warning(None, kind=self.kind)
             return warning.warn('doxygen{kind}: %s' % e)
 
         try:
             finder = self.finder_factory.create_finder(project_info)
         except MTimeError as e:
-            warning = create_warning(None, self.state, self.lineno, kind=self.kind)
+            warning = self.create_warning(None, kind=self.kind)
             return warning.warn('doxygen{kind}: %s' % e)
 
         finder_filter = self.filter_factory.create_compound_finder_filter(name, self.kind)
@@ -281,8 +278,7 @@ class _DoxygenClassLikeDirective(BaseDirective):
         finder.filter_(finder_filter, matches)
 
         if len(matches) == 0:
-            warning = create_warning(project_info, self.state, self.lineno, name=name,
-                                     kind=self.kind)
+            warning = self.create_warning(project_info, name=name, kind=self.kind)
             return warning.warn('doxygen{kind}: Cannot find class "{name}" {tail}')
 
         target_handler = create_target_handler(self.options, project_info, self.state.document)
@@ -329,13 +325,13 @@ class _DoxygenContentBlockDirective(BaseDirective):
         try:
             project_info = self.project_info_factory.create_project_info(self.options)
         except ProjectError as e:
-            warning = create_warning(None, self.state, self.lineno, kind=self.kind)
+            warning = self.create_warning(None, kind=self.kind)
             return warning.warn('doxygen{kind}: %s' % e)
 
         try:
             finder = self.finder_factory.create_finder(project_info)
         except MTimeError as e:
-            warning = create_warning(None, self.state, self.lineno, kind=self.kind)
+            warning = self.create_warning(None, kind=self.kind)
             return warning.warn('doxygen{kind}: %s' % e)
 
         finder_filter = self.filter_factory.create_finder_filter(self.kind, name)
@@ -347,8 +343,7 @@ class _DoxygenContentBlockDirective(BaseDirective):
         # It shouldn't be possible to have too many matches as namespaces & groups in their nature
         # are merged together if there are multiple declarations, so we only check for no matches
         if not matches:
-            warning = create_warning(project_info, self.state, self.lineno, name=name,
-                                     kind=self.kind)
+            warning = self.create_warning(project_info, name=name, kind=self.kind)
             return warning.warn('doxygen{kind}: Cannot find {kind} "{name}" {tail}')
 
         if 'content-only' in self.options and self.kind != "page":
@@ -443,13 +438,13 @@ class _DoxygenBaseItemDirective(BaseDirective):
         try:
             project_info = self.project_info_factory.create_project_info(self.options)
         except ProjectError as e:
-            warning = create_warning(None, self.state, self.lineno, kind=self.kind)
+            warning = self.create_warning(None, kind=self.kind)
             return warning.warn('doxygen{kind}: %s' % e)
 
         try:
             finder = self.finder_factory.create_finder(project_info)
         except MTimeError as e:
-            warning = create_warning(None, self.state, self.lineno, kind=self.kind)
+            warning = self.create_warning(None, kind=self.kind)
             return warning.warn('doxygen{kind}: %s' % e)
 
         finder_filter = self.create_finder_filter(namespace, name)
@@ -460,8 +455,8 @@ class _DoxygenBaseItemDirective(BaseDirective):
 
         if len(matches) == 0:
             display_name = "%s::%s" % (namespace, name) if namespace else name
-            warning = create_warning(project_info, self.state, self.lineno, kind=self.kind,
-                                     display_name=display_name)
+            warning = self.create_warning(project_info, kind=self.kind,
+                                          display_name=display_name)
             return warning.warn('doxygen{kind}: Cannot find {kind} "{display_name}" {tail}')
 
         target_handler = create_target_handler(self.options, project_info, self.state.document)
