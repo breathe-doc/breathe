@@ -1,7 +1,3 @@
-from breathe.directives import (
-    DoxygenVariableDirective, DoxygenDefineDirective, DoxygenUnionDirective,
-    DoxygenEnumDirective, DoxygenEnumValueDirective, DoxygenTypedefDirective,
-)
 from breathe.directive import BaseDirective
 from breathe.directive.class_like import (
     DoxygenStructDirective, DoxygenClassDirective, DoxygenInterfaceDirective,
@@ -12,6 +8,10 @@ from breathe.directive.content_block import (
 from breathe.directive.file import DoxygenFileDirective, AutoDoxygenFileDirective
 from breathe.directive.function import DoxygenFunctionDirective
 from breathe.directive.index import DoxygenIndexDirective, AutoDoxygenIndexDirective
+from breathe.directive.item import (
+    DoxygenVariableDirective, DoxygenDefineDirective, DoxygenUnionDirective,
+    DoxygenEnumDirective, DoxygenEnumValueDirective, DoxygenTypedefDirective,
+)
 from breathe.finder.factory import FinderFactory
 from breathe.parser import DoxygenParserFactory
 from breathe.project import ProjectInfoFactory

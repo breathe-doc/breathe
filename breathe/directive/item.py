@@ -12,12 +12,6 @@ from docutils.parsers.rst.directives import unchanged_required, flag
 from typing import Any, List, Optional, Type  # noqa
 
 
-# TODO: is this comment still relevant?
-# This class was the same as the DoxygenBaseDirective above, except that it
-# wraps the output in a definition_list before passing it back. This should be
-# abstracted in a far nicer way to avoid repeating so much code
-#
-# Now we've removed the definition_list wrap so we really need to refactor this!
 class _DoxygenBaseItemDirective(BaseDirective):
     required_arguments = 1
     optional_arguments = 1
