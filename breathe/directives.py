@@ -23,11 +23,11 @@ import re
 from typing import Any, List, Optional, Type  # noqa
 
 
-class NoMatchingFunctionError(BreatheError):
+class _NoMatchingFunctionError(BreatheError):
     pass
 
 
-class UnableToResolveFunctionError(BreatheError):
+class _UnableToResolveFunctionError(BreatheError):
     def __init__(self, signatures: List[str]) -> None:
         self.signatures = signatures
 
@@ -98,10 +98,10 @@ class DoxygenFunctionDirective(BaseDirective):
 
         try:
             node_stack = self._resolve_function(matches, args, project_info)
-        except NoMatchingFunctionError:
+        except _NoMatchingFunctionError:
             return warning.warn('doxygenfunction: Cannot find function "{namespace}{function}" '
                                 '{tail}')
-        except UnableToResolveFunctionError as error:
+        except _UnableToResolveFunctionError as error:
             message = 'doxygenfunction: Unable to resolve function ' \
                 '"{namespace}{function}" with arguments {args} {tail}.\n' \
                 'Potential matches:\n'
@@ -188,7 +188,7 @@ class DoxygenFunctionDirective(BaseDirective):
 
     def _resolve_function(self, matches, args: Optional[cpp.ASTParametersQualifiers], project_info):
         if not matches:
-            raise NoMatchingFunctionError()
+            raise _NoMatchingFunctionError()
 
         res = []
         candSignatures = []
@@ -227,7 +227,7 @@ class DoxygenFunctionDirective(BaseDirective):
         if len(res) == 1:
             return res[0][0]
         else:
-            raise UnableToResolveFunctionError(candSignatures)
+            raise _UnableToResolveFunctionError(candSignatures)
 
 
 class _DoxygenClassLikeDirective(BaseDirective):
