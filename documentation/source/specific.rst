@@ -122,9 +122,6 @@ Image
 Array Parameter
 ---------------
 
-.. this should be switch to the C domain,
-   as C++ does not support these array declarators
-
 .. doxygenfunction:: foo
    :project: array
 
