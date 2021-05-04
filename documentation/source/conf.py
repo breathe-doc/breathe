@@ -241,6 +241,7 @@ breathe_domain_by_extension = {
 breathe_domain_by_file_pattern = {
         "class.h" : "cpp",
         "alias.h" : "c",
+        "array.h" : "c",
         "c_*.h" : "c",
         }
 
