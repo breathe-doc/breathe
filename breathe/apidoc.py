@@ -43,6 +43,15 @@ TYPEDICT = {'class': 'Class',
             'namespace': 'Namespace',
             'group': 'Group'}
 
+# Types that accept the :members: option.
+MEMBERS_TYPES = [
+        'class',
+        'group',
+        'interface',
+        'namespace',
+        'struct'
+]
+
 
 def print_info(msg, args):
     if not args.quiet:
@@ -85,11 +94,13 @@ def format_heading(level, text):
     return '%s\n%s\n\n' % (text, underlining)
 
 
-def format_directive(package_type, package, project):
+def format_directive(package_type, package, args):
     """Create the breathe directive and add the options."""
     directive = '.. doxygen%s:: %s\n' % (package_type, package)
-    if project:
-        directive += '   :project: %s\n' % project
+    if args.project:
+        directive += '   :project: %s\n' % args.project
+    if args.members and package_type in MEMBERS_TYPES:
+        directive += '   :members:\n'
     return directive
 
 
@@ -99,7 +110,7 @@ def create_package_file(package, package_type, package_id, args):
     if package_type not in args.outtypes:
         return
     text = format_heading(1, '%s %s' % (TYPEDICT[package_type], package))
-    text += format_directive(package_type, package, args.project)
+    text += format_directive(package_type, package, args)
 
     write_file(os.path.join(package_type, package_id), text, args)
 
@@ -157,6 +168,8 @@ Note: By default this script will not overwrite already created files.""",
                         help='Directory to place all output', required=True)
     parser.add_argument('-f', '--force', action='store_true', dest='force',
                         help='Overwrite existing files')
+    parser.add_argument('-m', '--members', action='store_true', dest='members',
+                        help='Include members for types: %s' % MEMBERS_TYPES)
     parser.add_argument('-n', '--dry-run', action='store_true', dest='dryrun',
                         help='Run the script without creating files')
     parser.add_argument('-T', '--no-toc', action='store_true', dest='notoc',
