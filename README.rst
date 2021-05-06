@@ -175,6 +175,7 @@ Inspired by `Keepachangelog.com <http://keepachangelog.com/>`__.
 
   - Fix retval rendering. #687
   - Correctly label example as C. #690
+  - apidoc: add -m, --members option flag. #694
 
 - 2021-04-30 - Breathe v4.29.2
 
