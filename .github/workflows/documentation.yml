@@ -24,7 +24,7 @@ jobs:
 
       - name: build the documentation
         run: |
-          make html
+          PYTHONPATH="${PWD}${PYTHONPATH:+:$PYTHONPATH}" make html
           rm documentation/build/html/.buildinfo
 
       - uses: actions/upload-artifact@v1
