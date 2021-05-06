@@ -171,7 +171,7 @@ Change Log
 
 Inspired by `Keepachangelog.com <http://keepachangelog.com/>`__.
 
-- Unreleased - Breathe v4.29.3
+- 2021-05-06 - Breathe v4.30.0
 
   - Fix retval rendering. #687
   - Correctly label example as C. #690

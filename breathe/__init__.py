@@ -4,7 +4,7 @@ from .renderer import sphinxrenderer
 
 from sphinx.application import Sphinx
 
-__version__ = '4.29.2'
+__version__ = '4.30.0'
 
 
 def setup(app: Sphinx):
