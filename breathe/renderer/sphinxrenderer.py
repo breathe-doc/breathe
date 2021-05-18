@@ -866,6 +866,44 @@ class SphinxRenderer:
             for fl in fieldLists:
                 fieldList.extend(fl)
             fieldLists = [fieldList]
+
+        # collapse retvals into a single return field
+        if len(fieldLists) != 0:
+            others: nodes.field = []
+            retvals: nodes.field = []
+            for f in fieldLists[0]:
+                fn, fb = f
+                assert len(fn) == 1
+                if fn.astext().startswith("returns "):
+                    retvals.append(f)
+                else:
+                    others.append(f)
+            if len(retvals) != 0:
+                items: List[nodes.paragraph] = []
+                for fn, fb in retvals:
+                    # we created the retvals before, so we made this prefix
+                    assert fn.astext().startswith("returns ")
+                    val = nodes.strong('', fn.astext()[8:])
+                    # assumption from visit_docparamlist: fb is a single paragraph or nothing
+                    assert len(fb) <= 1, fb
+                    bodyNodes = [val, nodes.Text(' -- ')]
+                    if len(fb) == 1:
+                        assert isinstance(fb[0], nodes.paragraph)
+                        bodyNodes.extend(fb[0])
+                    items.append(nodes.paragraph('', '', *bodyNodes))
+                # only make a bullet list if there are multiple retvals
+                if len(items) == 1:
+                    body = items[0]
+                else:
+                    body = nodes.bullet_list()
+                    for i in items:
+                        body.append(nodes.list_item('', i))
+                fRetvals = nodes.field('',
+                                       nodes.field_name('', 'returns'),
+                                       nodes.field_body('', body))
+                fl = nodes.field_list('', *others, fRetvals)
+                fieldLists = [fl]
+
         if self.app.config.breathe_order_parameters_first:  # type: ignore
             return brief + detailed + fieldLists + admonitions
         else:
