@@ -171,6 +171,10 @@ Change Log
 
 Inspired by `Keepachangelog.com <http://keepachangelog.com/>`__.
 
+- Unreleased - Breathe v4.31.0
+
+  - Collapse multiple retvals into a single bullet list. #697
+
 - 2021-05-06 - Breathe v4.30.0
 
   - Fix retval rendering. #687
