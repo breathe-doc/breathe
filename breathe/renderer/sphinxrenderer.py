@@ -27,6 +27,7 @@ try:
 except ImportError:
     cs = None
 
+import os
 import re
 import textwrap
 from typing import Callable, cast, Dict, List, Optional, Tuple, Type, Union  # noqa
@@ -1443,6 +1444,9 @@ class SphinxRenderer:
         """Output docutils image node using name attribute from xml as the uri"""
 
         path_to_image = self.project_info.sphinx_abs_path_to_file(node.name)
+        if not os.path.exists(path_to_image):
+            path_to_image = node.name
+
         options = {"uri": path_to_image}
         return [nodes.image("", **options)]
 
