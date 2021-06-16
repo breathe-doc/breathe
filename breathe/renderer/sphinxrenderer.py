@@ -1731,6 +1731,7 @@ class SphinxRenderer:
         signode = addnodes.desc_signature()
         title = node.xreftitle[0] + ':'
         titlenode = nodes.emphasis(text=title)
+        assert self.app.env is not None
         ref = addnodes.pending_xref(
             "",
             reftype="ref",
