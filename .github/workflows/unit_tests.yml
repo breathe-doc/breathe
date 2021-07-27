@@ -14,6 +14,9 @@ jobs:
           - 3.3.1
           - 3.4.3
           - 3.5.4
+          - 4.0.3
+          - 4.1.2
+          - git+https://github.com/sphinx-doc/sphinx.git@4.1.x
           - git+https://github.com/sphinx-doc/sphinx.git@4.x
           - git+https://github.com/sphinx-doc/sphinx.git@master
 
