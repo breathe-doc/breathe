@@ -1857,11 +1857,13 @@ class SphinxRenderer:
                     elements.append('virtual')
                 if node.explicit == 'yes':
                     elements.append('explicit')
-                if 'constexpr' in dir(node):
-                    assert node.constexpr == 'yes'
-                    elements.append('constexpr')
-                elements.append(''.join(n.astext()
-                                        for n in self.render(node.get_type())))  # type: ignore
+                # TODO: handle constexpr when parser has been updated
+                #       but Doxygen seems to leave it in the type anyway
+                typ = ''.join(n.astext() for n in self.render(node.get_type()))
+                # Doxygen sometimes leaves 'static' in the type,
+                # e.g., for "constexpr static auto f()"
+                typ = typ.replace('static ', '')
+                elements.append(typ)
                 elements.append(name)
                 elements.append(node.get_argsstring())
                 declaration = ' '.join(elements)
