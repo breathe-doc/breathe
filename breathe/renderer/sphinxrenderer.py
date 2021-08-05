@@ -2097,7 +2097,7 @@ class SphinxRenderer:
                         location=self.state.state_machine.get_source_and_line(),
                         config=self.app.config)
                     try:
-                        # we really should use _parse_template_paramter()
+                        # we really should use _parse_template_parameter()
                         # but setting a name there is non-trivial, so we use type
                         ast = parser._parse_type(named='single', outer='templateParam')
                         assert ast.name is None
