@@ -158,7 +158,11 @@ class DoxygenFunctionDirective(BaseDirective):
                 continue
             declarator = p.arg.type.decl
             while hasattr(declarator, 'next'):
-                declarator = declarator.next  # type: ignore
+                if isinstance(declarator, cpp.ASTDeclaratorParen):
+                    assert hasattr(declarator, 'inner')
+                    declarator = declarator.inner  # type: ignore
+                else:
+                    declarator = declarator.next  # type: ignore
             assert hasattr(declarator, 'declId')
             declarator.declId = None  # type: ignore
             p.arg.init = None  # type: ignore
