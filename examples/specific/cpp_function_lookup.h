@@ -17,3 +17,6 @@ void fParamPack(T ...arg);
 class A {};
 void fMemPtr(int A::*arg);
 void fParen(void (*arg)());
+
+// different parameters in a function pointer
+void fParenPlain(void (*arg)(int argInner));

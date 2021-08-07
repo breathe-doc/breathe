@@ -166,15 +166,20 @@ class DoxygenFunctionDirective(BaseDirective):
                     continue
                 p.arg.init = None  # type: ignore
                 declarator = p.arg.type.decl
-                while hasattr(declarator, 'next'):
-                    if isinstance(declarator, cpp.ASTDeclaratorParen):
-                        assert hasattr(declarator, 'inner')
-                        declarator = declarator.inner  # type: ignore
+
+                def stripDeclarator(declarator):
+                    if hasattr(declarator, 'next'):
+                        stripDeclarator(declarator.next)
+                        if isinstance(declarator, cpp.ASTDeclaratorParen):
+                            assert hasattr(declarator, 'inner')
+                            stripDeclarator(declarator.inner)
                     else:
-                        declarator = declarator.next  # type: ignore
-                assert hasattr(declarator, 'declId')
-                assert isinstance(declarator, cpp.ASTDeclaratorNameParamQual)
-                declarator.declId = None  # type: ignore
+                        assert isinstance(declarator, cpp.ASTDeclaratorNameParamQual)
+                        assert hasattr(declarator, 'declId')
+                        declarator.declId = None  # type: ignore
+                        if declarator.paramQual is not None:
+                            stripParamQual(declarator.paramQual)
+                stripDeclarator(declarator)
         stripParamQual(paramQual)
         return paramQual
 

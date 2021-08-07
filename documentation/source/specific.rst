@@ -285,6 +285,9 @@ This one should actually have ``[[myattr]]`` but Doxygen seems to not put attrib
 .. doxygenfunction:: fParen(void (*)())
    :project: cpp_function_lookup
 
+.. doxygenfunction:: fParenPlain(void (*)(int))
+   :project: cpp_function_lookup
+
 
 Doxygen xrefsect
 ----------------
