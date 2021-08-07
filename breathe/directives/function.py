@@ -151,21 +151,24 @@ class DoxygenFunctionDirective(BaseDirective):
                                       location=self.get_source_info(),
                                       config=self.config)
         paramQual = parser._parse_parameters_and_qualifiers(paramMode='function')
-        # now erase the parameter names
-        for p in paramQual.args:
-            if p.arg is None:
-                assert p.ellipsis
-                continue
-            declarator = p.arg.type.decl
-            while hasattr(declarator, 'next'):
-                if isinstance(declarator, cpp.ASTDeclaratorParen):
-                    assert hasattr(declarator, 'inner')
-                    declarator = declarator.inner  # type: ignore
-                else:
-                    declarator = declarator.next  # type: ignore
-            assert hasattr(declarator, 'declId')
-            declarator.declId = None  # type: ignore
-            p.arg.init = None  # type: ignore
+        # strip everything that doesn't contribute to overloading
+
+        def stripParamQual(paramQual):
+            for p in paramQual.args:
+                if p.arg is None:
+                    assert p.ellipsis
+                    continue
+                declarator = p.arg.type.decl
+                while hasattr(declarator, 'next'):
+                    if isinstance(declarator, cpp.ASTDeclaratorParen):
+                        assert hasattr(declarator, 'inner')
+                        declarator = declarator.inner  # type: ignore
+                    else:
+                        declarator = declarator.next  # type: ignore
+                assert hasattr(declarator, 'declId')
+                declarator.declId = None  # type: ignore
+                p.arg.init = None  # type: ignore
+        stripParamQual(paramQual)
         return paramQual
 
     def _create_function_signature(self, node_stack, project_info, filter_, target_handler,
