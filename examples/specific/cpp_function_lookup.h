@@ -1,3 +1,12 @@
+// stuff on the paramQual
+void fNoexcept() noexcept;
+void fFinal() final;
+void fOverride() override;
+void fAttr() [[myattr]]; // TODO: Doxygen seems to strip attributes
+void fFInit() = default;
+auto fTrailing() -> int;
+
+// different parameters
 void fInit(int arg = 42);
 void fPlain(int arg);
 void fPtr(int *arg);

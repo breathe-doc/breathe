@@ -154,10 +154,17 @@ class DoxygenFunctionDirective(BaseDirective):
         # strip everything that doesn't contribute to overloading
 
         def stripParamQual(paramQual):
+            paramQual.exceptionSpec = None  # type: ignore
+            paramQual.final = None  # type: ignore
+            paramQual.override = None  # type: ignore
+            # TODO: strip attrs when Doxygen handles them
+            paramQual.initializer = None  # type: ignore
+            paramQual.trailingReturn = None  # type: ignore
             for p in paramQual.args:
                 if p.arg is None:
                     assert p.ellipsis
                     continue
+                p.arg.init = None  # type: ignore
                 declarator = p.arg.type.decl
                 while hasattr(declarator, 'next'):
                     if isinstance(declarator, cpp.ASTDeclaratorParen):
@@ -166,8 +173,8 @@ class DoxygenFunctionDirective(BaseDirective):
                     else:
                         declarator = declarator.next  # type: ignore
                 assert hasattr(declarator, 'declId')
+                assert isinstance(declarator, cpp.ASTDeclaratorNameParamQual)
                 declarator.declId = None  # type: ignore
-                p.arg.init = None  # type: ignore
         stripParamQual(paramQual)
         return paramQual
 

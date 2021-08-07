@@ -252,6 +252,22 @@ C++ Function Lookup
 
 .. cpp:namespace:: @ex_specific_cpp_function_lookup
 
+.. doxygenfunction:: fNoexcept()
+   :project: cpp_function_lookup
+.. doxygenfunction:: fFinal()
+   :project: cpp_function_lookup
+.. doxygenfunction:: fOverride()
+   :project: cpp_function_lookup
+
+This one should actually have ``[[myattr]]`` but Doxygen seems to not put attributes into the XML:
+
+.. doxygenfunction:: fAttr()
+   :project: cpp_function_lookup
+.. doxygenfunction:: fFInit()
+   :project: cpp_function_lookup
+.. doxygenfunction:: fTrailing()
+   :project: cpp_function_lookup
+
 .. doxygenfunction:: fInit(int)
    :project: cpp_function_lookup
 .. doxygenfunction:: fPlain(int)
