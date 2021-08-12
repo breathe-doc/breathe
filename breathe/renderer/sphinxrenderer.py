@@ -1702,6 +1702,9 @@ class SphinxRenderer:
         return [rst_node]
 
     def visit_inc(self, node) -> List[Node]:
+        if not self.app.config.breathe_show_include:
+            return []
+
         if node.local == u"yes":
             text = '#include "%s"' % node.content_[0].getValue()
         else:
