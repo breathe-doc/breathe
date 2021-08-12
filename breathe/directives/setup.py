@@ -101,6 +101,7 @@ def setup(app: Sphinx) -> None:
     app.add_config_value("breathe_default_members", (), True)
     app.add_config_value("breathe_show_define_initializer", False, 'env')
     app.add_config_value("breathe_show_enumvalue_initializer", False, 'env')
+    app.add_config_value("breathe_show_include", True, 'env')
     app.add_config_value("breathe_implementation_filename_extensions", ['.c', '.cc', '.cpp'], True)
     app.add_config_value("breathe_doxygen_config_options", {}, True)
     app.add_config_value("breathe_use_project_refids", False, "env")
