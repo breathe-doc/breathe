@@ -103,6 +103,7 @@ def setup(app: Sphinx) -> None:
     app.add_config_value("breathe_show_enumvalue_initializer", False, 'env')
     app.add_config_value("breathe_implementation_filename_extensions", ['.c', '.cc', '.cpp'], True)
     app.add_config_value("breathe_doxygen_config_options", {}, True)
+    app.add_config_value("breathe_doxygen_aliases", {}, True)
     app.add_config_value("breathe_use_project_refids", False, "env")
     app.add_config_value("breathe_order_parameters_first", False, 'env')
     app.add_config_value("breathe_separate_member_pages", False, 'env')
@@ -128,6 +129,7 @@ def setup(app: Sphinx) -> None:
     def doxygen_hook(app):
         doxygen_handle.generate_xml(
             app.config.breathe_projects_source,
-            app.config.breathe_doxygen_config_options
+            app.config.breathe_doxygen_config_options,
+            app.config.breathe_doxygen_aliases
         )
     app.connect("builder-inited", doxygen_hook)
