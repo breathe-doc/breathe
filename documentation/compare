@@ -3,16 +3,22 @@
 first=$1
 second=$2
 
-if [ -z "$second" ]; then
-	echo "Usage: compare <branch name A> <branch name B>"
+if [ -z "$first" ]; then
+	echo "Usage: compare <branch name A> [<branch name B>]"
+	echo ""
+	echo "The second argument defaults to the current branch if not specified"
 	exit 1
+fi
+
+# Remember the branch we're on
+currentbranch=`git symbolic-ref --short HEAD`
+
+if [ -z "$second" ]; then
+	second=$currentbranch
 fi
 
 firstdir=comparison/first
 seconddir=comparison/second
-
-# Remember the branch we're on
-currentbranch=`git symbolic-ref --short HEAD`
 
 # Make sure the output directory exists
 mkdir -p comparison
