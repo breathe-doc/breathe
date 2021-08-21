@@ -1,7 +1,12 @@
-#!/bin/sh
+#!/bin/sh -e
 
 first=$1
 second=$2
+
+if [ -z "$second" ]; then
+	echo "Usage: compare <branch name A> <branch name B>"
+	exit 1
+fi
 
 firstdir=comparison/first
 seconddir=comparison/second
@@ -19,8 +24,8 @@ rm -fr $seconddir
 export BREATHE_COMPARE=True
 
 # Checkout the first target
-echo git checkout $1
-git checkout $1
+echo git checkout $first
+git checkout $first
 # Run doxygen for this state
 (cd ../examples/specific; make)
 (cd ../examples/tinyxml; make)
@@ -36,8 +41,8 @@ git checkout Makefile
 
 
 # Checkout the second target and repeat
-echo git checkout $2
-git checkout $2
+echo git checkout $second
+git checkout $second
 (cd ../examples/specific; make)
 (cd ../examples/tinyxml; make)
 (cd ../examples/doxygen; make)
