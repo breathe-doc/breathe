@@ -35,7 +35,9 @@ def update(app: Sphinx, source_file: str) -> None:
     mtime, docnames = app.env.breathe_file_state.setdefault(  # type: ignore
         source_file, (new_mtime, set()))
 
+    assert app.env is not None
     docnames.add(app.env.docname)
+
     app.env.breathe_file_state[source_file] = (new_mtime, docnames)  # type: ignore
 
 
