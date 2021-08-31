@@ -53,6 +53,12 @@ def create_warning(project_info: Optional[ProjectInfo], state, lineno: int,
 
 
 class BaseDirective(SphinxDirective):
+    required_arguments: int
+    optional_arguments: int
+    option_spec: Dict[str, Any]
+    has_content: bool
+    final_argument_whitespace: bool
+
     def __init__(self, finder_factory: FinderFactory,
                  project_info_factory: ProjectInfoFactory,
                  parser_factory: DoxygenParserFactory,
