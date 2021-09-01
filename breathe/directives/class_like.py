@@ -5,7 +5,7 @@ from breathe.renderer.mask import NullMaskFactory
 from breathe.renderer.target import create_target_handler
 
 from docutils.nodes import Node
-from docutils.parsers.rst.directives import unchanged_required, unchanged, flag
+from docutils.parsers.rst.directives import unchanged_required, unchanged, flag  # type: ignore
 
 from typing import Any, List, Optional, Type  # noqa
 

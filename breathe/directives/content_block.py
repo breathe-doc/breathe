@@ -7,7 +7,7 @@ from breathe.renderer.sphinxrenderer import SphinxRenderer
 from breathe.renderer.target import create_target_handler
 
 from docutils.nodes import Node
-from docutils.parsers.rst.directives import unchanged_required, flag
+from docutils.parsers.rst.directives import unchanged_required, flag  # type: ignore
 
 from typing import Any, List, Optional, Type  # noqa
 
