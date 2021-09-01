@@ -583,6 +583,7 @@ class SphinxRenderer:
         for k, v in options.items():
             directive.options[k] = v
 
+        assert self.app.env is not None
         config = self.app.env.config
 
         if config.breathe_debug_trace_directives:
@@ -635,6 +636,8 @@ class SphinxRenderer:
             content_callback = content
         declaration = declaration.replace('\n', ' ')
         nodes_ = self.run_directive(obj_type, declaration, content_callback, options)
+
+        assert self.app.env is not None
         if self.app.env.config.breathe_debug_trace_doxygen_ids:
             target = self.create_doxygen_target(node)
             if len(target) == 0:
@@ -696,6 +699,7 @@ class SphinxRenderer:
         if self.nesting_level > 0:
             return []
 
+        assert self.app.env is not None
         config = self.app.env.config
         if config.breathe_debug_trace_qualification:
             def debug_print_node(n):
@@ -1722,6 +1726,8 @@ class SphinxRenderer:
         return nodelist
 
     def visit_docxrefsect(self, node) -> List[Node]:
+        assert self.app.env is not None
+
         signode = addnodes.desc_signature()
         title = node.xreftitle[0] + ':'
         titlenode = nodes.emphasis(text=title)
@@ -1897,6 +1903,8 @@ class SphinxRenderer:
             self.context.directive_args[1] = [signature]
 
             nodes = self.run_domain_directive(node.kind, self.context.directive_args[1])
+
+            assert self.app.env is not None
             if self.app.env.config.breathe_debug_trace_doxygen_ids:
                 target = self.create_doxygen_target(node)
                 if len(target) == 0:

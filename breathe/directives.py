@@ -22,7 +22,7 @@ from sphinx.domains import cpp
 
 from docutils import nodes
 from docutils.nodes import Node
-from docutils.parsers.rst.directives import unchanged_required, unchanged, flag
+from docutils.parsers.rst.directives import unchanged_required, unchanged, flag  # type: ignore
 
 import os
 import re
