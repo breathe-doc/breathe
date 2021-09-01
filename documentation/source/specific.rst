@@ -236,6 +236,17 @@ C++ Trailing Return Type
 .. doxygenfile:: cpp_trailing_return_type.h
    :project: cpp_trailing_return_type
 
+C++ Constexpr Handling
+------------------------
+
+.. cpp:namespace:: @ex_specific_cpp_constexpr_hax
+
+Test for issue 717.
+
+
+.. doxygenfile:: cpp_constexpr_hax.h
+   :project: cpp_constexpr_hax
+
 Doxygen xrefsect
 ----------------
 

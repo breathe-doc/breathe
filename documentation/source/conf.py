@@ -223,6 +223,7 @@ breathe_projects = {
     "cpp_friendclass":"../../examples/specific/cpp_friendclass/xml/",
     "cpp_inherited_members":"../../examples/specific/cpp_inherited_members/xml/",
     "cpp_trailing_return_type":"../../examples/specific/cpp_trailing_return_type/xml/",
+    "cpp_constexpr_hax":"../../examples/specific/cpp_constexpr_hax/xml/",
     "xrefsect": "../../examples/specific/xrefsect/xml/",
     "membergroups": "../../examples/specific/membergroups/xml/",
     }
