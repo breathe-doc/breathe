@@ -174,6 +174,7 @@ Inspired by `Keepachangelog.com <http://keepachangelog.com/>`__.
 - Unreleased - Breathe v4.31.0
 
   - Collapse multiple retvals into a single bullet list. #697
+  - Fix duplicate ``static`` in function declarations. #717
 
 - 2021-05-06 - Breathe v4.30.0
 
