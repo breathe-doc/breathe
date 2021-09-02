@@ -247,6 +247,48 @@ Test for issue 717.
 .. doxygenfile:: cpp_constexpr_hax.h
    :project: cpp_constexpr_hax
 
+C++ Function Lookup
+-------------------
+
+.. cpp:namespace:: @ex_specific_cpp_function_lookup
+
+.. doxygenfunction:: fNoexcept()
+   :project: cpp_function_lookup
+.. doxygenfunction:: fFinal()
+   :project: cpp_function_lookup
+.. doxygenfunction:: fOverride()
+   :project: cpp_function_lookup
+
+This one should actually have ``[[myattr]]`` but Doxygen seems to not put attributes into the XML:
+
+.. doxygenfunction:: fAttr()
+   :project: cpp_function_lookup
+.. doxygenfunction:: fFInit()
+   :project: cpp_function_lookup
+.. doxygenfunction:: fTrailing()
+   :project: cpp_function_lookup
+
+.. doxygenfunction:: fInit(int)
+   :project: cpp_function_lookup
+.. doxygenfunction:: fPlain(int)
+   :project: cpp_function_lookup
+.. doxygenfunction:: fPtr(int*)
+   :project: cpp_function_lookup
+.. doxygenfunction:: fLRef(int&)
+   :project: cpp_function_lookup
+.. doxygenfunction:: fRRef(int&&)
+   :project: cpp_function_lookup
+.. doxygenfunction:: fParamPack(T...)
+   :project: cpp_function_lookup
+.. doxygenfunction:: fMemPtr(int A::*)
+   :project: cpp_function_lookup
+.. doxygenfunction:: fParen(void (*)())
+   :project: cpp_function_lookup
+
+.. doxygenfunction:: fParenPlain(void (*)(int))
+   :project: cpp_function_lookup
+
+
 Doxygen xrefsect
 ----------------
 

@@ -151,17 +151,36 @@ class DoxygenFunctionDirective(BaseDirective):
                                       location=self.get_source_info(),
                                       config=self.config)
         paramQual = parser._parse_parameters_and_qualifiers(paramMode='function')
-        # now erase the parameter names
-        for p in paramQual.args:
-            if p.arg is None:
-                assert p.ellipsis
-                continue
-            declarator = p.arg.type.decl
-            while hasattr(declarator, 'next'):
-                declarator = declarator.next  # type: ignore
-            assert hasattr(declarator, 'declId')
-            declarator.declId = None  # type: ignore
-            p.arg.init = None  # type: ignore
+        # strip everything that doesn't contribute to overloading
+
+        def stripParamQual(paramQual):
+            paramQual.exceptionSpec = None  # type: ignore
+            paramQual.final = None  # type: ignore
+            paramQual.override = None  # type: ignore
+            # TODO: strip attrs when Doxygen handles them
+            paramQual.initializer = None  # type: ignore
+            paramQual.trailingReturn = None  # type: ignore
+            for p in paramQual.args:
+                if p.arg is None:
+                    assert p.ellipsis
+                    continue
+                p.arg.init = None  # type: ignore
+                declarator = p.arg.type.decl
+
+                def stripDeclarator(declarator):
+                    if hasattr(declarator, 'next'):
+                        stripDeclarator(declarator.next)
+                        if isinstance(declarator, cpp.ASTDeclaratorParen):
+                            assert hasattr(declarator, 'inner')
+                            stripDeclarator(declarator.inner)
+                    else:
+                        assert isinstance(declarator, cpp.ASTDeclaratorNameParamQual)
+                        assert hasattr(declarator, 'declId')
+                        declarator.declId = None  # type: ignore
+                        if declarator.paramQual is not None:
+                            stripParamQual(declarator.paramQual)
+                stripDeclarator(declarator)
+        stripParamQual(paramQual)
         return paramQual
 
     def _create_function_signature(self, node_stack, project_info, filter_, target_handler,
