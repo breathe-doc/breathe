@@ -2067,8 +2067,8 @@ class SphinxRenderer:
         signode += nodes.Text(node.name)
         return [desc]
 
-    def visit_param(self, node: compound.paramTypeSub, *,
-                    insertDeclNameByParsing: bool = False) -> List[Node]:
+    def visit_templateparam(self, node: compound.paramTypeSub, *,
+                            insertDeclNameByParsing: bool = False) -> List[Node]:
         nodelist = []
 
         # Parameter type
@@ -2096,15 +2096,22 @@ class SphinxRenderer:
                         ''.join(n.astext() for n in nodelist),
                         location=self.state.state_machine.get_source_and_line(),
                         config=self.app.config)
-                    ast = parser._parse_type(named='single', outer='templateParam')
-                    assert ast.name is None
-                    nn = cpp.ASTNestedName(
-                        names=[cpp.ASTNestedNameElement(cpp.ASTIdentifier(node.declname), None)],
-                        templates=[False], rooted=False)
-                    ast.name = nn
-                    # the actual nodes don't matter, as it is astext()-ed later
-                    nodelist = [nodes.Text(str(ast))]
-                    appendDeclName = False
+                    try:
+                        # we really should use _parse_template_parameter()
+                        # but setting a name there is non-trivial, so we use type
+                        ast = parser._parse_type(named='single', outer='templateParam')
+                        assert ast.name is None
+                        nn = cpp.ASTNestedName(
+                            names=[cpp.ASTNestedNameElement(
+                                cpp.ASTIdentifier(node.declname), None)],
+                            templates=[False], rooted=False)
+                        ast.name = nn
+                        # the actual nodes don't matter, as it is astext()-ed later
+                        nodelist = [nodes.Text(str(ast))]
+                        appendDeclName = False
+                    except cpp.DefinitionError:
+                        # happens with "typename ...Args", so for now, just append
+                        pass
 
             if appendDeclName:
                 if nodelist:
@@ -2134,7 +2141,7 @@ class SphinxRenderer:
         for i, item in enumerate(node.param):
             if i:
                 nodelist.append(nodes.Text(", "))
-            nodelist.extend(self.visit_param(item, insertDeclNameByParsing=True))
+            nodelist.extend(self.visit_templateparam(item, insertDeclNameByParsing=True))
         self.output_defname = True
         return nodelist
 
@@ -2273,7 +2280,6 @@ class SphinxRenderer:
         "compoundref": visit_compoundref,
         "mixedcontainer": visit_mixedcontainer,
         "description": visit_description,
-        "param": visit_param,
         "templateparamlist": visit_templateparamlist,
         "docparamlist": visit_docparamlist,
         "docxrefsect": visit_docxrefsect,

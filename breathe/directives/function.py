@@ -70,7 +70,18 @@ class DoxygenFunctionDirective(BaseDirective):
             return warning.warn('doxygenfunction: %s' % e)
 
         # Extract arguments from the function name.
-        args = self._parse_args(args)
+        try:
+            args = self._parse_args(args)
+        except cpp.DefinitionError as e:
+            return self.create_warning(
+                project_info,
+                namespace='%s::' % namespace if namespace else '',
+                function=function_name,
+                args=str(args),
+                cpperror=str(e)
+            ).warn('doxygenfunction: Unable to resolve function '
+                   '"{namespace}{function}" with arguments "{args}".\n'
+                   'Could not parse arguments. Parsing eror is\n{cpperror}')
 
         finder_filter = self.filter_factory.create_function_and_all_friend_finder_filter(
             namespace, function_name)
@@ -118,6 +129,12 @@ class DoxygenFunctionDirective(BaseDirective):
             result = warning.warn(message, rendered_nodes=warning_nodes,
                                   unformatted_suffix=text)
             return result
+        except cpp.DefinitionError as error:
+            warning.context['cpperror'] = str(error)
+            return warning.warn(
+                'doxygenfunction: Unable to resolve function '
+                '"{namespace}{function}" with arguments "{args}".\n'
+                'Candidate function could not be parsed. Parsing error is\n{cpperror}')
 
         target_handler = create_target_handler(self.options, project_info, self.state.document)
         filter_ = self.filter_factory.create_outline_filter(self.options)
@@ -126,6 +143,7 @@ class DoxygenFunctionDirective(BaseDirective):
                            self.directive_args)
 
     def _parse_args(self, function_description: str) -> Optional[cpp.ASTParametersQualifiers]:
+        # Note: the caller must catch cpp.DefinitionError
         if function_description == '':
             return None
 
@@ -216,6 +234,7 @@ class DoxygenFunctionDirective(BaseDirective):
                 _match_args = match.group(2)
 
                 # Parse the text to find the arguments
+                # This one should succeed as it came from _create_function_signature
                 match_args = self._parse_args(_match_args)
 
                 # Match them against the arg spec
