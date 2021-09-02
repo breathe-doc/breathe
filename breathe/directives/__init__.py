@@ -16,7 +16,7 @@ from docutils.nodes import Node
 from typing import Any, Dict, List, Optional, Sequence
 
 
-class WarningHandler:
+class _WarningHandler:
     def __init__(self, state, context: Dict[str, Any]) -> None:
         self.state = state
         self.context = context
@@ -33,23 +33,6 @@ class WarningHandler:
 
     def format(self, text: str) -> str:
         return text.format(**self.context)
-
-
-def create_warning(project_info: Optional[ProjectInfo], state, lineno: int,
-                   **kwargs) -> WarningHandler:
-    tail = ''
-    if project_info:
-        tail = 'in doxygen xml output for project "{project}" from directory: {path}'.format(
-            project=project_info.name(),
-            path=project_info.project_path()
-        )
-
-    context = dict(
-        lineno=lineno,
-        tail=tail,
-        **kwargs
-    )
-    return WarningHandler(state, context)
 
 
 class BaseDirective(SphinxDirective):
@@ -74,6 +57,22 @@ class BaseDirective(SphinxDirective):
     @property
     def kind(self) -> str:
         raise NotImplementedError
+
+    def create_warning(self, project_info: Optional[ProjectInfo], **kwargs) -> _WarningHandler:
+        if project_info:
+            tail = 'in doxygen xml output for project "{project}" from directory: {path}'.format(
+                project=project_info.name(),
+                path=project_info.project_path()
+            )
+        else:
+            tail = ''
+
+        context = dict(
+            lineno=self.lineno,
+            tail=tail,
+            **kwargs
+        )
+        return _WarningHandler(self.state, context)
 
     def render(self, node_stack, project_info: ProjectInfo, filter_: Filter,
                target_handler: TargetHandler, mask_factory: MaskFactoryBase,

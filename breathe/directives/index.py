@@ -1,8 +1,7 @@
 from ..renderer.mask import NullMaskFactory
-from ..directive.base import BaseDirective
+from ..directives import BaseDirective
 from ..project import ProjectError
 from ..parser import ParserError, FileIOError
-from .base import create_warning
 
 from breathe.renderer import format_parser_error, RenderContext
 from breathe.renderer.sphinxrenderer import SphinxRenderer
@@ -11,12 +10,11 @@ from breathe.renderer.target import create_target_handler
 from docutils.parsers.rst.directives import unchanged_required, flag  # type: ignore
 
 
-class RootDataObject(object):
-
+class RootDataObject:
     node_type = "root"
 
 
-class BaseIndexDirective(BaseDirective):
+class _BaseIndexDirective(BaseDirective):
     """Base class handle the main work when given the appropriate project info to work from.
     """
 
@@ -25,7 +23,6 @@ class BaseIndexDirective(BaseDirective):
     # pass way too much stuff to a helper object to be reasonable.
 
     def handle_contents(self, project_info):
-
         try:
             finder = self.finder_factory.create_finder(project_info)
         except ParserError as e:
@@ -65,7 +62,7 @@ class BaseIndexDirective(BaseDirective):
         return node_list
 
 
-class DoxygenIndexDirective(BaseIndexDirective):
+class DoxygenIndexDirective(_BaseIndexDirective):
     required_arguments = 0
     optional_arguments = 2
     option_spec = {
@@ -73,7 +70,7 @@ class DoxygenIndexDirective(BaseIndexDirective):
         "project": unchanged_required,
         "outline": flag,
         "no-link": flag,
-        }
+    }
     has_content = False
 
     def run(self):
@@ -82,21 +79,20 @@ class DoxygenIndexDirective(BaseIndexDirective):
         try:
             project_info = self.project_info_factory.create_project_info(self.options)
         except ProjectError as e:
-            warning = create_warning(None, self.state, self.lineno)
+            warning = self.create_warning(None)
             return warning.warn('doxygenindex: %s' % e)
 
         return self.handle_contents(project_info)
 
 
-class AutoDoxygenIndexDirective(BaseIndexDirective):
-
+class AutoDoxygenIndexDirective(_BaseIndexDirective):
     required_arguments = 0
     final_argument_whitespace = True
     option_spec = {
         "project": unchanged_required,
         "outline": flag,
         "no-link": flag,
-        }
+    }
     has_content = False
 
     def run(self):
@@ -107,7 +103,7 @@ class AutoDoxygenIndexDirective(BaseIndexDirective):
         try:
             project_info = self.project_info_factory.retrieve_project_info_for_auto(self.options)
         except ProjectError as e:
-            warning = create_warning(None, self.state, self.lineno)
+            warning = self.create_warning(None)
             return warning.warn('autodoxygenindex: %s' % e)
 
         return self.handle_contents(project_info)
