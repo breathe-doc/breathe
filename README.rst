@@ -166,3 +166,8 @@ Thanks to:
 - Georg Brandl for `Sphinx <http://sphinx-doc.org>`_.
 - David Goodger for `Docutils <http://docutils.sourceforge.net/>`_ and reStructuredText.
 
+Changelog
+---------
+
+See the `CHANGELOG.rst
+<https://github.com/michaeljones/breathe/blob/master/CHANGELOG.rst>`_
