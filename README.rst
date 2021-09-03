@@ -1,10 +1,6 @@
 Breathe
 =======
 
-**Packagers:** Breathe packages on PyPI are PGP signed for Breathe >= v4.28.0.
-
-**Packagers:** Breathe tarballs on GitHub are PGP signed for Breathe >= v4.29.0.
-
 .. image:: https://github.com/michaeljones/breathe/workflows/unit%20tests/badge.svg
     :target: https://github.com/michaeljones/breathe/actions?query=workflow%3A%22unit+tests%22
 
@@ -18,6 +14,13 @@ Breathe is available from github and `PyPI, the Python Package Index
 <http://pypi.python.org/pypi/breathe>`_. It can be installed with::
 
     pip install breathe
+
+For Packagers
+~~~~~~~~~~~~~
+
+Breathe packages on PyPI are PGP signed for Breathe >= v4.28.0.
+
+Breathe tarballs on GitHub are PGP signed for Breathe >= v4.29.0.
 
 Documentation
 -------------
