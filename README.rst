@@ -113,7 +113,7 @@ link in a GitHub issue.
 Release
 -------
 
-See the mkrelease utility in the root of the repository.
+See the ``mkrelease`` utility in the root of the repository.
 
 Credits
 -------
