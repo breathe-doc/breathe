@@ -960,6 +960,8 @@ class SphinxRenderer:
         parent_context = self.context.create_child_context(file_data)
         new_context = parent_context.create_child_context(nodeDef)
 
+        domain = self.get_domain()
+
         with WithContext(self, new_context):
             # Pretend that the signature is being rendered in context of the
             # definition, for proper domain detection
@@ -986,7 +988,7 @@ class SphinxRenderer:
                     decls.append(',')
                 else:
                     first = False
-                if base.prot is not None:
+                if base.prot is not None and domain != 'cs':
                     decls.append(base.prot)
                 if base.virt == 'virtual':
                     decls.append('virtual')
