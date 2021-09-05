@@ -7,16 +7,16 @@ Breathe
 This is an extension to reStructuredText and Sphinx to be able to read and
 render the Doxygen xml output.
 
-Download
---------
+Install
+-------
 
 Breathe is available from github and `PyPI, the Python Package Index
 <http://pypi.python.org/pypi/breathe>`_. It can be installed with::
 
     pip install breathe
 
-For Packagers
-~~~~~~~~~~~~~
+Packagers
+~~~~~~~~~
 
 Breathe packages on PyPI are PGP signed for Breathe >= v4.28.0.
 
