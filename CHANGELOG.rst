@@ -6,7 +6,9 @@ Inspired by `Keepachangelog.com <http://keepachangelog.com/>`__.
 - Unreleased - **Breathe v4.31.0**
 
   - Collapse multiple retvals into a single bullet list. `#697 <https://github.com/michaeljones/breathe/pull/697>`__
-  - Fix duplicate ``static`` in function declarations. `#717 <https://github.com/michaeljones/breathe/pull/717>`__
+  - Fix duplicate ``static`` in function declarations. `#717 <https://github.com/michaeljones/breathe/issues/717>`__ `#720 <https://github.com/michaeljones/breathe/pull/720>`__
+  - Make doxygenfunction more robust when matching parameters. `#722 <https://github.com/michaeljones/breathe/issues/722>`__ `#723 <https://github.com/michaeljones/breathe/pull/723>`__
+  - Test against Sphinx 4.0.3, 4.1.2 and 4.1.x branch. `#721 <https://github.com/michaeljones/breathe/pull/721>`__
 
 - 2021-05-06 - **Breathe v4.30.0**
 
