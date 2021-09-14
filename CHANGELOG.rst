@@ -15,6 +15,7 @@ Inspired by `Keepachangelog.com <http://keepachangelog.com/>`__.
   - Make doxygenfunction more robust when matching parameters. `#722 <https://github.com/michaeljones/breathe/issues/722>`__ `#723 <https://github.com/michaeljones/breathe/pull/723>`__
   - Separate, link and style the changelog. `#735 <https://github.com/michaeljones/breathe/pull/735>`__
   - Update changelog and readme ahead of release. `#739 <https://github.com/michaeljones/breathe/pull/739>`__
+  - CICD: Track Sphinx 4.2.x development series. `#741 <https://github.com/michaeljones/breathe/pull/741>`__
 
 - 2021-05-06 - **Breathe v4.30.0**
 
