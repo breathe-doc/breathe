@@ -6,9 +6,15 @@ Inspired by `Keepachangelog.com <http://keepachangelog.com/>`__.
 - Unreleased - **Breathe v4.31.0**
 
   - Collapse multiple retvals into a single bullet list. `#697 <https://github.com/michaeljones/breathe/pull/697>`__
-  - Fix duplicate ``static`` in function declarations. `#717 <https://github.com/michaeljones/breathe/issues/717>`__ `#720 <https://github.com/michaeljones/breathe/pull/720>`__
-  - Make doxygenfunction more robust when matching parameters. `#722 <https://github.com/michaeljones/breathe/issues/722>`__ `#723 <https://github.com/michaeljones/breathe/pull/723>`__
+  - Fix mypy issues on CI. `#731 <https://github.com/michaeljones/breathe/pull/731>`__
+  - Print usage message from 'compare' doc script. `#727 <https://github.com/michaeljones/breathe/pull/727>`__
   - Test against Sphinx 4.0.3, 4.1.2 and 4.1.x branch. `#721 <https://github.com/michaeljones/breathe/pull/721>`__
+  - Fix duplicate ``static`` in function declarations. `#717 <https://github.com/michaeljones/breathe/issues/717>`__ `#720 <https://github.com/michaeljones/breathe/pull/720>`__
+  - Directive refactoring. `#698 <https://github.com/michaeljones/breathe/pull/698>`__
+  - Handle parsing errors. `#711 <https://github.com/michaeljones/breathe/pull/711>`__
+  - Make doxygenfunction more robust when matching parameters. `#722 <https://github.com/michaeljones/breathe/issues/722>`__ `#723 <https://github.com/michaeljones/breathe/pull/723>`__
+  - Separate, link and style the changelog. `#735 <https://github.com/michaeljones/breathe/pull/735>`__
+  - Update changelog and readme ahead of release. `#739 <https://github.com/michaeljones/breathe/pull/739>`__
 
 - 2021-05-06 - **Breathe v4.30.0**
 
