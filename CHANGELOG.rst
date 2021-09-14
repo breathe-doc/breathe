@@ -3,7 +3,7 @@ Change Log
 
 Inspired by `Keepachangelog.com <http://keepachangelog.com/>`__.
 
-- Unreleased - **Breathe v4.31.0**
+- 2021-09-14 - **Breathe v4.31.0**
 
   - Collapse multiple retvals into a single bullet list. `#697 <https://github.com/michaeljones/breathe/pull/697>`__
   - Fix mypy issues on CI. `#731 <https://github.com/michaeljones/breathe/pull/731>`__
