@@ -3,6 +3,10 @@ Change Log
 
 Inspired by `Keepachangelog.com <http://keepachangelog.com/>`__.
 
+- Unreleased
+
+  - Added ``breathe_doxygen_aliases`` config variable. `#729 <https://github.com/michaeljones/breathe/pull/729>`__
+
 - 2021-09-14 - **Breathe v4.31.0**
 
   - Collapse multiple retvals into a single bullet list. `#697 <https://github.com/michaeljones/breathe/pull/697>`__

@@ -24,9 +24,9 @@ JAVADOC_AUTOBRIEF = YES
 JAVADOC_AUTOBRIEF = NO
 GENERATE_HTML = NO
 GENERATE_XML = YES
-ALIASES = "rst=\verbatim embed:rst"
-ALIASES += "endrst=\endverbatim"
-ALIASES += "inlinerst=\verbatim embed:rst:inline"
+ALIASES = rst="\verbatim embed:rst"
+ALIASES += endrst="\endverbatim"
+ALIASES += inlinerst="\verbatim embed:rst:inline"
 {extra}
 """.strip()
 
@@ -46,7 +46,7 @@ class AutoDoxygenProcessHandle:
         self.write_file = write_file
         self.project_info_factory = project_info_factory
 
-    def generate_xml(self, projects_source, doxygen_options):
+    def generate_xml(self, projects_source, doxygen_options, doxygen_aliases):
 
         project_files = {}
 
@@ -65,24 +65,32 @@ class AutoDoxygenProcessHandle:
         # a directory in the Sphinx build area
         for project_name, data in project_files.items():
 
-            project_path = self.process(data.auto_project_info, data.files, doxygen_options)
+            project_path = self.process(
+                data.auto_project_info,
+                data.files,
+                doxygen_options,
+                doxygen_aliases)
 
             project_info = data.auto_project_info.create_project_info(project_path)
 
             self.project_info_factory.store_project_info_for_auto(project_name, project_info)
 
-    def process(self, auto_project_info, files, doxygen_options):
+    def process(self, auto_project_info, files, doxygen_options, doxygen_aliases):
 
         name = auto_project_info.name()
         cfgfile = "%s.cfg" % name
 
         full_paths = map(lambda x: auto_project_info.abs_path_to_source_file(x), files)
 
+        options = "\n".join("%s=%s" % pair for pair in doxygen_options.items())
+        aliases = '\n'.join(
+            f'ALIASES += {name}="{value}"' for name, value in doxygen_aliases.items())
+
         cfg = AUTOCFG_TEMPLATE.format(
             project_name=name,
             output_dir=name,
             input=" ".join(full_paths),
-            extra='\n'.join("%s=%s" % pair for pair in doxygen_options.items())
+            extra=f"{options}\n{aliases}"
             )
 
         build_dir = os.path.join(
