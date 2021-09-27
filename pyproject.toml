@@ -1,0 +1,5 @@
+[tool.black]
+line-length = 100
+extend-exclude = '''
+^/breathe/parser/.*
+'''
