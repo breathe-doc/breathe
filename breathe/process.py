@@ -65,7 +65,11 @@ class AutoDoxygenProcessHandle:
         # a directory in the Sphinx build area
         for project_name, data in project_files.items():
 
-            project_path = self.process(data.auto_project_info, data.files, doxygen_options, doxygen_aliases)
+            project_path = self.process(
+                data.auto_project_info,
+                data.files,
+                doxygen_options,
+                doxygen_aliases)
 
             project_info = data.auto_project_info.create_project_info(project_path)
 
@@ -78,12 +82,15 @@ class AutoDoxygenProcessHandle:
 
         full_paths = map(lambda x: auto_project_info.abs_path_to_source_file(x), files)
 
+        options = "\n".join("%s=%s" % pair for pair in doxygen_options.items())
+        aliases = '\n'.join(
+            f'ALIASES += {name}="{value}"' for name, value in doxygen_aliases.items())
+
         cfg = AUTOCFG_TEMPLATE.format(
             project_name=name,
             output_dir=name,
             input=" ".join(full_paths),
-            extra='\n'.join("%s=%s" % pair for pair in doxygen_options.items()) + "\n"
-                  + '\n'.join(f'ALIASES += {name}="{value}"' for name, value in doxygen_aliases.items())
+            extra=f"{options}\n{aliases}"
             )
 
         build_dir = os.path.join(
