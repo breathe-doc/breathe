@@ -1845,11 +1845,18 @@ class SphinxRenderer:
             name = self.join_nested_name(names)
             if dom == 'py':
                 declaration = name + node.get_argsstring()
+            elif dom == 'cs':
+                declaration = ' '.join([
+                    self.create_template_prefix(node),
+                    ''.join(n.astext() for n in self.render(node.get_type())),  # type: ignore
+                    name,
+                    node.get_argsstring()
+                ])
             else:
                 elements = [self.create_template_prefix(node)]
                 if node.static == 'yes':
                     elements.append('static')
-                if node.inline == 'yes' and dom != 'cs':
+                if node.inline == 'yes':
                     elements.append('inline')
                 if node.kind == 'friend':
                     elements.append('friend')
@@ -2013,6 +2020,21 @@ class SphinxRenderer:
             initializer = self.make_initializer(node).strip().lstrip('=').strip()
             if len(initializer) != 0:
                 options['value'] = initializer
+        elif dom == 'cs':
+            declaration = ' '.join([
+                self.create_template_prefix(node),
+                ''.join(n.astext() for n in self.render(node.get_type())),  # type: ignore
+                name,
+                node.get_argsstring()
+            ])
+            if node.get_gettable() or node.get_settable():
+                declaration += '{'
+                if node.get_gettable():
+                    declaration += 'get;'
+                if node.get_settable():
+                    declaration += 'set;'
+                declaration += '}'
+            declaration += self.make_initializer(node)
         else:
             elements = [self.create_template_prefix(node)]
             if node.static == 'yes':
@@ -2022,19 +2044,9 @@ class SphinxRenderer:
             typename = ''.join(n.astext() for n in self.render(node.get_type()))
             if dom == 'c' and '::' in typename:
                 typename = typename.replace('::', '.')
-            elif dom == 'cs':
-                typename = typename.replace(' ', '')
             elements.append(typename)
             elements.append(name)
             elements.append(node.get_argsstring())
-            if dom == 'cs':
-                if node.get_gettable() or node.get_settable():
-                    elements.append('{')
-                    if node.get_gettable():
-                        elements.append('get;')
-                    if node.get_settable():
-                        elements.append('set;')
-                    elements.append('}')
             elements.append(self.make_initializer(node))
             declaration = ' '.join(elements)
         if not dom or dom in ('c', 'cpp', 'py', 'cs'):

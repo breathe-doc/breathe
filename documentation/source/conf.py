@@ -78,8 +78,9 @@ elif read_the_docs_build:
 
 else:
 
-    # For our usual dev build we'll be in the 'documentation' directory
-    sys.path.append('../')
+    # For our usual dev build we'll be in the 'documentation' directory but Sphinx seems to set the
+    # current working directory to 'source' so we append relative to that
+    sys.path.append('../../')
 
     # Check if it matches a pure tag number vX.Y.Z, rather than vX.Y.Z-91-g8676988 which is how
     # non-tagged commits are described (ie. relative to the last tag)
