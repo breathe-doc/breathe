@@ -36,13 +36,13 @@ class _DoxygenClassLikeDirective(BaseDirective):
             project_info = self.project_info_factory.create_project_info(self.options)
         except ProjectError as e:
             warning = self.create_warning(None, kind=self.kind)
-            return warning.warn('doxygen{kind}: %s' % e)
+            return warning.warn("doxygen{kind}: %s" % e)
 
         try:
             finder = self.finder_factory.create_finder(project_info)
         except MTimeError as e:
             warning = self.create_warning(None, kind=self.kind)
-            return warning.warn('doxygen{kind}: %s' % e)
+            return warning.warn("doxygen{kind}: %s" % e)
 
         finder_filter = self.filter_factory.create_compound_finder_filter(name, self.kind)
 
@@ -58,8 +58,9 @@ class _DoxygenClassLikeDirective(BaseDirective):
         filter_ = self.filter_factory.create_class_filter(name, self.options)
 
         mask_factory = NullMaskFactory()
-        return self.render(matches[0], project_info, filter_, target_handler, mask_factory,
-                           self.directive_args)
+        return self.render(
+            matches[0], project_info, filter_, target_handler, mask_factory, self.directive_args
+        )
 
 
 class DoxygenClassDirective(_DoxygenClassLikeDirective):

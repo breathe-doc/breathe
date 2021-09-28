@@ -17,8 +17,7 @@ class _CreateCompoundTypeSubFinder:
 
     def __call__(self, project_info: ProjectInfo, *args):
         compound_parser = self.parser_factory.create_compound_parser(project_info)
-        return indexfinder.CompoundTypeSubItemFinder(self.app, compound_parser,
-                                                     project_info, *args)
+        return indexfinder.CompoundTypeSubItemFinder(self.app, compound_parser, project_info, *args)
 
 
 class DoxygenItemFinderFactory:

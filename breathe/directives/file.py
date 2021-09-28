@@ -45,7 +45,7 @@ class _BaseFileDirective(BaseDirective):
                 self.state.document,
                 target_handler,
                 self.parser_factory.create_compound_parser(project_info),
-                filter_
+                filter_,
             )
 
             mask_factory = NullMaskFactory()
@@ -56,7 +56,7 @@ class _BaseFileDirective(BaseDirective):
 
 
 class DoxygenFileDirective(_BaseFileDirective):
-    directive_name = 'doxygenfile'
+    directive_name = "doxygenfile"
 
     required_arguments = 0
     optional_arguments = 3
@@ -77,13 +77,13 @@ class DoxygenFileDirective(_BaseFileDirective):
             project_info = self.project_info_factory.create_project_info(self.options)
         except ProjectError as e:
             warning = self.create_warning(None)
-            return warning.warn('doxygenfile: %s' % e)
+            return warning.warn("doxygenfile: %s" % e)
 
         return self.handle_contents(file_, project_info)
 
 
 class AutoDoxygenFileDirective(_BaseFileDirective):
-    directive_name = 'autodoxygenfile'
+    directive_name = "autodoxygenfile"
 
     required_arguments = 1
     option_spec = {
@@ -104,6 +104,6 @@ class AutoDoxygenFileDirective(_BaseFileDirective):
             project_info = self.project_info_factory.retrieve_project_info_for_auto(self.options)
         except ProjectError as e:
             warning = self.create_warning(None)
-            return warning.warn('autodoxygenfile: %s' % e)
+            return warning.warn("autodoxygenfile: %s" % e)
 
         return self.handle_contents(file_, project_info)

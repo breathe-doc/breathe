@@ -55,7 +55,8 @@ class CompoundTypeSubItemFinder(ItemFinder):
 
             for member_stack in member_matches:
                 ref_filter = self.filter_factory.create_id_filter(
-                    'memberdef', member_stack[0].refid)
+                    "memberdef", member_stack[0].refid
+                )
                 finder.filter_(node_stack, ref_filter, matches)
         else:
             # Read in the xml file referenced by the compound and descend into that as well

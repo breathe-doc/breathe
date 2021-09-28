@@ -26,7 +26,7 @@ class _DoxygenContentBlockDirective(BaseDirective):
         "protected-members": flag,
         "private-members": flag,
         "undoc-members": flag,
-        "no-link": flag
+        "no-link": flag,
     }
     has_content = False
 
@@ -37,13 +37,13 @@ class _DoxygenContentBlockDirective(BaseDirective):
             project_info = self.project_info_factory.create_project_info(self.options)
         except ProjectError as e:
             warning = self.create_warning(None, kind=self.kind)
-            return warning.warn('doxygen{kind}: %s' % e)
+            return warning.warn("doxygen{kind}: %s" % e)
 
         try:
             finder = self.finder_factory.create_finder(project_info)
         except MTimeError as e:
             warning = self.create_warning(None, kind=self.kind)
-            return warning.warn('doxygen{kind}: %s' % e)
+            return warning.warn("doxygen{kind}: %s" % e)
 
         finder_filter = self.filter_factory.create_finder_filter(self.kind, name)
 
@@ -57,15 +57,16 @@ class _DoxygenContentBlockDirective(BaseDirective):
             warning = self.create_warning(project_info, name=name, kind=self.kind)
             return warning.warn('doxygen{kind}: Cannot find {kind} "{name}" {tail}')
 
-        if 'content-only' in self.options and self.kind != "page":
+        if "content-only" in self.options and self.kind != "page":
             # Unpack the single entry in the matches list
             (node_stack,) = matches
 
             filter_ = self.filter_factory.create_content_filter(self.kind, self.options)
             # Having found the compound node for the namespace or group in the index we want to grab
             # the contents of it which match the filter
-            contents_finder = self.finder_factory.create_finder_from_root(node_stack[0],
-                                                                          project_info)
+            contents_finder = self.finder_factory.create_finder_from_root(
+                node_stack[0], project_info
+            )
             # TODO: find a more specific type for the Doxygen nodes
             contents = []  # type: List[Any]
             contents_finder.filter_(filter_, contents)
@@ -86,7 +87,7 @@ class _DoxygenContentBlockDirective(BaseDirective):
                 self.state.document,
                 target_handler,
                 self.parser_factory.create_compound_parser(project_info),
-                filter_
+                filter_,
             )
 
             mask_factory = NullMaskFactory()

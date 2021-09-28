@@ -57,7 +57,8 @@ class AutoDoxygenProcessHandle:
             contents = file_structure[1]
 
             auto_project_info = self.project_info_factory.create_auto_project_info(
-                project_name, folder)
+                project_name, folder
+            )
 
             project_files[project_name] = ProjectData(auto_project_info, contents)
 
@@ -66,10 +67,8 @@ class AutoDoxygenProcessHandle:
         for project_name, data in project_files.items():
 
             project_path = self.process(
-                data.auto_project_info,
-                data.files,
-                doxygen_options,
-                doxygen_aliases)
+                data.auto_project_info, data.files, doxygen_options, doxygen_aliases
+            )
 
             project_info = data.auto_project_info.create_project_info(project_path)
 
@@ -83,27 +82,24 @@ class AutoDoxygenProcessHandle:
         full_paths = map(lambda x: auto_project_info.abs_path_to_source_file(x), files)
 
         options = "\n".join("%s=%s" % pair for pair in doxygen_options.items())
-        aliases = '\n'.join(
-            f'ALIASES += {name}="{value}"' for name, value in doxygen_aliases.items())
+        aliases = "\n".join(
+            f'ALIASES += {name}="{value}"' for name, value in doxygen_aliases.items()
+        )
 
         cfg = AUTOCFG_TEMPLATE.format(
             project_name=name,
             output_dir=name,
             input=" ".join(full_paths),
-            extra=f"{options}\n{aliases}"
-            )
+            extra=f"{options}\n{aliases}",
+        )
 
-        build_dir = os.path.join(
-            auto_project_info.build_dir(),
-            "breathe",
-            "doxygen"
-            )
+        build_dir = os.path.join(auto_project_info.build_dir(), "breathe", "doxygen")
 
         self.write_file(build_dir, cfgfile, cfg)
 
         # Shell-escape the cfg file name to try to avoid any issue where the name might include
         # malicious shell character - We have to use the shell=True option to make it work on
         # Windows. See issue #271
-        self.run_process('doxygen %s' % quote(cfgfile), cwd=build_dir, shell=True)
+        self.run_process("doxygen %s" % quote(cfgfile), cwd=build_dir, shell=True)
 
         return os.path.join(build_dir, name, "xml")

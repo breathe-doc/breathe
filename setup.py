@@ -3,54 +3,55 @@ try:
     from setuptools import setup, find_packages
 except ImportError:
     import distribute_setup
+
     distribute_setup.use_setuptools()
     from setuptools import setup, find_packages
 
 import sys
 from breathe import __version__
 
-long_desc = '''
+long_desc = """
 Breathe is an extension to reStructuredText and Sphinx to be able to read and
  render `Doxygen <http://www.doxygen.org>`__ xml output.
-'''
+"""
 
-requires = ['Sphinx>=3.0,<5', 'docutils>=0.12']
+requires = ["Sphinx>=3.0,<5", "docutils>=0.12"]
 
 if sys.version_info < (3, 6):
-    print('ERROR: Sphinx requires at least Python 3.6 to run.')
+    print("ERROR: Sphinx requires at least Python 3.6 to run.")
     sys.exit(1)
 
 
 setup(
-    name='breathe',
+    name="breathe",
     version=__version__,
-    url='https://github.com/michaeljones/breathe',
-    download_url='https://github.com/michaeljones/breathe',
-    license='BSD',
-    author='Michael Jones',
-    author_email='m.pricejones@gmail.com',
-    description='Sphinx Doxygen renderer',
+    url="https://github.com/michaeljones/breathe",
+    download_url="https://github.com/michaeljones/breathe",
+    license="BSD",
+    author="Michael Jones",
+    author_email="m.pricejones@gmail.com",
+    description="Sphinx Doxygen renderer",
     long_description=long_desc,
     zip_safe=False,
     classifiers=[
-        'Development Status :: 4 - Beta',
-        'Environment :: Console',
-        'Environment :: Web Environment',
-        'Intended Audience :: Developers',
-        'Intended Audience :: Education',
-        'License :: OSI Approved :: BSD License',
-        'Operating System :: OS Independent',
-        'Programming Language :: Python :: 3',
-        'Topic :: Documentation',
-        'Topic :: Text Processing',
-        'Topic :: Utilities',
+        "Development Status :: 4 - Beta",
+        "Environment :: Console",
+        "Environment :: Web Environment",
+        "Intended Audience :: Developers",
+        "Intended Audience :: Education",
+        "License :: OSI Approved :: BSD License",
+        "Operating System :: OS Independent",
+        "Programming Language :: Python :: 3",
+        "Topic :: Documentation",
+        "Topic :: Text Processing",
+        "Topic :: Utilities",
     ],
-    platforms='any',
+    platforms="any",
     packages=find_packages(),
     include_package_data=True,
     entry_points={
-        'console_scripts': [
-            'breathe-apidoc = breathe.apidoc:main',
+        "console_scripts": [
+            "breathe-apidoc = breathe.apidoc:main",
         ],
     },
     install_requires=requires,

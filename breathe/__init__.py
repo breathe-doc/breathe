@@ -4,7 +4,7 @@ from breathe.renderer.sphinxrenderer import setup as renderer_setup
 
 from sphinx.application import Sphinx
 
-__version__ = '4.31.0'
+__version__ = "4.31.0"
 
 
 def setup(app: Sphinx):
@@ -12,8 +12,4 @@ def setup(app: Sphinx):
     file_state_cache_setup(app)
     renderer_setup(app)
 
-    return {
-        'version': __version__,
-        'parallel_read_safe': True,
-        'parallel_write_safe': True
-    }
+    return {"version": __version__, "parallel_read_safe": True, "parallel_write_safe": True}

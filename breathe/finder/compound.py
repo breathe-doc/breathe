@@ -49,7 +49,7 @@ class MemberDefTypeSubItemFinder(ItemFinder):
         if filter_.allow(node_stack):
             matches.append(node_stack)
 
-        if data_object.kind == 'enum':
+        if data_object.kind == "enum":
             for value in data_object.enumvalue:
                 value_stack = stack(value, node_stack)
                 if filter_.allow(value_stack):

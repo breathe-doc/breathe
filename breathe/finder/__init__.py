@@ -12,8 +12,7 @@ def stack(element, list_):
 
 
 class ItemFinder:
-    def __init__(self, project_info: ProjectInfo, data_object,
-                 item_finder_factory):
+    def __init__(self, project_info: ProjectInfo, data_object, item_finder_factory):
         self.data_object = data_object
         # DoxygenItemFinderFactory, but actually typing it would introduce an import cycle
         self.item_finder_factory = item_finder_factory
