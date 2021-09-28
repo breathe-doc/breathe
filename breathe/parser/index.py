@@ -1,4 +1,3 @@
-# flake8: noqa: E305
 """
 Generated Mon Feb  9 19:08:05 2009 by generateDS.py.
 """
