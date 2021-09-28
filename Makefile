@@ -43,6 +43,10 @@ flake8:
 		breathe/renderer/filter.py \
 		breathe/parser/compound.py
 
+.PHONY: black
+black:
+	black --check .
+
 .PHONY: type-check
 type-check:
 	mypy breathe tests

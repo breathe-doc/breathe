@@ -19,10 +19,12 @@ jobs:
       - name: install dependencies
         run: |
           pip install -r requirements/development.txt
-          pip install flake8
 
       - name: lint the source code
         run: make flake8
+
+      - name: check source code formatting
+        run: make black
 
       - name: type check the source code
         run: make type-check
