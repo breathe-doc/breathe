@@ -24,7 +24,7 @@ def _getmtime(filename: str):
     try:
         return os.path.getmtime(filename)
     except OSError:
-        raise MTimeError('Cannot find file: %s' % os.path.realpath(filename))
+        raise MTimeError("Cannot find file: %s" % os.path.realpath(filename))
 
 
 def update(app: Sphinx, source_file: str) -> None:
@@ -33,7 +33,8 @@ def update(app: Sphinx, source_file: str) -> None:
 
     new_mtime = _getmtime(source_file)
     mtime, docnames = app.env.breathe_file_state.setdefault(  # type: ignore
-        source_file, (new_mtime, set()))
+        source_file, (new_mtime, set())
+    )
 
     assert app.env is not None
     docnames.add(app.env.docname)
@@ -41,8 +42,9 @@ def update(app: Sphinx, source_file: str) -> None:
     app.env.breathe_file_state[source_file] = (new_mtime, docnames)  # type: ignore
 
 
-def _get_outdated(app: Sphinx, env: BuildEnvironment,
-                  added: Set[str], changed: Set[str], removed: Set[str]) -> List[str]:
+def _get_outdated(
+    app: Sphinx, env: BuildEnvironment, added: Set[str], changed: Set[str], removed: Set[str]
+) -> List[str]:
     if not hasattr(app.env, "breathe_file_state"):
         return []
 

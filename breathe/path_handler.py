@@ -6,7 +6,7 @@ import os
 def includes_directory(file_path: str):
     # Check for backslash or forward slash as we don't know what platform we're on and sometimes
     # the doxygen paths will have forward slash even on Windows.
-    return bool(file_path.count('\\')) or bool(file_path.count('/'))
+    return bool(file_path.count("\\")) or bool(file_path.count("/"))
 
 
 def resolve_path(app: Sphinx, directory: str, filename: str):

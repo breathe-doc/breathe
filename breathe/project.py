@@ -1,4 +1,3 @@
-
 from .exception import BreatheError
 
 from sphinx.application import Sphinx
@@ -48,11 +47,7 @@ class AutoProjectInfo:
     def create_project_info(self, project_path):
         """Creates a proper ProjectInfo object based on the information in this AutoProjectInfo"""
 
-        return ProjectInfo(self.app,
-                           self._name,
-                           project_path,
-                           self._source_path,
-                           self._reference)
+        return ProjectInfo(self.app, self._name, project_path, self._source_path, self._reference)
 
 
 class ProjectInfo:
@@ -145,8 +140,11 @@ class ProjectInfoFactory:
             return config.breathe_projects[config.breathe_default_project]
         except KeyError:
             raise ProjectError(
-                ("breathe_default_project value '%s' does not seem to be a valid key for the "
-                 "breathe_projects dictionary") % config.breathe_default_project
+                (
+                    "breathe_default_project value '%s' does not seem to be a valid key for the "
+                    "breathe_projects dictionary"
+                )
+                % config.breathe_default_project
             )
 
     def create_project_info(self, options) -> ProjectInfo:
@@ -158,8 +156,10 @@ class ProjectInfoFactory:
                 path = config.breathe_projects[options["project"]]
                 name = options["project"]
             except KeyError:
-                raise ProjectError("Unable to find project '%s' in breathe_projects dictionary"
-                                   % options["project"])
+                raise ProjectError(
+                    "Unable to find project '%s' in breathe_projects dictionary"
+                    % options["project"]
+                )
         elif "path" in options:
             path = options["path"]
         else:
@@ -174,11 +174,7 @@ class ProjectInfoFactory:
                 reference = path
                 self.project_count += 1
 
-            project_info = ProjectInfo(self.app,
-                                       name,
-                                       path,
-                                       "NoSourcePath",
-                                       reference)
+            project_info = ProjectInfo(self.app, name, path, "NoSourcePath", reference)
             self.project_info_store[path] = project_info
             return project_info
 
@@ -198,7 +194,7 @@ class ProjectInfoFactory:
         sense.
         """
 
-        name = options.get('project', self.app.config.breathe_default_project)  # type: ignore
+        name = options.get("project", self.app.config.breathe_default_project)  # type: ignore
         if name is None:
             raise NoDefaultProjectError(
                 "No breathe_default_project config setting to fall back on "
@@ -217,10 +213,8 @@ class ProjectInfoFactory:
                 reference = source_path
                 self.project_count += 1
 
-            auto_project_info = AutoProjectInfo(self.app,
-                                                name,
-                                                source_path,
-                                                self.build_dir,
-                                                reference)
+            auto_project_info = AutoProjectInfo(
+                self.app, name, source_path, self.build_dir, reference
+            )
             self.auto_project_info_store[key] = auto_project_info
             return auto_project_info

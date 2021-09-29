@@ -15,8 +15,7 @@ class RootDataObject:
 
 
 class _BaseIndexDirective(BaseDirective):
-    """Base class handle the main work when given the appropriate project info to work from.
-    """
+    """Base class handle the main work when given the appropriate project info to work from."""
 
     # We use inheritance here rather than a separate object and composition, because so much
     # information is present in the Directive class from the docutils framework that we'd have to
@@ -26,8 +25,9 @@ class _BaseIndexDirective(BaseDirective):
         try:
             finder = self.finder_factory.create_finder(project_info)
         except ParserError as e:
-            return format_parser_error(self.name, e.error, e.filename, self.state,
-                                       self.lineno, True)
+            return format_parser_error(
+                self.name, e.error, e.filename, self.state, self.lineno, True
+            )
         except FileIOError as e:
             return format_parser_error(self.name, e.error, e.filename, self.state, self.lineno)
 
@@ -44,18 +44,18 @@ class _BaseIndexDirective(BaseDirective):
             self.state.document,
             target_handler,
             self.parser_factory.create_compound_parser(project_info),
-            filter_
+            filter_,
         )
 
         mask_factory = NullMaskFactory()
-        context = RenderContext([data_object, RootDataObject()], mask_factory,
-                                self.directive_args)
+        context = RenderContext([data_object, RootDataObject()], mask_factory, self.directive_args)
 
         try:
             node_list = object_renderer.render(context.node_stack[0], context)
         except ParserError as e:
-            return format_parser_error(self.name, e.error, e.filename, self.state,
-                                       self.lineno, True)
+            return format_parser_error(
+                self.name, e.error, e.filename, self.state, self.lineno, True
+            )
         except FileIOError as e:
             return format_parser_error(self.name, e.error, e.filename, self.state, self.lineno)
 
@@ -80,7 +80,7 @@ class DoxygenIndexDirective(_BaseIndexDirective):
             project_info = self.project_info_factory.create_project_info(self.options)
         except ProjectError as e:
             warning = self.create_warning(None)
-            return warning.warn('doxygenindex: %s' % e)
+            return warning.warn("doxygenindex: %s" % e)
 
         return self.handle_contents(project_info)
 
@@ -104,6 +104,6 @@ class AutoDoxygenIndexDirective(_BaseIndexDirective):
             project_info = self.project_info_factory.retrieve_project_info_for_auto(self.options)
         except ProjectError as e:
             warning = self.create_warning(None)
-            return warning.warn('autodoxygenindex: %s' % e)
+            return warning.warn("autodoxygenindex: %s" % e)
 
         return self.handle_contents(project_info)

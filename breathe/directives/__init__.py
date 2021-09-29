@@ -21,14 +21,19 @@ class _WarningHandler:
         self.state = state
         self.context = context
 
-    def warn(self, raw_text: str, *, rendered_nodes: Sequence[nodes.Node] = None,
-             unformatted_suffix: str = '') -> List[nodes.Node]:
+    def warn(
+        self,
+        raw_text: str,
+        *,
+        rendered_nodes: Sequence[nodes.Node] = None,
+        unformatted_suffix: str = ""
+    ) -> List[nodes.Node]:
         raw_text = self.format(raw_text) + unformatted_suffix
         if rendered_nodes is None:
             rendered_nodes = [nodes.paragraph("", "", nodes.Text(raw_text))]
         return [
             nodes.warning("", *rendered_nodes),
-            self.state.document.reporter.warning(raw_text, line=self.context['lineno'])
+            self.state.document.reporter.warning(raw_text, line=self.context["lineno"]),
         ]
 
     def format(self, text: str) -> str:
@@ -42,10 +47,13 @@ class BaseDirective(SphinxDirective):
     has_content: bool
     final_argument_whitespace: bool
 
-    def __init__(self, finder_factory: FinderFactory,
-                 project_info_factory: ProjectInfoFactory,
-                 parser_factory: DoxygenParserFactory,
-                 *args) -> None:
+    def __init__(
+        self,
+        finder_factory: FinderFactory,
+        project_info_factory: ProjectInfoFactory,
+        parser_factory: DoxygenParserFactory,
+        *args
+    ) -> None:
         super().__init__(*args)
         self.directive_args = list(args)  # Convert tuple to list to allow modification.
 
@@ -61,22 +69,23 @@ class BaseDirective(SphinxDirective):
     def create_warning(self, project_info: Optional[ProjectInfo], **kwargs) -> _WarningHandler:
         if project_info:
             tail = 'in doxygen xml output for project "{project}" from directory: {path}'.format(
-                project=project_info.name(),
-                path=project_info.project_path()
+                project=project_info.name(), path=project_info.project_path()
             )
         else:
-            tail = ''
+            tail = ""
 
-        context = dict(
-            lineno=self.lineno,
-            tail=tail,
-            **kwargs
-        )
+        context = dict(lineno=self.lineno, tail=tail, **kwargs)
         return _WarningHandler(self.state, context)
 
-    def render(self, node_stack, project_info: ProjectInfo, filter_: Filter,
-               target_handler: TargetHandler, mask_factory: MaskFactoryBase,
-               directive_args) -> List[Node]:
+    def render(
+        self,
+        node_stack,
+        project_info: ProjectInfo,
+        filter_: Filter,
+        target_handler: TargetHandler,
+        mask_factory: MaskFactoryBase,
+        directive_args,
+    ) -> List[Node]:
         "Standard render process used by subclasses"
 
         try:
@@ -88,14 +97,16 @@ class BaseDirective(SphinxDirective):
                 self.state.document,
                 target_handler,
                 self.parser_factory.create_compound_parser(project_info),
-                filter_
+                filter_,
             )
         except ParserError as e:
-            return format_parser_error("doxygenclass", e.error, e.filename, self.state,
-                                       self.lineno, True)
+            return format_parser_error(
+                "doxygenclass", e.error, e.filename, self.state, self.lineno, True
+            )
         except FileIOError as e:
-            return format_parser_error("doxygenclass", e.error, e.filename, self.state,
-                                       self.lineno, True)
+            return format_parser_error(
+                "doxygenclass", e.error, e.filename, self.state, self.lineno, True
+            )
 
         context = RenderContext(node_stack, mask_factory, directive_args)
         return object_renderer.render(node_stack[0], context)

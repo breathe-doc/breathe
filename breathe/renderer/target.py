@@ -33,8 +33,9 @@ class _NullTargetHandler(TargetHandler):
         return []
 
 
-def create_target_handler(options: Dict[str, Any], project_info: ProjectInfo,
-                          document: nodes.document) -> TargetHandler:
+def create_target_handler(
+    options: Dict[str, Any], project_info: ProjectInfo, document: nodes.document
+) -> TargetHandler:
     if "no-link" in options:
         return _NullTargetHandler()
     return _RealTargetHandler(project_info, document)
