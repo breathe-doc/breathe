@@ -115,4 +115,5 @@ class DoxygenPageDirective(_DoxygenContentBlockDirective):
         "path": unchanged_required,
         "project": unchanged_required,
         "content-only": flag,
+        "no-link": flag,
     }
