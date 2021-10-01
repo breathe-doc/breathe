@@ -896,7 +896,7 @@ class SphinxRenderer:
             fieldLists = [fieldList]
 
         # collapse retvals into a single return field
-        if len(fieldLists) != 0:
+        if len(fieldLists) != 0 and sphinx.version_info[0:2] < (4, 3):
             others: nodes.field = []
             retvals: nodes.field = []
             for f in fieldLists[0]:
@@ -2211,7 +2211,8 @@ class SphinxRenderer:
             "param": "param",
             "exception": "throws",
             "templateparam": "tparam",
-            "retval": "returns",
+            # retval support available on Sphinx >= 4.3
+            "retval": "returns" if sphinx.version_info[0:2] < (4, 3) else "retval",
         }
 
         # https://docutils.sourceforge.io/docs/ref/doctree.html#field-list
