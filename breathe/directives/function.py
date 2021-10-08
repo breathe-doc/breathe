@@ -43,17 +43,11 @@ class DoxygenFunctionDirective(BaseDirective):
 
     def run(self) -> List[Node]:
         # Separate possible arguments (delimited by a "(") from the namespace::name
-        match = re.match(r"([^(]*)(.*)", self.arguments[0])
+        match = re.match(r"(?:([^:(<]+(?:::[^:(<]+)*)::)?([^(]+)(.*)", self.arguments[0])
         assert match is not None  # TODO: this is probably not appropriate, for now it fixes typing
-        namespaced_function, args = match.group(1), match.group(2)
-
-        # Split the namespace and the function name
-        try:
-            (namespace, function_name) = namespaced_function.rsplit("::", 1)
-        except ValueError:
-            (namespace, function_name) = "", namespaced_function
-        namespace = namespace.strip()
-        function_name = function_name.strip()
+        namespace = match.group(1).strip()
+        function_name = match.group(2).strip()
+        args = match.group(3)
 
         try:
             project_info = self.project_info_factory.create_project_info(self.options)
