@@ -1055,7 +1055,7 @@ class SphinxRenderer:
                     decls.append(",")
                 else:
                     first = False
-                if base.prot is not None and domain != "cs":
+                if base.prot is not None and domain != 'cs':
                     decls.append(base.prot)
                 if base.virt == "virtual":
                     decls.append("virtual")
