@@ -45,7 +45,7 @@ class DoxygenFunctionDirective(BaseDirective):
         # Separate possible arguments (delimited by a "(") from the namespace::name
         match = re.match(r"(?:([^:(<]+(?:::[^:(<]+)*)::)?([^(]+)(.*)", self.arguments[0])
         assert match is not None  # TODO: this is probably not appropriate, for now it fixes typing
-        namespace = match.group(1).strip()
+        namespace = (match.group(1) or "").strip()
         function_name = match.group(2).strip()
         args = match.group(3)
 
