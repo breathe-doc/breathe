@@ -1,3 +1,5 @@
+#include <string>
+
 /**
  * @brief a function with one template arguments
  * 
@@ -9,6 +11,18 @@
  */
 template <typename T>
 T function1(T arg1)
+{}
+
+
+/**
+ * @brief a function with one template argument specialized for `std::string`
+ *
+ * @param arg1 argument of type `std::string`
+ *
+ * @return return value of type `std::string`
+ */
+template <>
+std::string function1<std::string>(std::string arg1)
 {}
 
 

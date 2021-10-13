@@ -43,6 +43,17 @@ A function with single template parameter renders as:
 
 ----
 
+.. cpp:namespace:: @ex_specialized_template_function_single
+
+If specialized for a given type it renders as:
+
+----
+
+.. doxygenfunction:: function1< std::string >
+   :project: template_function
+
+----
+
 .. cpp:namespace:: @ex_template_function_multiple
 
 With multiple template parameters it renders as:
