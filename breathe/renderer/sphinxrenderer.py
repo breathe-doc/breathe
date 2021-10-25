@@ -236,6 +236,7 @@ class DomainDirectiveFactory:
         "signal": (CPPFunctionObject, "function"),
         "slot": (CPPFunctionObject, "function"),
         "enum": (CPPEnumObject, "enum"),
+        "enum-class": (CPPEnumObject, "enum-class"),
         "typedef": (CPPTypeObject, "type"),
         "using": (CPPTypeObject, "type"),
         "union": (CPPUnionObject, "union"),
@@ -2002,12 +2003,14 @@ class SphinxRenderer:
             enums = self.render_iterable(node.enumvalue)
             contentnode.extend(enums)
 
-        # TODO: scopedness, Doxygen doesn't seem to generate the xml for that
         # TODO: underlying type, Doxygen doesn't seem to generate the xml for that
         names = self.get_qualification()
         names.append(node.name)
         declaration = self.join_nested_name(names)
-        return self.handle_declaration(node, declaration, content_callback=content)
+        obj_type = "enum-class" if node.strong == "yes" else "enum"
+        return self.handle_declaration(
+            node, declaration, obj_type=obj_type, content_callback=content
+        )
 
     def visit_enumvalue(self, node) -> List[Node]:
         if self.app.config.breathe_show_enumvalue_initializer:  # type: ignore

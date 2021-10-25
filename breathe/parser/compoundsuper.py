@@ -1039,7 +1039,7 @@ class sectiondefType(GeneratedsSuper):
 class memberdefType(GeneratedsSuper):
     subclass = None
     superclass = None
-    def __init__(self, initonly=None, kind=None, volatile=None, const=None, raisexx=None, virt=None, readable=None, prot=None, explicit=None, new=None, final=None, writable=None, add=None, static=None, remove=None, sealed=None, mutable=None, gettable=None, inline=None, settable=None, id=None, templateparamlist=None, type_=None, definition=None, argsstring=None, name=None, read=None, write=None, bitfield=None, reimplements=None, reimplementedby=None, param=None, enumvalue=None, initializer=None, exceptions=None, briefdescription=None, detaileddescription=None, inbodydescription=None, location=None, references=None, referencedby=None, refqual=None):
+    def __init__(self, initonly=None, kind=None, volatile=None, const=None, raisexx=None, virt=None, readable=None, prot=None, explicit=None, new=None, final=None, writable=None, add=None, static=None, strong=None, remove=None, sealed=None, mutable=None, gettable=None, inline=None, settable=None, id=None, templateparamlist=None, type_=None, definition=None, argsstring=None, name=None, read=None, write=None, bitfield=None, reimplements=None, reimplementedby=None, param=None, enumvalue=None, initializer=None, exceptions=None, briefdescription=None, detaileddescription=None, inbodydescription=None, location=None, references=None, referencedby=None, refqual=None):
         self.initonly = initonly
         self.kind = kind
         self.volatile = volatile
@@ -1054,6 +1054,7 @@ class memberdefType(GeneratedsSuper):
         self.writable = writable
         self.add = add
         self.static = static
+        self.strong = strong
         self.remove = remove
         self.sealed = sealed
         self.mutable = mutable
@@ -1186,6 +1187,8 @@ class memberdefType(GeneratedsSuper):
     def set_add(self, add): self.add = add
     def get_static(self): return self.static
     def set_static(self, static): self.static = static
+    def get_strong(self): return self.strong
+    def set_strong(self, strong): self.strong = strong
     def get_remove(self): return self.remove
     def set_remove(self, remove): self.remove = remove
     def get_sealed(self): return self.sealed
@@ -1263,6 +1266,8 @@ class memberdefType(GeneratedsSuper):
             self.add = attrs.get('add').value
         if attrs.get('static'):
             self.static = attrs.get('static').value
+        if attrs.get('strong'):
+            self.strong = attrs.get('strong').value
         if attrs.get('remove'):
             self.remove = attrs.get('remove').value
         if attrs.get('sealed'):

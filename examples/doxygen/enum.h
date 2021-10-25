@@ -9,6 +9,12 @@ class Test4
       V1, /*!< value 1 */
       V2  /*!< value 2 */
     };
+
+    enum class AnotherScopedEnum
+    {
+      V1, /*!< value 1 */
+      V2  /*!< value 2 */
+    };
 };
 
 /*! \class Test4
