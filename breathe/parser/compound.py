@@ -154,9 +154,9 @@ class memberdefTypeSub(supermod.memberdefType):
 
     def __init__(self, initonly=None, kind=None, volatile=None, const=None, raise_=None, virt=None,
                  readable=None, prot=None, explicit=None, new=None, final=None, writable=None,
-                 add=None, static=None, remove=None, sealed=None, mutable=None, gettable=None,
-                 inline=None, settable=None, id=None, templateparamlist=None, type_=None,
-                 definition='', argsstring='', name='', read='', write='', bitfield='',
+                 add=None, static=None, strong=None, remove=None, sealed=None, mutable=None,
+                 gettable=None, inline=None, settable=None, id=None, templateparamlist=None,
+                 type_=None, definition='', argsstring='', name='', read='', write='', bitfield='',
                  reimplements=None, reimplementedby=None, param=None, enumvalue=None,
                  initializer=None, exceptions=None, briefdescription=None, detaileddescription=None,
                  inbodydescription=None, location=None, references=None, referencedby=None,
@@ -164,8 +164,8 @@ class memberdefTypeSub(supermod.memberdefType):
 
         supermod.memberdefType.__init__(self, initonly, kind, volatile, const, raise_, virt,
                                         readable, prot, explicit, new, final, writable, add, static,
-                                        remove, sealed, mutable, gettable, inline, settable, id,
-                                        templateparamlist, type_, definition, argsstring, name,
+                                        strong, remove, sealed, mutable, gettable, inline, settable,
+                                        id, templateparamlist, type_, definition, argsstring, name,
                                         read, write, bitfield, reimplements, reimplementedby, param,
                                         enumvalue, initializer, exceptions, briefdescription,
                                         detaileddescription, inbodydescription, location,
