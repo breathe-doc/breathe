@@ -1546,6 +1546,11 @@ class SphinxRenderer:
             return [nodes.warning("", *nodelist)]
         elif node.kind == "note":
             return [nodes.note("", *nodelist)]
+        elif node.kind == "see":
+            return [addnodes.seealso("", *nodelist)]
+        elif node.kind == "remark":
+            nodelist = [nodes.title("", nodes.Text(node.kind.capitalize()))] + nodelist
+            return [nodes.admonition("", classes=[node.kind], *nodelist)]
 
         if node.kind == "par":
             text = self.render(node.title)
