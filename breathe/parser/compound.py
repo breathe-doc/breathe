@@ -758,7 +758,7 @@ supermod.docImageType.subclass = docImageTypeSub
 
 class docDotFileTypeSub(supermod.docDotFileType):
 
-    node_type = "docdocfile"
+    node_type = "docdotfile"
 
     def __init__(self, name=None, valueOf_='', mixedclass_=None, content_=None):
         supermod.docDotFileType.__init__(self, mixedclass_, content_)
@@ -766,6 +766,18 @@ class docDotFileTypeSub(supermod.docDotFileType):
 
 supermod.docDotFileType.subclass = docDotFileTypeSub
 # end class docDotFileTypeSub
+
+
+class docDotTypeSub(supermod.docDotType):
+
+    node_type = "docdot"
+
+    def __init__(self, name=None, valueOf_='', mixedclass_=None, content_=None):
+        supermod.docDotType.__init__(self, mixedclass_, content_)
+
+
+supermod.docDotType.subclass = docDotTypeSub
+# end class docDotTypeSub
 
 
 class docTocItemTypeSub(supermod.docTocItemType):
@@ -1058,6 +1070,14 @@ class docParaTypeSub(supermod.docParaType):
             self.content.append(obj_)
         elif child_.nodeType == Node.ELEMENT_NODE and nodeName_ == "table":
             obj_ = supermod.docTableType.factory()
+            obj_.build(child_)
+            self.content.append(obj_)
+        elif child_.nodeType == Node.ELEMENT_NODE and nodeName_ == "dotfile":
+            obj_ = supermod.docDotFileType.factory()
+            obj_.build(child_)
+            self.content.append(obj_)
+        elif child_.nodeType == Node.ELEMENT_NODE and nodeName_ == "dot":
+            obj_ = supermod.docDotType.factory()
             obj_.build(child_)
             self.content.append(obj_)
         else:

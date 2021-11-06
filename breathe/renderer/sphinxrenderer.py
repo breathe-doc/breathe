@@ -11,6 +11,7 @@ from sphinx.application import Sphinx
 from sphinx.directives import ObjectDescription
 from sphinx.domains import cpp, c, python
 from sphinx.util.nodes import nested_parse_with_titles
+from sphinx.ext.graphviz import graphviz
 
 from docutils import nodes
 from docutils.nodes import Element, Node, TextElement
@@ -2314,6 +2315,31 @@ class SphinxRenderer:
             fieldList += field
         return [fieldList]
 
+    def visit_docdot(self, node) -> List[Node]:
+        """Translate node from doxygen's dot command to sphinx's graphviz directive."""
+        graph_node = graphviz()
+        graph_node["code"] = node.content_[0].getValue()
+        graph_node["options"] = {}
+        if node.caption:
+            caption_node = nodes.caption(node.caption, "")
+            caption_node += nodes.Text(node.caption)
+            return [nodes.figure("", graph_node, caption_node)]
+        return [graph_node]
+
+    def visit_docdotfile(self, node) -> List[Node]:
+        """Translate node from doxygen's dotfile command to sphinx's graphviz directive."""
+        with open(node.name, encoding="utf-8") as fp:
+            dotcode = fp.read()
+        graph_node = graphviz()
+        graph_node["code"] = dotcode
+        graph_node["options"] = {"docname": node.name}
+        caption = "" if not node.content_ else node.content_[0].getValue()
+        if caption:
+            caption_node = nodes.caption(caption, "")
+            caption_node += nodes.Text(caption)
+            return [nodes.figure("", graph_node, caption_node)]
+        return [graph_node]
+
     def visit_unknown(self, node) -> List[Node]:
         """Visit a node of unknown type."""
         return []
@@ -2394,6 +2420,8 @@ class SphinxRenderer:
         "doctable": visit_doctable,
         "docrow": visit_docrow,
         "docentry": visit_docentry,
+        "docdotfile": visit_docdotfile,
+        "docdot": visit_docdot,
     }
 
     def render_string(self, node: str) -> List[Node]:

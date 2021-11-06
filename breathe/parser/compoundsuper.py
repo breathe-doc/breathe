@@ -5035,6 +5035,76 @@ class docDotFileType(GeneratedsSuper):
 # end class docDotFileType
 
 
+class docDotType(GeneratedsSuper):
+    subclass = None
+    superclass = None
+    def __init__(self, caption=None, valueOf_='', mixedclass_=None, content_=None):
+        self.caption = caption
+        if mixedclass_ is None:
+            self.mixedclass_ = MixedContainer
+        else:
+            self.mixedclass_ = mixedclass_
+        if content_ is None:
+            self.content_ = []
+        else:
+            self.content_ = content_
+    def factory(*args_, **kwargs_):
+        if docDotType.subclass:
+            return docDotType.subclass(*args_, **kwargs_)
+        else:
+            return docDotType(*args_, **kwargs_)
+    factory = staticmethod(factory)
+    def get_name(self): return self.caption
+    def set_name(self, caption): self.caption = caption
+    def getValueOf_(self): return self.valueOf_
+    def setValueOf_(self, valueOf_): self.valueOf_ = valueOf_
+    def export(self, outfile, level, namespace_='', name_='docDotType', namespacedef_=''):
+        showIndent(outfile, level)
+        outfile.write('<%s%s %s' % (namespace_, name_, namespacedef_, ))
+        self.exportAttributes(outfile, level, namespace_, name_='docDotType')
+        outfile.write('>')
+        self.exportChildren(outfile, level + 1, namespace_, name_)
+        outfile.write('</%s%s>\n' % (namespace_, name_))
+    def exportAttributes(self, outfile, level, namespace_='', name_='docDotType'):
+        if self.caption is not None:
+            outfile.write(' caption=%s' % (self.format_string(quote_attrib(self.caption).encode(ExternalEncoding), input_name='caption'), ))
+    def exportChildren(self, outfile, level, namespace_='', name_='docDotType'):
+        if self.valueOf_.find('![CDATA')>-1:
+            value=quote_xml('%s' % self.valueOf_)
+            value=value.replace('![CDATA','<![CDATA')
+            value=value.replace(']]',']]>')
+            outfile.write(value)
+        else:
+            outfile.write(quote_xml('%s' % self.valueOf_))
+    def hasContent_(self):
+        if (
+            self.valueOf_ is not None
+            ):
+            return True
+        else:
+            return False
+    def build(self, node_):
+        attrs = node_.attributes
+        self.buildAttributes(attrs)
+        self.valueOf_ = ''
+        for child_ in node_.childNodes:
+            nodeName_ = child_.nodeName.split(':')[-1]
+            self.buildChildren(child_, nodeName_)
+    def buildAttributes(self, attrs):
+        if attrs.get('caption'):
+            self.caption = attrs.get('caption').value
+    def buildChildren(self, child_, nodeName_):
+        if child_.nodeType == Node.TEXT_NODE:
+            obj_ = self.mixedclass_(MixedContainer.CategoryText,
+                MixedContainer.TypeNone, '', child_.nodeValue)
+            self.content_.append(obj_)
+        if child_.nodeType == Node.TEXT_NODE:
+            self.valueOf_ += child_.nodeValue
+        elif child_.nodeType == Node.CDATA_SECTION_NODE:
+            self.valueOf_ += '![CDATA['+child_.nodeValue+']]'
+# end class docDotType
+
+
 class docTocItemType(GeneratedsSuper):
     subclass = None
     superclass = None
