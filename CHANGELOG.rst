@@ -13,6 +13,9 @@ Inspired by `Keepachangelog.com <http://keepachangelog.com/>`__.
   - Render C++ scoped enums differently than unscoped enums, and with their
     underlying type.
     `#753 <https://github.com/michaeljones/breathe/pull/753>`__
+  - Render ``\retval`` lists using dedicated field list when Sphinx >= 4.3 is
+    used.
+    `#749 <https://github.com/michaeljones/breathe/pull/749>`__
 
 - 2021-09-14 - **Breathe v4.31.0**
 
