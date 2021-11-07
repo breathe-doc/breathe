@@ -2008,11 +2008,16 @@ class SphinxRenderer:
             enums = self.render_iterable(node.enumvalue)
             contentnode.extend(enums)
 
-        # TODO: underlying type, Doxygen doesn't seem to generate the xml for that
         names = self.get_qualification()
         names.append(node.name)
         declaration = self.join_nested_name(names)
-        obj_type = "enum-class" if node.strong == "yes" else "enum"
+        if node.strong == "yes":
+            obj_type = "enum-class"
+            declaration += " : "
+            for n in self.render(node.type_):
+                declaration += n.astext()
+        else:
+            obj_type = "enum"
         return self.handle_declaration(
             node, declaration, obj_type=obj_type, content_callback=content
         )

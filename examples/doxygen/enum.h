@@ -10,7 +10,7 @@ class Test4
       V2  /*!< value 2 */
     };
 
-    enum class AnotherScopedEnum
+    enum class AnotherScopedEnum : long
     {
       V1, /*!< value 1 */
       V2  /*!< value 2 */
