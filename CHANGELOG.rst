@@ -10,6 +10,9 @@ Inspired by `Keepachangelog.com <http://keepachangelog.com/>`__.
   - Render ``\remark``/``\remarks`` and ``\see``/``\sa`` using Sphinx/Docutils
     admonition style nodes.
     `#756 <https://github.com/michaeljones/breathe/pull/756>`__
+  - Render C++ scoped enums differently than unscoped enums, and with their
+    underlying type.
+    `#753 <https://github.com/michaeljones/breathe/pull/753>`__
 
 - 2021-09-14 - **Breathe v4.31.0**
 
