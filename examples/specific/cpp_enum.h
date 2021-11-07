@@ -9,3 +9,7 @@ enum struct ScopedStruct : int {
 enum class ScopedClass : int {
 	Enumerator = 42
 };
+
+enum class ScopedClassNoUnderlying {
+	Enumerator = 42
+};

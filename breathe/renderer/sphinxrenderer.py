@@ -2016,9 +2016,10 @@ class SphinxRenderer:
             # between 'enum class' and 'enum struct',
             # so render them both as 'enum class'.
             obj_type = "enum-class"
-            declaration += " : "
-            for n in self.render(node.type_):
-                declaration += n.astext()
+            underlying_type = "".join(n.astext() for n in self.render(node.type_))
+            if len(underlying_type.strip()) != 0:
+                declaration += " : "
+                declaration += underlying_type
         else:
             obj_type = "enum"
         return self.handle_declaration(
