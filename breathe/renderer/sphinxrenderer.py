@@ -2318,7 +2318,15 @@ class SphinxRenderer:
     def visit_docdot(self, node) -> List[Node]:
         """Translate node from doxygen's dot command to sphinx's graphviz directive."""
         graph_node = graphviz()
-        graph_node["code"] = node.content_[0].getValue()
+        if node.content_ and node.content_[0].getValue().rstrip("\n"):
+            graph_node["code"] = node.content_[0].getValue()
+        else:
+            graph_node["code"] = ""  # triggers another warning from sphinx.ext.graphviz
+            self.state.document.reporter.warning(
+                # would be better if this output includes the parent node's
+                # name/reference, but that would always be a <para> element.
+                "no content provided for generating DOT graph."
+            )
         graph_node["options"] = {}
         if node.caption:
             caption_node = nodes.caption(node.caption, "")
@@ -2328,8 +2336,17 @@ class SphinxRenderer:
 
     def visit_docdotfile(self, node) -> List[Node]:
         """Translate node from doxygen's dotfile command to sphinx's graphviz directive."""
-        with open(node.name, encoding="utf-8") as fp:
-            dotcode = fp.read()
+        try:
+            with open(node.name, encoding="utf-8") as fp:
+                dotcode = fp.read()
+            if not dotcode.rstrip("\n"):
+                raise RuntimeError("%s found but without any content" % node.name)
+        except OSError as exc:
+            # doxygen seems to prevent this from triggering as a non-existant file
+            # generates no XML output for the corresponding `\dotfile` cmd
+            self.state.document.reporter.warning(exc)  # better safe than sorry
+        except RuntimeError as exc:
+            self.state.document.reporter.warning(exc)
         graph_node = graphviz()
         graph_node["code"] = dotcode
         graph_node["options"] = {"docname": node.name}
