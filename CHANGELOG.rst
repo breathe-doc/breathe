@@ -16,6 +16,8 @@ Inspired by `Keepachangelog.com <http://keepachangelog.com/>`__.
   - Render ``\retval`` lists using dedicated field list when Sphinx >= 4.3 is
     used.
     `#749 <https://github.com/michaeljones/breathe/pull/749>`__
+  - Make ``.. doxygenfunction`` handle function template specializations.
+    `#750 <https://github.com/michaeljones/breathe/pull/750>`__
 
 - 2021-09-14 - **Breathe v4.31.0**
 
