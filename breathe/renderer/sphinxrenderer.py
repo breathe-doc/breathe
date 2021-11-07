@@ -2012,6 +2012,9 @@ class SphinxRenderer:
         names.append(node.name)
         declaration = self.join_nested_name(names)
         if node.strong == "yes":
+            # It looks like Doxygen does not make a difference
+            # between 'enum class' and 'enum struct',
+            # so render them both as 'enum class'.
             obj_type = "enum-class"
             declaration += " : "
             for n in self.render(node.type_):
