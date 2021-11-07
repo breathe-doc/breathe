@@ -230,6 +230,7 @@ breathe_projects = {
     "cpp_constexpr_hax": "../../examples/specific/cpp_constexpr_hax/xml/",
     "xrefsect": "../../examples/specific/xrefsect/xml/",
     "membergroups": "../../examples/specific/membergroups/xml/",
+    "simplesect": "../../examples/specific/simplesect/xml/",
 }
 
 breathe_projects_source = {"auto": ("../../examples/specific", ["auto_function.h", "auto_class.h"])}

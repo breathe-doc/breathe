@@ -294,3 +294,10 @@ Doxygen xrefsect
 
 .. doxygenfile:: xrefsect.h
    :project: xrefsect
+
+
+Doxygen simplesect
+----------------
+
+.. doxygenfile:: simplesect.h
+   :project: simplesect
