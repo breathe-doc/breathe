@@ -72,6 +72,7 @@ Features
    lists
    tables
    template
+   dot_graphs
 
 Contributing
 ------------
@@ -150,4 +151,3 @@ You get something like this:
 ----
 
 Sound reasonable? To get started, go checkout the :doc:`quickstart guide <quickstart>`.
-
