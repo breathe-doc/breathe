@@ -42,7 +42,22 @@ class DoxygenFunctionDirective(BaseDirective):
     final_argument_whitespace = True
 
     def run(self) -> List[Node]:
-        # Separate possible arguments (delimited by a "(") from the namespace::name
+        # Extract namespace, function name, and parameters
+        # Regex explanation:
+        # 1. (?:<something>::)?
+        #    Optional namespace prefix, including template arguments if a specialization.
+        #    The <something> is group 1:
+        #    1. [^:(<]+, basically an identifier
+        #       definitely not a scope operator, ::, or template argument list, <
+        #    2. (?:::[^:(<]+)*, (?:<stuff>) for anon match group,
+        #       so a namespace delimiter and then another identifier
+        #    3. ::, another namespace delimiter before the function name
+        # 2. ([^(]+), group 2, the function name, whatever remains after the optional prefix,
+        #    until a (.
+        # 3. (.*), group 3, the parameters.
+        # Note: for template argument lists, the spacing is important for the Doxygen lookup.
+        # TODO: we should really do this parsing differently, e.g., using the Sphinx C++ domain.
+        # TODO: the Doxygen lookup should not be whitespace sensitive.
         match = re.match(r"(?:([^:(<]+(?:::[^:(<]+)*)::)?([^(]+)(.*)", self.arguments[0])
         assert match is not None  # TODO: this is probably not appropriate, for now it fixes typing
         namespace = (match.group(1) or "").strip()

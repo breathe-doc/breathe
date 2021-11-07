@@ -110,3 +110,27 @@ private:
 };
 
 
+template<typename T>
+void f0();
+
+template<>
+void f0<std::string>();
+
+namespace NS1 {
+
+template<typename T>
+void f1();
+
+template<>
+void f1<std::string>();
+
+namespace NS2 {
+
+template<typename T>
+void f2();
+
+template<>
+void f2<std::string>();
+
+} // namespace NS2
+} // namespace NS1

@@ -42,6 +42,22 @@ Namespaced Function Examples
 .. doxygenfunction:: ClassTest::anotherFunction
    :path: ../../examples/specific/class/xml
 
+.. doxygenfunction:: f0
+   :path: ../../examples/specific/class/xml
+.. doxygenfunction:: f0< std::string >
+   :path: ../../examples/specific/class/xml
+
+.. doxygenfunction:: NS1::f1
+   :path: ../../examples/specific/class/xml
+.. doxygenfunction:: NS1::f1< std::string >
+   :path: ../../examples/specific/class/xml
+
+.. doxygenfunction:: NS1::NS2::f2
+   :path: ../../examples/specific/class/xml
+.. doxygenfunction:: NS1::NS2::f2< std::string >
+   :path: ../../examples/specific/class/xml
+
+
 Extern Examples
 ---------------
 

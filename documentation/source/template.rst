@@ -43,7 +43,7 @@ A function with single template parameter renders as:
 
 ----
 
-.. cpp:namespace:: @ex_specialized_template_function_single
+.. cpp:namespace:: @ex_template_function_single_specialization
 
 If specialized for a given type it renders as:
 
