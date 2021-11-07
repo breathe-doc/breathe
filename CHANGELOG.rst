@@ -5,7 +5,11 @@ Inspired by `Keepachangelog.com <http://keepachangelog.com/>`__.
 
 - Unreleased
 
-  - Added ``breathe_doxygen_aliases`` config variable. `#729 <https://github.com/michaeljones/breathe/pull/729>`__
+  - Added ``breathe_doxygen_aliases`` config variable.
+    `#729 <https://github.com/michaeljones/breathe/pull/729>`__
+  - Render ``\remark``/``\remarks`` and ``\see``/``\sa`` using Sphinx/Docutils
+    admonition style nodes.
+    `#756 <https://github.com/michaeljones/breathe/pull/756>`__
 
 - 2021-09-14 - **Breathe v4.31.0**
 
