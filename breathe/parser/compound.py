@@ -967,6 +967,21 @@ class verbatimTypeSub(object):
             self.text += child_.nodeValue
 
 
+class docBlockQuoteTypeSub(supermod.docBlockQuoteType):
+
+    node_type = "docblockquote"
+
+    def __init__(self, para=None):
+        supermod.docBlockQuoteType.__init__(self, para)
+
+    def buildChildren(self, child_, nodeName_):
+        supermod.docBlockQuoteType.buildChildren(self, child_, nodeName_)
+
+
+supermod.docBlockQuoteType.subclass = docBlockQuoteTypeSub
+# end class docBlockQuoteTypeSub
+
+
 class docParaTypeSub(supermod.docParaType):
 
     node_type = "docpara"
@@ -1068,6 +1083,10 @@ class docParaTypeSub(supermod.docParaType):
             obj_ = supermod.docParBlockType.factory()
             obj_.build(child_)
             self.content.append(obj_)
+        elif child_.nodeType == Node.ELEMENT_NODE and nodeName_ == "blockquote":
+            obj_ = supermod.docBlockQuoteType.factory()
+            obj_.build(child_)
+            self.content.append(obj_)
         elif child_.nodeType == Node.ELEMENT_NODE and nodeName_ == "table":
             obj_ = supermod.docTableType.factory()
             obj_.build(child_)
@@ -1079,6 +1098,14 @@ class docParaTypeSub(supermod.docParaType):
         elif child_.nodeType == Node.ELEMENT_NODE and nodeName_ == "dot":
             obj_ = supermod.docDotType.factory()
             obj_.build(child_)
+            self.content.append(obj_)
+        elif child_.nodeType == Node.ELEMENT_NODE and (
+            nodeName_ == "ndash" or nodeName_ == "mdash"
+        ):
+            # inject a emphasized dash unicode char as a placeholder/flag for rendering
+            # later. See visit_docblockquote()
+            obj_ = self.mixedclass_(MixedContainer.CategoryText,
+                                    MixedContainer.TypeText, "", "&#8212;")
             self.content.append(obj_)
         else:
             obj_ = None
