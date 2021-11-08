@@ -3,6 +3,7 @@
 #
 
 import sys
+import os
 import getopt
 from xml.dom import minidom
 from xml.dom import Node
@@ -2398,7 +2399,8 @@ class linkType(GeneratedsSuper):
 class listingType(GeneratedsSuper):
     subclass = None
     superclass = None
-    def __init__(self, codeline=None):
+    def __init__(self, codeline=None, domain: str=None):
+        self.domain = domain
         if codeline is None:
             self.codeline = []
         else:
@@ -2436,14 +2438,18 @@ class listingType(GeneratedsSuper):
             return True
         else:
             return False
-    def build(self, node_):
+    def build(self, node_: minidom.Element):
         attrs = node_.attributes
         self.buildAttributes(attrs)
         for child_ in node_.childNodes:
             nodeName_ = child_.nodeName.split(':')[-1]
             self.buildChildren(child_, nodeName_)
-    def buildAttributes(self, attrs):
-        pass
+    def buildAttributes(self, attrs: minidom.NamedNodeMap):
+        if "filename" in attrs.keys():
+            # extract the domain for this programlisting tag.
+            ext_tuple = os.path.splitext(attrs["filename"].value)
+            self.domain = ext_tuple[0 if not ext_tuple[1] else 1].lstrip(".")
+            # print("found domain as", self.domain)
     def buildChildren(self, child_, nodeName_):
         if child_.nodeType == Node.ELEMENT_NODE and \
             nodeName_ == 'codeline':

@@ -1599,10 +1599,13 @@ class SphinxRenderer:
             if i:
                 nodelist.append(nodes.Text("\n"))
             nodelist.extend(self.render(item))
-
+        code = "".join([x.astext() for x in nodelist])
         # Add blank string at the start otherwise for some reason it renders
         # the pending_xref tags around the kind in plain text
-        block = nodes.literal_block("", "", *nodelist)
+        block = nodes.literal_block(code, code)
+        if node.domain:
+            print("indicated as", node.domain)
+            block["language"] = node.domain
         return [block]
 
     def visit_codeline(self, node) -> List[Node]:
