@@ -2452,7 +2452,6 @@ class listingType(GeneratedsSuper):
             # extract the domain for this programlisting tag.
             ext_tuple = os.path.splitext(attrs["filename"].value)
             self.domain = ext_tuple[0 if not ext_tuple[1] else 1].lstrip(".")
-            # print("found domain as", self.domain)
     def buildChildren(self, child_, nodeName_):
         if child_.nodeType == Node.ELEMENT_NODE and \
             nodeName_ == 'codeline':
