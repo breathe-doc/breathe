@@ -33,7 +33,7 @@ class compounddefTypeSub(supermod.compounddefType):
                  innerclass=None, innernamespace=None, innerpage=None, innergroup=None,
                  templateparamlist=None, sectiondef=None, briefdescription=None,
                  detaileddescription=None, inheritancegraph=None, collaborationgraph=None,
-                 programlisting=None, location=None, listofallmembers=None):
+                 programlisting=None, location=None, listofallmembers=None, language=None):
 
         supermod.compounddefType.__init__(self, kind, prot, id, compoundname, title,
                                           basecompoundref, derivedcompoundref, includes, includedby,
@@ -41,7 +41,7 @@ class compounddefTypeSub(supermod.compounddefType):
                                           innerclass, innernamespace, innerpage, innergroup,
                                           templateparamlist, sectiondef, briefdescription,
                                           detaileddescription, inheritancegraph, collaborationgraph,
-                                          programlisting, location, listofallmembers)
+                                          programlisting, location, listofallmembers, language)
 
 
 supermod.compounddefType.subclass = compounddefTypeSub
@@ -378,8 +378,8 @@ class listingTypeSub(supermod.listingType):
 
     node_type = "listing"
 
-    def __init__(self, codeline=None):
-        supermod.listingType.__init__(self, codeline)
+    def __init__(self, codeline=None, domain=None):
+        supermod.listingType.__init__(self, codeline, domain)
 
 
 supermod.listingType.subclass = listingTypeSub

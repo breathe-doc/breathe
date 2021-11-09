@@ -1604,7 +1604,6 @@ class SphinxRenderer:
         # the pending_xref tags around the kind in plain text
         block = nodes.literal_block(code, code)
         if node.domain:
-            print("indicated as", node.domain)
             block["language"] = node.domain
         return [block]
 

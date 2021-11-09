@@ -194,10 +194,11 @@ class DoxygenType(GeneratedsSuper):
 class compounddefType(GeneratedsSuper):
     subclass = None
     superclass = None
-    def __init__(self, kind=None, prot=None, id=None, compoundname=None, title=None, basecompoundref=None, derivedcompoundref=None, includes=None, includedby=None, incdepgraph=None, invincdepgraph=None, innerdir=None, innerfile=None, innerclass=None, innernamespace=None, innerpage=None, innergroup=None, templateparamlist=None, sectiondef=None, briefdescription=None, detaileddescription=None, inheritancegraph=None, collaborationgraph=None, programlisting=None, location=None, listofallmembers=None):
+    def __init__(self, kind=None, prot=None, id=None, compoundname=None, title=None, basecompoundref=None, derivedcompoundref=None, includes=None, includedby=None, incdepgraph=None, invincdepgraph=None, innerdir=None, innerfile=None, innerclass=None, innernamespace=None, innerpage=None, innergroup=None, templateparamlist=None, sectiondef=None, briefdescription=None, detaileddescription=None, inheritancegraph=None, collaborationgraph=None, programlisting=None, location=None, listofallmembers=None, language=None):
         self.kind = kind
         self.prot = prot
         self.id = id
+        self.language = language
         self.compoundname = compoundname
         self.title = title
         if basecompoundref is None:
@@ -377,6 +378,8 @@ class compounddefType(GeneratedsSuper):
             self.prot = attrs.get('prot').value
         if attrs.get('id'):
             self.id = attrs.get('id').value
+        if attrs.get('language'):
+            self.language = attrs.get('language').value.lower()
     def buildChildren(self, child_, nodeName_):
         if child_.nodeType == Node.ELEMENT_NODE and \
             nodeName_ == 'compoundname':
@@ -483,7 +486,7 @@ class compounddefType(GeneratedsSuper):
             self.set_collaborationgraph(obj_)
         elif child_.nodeType == Node.ELEMENT_NODE and \
             nodeName_ == 'programlisting':
-            obj_ = listingType.factory()
+            obj_ = listingType.factory(domain=self.language)
             obj_.build(child_)
             self.set_programlisting(obj_)
         elif child_.nodeType == Node.ELEMENT_NODE and \
