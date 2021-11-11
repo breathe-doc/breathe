@@ -7,6 +7,7 @@ import os
 import getopt
 from xml.dom import minidom
 from xml.dom import Node
+import pygments
 
 #
 # User methods
@@ -2450,8 +2451,13 @@ class listingType(GeneratedsSuper):
     def buildAttributes(self, attrs: minidom.NamedNodeMap):
         if "filename" in attrs.keys():
             # extract the domain for this programlisting tag.
-            ext_tuple = os.path.splitext(attrs["filename"].value)
-            self.domain = ext_tuple[0 if not ext_tuple[1] else 1].lstrip(".")
+            file_ext = list(os.path.splitext(attrs["filename"].value))
+            try:
+                lexer_cls = pygments.lexers.get_lexer_for_filename(attrs["filename"].value)
+                file_ext[1] = lexer_cls.name.lower()
+            except pygments.util.ClassNotFound:
+                pass # use file's extension as a fallback (file_ext from above)
+            self.domain = file_ext[0 if not file_ext[1] else 1].lstrip(".")
     def buildChildren(self, child_, nodeName_):
         if child_.nodeType == Node.ELEMENT_NODE and \
             nodeName_ == 'codeline':
