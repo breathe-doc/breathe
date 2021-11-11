@@ -415,12 +415,18 @@ class compounddefType(GeneratedsSuper):
             self.includedby.append(obj_)
         elif child_.nodeType == Node.ELEMENT_NODE and \
             nodeName_ == 'incdepgraph':
-            obj_ = graphType.factory()
+            obj_ = graphType.factory(
+                caption=f"Include dependency graph for {self.get_compoundname()}:"
+            )
             obj_.build(child_)
             self.set_incdepgraph(obj_)
         elif child_.nodeType == Node.ELEMENT_NODE and \
             nodeName_ == 'invincdepgraph':
-            obj_ = graphType.factory()
+            obj_ = graphType.factory(
+                direction="back",
+                caption=f"This graph shows which files directly "
+                f"or indirectly include {self.get_compoundname()}:"
+            )
             obj_.build(child_)
             self.set_invincdepgraph(obj_)
         elif child_.nodeType == Node.ELEMENT_NODE and \
@@ -477,12 +483,16 @@ class compounddefType(GeneratedsSuper):
             self.set_detaileddescription(obj_)
         elif child_.nodeType == Node.ELEMENT_NODE and \
             nodeName_ == 'inheritancegraph':
-            obj_ = graphType.factory()
+            obj_ = graphType.factory(
+                caption=f"Inheritence diagram for {self.get_compoundname()}:"
+            )
             obj_.build(child_)
             self.set_inheritancegraph(obj_)
         elif child_.nodeType == Node.ELEMENT_NODE and \
             nodeName_ == 'collaborationgraph':
-            obj_ = graphType.factory()
+            obj_ = graphType.factory(
+                caption=f"Collaboration diagram for {self.get_compoundname()}:"
+            )
             obj_.build(child_)
             self.set_collaborationgraph(obj_)
         elif child_.nodeType == Node.ELEMENT_NODE and \
@@ -2059,17 +2069,23 @@ class linkedTextType(GeneratedsSuper):
 class graphType(GeneratedsSuper):
     subclass = None
     superclass = None
-    def __init__(self, node=None):
+    def __init__(self, node=None, direction: str = "forward", caption:str = ""):
         if node is None:
             self.node = []
         else:
             self.node = node
+        self.direction = direction
+        self.caption = caption
     def factory(*args_, **kwargs_):
         if graphType.subclass:
             return graphType.subclass(*args_, **kwargs_)
         else:
             return graphType(*args_, **kwargs_)
     factory = staticmethod(factory)
+    def get_direction(self): return self.direction
+    def set_direction(self, direction): self.direction = direction
+    def get_caption(self): return self.caption
+    def set_caption(self, caption): self.caption = caption
     def get_node(self): return self.node
     def set_node(self, node): self.node = node
     def add_node(self, value): self.node.append(value)

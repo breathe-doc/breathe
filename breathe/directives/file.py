@@ -65,6 +65,7 @@ class DoxygenFileDirective(_BaseFileDirective):
         "project": unchanged_required,
         "outline": flag,
         "no-link": flag,
+        "allow-dot-graphs": flag,
         "sections": unchanged_required,
     }
     has_content = False
@@ -90,6 +91,7 @@ class AutoDoxygenFileDirective(_BaseFileDirective):
         "project": unchanged_required,
         "outline": flag,
         "no-link": flag,
+        "allow-dot-graphs": flag,
         "sections": unchanged_required,
     }
     has_content = False

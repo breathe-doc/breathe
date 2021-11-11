@@ -330,8 +330,8 @@ class graphTypeSub(supermod.graphType):
 
     node_type = "graph"
 
-    def __init__(self, node=None):
-        supermod.graphType.__init__(self, node)
+    def __init__(self, node=None, direction="forward", caption=""):
+        supermod.graphType.__init__(self, node, direction, caption)
 
 
 supermod.graphType.subclass = graphTypeSub

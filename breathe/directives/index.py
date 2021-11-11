@@ -72,6 +72,7 @@ class DoxygenIndexDirective(_BaseIndexDirective):
         "project": unchanged_required,
         "outline": flag,
         "no-link": flag,
+        "allow-dot-graphs": flag,
     }
     has_content = False
 
@@ -94,6 +95,7 @@ class AutoDoxygenIndexDirective(_BaseIndexDirective):
         "project": unchanged_required,
         "outline": flag,
         "no-link": flag,
+        "allow-dot-graphs": flag,
     }
     has_content = False
 
