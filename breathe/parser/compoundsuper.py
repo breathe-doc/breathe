@@ -2454,7 +2454,7 @@ class listingType(GeneratedsSuper):
             file_ext = list(os.path.splitext(attrs["filename"].value))
             try:
                 lexer_cls = pygments.lexers.get_lexer_for_filename(attrs["filename"].value)
-                file_ext[1] = lexer_cls.name.lower()
+                file_ext[1] = lexer_cls.aliases[0]
             except pygments.util.ClassNotFound:
                 pass # use file's extension as a fallback (file_ext from above)
             self.domain = file_ext[0 if not file_ext[1] else 1].lstrip(".")
