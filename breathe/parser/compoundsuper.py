@@ -798,6 +798,8 @@ class reimplementType(GeneratedsSuper):
 class incType(GeneratedsSuper):
     subclass = None
     superclass = None
+    # This is an empty list used to bypass render_iterable() in visit_docreftext()
+    para = []  # type: ignore
     def __init__(self, local=None, refid=None, valueOf_='', mixedclass_=None, content_=None):
         self.local = local
         self.refid = refid

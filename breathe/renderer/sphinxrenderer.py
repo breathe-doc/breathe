@@ -1697,15 +1697,16 @@ class SphinxRenderer:
 
         return [rst_node]
 
-    def visit_inc(self, node) -> List[Node]:
-        if node.local == u"yes":
-            text = '#include "%s"' % node.content_[0].getValue()
+    def visit_inc(self, node: compoundsuper.incType) -> List[nodes.container]:
+        if node.local == "yes":
+            compound_link = self.visit_docreftext(node)
+            text = [nodes.Text('#include "'), *compound_link, nodes.Text('"')]
         else:
-            text = "#include <%s>" % node.content_[0].getValue()
+            text = [nodes.Text("#include <%s>" % node.content_[0].getValue())]
 
-        return [nodes.emphasis(text=text)]
+        return [nodes.container("", nodes.emphasis("", *text))]
 
-    def visit_ref(self, node) -> List[Node]:
+    def visit_ref(self, node: compoundsuper.refType) -> List[Node]:
         def get_node_info(file_data):
             name = node.content_[0].getValue()
             name = name.rsplit("::", 1)[-1]
