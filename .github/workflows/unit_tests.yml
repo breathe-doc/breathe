@@ -6,7 +6,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: [3.6, 3.7, 3.8, 3.9]
+        python-version: [3.6, 3.7, 3.8, 3.9, 3.10]
         sphinx-version:
           - 3.0.4
           - 3.1.2
@@ -16,7 +16,9 @@ jobs:
           - 3.5.4
           - 4.0.3
           - 4.1.2
-          - git+https://github.com/sphinx-doc/sphinx.git@4.2.x
+          - 4.2.0
+          - 4.3.0
+          - git+https://github.com/sphinx-doc/sphinx.git@4.3.x
           - git+https://github.com/sphinx-doc/sphinx.git@4.x
           - git+https://github.com/sphinx-doc/sphinx.git@master
 
