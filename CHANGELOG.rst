@@ -5,8 +5,7 @@ Inspired by `Keepachangelog.com <http://keepachangelog.com/>`__.
 
 - Unreleased
 
-  - Improved list of included files (with cross-references for local includes)
-    `#763 <https://github.com/michaeljones/breathe/pull/763>`_
+
   - Added ``breathe_doxygen_aliases`` config variable.
     `#729 <https://github.com/michaeljones/breathe/pull/729>`__
   - Render ``\remark``/``\remarks`` and ``\see``/``\sa`` using Sphinx/Docutils
@@ -20,6 +19,8 @@ Inspired by `Keepachangelog.com <http://keepachangelog.com/>`__.
     `#749 <https://github.com/michaeljones/breathe/pull/749>`__
   - Make ``.. doxygenfunction`` handle function template specializations.
     `#750 <https://github.com/michaeljones/breathe/pull/750>`__
+  - Improved list of included files (with cross-references for local includes)
+    `#763 <https://github.com/michaeljones/breathe/pull/763>`_
 
 - 2021-09-14 - **Breathe v4.31.0**
 
