@@ -5,6 +5,8 @@ Inspired by `Keepachangelog.com <http://keepachangelog.com/>`__.
 
 - Unreleased
 
+  - Improved list of included files (with cross-references for local includes)
+    `#763 <https://github.com/michaeljones/breathe/pull/763>`_
   - Added ``breathe_doxygen_aliases`` config variable.
     `#729 <https://github.com/michaeljones/breathe/pull/729>`__
   - Render ``\remark``/``\remarks`` and ``\see``/``\sa`` using Sphinx/Docutils
