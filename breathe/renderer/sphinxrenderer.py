@@ -860,6 +860,10 @@ class SphinxRenderer:
 
     def description(self, node) -> List[Node]:
         brief = self.render_optional(node.briefdescription)
+        detailed = self.detaileddescription(node)
+        return brief + detailed
+
+    def detaileddescription(self, node) -> List[Node]:
         detailedCand = self.render_optional(node.detaileddescription)
         # all field_lists must be at the top-level of the desc_content, so pull them up
         fieldLists = []  # type: List[nodes.field_list]
@@ -934,9 +938,9 @@ class SphinxRenderer:
                 fieldLists = [fl]
 
         if self.app.config.breathe_order_parameters_first:  # type: ignore
-            return brief + detailed + fieldLists + admonitions
+            return detailed + fieldLists + admonitions
         else:
-            return brief + detailed + admonitions + fieldLists
+            return detailed + admonitions + fieldLists
 
     def update_signature(self, signature, obj_type):
         """Update the signature node if necessary, e.g. add qualifiers."""
@@ -1300,7 +1304,7 @@ class SphinxRenderer:
 
         if "members-only" not in options:
             addnode("briefdescription", lambda: self.render_optional(node.briefdescription))
-            addnode("detaileddescription", lambda: self.render_optional(node.detaileddescription))
+            addnode("detaileddescription", lambda: self.detaileddescription(node))
 
             def render_derivedcompoundref(node):
                 if node is None:
