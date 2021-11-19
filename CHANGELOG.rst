@@ -18,6 +18,9 @@ Inspired by `Keepachangelog.com <http://keepachangelog.com/>`__.
     `#749 <https://github.com/michaeljones/breathe/pull/749>`__
   - Make ``.. doxygenfunction`` handle function template specializations.
     `#750 <https://github.com/michaeljones/breathe/pull/750>`__
+  - Properly handle field-lists and admonitions in the detailed description of
+    classes and functions.
+    `#764 <https://github.com/michaeljones/breathe/pull/764>`__
 
 - 2021-09-14 - **Breathe v4.31.0**
 
