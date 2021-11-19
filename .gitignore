@@ -6,6 +6,9 @@ build/
 /breathe.egg-info
 /.mypy_cache
 
+# this is generated at build-time by setuptools_scm
+breathe/version.py
+
 # Folder for placing stuff to be ignored
 /ignored
 

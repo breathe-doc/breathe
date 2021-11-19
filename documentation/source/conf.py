@@ -19,6 +19,12 @@ import os
 import subprocess
 import re
 
+try:
+    from importlib.metadata import version as get_version
+except ImportError:  # for python v3.7 or older
+    from importlib_metadata import version as get_version  # type: ignore
+
+
 # If your extensions are in another directory, add it here. If the directory
 # is relative to the documentation root, use os.path.abspath to make it
 # absolute, like shown here.
@@ -32,74 +38,44 @@ import re
 extensions = ["breathe", "sphinx.ext.mathjax", "sphinx.ext.ifconfig"]
 
 read_the_docs_build = os.environ.get("READTHEDOCS", None) == "True"
-travis_build = os.environ.get("TRAVIS_CI", None) == "True"
+
+# The version info for the project you're documenting, acts as replacement for
+# |version| and |release|, also used in various other places throughout the
+# built documents.
+#
+# The short X.Y version.
+version = "'unknown'"
+# The full version, including alpha/beta/rc tags.
+release = "'unknown'"
 
 # Get a description of the current position. Use Popen for 2.6 compat
-git_tag = subprocess.Popen(["git", "describe", "--tags"], stdout=subprocess.PIPE).communicate()[0]
+git_tag = get_version("breathe")
 
-# convert from bytes to string
-git_tag = git_tag.decode("ascii")
-
-if travis_build:
-
-    # Don't attempt to set the path as breathe is installed to virtualenv on travis
-
-    # Set values with simple strings
-    version = "'travis'"
-    release = "'travis'"
-    documentation_build = "travis"
-
-elif read_the_docs_build:
-
-    # On RTD we'll be in the 'source' directory
-    sys.path.append("../../")
-
-    # The version info for the project you're documenting, acts as replacement for
-    # |version| and |release|, also used in various other places throughout the
-    # built documents.
-    #
-    # The short X.Y version.
-    version = "'unknown'"
-    # The full version, including alpha/beta/rc tags.
-    release = "'unknown'"
-
-    # Check if it matches a pure tag number vX.Y.Z, rather than vX.Y.Z-91-g8676988 which is how
-    # non-tagged commits are described (ie. relative to the last tag)
-    if re.match(r"^v\d+\.\d+\.\d+$", git_tag):
-        # git_tag is a pure version number (no subsequent commits)
-        version = git_tag
-        release = git_tag
-        documentation_build = "readthedocs"
-
-    else:
-        version = "'latest'"
-        release = "'latest'"
-        documentation_build = "readthedocs_latest"
-
+# Check if it matches a pure tag number vX.Y.Z, rather than vX.Y.Z-91-g8676988 which is how
+# non-tagged commits are described (ie. relative to the last tag)
+if re.match(r"^\d+\.\d+\.\d+$", git_tag):
+    # git_tag is a pure version number (no subsequent commits)
+    version = "v" + git_tag
+    release = "v" + git_tag
 else:
+    version = "'latest'"
+    release = "'latest'"
 
-    # For our usual dev build we'll be in the 'documentation' directory but Sphinx seems to set the
-    # current working directory to 'source' so we append relative to that
-    sys.path.append("../../")
+# For our usual dev build (& on RTD) we'll be in the 'documentation' directory but Sphinx seems to
+# set the current working directory to 'source' so we append relative to that
+sys.path.append("../../")
 
-    # Check if it matches a pure tag number vX.Y.Z, rather than vX.Y.Z-91-g8676988 which is how
-    # non-tagged commits are described (ie. relative to the last tag)
-    if re.match(r"^v\d+\.\d+\.\d+$", git_tag):
-        # git_tag is a pure version number (no subsequent commits)
-        version = git_tag
-        release = git_tag
+if read_the_docs_build:
+    if version != "'latest'":
+        documentation_build = "readthedocs"
     else:
-        version = "'latest'"
-        release = "'latest'"
-
+        documentation_build = "readthedocs_latest"
+else:
     documentation_build = "development"
-
 
 # If we're doing a comparison then set the version & release to 'compare' so that they are always
 # the same otherwise they can come up as changes when we really don't care if they are different.
-comparison = os.environ.get("BREATHE_COMPARE", None) == "True"
-
-if comparison:
+if os.environ.get("BREATHE_COMPARE", "False").capitalize() == "True":
     version = "compare"
     release = "compare"
 
@@ -125,9 +101,7 @@ spelling_lang = "en_US"
 # Set path for mathjax js to a https URL as sometimes the Breathe docs are displayed under https
 # and we can't load an http mathjax file from an https view of the docs. So we change to a https
 # mathjax file which we can load from http or https. We break the url over two lines.
-mathjax_path = (
-    "https://c328740.ssl.cf1.rackcdn.com/" "mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"
-)
+mathjax_path = "https://cdn.jsdelivr.net/npm/mathjax@2/MathJax.js?config=TeX-AMS-MML_HTMLorMML"
 
 
 # Add any paths that contain templates here, relative to this directory.

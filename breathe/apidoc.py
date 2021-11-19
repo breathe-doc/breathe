@@ -22,7 +22,11 @@ import argparse
 import errno
 import xml.etree.ElementTree
 
-from breathe import __version__
+try:
+    from importlib.metadata import version
+except ImportError:  # for python v3.7 or older
+    from importlib_metadata import version  # type: ignore
+
 
 # Account for FileNotFoundError in Python 2
 # IOError is broader but will hopefully suffice
@@ -222,7 +226,7 @@ Note: By default this script will not overwrite already created files.""",
         "-q", "--quiet", action="store_true", dest="quiet", help="suppress informational messages"
     )
     parser.add_argument(
-        "--version", action="version", version="Breathe (breathe-apidoc) %s" % __version__
+        "--version", action="version", version="Breathe (breathe-apidoc) %s" % version("breathe")
     )
     parser.add_argument("rootpath", type=str, help="The directory contains index.xml")
     args = parser.parse_args()
