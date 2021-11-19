@@ -19,7 +19,7 @@ jobs:
 
       - name: install dependencies
         run: |
-          pip install -r requirements/development.txt
+          pip install . -r requirements/development.txt
           sudo apt -y install doxygen
 
       - name: build the documentation
