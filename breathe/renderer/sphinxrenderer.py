@@ -1405,7 +1405,8 @@ class SphinxRenderer:
 
     def visit_docreftext(self, node) -> List[Node]:
         nodelist = self.render_iterable(node.content_)
-        nodelist.extend(self.render_iterable(node.para))
+        if hasattr(node, "para"):
+            nodelist.extend(self.render_iterable(node.para))
 
         refid = self.get_refid(node.refid)
 
@@ -1705,11 +1706,11 @@ class SphinxRenderer:
         if not self.app.config.breathe_show_include:
             return []
 
+        compound_link = self.visit_docreftext(node)
         if node.local == "yes":
-            compound_link = self.visit_docreftext(node)
             text = [nodes.Text('#include "'), *compound_link, nodes.Text('"')]
         else:
-            text = [nodes.Text("#include <%s>" % node.content_[0].getValue())]
+            text = [nodes.Text("#include <"), *compound_link, nodes.Text(">")]
 
         return [nodes.container("", nodes.emphasis("", *text))]
 
