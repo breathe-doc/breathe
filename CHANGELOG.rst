@@ -19,6 +19,12 @@ Inspired by `Keepachangelog.com <http://keepachangelog.com/>`__.
     `#749 <https://github.com/michaeljones/breathe/pull/749>`__
   - Make ``.. doxygenfunction`` handle function template specializations.
     `#750 <https://github.com/michaeljones/breathe/pull/750>`__
+  - Properly handle field-lists and admonitions in the detailed description of
+    classes and functions.
+    `#764 <https://github.com/michaeljones/breathe/pull/764>`__
+  - Add :confval:`breathe_show_include` to control whether ``#include`` lines
+    are shown. Defaults to ``True``.
+    `#725 <https://github.com/michaeljones/breathe/pull/725>`__
   - Improved list of included files (with cross-references for local includes)
     `#763 <https://github.com/michaeljones/breathe/pull/763>`_
 
