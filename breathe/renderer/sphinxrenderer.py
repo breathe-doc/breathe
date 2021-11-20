@@ -1706,7 +1706,9 @@ class SphinxRenderer:
         if not self.app.config.breathe_show_include:
             return []
 
-        compound_link = self.visit_docreftext(node)
+        compound_link = node.content_[0].getValue()
+        if node.get_refid():
+            compound_link = self.visit_docreftext(node)
         if node.local == "yes":
             text = [nodes.Text('#include "'), *compound_link, nodes.Text('"')]
         else:
