@@ -21,6 +21,9 @@ Inspired by `Keepachangelog.com <http://keepachangelog.com/>`__.
   - Properly handle field-lists and admonitions in the detailed description of
     classes and functions.
     `#764 <https://github.com/michaeljones/breathe/pull/764>`__
+  - Add :confval:`breathe_show_include` to control whether ``#include`` lines
+    are shown. Defaults to ``True``.
+    `#725 <https://github.com/michaeljones/breathe/pull/725>`__
 
 - 2021-09-14 - **Breathe v4.31.0**
 
