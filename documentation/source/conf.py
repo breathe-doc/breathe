@@ -232,6 +232,7 @@ breathe_projects = {
     "xrefsect": "../../examples/specific/xrefsect/xml/",
     "membergroups": "../../examples/specific/membergroups/xml/",
     "simplesect": "../../examples/specific/simplesect/xml/",
+    "dot_graphs": "../../examples/specific/dot_graphs/xml/",
 }
 
 breathe_projects_source = {"auto": ("../../examples/specific", ["auto_function.h", "auto_class.h"])}

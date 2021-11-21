@@ -28,7 +28,7 @@ projects  = nutshell alias rst inline namespacefile array inheritance \
 			cpp_inherited_members cpp_trailing_return_type cpp_constexpr_hax \
 			cpp_function_lookup \
 			c_file c_struct c_enum c_typedef c_macro c_union membergroups \
-			simplesect code_blocks
+			simplesect code_blocks dot_graphs
 
 special   = programlisting decl_impl multifilexml auto class typedef
 
