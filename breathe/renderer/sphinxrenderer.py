@@ -2354,6 +2354,7 @@ class SphinxRenderer:
 
     def visit_docdotfile(self, node) -> List[Node]:
         """Translate node from doxygen's dotfile command to sphinx's graphviz directive."""
+        dotcode = ""
         try:
             with open(node.name, encoding="utf-8") as fp:
                 dotcode = fp.read()
