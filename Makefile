@@ -36,12 +36,7 @@ dev-test:
 
 .PHONY: flake8
 flake8:
-	flake8 breathe/*.py \
-		breathe/directives/*.py \
-		breathe/finder/*.py \
-		breathe/renderer/sphinxrenderer.py \
-		breathe/renderer/filter.py \
-		breathe/parser/compound.py
+	flake8 breathe
 
 .PHONY: black
 black:
