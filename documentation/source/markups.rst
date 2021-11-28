@@ -22,7 +22,7 @@ with the markup **embed:rst**. This means that a comment block like this::
    Inserting additional reStructuredText information.
    \verbatim embed:rst
    .. note::
-   
+
       This reStructuredText has been handled correctly.
    \endverbatim
    */
@@ -164,16 +164,11 @@ Aliases
 
 .. cpp:namespace:: @ex_markups_aliases
 
-To make these blocks appears as more appropriate doxygen-like markup in your
+To make these blocks appear as more appropriate doxygen-like markup in your
 comments you can add the following aliases to your doxygen configuration file::
 
-   ALIASES = "rst=\verbatim embed:rst"
+   ALIASES = "rst=^^\verbatim embed:rst^^"
    ALIASES += "endrst=\endverbatim"
-
-And, if you use leading asterisks then perhaps::
-
-   ALIASES += "rststar=\verbatim embed:rst:leading-asterisk"
-   ALIASES += "endrststar=\endverbatim"
 
 Which allow you to write comments like::
 
@@ -185,7 +180,7 @@ Which allow you to write comments like::
     This is some funky non-xml compliant text: <& !><
 
     .. note::
-        
+
        This reStructuredText has been handled correctly.
     \endrst
 
@@ -203,4 +198,29 @@ Which will be rendered as:
 .. doxygenfunction:: TestClass::function
    :project: rst
 
+.. note::
+
+   The character sequence ``^^`` in an ALIAS definition inserts a line break.
+   The leading ``^^`` ensures that a RST ``\verbatim`` block never starts in a brief description
+   (which would break the output), even if you put it on the first line of a comment.
+   The trailing ``^^`` allows to start with RST content on the same line of the ``\rst`` command.
+
+The ALIAS given above only works for comment blocks without a leading comment character on each line.
+If you use a comment style with a leading comment character on each new line,
+use these aliases instead::
+
+   ALIASES = "rst=^^\verbatim embed:rst:leading-asterisk^^"
+   ALIASES += "endrst=\endverbatim"
+
+Due to an `undocumented behavior in doxygen <https://github.com/doxygen/doxygen/issues/8907>`_,
+all leading comment characters (``*``, ``///`` or ``//!``) encountered in a verbatim section
+will be converted to asterisk (``*`` ) by Doxygen, when ``\verbatim`` is part of an alias.
+Therefore, the ALIAS above works in all comment blocks with leading line comment characters.
+
+If you want to hide reStructuredText output from Doxygen html and only include it in sphinx,
+use the Doxygen command ``\xmlonly``.
+This is an example alias that enables all RST sections in XML only::
+
+    ALIASES = "rst=^^\xmlonly<verbatim>embed:rst:leading-asterisk^^"
+    ALIASES += "endrst=</verbatim>\endxmlonly"
 
