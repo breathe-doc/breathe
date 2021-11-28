@@ -1923,6 +1923,11 @@ class SphinxRenderer:
                 # Doxygen sometimes leaves 'static' in the type,
                 # e.g., for "constexpr static auto f()"
                 typ = typ.replace("static ", "")
+                # In Doxygen up to somewhere between 1.8.17 to exclusive 1.9.1
+                # the 'friend' part is also left in the type.
+                # See also #767.
+                if typ.startswith("friend "):
+                    typ = typ[7:]
                 elements.append(typ)
                 elements.append(name)
                 elements.append(node.get_argsstring())
