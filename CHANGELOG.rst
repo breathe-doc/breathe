@@ -24,6 +24,8 @@ Inspired by `Keepachangelog.com <http://keepachangelog.com/>`__.
   - Add :confval:`breathe_show_include` to control whether ``#include`` lines
     are shown. Defaults to ``True``.
     `#725 <https://github.com/michaeljones/breathe/pull/725>`__
+  - Fix friend functions for older Doxygen versions.
+    `#767 <https://github.com/michaeljones/breathe/issues/767>`__
 
 - 2021-09-14 - **Breathe v4.31.0**
 
