@@ -228,8 +228,8 @@ group. A doxygen group can be declared with specific doxygen markup in the
 source comments as covered in the `doxygen grouping documentation`_.
 
 It takes the standard ``project``, ``path``, ``outline`` and ``no-link`` options
-and additionally the ``content-only``, ``members``, ``protected-members``,
-``private-members`` and ``undoc-members`` options.
+and additionally the ``content-only``, ``desc-only``, ``members``,
+``protected-members``, ``private-members`` and ``undoc-members`` options.
 
 ::
 
@@ -237,6 +237,7 @@ and additionally the ``content-only``, ``members``, ``protected-members``,
       :project: ...
       :path: ...
       :content-only:
+      :desc-only:
       :outline:
       :members:
       :protected-members:
@@ -307,8 +308,8 @@ doxygennamespace
 This directive generates the appropriate output for the contents of a namespace.
 
 It takes the standard ``project``, ``path``, ``outline`` and ``no-link`` options
-and additionally the ``content-only``, ``members``, ``protected-members``,
-``private-members`` and ``undoc-members`` options.
+and additionally the ``content-only``, ``desc-only``, ``members``,
+``protected-members``, ``private-members`` and ``undoc-members`` options.
 
 To reference a nested namespace, the full namespaced path must be provided, e.g.
 ``foo::bar`` for the ``bar`` namespace inside the ``foo`` namespace.
@@ -319,6 +320,7 @@ To reference a nested namespace, the full namespaced path must be provided, e.g.
       :project: ...
       :path: ...
       :content-only:
+      :desc-only:
       :outline:
       :members:
       :protected-members:

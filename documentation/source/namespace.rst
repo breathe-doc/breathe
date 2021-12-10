@@ -8,14 +8,18 @@ This directive generates the appropriate output for the contents of a
 namespace.
 
 It takes the standard ``project``, ``path``, ``outline`` and ``no-link`` options
-and additionally the ``content-only``, ``members``, ``protected-members``,
-``private-members`` and ``undoc-members`` options.
+and additionally the ``content-only``, ``desc-only``, ``members``,
+``protected-members``, ``private-members`` and ``undoc-members`` options.
 
 ``content-only``
    If this flag is specified, then the directive does not output the name of the
    namespace or the namespace description and instead outputs the contents of
    the namespace. This can be useful for structuring your documentation but
    leaving out the namespace declaration itself which is often undocumented.
+
+``desc-only``
+   If specified, only the description and name of the namespace will be
+   displayed.
 
 ``members``
    If specified, the public members of any classes in the namespace output will be

@@ -9,14 +9,19 @@ group. A doxygen group can be declared with specific doxygen markup in the
 source comments as cover in the `doxygen grouping documentation`_.
 
 It takes the standard ``project``, ``path``, ``outline`` and ``no-link`` options
-and additionally the ``content-only``, ``members``, ``protected-members``,
-``private-members``, ``undoc-members`` and ``inner`` options.
+and additionally the ``content-only``, ``desc-only``, ``members``,
+``protected-members``, ``private-members``, ``undoc-members`` and ``inner``
+options.
 
 ``content-only``
    If this flag is specified, then the directive does not output the name of the
    group or the group description and instead outputs the contents of the group.
    This can be useful if the groups are only used for organizational purposes
    and not to provide additional information.
+
+``desc-only``
+   If specified, only the description and name of the group will be
+   displayed.
 
 ``members``
    If specified, the public members of any classes in the group output will be
