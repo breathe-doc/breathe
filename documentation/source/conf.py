@@ -48,7 +48,7 @@ version = "'unknown'"
 # The full version, including alpha/beta/rc tags.
 release = "'unknown'"
 
-# Get a description of the current position. Use Popen for 2.6 compat
+# Get a description of the current version.
 git_tag = get_version("breathe")
 
 # Check if it matches a pure tag number vX.Y.Z, rather than vX.Y.Z-91-g8676988 which is how
