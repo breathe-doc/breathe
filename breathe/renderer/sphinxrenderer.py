@@ -90,6 +90,10 @@ class CPPTypeObject(BaseObject, cpp.CPPTypeObject):
     pass
 
 
+class CPPConceptObject(BaseObject, cpp.CPPConceptObject):
+    pass
+
+
 class CPPEnumObject(BaseObject, cpp.CPPEnumObject):
     pass
 
@@ -235,6 +239,7 @@ class DomainDirectiveFactory:
         "friend": (CPPFunctionObject, "function"),
         "signal": (CPPFunctionObject, "function"),
         "slot": (CPPFunctionObject, "function"),
+        "concept": (CPPConceptObject, "concept"),
         "enum": (CPPEnumObject, "enum"),
         "enum-class": (CPPEnumObject, "enum-class"),
         "typedef": (CPPTypeObject, "type"),
@@ -1280,6 +1285,7 @@ class SphinxRenderer:
         ("define", "Defines"),
         ("prototype", "Prototypes"),
         ("typedef", "Typedefs"),
+        ("concept", "Concepts"),
         ("enum", "Enums"),
         ("func", "Functions"),
         ("var", "Variables"),

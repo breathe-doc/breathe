@@ -3,9 +3,9 @@
 #
 
 DOXYGEN   ?= `which doxygen`
-TMAKEPATH = 
+TMAKEPATH =
 ENV       = env TMAKEPATH=$(TMAKEPATH)
-TMAKE     = 
+TMAKE     =
 MAKE      = /usr/bin/make
 PERL      = /usr/bin/perl
 RM        = rm -f
@@ -15,10 +15,11 @@ INSTALL   = /tmp
 INSTTOOL  = /usr/bin/install
 DOXYDOCS  = ..
 DOCDIR    = $(INSTALL)/share/doc/packages/doxygen
-QTDIR     = 
+QTDIR     =
 HAVE_DOT  = /usr/bin/dot
 
 all: class/xml/index.xml \
+     concept/xml/index.xml \
      define/xml/index.xml \
      enum/xml/index.xml \
      file/xml/index.xml \
@@ -49,13 +50,16 @@ all: class/xml/index.xml \
      interface/xml/index.xml
 
 clean:
-	rm -rf  class define enum file func page relates author \
+	rm -rf  class concept define enum file func page relates author \
 		par parblock overload example include qtstyle jdstyle structcmd \
 		autolink tag restypedef afterdoc template tag group diagrams \
 		memgrp docstring pyexample mux manual interface
 
 class/xml/index.xml: class.h class.cfg
 	$(DOXYGEN) class.cfg
+
+concept/xml/index.xml: concept.h concept.cfg
+	$(DOXYGEN) concept.cfg
 
 define/xml/index.xml: define.h define.cfg
 	$(DOXYGEN) define.cfg
@@ -87,22 +91,22 @@ parblock/xml/index.xml: parblock.cpp parblock.cfg
 overload/xml/index.xml: overload.cpp overload.cfg
 	$(DOXYGEN) overload.cfg
 
-example/xml/index.xml: example.cpp example_test.cpp example.cfg 
+example/xml/index.xml: example.cpp example_test.cpp example.cfg
 	$(DOXYGEN) example.cfg
 
-include/xml/index.xml: include.cpp example_test.cpp include.cfg 
+include/xml/index.xml: include.cpp example_test.cpp include.cfg
 	$(DOXYGEN) include.cfg
 
-qtstyle/xml/index.xml: qtstyle.cpp qtstyle.cfg 
+qtstyle/xml/index.xml: qtstyle.cpp qtstyle.cfg
 	$(DOXYGEN) qtstyle.cfg
 
-jdstyle/xml/index.xml: jdstyle.cpp jdstyle.cfg 
+jdstyle/xml/index.xml: jdstyle.cpp jdstyle.cfg
 	$(DOXYGEN) jdstyle.cfg
 
-structcmd/xml/index.xml: structcmd.h structcmd.cfg 
+structcmd/xml/index.xml: structcmd.h structcmd.cfg
 	$(DOXYGEN) structcmd.cfg
 
-autolink/xml/index.xml: autolink.cpp autolink.cfg 
+autolink/xml/index.xml: autolink.cpp autolink.cfg
 	$(DOXYGEN) autolink.cfg
 
 tag/xml/index.xml: tag.cpp tag.cfg example/xml/index.xml
@@ -110,7 +114,7 @@ tag/xml/index.xml: tag.cpp tag.cfg example/xml/index.xml
 #	sed -e "1,1s#perl#$(PERL)#g" tag/xml/installdox >tag/xml/installdox.perl
 #	cd tag/xml ; $(PERL) installdox.perl -lexample.tag@../../example/xml
 
-restypedef/xml/index.xml: restypedef.cpp restypedef.cfg 
+restypedef/xml/index.xml: restypedef.cpp restypedef.cfg
 	$(DOXYGEN) restypedef.cfg
 
 afterdoc/xml/index.xml: afterdoc.h afterdoc.cfg
