@@ -220,6 +220,7 @@ breathe_projects = {
     "define": "../../examples/specific/define/xml/",
     "multifile": "../../examples/specific/multifilexml/xml/",
     "cpp_anon": "../../examples/specific/cpp_anon/xml/",
+    "cpp_concept": "../../examples/specific/cpp_concept/xml/",
     "cpp_enum": "../../examples/specific/cpp_enum/xml/",
     "cpp_union": "../../examples/specific/cpp_union/xml/",
     "cpp_function": "../../examples/specific/cpp_function/xml/",

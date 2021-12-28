@@ -26,6 +26,8 @@ Inspired by `Keepachangelog.com <http://keepachangelog.com/>`__.
     `#725 <https://github.com/michaeljones/breathe/pull/725>`__
   - Fix friend functions for older Doxygen versions.
     `#767 <https://github.com/michaeljones/breathe/issues/767>`__
+  - Doxygen >= 1.9.2 supports C++20 concepts, add support for them.
+    `#779 <https://github.com/michaeljones/breathe/pull/779>`__
 
 - 2021-09-14 - **Breathe v4.31.0**
 

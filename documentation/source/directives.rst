@@ -9,6 +9,7 @@ Directives & Config Variables
    struct
    class
    namespace
+   concept
    enum
    enumvalue
    typedef
@@ -104,6 +105,23 @@ define. It behaves the same as the doxygenstruct directive.
       :no-link:
 
 Checkout the :ref:`example <define-example>` to see it in action.
+
+
+doxygenconcept
+~~~~~~~~~~~~~~
+
+This directive generates the appropriate output for a single concept. It
+behaves the same as the doxygenstruct directive.
+
+::
+
+   .. doxygenconcept:: <concept name>
+      :project: ...
+      :path: ...
+      :outline:
+      :no-link:
+
+Checkout the :ref:`example <concept-example>` to see it in action.
 
 
 doxygenenum
