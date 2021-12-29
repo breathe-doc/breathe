@@ -1,4 +1,3 @@
-from breathe.directives import BaseDirective
 from breathe.directives.class_like import (
     DoxygenStructDirective,
     DoxygenClassDirective,
@@ -21,7 +20,6 @@ from breathe.directives.item import (
     DoxygenEnumValueDirective,
     DoxygenTypedefDirective,
 )
-from breathe.finder.factory import FinderFactory
 from breathe.parser import DoxygenParserFactory
 from breathe.project import ProjectInfoFactory
 from breathe.process import AutoDoxygenProcessHandle
@@ -32,34 +30,6 @@ import os
 import subprocess
 
 from typing import Any, List, Optional, Type  # noqa
-
-
-class DirectiveContainer:
-    def __init__(
-        self,
-        app: Sphinx,
-        directive: Type[BaseDirective],
-        finder_factory: FinderFactory,
-        project_info_factory: ProjectInfoFactory,
-        parser_factory: DoxygenParserFactory,
-    ):
-        self.app = app
-        self.directive = directive
-        self.finder_factory = finder_factory
-        self.project_info_factory = project_info_factory
-        self.parser_factory = parser_factory
-
-        # Required for sphinx to inspect
-        self.required_arguments = directive.required_arguments
-        self.optional_arguments = directive.optional_arguments
-        self.option_spec = directive.option_spec
-        self.has_content = directive.has_content
-        self.final_argument_whitespace = directive.final_argument_whitespace
-
-    def __call__(self, *args):
-        call_args = [self.finder_factory, self.project_info_factory, self.parser_factory]
-        call_args.extend(args)
-        return self.directive(*call_args)
 
 
 def setup(app: Sphinx) -> None:
@@ -84,21 +54,26 @@ def setup(app: Sphinx) -> None:
         "doxygenpage": DoxygenPageDirective,
     }
 
+    # The directives need these global objects, so in order to smuggle
+    # them in, we use env.temp_data. But it is cleared after each document
+    # has been read, we use the source-read event to set them.
     # note: the parser factory contains a cache of the parsed XML
     # note: the project_info_factory also contains some caching stuff
     # TODO: is that actually safe for when reading in parallel?
     project_info_factory = ProjectInfoFactory(app)
     parser_factory = DoxygenParserFactory(app)
-    finder_factory = FinderFactory(app, parser_factory)
+
+    def set_temp_data(
+        app: Sphinx, project_info_factory=project_info_factory, parser_factory=parser_factory
+    ):
+        assert app.env is not None
+        app.env.temp_data["breathe_project_info_factory"] = project_info_factory
+        app.env.temp_data["breathe_parser_factory"] = parser_factory
+
+    app.connect("source-read", lambda app, docname, source: set_temp_data(app))
+
     for name, directive in directives.items():
-        # ordinarily app.add_directive takes a class it self, but we need to inject extra arguments
-        # so we give a DirectiveContainer object which has an overloaded __call__ operator.
-        app.add_directive(
-            name,
-            DirectiveContainer(  # type: ignore
-                app, directive, finder_factory, project_info_factory, parser_factory
-            ),
-        )
+        app.add_directive(name, directive)
 
     app.add_config_value("breathe_projects", {}, True)  # Dict[str, str]
     app.add_config_value("breathe_default_project", "", True)  # str
