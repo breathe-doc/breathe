@@ -907,8 +907,8 @@ class SphinxRenderer:
             f: nodes.field
             fn: nodes.field_name
             fb: nodes.field_body
-            for f in fieldLists[0]:  # type: ignore
-                fn, fb = f  # type: ignore
+            for f in fieldLists[0]:
+                fn, fb = f
                 assert len(fn) == 1
                 if fn.astext().startswith("returns "):
                     retvals.append(f)
@@ -916,7 +916,7 @@ class SphinxRenderer:
                     others.append(f)
             if len(retvals) != 0:
                 items: List[nodes.paragraph] = []
-                for fn, fb in retvals:  # type: ignore
+                for fn, fb in retvals:
                     # we created the retvals before, so we made this prefix
                     assert fn.astext().startswith("returns ")
                     val = nodes.strong("", fn.astext()[8:])
@@ -942,9 +942,9 @@ class SphinxRenderer:
                 fieldLists = [fl]
 
         if self.app.config.breathe_order_parameters_first:
-            return detailed + fieldLists + admonitions  # type: ignore
+            return detailed + fieldLists + admonitions
         else:
-            return detailed + admonitions + fieldLists  # type: ignore
+            return detailed + admonitions + fieldLists
 
     def update_signature(self, signature, obj_type):
         """Update the signature node if necessary, e.g. add qualifiers."""
@@ -1829,7 +1829,7 @@ class SphinxRenderer:
         return self.render_iterable(content)
 
     def visit_docanchor(self, node) -> List[Node]:
-        return cast(List[Node], self.create_doxygen_target(node))
+        return self.create_doxygen_target(node)
 
     def visit_docentry(self, node) -> List[Node]:
         col = nodes.entry()
@@ -1844,7 +1844,7 @@ class SphinxRenderer:
 
     def visit_docrow(self, node) -> List[Node]:
         row = nodes.row()
-        cols = cast(List[nodes.entry], self.render_iterable(node.entry))
+        cols = self.render_iterable(node.entry)
         elem: Union[nodes.thead, nodes.tbody]
         if all(col.get("heading", False) for col in cols):
             elem = nodes.thead()
@@ -1863,7 +1863,7 @@ class SphinxRenderer:
             colspec.attributes["colwidth"] = "auto"
             tgroup += colspec
         table += tgroup
-        rows = cast(List[Element], self.render_iterable(node.row))
+        rows = self.render_iterable(node.row)
 
         # this code depends on visit_docrow(), and expects the same elements used to
         # "envelop" rows there, namely thead and tbody (eg it will need to be updated
@@ -1994,7 +1994,7 @@ class SphinxRenderer:
             # Insert Doxygen target into the first signature node.
             if not self.app.env.config.breathe_debug_trace_doxygen_ids:
                 target = self.create_doxygen_target(node)
-            rst_node.children[0].insert(0, target)  # type: ignore
+            rst_node.children[0].insert(0, target)
 
             finder.content.extend(self.description(node))
             return nodes
