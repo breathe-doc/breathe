@@ -15,4 +15,4 @@ def resolve_path(app: Sphinx, directory: str, filename: str):
     """
 
     # os.path.join does the appropriate handling if _project_path is an absolute path
-    return os.path.join(app.confdir, directory, filename)  # type: ignore
+    return os.path.join(app.confdir, directory, filename)

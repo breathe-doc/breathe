@@ -10,7 +10,7 @@ from breathe.renderer.sphinxrenderer import SphinxRenderer
 from breathe.renderer.target import create_target_handler
 
 from docutils.nodes import Node
-from docutils.parsers.rst.directives import unchanged_required, flag  # type: ignore
+from docutils.parsers.rst.directives import unchanged_required, flag
 
 from sphinx.domains import cpp
 
@@ -18,7 +18,7 @@ from docutils import nodes
 
 import re
 
-from typing import Any, List, Optional, Type  # noqa
+from typing import Any, List, Optional
 
 
 class _NoMatchingFunctionError(BreatheError):
@@ -62,7 +62,7 @@ class DoxygenFunctionDirective(BaseDirective):
         assert match is not None  # TODO: this is probably not appropriate, for now it fixes typing
         namespace = (match.group(1) or "").strip()
         function_name = match.group(2).strip()
-        args = match.group(3)
+        argsStr = match.group(3)
 
         try:
             project_info = self.project_info_factory.create_project_info(self.options)
@@ -78,13 +78,13 @@ class DoxygenFunctionDirective(BaseDirective):
 
         # Extract arguments from the function name.
         try:
-            args = self._parse_args(args)
+            args = self._parse_args(argsStr)
         except cpp.DefinitionError as e:
             return self.create_warning(
                 project_info,
                 namespace="%s::" % namespace if namespace else "",
                 function=function_name,
-                args=str(args),
+                args=argsStr,
                 cpperror=str(e),
             ).warn(
                 "doxygenfunction: Unable to resolve function "
@@ -97,7 +97,7 @@ class DoxygenFunctionDirective(BaseDirective):
         )
 
         # TODO: find a more specific type for the Doxygen nodes
-        matchesAll = []  # type: List[Any]
+        matchesAll: List[Any] = []
         finder.filter_(finder_filter, matchesAll)
         matches = []
         for m in matchesAll:
@@ -170,17 +170,17 @@ class DoxygenFunctionDirective(BaseDirective):
         # strip everything that doesn't contribute to overloading
 
         def stripParamQual(paramQual):
-            paramQual.exceptionSpec = None  # type: ignore
-            paramQual.final = None  # type: ignore
-            paramQual.override = None  # type: ignore
+            paramQual.exceptionSpec = None
+            paramQual.final = None
+            paramQual.override = None
             # TODO: strip attrs when Doxygen handles them
-            paramQual.initializer = None  # type: ignore
-            paramQual.trailingReturn = None  # type: ignore
+            paramQual.initializer = None
+            paramQual.trailingReturn = None
             for p in paramQual.args:
                 if p.arg is None:
                     assert p.ellipsis
                     continue
-                p.arg.init = None  # type: ignore
+                p.arg.init = None
                 declarator = p.arg.type.decl
 
                 def stripDeclarator(declarator):
@@ -192,7 +192,7 @@ class DoxygenFunctionDirective(BaseDirective):
                     else:
                         assert isinstance(declarator, cpp.ASTDeclaratorNameParamQual)
                         assert hasattr(declarator, "declId")
-                        declarator.declId = None  # type: ignore
+                        declarator.declId = None
                         if declarator.paramQual is not None:
                             stripParamQual(declarator.paramQual)
 

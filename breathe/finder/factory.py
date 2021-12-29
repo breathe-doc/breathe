@@ -59,7 +59,7 @@ class FinderFactory:
         return self.create_finder_from_root(root, project_info)
 
     def create_finder_from_root(self, root, project_info: ProjectInfo) -> Finder:
-        finders = {
+        finders: Dict[str, Type[ItemFinder]] = {
             "doxygen": indexfinder.DoxygenTypeSubItemFinder,
             "compound": _CreateCompoundTypeSubFinder(self.app, self.parser_factory),  # type: ignore
             "member": indexfinder.MemberTypeSubItemFinder,
@@ -68,6 +68,6 @@ class FinderFactory:
             "sectiondef": compoundfinder.SectionDefTypeSubItemFinder,
             "memberdef": compoundfinder.MemberDefTypeSubItemFinder,
             "ref": compoundfinder.RefTypeSubItemFinder,
-        }  # type: Dict[str, Type[ItemFinder]]
+        }
         item_finder_factory = DoxygenItemFinderFactory(finders, project_info)
         return Finder(root, item_finder_factory)

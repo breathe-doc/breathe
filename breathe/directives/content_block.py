@@ -7,9 +7,9 @@ from breathe.renderer.sphinxrenderer import SphinxRenderer
 from breathe.renderer.target import create_target_handler
 
 from docutils.nodes import Node
-from docutils.parsers.rst.directives import unchanged_required, flag  # type: ignore
+from docutils.parsers.rst.directives import unchanged_required, flag
 
-from typing import Any, List, Optional, Type  # noqa
+from typing import Any, List
 
 
 class _DoxygenContentBlockDirective(BaseDirective):
@@ -48,7 +48,7 @@ class _DoxygenContentBlockDirective(BaseDirective):
         finder_filter = self.filter_factory.create_finder_filter(self.kind, name)
 
         # TODO: find a more specific type for the Doxygen nodes
-        matches = []  # type: List[Any]
+        matches: List[Any] = []
         finder.filter_(finder_filter, matches)
 
         # It shouldn't be possible to have too many matches as namespaces & groups in their nature
@@ -68,7 +68,7 @@ class _DoxygenContentBlockDirective(BaseDirective):
                 node_stack[0], project_info
             )
             # TODO: find a more specific type for the Doxygen nodes
-            contents = []  # type: List[Any]
+            contents: List[Any] = []
             contents_finder.filter_(filter_, contents)
 
             # Replaces matches with our new starting points
@@ -77,7 +77,7 @@ class _DoxygenContentBlockDirective(BaseDirective):
         target_handler = create_target_handler(self.options, project_info, self.state.document)
         filter_ = self.filter_factory.create_render_filter(self.kind, self.options)
 
-        node_list = []
+        node_list: List[Node] = []
         for node_stack in matches:
             object_renderer = SphinxRenderer(
                 self.parser_factory.app,
@@ -103,10 +103,8 @@ class DoxygenNamespaceDirective(_DoxygenContentBlockDirective):
 
 class DoxygenGroupDirective(_DoxygenContentBlockDirective):
     kind = "group"
-    option_spec = {
-        **_DoxygenContentBlockDirective.option_spec,
-        "inner": flag,
-    }
+    option_spec = _DoxygenContentBlockDirective.option_spec.copy()
+    option_spec.update({"inner": flag})
 
 
 class DoxygenPageDirective(_DoxygenContentBlockDirective):

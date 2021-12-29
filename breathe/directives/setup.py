@@ -29,7 +29,7 @@ from sphinx.application import Sphinx
 import os
 import subprocess
 
-from typing import Any, List, Optional, Type  # noqa
+from typing import Type
 
 
 def setup(app: Sphinx) -> None:
@@ -96,7 +96,7 @@ def setup(app: Sphinx) -> None:
     app.add_config_value("breathe_separate_member_pages", False, "env")
 
     breathe_css = "breathe.css"
-    if os.path.exists(os.path.join(app.confdir, "_static", breathe_css)):  # type: ignore
+    if os.path.exists(os.path.join(app.confdir, "_static", breathe_css)):
         app.add_css_file(breathe_css)
 
     def write_file(directory, filename, content):
