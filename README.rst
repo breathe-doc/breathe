@@ -1,26 +1,56 @@
-Breathe
-=======
+.. raw:: html
 
-.. image:: https://github.com/michaeljones/breathe/workflows/unit%20tests/badge.svg
-    :target: https://github.com/michaeljones/breathe/actions?query=workflow%3A%22unit+tests%22
+   <div align="center">
+     <a href="https://www.breathe-doc.org">
+       <img width="200" height="200" src="https://www.breathe-doc.org/img/logo.svg">
+     </a>
+   </div>
 
-This is an extension to reStructuredText and Sphinx to be able to read and
-render the Doxygen xml output.
+   <h1 align="center">
+     Breathe
+   </h1>
 
-Install
--------
+   <p align="center">
+      Your technical docs, beautifully integrated
+   </p>
+
+   <p align="center">
+        <a href="https://www.breathe-doc.org/">Website</a>
+      • <a href="https://breathe.readthedocs.io/en/latest/">Documentation</a>
+      • <a href="https://opencollective.com/breathe">Sponsor</a>
+   </p>
+
+   <p align="center">
+      <a href="https://github.com/michaeljones/breathe/actions?query=workflow%3A%22unit+tests%22">
+         <img src="https://github.com/michaeljones/breathe/workflows/unit%20tests/badge.svg">
+      </a>
+   </p>
+
+
+**Sponsor**: If you benefit from using Breathe as a company or an individual, you
+can financially support the Breathe project with recurring or one off
+contributions via `Open Collective <https://opencollective.com/breathe>`_.
+
+----
+
+Breathe is a Sphinx plugin providing beautifully integrated Doxygen output in
+your user-facing documentation. It allows you to combine Doxygen's excellent
+technical understanding of your code base with the superb long form
+documentation output of the Sphinx system.
+
+For Packagers
+-------------
+
+- Breathe packages on PyPI are PGP signed for Breathe >= v4.28.0.
+- Breathe tarballs on GitHub are PGP signed for Breathe >= v4.29.0.
+
+Download
+--------
 
 Breathe is available from github and `PyPI, the Python Package Index
 <http://pypi.python.org/pypi/breathe>`_. It can be installed with::
 
     pip install breathe
-
-Packagers
-~~~~~~~~~
-
-Breathe packages on PyPI are PGP signed for Breathe >= v4.28.0.
-
-Breathe tarballs on GitHub are PGP signed for Breathe >= v4.29.0.
 
 Documentation
 -------------
