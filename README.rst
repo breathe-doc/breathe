@@ -116,10 +116,21 @@ Examples
 
 Examples of Breathe used by other projects:
 
-- `Zephyr RTOS <https://docs.zephyrproject.org/latest/reference/index.html>`_
+- `PyTorch <https://github.com/pytorch/pytorch>`_
+- `OpenPilot <https://github.com/commaai/openpilot>`_
+- `XGBoost <https://github.com/dmlc/xgboost>`_
+- `NumPy <https://github.com/numpy/numpy>`_
+- `Mozilla's DeepSpeech <https://github.com/mozilla/DeepSpeech>`_
+- `Microsoft's LightGBM <https://github.com/microsoft/LightGBM>`_
+- `PyBind11 <https://github.com/pybind/pybind11>`_
+- `Ceph <https://github.com/ceph/ceph>`_
+- `Apache Arrow <https://github.com/apache/arrow>`_
+- `LVGL <https://github.com/lvgl/lvgl>`_
+- `Espressif IoT Development Framework <https://github.com/espressif/esp-idf>`_
+- `Zephyr Project <https://github.com/zephyrproject-rtos/zephyr>`_
+- `Plaid ML <https://github.com/plaidml/plaidml>`_
+- `Sony's Neural Network Libraries <https://github.com/sony/nnabla>`_
 - `fmt <http://fmtlib.net/latest>`_
-- `Lasso C API <http://lassoguide.com/api/lcapi-reference.html>`_
-  [`pdf <http://lassoguide.com/LassoGuide9.2.pdf>`__]
 
 If you have an example you would like listed here, please make a github issue
 with the details.
