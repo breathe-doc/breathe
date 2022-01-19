@@ -111,10 +111,10 @@ archives are available `here <http://librelist.com/browser/breathe/>`__.
 
 Please post new questions as GitHub issues.
 
-Examples
---------
+Projects Using Breathe
+----------------------
 
-Examples of Breathe used by other projects:
+Examples of projects that use Breathe:
 
 - `PyTorch <https://github.com/pytorch/pytorch>`_
 - `OpenPilot <https://github.com/commaai/openpilot>`_
@@ -131,9 +131,6 @@ Examples of Breathe used by other projects:
 - `Plaid ML <https://github.com/plaidml/plaidml>`_
 - `Sony's Neural Network Libraries <https://github.com/sony/nnabla>`_
 - `fmt <http://fmtlib.net/latest>`_
-
-If you have an example you would like listed here, please make a github issue
-with the details.
 
 Alternatives
 ------------
