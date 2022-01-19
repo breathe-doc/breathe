@@ -154,44 +154,17 @@ See the ``mkrelease`` utility in the root of the repository.
 Useful vim command for changelog conversion to the git tag format:
 ``%s/\v`(#[0-9]+) \<[^`]*`__/\1/g``.
 
-Credits
--------
+Maintainers
+-----------
 
-Breathe is currently maintained by `vermeeren <https://github.com/vermeeren>`_
+Breathe is currently maintained by `vermeeren <https://github.com/vermeeren>`_ & `jakobandersen <https://github.com/jakobandersen>`_
 and was formerly maintained by `michaeljones <https://github.com/michaeljones>`_
-& `vitaut <https://github.com/vitaut>`_, contributors include:
+& `vitaut <https://github.com/vitaut>`_.
 
-- `nijel <https://github.com/nijel>`_
-- `sebastianschaetz <https://github.com/sebastianschaetz>`_
-- `mbolivar <https://github.com/mbolivar>`_
-- `queezythegreat <https://github.com/queezythegreat>`_
-- `abingham <https://github.com/abingham>`_
-- `davidm <https://github.com/davidm>`_
-- `hobu <https://github.com/hobu>`_
-- `magro11 <https://github.com/magro11>`_
-- `scopatz <https://github.com/scopatz>`_
-- `vonj <https://github.com/vonj>`_
-- `jmnas <https://github.com/jmnas>`_
-- `donkopotamus <https://github.com/donkopotamus>`_
-- `jo3w4rd <https://github.com/jo3w4rd>`_
-- `Anthony Truchet <https://github.com/AnthonyTruchet>`_
-- `Daniel Matz <https://github.com/danielmatz>`_
-- `Andrew Hundt <https://github.com/ahundt>`_
-- `sebastinas <https://github.com/sebastinas>`_
-- `robo9k <https://github.com/robo9k>`_
-- `sieben <https://github.com/sieben>`_
-- `rweickelt <https://github.com/rweickelt>`_
-- `sam-roth <https://github.com/sam-roth>`_
-- `bnewbold <https://github.com/bnewbold>`_
-- `serge-sans-paille <https://github.com/serge-sans-paille>`_
-- `dean0x7d <https://github.com/dean0x7d>`_
-- `Andne <https://github.com/Andne>`_
-- `Tiwalun <https://github.com/Tiwalun>`_
-- `eric-wieser <https://github.com/eric-wieser>`_
-- `olitheolix <https://github.com/olitheolix>`_
-- Many more, this list is rather outdated. Refer to the git history.
+See `CONTRIBUTORS <https://github.com/michaeljones/breathe/blob/master/CONTRIBUTORS.rst`_ for the full list.
 
-Thanks to:
+Acknowledgements
+----------------
 
 - Dimitri van Heesch for `Doxygen <http://www.stack.nl/~dimitri/doxygen/>`_.
 - Georg Brandl for `Sphinx <http://sphinx-doc.org>`_.
