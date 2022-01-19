@@ -116,6 +116,7 @@ Examples
 
 Examples of Breathe used by other projects:
 
+- `Zephyr RTOS <https://docs.zephyrproject.org/latest/reference/index.html>`_
 - `fmt <http://fmtlib.net/latest>`_
 - `Lasso C API <http://lassoguide.com/api/lcapi-reference.html>`_
   [`pdf <http://lassoguide.com/LassoGuide9.2.pdf>`__]
