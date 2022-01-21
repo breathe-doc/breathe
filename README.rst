@@ -158,7 +158,7 @@ Breathe is currently maintained by `vermeeren <https://github.com/vermeeren>`_ &
 and was formerly maintained by `michaeljones <https://github.com/michaeljones>`_
 & `vitaut <https://github.com/vitaut>`_.
 
-See `CONTRIBUTORS <https://github.com/michaeljones/breathe/blob/master/CONTRIBUTORS.rst`_ for the full list.
+See `CONTRIBUTORS </CONTRIBUTORS.rst>`_ for the full list.
 
 Acknowledgements
 ----------------
