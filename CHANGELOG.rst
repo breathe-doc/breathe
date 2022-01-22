@@ -28,6 +28,9 @@ Inspired by `Keepachangelog.com <http://keepachangelog.com/>`__.
     `#767 <https://github.com/michaeljones/breathe/issues/767>`__
   - Doxygen >= 1.9.2 supports C++20 concepts, add support for them.
     `#779 <https://github.com/michaeljones/breathe/pull/779>`__
+  - Change the way directives are added to adhere to the interface,
+    e.g., avoiding myst-parser to crash.
+    `#780 <https://github.com/michaeljones/breathe/pull/780>`__
 
 - 2021-09-14 - **Breathe v4.31.0**
 
