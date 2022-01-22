@@ -29,8 +29,6 @@ from sphinx.application import Sphinx
 import os
 import subprocess
 
-from typing import Type
-
 
 def setup(app: Sphinx) -> None:
     directives = {
