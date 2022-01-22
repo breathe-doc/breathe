@@ -11,7 +11,6 @@ from breathe.renderer.target import TargetHandler
 from sphinx.directives import SphinxDirective
 
 from docutils import nodes
-from docutils.nodes import Node
 
 from typing import Any, Dict, List, Optional, Sequence
 
@@ -95,7 +94,7 @@ class BaseDirective(SphinxDirective):
         target_handler: TargetHandler,
         mask_factory: MaskFactoryBase,
         directive_args,
-    ) -> List[Node]:
+    ) -> List[nodes.Node]:
         "Standard render process used by subclasses"
 
         try:

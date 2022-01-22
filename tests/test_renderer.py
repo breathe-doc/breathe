@@ -1,5 +1,5 @@
 import os
-import pytest  # type: ignore
+import pytest
 
 import sphinx.addnodes
 import sphinx.environment

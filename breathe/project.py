@@ -5,9 +5,8 @@ from sphinx.application import Sphinx
 import os
 import fnmatch
 
-if False:
-    # For type annotation
-    from typing import Dict, Optional  # noqa
+
+from typing import Dict
 
 
 class ProjectError(BreatheError):
@@ -94,11 +93,11 @@ class ProjectInfo:
     def domain_for_file(self, file_: str) -> str:
         extension = file_.split(".")[-1]
         try:
-            domain = self.app.config.breathe_domain_by_extension[extension]  # type: ignore
+            domain = self.app.config.breathe_domain_by_extension[extension]
         except KeyError:
             domain = ""
 
-        domainFromFilePattern = self.app.config.breathe_domain_by_file_pattern  # type: ignore
+        domainFromFilePattern = self.app.config.breathe_domain_by_file_pattern
         for pattern, pattern_domain in domainFromFilePattern.items():
             if fnmatch.fnmatch(file_, pattern):
                 domain = pattern_domain
@@ -116,20 +115,20 @@ class ProjectInfoFactory:
         # This can be overridden with the breathe_build_directory config variable
         self._default_build_dir = os.path.dirname(app.doctreedir.rstrip(os.sep))
         self.project_count = 0
-        self.project_info_store = {}  # type: Dict[str, ProjectInfo]
-        self.project_info_for_auto_store = {}  # type: Dict[str, AutoProjectInfo]
-        self.auto_project_info_store = {}  # type: Dict[str, AutoProjectInfo]
+        self.project_info_store: Dict[str, ProjectInfo] = {}
+        self.project_info_for_auto_store: Dict[str, AutoProjectInfo] = {}
+        self.auto_project_info_store: Dict[str, AutoProjectInfo] = {}
 
     @property
     def build_dir(self) -> str:
-        config = self.app.config  # type: ignore
+        config = self.app.config
         if config.breathe_build_directory:
             return config.breathe_build_directory
         else:
             return self._default_build_dir
 
     def default_path(self) -> str:
-        config = self.app.config  # type: ignore
+        config = self.app.config
         if not config.breathe_default_project:
             raise NoDefaultProjectError(
                 "No breathe_default_project config setting to fall back on "
@@ -148,7 +147,7 @@ class ProjectInfoFactory:
             )
 
     def create_project_info(self, options) -> ProjectInfo:
-        config = self.app.config  # type: ignore
+        config = self.app.config
         name = config.breathe_default_project
 
         if "project" in options:
@@ -194,7 +193,7 @@ class ProjectInfoFactory:
         sense.
         """
 
-        name = options.get("project", self.app.config.breathe_default_project)  # type: ignore
+        name = options.get("project", self.app.config.breathe_default_project)
         if name is None:
             raise NoDefaultProjectError(
                 "No breathe_default_project config setting to fall back on "
