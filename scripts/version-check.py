@@ -9,9 +9,9 @@ import re
 import breathe
 
 setup_version = ""
-with open('setup.py') as setup:
+with open("setup.py") as setup:
     for line in setup:
-        if line.startswith('__version__'):
+        if line.startswith("__version__"):
             match = re.search('"(?P<version>[^"]*)"', line)
             if match:
                 setup_version = match.group("version")
