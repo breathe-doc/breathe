@@ -132,17 +132,6 @@ Examples of projects that use Breathe:
 - `Sony's Neural Network Libraries <https://github.com/sony/nnabla>`_
 - `fmt <http://fmtlib.net/latest>`_
 
-Alternatives
-------------
-
-Breathe is not the only solution to this problem. These are the alternatives
-that we know about. We are very happy to list others if you'd like to provide a
-link in a GitHub issue.
-
-- `Gasp <https://github.com/troelsfr/Gasp>`_
-- `Robin <https://bitbucket.org/reima/robin>`_
-- `sphinxcontrib-autodoc_doxygen <https://github.com/rmcgibbo/sphinxcontrib-autodoc_doxygen>`_
-
 Release
 -------
 
