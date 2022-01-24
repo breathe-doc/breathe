@@ -48,4 +48,4 @@ type-check:
 
 .PHONY: version-check
 version-check:
-	 python3 scripts/version-check.py
+	 PYTHONPATH=../:$(PYTHONPATH) python3 scripts/version-check.py
