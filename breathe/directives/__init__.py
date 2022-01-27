@@ -11,7 +11,6 @@ from breathe.renderer.target import TargetHandler
 from sphinx.directives import SphinxDirective
 
 from docutils import nodes
-from docutils.nodes import Node
 
 from typing import Any, Dict, List, Optional, Sequence
 
@@ -41,26 +40,36 @@ class _WarningHandler:
 
 
 class BaseDirective(SphinxDirective):
-    required_arguments: int
-    optional_arguments: int
-    option_spec: Dict[str, Any]
-    has_content: bool
-    final_argument_whitespace: bool
+    @property
+    def directive_args(self) -> list:
+        # the order must be the same as in docutils.parsers.rst.Directive.__init__
+        return [
+            self.name,
+            self.arguments,
+            self.options,
+            self.content,
+            self.lineno,
+            self.content_offset,
+            self.block_text,
+            self.state,
+            self.state_machine,
+        ]
 
-    def __init__(
-        self,
-        finder_factory: FinderFactory,
-        project_info_factory: ProjectInfoFactory,
-        parser_factory: DoxygenParserFactory,
-        *args
-    ) -> None:
-        super().__init__(*args)
-        self.directive_args = list(args)  # Convert tuple to list to allow modification.
+    @property
+    def project_info_factory(self) -> ProjectInfoFactory:
+        return self.env.temp_data["breathe_project_info_factory"]
 
-        self.finder_factory = finder_factory
-        self.project_info_factory = project_info_factory
-        self.filter_factory = FilterFactory(self.env.app)
-        self.parser_factory = parser_factory
+    @property
+    def parser_factory(self) -> DoxygenParserFactory:
+        return self.env.temp_data["breathe_parser_factory"]
+
+    @property
+    def finder_factory(self) -> FinderFactory:
+        return FinderFactory(self.env.app, self.parser_factory)
+
+    @property
+    def filter_factory(self) -> FilterFactory:
+        return FilterFactory(self.env.app)
 
     @property
     def kind(self) -> str:
@@ -85,7 +94,7 @@ class BaseDirective(SphinxDirective):
         target_handler: TargetHandler,
         mask_factory: MaskFactoryBase,
         directive_args,
-    ) -> List[Node]:
+    ) -> List[nodes.Node]:
         "Standard render process used by subclasses"
 
         try:

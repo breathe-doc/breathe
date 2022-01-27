@@ -24,8 +24,16 @@ Inspired by `Keepachangelog.com <http://keepachangelog.com/>`__.
   - Add :confval:`breathe_show_include` to control whether ``#include`` lines
     are shown. Defaults to ``True``.
     `#725 <https://github.com/michaeljones/breathe/pull/725>`__
+  - Fix friend functions for older Doxygen versions.
+    `#767 <https://github.com/michaeljones/breathe/issues/767>`__
+  - Doxygen >= 1.9.2 supports C++20 concepts, add support for them.
+    `#779 <https://github.com/michaeljones/breathe/pull/779>`__
+  - Change the way directives are added to adhere to the interface,
+    e.g., avoiding myst-parser to crash.
+    `#780 <https://github.com/michaeljones/breathe/pull/780>`__
   - Improved list of included files (with cross-references for local includes)
     `#763 <https://github.com/michaeljones/breathe/pull/763>`_
+
 
 - 2021-09-14 - **Breathe v4.31.0**
 

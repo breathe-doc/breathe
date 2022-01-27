@@ -586,9 +586,7 @@ class FilterFactory:
             raise UnrecognisedKindError(kind)
 
         # Generate new dictionary from defaults
-        filter_options = dict(
-            (entry, "") for entry in self.app.config.breathe_default_members
-        )  # type: ignore
+        filter_options = dict((entry, "") for entry in self.app.config.breathe_default_members)
 
         # Update from the actual options
         filter_options.update(options)
@@ -621,9 +619,7 @@ class FilterFactory:
         """Content filter for classes based on various directive options"""
 
         # Generate new dictionary from defaults
-        filter_options = dict(
-            (entry, "") for entry in self.app.config.breathe_default_members
-        )  # type: ignore
+        filter_options = dict((entry, "") for entry in self.app.config.breathe_default_members)
 
         # Update from the actual options
         filter_options.update(options)
@@ -842,7 +838,7 @@ class FilterFactory:
             return OpenFilter()
 
     def create_file_filter(self, filename: str, options: Dict[str, Any]) -> Filter:
-        valid_names = []  # type: List[str]
+        valid_names: List[str] = []
 
         filter_ = AndFilter(
             NotFilter(
@@ -1021,7 +1017,7 @@ class FilterFactory:
         else:
             is_implementation_file = parent.name.endswith(
                 self.app.config.breathe_implementation_filename_extensions
-            )  # type: ignore
+            )
             parent_is_compound = parent.node_type == "compound"
             parent_is_file = (parent.kind == "file") & (~is_implementation_file)
             parent_is_not_file = parent.kind != "file"

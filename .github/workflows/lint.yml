@@ -28,3 +28,6 @@ jobs:
 
       - name: type check the source code
         run: make type-check
+
+      - name: check version numbers are in sync
+        run: make version-check
