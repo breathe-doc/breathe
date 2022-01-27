@@ -1410,7 +1410,8 @@ class SphinxRenderer:
 
     def visit_docreftext(self, node) -> List[Node]:
         nodelist = self.render_iterable(node.content_)
-        nodelist.extend(self.render_iterable(node.para))
+        if hasattr(node, "para"):
+            nodelist.extend(self.render_iterable(node.para))
 
         refid = self.get_refid(node.refid)
 
@@ -1706,18 +1707,21 @@ class SphinxRenderer:
 
         return [rst_node]
 
-    def visit_inc(self, node) -> List[Node]:
+    def visit_inc(self, node: compoundsuper.incType) -> List[nodes.container]:
         if not self.app.config.breathe_show_include:
             return []
 
-        if node.local == u"yes":
-            text = '#include "%s"' % node.content_[0].getValue()
+        compound_link = [nodes.Text("", node.content_[0].getValue())]
+        if node.get_refid():
+            compound_link = self.visit_docreftext(node)
+        if node.local == "yes":
+            text = [nodes.Text('#include "'), *compound_link, nodes.Text('"')]
         else:
-            text = "#include <%s>" % node.content_[0].getValue()
+            text = [nodes.Text("#include <"), *compound_link, nodes.Text(">")]
 
-        return [nodes.emphasis(text=text)]
+        return [nodes.container("", nodes.emphasis("", *text))]
 
-    def visit_ref(self, node) -> List[Node]:
+    def visit_ref(self, node: compoundsuper.refType) -> List[Node]:
         def get_node_info(file_data):
             name = node.content_[0].getValue()
             name = name.rsplit("::", 1)[-1]

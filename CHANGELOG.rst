@@ -31,6 +31,9 @@ Inspired by `Keepachangelog.com <http://keepachangelog.com/>`__.
   - Change the way directives are added to adhere to the interface,
     e.g., avoiding myst-parser to crash.
     `#780 <https://github.com/michaeljones/breathe/pull/780>`__
+  - Improved list of included files (with cross-references for local includes)
+    `#763 <https://github.com/michaeljones/breathe/pull/763>`_
+
 
 - 2021-09-14 - **Breathe v4.31.0**
 
