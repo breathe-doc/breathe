@@ -3,7 +3,7 @@ Change Log
 
 Inspired by `Keepachangelog.com <http://keepachangelog.com/>`__.
 
-- Unreleased
+- Unreleased - **Breathe v4.32.0**
 
   - Added ``breathe_doxygen_aliases`` config variable.
     `#729 <https://github.com/michaeljones/breathe/pull/729>`__
@@ -24,16 +24,35 @@ Inspired by `Keepachangelog.com <http://keepachangelog.com/>`__.
   - Add :confval:`breathe_show_include` to control whether ``#include`` lines
     are shown. Defaults to ``True``.
     `#725 <https://github.com/michaeljones/breathe/pull/725>`__
+  - Fix sys.path adjustment in doc config.
+    `#734 <https://github.com/michaeljones/breathe/pull/734>`__
+  - Fix sphinx renderer variable and function visitors for C#.
+    `#737 <https://github.com/michaeljones/breathe/pull/737>`__
+  - Fix sphinx renderer class visitor for C#.
+    `#738 <https://github.com/michaeljones/breathe/pull/738>`__
+  - Auto-format python code with black.
+    `#743 <https://github.com/michaeljones/breathe/pull/743>`__
+  - Extend flake8 and address some style issues.
+    `#745 <https://github.com/michaeljones/breathe/pull/745>`__
+  - Fix black formatting warning.
+    `#747 <https://github.com/michaeljones/breathe/pull/747>`__
+  - Update Sphinx and Python versions tested against.
+    `#765 <https://github.com/michaeljones/breathe/pull/765>`__
   - Fix friend functions for older Doxygen versions.
-    `#767 <https://github.com/michaeljones/breathe/issues/767>`__
+    `#769 <https://github.com/michaeljones/breathe/pull/769>`__
   - Doxygen >= 1.9.2 supports C++20 concepts, add support for them.
     `#779 <https://github.com/michaeljones/breathe/pull/779>`__
   - Change the way directives are added to adhere to the interface,
     e.g., avoiding myst-parser to crash.
     `#780 <https://github.com/michaeljones/breathe/pull/780>`__
-  - Improved list of included files (with cross-references for local includes)
+  - Improved list of included files (with cross-references for local includes).
     `#763 <https://github.com/michaeljones/breathe/pull/763>`_
-
+  - Update flake8 and mypy related stuff.
+    `#781 <https://github.com/michaeljones/breathe/pull/781>`__
+  - Update readme with logo and sponsorship info.
+    `#784 <https://github.com/michaeljones/breathe/pull/784>`__
+  - Store version number in both setup.py and __init__.py.
+    `#789 <https://github.com/michaeljones/breathe/pull/789>`__
 
 - 2021-09-14 - **Breathe v4.31.0**
 
