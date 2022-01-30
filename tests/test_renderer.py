@@ -315,7 +315,7 @@ def test_render_func(app):
         argsstring="(int)",
         virt="non-virtual",
         param=[
-            WrappedParam(type_=WrappedLinkedText(content_=[WrappedMixedContainer(value=u"int")]))
+            WrappedParam(type_=WrappedLinkedText(content_=[WrappedMixedContainer(value="int")]))
         ],
     )
     signature = find_node(render(app, member_def), "desc_signature")
@@ -460,7 +460,7 @@ def test_render_variable_initializer(app):
         definition="const int EOF",
         type_="const int",
         name="EOF",
-        initializer=WrappedMixedContainer(value=u"= -1"),
+        initializer=WrappedMixedContainer(value="= -1"),
     )
     signature = find_node(render(app, member_def), "desc_signature")
     assert signature.astext() == "const int EOF = -1"
@@ -470,7 +470,7 @@ def test_render_define_initializer(app):
     member_def = WrappedMemberDef(
         kind="define",
         name="MAX_LENGTH",
-        initializer=WrappedLinkedText(content_=[WrappedMixedContainer(value=u"100")]),
+        initializer=WrappedLinkedText(content_=[WrappedMixedContainer(value="100")]),
     )
     signature_w_initializer = find_node(
         render(app, member_def, show_define_initializer=True), "desc_signature"
@@ -480,7 +480,7 @@ def test_render_define_initializer(app):
     member_def_no_show = WrappedMemberDef(
         kind="define",
         name="MAX_LENGTH_NO_INITIALIZER",
-        initializer=WrappedLinkedText(content_=[WrappedMixedContainer(value=u"100")]),
+        initializer=WrappedLinkedText(content_=[WrappedMixedContainer(value="100")]),
     )
 
     signature_wo_initializer = find_node(

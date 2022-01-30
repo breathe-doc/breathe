@@ -1681,7 +1681,7 @@ class SphinxRenderer:
             text = node.text.replace("embed:rst:inline", "", 1)
         else:
             # Remove the first line which is "embed:rst[:leading-asterisk]"
-            text = "\n".join(node.text.split(u"\n")[1:])
+            text = "\n".join(node.text.split("\n")[1:])
 
             # Remove starting whitespace
             text = textwrap.dedent(text)
