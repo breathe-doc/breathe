@@ -24,6 +24,7 @@ jobs:
         run: make flake8
 
       - name: check source code formatting
+        continue-on-error: true
         run: make black
 
       - name: type check the source code
