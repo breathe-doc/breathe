@@ -53,6 +53,8 @@ Inspired by `Keepachangelog.com <http://keepachangelog.com/>`__.
     `#784 <https://github.com/michaeljones/breathe/pull/784>`__
   - Store version number in both setup.py and __init__.py.
     `#789 <https://github.com/michaeljones/breathe/pull/789>`__
+  - CICD: lint: continue with other jobs if black fails.
+    `#791 <https://github.com/michaeljones/breathe/pull/791>`__
 
 - 2021-09-14 - **Breathe v4.31.0**
 
