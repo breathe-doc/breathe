@@ -10,7 +10,7 @@ except ImportError:
 import sys
 
 # Keep in sync with breathe/__init__.py __version__
-__version__ = "4.31.0"
+__version__ = "4.32.0"
 
 long_desc = """
 Breathe is an extension to reStructuredText and Sphinx to be able to read and

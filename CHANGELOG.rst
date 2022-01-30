@@ -3,7 +3,7 @@ Change Log
 
 Inspired by `Keepachangelog.com <http://keepachangelog.com/>`__.
 
-- Unreleased - **Breathe v4.32.0**
+- 2022-01-30 - **Breathe v4.32.0**
 
   - Added ``breathe_doxygen_aliases`` config variable.
     `#729 <https://github.com/michaeljones/breathe/pull/729>`__
@@ -21,8 +21,8 @@ Inspired by `Keepachangelog.com <http://keepachangelog.com/>`__.
   - Properly handle field-lists and admonitions in the detailed description of
     classes and functions.
     `#764 <https://github.com/michaeljones/breathe/pull/764>`__
-  - Add :confval:`breathe_show_include` to control whether ``#include`` lines
-    are shown. Defaults to ``True``.
+  - Add ``:confval:`breathe_show_include``` to control whether ``#include``
+    lines are shown. Defaults to ``True``.
     `#725 <https://github.com/michaeljones/breathe/pull/725>`__
   - Fix sys.path adjustment in doc config.
     `#734 <https://github.com/michaeljones/breathe/pull/734>`__
@@ -46,7 +46,7 @@ Inspired by `Keepachangelog.com <http://keepachangelog.com/>`__.
     e.g., avoiding myst-parser to crash.
     `#780 <https://github.com/michaeljones/breathe/pull/780>`__
   - Improved list of included files (with cross-references for local includes).
-    `#763 <https://github.com/michaeljones/breathe/pull/763>`_
+    `#763 <https://github.com/michaeljones/breathe/pull/763>`__
   - Update flake8 and mypy related stuff.
     `#781 <https://github.com/michaeljones/breathe/pull/781>`__
   - Update readme with logo and sponsorship info.
