@@ -3,6 +3,11 @@ Change Log
 
 Inspired by `Keepachangelog.com <http://keepachangelog.com/>`__.
 
+- Unreleased - **Breathe v4.33.0**
+
+  - Fix duplicate ``static`` in variable declarations.
+    `#794 <https://github.com/michaeljones/breathe/pull/794>`__
+
 - 2022-01-30 - **Breathe v4.32.0**
 
   - Added ``breathe_doxygen_aliases`` config variable.
