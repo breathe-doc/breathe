@@ -2124,6 +2124,9 @@ class SphinxRenderer:
             if node.mutable == "yes":
                 elements.append("mutable")
             typename = "".join(n.astext() for n in self.render(node.get_type()))
+            # Doxygen sometimes leaves 'static' in the type,
+            # e.g., for "constexpr static int i"
+            typename = typename.replace("static ", "")
             if dom == "c" and "::" in typename:
                 typename = typename.replace("::", ".")
             elements.append(typename)
