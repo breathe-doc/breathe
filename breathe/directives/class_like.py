@@ -71,5 +71,9 @@ class DoxygenStructDirective(_DoxygenClassLikeDirective):
     kind = "struct"
 
 
+class DoxygenUnionDirective(_DoxygenClassLikeDirective):
+    kind = "union"
+
+
 class DoxygenInterfaceDirective(_DoxygenClassLikeDirective):
     kind = "interface"
