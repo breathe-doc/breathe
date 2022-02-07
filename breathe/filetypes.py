@@ -1,7 +1,7 @@
 from typing import Optional
 import os.path
 
-import pygments # type: ignore
+import pygments  # type: ignore
 
 
 def get_pygments_alias(filename: str) -> Optional[str]:
