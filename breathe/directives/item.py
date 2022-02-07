@@ -9,7 +9,7 @@ from docutils.nodes import Node
 
 from docutils.parsers.rst.directives import unchanged_required, flag  # type: ignore
 
-from typing import Any, List, Optional, Type  # noqa
+from typing import Any, List
 
 
 class _DoxygenBaseItemDirective(BaseDirective):
@@ -49,7 +49,7 @@ class _DoxygenBaseItemDirective(BaseDirective):
         finder_filter = self.create_finder_filter(namespace, name)
 
         # TODO: find a more specific type for the Doxygen nodes
-        matches = []  # type: List[Any]
+        matches: List[Any] = []
         finder.filter_(finder_filter, matches)
 
         if len(matches) == 0:
@@ -73,6 +73,18 @@ class DoxygenVariableDirective(_DoxygenBaseItemDirective):
 
 class DoxygenDefineDirective(_DoxygenBaseItemDirective):
     kind = "define"
+
+
+class DoxygenConceptDirective(_DoxygenBaseItemDirective):
+    kind = "concept"
+
+    def create_finder_filter(self, namespace: str, name: str) -> Filter:
+        # Unions are stored in the xml file with their fully namespaced name
+        # We're using C++ namespaces here, it might be best to make this file
+        # type dependent
+        #
+        xml_name = "%s::%s" % (namespace, name) if namespace else name
+        return self.filter_factory.create_compound_finder_filter(xml_name, "concept")
 
 
 class DoxygenEnumDirective(_DoxygenBaseItemDirective):

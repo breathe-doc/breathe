@@ -1,5 +1,5 @@
 import os
-import pytest  # type: ignore
+import pytest
 
 import sphinx.addnodes
 import sphinx.environment
@@ -111,9 +111,14 @@ class WrappedCompoundDef(compounddefTypeSub, WrappedDoxygenNode):
 
 class MockState:
     def __init__(self, app):
+        from breathe.project import ProjectInfoFactory
+        from breathe.parser import DoxygenParserFactory
+
         env = sphinx.environment.BuildEnvironment(app)
         env.setup(app)
         env.temp_data["docname"] = "mock-doc"
+        env.temp_data["breathe_project_info_factory"] = ProjectInfoFactory(app)
+        env.temp_data["breathe_parser_factory"] = DoxygenParserFactory(app)
         settings = frontend.OptionParser(components=(parsers.rst.Parser,)).get_default_values()
         settings.env = env
         self.document = utils.new_document("", settings)
@@ -310,7 +315,7 @@ def test_render_func(app):
         argsstring="(int)",
         virt="non-virtual",
         param=[
-            WrappedParam(type_=WrappedLinkedText(content_=[WrappedMixedContainer(value=u"int")]))
+            WrappedParam(type_=WrappedLinkedText(content_=[WrappedMixedContainer(value="int")]))
         ],
     )
     signature = find_node(render(app, member_def), "desc_signature")
@@ -455,7 +460,7 @@ def test_render_variable_initializer(app):
         definition="const int EOF",
         type_="const int",
         name="EOF",
-        initializer=WrappedMixedContainer(value=u"= -1"),
+        initializer=WrappedMixedContainer(value="= -1"),
     )
     signature = find_node(render(app, member_def), "desc_signature")
     assert signature.astext() == "const int EOF = -1"
@@ -465,7 +470,7 @@ def test_render_define_initializer(app):
     member_def = WrappedMemberDef(
         kind="define",
         name="MAX_LENGTH",
-        initializer=WrappedLinkedText(content_=[WrappedMixedContainer(value=u"100")]),
+        initializer=WrappedLinkedText(content_=[WrappedMixedContainer(value="100")]),
     )
     signature_w_initializer = find_node(
         render(app, member_def, show_define_initializer=True), "desc_signature"
@@ -475,7 +480,7 @@ def test_render_define_initializer(app):
     member_def_no_show = WrappedMemberDef(
         kind="define",
         name="MAX_LENGTH_NO_INITIALIZER",
-        initializer=WrappedLinkedText(content_=[WrappedMixedContainer(value=u"100")]),
+        initializer=WrappedLinkedText(content_=[WrappedMixedContainer(value="100")]),
     )
 
     signature_wo_initializer = find_node(
@@ -516,9 +521,6 @@ def test_render_innergroup(app):
 
 def get_directive(app):
     from breathe.directives.function import DoxygenFunctionDirective
-    from breathe.project import ProjectInfoFactory
-    from breathe.parser import DoxygenParserFactory
-    from breathe.finder.factory import FinderFactory
     from docutils.statemachine import StringList
 
     app.config.breathe_separate_member_pages = False
@@ -526,9 +528,6 @@ def get_directive(app):
     app.config.breathe_domain_by_extension = {}
     app.config.breathe_domain_by_file_pattern = {}
     app.config.breathe_use_project_refids = False
-    project_info_factory = ProjectInfoFactory(app)
-    parser_factory = DoxygenParserFactory(app)
-    finder_factory = FinderFactory(app, parser_factory)
     cls_args = (
         "doxygenclass",
         ["at::Tensor"],
@@ -543,7 +542,7 @@ def get_directive(app):
         MockState(app),
         MockStateMachine(),
     )
-    return DoxygenFunctionDirective(finder_factory, project_info_factory, parser_factory, *cls_args)
+    return DoxygenFunctionDirective(*cls_args)
 
 
 def get_matches(datafile):

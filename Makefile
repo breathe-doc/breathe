@@ -36,12 +36,7 @@ dev-test:
 
 .PHONY: flake8
 flake8:
-	flake8 breathe/*.py \
-		breathe/directives/*.py \
-		breathe/finder/*.py \
-		breathe/renderer/sphinxrenderer.py \
-		breathe/renderer/filter.py \
-		breathe/parser/compound.py
+	flake8 breathe
 
 .PHONY: black
 black:
@@ -49,4 +44,8 @@ black:
 
 .PHONY: type-check
 type-check:
-	mypy breathe tests
+	mypy --warn-redundant-casts --warn-unused-ignores breathe tests
+
+.PHONY: version-check
+version-check:
+	 PYTHONPATH=../:$(PYTHONPATH) python3 scripts/version-check.py

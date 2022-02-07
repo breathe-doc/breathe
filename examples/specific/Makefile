@@ -3,9 +3,9 @@
 #
 
 DOXYGEN   ?= `which doxygen`
-TMAKEPATH = 
+TMAKEPATH =
 ENV       = env TMAKEPATH=$(TMAKEPATH)
-TMAKE     = 
+TMAKE     =
 MAKE      = /usr/bin/make
 PERL      = /usr/bin/perl
 RM        = rm -f
@@ -15,7 +15,7 @@ INSTALL   = /tmp
 INSTTOOL  = /usr/bin/install
 DOXYDOCS  = ..
 DOCDIR    = $(INSTALL)/share/doc/packages/doxygen
-QTDIR     = 
+QTDIR     =
 HAVE_DOT  = /usr/bin/dot
 
 projects  = nutshell alias rst inline namespacefile array inheritance \
@@ -24,7 +24,7 @@ projects  = nutshell alias rst inline namespacefile array inheritance \
 			headings links parameters template_class template_class_non_type \
 			template_function template_type_alias template_specialisation \
 			enum define interface xrefsect tables \
-			cpp_anon cpp_enum cpp_union cpp_function cpp_friendclass \
+			cpp_anon cpp_concept cpp_enum cpp_union cpp_function cpp_friendclass \
 			cpp_inherited_members cpp_trailing_return_type cpp_constexpr_hax \
 			cpp_function_lookup \
 			c_file c_struct c_enum c_typedef c_macro c_union membergroups \
@@ -45,7 +45,7 @@ clean:
 # General pattern
 # ---------------
 
-$(xmls): %/xml/index.xml: %.cfg %.h 
+$(xmls): %/xml/index.xml: %.cfg %.h
 	$(DOXYGEN) $<
 
 

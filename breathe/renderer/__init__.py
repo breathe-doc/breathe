@@ -1,6 +1,3 @@
-from breathe.renderer.filter import Filter
-from breathe.renderer.target import TargetHandler
-
 from docutils import nodes
 import textwrap
 

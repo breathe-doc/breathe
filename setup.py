@@ -8,7 +8,9 @@ except ImportError:
     from setuptools import setup, find_packages
 
 import sys
-from breathe import __version__
+
+# Keep in sync with breathe/__init__.py __version__
+__version__ = "4.32.0"
 
 long_desc = """
 Breathe is an extension to reStructuredText and Sphinx to be able to read and

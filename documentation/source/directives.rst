@@ -9,6 +9,7 @@ Directives & Config Variables
    struct
    class
    namespace
+   concept
    enum
    enumvalue
    typedef
@@ -104,6 +105,23 @@ define. It behaves the same as the doxygenstruct directive.
       :no-link:
 
 Checkout the :ref:`example <define-example>` to see it in action.
+
+
+doxygenconcept
+~~~~~~~~~~~~~~
+
+This directive generates the appropriate output for a single concept. It
+behaves the same as the doxygenstruct directive.
+
+::
+
+   .. doxygenconcept:: <concept name>
+      :project: ...
+      :path: ...
+      :outline:
+      :no-link:
+
+Checkout the :ref:`example <concept-example>` to see it in action.
 
 
 doxygenenum
@@ -580,6 +598,23 @@ Config Values
 
    For example an enum value ``TWO = 2`` would be shown with the value 2 if this is set to ``True``,
    and without if it is set to ``False``.
+
+.. confval:: breathe_show_include
+
+   A boolean flag which can be set to ``False`` to hide the header in which each
+   entity (struct, function, macro, etc.) is defined.
+
+   For example, when set to ``True`` (the default) a ``struct Foo`` is rendered
+   similarly to::
+
+     struct Foo
+       #include <foo.hpp>
+       Description of Foo.
+
+   but when set to ``False`` it is instead rendered as::
+
+     struct Foo
+       Description of Foo.
 
 .. confval:: breathe_use_project_refids
 

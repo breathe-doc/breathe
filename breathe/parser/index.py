@@ -5,8 +5,8 @@ Generated Mon Feb  9 19:08:05 2009 by generateDS.py.
 from xml.dom import minidom
 from xml.parsers.expat import ExpatError
 
-
 from . import indexsuper as supermod
+
 
 class DoxygenTypeSub(supermod.DoxygenType):
 
@@ -41,8 +41,10 @@ supermod.MemberType.subclass = MemberTypeSub
 class ParseError(Exception):
     pass
 
+
 class FileIOError(Exception):
     pass
+
 
 def parse(inFilename):
     try:
