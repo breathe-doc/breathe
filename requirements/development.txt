@@ -6,6 +6,5 @@ pytest
 
 mypy>=0.900
 types-docutils>=0.17.0
-types-Pygments>=2.9.16
 
 black==22.1.0
