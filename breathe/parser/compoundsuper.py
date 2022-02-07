@@ -2449,7 +2449,7 @@ class listingType(GeneratedsSuper):
             nodeName_ = child_.nodeName.split(':')[-1]
             self.buildChildren(child_, nodeName_)
     def buildAttributes(self, attrs: minidom.NamedNodeMap):
-        if "filename" in attrs.keys():
+        if "filename" in attrs:
             # extract the domain for this programlisting tag.
             filename = attrs["filename"].value
             self.domain = filetypes.get_pygments_alias(filename) or filetypes.get_extension(filename)
