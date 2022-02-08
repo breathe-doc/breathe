@@ -2,7 +2,8 @@
 /** A function with an unannotated code block with C/C++ code.
  *
  * @code
- * int result = with_standard_code_block()
+ * char* buffer = new char[42];
+ * int charsAdded = sprintf(buffer, "Tabs are normally %d spaces\n", 8);
  * @endcode
  */
 void with_standard_code_block();
