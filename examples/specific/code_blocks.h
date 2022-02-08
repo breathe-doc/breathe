@@ -11,9 +11,9 @@ void with_standard_code_block();
  *
  * @code
  * set(user_list A B C)
- * for(element in ${user_list})
+ * foreach(element ${user_list})
  *     message(STATUS "Element is ${element}")
- * endfor()
+ * endforeach()
  * @endcode
  */
 void with_unannotated_cmake_code_block();
@@ -22,9 +22,9 @@ void with_unannotated_cmake_code_block();
  *
  * @code{.cmake}
  * set(user_list A B C)
- * for(element in ${user_list})
+ * foreach(element ${user_list})
  *     message(STATUS "Element is ${element}")
- * endfor()
+ * endforeach()
  * @endcode
  */
 void with_annotated_cmake_code_block();

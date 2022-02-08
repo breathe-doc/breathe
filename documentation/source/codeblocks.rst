@@ -3,7 +3,9 @@ Code Blocks
 ===========
 
 Breathe suppports rendering code blocks with syntax highlighting provided by the
-`Pygments <https://pygments.org/>`_ library.
+`Pygments <https://pygments.org/>`_ library. By default, Breathe will assume
+that code blocks match the language of the source file but you can also specify
+the language of the code blocks using Doxygen syntax.
 
 The Doxygen syntax for code blocks supports specifying the language as follows:
 
@@ -56,9 +58,9 @@ The following should render with no detected highlighting.
     *
     * @code
     * set(user_list A B C)
-    * for(element in ${user_list})
+    * foreach(element ${user_list})
     *     message(STATUS "Element is ${element}")
-    * endfor()
+    * endforeach()
     * @endcode
     */
    void with_unannotated_cmake_code_block();
@@ -81,9 +83,9 @@ The following should render with specified cmake highlighting.
     *
     * @code{.cmake}
     * set(user_list A B C)
-    * for(element in ${user_list})
+    * foreach(element ${user_list})
     *     message(STATUS "Element is ${element}")
-    * endfor()
+    * endforeach()
     * @endcode
     */
    void with_annotated_cmake_code_block();
