@@ -65,6 +65,7 @@ Features
 
    markups
    latexmath
+   codeblocks
    domains
    customcss
    groups
