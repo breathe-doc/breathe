@@ -3,10 +3,12 @@
 #
 
 import sys
+import os
 import getopt
 from xml.dom import minidom
 from xml.dom import Node
 
+from .. import filetypes
 #
 # User methods
 #
@@ -193,10 +195,11 @@ class DoxygenType(GeneratedsSuper):
 class compounddefType(GeneratedsSuper):
     subclass = None
     superclass = None
-    def __init__(self, kind=None, prot=None, id=None, compoundname=None, title=None, basecompoundref=None, derivedcompoundref=None, includes=None, includedby=None, incdepgraph=None, invincdepgraph=None, innerdir=None, innerfile=None, innerclass=None, innernamespace=None, innerpage=None, innergroup=None, templateparamlist=None, sectiondef=None, briefdescription=None, detaileddescription=None, inheritancegraph=None, collaborationgraph=None, programlisting=None, location=None, listofallmembers=None):
+    def __init__(self, kind=None, prot=None, id=None, compoundname=None, title=None, basecompoundref=None, derivedcompoundref=None, includes=None, includedby=None, incdepgraph=None, invincdepgraph=None, innerdir=None, innerfile=None, innerclass=None, innernamespace=None, innerpage=None, innergroup=None, templateparamlist=None, sectiondef=None, briefdescription=None, detaileddescription=None, inheritancegraph=None, collaborationgraph=None, programlisting=None, location=None, listofallmembers=None, language=None):
         self.kind = kind
         self.prot = prot
         self.id = id
+        self.language = language
         self.compoundname = compoundname
         self.title = title
         if basecompoundref is None:
@@ -376,6 +379,8 @@ class compounddefType(GeneratedsSuper):
             self.prot = attrs.get('prot').value
         if attrs.get('id'):
             self.id = attrs.get('id').value
+        if attrs.get('language'):
+            self.language = attrs.get('language').value.lower()
     def buildChildren(self, child_, nodeName_):
         if child_.nodeType == Node.ELEMENT_NODE and \
             nodeName_ == 'compoundname':
@@ -482,7 +487,7 @@ class compounddefType(GeneratedsSuper):
             self.set_collaborationgraph(obj_)
         elif child_.nodeType == Node.ELEMENT_NODE and \
             nodeName_ == 'programlisting':
-            obj_ = listingType.factory()
+            obj_ = listingType.factory(domain=self.language)
             obj_.build(child_)
             self.set_programlisting(obj_)
         elif child_.nodeType == Node.ELEMENT_NODE and \
@@ -2398,7 +2403,8 @@ class linkType(GeneratedsSuper):
 class listingType(GeneratedsSuper):
     subclass = None
     superclass = None
-    def __init__(self, codeline=None):
+    def __init__(self, codeline=None, domain: str=None):
+        self.domain = domain
         if codeline is None:
             self.codeline = []
         else:
@@ -2436,14 +2442,17 @@ class listingType(GeneratedsSuper):
             return True
         else:
             return False
-    def build(self, node_):
+    def build(self, node_: minidom.Element):
         attrs = node_.attributes
         self.buildAttributes(attrs)
         for child_ in node_.childNodes:
             nodeName_ = child_.nodeName.split(':')[-1]
             self.buildChildren(child_, nodeName_)
-    def buildAttributes(self, attrs):
-        pass
+    def buildAttributes(self, attrs: minidom.NamedNodeMap):
+        if "filename" in attrs:
+            # extract the domain for this programlisting tag.
+            filename = attrs["filename"].value
+            self.domain = filetypes.get_pygments_alias(filename) or filetypes.get_extension(filename)
     def buildChildren(self, child_, nodeName_):
         if child_.nodeType == Node.ELEMENT_NODE and \
             nodeName_ == 'codeline':

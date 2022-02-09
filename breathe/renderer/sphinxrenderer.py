@@ -1604,7 +1604,7 @@ class SphinxRenderer:
     def visit_listing(self, node) -> List[Node]:
         nodelist: List[Node] = []
         for i, item in enumerate(node.codeline):
-            # Put new lines between the lines. There must be a more pythonic way of doing this
+            # Put new lines between the lines
             if i:
                 nodelist.append(nodes.Text("\n"))
             nodelist.extend(self.render(item))
@@ -1612,6 +1612,8 @@ class SphinxRenderer:
         # Add blank string at the start otherwise for some reason it renders
         # the pending_xref tags around the kind in plain text
         block = nodes.literal_block("", "", *nodelist)
+        if node.domain:
+            block["language"] = node.domain
         return [block]
 
     def visit_codeline(self, node) -> List[Node]:
