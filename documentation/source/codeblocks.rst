@@ -76,7 +76,7 @@ exists in a C++ source file.
 ----
 
 The following should render with no detected highlighting.
-Notice there is no syntax highlighting because Pygments does not
+Notice, there is no syntax highlighting because Pygments does not
 recognize the code block's contained syntax as a C++ snippet.
 
 ----
