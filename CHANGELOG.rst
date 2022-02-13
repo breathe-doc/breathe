@@ -7,6 +7,8 @@ Inspired by `Keepachangelog.com <http://keepachangelog.com/>`__.
 
   - Fix duplicate ``static`` in variable declarations.
     `#794 <https://github.com/michaeljones/breathe/pull/794>`__
+  - Doxygen dot graphs to Sphinx graphviz.
+    `#757 <https://github.com/michaeljones/breathe/pull/757>`__
 
 - 2022-01-30 - **Breathe v4.32.0**
 
