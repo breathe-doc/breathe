@@ -9,6 +9,8 @@ Inspired by `Keepachangelog.com <http://keepachangelog.com/>`__.
     `#794 <https://github.com/michaeljones/breathe/pull/794>`__
   - Doxygen dot graphs to Sphinx graphviz.
     `#757 <https://github.com/michaeljones/breathe/pull/757>`__
+  - Support externally hosted images.
+    `#705 <https://github.com/michaeljones/breathe/pull/705>`__
 
 - 2022-01-30 - **Breathe v4.32.0**
 
