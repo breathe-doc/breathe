@@ -1,13 +1,8 @@
-from __future__ import unicode_literals
-
-from breathe.project import ProjectInfoFactory
-
-try:
-    from shlex import quote  # py3
-except ImportError:
-    from pipes import quote  # py2
+from breathe.project import AutoProjectInfo, ProjectInfoFactory
 
 import os
+from shlex import quote
+from typing import Callable, Dict, List, Tuple
 
 
 AUTOCFG_TEMPLATE = r"""
@@ -31,55 +26,59 @@ ALIASES += inlinerst="\verbatim embed:rst:inline"
 """.strip()
 
 
-class ProjectData(object):
-    "Simple handler for the files and project_info for each project"
+class ProjectData:
+    """Simple handler for the files and project_info for each project."""
 
-    def __init__(self, auto_project_info, files):
-
+    def __init__(self, auto_project_info: AutoProjectInfo, files: List[str]) -> None:
         self.auto_project_info = auto_project_info
         self.files = files
 
 
 class AutoDoxygenProcessHandle:
-    def __init__(self, run_process, write_file, project_info_factory: ProjectInfoFactory):
+    def __init__(
+        self,
+        run_process: Callable,
+        write_file: Callable[[str, str, str], None],
+        project_info_factory: ProjectInfoFactory,
+    ) -> None:
         self.run_process = run_process
         self.write_file = write_file
         self.project_info_factory = project_info_factory
 
-    def generate_xml(self, projects_source, doxygen_options, doxygen_aliases):
-
-        project_files = {}
+    def generate_xml(
+        self,
+        projects_source: Dict[str, Tuple[str, List[str]]],
+        doxygen_options: Dict[str, str],
+        doxygen_aliases: Dict[str, str],
+    ) -> None:
+        project_files: Dict[str, ProjectData] = {}
 
         # First collect together all the files which need to be doxygen processed for each project
         for project_name, file_structure in projects_source.items():
-
-            folder = file_structure[0]
-            contents = file_structure[1]
-
+            folder, contents = file_structure
             auto_project_info = self.project_info_factory.create_auto_project_info(
                 project_name, folder
             )
-
             project_files[project_name] = ProjectData(auto_project_info, contents)
 
         # Iterate over the projects and generate doxygen xml output for the files for each one into
         # a directory in the Sphinx build area
         for project_name, data in project_files.items():
-
             project_path = self.process(
                 data.auto_project_info, data.files, doxygen_options, doxygen_aliases
             )
-
             project_info = data.auto_project_info.create_project_info(project_path)
-
             self.project_info_factory.store_project_info_for_auto(project_name, project_info)
 
-    def process(self, auto_project_info, files, doxygen_options, doxygen_aliases):
-
+    def process(
+        self,
+        auto_project_info: AutoProjectInfo,
+        files: List[str],
+        doxygen_options: Dict[str, str],
+        doxygen_aliases: Dict[str, str],
+    ) -> str:
         name = auto_project_info.name()
-        cfgfile = "%s.cfg" % name
-
-        full_paths = map(lambda x: auto_project_info.abs_path_to_source_file(x), files)
+        full_paths = [auto_project_info.abs_path_to_source_file(f) for f in files]
 
         options = "\n".join("%s=%s" % pair for pair in doxygen_options.items())
         aliases = "\n".join(
@@ -94,7 +93,7 @@ class AutoDoxygenProcessHandle:
         )
 
         build_dir = os.path.join(auto_project_info.build_dir(), "breathe", "doxygen")
-
+        cfgfile = "%s.cfg" % name
         self.write_file(build_dir, cfgfile, cfg)
 
         # Shell-escape the cfg file name to try to avoid any issue where the name might include
