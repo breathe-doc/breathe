@@ -5865,7 +5865,6 @@ class docParBlockType(GeneratedsSuper):
             obj_ = self.mixedclass_(MixedContainer.CategoryComplex,
                 MixedContainer.TypeNone, 'para', obj_)
             self.para.append(obj_)
-
 # end class docParBlockType
 
 
