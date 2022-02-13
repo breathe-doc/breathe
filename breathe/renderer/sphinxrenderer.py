@@ -11,6 +11,7 @@ from sphinx.application import Sphinx
 from sphinx.directives import ObjectDescription
 from sphinx.domains import cpp, c, python
 from sphinx.util.nodes import nested_parse_with_titles
+from sphinx.util import url_re
 from sphinx.ext.graphviz import (
     graphviz,
     html_visit_graphviz,
@@ -1509,7 +1510,10 @@ class SphinxRenderer:
     def visit_docimage(self, node) -> List[Node]:
         """Output docutils image node using name attribute from xml as the uri"""
 
-        path_to_image = self.project_info.sphinx_abs_path_to_file(node.name)
+        path_to_image = node.name
+        if not url_re.match(path_to_image):
+            path_to_image = self.project_info.sphinx_abs_path_to_file(path_to_image)
+
         options = {"uri": path_to_image}
         return [nodes.image("", **options)]
 
