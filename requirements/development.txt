@@ -7,4 +7,4 @@ pytest
 mypy>=0.900
 types-docutils>=0.17.0
 
-black
+black==22.1.0

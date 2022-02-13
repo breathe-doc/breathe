@@ -55,8 +55,8 @@ source_suffix = ".rst"
 master_doc = "index"
 
 # General information about the project.
-project = u"Test Breathe Warnings"
-copyright = u"2014, Michael Jones"
+project = "Test Breathe Warnings"
+copyright = "2014, Michael Jones"
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -209,8 +209,8 @@ latex_documents = [
     (
         "index",
         "TestBreatheWarnings.tex",
-        u"Test Breathe Warnings Documentation",
-        u"Michael Jones",
+        "Test Breathe Warnings Documentation",
+        "Michael Jones",
         "manual",
     ),
 ]
@@ -241,7 +241,7 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    ("index", "testbreathewarnings", u"Test Breathe Warnings Documentation", [u"Michael Jones"], 1)
+    ("index", "testbreathewarnings", "Test Breathe Warnings Documentation", ["Michael Jones"], 1)
 ]
 
 # If true, show URL addresses after external links.
@@ -257,8 +257,8 @@ texinfo_documents = [
     (
         "index",
         "TestBreatheWarnings",
-        u"Test Breathe Warnings Documentation",
-        u"Michael Jones",
+        "Test Breathe Warnings Documentation",
+        "Michael Jones",
         "TestBreatheWarnings",
         "One line description of project.",
         "Miscellaneous",

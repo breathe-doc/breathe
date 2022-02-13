@@ -11,6 +11,14 @@ from sphinx.application import Sphinx
 from sphinx.directives import ObjectDescription
 from sphinx.domains import cpp, c, python
 from sphinx.util.nodes import nested_parse_with_titles
+from sphinx.ext.graphviz import (
+    graphviz,
+    html_visit_graphviz,
+    latex_visit_graphviz,
+    texinfo_visit_graphviz,
+    text_visit_graphviz,
+    man_visit_graphviz,
+)
 
 from docutils import nodes
 from docutils.nodes import Element, Node, TextElement
@@ -644,7 +652,7 @@ class SphinxRenderer:
         content_callback: ContentCallback = None,
         display_obj_type: str = None,
         declarator_callback: DeclaratorCallback = None,
-        options={}
+        options={},
     ) -> List[Node]:
         if obj_type is None:
             obj_type = node.kind
@@ -1308,6 +1316,17 @@ class SphinxRenderer:
                 nodemap.setdefault(section_order[kind], []).extend(lam())
 
         if "members-only" not in options:
+            if "allow-dot-graphs" in options:
+                addnode("incdepgraph", lambda: self.render_optional(node.get_incdepgraph()))
+                addnode("invincdepgraph", lambda: self.render_optional(node.get_invincdepgraph()))
+                addnode(
+                    "inheritancegraph", lambda: self.render_optional(node.get_inheritancegraph())
+                )
+                addnode(
+                    "collaborationgraph",
+                    lambda: self.render_optional(node.get_collaborationgraph()),
+                )
+
             addnode("briefdescription", lambda: self.render_optional(node.briefdescription))
             addnode("detaileddescription", lambda: self.detaileddescription(node))
 
@@ -1365,7 +1384,7 @@ class SphinxRenderer:
                 addnode("innergroup", lambda: self.visit_compounddef(inner))
 
         nodelist = []
-        for i, nodes_ in sorted(nodemap.items()):
+        for _, nodes_ in sorted(nodemap.items()):
             nodelist += nodes_
 
         return nodelist
@@ -1423,7 +1442,7 @@ class SphinxRenderer:
                 refexplicit=True,
                 refid=refid,
                 reftarget=refid,
-                *nodelist
+                *nodelist,
             )
         ]
         return nodelist
@@ -1604,7 +1623,7 @@ class SphinxRenderer:
     def visit_listing(self, node) -> List[Node]:
         nodelist: List[Node] = []
         for i, item in enumerate(node.codeline):
-            # Put new lines between the lines. There must be a more pythonic way of doing this
+            # Put new lines between the lines
             if i:
                 nodelist.append(nodes.Text("\n"))
             nodelist.extend(self.render(item))
@@ -1612,6 +1631,8 @@ class SphinxRenderer:
         # Add blank string at the start otherwise for some reason it renders
         # the pending_xref tags around the kind in plain text
         block = nodes.literal_block("", "", *nodelist)
+        if node.domain:
+            block["language"] = node.domain
         return [block]
 
     def visit_codeline(self, node) -> List[Node]:
@@ -1681,7 +1702,7 @@ class SphinxRenderer:
             text = node.text.replace("embed:rst:inline", "", 1)
         else:
             # Remove the first line which is "embed:rst[:leading-asterisk]"
-            text = "\n".join(node.text.split(u"\n")[1:])
+            text = "\n".join(node.text.split("\n")[1:])
 
             # Remove starting whitespace
             text = textwrap.dedent(text)
@@ -1779,7 +1800,7 @@ class SphinxRenderer:
                     refexplicit=True,
                     refid=refid,
                     reftarget=refid,
-                    *nodelist
+                    *nodelist,
                 )
             ]
         return nodelist
@@ -1797,7 +1818,7 @@ class SphinxRenderer:
             refexplicit=True,
             reftarget=node.id,
             refdoc=self.app.env.docname,
-            *[titlenode]
+            *[titlenode],
         )
         signode += ref
 
@@ -2124,6 +2145,9 @@ class SphinxRenderer:
             if node.mutable == "yes":
                 elements.append("mutable")
             typename = "".join(n.astext() for n in self.render(node.get_type()))
+            # Doxygen sometimes leaves 'static' in the type,
+            # e.g., for "constexpr static int i"
+            typename = typename.replace("static ", "")
             if dom == "c" and "::" in typename:
                 typename = typename.replace("::", ".")
             elements.append(typename)
@@ -2309,6 +2333,113 @@ class SphinxRenderer:
             fieldList += field
         return [fieldList]
 
+    def visit_docdot(self, node) -> List[Node]:
+        """Translate node from doxygen's dot command to sphinx's graphviz directive."""
+        graph_node = graphviz()
+        if node.content_ and node.content_[0].getValue().rstrip("\n"):
+            graph_node["code"] = node.content_[0].getValue()
+        else:
+            graph_node["code"] = ""  # triggers another warning from sphinx.ext.graphviz
+            self.state.document.reporter.warning(
+                # would be better if this output includes the parent node's
+                # name/reference, but that would always be a <para> element.
+                "no content provided for generating DOT graph."
+            )
+        graph_node["options"] = {}
+        if node.caption:
+            caption_node = nodes.caption(node.caption, "")
+            caption_node += nodes.Text(node.caption)
+            return [nodes.figure("", graph_node, caption_node)]
+        return [graph_node]
+
+    def visit_docdotfile(self, node) -> List[Node]:
+        """Translate node from doxygen's dotfile command to sphinx's graphviz directive."""
+        dotcode = ""
+        try:
+            with open(node.name, encoding="utf-8") as fp:
+                dotcode = fp.read()
+            if not dotcode.rstrip("\n"):
+                raise RuntimeError("%s found but without any content" % node.name)
+        except OSError as exc:
+            # doxygen seems to prevent this from triggering as a non-existant file
+            # generates no XML output for the corresponding `\dotfile` cmd
+            self.state.document.reporter.warning(exc)  # better safe than sorry
+        except RuntimeError as exc:
+            self.state.document.reporter.warning(exc)
+        graph_node = graphviz()
+        graph_node["code"] = dotcode
+        graph_node["options"] = {"docname": node.name}
+        caption = "" if not node.content_ else node.content_[0].getValue()
+        if caption:
+            caption_node = nodes.caption(caption, "")
+            caption_node += nodes.Text(caption)
+            return [nodes.figure("", graph_node, caption_node)]
+        return [graph_node]
+
+    def visit_docgraph(self, node: compoundsuper.graphType) -> List[Node]:
+        """Create a graph (generated by doxygen - not user-defined) from XML using dot
+        syntax."""
+        # use graphs' legend from doxygen (v1.9.1)
+        # most colors can be changed via `graphviz_dot_args` in conf.py
+        edge_colors = {
+            # blue (#1414CE) doesn't contrast well in dark mode.
+            # "public-inheritance": "1414CE",  # allow user to customize this one
+            "private-inheritance": "8B1A1A",  # hardcoded
+            "protected-inheritance": "006400",  # hardcoded
+            # the following are demonstrated in the doxygen graphs' legend, but
+            # these don't show in XML properly (bug?); these keys are fiction.
+            "used-internal": "9C35CE",  # should also be dashed
+            "template-instantiated-inheritance": "FFA500",  # should also be dashed
+        }
+
+        # assemble the dot syntax we'll pass to the graphviz directive
+        dot = "digraph {\n"
+        dot += '    graph [bgcolor="#00000000"]\n'  # transparent color for graph's bg
+        dot += '    node [shape=rectangle style=filled fillcolor="#FFFFFF"'
+        dot += " font=Helvetica padding=2]\n"
+        dot += '    edge [color="#1414CE"]\n'
+        relations = []
+        for g_node in node.get_node():
+            dot += '    "%s" [label="%s"' % (g_node.get_id(), g_node.get_label())
+            dot += ' tooltip="%s"' % g_node.get_label()
+            if g_node.get_id() == "1":
+                # the disabled grey color is used in doxygen to indicate that the URL is
+                # not set (for the compound in focus). Setting this here doesn't allow
+                # further customization. Maybe remove this since URL is not used?
+                #
+                dot += ' fillcolor="#BFBFBF"'  # hardcoded
+            # URLs from a doxygen refid won't work in sphinx graphviz; we can't convert
+            # the refid until all docs are built, and pending references are un-noticed
+            # within graphviz directives. Maybe someone wiser will find a way to do it.
+            #
+            # dot += ' URL="%s"' % g_node.get_link().get_refid()
+            dot += "]\n"
+            for child_node in g_node.childnode:
+                edge = f'    "{g_node.get_id()}"'
+                edge += f' -> "{child_node.get_refid()}" ['
+                edge += f"dir={node.get_direction()} "
+                # edge labels don't appear in XML (bug?); use tooltip in meantime
+                edge += 'tooltip="%s"' % child_node.get_relation()
+                if child_node.get_relation() in edge_colors.keys():
+                    edge += ' color="#%s"' % edge_colors.get(child_node.get_relation())
+                edge += "]\n"
+                relations.append(edge)
+        for relation in relations:
+            dot += relation
+        dot += "}"
+
+        # use generated dot syntax to create a graphviz node
+        graph_node = graphviz()
+        graph_node["code"] = dot
+        graph_node["align"] = "center"
+        graph_node["options"] = {}
+        caption = node.get_caption()
+        # if caption is first node in a figure, then everything that follows is
+        # considered a caption. Use a paragraph followed by a figure to center the
+        # graph. This may have illegible side effects for very large graphs.
+        caption_node = nodes.paragraph("", nodes.Text(caption))
+        return [caption_node, nodes.figure("", graph_node)]
+
     def visit_unknown(self, node) -> List[Node]:
         """Visit a node of unknown type."""
         return []
@@ -2389,6 +2520,9 @@ class SphinxRenderer:
         "doctable": visit_doctable,
         "docrow": visit_docrow,
         "docentry": visit_docentry,
+        "docdotfile": visit_docdotfile,
+        "docdot": visit_docdot,
+        "graph": visit_docgraph,
     }
 
     def render_string(self, node: str) -> List[Node]:
@@ -2451,3 +2585,15 @@ def setup(app: Sphinx) -> None:
     app.add_config_value("breathe_debug_trace_directives", False, "")
     app.add_config_value("breathe_debug_trace_doxygen_ids", False, "")
     app.add_config_value("breathe_debug_trace_qualification", False, "")
+
+    app.add_node(
+        graphviz,
+        html=(html_visit_graphviz, None),
+        latex=(latex_visit_graphviz, None),
+        texinfo=(texinfo_visit_graphviz, None),
+        text=(text_visit_graphviz, None),
+        man=(man_visit_graphviz, None),
+    )
+    app.add_config_value("graphviz_dot", "dot", "html")
+    app.add_config_value("graphviz_dot_args", [], "html")
+    app.add_config_value("graphviz_output_format", "png", "html")

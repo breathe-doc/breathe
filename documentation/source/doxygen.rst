@@ -195,6 +195,7 @@ Diagrams
 
 .. doxygenindex::
    :path: ../../examples/doxygen/diagrams/xml
+   :allow-dot-graphs:
 
 Memgrp
 ------
@@ -231,9 +232,3 @@ Manual
 
 .. doxygenindex::
    :path: ../../examples/doxygen/manual/xml
-
-
-
-
-
-

@@ -253,11 +253,11 @@ class DoxygenFunctionDirective(BaseDirective):
         res = []
         candSignatures = []
         for entry in matches:
-            text_options = {"no-link": u"", "outline": u""}
+            text_options = {"no-link": "", "outline": ""}
 
             # Render the matches to docutils nodes
             target_handler = create_target_handler(
-                {"no-link": u""}, project_info, self.state.document
+                {"no-link": ""}, project_info, self.state.document
             )
             filter_ = self.filter_factory.create_outline_filter(text_options)
             mask_factory = MaskFactory({"param": NoParameterNamesMask})

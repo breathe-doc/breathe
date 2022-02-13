@@ -18,8 +18,9 @@ jobs:
           - '4.0.3'
           - '4.1.2'
           - '4.2.0'
-          - '4.3.0'
-          - git+https://github.com/sphinx-doc/sphinx.git@4.3.x
+          - '4.3.2'
+          - '4.4.0'
+          - git+https://github.com/sphinx-doc/sphinx.git@4.4.x
           - git+https://github.com/sphinx-doc/sphinx.git@4.x
           - git+https://github.com/sphinx-doc/sphinx.git@master
         # avoid bug in following configurations

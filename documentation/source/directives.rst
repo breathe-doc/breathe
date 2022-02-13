@@ -85,10 +85,12 @@ additionally the ``members``, ``protected-members``, ``private-members``,
       :members-only:
       :outline:
       :no-link:
+      :allow-dot-graphs:
 
 Checkout the :ref:`doxygenclass documentation <class-example>` for more details
 and to see it in action.
 
+.. _doxygendefine:
 
 doxygendefine
 ~~~~~~~~~~~~~
@@ -106,6 +108,7 @@ define. It behaves the same as the doxygenstruct directive.
 
 Checkout the :ref:`example <define-example>` to see it in action.
 
+.. _doxygenconcept:
 
 doxygenconcept
 ~~~~~~~~~~~~~~
@@ -123,6 +126,7 @@ behaves the same as the doxygenstruct directive.
 
 Checkout the :ref:`example <concept-example>` to see it in action.
 
+.. _doxygenenum:
 
 doxygenenum
 ~~~~~~~~~~~
@@ -140,6 +144,7 @@ the same as the doxygenstruct directive.
 
 Checkout the :ref:`example <enum-example>` to see it in action.
 
+.. _doxygenenumvalue:
 
 doxygenenumvalue
 ~~~~~~~~~~~~~~~~
@@ -156,6 +161,7 @@ This directive generates the appropriate output for a single enum value.
 
 Checkout the :ref:`example <enumvalue-example>` to see it in action.
 
+.. _doxygenfile:
 
 doxygenfile
 ~~~~~~~~~~~
@@ -171,9 +177,11 @@ file.
       :outline:
       :no-link:
       :sections: ...
+      :allow-dot-graphs:
 
 Checkout the :ref:`example <file-example>` to see it in action.
 
+.. _autodoxygenfile:
 
 autodoxygenfile
 ~~~~~~~~~~~~~~~
@@ -188,9 +196,11 @@ It handles the doxygen xml generation for you like the other auto directives.
       :outline:
       :no-link:
       :sections: ...
+      :allow-dot-graphs:
 
 Checkout the :ref:`example <autodoxygenfile-example>` to see it in action.
 
+.. _doxygenfunction:
 
 doxygenfunction
 ~~~~~~~~~~~~~~~
@@ -208,6 +218,7 @@ function name is required to be unique in the project.
 
 Checkout the :ref:`example <function-example>` to see it in action.
 
+.. _doxygengroup:
 
 doxygengroup
 ~~~~~~~~~~~~
@@ -256,7 +267,9 @@ referenced by it.
       :path: ...
       :outline:
       :no-link:
+      :allow-dot-graphs:
 
+.. _autodoxygenindex:
 
 autodoxygenindex
 ~~~~~~~~~~~~~~~~
@@ -282,9 +295,11 @@ implementation.
       :project: ...
       :outline:
       :no-link:
+      :allow-dot-graphs:
 
 Checkout the :ref:`example <autodoxygenindex-example>` to see it in action.
 
+.. _doxygennamespace:
 
 doxygennamespace
 ~~~~~~~~~~~~~~~~
@@ -314,6 +329,7 @@ To reference a nested namespace, the full namespaced path must be provided, e.g.
 Checkout the :ref:`doxygennamespace documentation <namespace-example>` for more
 details and to see it in action.
 
+.. _doxygenstruct:
 
 doxygenstruct
 ~~~~~~~~~~~~~
@@ -338,9 +354,11 @@ and additionally the ``members``, ``protected-members``, ``private-members``,
       :members-only:
       :outline:
       :no-link:
+      :allow-dot-graphs:
 
 Checkout the :ref:`example <struct-example>` to see it in action.
 
+.. _doxygeninterface:
 
 doxygeninterface
 ~~~~~~~~~~~~~~~~
@@ -362,6 +380,7 @@ class). It behaves the same as the doxygenclass directive.
       :outline:
       :no-link:
 
+.. _doxygentypedef:
 
 doxygentypedef
 ~~~~~~~~~~~~~~
@@ -379,6 +398,7 @@ the same as the doxygenstruct directive.
 
 Checkout the :ref:`example <typedef-example>` to see it in action.
 
+.. _doxygenunion:
 
 doxygenunion
 ~~~~~~~~~~~~
@@ -396,6 +416,7 @@ the same as the doxygenstruct directive.
 
 Checkout the :ref:`example <union-example>` to see it in action.
 
+.. _doxygenvariable:
 
 doxygenvariable
 ~~~~~~~~~~~~~~~
@@ -413,6 +434,7 @@ It behaves the same as the doxygenstruct directive.
 
 Checkout the :ref:`example <variable-example>` to see it in action.
 
+.. _doxygenpage:
 
 doxygenpage
 ~~~~~~~~~~~

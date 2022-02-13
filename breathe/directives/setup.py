@@ -110,7 +110,7 @@ def setup(app: Sphinx) -> None:
         subprocess.check_call, write_file, project_info_factory
     )
 
-    def doxygen_hook(app):
+    def doxygen_hook(app: Sphinx):
         doxygen_handle.generate_xml(
             app.config.breathe_projects_source,
             app.config.breathe_doxygen_config_options,

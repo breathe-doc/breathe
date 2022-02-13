@@ -21,7 +21,7 @@ jobs:
         run: |
           pip install -r requirements/development.txt
           sudo apt -y update
-          sudo apt -y install doxygen
+          sudo apt -y install doxygen graphviz
 
       - name: build the documentation
         run: |

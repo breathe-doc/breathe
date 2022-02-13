@@ -1,13 +1,15 @@
-from ..renderer.mask import NullMaskFactory
-from ..directives import BaseDirective
-from ..project import ProjectError
-from ..parser import ParserError, FileIOError
-
+from breathe.directives import BaseDirective
+from breathe.parser import ParserError, FileIOError
+from breathe.project import ProjectError
 from breathe.renderer import format_parser_error, RenderContext
+from breathe.renderer.mask import NullMaskFactory
 from breathe.renderer.sphinxrenderer import SphinxRenderer
 from breathe.renderer.target import create_target_handler
 
+from docutils.nodes import Node
 from docutils.parsers.rst.directives import unchanged_required, flag  # type: ignore
+
+from typing import List
 
 
 class RootDataObject:
@@ -70,6 +72,7 @@ class DoxygenIndexDirective(_BaseIndexDirective):
         "project": unchanged_required,
         "outline": flag,
         "no-link": flag,
+        "allow-dot-graphs": flag,
     }
     has_content = False
 
@@ -92,12 +95,13 @@ class AutoDoxygenIndexDirective(_BaseIndexDirective):
         "project": unchanged_required,
         "outline": flag,
         "no-link": flag,
+        "allow-dot-graphs": flag,
     }
     has_content = False
 
-    def run(self):
+    def run(self) -> List[Node]:
         """Extract the project info from the auto project info store and pass it to the helper
-        method
+        method.
         """
 
         try:

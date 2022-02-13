@@ -3,10 +3,12 @@
 #
 
 import sys
+import os
 import getopt
 from xml.dom import minidom
 from xml.dom import Node
 
+from .. import filetypes
 #
 # User methods
 #
@@ -193,10 +195,11 @@ class DoxygenType(GeneratedsSuper):
 class compounddefType(GeneratedsSuper):
     subclass = None
     superclass = None
-    def __init__(self, kind=None, prot=None, id=None, compoundname=None, title=None, basecompoundref=None, derivedcompoundref=None, includes=None, includedby=None, incdepgraph=None, invincdepgraph=None, innerdir=None, innerfile=None, innerclass=None, innernamespace=None, innerpage=None, innergroup=None, templateparamlist=None, sectiondef=None, briefdescription=None, detaileddescription=None, inheritancegraph=None, collaborationgraph=None, programlisting=None, location=None, listofallmembers=None):
+    def __init__(self, kind=None, prot=None, id=None, compoundname=None, title=None, basecompoundref=None, derivedcompoundref=None, includes=None, includedby=None, incdepgraph=None, invincdepgraph=None, innerdir=None, innerfile=None, innerclass=None, innernamespace=None, innerpage=None, innergroup=None, templateparamlist=None, sectiondef=None, briefdescription=None, detaileddescription=None, inheritancegraph=None, collaborationgraph=None, programlisting=None, location=None, listofallmembers=None, language=None):
         self.kind = kind
         self.prot = prot
         self.id = id
+        self.language = language
         self.compoundname = compoundname
         self.title = title
         if basecompoundref is None:
@@ -376,6 +379,8 @@ class compounddefType(GeneratedsSuper):
             self.prot = attrs.get('prot').value
         if attrs.get('id'):
             self.id = attrs.get('id').value
+        if attrs.get('language'):
+            self.language = attrs.get('language').value.lower()
     def buildChildren(self, child_, nodeName_):
         if child_.nodeType == Node.ELEMENT_NODE and \
             nodeName_ == 'compoundname':
@@ -410,12 +415,18 @@ class compounddefType(GeneratedsSuper):
             self.includedby.append(obj_)
         elif child_.nodeType == Node.ELEMENT_NODE and \
             nodeName_ == 'incdepgraph':
-            obj_ = graphType.factory()
+            obj_ = graphType.factory(
+                caption=f"Include dependency graph for {self.get_compoundname()}:"
+            )
             obj_.build(child_)
             self.set_incdepgraph(obj_)
         elif child_.nodeType == Node.ELEMENT_NODE and \
             nodeName_ == 'invincdepgraph':
-            obj_ = graphType.factory()
+            obj_ = graphType.factory(
+                direction="back",
+                caption=f"This graph shows which files directly "
+                f"or indirectly include {self.get_compoundname()}:"
+            )
             obj_.build(child_)
             self.set_invincdepgraph(obj_)
         elif child_.nodeType == Node.ELEMENT_NODE and \
@@ -472,17 +483,21 @@ class compounddefType(GeneratedsSuper):
             self.set_detaileddescription(obj_)
         elif child_.nodeType == Node.ELEMENT_NODE and \
             nodeName_ == 'inheritancegraph':
-            obj_ = graphType.factory()
+            obj_ = graphType.factory(
+                caption=f"Inheritence diagram for {self.get_compoundname()}:"
+            )
             obj_.build(child_)
             self.set_inheritancegraph(obj_)
         elif child_.nodeType == Node.ELEMENT_NODE and \
             nodeName_ == 'collaborationgraph':
-            obj_ = graphType.factory()
+            obj_ = graphType.factory(
+                caption=f"Collaboration diagram for {self.get_compoundname()}:"
+            )
             obj_.build(child_)
             self.set_collaborationgraph(obj_)
         elif child_.nodeType == Node.ELEMENT_NODE and \
             nodeName_ == 'programlisting':
-            obj_ = listingType.factory()
+            obj_ = listingType.factory(domain=self.language)
             obj_.build(child_)
             self.set_programlisting(obj_)
         elif child_.nodeType == Node.ELEMENT_NODE and \
@@ -2054,17 +2069,23 @@ class linkedTextType(GeneratedsSuper):
 class graphType(GeneratedsSuper):
     subclass = None
     superclass = None
-    def __init__(self, node=None):
+    def __init__(self, node=None, direction: str = "forward", caption:str = ""):
         if node is None:
             self.node = []
         else:
             self.node = node
+        self.direction = direction
+        self.caption = caption
     def factory(*args_, **kwargs_):
         if graphType.subclass:
             return graphType.subclass(*args_, **kwargs_)
         else:
             return graphType(*args_, **kwargs_)
     factory = staticmethod(factory)
+    def get_direction(self): return self.direction
+    def set_direction(self, direction): self.direction = direction
+    def get_caption(self): return self.caption
+    def set_caption(self, caption): self.caption = caption
     def get_node(self): return self.node
     def set_node(self, node): self.node = node
     def add_node(self, value): self.node.append(value)
@@ -2398,7 +2419,8 @@ class linkType(GeneratedsSuper):
 class listingType(GeneratedsSuper):
     subclass = None
     superclass = None
-    def __init__(self, codeline=None):
+    def __init__(self, codeline=None, domain: str=None):
+        self.domain = domain
         if codeline is None:
             self.codeline = []
         else:
@@ -2436,14 +2458,17 @@ class listingType(GeneratedsSuper):
             return True
         else:
             return False
-    def build(self, node_):
+    def build(self, node_: minidom.Element):
         attrs = node_.attributes
         self.buildAttributes(attrs)
         for child_ in node_.childNodes:
             nodeName_ = child_.nodeName.split(':')[-1]
             self.buildChildren(child_, nodeName_)
-    def buildAttributes(self, attrs):
-        pass
+    def buildAttributes(self, attrs: minidom.NamedNodeMap):
+        if "filename" in attrs:
+            # extract the domain for this programlisting tag.
+            filename = attrs["filename"].value
+            self.domain = filetypes.get_pygments_alias(filename) or filetypes.get_extension(filename)
     def buildChildren(self, child_, nodeName_):
         if child_.nodeType == Node.ELEMENT_NODE and \
             nodeName_ == 'codeline':
@@ -5026,6 +5051,76 @@ class docDotFileType(GeneratedsSuper):
 # end class docDotFileType
 
 
+class docDotType(GeneratedsSuper):
+    subclass = None
+    superclass = None
+    def __init__(self, caption=None, valueOf_='', mixedclass_=None, content_=None):
+        self.caption = caption
+        if mixedclass_ is None:
+            self.mixedclass_ = MixedContainer
+        else:
+            self.mixedclass_ = mixedclass_
+        if content_ is None:
+            self.content_ = []
+        else:
+            self.content_ = content_
+    def factory(*args_, **kwargs_):
+        if docDotType.subclass:
+            return docDotType.subclass(*args_, **kwargs_)
+        else:
+            return docDotType(*args_, **kwargs_)
+    factory = staticmethod(factory)
+    def get_name(self): return self.caption
+    def set_name(self, caption): self.caption = caption
+    def getValueOf_(self): return self.valueOf_
+    def setValueOf_(self, valueOf_): self.valueOf_ = valueOf_
+    def export(self, outfile, level, namespace_='', name_='docDotType', namespacedef_=''):
+        showIndent(outfile, level)
+        outfile.write('<%s%s %s' % (namespace_, name_, namespacedef_, ))
+        self.exportAttributes(outfile, level, namespace_, name_='docDotType')
+        outfile.write('>')
+        self.exportChildren(outfile, level + 1, namespace_, name_)
+        outfile.write('</%s%s>\n' % (namespace_, name_))
+    def exportAttributes(self, outfile, level, namespace_='', name_='docDotType'):
+        if self.caption is not None:
+            outfile.write(' caption=%s' % (self.format_string(quote_attrib(self.caption).encode(ExternalEncoding), input_name='caption'), ))
+    def exportChildren(self, outfile, level, namespace_='', name_='docDotType'):
+        if self.valueOf_.find('![CDATA')>-1:
+            value=quote_xml('%s' % self.valueOf_)
+            value=value.replace('![CDATA','<![CDATA')
+            value=value.replace(']]',']]>')
+            outfile.write(value)
+        else:
+            outfile.write(quote_xml('%s' % self.valueOf_))
+    def hasContent_(self):
+        if (
+            self.valueOf_ is not None
+            ):
+            return True
+        else:
+            return False
+    def build(self, node_):
+        attrs = node_.attributes
+        self.buildAttributes(attrs)
+        self.valueOf_ = ''
+        for child_ in node_.childNodes:
+            nodeName_ = child_.nodeName.split(':')[-1]
+            self.buildChildren(child_, nodeName_)
+    def buildAttributes(self, attrs):
+        if attrs.get('caption'):
+            self.caption = attrs.get('caption').value
+    def buildChildren(self, child_, nodeName_):
+        if child_.nodeType == Node.TEXT_NODE:
+            obj_ = self.mixedclass_(MixedContainer.CategoryText,
+                MixedContainer.TypeNone, '', child_.nodeValue)
+            self.content_.append(obj_)
+        if child_.nodeType == Node.TEXT_NODE:
+            self.valueOf_ += child_.nodeValue
+        elif child_.nodeType == Node.CDATA_SECTION_NODE:
+            self.valueOf_ += '![CDATA['+child_.nodeValue+']]'
+# end class docDotType
+
+
 class docTocItemType(GeneratedsSuper):
     subclass = None
     superclass = None
@@ -5770,7 +5865,6 @@ class docParBlockType(GeneratedsSuper):
             obj_ = self.mixedclass_(MixedContainer.CategoryComplex,
                 MixedContainer.TypeNone, 'para', obj_)
             self.para.append(obj_)
-
 # end class docParBlockType
 
 
