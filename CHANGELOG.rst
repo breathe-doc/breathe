@@ -7,6 +7,14 @@ Inspired by `Keepachangelog.com <http://keepachangelog.com/>`__.
 
   - Fix duplicate ``static`` in variable declarations.
     `#794 <https://github.com/michaeljones/breathe/pull/794>`__
+  - Update CICD for Sphinx 4.4.0 series.
+    `#795 <https://github.com/michaeljones/breathe/pull/795>`__
+  - Pin version of black in CICD and reformat files.
+    `#792 <https://github.com/michaeljones/breathe/pull/792>`__
+  - Fix code block highlighting.
+    `#760 <https://github.com/michaeljones/breathe/pull/760>`__
+  - Refactoring, cleanup and typing improvements.
+    `#802 <https://github.com/michaeljones/breathe/pull/802>`__
   - Doxygen dot graphs to Sphinx graphviz.
     `#757 <https://github.com/michaeljones/breathe/pull/757>`__
   - Support externally hosted images.
