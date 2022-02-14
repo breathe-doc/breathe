@@ -5803,6 +5803,71 @@ class docCharType(GeneratedsSuper):
 # end class docCharType
 
 
+class docBlockQuoteType(GeneratedsSuper):
+    subclass = None
+    superclass = None
+    def __init__(self, mixedclass_=None, para=None):
+        if mixedclass_ is None:
+            self.mixedclass_ = MixedContainer
+        else:
+            self.mixedclass_ = mixedclass_
+        if para is None:
+            self.para = []
+        else:
+            self.para = para
+    def factory(*args_, **kwargs_):
+        if docBlockQuoteType.subclass:
+            return docBlockQuoteType.subclass(*args_, **kwargs_)
+        else:
+            return docBlockQuoteType(*args_, **kwargs_)
+    factory = staticmethod(factory)
+    def get_para(self): return self.para
+    def set_para(self, para): self.para = para
+    def add_para(self, value): self.para.append(value)
+    def insert_para(self, index, value): self.para[index] = value
+    def export(self, outfile, level, namespace_='', name_='docBlockQuoteType', namespacedef_=''):
+        showIndent(outfile, level)
+        outfile.write('<%s%s%s' % (namespace_, name_, namespacedef_ and ' ' + namespacedef_ or '', ))
+        self.exportAttributes(outfile, level, namespace_, name_='docBlockQuoteType')
+        if self.hasContent_():
+            outfile.write('>\n')
+            self.exportChildren(outfile, level + 1, namespace_, name_)
+            showIndent(outfile, level)
+            outfile.write('</%s%s>\n' % (namespace_, name_))
+        else:
+            outfile.write('/>\n')
+    def exportAttributes(self, outfile, level, namespace_='', name_='docBlockQuoteType'):
+        pass
+    def exportChildren(self, outfile, level, namespace_='', name_='docBlockQuoteType'):
+        for para_ in self.para:
+            para_.export(outfile, level, namespace_, name_='para')
+    def hasContent_(self):
+        if (
+            self.para
+            ):
+            return True
+        else:
+            return False
+    def build(self, node_):
+        attrs = node_.attributes
+        self.buildAttributes(attrs)
+        self.valueOf_ = ''
+        for child_ in node_.childNodes:
+            nodeName_ = child_.nodeName.split(':')[-1]
+            self.buildChildren(child_, nodeName_)
+    def buildAttributes(self, attrs):
+        pass
+    def buildChildren(self, child_, nodeName_):
+        if child_.nodeType == Node.ELEMENT_NODE and \
+            nodeName_ == 'para':
+            obj_ = docParaType.factory()
+            obj_.build(child_)
+            obj_ = self.mixedclass_(MixedContainer.CategoryComplex,
+                MixedContainer.TypeNone, 'para', obj_)
+            self.para.append(obj_)
+# end class docBlockQuoteType
+
+
 class docParBlockType(GeneratedsSuper):
     subclass = None
     superclass = None

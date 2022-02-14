@@ -1507,6 +1507,17 @@ class SphinxRenderer:
     def visit_docparblock(self, node) -> List[Node]:
         return self.render_iterable(node.para)
 
+    def visit_docblockquote(self, node) -> List[Node]:
+        nodelist = self.render_iterable(node.para)
+        # catch block quote attributions here; the <ndash/> tag is the only identifier,
+        # and it is nested within a subsequent <para> tag
+        if nodelist and nodelist[-1].astext().startswith("&#8212;"):
+            # nodes.attribution prepends the author with an emphasized dash.
+            # replace the &#8212; placeholder and strip any leading whitespace.
+            text = nodelist[-1].astext().replace("&#8212;", "").lstrip()
+            nodelist[-1] = nodes.attribution("", text)
+        return [nodes.block_quote("", classes=[], *nodelist)]
+
     def visit_docimage(self, node) -> List[Node]:
         """Output docutils image node using name attribute from xml as the uri"""
 
@@ -2527,6 +2538,7 @@ class SphinxRenderer:
         "docdotfile": visit_docdotfile,
         "docdot": visit_docdot,
         "graph": visit_docgraph,
+        "docblockquote": visit_docblockquote,
     }
 
     def render_string(self, node: str) -> List[Node]:
