@@ -12,14 +12,7 @@ from sphinx.directives import ObjectDescription
 from sphinx.domains import cpp, c, python
 from sphinx.util.nodes import nested_parse_with_titles
 from sphinx.util import url_re
-from sphinx.ext.graphviz import (
-    graphviz,
-    html_visit_graphviz,
-    latex_visit_graphviz,
-    texinfo_visit_graphviz,
-    text_visit_graphviz,
-    man_visit_graphviz,
-)
+from sphinx.ext.graphviz import graphviz
 
 from docutils import nodes
 from docutils.nodes import Element, Node, TextElement
@@ -2601,15 +2594,3 @@ def setup(app: Sphinx) -> None:
     app.add_config_value("breathe_debug_trace_directives", False, "")
     app.add_config_value("breathe_debug_trace_doxygen_ids", False, "")
     app.add_config_value("breathe_debug_trace_qualification", False, "")
-
-    app.add_node(
-        graphviz,
-        html=(html_visit_graphviz, None),
-        latex=(latex_visit_graphviz, None),
-        texinfo=(texinfo_visit_graphviz, None),
-        text=(text_visit_graphviz, None),
-        man=(man_visit_graphviz, None),
-    )
-    app.add_config_value("graphviz_dot", "dot", "html")
-    app.add_config_value("graphviz_dot_args", [], "html")
-    app.add_config_value("graphviz_output_format", "png", "html")
