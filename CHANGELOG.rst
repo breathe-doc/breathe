@@ -13,6 +13,8 @@ Inspired by `Keepachangelog.com <http://keepachangelog.com/>`__.
     `#705 <https://github.com/michaeljones/breathe/pull/705>`__
   - Address a peculiarity in Doxygen aliases in doc.
     `#770 <https://github.com/michaeljones/breathe/pull/770>`__
+  - Add flag to doxygengroup, doxygennamespace to display only the description.
+    `#718 <https://github.com/michaeljones/breathe/pull/718>`__
 
 - 2022-01-30 - **Breathe v4.32.0**
 
