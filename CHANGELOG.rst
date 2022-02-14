@@ -3,6 +3,11 @@ Change Log
 
 Inspired by `Keepachangelog.com <http://keepachangelog.com/>`__.
 
+- Unreleased - **Breathe v4.33.1**
+
+  - Avoid warning about multiple graphviz directives.
+    `#804 <https://github.com/michaeljones/breathe/pull/804>`__
+
 - 2022-02-14 - **Breathe v4.33.0**
 
   - Fix duplicate ``static`` in variable declarations.
