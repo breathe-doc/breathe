@@ -91,6 +91,11 @@ recognize the code block's contained syntax as a C++ snippet.
     *     message(STATUS "Element is ${element}")
     * endforeach()
     * @endcode
+    * 
+    * Another code-block that explicitly remains not highlighted.
+    * @code{.unparsed}
+    * Show this as is.
+    * @endcode
     */
    void with_unannotated_cmake_code_block();
 

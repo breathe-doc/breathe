@@ -16,6 +16,11 @@ void with_standard_code_block();
  *     message(STATUS "Element is ${element}")
  * endforeach()
  * @endcode
+ * 
+ * Another code-block that explicitly remains not highlighted.
+ * @code{.unparsed}
+ * Show this as is.
+ * @endcode
  */
 void with_unannotated_cmake_code_block();
 

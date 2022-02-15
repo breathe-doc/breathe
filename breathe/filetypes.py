@@ -18,4 +18,4 @@ def get_extension(filename: str) -> str:
     # If the filename is just '.ext' then we get ('.ext', '') so we fall back to first part if
     # the second isn't there
     (first, second) = os.path.splitext(filename)
-    return (second or first).lstrip(".")
+    return (second or first).lstrip(".").replace("unparsed", "text")
