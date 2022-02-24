@@ -3,6 +3,12 @@ Change Log
 
 Inspired by `Keepachangelog.com <http://keepachangelog.com/>`__.
 
+- Unreleased
+
+  - Fix internal ``NodeFinder`` visitor for when non-Docutils nodes are
+    present in the content of a directive.
+    `#812 <https://github.com/michaeljones/breathe/pull/812>`__
+
 - 2022-02-14 - **Breathe v4.33.1**
 
   - Avoid warning about multiple graphviz directives.
