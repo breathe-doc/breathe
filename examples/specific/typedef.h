@@ -15,7 +15,7 @@ typedef float floatingPointNumber;
 
 typedef int TestTypedef;
 
-namespace testnamespace {
+namespace TypeDefNamespace {
   typedef char *AnotherTypedef;
 }
 

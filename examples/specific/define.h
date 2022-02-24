@@ -18,7 +18,7 @@
  *
  * \returns The maximum of A and B
  */
-#define MAX(A,B) ((A > B)?(A):(B))
+#define MAXIMUM(A,B) ((A > B)?(A):(B))
 
 
 /**

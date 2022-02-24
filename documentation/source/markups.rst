@@ -31,6 +31,7 @@ Will be rendered as:
 
 .. doxygenfunction:: TestClass::rawVerbatim
    :project: rst
+   :no-link:
 
 Handling Leading Asterisks
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -223,4 +224,3 @@ This is an example alias that enables all RST sections in XML only::
 
     ALIASES = "rst=^^\xmlonly<verbatim>embed:rst:leading-asterisk^^"
     ALIASES += "endrst=</verbatim>\endxmlonly"
-

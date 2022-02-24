@@ -1,5 +1,5 @@
 
-/*! @file */
+/*! @file alias.h */
 
 /**
  * Foo frob routine.
@@ -14,4 +14,3 @@
  * @param Frobs any foos.
  */
 void frob_foos(void* Frobs);
-

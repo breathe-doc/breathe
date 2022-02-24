@@ -1,5 +1,5 @@
 
-namespace testnamespace {
+namespace TestEnumNamespace {
 
 //! \brief enum inside of namespace
 enum NamespacedEnumTest {

@@ -119,7 +119,7 @@ It produces this output:
 .. doxygenclass:: Nutshell
    :project: nutshell
    :members:
-
+   :no-link:
 
 Specific Members Example
 ------------------------
@@ -133,14 +133,14 @@ This displays the class documentation with only the members listed in the
 
    .. doxygenclass:: Nutshell
       :project: nutshell
-      :members: crack, isCracked
+      :members: Tool, crack, isCracked
 
 It produces this output:
 
 .. doxygenclass:: Nutshell
    :project: nutshell
-   :members: crack, isCracked
-
+   :members: Tool, crack, isCracked
+   :no-link:
 
 Protected Members
 -----------------
@@ -182,6 +182,7 @@ It produces this output:
 .. doxygenclass:: Nutshell
    :project: nutshell
    :private-members:
+   :no-link:
 
 Undocumented Members
 --------------------
@@ -208,6 +209,7 @@ It produces this output:
    :members:
    :private-members:
    :undoc-members:
+   :no-link:
 
 .. note::
 
@@ -237,8 +239,11 @@ It produces this output:
    :project: membergroups
    :members:
    :membergroups: myGroup
+   :no-link:
 
 Without ``:membergroups: myGroup`` it would produce:
+
+.. cpp:namespace:: @ex_class_membergroups_all
 
 .. doxygenclass:: GroupedMembers
    :project: membergroups
@@ -268,12 +273,16 @@ It produces this output:
    :project: classtest
    :members:
    :members-only:
+   :no-link:
 
 Without ``:members-only:`` it would produce:
+
+.. cpp:namespace:: @ex_class_members_all
 
 .. doxygenclass:: ClassTest
    :project: classtest
    :members:
+   :no-link:
 
 .. note::
 
@@ -328,7 +337,7 @@ It produces this output:
    :project: nutshell
    :members:
    :outline:
-
+   :no-link:
 
 Qt Signals & Slots Example
 --------------------------
@@ -368,5 +377,3 @@ It produces the following warning message:
 
 .. warning:: doxygenclass: Cannot find class “made_up_class” in doxygen xml
    output for project “class” from directory: ../../examples/doxygen/class/xml/
-
-

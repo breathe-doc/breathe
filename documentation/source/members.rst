@@ -19,6 +19,7 @@ Specific Members
 .. doxygenclass:: testnamespace::NamespacedClassTest
    :path: ../../examples/specific/members/xml
    :members: functionS, anotherFunction
+   :no-link:
 
 No Members
 ----------
@@ -27,13 +28,14 @@ No Members
 
 .. doxygenclass:: testnamespace::NamespacedClassTest
    :path: ../../examples/specific/members/xml
+   :no-link:
 
 Struct Members
 ----------------
 
 .. cpp:namespace:: @ex_members_struct
 
-.. doxygenfunction:: testnamespace::MyClass::MyClass
+.. doxygenfunction:: testnamespace::MyClass::MyClass()
    :path: ../../examples/specific/struct_function/xml
 
 .. doxygenfunction:: testnamespace::MyClass::MyClass(const MyClass&)

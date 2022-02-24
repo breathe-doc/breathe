@@ -26,13 +26,13 @@ Example with Namespace
 
 This should work::
 
-   .. doxygentypedef:: foo::ns::MyInt
-      :project: namespace
+   .. doxygennamespace:: TypeDefNamespace
+      :path: ../../examples/specific/typedef/xml
 
 It produces this output:
 
-.. doxygentypedef:: foo::ns::MyInt
-   :project: namespace
+.. doxygennamespace:: TypeDefNamespace
+   :path: ../../examples/specific/typedef/xml
 
 Failing Example
 ---------------
@@ -47,4 +47,3 @@ This intentionally fails::
 It produces the following warning message:
 
 .. warning:: doxygentypedef: Cannot find typedef "made_up_typedef" in doxygen xml output
-

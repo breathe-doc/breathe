@@ -45,15 +45,19 @@ all: class/xml/index.xml \
      memgrp/xml/index.xml \
      docstring/xml/index.xml \
      pyexample/xml/index.xml \
-     mux/xml/index.xml \
      manual/xml/index.xml \
      interface/xml/index.xml
+	
+# VHDL not supported by breathe; there are other Sphinx extensions for that domain 
+#	mux/xml/index.xml \
 
 clean:
 	rm -rf  class concept define enum file func page relates author \
 		par parblock overload example include qtstyle jdstyle structcmd \
 		autolink tag restypedef afterdoc template tag group diagrams \
-		memgrp docstring pyexample mux manual interface
+		memgrp docstring pyexample manual interface
+# VHDL not supported by breathe; there are other Sphinx extensions for that domain 
+#	mux 
 
 class/xml/index.xml: class.h class.cfg
 	$(DOXYGEN) class.cfg
