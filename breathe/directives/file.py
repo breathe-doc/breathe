@@ -6,7 +6,7 @@ from breathe.renderer import RenderContext
 from breathe.renderer.sphinxrenderer import SphinxRenderer
 from breathe.renderer.target import create_target_handler
 
-from docutils.parsers.rst.directives import unchanged_required, flag  # type: ignore
+from docutils.parsers.rst.directives import unchanged_required, flag
 
 
 class _BaseFileDirective(BaseDirective):

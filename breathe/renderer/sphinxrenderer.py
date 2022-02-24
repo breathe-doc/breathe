@@ -990,7 +990,7 @@ class SphinxRenderer:
         return nodes
 
     def visit_doxygen(self, node) -> List[Node]:
-        nodelist = []
+        nodelist: List[Node] = []
 
         # Process all the compound children
         for n in node.get_compound():
@@ -1736,11 +1736,11 @@ class SphinxRenderer:
 
         return [rst_node]
 
-    def visit_inc(self, node: compoundsuper.incType) -> List[nodes.container]:
+    def visit_inc(self, node: compoundsuper.incType) -> List[Node]:
         if not self.app.config.breathe_show_include:
             return []
 
-        compound_link = [nodes.Text("", node.content_[0].getValue())]
+        compound_link: List[Node] = [nodes.Text("", node.content_[0].getValue())]
         if node.get_refid():
             compound_link = self.visit_docreftext(node)
         if node.local == "yes":
@@ -1748,7 +1748,7 @@ class SphinxRenderer:
         else:
             text = [nodes.Text("#include <"), *compound_link, nodes.Text(">")]
 
-        return [nodes.container("", nodes.emphasis("", *text))]
+        return [nodes.container("", nodes.emphasis("", "", *text))]
 
     def visit_ref(self, node: compoundsuper.refType) -> List[Node]:
         def get_node_info(file_data):
@@ -1862,7 +1862,7 @@ class SphinxRenderer:
         return self.render_iterable(content)
 
     def visit_docanchor(self, node) -> List[Node]:
-        return self.create_doxygen_target(node)
+        return list(self.create_doxygen_target(node))
 
     def visit_docentry(self, node) -> List[Node]:
         col = nodes.entry()
@@ -2196,7 +2196,7 @@ class SphinxRenderer:
     def visit_templateparam(
         self, node: compound.paramTypeSub, *, insertDeclNameByParsing: bool = False
     ) -> List[Node]:
-        nodelist = []
+        nodelist: List[Node] = []
 
         # Parameter type
         if node.type_:
