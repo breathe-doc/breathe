@@ -15,7 +15,7 @@ from sphinx.util import url_re
 from sphinx.ext.graphviz import graphviz
 
 from docutils import nodes
-from docutils.nodes import Element, Node, TextElement
+from docutils.nodes import Node, TextElement
 from docutils.statemachine import StringList, UnexpectedIndentationError
 from docutils.parsers.rst.states import Text
 
