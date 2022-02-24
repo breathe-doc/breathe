@@ -31,7 +31,7 @@ except ImportError:
 
 import re
 import textwrap
-from typing import Any, Callable, cast, Dict, List, Optional, Sequence, Type, Union
+from typing import Any, Callable, cast, Dict, List, Optional, Type, Union
 
 ContentCallback = Callable[[addnodes.desc_content], None]
 Declarator = Union[addnodes.desc_signature, addnodes.desc_signature_line]
@@ -990,7 +990,7 @@ class SphinxRenderer:
         return nodes
 
     def visit_doxygen(self, node) -> List[Node]:
-        nodelist = []
+        nodelist: List[Node] = []
 
         # Process all the compound children
         for n in node.get_compound():
@@ -1736,7 +1736,7 @@ class SphinxRenderer:
 
         return [rst_node]
 
-    def visit_inc(self, node: compoundsuper.incType) -> List[nodes.container]:
+    def visit_inc(self, node: compoundsuper.incType) -> List[Node]:
         if not self.app.config.breathe_show_include:
             return []
 
@@ -1861,8 +1861,8 @@ class SphinxRenderer:
         content = node.term.content_
         return self.render_iterable(content)
 
-    def visit_docanchor(self, node) -> Sequence[Node]:
-        return self.create_doxygen_target(node)
+    def visit_docanchor(self, node) -> List[Node]:
+        return list(self.create_doxygen_target(node))
 
     def visit_docentry(self, node) -> List[Node]:
         col = nodes.entry()
@@ -2196,7 +2196,7 @@ class SphinxRenderer:
     def visit_templateparam(
         self, node: compound.paramTypeSub, *, insertDeclNameByParsing: bool = False
     ) -> List[Node]:
-        nodelist = []
+        nodelist: List[Node] = []
 
         # Parameter type
         if node.type_:
