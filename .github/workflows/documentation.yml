@@ -37,7 +37,9 @@ jobs:
           make html
           rm documentation/build/html/.buildinfo
 
-      - uses: actions/upload-artifact@v1
+      - uses: actions/upload-artifact@v2
         with:
-          name: documentation
-          path: documentation/build/html
+          name: docs build artifacts
+          path: |
+            documentation/build/html
+            examples/*/*/xml
