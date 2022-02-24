@@ -10,6 +10,7 @@ class Test4
       V2  /*!< value 2 */
     };
 
+    /*! Another enum, with inline docs (using an explicit datatype) */
     enum class AnotherScopedEnum : long
     {
       V1, /*!< value 1 */

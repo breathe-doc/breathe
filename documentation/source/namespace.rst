@@ -85,6 +85,7 @@ Produces this output:
 .. doxygennamespace:: foo
    :project: namespace
    :content-only:
+   :no-link:
 
 .. note::
 
@@ -114,6 +115,7 @@ It produces this output:
 .. doxygennamespace:: foo
    :project: namespace
    :members:
+   :no-link:
 
 
 Protected Members Example
@@ -137,6 +139,7 @@ It produces this output:
 .. doxygennamespace:: foo
    :project: namespace
    :protected-members:
+   :no-link:
 
 
 Private-Members Example
@@ -160,7 +163,7 @@ Produces this output:
 .. doxygennamespace:: foo
    :project: namespace
    :private-members:
-
+   :no-link:
 
 Undocumented Members Example
 ----------------------------
@@ -184,6 +187,7 @@ Produces this output:
    :project: namespace
    :private-members:
    :undoc-members:
+   :no-link:
 
 .. note::
 
@@ -213,6 +217,7 @@ It produces this output:
    :project: namespace
    :members:
    :outline:
+   :no-link:
 
 
 Nested Example
@@ -231,7 +236,7 @@ Produces this output:
 
 .. doxygennamespace:: foo::ns
    :project: namespace
-
+   :no-link:
 
 Failing Example
 ---------------

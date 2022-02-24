@@ -4,7 +4,7 @@
     Details.
 */
 
-/*! \def MAX(a,b)
+/*! \def MAX_NUMBER(a,b)
     \brief A macro that returns the maximum of \a a and \a b.
    
     Details.
@@ -50,7 +50,7 @@
     \param count The number of bytes to read.
 */
 
-#define MAX(a,b) (((a)>(b))?(a):(b))
+#define MAX_NUMBER(a,b) (((a)>(b))?(a):(b))
 typedef unsigned int UINT32;
 int errno;
 int open(const char *,int);

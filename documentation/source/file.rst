@@ -100,6 +100,7 @@ It produces this output:
 .. doxygenfile:: nutshell.h
    :project: nutshell
    :sections: briefdescription innerclass public-type
+   :no-link:
 
 Example with Nested Namespaces
 ------------------------------
