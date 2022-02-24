@@ -14,6 +14,11 @@ Template Type Alias
 .. doxygentypedef:: IsFuzzy
    :path: ../../examples/specific/template_type_alias/xml
 
+.. doxygenfunction:: f0
+   :path: ../../examples/specific/class/xml
+.. doxygenfunction:: f0< std::string >
+   :path: ../../examples/specific/class/xml
+
 Typedef Examples
 ----------------
 
@@ -27,34 +32,10 @@ Namespaced Function Examples
 
 .. cpp:namespace:: @ex_specific_namespaced_function
 
-.. doxygenfunction:: TestNamespaceClasses::NamespacedClassTest::function
+.. doxygennamespace:: TestNamespaceClasses
    :path: ../../examples/specific/class/xml
 
-.. doxygenfunction:: TestNamespaceClasses::ClassTest::function
-   :path: ../../examples/specific/class/xml
-
-.. doxygenfunction:: TestNamespaceClasses::ClassTest::anotherFunction
-   :path: ../../examples/specific/class/xml
-
-.. doxygenfunction:: ClassTest::function
-   :path: ../../examples/specific/class/xml
-
-.. doxygenfunction:: ClassTest::anotherFunction
-   :path: ../../examples/specific/class/xml
-
-.. doxygenfunction:: f0
-   :path: ../../examples/specific/class/xml
-.. doxygenfunction:: f0< std::string >
-   :path: ../../examples/specific/class/xml
-
-.. doxygenfunction:: NS1::f1
-   :path: ../../examples/specific/class/xml
-.. doxygenfunction:: NS1::f1< std::string >
-   :path: ../../examples/specific/class/xml
-
-.. doxygenfunction:: NS1::NS2::f2
-   :path: ../../examples/specific/class/xml
-.. doxygenfunction:: NS1::NS2::f2< std::string >
+.. doxygennamespace:: NS1
    :path: ../../examples/specific/class/xml
 
 
@@ -63,8 +44,11 @@ Extern Examples
 
 .. cpp:namespace:: @ex_specific_extern_examples
 
-.. doxygenfunction:: cache_tree_matches_traversal
+.. doxygenfunction:: cache_tree_free
    :project: c_file
+.. doxygenstruct:: cache_tree
+   :project: c_file
+   :outline:
 
 ..
    duplicated by variable.rst:19
@@ -103,16 +87,19 @@ Function Overloads
 .. doxygenfunction:: f(double, double)
    :project: functionOverload
 
-.. doxygenfunction:: test::g(int,int)
-   :project: functionOverload
-
-.. doxygenfunction:: test::g(double, double)
+.. doxygennamespace:: test
    :project: functionOverload
 
 .. doxygenfunction:: h(std::string, MyType)
    :project: functionOverload
 
 .. doxygenfunction:: h(std::string, MyOtherType)
+   :project: functionOverload
+
+.. doxygenclass:: MyType
+   :project: functionOverload
+
+.. doxygenclass:: MyOtherType
    :project: functionOverload
 
 .. doxygenfunction:: h(std::string, const int)
@@ -190,7 +177,7 @@ Multifile
 
 .. cpp:namespace:: @ex_specific_multifile
 
-.. doxygenfunction:: TestTemplateFunction
+.. doxygenindex::
    :project: multifile
 
 Interface Class
@@ -246,16 +233,19 @@ C++ Inherited Members
 
 .. cpp:namespace:: @ex_specific_cpp_inherited_members
 
-.. doxygenfile:: cpp_inherited_members.h
+.. doxygenclass:: Base
    :project: cpp_inherited_members
-   :no-link:
+.. doxygenclass:: A
+   :project: cpp_inherited_members
+.. doxygenclass:: B
+   :project: cpp_inherited_members
 
 C++ Trailing Return Type
 ------------------------
 
 .. cpp:namespace:: @ex_specific_cpp_trailing_return_type
 
-.. doxygenfile:: cpp_trailing_return_type.h
+.. doxygenindex::
    :project: cpp_trailing_return_type
 
 C++ Constexpr Handling
@@ -314,7 +304,7 @@ This one should actually have ``[[myattr]]`` but Doxygen seems to not put attrib
 Doxygen xrefsect
 ----------------
 
-.. doxygenfile:: xrefsect.h
+.. doxygenindex::
    :project: xrefsect
 
 
