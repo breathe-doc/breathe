@@ -34,6 +34,5 @@ class ClassWithUnion
     {
         int a_member;
         float another_member;
-    }
+    };
 };
-
