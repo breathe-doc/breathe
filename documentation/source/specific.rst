@@ -32,34 +32,10 @@ Namespaced Function Examples
 
 .. cpp:namespace:: @ex_specific_namespaced_function
 
-.. doxygenfunction:: TestNamespaceClasses::NamespacedClassTest::function
+.. doxygennamespace:: TestNamespaceClasses
    :path: ../../examples/specific/class/xml
 
-.. doxygenfunction:: TestNamespaceClasses::ClassTest::function
-   :path: ../../examples/specific/class/xml
-
-.. doxygenfunction:: TestNamespaceClasses::ClassTest::anotherFunction
-   :path: ../../examples/specific/class/xml
-
-.. doxygenfunction:: ClassTest::function
-   :path: ../../examples/specific/class/xml
-
-.. doxygenfunction:: ClassTest::anotherFunction
-   :path: ../../examples/specific/class/xml
-
-.. doxygenfunction:: f0
-   :path: ../../examples/specific/class/xml
-.. doxygenfunction:: f0< std::string >
-   :path: ../../examples/specific/class/xml
-
-.. doxygenfunction:: NS1::f1
-   :path: ../../examples/specific/class/xml
-.. doxygenfunction:: NS1::f1< std::string >
-   :path: ../../examples/specific/class/xml
-
-.. doxygenfunction:: NS1::NS2::f2
-   :path: ../../examples/specific/class/xml
-.. doxygenfunction:: NS1::NS2::f2< std::string >
+.. doxygennamespace:: NS1
    :path: ../../examples/specific/class/xml
 
 
