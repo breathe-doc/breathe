@@ -49,7 +49,6 @@ public:
     */
     virtual void rawLeadingAsteriskVerbatim() const = 0;
 
-    //////////////////////////////////////////////////////////////
     /// Some kind of method
     ///
     /// @param something a parameter
@@ -64,7 +63,8 @@ public:
     ///       };
     ///
     /// @endverbatim
-    //////////////////////////////////////////////////////////////
+    /// @note Documentation using `///` should begin and end in a blank line.
+
     virtual void rawLeadingSlashesVerbatim(int something) const = 0;
 
     /*!

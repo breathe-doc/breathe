@@ -11,5 +11,3 @@ Test Pages
    embeddedrst
    inline 
    members
-   examples/codeblocks
-

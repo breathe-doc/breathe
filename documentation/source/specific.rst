@@ -27,13 +27,13 @@ Namespaced Function Examples
 
 .. cpp:namespace:: @ex_specific_namespaced_function
 
-.. doxygenfunction:: testnamespace::NamespacedClassTest::function
+.. doxygenfunction:: TestNamespaceClasses::NamespacedClassTest::function
    :path: ../../examples/specific/class/xml
 
-.. doxygenfunction:: testnamespace::ClassTest::function
+.. doxygenfunction:: TestNamespaceClasses::ClassTest::function
    :path: ../../examples/specific/class/xml
 
-.. doxygenfunction:: testnamespace::ClassTest::anotherFunction
+.. doxygenfunction:: TestNamespaceClasses::ClassTest::anotherFunction
    :path: ../../examples/specific/class/xml
 
 .. doxygenfunction:: ClassTest::function
@@ -66,17 +66,22 @@ Extern Examples
 .. doxygenfunction:: cache_tree_matches_traversal
    :project: c_file
 
-.. doxygenvariable:: global_cache_tree
-   :project: c_file
+..
+   duplicated by variable.rst:19
 
+   .. doxygenvariable:: global_cache_tree
+      :project: c_file
 
-Alias Example
--------------
+..
+   duplicated by domains.rst:81
 
-.. cpp:namespace:: @ex_specific_alias
+   Alias Example
+   -------------
 
-.. doxygenfunction:: frob_foos
-   :path: ../../examples/specific/alias/xml
+   .. cpp:namespace:: @ex_specific_alias
+
+   .. doxygenfunction:: frob_foos
+      :path: ../../examples/specific/alias/xml
 
 Fixed Width Font
 ----------------
@@ -243,6 +248,7 @@ C++ Inherited Members
 
 .. doxygenfile:: cpp_inherited_members.h
    :project: cpp_inherited_members
+   :no-link:
 
 C++ Trailing Return Type
 ------------------------
@@ -313,7 +319,7 @@ Doxygen xrefsect
 
 
 Doxygen simplesect
-----------------
+------------------
 
 .. doxygenfile:: simplesect.h
    :project: simplesect

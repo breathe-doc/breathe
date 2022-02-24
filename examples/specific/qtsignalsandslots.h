@@ -1,7 +1,12 @@
 #ifndef QT_OBJECT_H
 #define QT_OBJECT_H
 
-#include
+/*!
+*\brief Forward declaration of QT API class
+
+QT slots and signals typically `#include <QObject>`, but this example is parsed without QT SDK installed.
+*/
+extern class QObject;
 
 class QtSignalSlotExample: public QObject
 {
@@ -18,7 +23,7 @@ class QtSignalSlotExample: public QObject
     signals:
 
     /*!
-     *\param iShown
+     \param iShown
      This is in function declaration
      */
     void workingSignal( int iShown );
@@ -26,7 +31,7 @@ class QtSignalSlotExample: public QObject
     public slots:
 
     /*!
-     *\param iShown
+     \param iShown
      This is in function declaration
      */
     void workingSlot( int iShown ) { iShown; }

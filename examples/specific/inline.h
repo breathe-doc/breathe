@@ -1,5 +1,6 @@
-
-class Test
+#include <stdexcept>
+/** A class to dominstrate inline documentation syntax. */
+class InlineTest
 {
  public:
  /** A member function.
@@ -14,4 +15,3 @@ class Test
 
  throw(std::out_of_range);
 };
-

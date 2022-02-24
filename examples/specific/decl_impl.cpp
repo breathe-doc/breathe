@@ -2,7 +2,7 @@
 
     Yeah and some more.
 */
-int open_di(const char * a, int b) {
+int open_di(const char * pathname, int flags) {
 	return 0;
 }
 
@@ -15,4 +15,3 @@ int another_open_di(const char *,int)
 }
 
 }
-
