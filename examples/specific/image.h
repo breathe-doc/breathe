@@ -6,6 +6,4 @@
 * Breathe & Sphinx should automatically copy the image from the doxygen output directory into the
 * _images folder of the Sphinx output.
 */
-class ImageClass : public Image {}
-
-
+class ImageClass {};

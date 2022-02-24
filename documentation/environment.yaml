@@ -1,0 +1,11 @@
+name: RTD
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  # doxygen versions aailable from conda forge are listed at
+  # https://anaconda.org/conda-forge/doxygen/files
+  # 
+  # - doxygen=1.9.1 # to specify a specific version of doxygen
+  # we'll be using the latest available
+  - doxygen

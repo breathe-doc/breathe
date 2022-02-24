@@ -26,7 +26,7 @@ struct cache_tree {
 extern struct cache_tree global_cache_tree;
 
 struct cache_tree *cache_tree(void);
-void cache_tree_free(struct cache_tree **);
+extern void cache_tree_free(struct cache_tree **);
 void cache_tree_invalidate_path(struct cache_tree *, const char *);
 struct cache_tree_sub *cache_tree_sub(struct cache_tree *, const char *);
 
@@ -51,4 +51,3 @@ void prime_cache_tree(struct cache_tree **, struct tree *);
 extern int cache_tree_matches_traversal(struct cache_tree *, struct name_entry *ent, struct traverse_info *info);
 
 #endif
-

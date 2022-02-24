@@ -1,3 +1,4 @@
+struct Foo{};
 struct Class {
 	virtual void f1() const volatile & = 0;
 	virtual void f2() const volatile && = 0;
