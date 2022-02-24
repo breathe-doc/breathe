@@ -359,6 +359,12 @@ class NodeFinder(nodes.SparseNodeVisitor):
 
     def visit_desc_content(self, node):
         self.content = node
+        # The SparseNodeVisitor seems to not actually be universally Sparse,
+        # but only for nodes known to Docutils.
+        # So if there are extensions with new node types in the content,
+        # then the visitation will fail.
+        # We anyway don't need to visit the actual content, so skip it.
+        raise nodes.SkipChildren
 
 
 def intersperse(iterable, delimiter):
