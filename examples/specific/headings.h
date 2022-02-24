@@ -15,5 +15,4 @@ Text
 ### Header ###
 Text
 */
-class Test {};
-
+class HeadingsTest {};

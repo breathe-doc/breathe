@@ -1,3 +1,4 @@
+#include <string>
 
 //! Non overloaded function
 void simplefunc();

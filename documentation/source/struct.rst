@@ -84,7 +84,7 @@ It produces this output:
 .. doxygenstruct:: StructTest
    :project: struct
    :members:
-
+   :no-link:
 
 Specific Members Example
 ------------------------
@@ -105,7 +105,7 @@ It produces this output:
 .. doxygenstruct:: StructTest
    :project: struct
    :members: publicFunction, protectedFunction
-
+   :no-link:
 
 Protected Members
 -----------------
@@ -126,7 +126,7 @@ It produces this output:
 .. doxygenstruct:: StructTest
    :project: struct
    :protected-members:
-
+   :no-link:
 
 Private Members
 ---------------
@@ -147,7 +147,7 @@ It produces this output:
 .. doxygenstruct:: StructTest
    :project: struct
    :private-members:
-
+   :no-link:
 
 Undocumented Members
 --------------------
@@ -174,6 +174,7 @@ It produces this output:
    :members:
    :private-members:
    :undoc-members:
+   :no-link:
 
 .. note::
 
@@ -220,7 +221,7 @@ It produces this output:
    :project: struct
    :members:
    :outline:
-
+   :no-link:
 
 Failing Example
 ---------------
@@ -239,5 +240,3 @@ It produces the following warning message:
 
 .. warning:: doxygenstruct: Cannot find struct “made_up_struct” in doxygen xml
    output for project “struct” from directory: ../../examples/doxygen/struct/xml/
-
-

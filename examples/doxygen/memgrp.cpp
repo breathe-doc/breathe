@@ -10,6 +10,7 @@ class Test9
 
     /** Function without group. Details. */
     void ungroupedFunction();
+    // intentionally not documenting this member?
     void func1InGroup2();
   protected:
     void func2InGroup2();

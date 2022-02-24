@@ -13,14 +13,14 @@ Using the example from the Doxygen docs:
 
 If we reference this with a directive, for example::
 
-   .. doxygenclass:: Test
+   .. doxygenclass:: UserDefinedGroupTest
       :project: userdefined
       :members:
       :protected-members:
 
 It renders as:
 
-.. doxygenclass:: Test
+.. doxygenclass:: UserDefinedGroupTest
    :project: userdefined
    :members:
    :protected-members:
@@ -31,5 +31,3 @@ It renders as:
    Any groups which are not named in the original source code will appear as
    **Unnamed Group** in the final output. This is different to Doxygen which
    will number the groups and so name them as Group1, Group2, Group3, etc.
-
-

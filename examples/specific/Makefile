@@ -55,7 +55,7 @@ $(xmls): %/xml/index.xml: %.cfg %.h
 programlisting/xml/index.xml: programlisting.h programlisting.cfg programlistinginclude.txt
 	$(DOXYGEN) programlisting.cfg
 
-decl_impl/xml/index.xml: decl_impl.h decl_impl.c decl_impl.cfg
+decl_impl/xml/index.xml: decl_impl.h decl_impl.cpp decl_impl.cfg
 	$(DOXYGEN) decl_impl.cfg
 
 multifilexml/xml/index.xml: multifile/one/Util.h multifile/two/Util.h multifile.cfg

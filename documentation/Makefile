@@ -2,7 +2,7 @@
 #
 
 # You can set these variables from the command line.
-SPHINXOPTS   ?= -vn
+SPHINXOPTS   ?= -v -W -E
 SPHINXBUILD   = sphinx-build
 PAPER         =
 BUILDDIR     ?= build
@@ -181,4 +181,3 @@ spelling:
 	$(SPHINXBUILD) -b spelling -N $(ALLSPHINXOPTS) $(BUILDDIR)/spelling
 	@echo
 	@echo "Build finished. The spelling files are in $(BUILDDIR)/spelling."
-

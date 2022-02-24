@@ -1,5 +1,6 @@
+#include <string>
 
-namespace testnamespace {
+namespace TestNamespaceClasses {
 
 //! \brief first class inside of namespace
 class NamespacedClassTest {
@@ -32,7 +33,7 @@ public:
 };
 
 
-}
+} // TestNamespaceClasses
 
 //! \brief class outside of namespace
 class OuterClass {
@@ -94,9 +95,9 @@ protected:
 private:
 
     //! This is a private function
-    void privateFunction() const = 0;
+    virtual void privateFunction() const = 0;
 
-    void undocumentedPrivateFunction() const = 0;
+    virtual void undocumentedPrivateFunction() const = 0;
 
     //! A private class
     class PrivateClass {};

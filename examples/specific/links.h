@@ -6,7 +6,4 @@
   handling of links.
 
  */
-class Test {};
-
-
-
+class LinksTest {};
