@@ -90,8 +90,8 @@ Produces this output:
 .. note::
 
    As you can see from the output, section headings like 'Functions' are missing
-   from the :content-only: display. This is due to an implementation detail. If
-   post an issue on github if you'd like it addressed.
+   from the :content-only: display. This is due to an implementation detail. Open
+   an issue on github if you'd like it addressed.
 
 
 Members Example

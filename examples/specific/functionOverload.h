@@ -19,8 +19,10 @@ void g(double, double);
 
 }
 
+/*! needed for references in global function parameters */
 class MyType {};
 
+/*! needed for references in global function parameters */
 class MyOtherType {};
 
 //! Another function which takes a custom type

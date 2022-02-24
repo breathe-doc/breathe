@@ -19,9 +19,18 @@ jobs:
 
       - name: install dependencies
         run: |
-          pip install -r requirements/development.txt
-          sudo apt -y update
-          sudo apt -y install doxygen graphviz
+          pip install .
+          sudo apt-get -y update
+          sudo apt-get -y install graphviz libclang1-9 libclang-cpp9
+
+      - name: install doxygen from SF binary archives
+        run: |
+          mkdir doxygen-bin-arc && cd doxygen-bin-arc
+          curl -L https://sourceforge.net/projects/doxygen/files/rel-1.9.2/doxygen-1.9.2.linux.bin.tar.gz > doxygen.tar.gz
+          gunzip doxygen.tar.gz
+          tar xf doxygen.tar
+          cd doxygen-1.9.2
+          sudo make install
 
       - name: build the documentation
         run: |
