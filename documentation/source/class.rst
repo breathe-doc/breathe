@@ -47,7 +47,6 @@ specified class.
 
 .. contents::
 
-
 Basic Example
 -------------
 
@@ -295,11 +294,12 @@ Without ``:members-only:`` it would produce:
    In the ``readthedocs`` theme, the members will show up in the color scheme of the
    class definitions. If you would like them rendered as the other members,
    indent like above, create a ``_static/css/custom.css`` file containing
-   
+
    .. code-block:: css
 
       /* render as functions not classes when indented (for :members-only:) */
-      html.writer-html4 .rst-content blockquote dl:not(.field-list)>dt, html.writer-html5 .rst-content blockquote dl[class]:not(.option-list):not(.field-list):not(.footnote):not(.glossary):not(.simple)>dt {
+      html.writer-html4 .rst-content blockquote dl:not(.field-list)>dt,
+      html.writer-html5 .rst-content blockquote dl[class]:not(.option-list):not(.field-list):not(.footnote):not(.glossary):not(.simple)>dt {
         margin-bottom: 6px;
         border: none;
         border-left: 3px solid #ccc;
@@ -308,11 +308,11 @@ Without ``:members-only:`` it would produce:
       }
 
    and add the following to your ``conf.py``
-    
+
    .. code-block:: python
 
       html_static_path = ['_static']
-      
+
       html_css_files = ['css/custom.css']
 
 Outline Example
@@ -375,5 +375,6 @@ This intentionally fails:
 
 It produces the following warning message:
 
-.. warning:: doxygenclass: Cannot find class “made_up_class” in doxygen xml
+.. warning::
+   doxygenclass: Cannot find class “made_up_class” in doxygen xml
    output for project “class” from directory: ../../examples/doxygen/class/xml/

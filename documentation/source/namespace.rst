@@ -90,7 +90,7 @@ Produces this output:
 .. note::
 
    As you can see from the output, section headings like 'Functions' are missing
-   from the :content-only: display. This is due to an implementation detail. Open
+   from the ``:content-only:`` display. This is due to an implementation detail. Open
    an issue on github if you'd like it addressed.
 
 
@@ -104,7 +104,7 @@ classes. The output for any class in the namespace should be the same as if it h
 be produced by the :ref:`doxygenclass directive <class-example>` with the
 ``members`` option specified.
 
-::
+.. code-block:: rst
 
    .. doxygennamespace:: foo
       :project: namespace
@@ -128,7 +128,7 @@ members of any classes. The output for any class in the namespace should be the 
 as if it had be produced by the :ref:`doxygenclass directive <class-example>`
 with the ``protected-members`` option specified.
 
-::
+.. code-block:: rst
 
    .. doxygennamespace:: foo
       :project: namespace
@@ -252,6 +252,7 @@ This intentionally fails:
 
 It produces the following warning message:
 
-.. warning:: doxygennamespace: Cannot find namespace “madeupnamespace” in
-             doxygen xml output for project “namespace” from directory:
-             ../../examples/specific/namespacefile/xml/
+.. warning::
+   doxygennamespace: Cannot find namespace “madeupnamespace” in
+   doxygen xml output for project “namespace” from directory:
+   ../../examples/specific/namespacefile/xml/

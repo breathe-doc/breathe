@@ -6,7 +6,9 @@ follows.
 
 .. cpp:namespace:: @ex_lists_plus
 
-For unordered lists with list items prefixed with **+** ::
+For unordered lists with list items prefixed with **+**
+
+.. code-block:: rst
 
    .. doxygenclass:: SimpleList_1
       :project: lists
@@ -75,7 +77,8 @@ Numbered lists with list items prefixed with Arabic numerals **1. 2. ...** rende
 
 ----
 
-.. note:: Numbered lists support for the moment only Arabic numerals.
+.. note::
+   Numbered lists support for the moment only Arabic numerals.
 
    
 Nested lists are supported in all combinations, as long as they are valid doxygen markup.

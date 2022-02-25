@@ -139,15 +139,21 @@ which create formatted output like:
       :path: ../../examples/specific/typedef/xml
       :members:
 
-We can refer to **TestTypedef** using::
+We can refer to **TestTypedef** using 
+
+.. code-block:: rst
 
    :cpp:type:`TestTypedef`
    
-which renders as :cpp:type:`TestTypedef`, to **TypeDefNamespace::AnotherTypedef** using::
+which renders as :cpp:type:`TestTypedef`, to **TypeDefNamespace::AnotherTypedef** using 
+
+.. code-block:: rst
 
    :cpp:type:`TypeDefNamespace::AnotherTypedef`
 
-which renders as :cpp:type:`TypeDefNamespace::AnotherTypedef` and to **TestClass::MemberTypedef** using::
+which renders as :cpp:type:`TypeDefNamespace::AnotherTypedef` and to **TestClass::MemberTypedef** using 
+
+.. code-block:: rst
 
    :cpp:type:`TestClass::MemberTypedef`
 
@@ -158,7 +164,9 @@ Enum Value Examples
 
 .. cpp:namespace:: @ex_domains_enum
 
-Given the following Breathe directives::
+Given the following Breathe directives 
+
+.. code-block:: rst
 
    .. doxygenenumvalue:: VALUE
       :path: ../../examples/specific/enum/xml
