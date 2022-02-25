@@ -286,7 +286,7 @@ option associates the directive with a particular project in the
 the :confval:`breathe_projects_source` will be included in the output. In addition, any
 options specified in :confval:`breathe_doxygen_config_options` will be added to the
 generated Doxygen config file and any custom aliases specified in
-:confval:`breathe_doxygen_config_aliases` will be added to the `doxygen aliases
+:confval:`breathe_doxygen_aliases` will be added to the `doxygen aliases
 <https://www.doxygen.nl/manual/custcmd.html>`_.
 
 Thank you to `Scopatz <https://github.com/scopatz>`_ for the idea and initial
