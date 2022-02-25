@@ -21,9 +21,9 @@ The following steps are required to integrate breathe functionality:
 
 #. Add the breathe path to your conf.py by adding the following line
 
-   .. code-block:: rst
+   .. code-block:: python
 
-     sys.path.append( "/home/me/docproj/ext/breathe/" )
+     sys.path.append("/home/me/docproj/ext/breathe/")
 
 #. Add breathe as an extension the line could look like this
 
@@ -35,7 +35,7 @@ The following steps are required to integrate breathe functionality:
 
    .. code-block:: python
 
-     breathe_projects = { "myproject": "/home/me/docproj/doxyxml/" }
+     breathe_projects = {"myproject": "/home/me/docproj/doxyxml/"}
 
 #. Specify a default project
 
