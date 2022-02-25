@@ -19,7 +19,7 @@ jobs:
 
       - name: install dependencies
         run: |
-          pip install .
+          pip install -r requirements/development.txt
           sudo apt-get -y update
           sudo apt-get -y install graphviz libclang1-9 libclang-cpp9
 

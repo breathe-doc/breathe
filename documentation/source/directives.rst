@@ -21,8 +21,6 @@ Directives & Config Variables
    autofile
    page
 
-.. contents:: Table of Contents
-
 Directives
 ----------
 
@@ -34,15 +32,15 @@ The available directives are shown below. In each case the ``project``,
    should be used for this directive. This overrides the default project if one
    has been specified.
 
-   This is not used by the ``autodoxygenindex`` directive. Use ``source``
-   instead to specify the entry in the ``breathe_projects_source`` config value
+   This is not used by the `autodoxygenindex`_ directive. Use ``source``
+   instead to specify the entry in the :confval:`breathe_projects_source` config value
    to use.
 
 ``path``
    Directly specifies the path to the folder with the doxygen output. This
    overrides the project and default project if they have been specified.
 
-   This is not used by the ``autodoxygenindex`` directive. Use ``source-path``
+   This is not used by the `autodoxygenindex`_ directive. Use ``source-path``
    instead to specify the root path to the sources files which are to be
    processed.
 
@@ -72,7 +70,9 @@ doxygenclass
 This directive generates the appropriate output for a single class. It takes the
 standard ``project``, ``path``, ``outline`` and ``no-link`` options and
 additionally the ``members``, ``protected-members``, ``private-members``,
-``undoc-members``, ``membergroups`` and ``members-only`` options::
+``undoc-members``, ``membergroups`` and ``members-only`` options
+
+.. code-block:: rst
 
    .. doxygenclass:: <class name>
       :project: ...
@@ -96,9 +96,9 @@ doxygendefine
 ~~~~~~~~~~~~~
 
 This directive generates the appropriate output for a single preprocessor
-define. It behaves the same as the doxygenstruct directive.
+define. It behaves the same as the `doxygenstruct`_ directive.
 
-::
+.. code-block:: rst
 
    .. doxygendefine:: <define name>
       :project: ...
@@ -114,9 +114,9 @@ doxygenconcept
 ~~~~~~~~~~~~~~
 
 This directive generates the appropriate output for a single concept. It
-behaves the same as the doxygenstruct directive.
+behaves the same as the `doxygenstruct`_ directive.
 
-::
+.. code-block:: rst
 
    .. doxygenconcept:: <concept name>
       :project: ...
@@ -132,9 +132,9 @@ doxygenenum
 ~~~~~~~~~~~
 
 This directive generates the appropriate output for a single enum. It behaves
-the same as the doxygenstruct directive.
+the same as the `doxygenstruct`_ directive.
 
-::
+.. code-block:: rst
 
    .. doxygenenum:: <enum name>
       :project: ...
@@ -151,7 +151,7 @@ doxygenenumvalue
 
 This directive generates the appropriate output for a single enum value.
 
-::
+.. code-block:: rst
 
    .. doxygenenumvalue:: <enum value name>
       :project: ...
@@ -169,7 +169,7 @@ doxygenfile
 This directive generates the appropriate output for the contents of a source
 file.
 
-::
+.. code-block:: rst
 
    .. doxygenfile:: <filename>
       :project: ...
@@ -186,10 +186,10 @@ Checkout the :ref:`example <file-example>` to see it in action.
 autodoxygenfile
 ~~~~~~~~~~~~~~~
 
-This directive is this ``auto`` version of the doxygenfile directive above.
+This directive is this ``auto`` version of the `doxygenfile`_ directive above.
 It handles the doxygen xml generation for you like the other auto directives.
 
-::
+.. code-block:: rst
 
    .. autodoxygenfile:: <filename>
       :project: ...
@@ -208,7 +208,7 @@ doxygenfunction
 This directive generates the appropriate output for a single function. The
 function name is required to be unique in the project.
 
-::
+.. code-block:: rst
 
    .. doxygenfunction:: <function name>
       :project: ...
@@ -231,7 +231,7 @@ It takes the standard ``project``, ``path``, ``outline`` and ``no-link`` options
 and additionally the ``content-only``, ``desc-only``, ``members``,
 ``protected-members``, ``private-members`` and ``undoc-members`` options.
 
-::
+.. code-block:: rst
 
    .. doxygengroup:: <group name>
       :project: ...
@@ -261,7 +261,7 @@ This directive processes and produces output for everything described by the
 Doxygen xml output. It reads the ``index.xml`` file and process everything
 referenced by it.
 
-::
+.. code-block:: rst
 
    .. doxygenindex::
       :project: ...
@@ -275,22 +275,22 @@ referenced by it.
 autodoxygenindex
 ~~~~~~~~~~~~~~~~
 
-This directive performs a similar role to the ``doxygenindex`` directive except
+This directive performs a similar role to the `doxygenindex`_ directive except
 that it handles the doxygen xml generation for you. It uses the
-``breathe_projects_source`` configuration dictionary to judge which code source
+:confval:`breathe_projects_source` configuration dictionary to judge which code source
 files should have doxygen xml generated for them. The ``project`` directive
 option associates the directive with a particular project in the
-``breathe_projects_source`` dictionary. All the files references by the entry in
-the ``breathe_projects_source`` will be included in the output. In addition, any
-options specified in ``breathe_doxygen_config_options`` will be added to the
+:confval:`breathe_projects_source` dictionary. All the files references by the entry in
+the :confval:`breathe_projects_source` will be included in the output. In addition, any
+options specified in :confval:`breathe_doxygen_config_options` will be added to the
 generated Doxygen config file and any custom aliases specified in
-``breathe_doxygen_config_aliases`` will be added to the `doxygen aliases
+:confval:`breathe_doxygen_config_aliases` will be added to the `doxygen aliases
 <https://www.doxygen.nl/manual/custcmd.html>`_.
 
 Thank you to `Scopatz <https://github.com/scopatz>`_ for the idea and initial
 implementation.
 
-::
+.. code-block:: rst
 
    .. autodoxygenindex::
       :project: ...
@@ -314,7 +314,7 @@ and additionally the ``content-only``, ``desc-only``, ``members``,
 To reference a nested namespace, the full namespaced path must be provided, e.g.
 ``foo::bar`` for the ``bar`` namespace inside the ``foo`` namespace.
 
-::
+.. code-block:: rst
 
    .. doxygennamespace:: <namespace>
       :project: ...
@@ -343,7 +343,7 @@ It takes the standard ``project``, ``path``, ``outline`` and ``no-link`` options
 and additionally the ``members``, ``protected-members``, ``private-members``,
 ``membergroups``, ``members-only`` and ``undoc-members`` options.
 
-::
+.. code-block:: rst
 
    .. doxygenstruct:: <struct name>
       :project: ...
@@ -366,9 +366,9 @@ doxygeninterface
 ~~~~~~~~~~~~~~~~
 
 This directive generates the appropriate output for a single interface (specially-used
-class). It behaves the same as the doxygenclass directive.
+class). It behaves the same as the `doxygenclass`_ directive.
 
-::
+.. code-block:: rst
 
    .. doxygeninterface:: <interface name>
       :project: ...
@@ -390,7 +390,7 @@ doxygentypedef
 This directive generates the appropriate output for a single typedef. It behaves
 the same as the doxygenstruct directive.
 
-::
+.. code-block:: rst
 
    .. doxygentypedef:: <typedef name>
       :project: ...
@@ -408,7 +408,7 @@ doxygenunion
 This directive generates the appropriate output for a single union. It behaves
 the same as the doxygenstruct directive.
 
-::
+.. code-block:: rst
 
    .. doxygenunion:: <union name>
       :project: ...
@@ -426,7 +426,7 @@ doxygenvariable
 This directive generates the appropriate output for a single variable.
 It behaves the same as the doxygenstruct directive.
 
-::
+.. code-block:: rst
 
    .. doxygenvariable:: <variable name>
       :project: ...
@@ -449,7 +449,7 @@ for markup in the source comments. For more information check the
 It takes the standard ``project`` and ``path`` options and additionally the
 ``content-only`` option.
 
-::
+.. code-block:: rst
 
    .. doxygenpage:: <page name>
       :project: ...
@@ -484,17 +484,21 @@ Config Values
    Allows you to specify domains for particular files according to their
    extension.
 
-   For example::
+   For example
+
+   .. code-block:: python
 
       breathe_domain_by_extension = {
-              "h" : "cpp",
-              }
+          "h" : "cpp",
+      }
 
-   You can also use this to enable support for Doxygen XML generated from PHP code::
+   You can also use this to enable support for Doxygen XML generated from PHP code
+
+   .. code-block:: python
 
       breathe_domain_by_extension = {
-              "php" : "php",
-              }
+          "php" : "php",
+      }
 
 .. confval:: breathe_domain_by_file_pattern
 
@@ -502,11 +506,13 @@ Config Values
    is checked after :confval:`breathe_domain_by_extension` and so will override
    it when necessary.
 
-   For example::
+   For example
+
+   .. code-block:: python
 
       breathe_domain_by_file_pattern = {
-              "\*/alias.h" : "c",
-              }
+          "\*/alias.h" : "c",
+      }
 
    If you wanted all ``.h`` header files to be treated as being in the **cpp**
    domain you might use the :confval:`breathe_domain_by_extension` example
@@ -524,14 +530,19 @@ Config Values
       /some/long/path/to/myproject/file.c
       /some/long/path/to/myproject/subfolder/otherfile.c
 
-   Then you can set::
+   Then you can set
+
+   .. code-block:: python
 
       breathe_projects_source = {
-         "myprojectsource" :
-             ( "/some/long/path/to/myproject", [ "file.c", "subfolder/otherfile.c" ] )
-         }
+          "myprojectsource" : (
+              "/some/long/path/to/myproject", ["file.c", "subfolder/otherfile.c"]
+          )
+      }
 
-   Then your ``autodoxygenfile`` usage can look like this::
+   Then your `autodoxygenfile`_ usage can look like this
+
+   .. code-block:: rst
 
       .. autodoxygenfile:: file.c
          :project: myprojectsource
@@ -541,7 +552,7 @@ Config Values
 
 .. confval:: breathe_build_directory
 
-   In order to process the ``autodoxygenindex`` Breathe has to run ``doxygen``
+   In order to process the `autodoxygenindex`_ Breathe has to run ``doxygen``
    to create the xml files for processing. This config value specifies the root
    directory that these files should be created in. By default, this is set to
    the parent directory of the ``doctrees`` output folder which is the normal
@@ -559,7 +570,9 @@ Config Values
    take ``:members:``, ``:private-members:`` and ``:undoc-members:`` options.
    By default, this is set to an empty list, which means no members are
    displayed. If you'd like to always display the public and public,
-   undocumented members then you could set it like this::
+   undocumented members then you could set it like this
+
+   .. code-block:: python
 
       breathe_default_members = ('members', 'undoc-members')
 
@@ -568,14 +581,16 @@ Config Values
 .. confval:: breathe_implementation_filename_extensions
 
    Provides a list of the filename extensions which are considered to be
-   implementation files. These files are ignored when the ``doxygenfunction``
-   directive looks for unnamespaced function names. This is to avoid the issue
+   implementation files. These files are ignored when the `doxygenfunction`_
+   directive looks for un-namespaced function names. This is to avoid the issue
    where the same function name appears in the doxygen XML output for a header
    file and implementation file because the declaration is in one and the
    definition is in the other. Doxygen appends the documentation from the
    definition to the XML for the declaration so we don't miss any documentation
    information from the implementation files. The default value for this
-   variable is::
+   variable is
+
+   .. code-block:: python
 
       breathe_implementation_filename_extensions = ['.c', '.cc', '.cpp']
 
@@ -585,7 +600,9 @@ Config Values
 
    A dictionary in which the keys and values are the names and values of config
    options to be placed in the Doxygen config file generated by
-   ``autodoxygenindex``. For instance, this::
+   `autodoxygenindex`_. For instance, this
+
+   .. code-block:: python
 
       breathe_doxygen_config_options = {'EXCLUDE_SYMBOLS': 'abc123'}
 
@@ -594,20 +611,24 @@ Config Values
 
 .. confval:: breathe_doxygen_aliases
 
-    A dictionnary in which the keys and values are the names and values of aliases
-    to be placed in the Doxygen config file generated by ``autodoxygenindex``.
-    For instance, this::
+   A dictionary in which the keys and values are the names and values of aliases
+   to be placed in the Doxygen config file generated by `autodoxygenindex`_.
+   For instance, this
 
-      breathe_doxygen_aliases = {'rstref{1}': r'\verbatim embed:rst:inline :ref:`\1` \endverbatim'}
+   .. code-block:: python
 
-    would place the line::
+      breathe_doxygen_aliases = {
+          'rstref{1}': r'\verbatim embed:rst:inline :ref:`\1` \endverbatim'
+      }
+
+   would place the line::
 
       ALIASES += rstref{1}="\verbatim embed:rst:inline :ref:`\1` \endverbatim"
 
-    in the config file. The default value is an empty dictionary.
-    Note the use of a raw string to ensure that backslashes are interpreted as literal characters.
-    (This example alias enables linking to rst targets inline in doxygen comments using
-    ``\rstref{<target_name>}``)
+   in the config file. The default value is an empty dictionary.
+   Note the use of a raw string to ensure that backslashes are interpreted as literal characters.
+   (This example alias enables linking to rst targets inline in doxygen comments using
+   ``\rstref{<target_name>}``)
 
 .. confval:: breathe_show_define_initializer
 

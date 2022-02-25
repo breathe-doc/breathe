@@ -62,14 +62,15 @@ The directive-specific options are documented below.
       "user-defined", "User defined"
       "var", "Variable"
 
-.. contents::
 
 Example
 -------
 
 .. cpp:namespace:: @ex_file_example
 
-This should work::
+This should work 
+
+.. code-block:: rst
 
    .. doxygenfile:: nutshell.h
       :project: nutshell
@@ -87,7 +88,9 @@ Example with Selected and Ordered Sections
 .. cpp:namespace:: @ex_file_section
 
 The following will only show the **briefdescription** and **public-type**
-sections, in that order::
+sections, in that order 
+
+.. code-block:: rst
 
    .. doxygenfile:: nutshell.h
       :project: nutshell
@@ -107,7 +110,9 @@ Example with Nested Namespaces
 
 .. cpp:namespace:: @ex_file_namespace
 
-This should work::
+This should work 
+
+.. code-block:: rst
 
    .. doxygenfile:: namespacefile.h
       :project: namespace
@@ -132,7 +137,9 @@ following two files::
    /some/long/project/path/parser/Util.h
    /some/long/project/path/finder/Util.h
 
-You should specify::
+You should specify 
+
+.. code-block:: rst
 
    .. doxygenfile:: parser/Util.h
 
@@ -145,11 +152,14 @@ Failing Example
 
 .. cpp:namespace:: @ex_file_failing
 
-This intentionally fails::
+This intentionally fails 
+
+.. code-block:: rst
 
    .. doxygenfile:: made_up_file.h
       :project: nutshell
 
 It produces the following warning message:
 
-.. warning:: Cannot find file "made_up_file.h" in doxygen xml output for project "nutshell" from directory: ../../examples/specific/nutshell/xml/
+.. warning::
+   Cannot find file "made_up_file.h" in doxygen xml output for project "nutshell" from directory: ../../examples/specific/nutshell/xml/

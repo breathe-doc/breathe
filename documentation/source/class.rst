@@ -45,8 +45,6 @@ variable to set it in the ``conf.py``.
 The output includes references to any base classes and derived classes of the
 specified class.
 
-.. contents::
-
 
 Basic Example
 -------------
@@ -299,7 +297,8 @@ Without ``:members-only:`` it would produce:
    .. code-block:: css
 
       /* render as functions not classes when indented (for :members-only:) */
-      html.writer-html4 .rst-content blockquote dl:not(.field-list)>dt, html.writer-html5 .rst-content blockquote dl[class]:not(.option-list):not(.field-list):not(.footnote):not(.glossary):not(.simple)>dt {
+      html.writer-html4 .rst-content blockquote dl:not(.field-list)>dt,
+      html.writer-html5 .rst-content blockquote dl[class]:not(.option-list):not(.field-list):not(.footnote):not(.glossary):not(.simple)>dt {
         margin-bottom: 6px;
         border: none;
         border-left: 3px solid #ccc;
@@ -375,5 +374,6 @@ This intentionally fails:
 
 It produces the following warning message:
 
-.. warning:: doxygenclass: Cannot find class “made_up_class” in doxygen xml
+.. warning::
+   doxygenclass: Cannot find class “made_up_class” in doxygen xml
    output for project “class” from directory: ../../examples/doxygen/class/xml/
