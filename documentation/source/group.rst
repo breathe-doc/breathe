@@ -56,7 +56,6 @@ variable to set it in the ``conf.py``.
 
 .. contents::
 
-
 Basic Example
 -------------
 

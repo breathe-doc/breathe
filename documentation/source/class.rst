@@ -47,7 +47,6 @@ specified class.
 
 .. contents::
 
-
 Basic Example
 -------------
 
