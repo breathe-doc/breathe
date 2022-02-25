@@ -11,15 +11,13 @@ for markup in the source comments. For more information check the
 
 It takes the standard ``project`` and ``path`` options.
 
-::
+.. code-block:: rst
 
    .. doxygenpage:: <page name>
       :project: ...
       :path: ...
 
 .. _doxygen documentation: https://www.doxygen.nl/manual/commands.html#cmdxrefitem
-
-.. contents::
 
 
 Basic Example
@@ -56,5 +54,6 @@ This intentionally fails:
 
 It produces the following warning message:
 
-.. warning:: Cannot find file "madeuppage" in doxygen xml output for project
-             "xrefsect" from directory: ../../examples/specific/xrefsect/xml/
+.. warning::
+   Cannot find file "madeuppage" in doxygen xml output for project
+   "xrefsect" from directory: ../../examples/specific/xrefsect/xml/

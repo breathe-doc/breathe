@@ -16,7 +16,9 @@ reStructuredText
 .. cpp:namespace:: @ex_markups_rst
 
 Breathe supports reStructuredText within doxygen **verbatim** blocks which begin
-with the markup **embed:rst**. This means that a comment block like this::
+with the markup **embed:rst**. This means that a comment block like this
+
+.. code-block:: cpp
 
    /*!
    Inserting additional reStructuredText information.
@@ -40,13 +42,17 @@ Handling Leading Asterisks
 
 Note that doxygen captures **all** content in a **verbatim** block.  This can
 be rather an annoyance if you use a leading-asterisk style of comment block
-such as the following::
+such as the following
+
+.. code-block:: cpp
 
    /*!
     * Inserting additional reStructuredText information.
     *
     * \verbatim embed:rst
-    *     Some example code::
+    *     Some example code
+    *
+    *     .. code-block:: cpp
     *
     *        int example(int x) {
     *            return x * 2;
@@ -70,7 +76,9 @@ void **rawBadAsteriskVerbatim**\ ()
    - return x \* 2;
    - }
 
-To prevent this, use an **embed:rst:leading-asterisk** tag::
+To prevent this, use an **embed:rst:leading-asterisk** tag
+
+.. code-block:: cpp
 
    /*!
     * Inserting additional reStructuredText information.
@@ -99,7 +107,9 @@ Handling Leading Slashes
 .. cpp:namespace:: @ex_markups_leading_slash
 
 Similar troubles can be encountered when using comment blocks that start with a
-triple forward slash. For example::
+triple forward slash. For example
+
+.. code-block:: cpp
 
    /// Some kind of method
    ///
@@ -115,6 +125,7 @@ triple forward slash. For example::
    ///       };
    ///
    /// @endverbatim
+   /// @note Documentation using `///` should begin and end in a blank line.
 
 For these kinds of blocks, you can use an **embed:rst:leading-slashes** tag as
 shown in the above example.
@@ -135,7 +146,9 @@ Inline rST
 
 Normal verbatim elements result in block elements. But sometimes you'll want
 to generate rST references where they need to be rendered inline with the text.
-For example::
+For example
+
+.. code-block:: cpp
 
    /// Some kind of method
    ///
@@ -171,26 +184,28 @@ comments you can add the following aliases to your doxygen configuration file::
    ALIASES = "rst=^^\verbatim embed:rst^^"
    ALIASES += "endrst=\endverbatim"
 
-Which allow you to write comments like::
+Which allow you to write comments like
 
-    /*!
-    Inserting additional reStructuredText information.
+.. code-block:: cpp
 
-    \rst
+   /*!
+   Inserting additional reStructuredText information.
 
-    This is some funky non-xml compliant text: <& !><
+   \rst
 
-    .. note::
+   This is some funky non-xml compliant text: <& !><
+
+   .. note::
 
        This reStructuredText has been handled correctly.
-    \endrst
+   \endrst
 
-    This is just a standard verbatim block with code:
+   This is just a standard verbatim block with code:
 
-    \verbatim
-        child = 0;
-        while( child = parent->IterateChildren( child ) )
-    \endverbatim
+   \verbatim
+       child = 0;
+       while( child = parent->IterateChildren( child ) )
+   \endverbatim
 
     */
 

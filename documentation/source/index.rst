@@ -122,21 +122,27 @@ With a setting that says this::
 
    GENERATE_XML = YES
 
-Then in your Sphinx documentation, you add something like this::
+Then in your Sphinx documentation, you add something like this 
+
+.. code-block:: rst
 
    .. doxygenclass:: Nutshell
       :project: nutshell
       :members:
 
-With a ``conf.py`` setting like this::
+With a ``conf.py`` setting like this 
+
+.. code-block:: python
 
    breathe_projects = {
-       "nutshell":"../../examples/specific/nutshell/xml/",
-       }
+       "nutshell": "../../examples/specific/nutshell/xml/",
+   }
 
-And Breathe registered as an extension in ``conf.py`` like this::
+And Breathe registered as an extension in ``conf.py`` like this 
 
-   extensions = [ "breathe" ]
+.. code-block:: rst
+
+   extensions = ["breathe"]
 
 You get something like this:
 

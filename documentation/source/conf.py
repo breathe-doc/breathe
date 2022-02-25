@@ -19,6 +19,8 @@ import os
 import subprocess
 import re
 
+from pyparsing import html_comment
+
 # If your extensions are in another directory, add it here. If the directory
 # is relative to the documentation root, use os.path.abspath to make it
 # absolute, like shown here.
@@ -29,7 +31,13 @@ import re
 
 # Add any Sphinx extension module names here, as strings. They can be extensions
 # coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
-extensions = ["breathe", "sphinx.ext.mathjax", "sphinx.ext.ifconfig", "sphinx.ext.graphviz"]
+extensions = [
+    "breathe",
+    "sphinx.ext.mathjax",
+    "sphinx.ext.ifconfig",
+    "sphinx.ext.graphviz",
+    "sphinx_copybutton",
+]
 
 read_the_docs_build = os.environ.get("READTHEDOCS", None) == "True"
 travis_build = os.environ.get("TRAVIS_CI", None) == "True"
@@ -266,7 +274,7 @@ breathe_use_project_refids = True
 # given in html_static_path.
 # html_style = 'default.css'
 
-html_theme = "haiku"
+html_theme = "furo"
 
 # The name for this set of Sphinx documents.  If None, it defaults to
 # "<project> v<release> documentation".
@@ -277,18 +285,19 @@ html_theme = "haiku"
 
 # The name of an image file (relative to this directory) to place at the top
 # of the sidebar.
-# html_logo = None
+html_logo = "_static/logo.svg"
 
 # The name of an image file (within the static path) to use as favicon of the
 # docs.  This file should be a Windows icon file (.ico) being 16x16 or 32x32
 # pixels large.
-# html_favicon = None
+html_favicon = "_static/favicon.ico"
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ["_static"]
 
+html_css_files = ["breathe.css"]
 # If not '', a 'Last updated on:' timestamp is inserted at every page bottom,
 # using the given strftime format.
 # html_last_updated_fmt = '%b %d, %Y'

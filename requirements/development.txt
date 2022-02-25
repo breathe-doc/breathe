@@ -9,3 +9,6 @@ types-docutils>=0.17.0
 types-Pygments
 
 black==22.1.0
+
+sphinx-copybutton
+furo

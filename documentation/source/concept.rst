@@ -7,7 +7,9 @@ doxygenconcept Directive Example
 Working Example
 ---------------
 
-This should work::
+This should work
+
+.. code-block:: rst
 
    .. doxygenconcept:: Hashable
       :project: cpp_concept
@@ -20,12 +22,14 @@ It produces this output:
 Failing Example
 ---------------
 
-This intentionally fails::
+This intentionally fails
+
+.. code-block:: rst
 
    .. doxygenconcept:: MadeUpConcept
       :project: cpp_concept
 
 It produces the following warning message:
 
-.. warning:: doxygenconcept: Cannot find concept "MadeUpConcept" in doxygen xml output
-
+.. warning::
+   doxygenconcept: Cannot find concept "MadeUpConcept" in doxygen xml output
