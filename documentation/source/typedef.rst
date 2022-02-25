@@ -9,7 +9,9 @@ Working Example
 
 .. cpp:namespace:: @ex_typedef_example
 
-This should work::
+This should work
+
+.. code-block:: rst
 
    .. doxygentypedef:: UINT32
       :project: structcmd
@@ -24,7 +26,9 @@ Example with Namespace
 
 .. cpp:namespace:: @ex_typedef_namespace
 
-This should work::
+This should work
+
+.. code-block:: rst
 
    .. doxygennamespace:: TypeDefNamespace
       :path: ../../examples/specific/typedef/xml
@@ -39,11 +43,14 @@ Failing Example
 
 .. cpp:namespace:: @ex_typedef_failing
 
-This intentionally fails::
+This intentionally fails
+
+.. code-block:: rst
 
    .. doxygentypedef:: made_up_typedef
       :project: restypedef
 
 It produces the following warning message:
 
-.. warning:: doxygentypedef: Cannot find typedef "made_up_typedef" in doxygen xml output
+.. warning::
+   doxygentypedef: Cannot find typedef "made_up_typedef" in doxygen xml output

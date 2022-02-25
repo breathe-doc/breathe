@@ -44,7 +44,7 @@ options.
 
 If you would like to always specify some combination of ``members``,
 ``protected-members``, ``private-members`` and ``undoc-members`` then you can
-use the :ref:`breathe_default_members <breathe-default-members>` configuration
+use the :confval:`breathe_default_members` configuration
 variable to set it in the ``conf.py``.
 
 ``inner``
@@ -55,7 +55,6 @@ variable to set it in the ``conf.py``.
 .. _doxygen grouping documentation: https://www.doxygen.nl/manual/grouping.html
 
 .. contents::
-
 
 Basic Example
 -------------
@@ -99,7 +98,7 @@ Produces this output:
 .. note::
 
    As you can see from the output, section headings like 'Functions' are missing
-   from the :content-only: display. This is due to an implementation detail. If
+   from the ``:content-only:`` display. This is due to an implementation detail. If
    post an issue on github if you'd like it addressed.
 
 
@@ -113,7 +112,7 @@ classes. The output for any class in the group should be the same as if it had
 be produced by the :ref:`doxygenclass directive <class-example>` with the
 ``members`` option specified.
 
-::
+.. code-block:: rst
 
    .. doxygengroup:: mygroup
       :project: group
@@ -136,7 +135,7 @@ members of any classes. The output for any class in the group should be the same
 as if it had be produced by the :ref:`doxygenclass directive <class-example>`
 with the ``protected-members`` option specified.
 
-::
+.. code-block:: rst
 
    .. doxygengroup:: mygroup
       :project: group
@@ -260,5 +259,6 @@ This intentionally fails:
 
 It produces the following warning message:
 
-.. warning:: Cannot find file "madeupgroup" in doxygen xml output for project
-             "group" from directory: ../../examples/specific/group/xml/
+.. warning::
+   Cannot find file "madeupgroup" in doxygen xml output for project
+   "group" from directory: ../../examples/specific/group/xml/

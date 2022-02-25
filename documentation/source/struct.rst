@@ -238,5 +238,6 @@ This intentionally fails:
 
 It produces the following warning message:
 
-.. warning:: doxygenstruct: Cannot find struct “made_up_struct” in doxygen xml
+.. warning::
+   doxygenstruct: Cannot find struct "made_up_struct" in doxygen xml
    output for project “struct” from directory: ../../examples/doxygen/struct/xml/
