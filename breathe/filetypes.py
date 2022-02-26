@@ -1,16 +1,15 @@
 from typing import Optional
 import os.path
 
-from pygments.lexers import get_lexer_for_filename
-from pygments.util import ClassNotFound
+import pygments  # type: ignore
 
 
 def get_pygments_alias(filename: str) -> Optional[str]:
     "Find first pygments alias from filename"
     try:
-        lexer_cls = get_lexer_for_filename(filename)
-        return lexer_cls.aliases[0]  # type: ignore
-    except ClassNotFound:
+        lexer_cls = pygments.lexers.get_lexer_for_filename(filename)
+        return lexer_cls.aliases[0]
+    except pygments.util.ClassNotFound:
         return None
 
 
@@ -21,5 +20,5 @@ def get_extension(filename: str) -> str:
     (first, second) = os.path.splitext(filename)
 
     # Doxygen allows users to specify the file extension ".unparsed" to disable syntax highlighting.
-    # We translate it into the pygments un-highlighted 'text' type
+    # We translate it into the pygments unhighlighted 'text' type
     return (second or first).lstrip(".").replace("unparsed", "text")
