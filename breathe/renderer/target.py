@@ -3,11 +3,11 @@ from breathe.project import ProjectInfo
 from docutils import nodes
 from docutils.nodes import Element
 
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Sequence
 
 
 class TargetHandler:
-    def create_target(self, refid: str) -> List[Element]:
+    def create_target(self, refid: str) -> Sequence[Element]:
         raise NotImplementedError
 
 

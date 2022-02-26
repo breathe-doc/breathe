@@ -15,7 +15,7 @@ from sphinx.util import url_re
 from sphinx.ext.graphviz import graphviz
 
 from docutils import nodes
-from docutils.nodes import Element, Node, TextElement
+from docutils.nodes import Node, TextElement
 from docutils.statemachine import StringList, UnexpectedIndentationError
 from docutils.parsers.rst.states import Text
 
@@ -846,7 +846,7 @@ class SphinxRenderer:
             signode.children = [n for n in signode.children if not n.tagname == "desc_addname"]
         return nodes
 
-    def create_doxygen_target(self, node) -> List[Element]:
+    def create_doxygen_target(self, node):
         """Can be overridden to create a target node which uses the doxygen refid information
         which can be used for creating links between internal doxygen elements.
 
