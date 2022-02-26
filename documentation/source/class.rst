@@ -83,7 +83,7 @@ Produces this output:
 .. doxygenclass:: TemplateClass< T * >
    :project: template_specialisation
 
-Where as without the specialization, the directive references the generic
+Where as without the specialisation, the directive references the generic
 declaration:
 
 .. code-block:: rst
