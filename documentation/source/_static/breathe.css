@@ -10,34 +10,3 @@
 .breatheparameterlist li tt + p {
   display: inline;
 }
-
-/* ************************************************** */
-/* rules to uniform color scheme with breathe-doc.org */
-
-.sidebar-brand {
-  background: radial-gradient(closest-side, #7992a466 0%, #7992a400 80%), linear-gradient(0deg, #003c66 0%, #2a5c80 100%);
-}
-
-.sidebar-brand .sidebar-brand-text {
-  color:white;
-}
-
-.mobile-header {
-  /* background-color: var(--color-header-background); */
-  background-color: #003c66;
-}
-
-.nav-overlay-icon .icon, .toc-overlay-icon .icon {
-  /* color: var(--color-foreground-secondary); */
-  color: white;
-}
-
-.mobile-header .header-center a {
-  /* color: var(--color-header-text); */
-  color: white;
-}
-
-.theme-toggle svg {
-  /* color: var(--color-foreground-primary); */
-  color: white;
-}
