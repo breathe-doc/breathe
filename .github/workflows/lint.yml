@@ -1,4 +1,4 @@
-name: lint using flake8
+name: lint
 on: [push, pull_request]
 jobs:
   build:
