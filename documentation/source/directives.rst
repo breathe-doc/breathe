@@ -21,6 +21,8 @@ Directives & Config Variables
    autofile
    page
 
+.. contents:: Table of Contents
+
 Directives
 ----------
 

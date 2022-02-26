@@ -19,6 +19,8 @@ It takes the standard ``project`` and ``path`` options.
 
 .. _doxygen documentation: https://www.doxygen.nl/manual/commands.html#cmdxrefitem
 
+.. contents::
+
 
 Basic Example
 -------------
