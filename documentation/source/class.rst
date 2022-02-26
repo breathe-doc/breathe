@@ -45,6 +45,7 @@ variable to set it in the ``conf.py``.
 The output includes references to any base classes and derived classes of the
 specified class.
 
+.. contents::
 
 Basic Example
 -------------
@@ -82,7 +83,7 @@ Produces this output:
 .. doxygenclass:: TemplateClass< T * >
    :project: template_specialisation
 
-Where as without the specialisation, the directive references the generic
+Where as without the specialization, the directive references the generic
 declaration:
 
 .. code-block:: rst
@@ -293,7 +294,7 @@ Without ``:members-only:`` it would produce:
    In the ``readthedocs`` theme, the members will show up in the color scheme of the
    class definitions. If you would like them rendered as the other members,
    indent like above, create a ``_static/css/custom.css`` file containing
-   
+
    .. code-block:: css
 
       /* render as functions not classes when indented (for :members-only:) */
@@ -307,11 +308,11 @@ Without ``:members-only:`` it would produce:
       }
 
    and add the following to your ``conf.py``
-    
+
    .. code-block:: python
 
       html_static_path = ['_static']
-      
+
       html_css_files = ['css/custom.css']
 
 Outline Example

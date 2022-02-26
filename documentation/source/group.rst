@@ -54,6 +54,7 @@ variable to set it in the ``conf.py``.
 
 .. _doxygen grouping documentation: https://www.doxygen.nl/manual/grouping.html
 
+.. contents::
 
 Basic Example
 -------------
@@ -109,7 +110,7 @@ Members Example
 The ``members`` option changes the output to include the public members of any
 classes. The output for any class in the group should be the same as if it had
 be produced by the :ref:`doxygenclass directive <class-example>` with the
-``members`` option specified. 
+``members`` option specified.
 
 .. code-block:: rst
 
@@ -132,7 +133,7 @@ Protected Members Example
 The ``protected-members`` option changes the output to include the protected
 members of any classes. The output for any class in the group should be the same
 as if it had be produced by the :ref:`doxygenclass directive <class-example>`
-with the ``protected-members`` option specified. 
+with the ``protected-members`` option specified.
 
 .. code-block:: rst
 
