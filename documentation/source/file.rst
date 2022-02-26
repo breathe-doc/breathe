@@ -62,7 +62,6 @@ The directive-specific options are documented below.
       "user-defined", "User defined"
       "var", "Variable"
 
-.. contents::
 
 Example
 -------
