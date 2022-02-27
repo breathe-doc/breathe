@@ -4,7 +4,7 @@ Template
 .. cpp:namespace:: @ex_template_first
 
 Breathe has support for class and function templates. They are output as
-follows. For a class with a single template parameter
+follows. For a class with a single template parameter:
 
 .. code-block:: rst
 

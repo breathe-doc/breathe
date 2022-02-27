@@ -9,7 +9,7 @@ Working Example
 
 .. cpp:namespace:: @ex_enum_example
 
-This should work 
+This should work:
 
 .. code-block:: rst
 
@@ -26,7 +26,7 @@ Example with Namespace
 
 .. cpp:namespace:: @ex_enum_namespace
 
-This should work 
+This should work:
 
 .. code-block:: rst
 
@@ -43,7 +43,7 @@ Failing Example
 
 .. cpp:namespace:: @ex_enum_failing
 
-This intentionally fails 
+This intentionally fails:
 
 .. code-block:: rst
 

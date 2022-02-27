@@ -9,7 +9,7 @@ Working Example
 
 .. cpp:namespace:: @ex_variable_example
 
-This should work
+This should work:
 
 .. code-block:: rst
 
@@ -26,7 +26,7 @@ Failing Example
 
 .. cpp:namespace:: @ex_variable_failing
 
-This intentionally fails
+This intentionally fails:
 
 .. code-block:: rst
 

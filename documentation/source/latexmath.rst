@@ -3,7 +3,7 @@ Latex Math
 ==========
 
 Breathe has basic support for latex math markup in the doxygen comments.  A
-class with a comment like 
+class with a comment like:
 
 .. code-block:: cpp
 
@@ -17,7 +17,7 @@ class with a comment like
     * \int_a^b f(x) dx = F(b) - F(a)
     * @f]
     */
-   class MathHelper 
+   class MathHelper
    {
    public:
      MathHelper() {}
@@ -36,7 +36,7 @@ Will be renderer as:
 
 
 Without any additional configuration except for including a math extension in
-the Sphinx ``conf.py`` 
+the Sphinx ``conf.py``:
 
 .. code-block:: python
 
