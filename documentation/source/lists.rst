@@ -6,7 +6,7 @@ follows.
 
 .. cpp:namespace:: @ex_lists_plus
 
-For unordered lists with list items prefixed with **+**
+For unordered lists with list items prefixed with **+**:
 
 .. code-block:: rst
 
@@ -80,9 +80,9 @@ Numbered lists with list items prefixed with Arabic numerals **1. 2. ...** rende
 .. note::
    Numbered lists support for the moment only Arabic numerals.
 
-   
+
 Nested lists are supported in all combinations, as long as they are valid doxygen markup.
-Below are a couple of examples of different nested lists documentation and their corresponding 
+Below are a couple of examples of different nested lists documentation and their corresponding
 breathe output.
 
 .. cpp:namespace:: @ex_lists_nested_1
