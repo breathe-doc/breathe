@@ -47,9 +47,6 @@ all: class/xml/index.xml \
      pyexample/xml/index.xml \
      manual/xml/index.xml \
      interface/xml/index.xml
-	
-# VHDL not supported by breathe; there are other Sphinx extensions for that domain 
-#	mux/xml/index.xml \
 
 clean:
 	rm -rf  class concept define enum file func page relates author \
