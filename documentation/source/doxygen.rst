@@ -217,16 +217,6 @@ PyExample
 .. doxygenindex::
    :path: ../../examples/doxygen/pyexample/xml
 
-..
-   breathe does not support VHDL domain. There are other Sphinx extensions that do.
-   
-   Mux
-   ---
-
-   .. cpp:namespace:: @ex_doxygen_mux
-
-   .. doxygenindex::
-      :path: ../../examples/doxygen/mux/xml
 
 Manual
 ------
