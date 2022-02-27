@@ -6,7 +6,7 @@ follows.
 
 .. cpp:namespace:: @ex_tables_simple
 
-A simple Markdown syntax table
+A simple Markdown syntax table:
 
 .. code-block:: rst
 
@@ -24,7 +24,7 @@ It renders as:
 
 .. cpp:namespace:: @ex_tables_aligned
 
-A Markdown syntax table with alignment
+A Markdown syntax table with alignment:
 
 .. code-block:: rst
 
@@ -42,7 +42,7 @@ It renders as:
 
 .. cpp:namespace:: @ex_tables_rowspan
 
-A Markdown syntax table with rowspan (and alignment)
+A Markdown syntax table with rowspan (and alignment):
 
 .. code-block:: rst
 
@@ -62,7 +62,7 @@ It renders as:
 
 .. cpp:namespace:: @ex_tables_colspan
 
-A Markdown syntax table with colspan (and alignment)
+A Markdown syntax table with colspan (and alignment):
 
 .. code-block:: rst
 
@@ -82,7 +82,7 @@ It renders as:
 
 .. cpp:namespace:: @ex_tables_doxygen
 
-A Doxygen syntax table
+A Doxygen syntax table:
 
 .. code-block:: rst
 

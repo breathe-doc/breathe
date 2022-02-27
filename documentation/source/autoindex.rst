@@ -7,14 +7,14 @@ autodoxygenindex Directive Example
 Working Example
 ---------------
 
-This should work
+This should work:
 
 .. code-block:: rst
 
    .. autodoxygenindex::
       :project: auto
 
-With the following config value
+With the following config value:
 
 .. code-block:: python
 

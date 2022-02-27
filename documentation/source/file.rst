@@ -69,7 +69,7 @@ Example
 
 .. cpp:namespace:: @ex_file_example
 
-This should work
+This should work:
 
 .. code-block:: rst
 
@@ -89,7 +89,7 @@ Example with Selected and Ordered Sections
 .. cpp:namespace:: @ex_file_section
 
 The following will only show the **briefdescription** and **public-type**
-sections, in that order
+sections, in that order:
 
 .. code-block:: rst
 
@@ -111,7 +111,7 @@ Example with Nested Namespaces
 
 .. cpp:namespace:: @ex_file_namespace
 
-This should work
+This should work:
 
 .. code-block:: rst
 
@@ -133,12 +133,14 @@ Example for Multiple Files
 
 When there are multiple files with the same name in the project, you need to be
 more specific with the filename you provide. For example, in a project with the
-following two files::
+following two files:
+
+.. code-block:: text
 
    /some/long/project/path/parser/Util.h
    /some/long/project/path/finder/Util.h
 
-You should specify
+You should specify:
 
 .. code-block:: rst
 
@@ -153,7 +155,7 @@ Failing Example
 
 .. cpp:namespace:: @ex_file_failing
 
-This intentionally fails
+This intentionally fails:
 
 .. code-block:: rst
 

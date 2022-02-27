@@ -7,7 +7,7 @@ doxygendefine Directive Example
 Working Example
 ---------------
 
-This should work
+This should work:
 
 .. code-block:: rst
 
@@ -22,7 +22,7 @@ It produces this output:
 Failing Example
 ---------------
 
-This intentionally fails
+This intentionally fails:
 
 .. code-block:: rst
 

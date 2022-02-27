@@ -20,7 +20,7 @@ Working Example
 
 .. cpp:namespace:: @ex_function_example
 
-This should work 
+This should work:
 
 .. code-block:: rst
 
@@ -37,7 +37,7 @@ Separated Declaration & Implementation Example
 
 .. cpp:namespace:: @ex_function_separated
 
-This should work 
+This should work:
 
 .. code-block:: rst
 
@@ -54,7 +54,7 @@ Failing Example
 
 .. cpp:namespace:: @ex_function_failing
 
-This intentionally fails 
+This intentionally fails:
 
 .. code-block:: rst
 

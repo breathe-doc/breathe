@@ -10,14 +10,14 @@ which is very similar to this directive.
 Working Example
 ---------------
 
-This should work
+This should work:
 
 .. code-block:: rst
 
    .. autodoxygenfile:: auto_class.h
       :project: auto
 
-With the following config value
+With the following config value:
 
 .. code-block:: python
 

@@ -11,7 +11,7 @@ Using the example from the Doxygen docs:
 .. literalinclude:: code/groups.h
    :language: cpp
 
-If we reference this with a directive, for example 
+If we reference this with a directive, for example:
 
 .. code-block:: rst
 
