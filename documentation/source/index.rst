@@ -143,7 +143,7 @@ With a ``conf.py`` setting like this:
        "nutshell": "../../examples/specific/nutshell/xml/",
    }
 
-And Breathe registered as an extension in ``conf.py`` like this
+And Breathe registered as an extension in ``conf.py`` like this:
 
 .. code-block:: rst
 
