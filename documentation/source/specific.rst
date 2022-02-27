@@ -50,22 +50,6 @@ Extern Examples
    :project: c_file
    :outline:
 
-..
-   duplicated by variable.rst:19
-
-   .. doxygenvariable:: global_cache_tree
-      :project: c_file
-
-..
-   duplicated by domains.rst:81
-
-   Alias Example
-   -------------
-
-   .. cpp:namespace:: @ex_specific_alias
-
-   .. doxygenfunction:: frob_foos
-      :path: ../../examples/specific/alias/xml
 
 Fixed Width Font
 ----------------
