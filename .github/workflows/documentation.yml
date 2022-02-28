@@ -28,10 +28,10 @@ jobs:
           DOXYGEN_VERSION: 1.9.3
         run: |
           mkdir doxygen-bin-arc && cd doxygen-bin-arc
-          curl -L https://sourceforge.net/projects/doxygen/files/rel-${{ DOXYGEN_VERSION }}/doxygen-${{ DOXYGEN_VERSION }}.linux.bin.tar.gz > doxygen.tar.gz
+          curl -L https://sourceforge.net/projects/doxygen/files/rel-$DOXYGEN_VERSION/doxygen-$DOXYGEN_VERSION.linux.bin.tar.gz > doxygen.tar.gz
           gunzip doxygen.tar.gz
           tar xf doxygen.tar
-          cd doxygen-${{ DOXYGEN_VERSION }}
+          cd doxygen-$DOXYGEN_VERSION
           sudo make install
 
       - name: build the documentation
