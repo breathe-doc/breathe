@@ -47,3 +47,4 @@ com_crashlytics_export_strings.xml
 
 # modified by build process
 examples/doxygen/example.tag
+examples/specific/dot_graphs/xml/dotfile.dot
