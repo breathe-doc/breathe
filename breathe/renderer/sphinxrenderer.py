@@ -2374,13 +2374,17 @@ class SphinxRenderer:
         # Doxygen v1.9.3+ uses a relative path to specify the dot file.
         # Previously, Doxygen used an absolute path.
         # This relative path is with respect to the XML_OUTPUT path.
-        # furthermore, Doxygen v1.9.3+ will copy the dot file into the XML_OUTPUT
+        # Furthermore, Doxygen v1.9.3+ will copy the dot file into the XML_OUTPUT
         if not os.path.isabs(dot_file_path):
-            # use self.project_info.project_path as the XML_OUTPUT path,
-            # and make it absolute with consideration to the conf.py path
-            dot_file_path = os.path.abspath(
-                self.app.confdir + os.sep + self.project_info.project_path() + dot_file_path
-            )
+            # Use self.project_info.project_path as the XML_OUTPUT path, and
+            # make it absolute with consideration to the conf.py path
+            project_path = self.project_info.project_path()
+            if os.path.isabs(project_path):
+                dot_file_path = os.path.abspath(project_path + os.sep + dot_file_path)
+            else:
+                dot_file_path = os.path.abspath(
+                    self.app.confdir + os.sep + project_path + os.sep + dot_file_path
+                )
         try:
             with open(dot_file_path, encoding="utf-8") as fp:
                 dotcode = fp.read()
