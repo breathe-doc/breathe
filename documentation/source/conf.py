@@ -40,9 +40,8 @@ travis_build = os.environ.get("TRAVIS_CI", None) == "True"
 doxygen_test = subprocess.run(["doxygen", "--version"], capture_output=True)
 if doxygen_test.returncode < 0:
     raise RuntimeError(
-        "doxygen --version reported the following error:\n\t" + str(
-            doxygen_test.stderr, encoding="utf-8"
-        )
+        "doxygen --version reported the following error:\n\t"
+        + str(doxygen_test.stderr, encoding="utf-8")
     )
 doxygen_version = tuple(
     int(x) for x in str(doxygen_test.stdout, encoding="utf-8").split()[0].split(".")
