@@ -4,6 +4,10 @@
 doxygenconcept Directive Example
 ================================
 
+.. warning::
+   C++20 Concepts support was added in Doxygen v1.9.2. Please be sure to use Doxygen v1.9.2 or
+   newer with :ref:`doxygenconcept`.
+
 Working Example
 ---------------
 
@@ -16,8 +20,16 @@ This should work:
 
 It produces this output:
 
-.. doxygenconcept:: Hashable
-  :project: cpp_concept
+.. ifconfig:: doxygen_version < (1, 9, 2)
+
+   .. error::
+      The Doxygen version used to generate these docs does not support C++20 Concepts.
+      Please upgrade to using Doxygen v1.9.2 or newer.
+
+.. ifconfig:: doxygen_version >= (1, 9, 2)
+
+   .. doxygenconcept:: Hashable
+      :project: cpp_concept
 
 Failing Example
 ---------------
