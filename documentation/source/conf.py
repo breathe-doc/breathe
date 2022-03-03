@@ -18,6 +18,7 @@ import sys
 import os
 import subprocess
 import re
+from tkinter.tix import Tree
 
 # If your extensions are in another directory, add it here. If the directory
 # is relative to the documentation root, use os.path.abspath to make it
@@ -33,6 +34,19 @@ extensions = ["breathe", "sphinx.ext.mathjax", "sphinx.ext.ifconfig", "sphinx.ex
 
 read_the_docs_build = os.environ.get("READTHEDOCS", None) == "True"
 travis_build = os.environ.get("TRAVIS_CI", None) == "True"
+
+# Get version of Doxygen and save it as a tuple
+
+doxygen_test = subprocess.run(["doxygen", "--version"], capture_output=True)
+if doxygen_test.returncode < 0:
+    raise RuntimeError(
+        "doxygen --version reported the following error:\n\t" + str(
+            doxygen_test.stderr, encoding="utf-8"
+        )
+    )
+doxygen_version = tuple(
+    int(x) for x in str(doxygen_test.stdout, encoding="utf-8").split()[0].split(".")
+)
 
 # Get a description of the current position. Use Popen for 2.6 compat
 git_tag = subprocess.Popen(["git", "describe", "--tags"], stdout=subprocess.PIPE).communicate()[0]
@@ -401,3 +415,4 @@ def setup(app):
     app.connect("builder-inited", generate_doxygen_xml)
 
     app.add_config_value("documentation_build", "development", True)
+    app.add_config_value("doxygen_version", (0, 0, 0), "env")
