@@ -18,7 +18,6 @@ import sys
 import os
 import subprocess
 import re
-from tkinter.tix import Tree
 
 # If your extensions are in another directory, add it here. If the directory
 # is relative to the documentation root, use os.path.abspath to make it
