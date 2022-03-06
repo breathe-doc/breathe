@@ -31,7 +31,7 @@ Namespaced Function Examples
 ----------------------------
 
 .. cpp:namespace:: @ex_specific_namespaced_function
-   
+
 .. doxygenfunction:: TestNamespaceClasses::NamespacedClassTest::function
    :path: ../../examples/specific/class/xml
 
@@ -50,6 +50,11 @@ Namespaced Function Examples
 .. doxygenfunction:: NS1::f1
    :path: ../../examples/specific/class/xml
 .. doxygenfunction:: NS1::f1< std::string >
+   :path: ../../examples/specific/class/xml
+
+.. doxygenfunction:: NS1::NS2::f2
+   :path: ../../examples/specific/class/xml
+.. doxygenfunction:: NS1::NS2::f2< std::string >
    :path: ../../examples/specific/class/xml
 
 
@@ -84,6 +89,9 @@ Function Overloads
 .. doxygenfunction:: f(double, double)
    :project: functionOverload
 
+.. doxygenfunction:: test::g(int,int)
+   :project: functionOverload
+
 .. doxygenfunction:: test::g(double, double)
    :project: functionOverload
 
@@ -92,7 +100,6 @@ Function Overloads
 
 .. doxygenfunction:: h(std::string, MyOtherType)
    :project: functionOverload
-
 
 .. doxygenfunction:: h(std::string, const int)
    :project: functionOverload
@@ -237,7 +244,7 @@ C++ Trailing Return Type
 
 .. cpp:namespace:: @ex_specific_cpp_trailing_return_type
 
-.. doxygenindex::
+.. doxygenfile:: cpp_trailing_return_type.h
    :project: cpp_trailing_return_type
 
 C++ Constexpr Handling
@@ -296,7 +303,7 @@ This one should actually have ``[[myattr]]`` but Doxygen seems to not put attrib
 Doxygen xrefsect
 ----------------
 
-.. doxygenindex::
+.. doxygenfile:: xrefsect.h
    :project: xrefsect
 
 

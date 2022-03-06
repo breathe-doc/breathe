@@ -36,7 +36,7 @@ This should work:
 It produces this output:
 
 .. doxygentypedef:: foo::ns::MyInt
-      :project: namespace
+   :project: namespace
 
 Failing Example
 ---------------
