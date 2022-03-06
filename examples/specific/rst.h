@@ -52,7 +52,6 @@ public:
     /// Some kind of method
     ///
     /// @param something a parameter
-    /// @returns the same value provided in something param
     ///
     /// @verbatim embed:rst:leading-slashes
     ///    .. code-block:: c
