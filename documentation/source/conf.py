@@ -137,9 +137,7 @@ spelling_lang = "en_US"
 # Set path for mathjax js to a https URL as sometimes the Breathe docs are displayed under https
 # and we can't load an http mathjax file from an https view of the docs. So we change to a https
 # mathjax file which we can load from http or https. We break the url over two lines.
-mathjax_path = (
-    "https://c328740.ssl.cf1.rackcdn.com/" "mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"
-)
+mathjax_path = "https://cdn.jsdelivr.net/npm/mathjax@2/MathJax.js?config=TeX-AMS-MML_HTMLorMML"
 
 
 # Add any paths that contain templates here, relative to this directory.
