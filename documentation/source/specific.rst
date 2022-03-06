@@ -14,11 +14,6 @@ Template Type Alias
 .. doxygentypedef:: IsFuzzy
    :path: ../../examples/specific/template_type_alias/xml
 
-.. doxygenfunction:: f0
-   :path: ../../examples/specific/class/xml
-.. doxygenfunction:: f0< std::string >
-   :path: ../../examples/specific/class/xml
-
 Typedef Examples
 ----------------
 
@@ -45,6 +40,11 @@ Namespaced Function Examples
    :path: ../../examples/specific/class/xml
 
 .. doxygenfunction:: ClassTest::anotherFunction
+   :path: ../../examples/specific/class/xml
+
+.. doxygenfunction:: f0
+   :path: ../../examples/specific/class/xml
+.. doxygenfunction:: f0< std::string >
    :path: ../../examples/specific/class/xml
 
 .. doxygenfunction:: NS1::f1
