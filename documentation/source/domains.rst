@@ -75,16 +75,16 @@ Given the following Breathe directives:
 
 .. code-block:: rst
 
-   .. doxygennamespace:: TestNamespaceFunction
-      :project: cpp_function
+   .. doxygenfunction:: TestNamespaceClasses::NamespacedClassTest::function
+      :path: ../../examples/specific/class/xml
 
    .. doxygenfunction:: frob_foos
       :path: ../../examples/specific/alias/xml
 
 Which create formatted output like:
 
-   .. doxygennamespace:: TestNamespaceFunction
-      :project: cpp_function
+   .. doxygenfunction:: TestNamespaceClasses::NamespacedClassTest::function
+      :path: ../../examples/specific/class/xml
 
    .. doxygenfunction:: frob_foos
       :path: ../../examples/specific/alias/xml
