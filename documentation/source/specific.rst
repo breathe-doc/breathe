@@ -31,11 +31,25 @@ Namespaced Function Examples
 ----------------------------
 
 .. cpp:namespace:: @ex_specific_namespaced_function
-
-.. doxygennamespace:: TestNamespaceClasses
+   
+.. doxygenfunction:: TestNamespaceClasses::NamespacedClassTest::function
    :path: ../../examples/specific/class/xml
 
-.. doxygennamespace:: NS1
+.. doxygenfunction:: TestNamespaceClasses::ClassTest::function
+   :path: ../../examples/specific/class/xml
+
+.. doxygenfunction:: TestNamespaceClasses::ClassTest::anotherFunction
+   :path: ../../examples/specific/class/xml
+
+.. doxygenfunction:: ClassTest::function
+   :path: ../../examples/specific/class/xml
+
+.. doxygenfunction:: ClassTest::anotherFunction
+   :path: ../../examples/specific/class/xml
+
+.. doxygenfunction:: NS1::f1
+   :path: ../../examples/specific/class/xml
+.. doxygenfunction:: NS1::f1< std::string >
    :path: ../../examples/specific/class/xml
 
 
@@ -71,7 +85,7 @@ Function Overloads
 .. doxygenfunction:: f(double, double)
    :project: functionOverload
 
-.. doxygennamespace:: test
+.. doxygenfunction:: test::g(double, double)
    :project: functionOverload
 
 .. doxygenfunction:: h(std::string, MyType)
@@ -80,11 +94,6 @@ Function Overloads
 .. doxygenfunction:: h(std::string, MyOtherType)
    :project: functionOverload
 
-.. doxygenclass:: MyType
-   :project: functionOverload
-
-.. doxygenclass:: MyOtherType
-   :project: functionOverload
 
 .. doxygenfunction:: h(std::string, const int)
    :project: functionOverload
@@ -161,7 +170,7 @@ Multifile
 
 .. cpp:namespace:: @ex_specific_multifile
 
-.. doxygenindex::
+.. doxygenfunction:: TestTemplateFunction
    :project: multifile
 
 Interface Class

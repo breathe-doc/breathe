@@ -181,9 +181,15 @@ Given the following Breathe directives:
    .. doxygenenumvalue:: VALUE
       :path: ../../examples/specific/enum/xml
 
+   .. doxygenenumvalue:: TestEnumNamespace::FIRST
+      :path: ../../examples/specific/enum/xml
+
 Which create formatted output like:
 
    .. doxygenenumvalue:: VALUE
+      :path: ../../examples/specific/enum/xml
+
+   .. doxygenenumvalue:: TestEnumNamespace::FIRST
       :path: ../../examples/specific/enum/xml
 
 We can refer to **VALUE** using:
@@ -192,24 +198,10 @@ We can refer to **VALUE** using:
 
    :cpp:enumerator:`VALUE`
 
-which renders as :cpp:enumerator:`VALUE`.
-
-When we include the documentation for the ``TestEnumNamespace`` like so:
+which renders as :cpp:enumerator:`VALUE` and to **TestEnumNamespace::FIRST** using:
 
 .. code-block:: rst
 
-   .. doxygennamespace:: TestEnumNamespace
-      :path: ../../examples/specific/enum/xml
+   :cpp:enumerator:`TestEnumNamespace::FIRST`
 
-----
-
-.. doxygennamespace:: TestEnumNamespace
-   :path: ../../examples/specific/enum/xml
-
-We can reference the namespaced enumerator **FIRST** properly using:
-
-.. code-block:: rst
-
-   :cpp:enumerator:`TestEnumNamespace::NamespacedEnumTest::FIRST`
-
-which renders as :cpp:enumerator:`TestEnumNamespace::NamespacedEnumTest::FIRST`.
+which renders as :cpp:enumerator:`TestEnumNamespace::FIRST`.
