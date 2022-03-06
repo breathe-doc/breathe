@@ -45,6 +45,7 @@ if doxygen_test.returncode < 0:
 doxygen_version = tuple(
     int(x) for x in str(doxygen_test.stdout, encoding="utf-8").split()[0].split(".")
 )
+print("Using Doxygen v%d.%d.%d" % doxygen_version)
 
 # Get a description of the current position. Use Popen for 2.6 compat
 git_tag = subprocess.Popen(["git", "describe", "--tags"], stdout=subprocess.PIPE).communicate()[0]

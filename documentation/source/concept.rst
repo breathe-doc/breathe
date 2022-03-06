@@ -26,7 +26,7 @@ It produces this output:
       The Doxygen version used to generate these docs does not support C++20 Concepts.
       Please upgrade to using Doxygen v1.9.2 or newer.
 
-.. ifconfig:: doxygen_version >= (1, 9, 2)
+.. ifconfig:: doxygen_version > (1, 9, 1)
 
    .. doxygenconcept:: Hashable
       :project: cpp_concept
