@@ -30,9 +30,9 @@ namespace foo {
     private:
 
         //! This is a private function
-        void privateFunction() const = 0;
+        virtual void privateFunction() const = 0;
 
-        void undocumentedPrivateFunction() const = 0;
+        virtual void undocumentedPrivateFunction() const = 0;
 
         //! A private class
         class PrivateClass {};
@@ -76,4 +76,3 @@ class OuterBar {
 
 /** Function outside of the namespace */
 void outerFunction() {};
-

@@ -33,9 +33,9 @@ protected:
 private:
 
     //! This is a private function
-    void privateFunction() const = 0;
+    virtual void privateFunction() const = 0;
 
-    void undocumentedPrivateFunction() const = 0;
+    virtual void undocumentedPrivateFunction() const = 0;
 
     //! A private class
     class PrivateClass {};
@@ -88,4 +88,3 @@ private:
 
 //! Ungrouped function
 void ungroupedFunction();
-

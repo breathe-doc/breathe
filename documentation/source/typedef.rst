@@ -30,13 +30,13 @@ This should work:
 
 .. code-block:: rst
 
-   .. doxygennamespace:: TypeDefNamespace
-      :path: ../../examples/specific/typedef/xml
+   .. doxygentypedef:: foo::ns::MyInt
+      :project: namespace
 
 It produces this output:
 
-.. doxygennamespace:: TypeDefNamespace
-   :path: ../../examples/specific/typedef/xml
+.. doxygentypedef:: foo::ns::MyInt
+      :project: namespace
 
 Failing Example
 ---------------
