@@ -1502,6 +1502,23 @@ class SphinxRenderer:
             nodelist.extend(paramList)
             nodelist.extend(fields)
 
+        # And now all kinds of cleanup steps
+        # ----------------------------------
+
+        # trim trailing whitespace
+        while len(nodelist) != 0:
+            last = nodelist[-1]
+            if not isinstance(last, nodes.Text):
+                break
+            if last.astext().strip() != "":
+                break
+            nodelist.pop()
+
+        # https://github.com/michaeljones/breathe/issues/827
+        # verbatim nodes should not be in a paragraph:
+        if len(nodelist) == 1 and isinstance(nodelist[0], nodes.literal_block):
+            return nodelist
+
         return [nodes.paragraph("", "", *nodelist)]
 
     def visit_docparblock(self, node) -> List[Node]:
