@@ -1,8 +1,12 @@
+import time
+
 from breathe.project import AutoProjectInfo, ProjectInfoFactory
 
 import os
 from shlex import quote
 from typing import Callable, Dict, List, Tuple
+import lxml.etree as le
+
 
 
 AUTOCFG_TEMPLATE = r"""
@@ -67,8 +71,22 @@ class AutoDoxygenProcessHandle:
             project_path = self.process(
                 data.auto_project_info, data.files, doxygen_options, doxygen_aliases
             )
+            self.make_public_api_compatible(project_path)
             project_info = data.auto_project_info.create_project_info(project_path)
             self.project_info_factory.store_project_info_for_auto(project_name, project_info)
+            # print("Process.py")
+            # time.sleep(120)
+
+    def make_public_api_compatible(self, path):
+        for el in os.listdir(path):
+            full_path = f"{path}/{el}"
+
+            with open(full_path, 'r') as f:
+                doc = le.parse(f)
+                for i, elem in enumerate(doc.xpath('//*[attribute::prot]')):
+                    if elem.attrib['prot'] == 'private':
+                        elem.attrib.pop('prot')
+            doc.write(full_path)
 
     def process(
         self,
