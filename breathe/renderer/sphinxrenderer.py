@@ -295,6 +295,7 @@ class DomainDirectiveFactory:
             "variable": (CSharpVariable, "var"),
             "property": (CSharpProperty, "property"),
             "event": (CSharpEvent, "event"),
+            "enum-class": (CSharpEnum, "enum"),
             "enum": (CSharpEnum, "enum"),
             "enumvalue": (CSharpEnumValue, "enumerator"),
             "attribute": (CSharpAttribute, "attr"),
