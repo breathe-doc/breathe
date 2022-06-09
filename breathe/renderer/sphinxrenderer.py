@@ -2069,7 +2069,8 @@ class SphinxRenderer:
         names = self.get_qualification()
         names.append(node.name)
         declaration = self.join_nested_name(names)
-        if node.strong == "yes":
+        dom = self.get_domain()
+        if (not dom or dom == "cpp") and node.strong == "yes":
             # It looks like Doxygen does not make a difference
             # between 'enum class' and 'enum struct',
             # so render them both as 'enum class'.
