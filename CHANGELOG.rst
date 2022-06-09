@@ -5,6 +5,8 @@ Inspired by `Keepachangelog.com <http://keepachangelog.com/>`__.
 
 - Unreleased
 
+  - Fix C# enum rendering crash.
+    `#849 <https://github.com/michaeljones/breathe/pull/849>`__
   - Fix internal ``NodeFinder`` visitor for when non-Docutils nodes are
     present in the content of a directive.
     `#812 <https://github.com/michaeljones/breathe/pull/812>`__
