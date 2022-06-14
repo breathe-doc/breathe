@@ -274,13 +274,16 @@ class DoxygenFunctionDirective(BaseDirective):
             candSignatures.append(signature)
 
             if args is not None:
-                match = re.match(r"([^(]*)(.*)", signature)
-                assert match
-                _match_args = match.group(2)
+                parser = cpp.DefinitionParser(
+                    signature, location=self.get_source_info(), config=self.config
+                )
 
-                # Parse the text to find the arguments
-                # This one should succeed as it came from _create_function_signature
-                match_args = self._parse_args(_match_args)
+                ast = parser.parse_declaration(
+                    objectType="function",
+                    directiveType="function",
+                )
+                match_args = ast.declaration.decl.paramQual
+                self.strip_param_qual(match_args)
 
                 # Match them against the arg spec
                 if args != match_args:
