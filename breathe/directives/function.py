@@ -169,7 +169,6 @@ class DoxygenFunctionDirective(BaseDirective):
         param_qual = parser._parse_parameters_and_qualifiers(paramMode="function")
         # strip everything that doesn't contribute to overloading
 
-        self.strip_param_qual(param_qual)
         return param_qual
 
     @classmethod
@@ -253,6 +252,8 @@ class DoxygenFunctionDirective(BaseDirective):
             raise _NoMatchingFunctionError()
 
         res = []
+        perfect_matches_res = []
+
         candSignatures = []
         for entry in matches:
             text_options = {"no-link": "", "outline": ""}
@@ -283,15 +284,21 @@ class DoxygenFunctionDirective(BaseDirective):
                     directiveType="function",
                 )
                 match_args = ast.declaration.decl.paramQual
-                self.strip_param_qual(match_args)
 
+                if args == match_args:
+                    perfect_matches_res.append((entry, signature))
+
+                stripped_args = args.clone()
+                stripped_match_args = match_args.clone()
+                self.strip_param_qual(stripped_args)
+                self.strip_param_qual(stripped_match_args)
                 # Match them against the arg spec
-                if args != match_args:
-                    continue
+                if stripped_args == stripped_match_args:
+                    res.append((entry, signature))
 
-            res.append((entry, signature))
-
-        if len(res) == 1:
+        if len(perfect_matches_res) == 1:
+            return perfect_matches_res[0][0]
+        elif len(res) == 1:
             return res[0][0]
         else:
             raise _UnableToResolveFunctionError(candSignatures)
