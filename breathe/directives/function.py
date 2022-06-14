@@ -166,40 +166,42 @@ class DoxygenFunctionDirective(BaseDirective):
         parser = cpp.DefinitionParser(
             function_description, location=self.get_source_info(), config=self.config
         )
-        paramQual = parser._parse_parameters_and_qualifiers(paramMode="function")
+        param_qual = parser._parse_parameters_and_qualifiers(paramMode="function")
         # strip everything that doesn't contribute to overloading
 
-        def stripParamQual(paramQual):
-            paramQual.exceptionSpec = None
-            paramQual.final = None
-            paramQual.override = None
-            # TODO: strip attrs when Doxygen handles them
-            paramQual.initializer = None
-            paramQual.trailingReturn = None
-            for p in paramQual.args:
-                if p.arg is None:
-                    assert p.ellipsis
-                    continue
-                p.arg.init = None
-                declarator = p.arg.type.decl
+        self.strip_param_qual(param_qual)
+        return param_qual
 
-                def stripDeclarator(declarator):
-                    if hasattr(declarator, "next"):
-                        stripDeclarator(declarator.next)
-                        if isinstance(declarator, cpp.ASTDeclaratorParen):
-                            assert hasattr(declarator, "inner")
-                            stripDeclarator(declarator.inner)
-                    else:
-                        assert isinstance(declarator, cpp.ASTDeclaratorNameParamQual)
-                        assert hasattr(declarator, "declId")
-                        declarator.declId = None
-                        if declarator.paramQual is not None:
-                            stripParamQual(declarator.paramQual)
+    @classmethod
+    def strip_declarator(cls, declarator):
+        if hasattr(declarator, "next"):
+            cls.strip_declarator(declarator.next)
+            if isinstance(declarator, cpp.ASTDeclaratorParen):
+                assert hasattr(declarator, "inner")
+                cls.strip_declarator(declarator.inner)
+        else:
+            assert isinstance(declarator, cpp.ASTDeclaratorNameParamQual)
+            assert hasattr(declarator, "declId")
+            declarator.declId = None
+            if declarator.paramQual is not None:
+                cls.strip_param_qual(declarator.paramQual)
 
-                stripDeclarator(declarator)
+    @classmethod
+    def strip_param_qual(cls, param_qual):
+        param_qual.exceptionSpec = None
+        param_qual.final = None
+        param_qual.override = None
+        # TODO: strip attrs when Doxygen handles them
+        param_qual.initializer = None
+        param_qual.trailingReturn = None
+        for p in param_qual.args:
+            if p.arg is None:
+                assert p.ellipsis
+                continue
+            p.arg.init = None
+            declarator = p.arg.type.decl
 
-        stripParamQual(paramQual)
-        return paramQual
+            cls.strip_declarator(declarator)
 
     def _create_function_signature(
         self, node_stack, project_info, filter_, target_handler, mask_factory, directive_args
