@@ -5,13 +5,33 @@ Inspired by `Keepachangelog.com <http://keepachangelog.com/>`__.
 
 - Unreleased
 
-  - Fix C# enum rendering crash.
-    `#849 <https://github.com/michaeljones/breathe/pull/849>`__
+  - Treat .unparsed as plain text.
+    `#806 <https://github.com/michaeljones/breathe/pull/806>`__
+  - Remove unneeded type: ignore annotations.
+    `#813 <https://github.com/michaeljones/breathe/pull/813>`__
   - Fix internal ``NodeFinder`` visitor for when non-Docutils nodes are
     present in the content of a directive.
     `#812 <https://github.com/michaeljones/breathe/pull/812>`__
+  - Rename lint workflow.
+    `#814 <https://github.com/michaeljones/breathe/pull/814>`__
+  - Type check pygments and limit docutils stub version.
+    `#819 <https://github.com/michaeljones/breathe/pull/819>`__
   - Convert dot files' relative path to absolute.
     `#821 <https://github.com/michaeljones/breathe/pull/821>`__
+  - CI, update Sphinx versions to test.
+    `#834 <https://github.com/michaeljones/breathe/pull/834>`__
+  - CI, update for Sphinx 5.0.1.
+    `#846 <https://github.com/michaeljones/breathe/pull/846>`__
+  - Fix inconsistency in example.
+    `#843 <https://github.com/michaeljones/breathe/pull/843>`__
+  - Fix C# enum rendering crash.
+    `#849 <https://github.com/michaeljones/breathe/pull/849>`__
+  - Drop Sphinx 3 support, add Sphinx 5 support.
+    `#850 <https://github.com/michaeljones/breathe/pull/850>`__
+  - CICD: Disable python 3.6 for Sphinx master tests.
+    `#853 <https://github.com/michaeljones/breathe/pull/853>`__
+  - Populate default include text-node's data field instead of raw-source.
+    `#828 <https://github.com/michaeljones/breathe/pull/828>`__
 
 - 2022-02-14 - **Breathe v4.33.1**
 
