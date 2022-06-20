@@ -3,7 +3,7 @@ Change Log
 
 Inspired by `Keepachangelog.com <http://keepachangelog.com/>`__.
 
-- Unreleased
+- 2022-06-20 - **Breathe v4.34.0**
 
   - Treat .unparsed as plain text.
     `#806 <https://github.com/michaeljones/breathe/pull/806>`__
