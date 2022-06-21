@@ -1,5 +1,5 @@
 #include <stdexcept>
-/** A class to dominstrate inline documentation syntax. */
+/** A class to demonstrate inline documentation syntax. */
 class InlineTest
 {
  public:
