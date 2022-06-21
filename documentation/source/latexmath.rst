@@ -3,7 +3,9 @@ Latex Math
 ==========
 
 Breathe has basic support for latex math markup in the doxygen comments.  A
-class with a comment like::
+class with a comment like:
+
+.. code-block:: cpp
 
    /**
     * @brief A class
@@ -15,7 +17,7 @@ class with a comment like::
     * \int_a^b f(x) dx = F(b) - F(a)
     * @f]
     */
-   class MathHelper 
+   class MathHelper
    {
    public:
      MathHelper() {}
@@ -34,9 +36,11 @@ Will be renderer as:
 
 
 Without any additional configuration except for including a math extension in
-the Sphinx ``conf.py``::
+the Sphinx ``conf.py``:
 
-   extensions = [ "breathe", "sphinx.ext.mathjax" ]
+.. code-block:: python
+
+   extensions = ["breathe", "sphinx.ext.mathjax"]
 
 The specific environment formula fails when using ``sphinx.ext.pngmath`` so more
 work is needed.
@@ -55,4 +59,3 @@ Credits
 Thank you to `dazzlezhang <https://github.com/dazzlezhang>`_ for providing
 examples and a full run down of necessary details.  It made the implementation
 much easier.
-

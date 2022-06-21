@@ -119,7 +119,7 @@ It produces this output:
 .. doxygenclass:: Nutshell
    :project: nutshell
    :members:
-
+   :no-link:
 
 Specific Members Example
 ------------------------
@@ -133,14 +133,14 @@ This displays the class documentation with only the members listed in the
 
    .. doxygenclass:: Nutshell
       :project: nutshell
-      :members: crack, isCracked
+      :members: Tool, crack, isCracked
 
 It produces this output:
 
 .. doxygenclass:: Nutshell
    :project: nutshell
-   :members: crack, isCracked
-
+   :members: Tool, crack, isCracked
+   :no-link:
 
 Protected Members
 -----------------
@@ -182,6 +182,7 @@ It produces this output:
 .. doxygenclass:: Nutshell
    :project: nutshell
    :private-members:
+   :no-link:
 
 Undocumented Members
 --------------------
@@ -208,6 +209,7 @@ It produces this output:
    :members:
    :private-members:
    :undoc-members:
+   :no-link:
 
 .. note::
 
@@ -237,8 +239,11 @@ It produces this output:
    :project: membergroups
    :members:
    :membergroups: myGroup
+   :no-link:
 
 Without ``:membergroups: myGroup`` it would produce:
+
+.. cpp:namespace:: @ex_class_membergroups_all
 
 .. doxygenclass:: GroupedMembers
    :project: membergroups
@@ -268,12 +273,16 @@ It produces this output:
    :project: classtest
    :members:
    :members-only:
+   :no-link:
 
 Without ``:members-only:`` it would produce:
+
+.. cpp:namespace:: @ex_class_members_all
 
 .. doxygenclass:: ClassTest
    :project: classtest
    :members:
+   :no-link:
 
 .. note::
 
@@ -286,11 +295,12 @@ Without ``:members-only:`` it would produce:
    In the ``readthedocs`` theme, the members will show up in the color scheme of the
    class definitions. If you would like them rendered as the other members,
    indent like above, create a ``_static/css/custom.css`` file containing
-   
+
    .. code-block:: css
 
       /* render as functions not classes when indented (for :members-only:) */
-      html.writer-html4 .rst-content blockquote dl:not(.field-list)>dt, html.writer-html5 .rst-content blockquote dl[class]:not(.option-list):not(.field-list):not(.footnote):not(.glossary):not(.simple)>dt {
+      html.writer-html4 .rst-content blockquote dl:not(.field-list)>dt,
+      html.writer-html5 .rst-content blockquote dl[class]:not(.option-list):not(.field-list):not(.footnote):not(.glossary):not(.simple)>dt {
         margin-bottom: 6px;
         border: none;
         border-left: 3px solid #ccc;
@@ -299,11 +309,11 @@ Without ``:members-only:`` it would produce:
       }
 
    and add the following to your ``conf.py``
-    
+
    .. code-block:: python
 
       html_static_path = ['_static']
-      
+
       html_css_files = ['css/custom.css']
 
 Outline Example
@@ -328,7 +338,7 @@ It produces this output:
    :project: nutshell
    :members:
    :outline:
-
+   :no-link:
 
 Qt Signals & Slots Example
 --------------------------
@@ -366,7 +376,6 @@ This intentionally fails:
 
 It produces the following warning message:
 
-.. warning:: doxygenclass: Cannot find class “made_up_class” in doxygen xml
+.. warning::
+   doxygenclass: Cannot find class “made_up_class” in doxygen xml
    output for project “class” from directory: ../../examples/doxygen/class/xml/
-
-

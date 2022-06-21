@@ -49,11 +49,9 @@ public:
     */
     virtual void rawLeadingAsteriskVerbatim() const = 0;
 
-    //////////////////////////////////////////////////////////////
     /// Some kind of method
     ///
     /// @param something a parameter
-    /// @returns the same value provided in something param
     ///
     /// @verbatim embed:rst:leading-slashes
     ///    .. code-block:: c
@@ -64,7 +62,8 @@ public:
     ///       };
     ///
     /// @endverbatim
-    //////////////////////////////////////////////////////////////
+    /// @note Documentation using `///` should begin and end in a blank line.
+
     virtual void rawLeadingSlashesVerbatim(int something) const = 0;
 
     /*!

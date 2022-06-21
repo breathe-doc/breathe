@@ -12,7 +12,7 @@
 
   A link to the global enumeration type #GlobEnum.
  
-  A link to the define #ABS(x).
+  A link to the define #ABS_NUMBER(x).
   
   A link to the destructor of the Test2 class: Test2::~Test2,
   
@@ -42,7 +42,7 @@
 
   A link to the global enumeration type #GlobEnum.
   
-  A link to the define ABS(x).
+  A link to the define ABS_NUMBER(x).
   
   A link to a variable \link #var using another text\endlink as a link.
   
@@ -92,7 +92,7 @@ enum GlobEnum {
 /*!
  *  A macro definition.
  */ 
-#define ABS(x) (((x)>0)?(x):-(x))
+#define ABS_NUMBER(x) (((x)>0)?(x):-(x))
 
 typedef Test2 Test2TypeDef;
 

@@ -45,7 +45,6 @@ all: class/xml/index.xml \
      memgrp/xml/index.xml \
      docstring/xml/index.xml \
      pyexample/xml/index.xml \
-     mux/xml/index.xml \
      manual/xml/index.xml \
      interface/xml/index.xml
 
@@ -53,7 +52,7 @@ clean:
 	rm -rf  class concept define enum file func page relates author \
 		par parblock overload example include qtstyle jdstyle structcmd \
 		autolink tag restypedef afterdoc template tag group diagrams \
-		memgrp docstring pyexample mux manual interface
+		memgrp docstring pyexample manual interface
 
 class/xml/index.xml: class.h class.cfg
 	$(DOXYGEN) class.cfg
@@ -131,9 +130,6 @@ memgrp/xml/index.xml: memgrp.cpp memgrp.cfg
 
 pyexample/xml/index.xml: pyexample.py pyexample.cfg
 	$(DOXYGEN) pyexample.cfg
-
-mux/xml/index.xml: mux.vhdl mux.cfg
-	$(DOXYGEN) mux.cfg
 
 manual/xml/index.xml: manual.c manual.cfg
 	$(DOXYGEN) manual.cfg

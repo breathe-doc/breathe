@@ -217,13 +217,6 @@ PyExample
 .. doxygenindex::
    :path: ../../examples/doxygen/pyexample/xml
 
-Mux
----
-
-.. cpp:namespace:: @ex_doxygen_mux
-
-.. doxygenindex::
-   :path: ../../examples/doxygen/mux/xml
 
 Manual
 ------

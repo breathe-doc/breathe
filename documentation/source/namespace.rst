@@ -85,12 +85,13 @@ Produces this output:
 .. doxygennamespace:: foo
    :project: namespace
    :content-only:
+   :no-link:
 
 .. note::
 
    As you can see from the output, section headings like 'Functions' are missing
-   from the :content-only: display. This is due to an implementation detail. If
-   post an issue on github if you'd like it addressed.
+   from the ``:content-only:`` display. This is due to an implementation detail. Open
+   an issue on github if you'd like it addressed.
 
 
 Members Example
@@ -103,7 +104,7 @@ classes. The output for any class in the namespace should be the same as if it h
 be produced by the :ref:`doxygenclass directive <class-example>` with the
 ``members`` option specified.
 
-::
+.. code-block:: rst
 
    .. doxygennamespace:: foo
       :project: namespace
@@ -114,6 +115,7 @@ It produces this output:
 .. doxygennamespace:: foo
    :project: namespace
    :members:
+   :no-link:
 
 
 Protected Members Example
@@ -126,7 +128,7 @@ members of any classes. The output for any class in the namespace should be the 
 as if it had be produced by the :ref:`doxygenclass directive <class-example>`
 with the ``protected-members`` option specified.
 
-::
+.. code-block:: rst
 
    .. doxygennamespace:: foo
       :project: namespace
@@ -137,6 +139,7 @@ It produces this output:
 .. doxygennamespace:: foo
    :project: namespace
    :protected-members:
+   :no-link:
 
 
 Private-Members Example
@@ -160,7 +163,7 @@ Produces this output:
 .. doxygennamespace:: foo
    :project: namespace
    :private-members:
-
+   :no-link:
 
 Undocumented Members Example
 ----------------------------
@@ -184,6 +187,7 @@ Produces this output:
    :project: namespace
    :private-members:
    :undoc-members:
+   :no-link:
 
 .. note::
 
@@ -213,6 +217,7 @@ It produces this output:
    :project: namespace
    :members:
    :outline:
+   :no-link:
 
 
 Nested Example
@@ -231,7 +236,7 @@ Produces this output:
 
 .. doxygennamespace:: foo::ns
    :project: namespace
-
+   :no-link:
 
 Failing Example
 ---------------
@@ -247,6 +252,7 @@ This intentionally fails:
 
 It produces the following warning message:
 
-.. warning:: doxygennamespace: Cannot find namespace “madeupnamespace” in
-             doxygen xml output for project “namespace” from directory:
-             ../../examples/specific/namespacefile/xml/
+.. warning::
+   doxygennamespace: Cannot find namespace “madeupnamespace” in
+   doxygen xml output for project “namespace” from directory:
+   ../../examples/specific/namespacefile/xml/

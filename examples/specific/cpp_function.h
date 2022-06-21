@@ -1,3 +1,4 @@
+struct Foo{};
 struct Class {
 	virtual void f1() const volatile & = 0;
 	virtual void f2() const volatile && = 0;
@@ -8,3 +9,9 @@ struct Class {
 
 	int f_issue_338() noexcept;
 };
+
+/** A namespace to demonstrate a namespaced function */
+namespace TestNamespaceFunction {
+/** A function within a namspace. */
+void namespaceFunc();
+}

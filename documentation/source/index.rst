@@ -1,4 +1,5 @@
-.. BreatheExample documentation master file, created by sphinx-quickstart on Tue Feb  3 18:20:48 2009.
+..
+   BreatheExample documentation master file, created by sphinx-quickstart on Tue Feb  3 18:20:48 2009.
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
@@ -114,29 +115,39 @@ You write code that looks a little like this:
 .. literalinclude:: code/nutshell.h
    :language: cpp
 
-Then you run this::
+Then you run this:
+
+.. code-block:: text
 
    doxygen
 
-With a setting that says this::
+With a setting that says this:
+
+.. code-block:: text
 
    GENERATE_XML = YES
 
-Then in your Sphinx documentation, you add something like this::
+Then in your Sphinx documentation, you add something like this:
+
+.. code-block:: rst
 
    .. doxygenclass:: Nutshell
       :project: nutshell
       :members:
 
-With a ``conf.py`` setting like this::
+With a ``conf.py`` setting like this:
+
+.. code-block:: python
 
    breathe_projects = {
-       "nutshell":"../../examples/specific/nutshell/xml/",
-       }
+       "nutshell": "../../examples/specific/nutshell/xml/",
+   }
 
-And Breathe registered as an extension in ``conf.py`` like this::
+And Breathe registered as an extension in ``conf.py`` like this:
 
-   extensions = [ "breathe" ]
+.. code-block:: rst
+
+   extensions = ["breathe"]
 
 You get something like this:
 

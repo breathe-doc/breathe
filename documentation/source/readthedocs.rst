@@ -37,7 +37,7 @@ One simple way of achieving this is to add the following code to your
 
    if read_the_docs_build:
 
-       subprocess.call('cd ../doxygen; doxygen', shell=True)
+        subprocess.call('cd ../doxygen; doxygen', shell=True)
 
 The first line uses the ``READTHEDOCS`` environment variable to determine
 whether or not we are building on the Read the Docs servers. Read the Docs
@@ -63,39 +63,37 @@ order to run ``doxygen`` on the Read the Docs server.
 
 .. code-block:: python
 
-   import subprocess, sys
+    import subprocess, sys
 
-   def run_doxygen(folder):
-       """Run the doxygen make command in the designated folder"""
+    def run_doxygen(folder):
+        """Run the doxygen make command in the designated folder"""
 
-       try:
-           retcode = subprocess.call("cd %s; make" % folder, shell=True)
-           if retcode < 0:
-               sys.stderr.write("doxygen terminated by signal %s" % (-retcode))
-       except OSError as e:
-           sys.stderr.write("doxygen execution failed: %s" % e)
-
-
-   def generate_doxygen_xml(app):
-       """Run the doxygen make commands if we're on the ReadTheDocs server"""
-
-       read_the_docs_build = os.environ.get('READTHEDOCS', None) == 'True'
-
-       if read_the_docs_build:
-
-           run_doxygen("../../examples/doxygen")
-           run_doxygen("../../examples/specific")
-           run_doxygen("../../examples/tinyxml")
+        try:
+            retcode = subprocess.call("cd %s; make" % folder, shell=True)
+            if retcode < 0:
+                sys.stderr.write("doxygen terminated by signal %s" % (-retcode))
+        except OSError as e:
+            sys.stderr.write("doxygen execution failed: %s" % e)
 
 
-   def setup(app):
+    def generate_doxygen_xml(app):
+        """Run the doxygen make commands if we're on the ReadTheDocs server"""
 
-       # Add hook for building doxygen xml when needed
-       app.connect("builder-inited", generate_doxygen_xml)
+        read_the_docs_build = os.environ.get('READTHEDOCS', None) == 'True'
+
+        if read_the_docs_build:
+
+            run_doxygen("../../examples/doxygen")
+            run_doxygen("../../examples/specific")
+            run_doxygen("../../examples/tinyxml")
+
+
+    def setup(app):
+
+        # Add hook for building doxygen xml when needed
+        app.connect("builder-inited", generate_doxygen_xml)
 
 .. _Read the Docs: https://readthedocs.org/
 .. _Github: https://github.com
 .. _Bitbucket: https://bitbucket.org
 .. _specifically for this purpose: https://docs.readthedocs.org/en/latest/faq.html#how-do-i-change-behavior-for-read-the-docs
-
-

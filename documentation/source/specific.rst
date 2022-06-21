@@ -27,13 +27,13 @@ Namespaced Function Examples
 
 .. cpp:namespace:: @ex_specific_namespaced_function
 
-.. doxygenfunction:: testnamespace::NamespacedClassTest::function
+.. doxygenfunction:: TestNamespaceClasses::NamespacedClassTest::function
    :path: ../../examples/specific/class/xml
 
-.. doxygenfunction:: testnamespace::ClassTest::function
+.. doxygenfunction:: TestNamespaceClasses::ClassTest::function
    :path: ../../examples/specific/class/xml
 
-.. doxygenfunction:: testnamespace::ClassTest::anotherFunction
+.. doxygenfunction:: TestNamespaceClasses::ClassTest::anotherFunction
    :path: ../../examples/specific/class/xml
 
 .. doxygenfunction:: ClassTest::function
@@ -63,20 +63,11 @@ Extern Examples
 
 .. cpp:namespace:: @ex_specific_extern_examples
 
-.. doxygenfunction:: cache_tree_matches_traversal
+.. doxygenfunction:: cache_tree_free
    :project: c_file
-
-.. doxygenvariable:: global_cache_tree
+.. doxygenstruct:: cache_tree
    :project: c_file
-
-
-Alias Example
--------------
-
-.. cpp:namespace:: @ex_specific_alias
-
-.. doxygenfunction:: frob_foos
-   :path: ../../examples/specific/alias/xml
+   :outline:
 
 Fixed Width Font
 ----------------
@@ -241,7 +232,11 @@ C++ Inherited Members
 
 .. cpp:namespace:: @ex_specific_cpp_inherited_members
 
-.. doxygenfile:: cpp_inherited_members.h
+.. doxygenclass:: Base
+   :project: cpp_inherited_members
+.. doxygenclass:: A
+   :project: cpp_inherited_members
+.. doxygenclass:: B
    :project: cpp_inherited_members
 
 C++ Trailing Return Type
@@ -313,7 +308,7 @@ Doxygen xrefsect
 
 
 Doxygen simplesect
-----------------
+------------------
 
 .. doxygenfile:: simplesect.h
    :project: simplesect

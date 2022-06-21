@@ -9,7 +9,9 @@ Working Example
 
 .. cpp:namespace:: @ex_enumvalue_example
 
-This should work::
+This should work:
+
+.. code-block:: rst
 
    .. doxygenenumvalue:: TIXML_NO_ERROR
       :project: tinyxml
@@ -24,7 +26,9 @@ Example with Namespace
 
 .. cpp:namespace:: @ex_enumvalue_namespace
 
-This should work::
+This should work:
+
+.. code-block:: rst
 
    .. doxygenenumvalue:: foo::ns::A
       :project: namespace
@@ -39,12 +43,14 @@ Failing Example
 
 .. cpp:namespace:: @ex_enumvalue_failing
 
-This intentionally fails::
+This intentionally fails:
+
+.. code-block:: rst
 
    .. doxygenenumvalue:: made_up_enumvalue
       :project: restypedef
 
 It produces the following warning message:
 
-.. warning:: doxygenenumvalue: Cannot find enumvalue "made_up_enumvalue" in doxygen xml output
-
+.. warning::
+   doxygenenumvalue: Cannot find enumvalue "made_up_enumvalue" in doxygen xml output

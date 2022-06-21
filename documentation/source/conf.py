@@ -34,6 +34,19 @@ extensions = ["breathe", "sphinx.ext.mathjax", "sphinx.ext.ifconfig", "sphinx.ex
 read_the_docs_build = os.environ.get("READTHEDOCS", None) == "True"
 travis_build = os.environ.get("TRAVIS_CI", None) == "True"
 
+# Get version of Doxygen and save it as a tuple
+
+doxygen_test = subprocess.run(["doxygen", "--version"], capture_output=True)
+if doxygen_test.returncode < 0:
+    raise RuntimeError(
+        "doxygen --version reported the following error:\n\t"
+        + str(doxygen_test.stderr, encoding="utf-8")
+    )
+doxygen_version = tuple(
+    int(x) for x in str(doxygen_test.stdout, encoding="utf-8").split()[0].split(".")
+)
+print("Using Doxygen v%d.%d.%d" % doxygen_version)
+
 # Get a description of the current position. Use Popen for 2.6 compat
 git_tag = subprocess.Popen(["git", "describe", "--tags"], stdout=subprocess.PIPE).communicate()[0]
 
@@ -125,9 +138,7 @@ spelling_lang = "en_US"
 # Set path for mathjax js to a https URL as sometimes the Breathe docs are displayed under https
 # and we can't load an http mathjax file from an https view of the docs. So we change to a https
 # mathjax file which we can load from http or https. We break the url over two lines.
-mathjax_path = (
-    "https://c328740.ssl.cf1.rackcdn.com/" "mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"
-)
+mathjax_path = "https://cdn.jsdelivr.net/npm/mathjax@2/MathJax.js?config=TeX-AMS-MML_HTMLorMML"
 
 
 # Add any paths that contain templates here, relative to this directory.
@@ -401,3 +412,4 @@ def setup(app):
     app.connect("builder-inited", generate_doxygen_xml)
 
     app.add_config_value("documentation_build", "development", True)
+    app.add_config_value("doxygen_version", (0, 0, 0), "env")

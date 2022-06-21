@@ -17,25 +17,31 @@ Class Example
 
 .. cpp:namespace:: @ex_domains_class
 
-Given the following Breathe directives::
+Given the following Breathe directives:
 
-   .. doxygenclass:: testnamespace::NamespacedClassTest
+.. code-block:: rst
+
+   .. doxygenclass:: TestNamespaceClasses::NamespacedClassTest
       :path: ../../examples/specific/class/xml
 
 Which create formatted output like:
 
-   .. doxygenclass:: testnamespace::NamespacedClassTest
+   .. doxygenclass:: TestNamespaceClasses::NamespacedClassTest
       :path: ../../examples/specific/class/xml
 
-We can refer to **NamespacedClassTest** using:: 
+We can refer to **NamespacedClassTest** using:
 
-   :cpp:class:`testnamespace::NamespacedClassTest`
-   
-which renders as :cpp:class:`testnamespace::NamespacedClassTest`, or using::
+.. code-block:: rst
 
-   :cpp:class:`another reference <testnamespace::NamespacedClassTest>`
-   
-which renders as: :cpp:class:`another reference <testnamespace::NamespacedClassTest>`.
+   :cpp:class:`TestNamespaceClasses::NamespacedClassTest`
+
+which renders as :cpp:class:`TestNamespaceClasses::NamespacedClassTest`, or using:
+
+.. code-block:: rst
+
+   :cpp:class:`another reference <TestNamespaceClasses::NamespacedClassTest>`
+
+which renders as: :cpp:class:`another reference <TestNamespaceClasses::NamespacedClassTest>`.
 
 Inner Class Example
 -------------------
@@ -57,7 +63,7 @@ Which create formatted output like:
 We can refer to **OuterClass::InnerClass** using::
 
    :cpp:class:`OuterClass::InnerClass`
-   
+
 which renders as :cpp:class:`OuterClass::InnerClass`.
 
 Function Examples
@@ -65,9 +71,11 @@ Function Examples
 
 .. cpp:namespace:: @ex_domains_function
 
-Given the following Breathe directives::
+Given the following Breathe directives:
 
-   .. doxygenfunction:: testnamespace::NamespacedClassTest::function
+.. code-block:: rst
+
+   .. doxygenfunction:: TestNamespaceClasses::NamespacedClassTest::function
       :path: ../../examples/specific/class/xml
 
    .. doxygenfunction:: frob_foos
@@ -75,31 +83,39 @@ Given the following Breathe directives::
 
 Which create formatted output like:
 
-   .. doxygenfunction:: testnamespace::NamespacedClassTest::function
+   .. doxygenfunction:: TestNamespaceClasses::NamespacedClassTest::function
       :path: ../../examples/specific/class/xml
 
    .. doxygenfunction:: frob_foos
       :path: ../../examples/specific/alias/xml
 
-We can refer to **function** using:: 
+We can refer to **namespaceFunc** using:
 
-   :cpp:func:`testnamespace::NamespacedClassTest::function()`
-   
-which renders as :cpp:func:`testnamespace::NamespacedClassTest::function()`, or using::
+.. code-block:: rst
 
-   :cpp:func:`another reference <testnamespace::NamespacedClassTest::function()>`
-   
-which renders as: :cpp:func:`another reference <testnamespace::NamespacedClassTest::function()>`.
+   :cpp:func:`TestNamespaceFunction::namespaceFunc()`
+
+which renders as :cpp:func:`TestNamespaceFunction::namespaceFunc()`, or using:
+
+.. code-block:: rst
+
+   :cpp:func:`another reference <namespaceFunc()>`
+
+which renders as: :cpp:func:`another reference <TestNamespaceFunction::namespaceFunc()>`.
 Note the use of the **cpp** domain.
 
-And we can refer to **frob_foos** using:: 
-   
+And we can refer to **frob_foos** using:
+
+.. code-block:: rst
+
    :c:func:`frob_foos()`
 
-which renders as: :c:func:`frob_foos()`, or using::
+which renders as: :c:func:`frob_foos()`, or using:
 
-   :c:func:`another reference <frob_foos()>` 
-   
+.. code-block:: rst
+
+   :c:func:`another reference <frob_foos()>`
+
 which renders as: :c:func:`another reference <frob_foos()>`. Note the use of the **c** domain.
 
 Typedef Examples
@@ -107,12 +123,14 @@ Typedef Examples
 
 .. cpp:namespace:: @ex_domains_typedef
 
-Given the following Breathe directives::
+Given the following Breathe directives:
+
+.. code-block:: rst
 
    .. doxygentypedef:: TestTypedef
       :path: ../../examples/specific/typedef/xml
 
-   .. doxygentypedef:: testnamespace::AnotherTypedef
+   .. doxygennamespace:: TypeDefNamespace
       :path: ../../examples/specific/typedef/xml
 
    .. doxygenclass:: TestClass
@@ -124,22 +142,28 @@ which create formatted output like:
    .. doxygentypedef:: TestTypedef
       :path: ../../examples/specific/typedef/xml
 
-   .. doxygentypedef:: testnamespace::AnotherTypedef
+   .. doxygennamespace:: TypeDefNamespace
       :path: ../../examples/specific/typedef/xml
 
    .. doxygenclass:: TestClass
       :path: ../../examples/specific/typedef/xml
       :members:
 
-We can refer to **TestTypedef** using::
+We can refer to **TestTypedef** using:
+
+.. code-block:: rst
 
    :cpp:type:`TestTypedef`
-   
-which renders as :cpp:type:`TestTypedef`, to **testnamespace::AnotherTypedef** using::
 
-   :cpp:type:`testnamespace::AnotherTypedef`
+which renders as :cpp:type:`TestTypedef`, to **TypeDefNamespace::AnotherTypedef** using:
 
-which renders as :cpp:type:`testnamespace::AnotherTypedef` and to **TestClass::MemberTypedef** using::
+.. code-block:: rst
+
+   :cpp:type:`TypeDefNamespace::AnotherTypedef`
+
+which renders as :cpp:type:`TypeDefNamespace::AnotherTypedef` and to **TestClass::MemberTypedef** using:
+
+.. code-block:: rst
 
    :cpp:type:`TestClass::MemberTypedef`
 
@@ -150,12 +174,14 @@ Enum Value Examples
 
 .. cpp:namespace:: @ex_domains_enum
 
-Given the following Breathe directives::
+Given the following Breathe directives:
+
+.. code-block:: rst
 
    .. doxygenenumvalue:: VALUE
       :path: ../../examples/specific/enum/xml
 
-   .. doxygenenumvalue:: testnamespace::FIRST
+   .. doxygenenumvalue:: TestEnumNamespace::FIRST
       :path: ../../examples/specific/enum/xml
 
 Which create formatted output like:
@@ -163,15 +189,19 @@ Which create formatted output like:
    .. doxygenenumvalue:: VALUE
       :path: ../../examples/specific/enum/xml
 
-   .. doxygenenumvalue:: testnamespace::FIRST
+   .. doxygenenumvalue:: TestEnumNamespace::FIRST
       :path: ../../examples/specific/enum/xml
 
-We can refer to **VALUE** using::
+We can refer to **VALUE** using:
+
+.. code-block:: rst
 
    :cpp:enumerator:`VALUE`
-   
-which renders as :cpp:enumerator:`VALUE` and to **testnamespace::FIRST** using ::
 
-   :cpp:enumerator:`testnamespace::FIRST`
+which renders as :cpp:enumerator:`VALUE` and to **TestEnumNamespace::FIRST** using:
 
-which renders as :cpp:enumerator:`testnamespace::FIRST`.
+.. code-block:: rst
+
+   :cpp:enumerator:`TestEnumNamespace::FIRST`
+
+which renders as :cpp:enumerator:`TestEnumNamespace::FIRST`.

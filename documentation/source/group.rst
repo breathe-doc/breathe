@@ -44,7 +44,7 @@ options.
 
 If you would like to always specify some combination of ``members``,
 ``protected-members``, ``private-members`` and ``undoc-members`` then you can
-use the :ref:`breathe_default_members <breathe-default-members>` configuration
+use the :confval:`breathe_default_members` configuration
 variable to set it in the ``conf.py``.
 
 ``inner``
@@ -94,11 +94,12 @@ Produces this output:
 .. doxygengroup:: mygroup
    :project: group
    :content-only:
+   :no-link:
 
 .. note::
 
    As you can see from the output, section headings like 'Functions' are missing
-   from the :content-only: display. This is due to an implementation detail. If
+   from the ``:content-only:`` display. This is due to an implementation detail. If
    post an issue on github if you'd like it addressed.
 
 
@@ -112,7 +113,7 @@ classes. The output for any class in the group should be the same as if it had
 be produced by the :ref:`doxygenclass directive <class-example>` with the
 ``members`` option specified.
 
-::
+.. code-block:: rst
 
    .. doxygengroup:: mygroup
       :project: group
@@ -123,7 +124,7 @@ It produces this output:
 .. doxygengroup:: mygroup
    :project: group
    :members:
-
+   :no-link:
 
 Protected Members Example
 -------------------------
@@ -135,7 +136,7 @@ members of any classes. The output for any class in the group should be the same
 as if it had be produced by the :ref:`doxygenclass directive <class-example>`
 with the ``protected-members`` option specified.
 
-::
+.. code-block:: rst
 
    .. doxygengroup:: mygroup
       :project: group
@@ -146,7 +147,7 @@ It produces this output:
 .. doxygengroup:: mygroup
    :project: group
    :protected-members:
-
+   :no-link:
 
 Private-Members Example
 -----------------------
@@ -169,7 +170,7 @@ Produces this output:
 .. doxygengroup:: mygroup
    :project: group
    :private-members:
-
+   :no-link:
 
 Undocumented Members Example
 ----------------------------
@@ -193,6 +194,7 @@ Produces this output:
    :project: group
    :private-members:
    :undoc-members:
+   :no-link:
 
 .. note::
 
@@ -219,7 +221,7 @@ Produces this output:
 .. doxygengroup:: mygroup
    :project: group
    :inner:
-
+   :no-link:
 
 Outline Example
 ---------------
@@ -242,7 +244,7 @@ It produces this output:
    :project: group
    :members:
    :outline:
-
+   :no-link:
 
 Failing Example
 ---------------
@@ -258,6 +260,6 @@ This intentionally fails:
 
 It produces the following warning message:
 
-.. warning:: Cannot find file "madeupgroup" in doxygen xml output for project
-             "group" from directory: ../../examples/specific/group/xml/
-
+.. warning::
+   Cannot find file "madeupgroup" in doxygen xml output for project
+   "group" from directory: ../../examples/specific/group/xml/

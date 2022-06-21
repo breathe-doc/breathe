@@ -2,7 +2,9 @@
 #
 
 # You can set these variables from the command line.
-SPHINXOPTS   ?= -vn
+SPHINXOPTS   ?= -v -W -E
+# -n triggers an additional 100+ warnings (all about undefined references) that -W treats as errors.
+# these extraneous warnings are ignored because some doc pages have to avoid duplicate IDs
 SPHINXBUILD   = sphinx-build
 PAPER         =
 BUILDDIR     ?= build
@@ -181,4 +183,3 @@ spelling:
 	$(SPHINXBUILD) -b spelling -N $(ALLSPHINXOPTS) $(BUILDDIR)/spelling
 	@echo
 	@echo "Build finished. The spelling files are in $(BUILDDIR)/spelling."
-

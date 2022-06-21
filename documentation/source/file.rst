@@ -69,7 +69,9 @@ Example
 
 .. cpp:namespace:: @ex_file_example
 
-This should work::
+This should work:
+
+.. code-block:: rst
 
    .. doxygenfile:: nutshell.h
       :project: nutshell
@@ -87,7 +89,9 @@ Example with Selected and Ordered Sections
 .. cpp:namespace:: @ex_file_section
 
 The following will only show the **briefdescription** and **public-type**
-sections, in that order::
+sections, in that order:
+
+.. code-block:: rst
 
    .. doxygenfile:: nutshell.h
       :project: nutshell
@@ -100,13 +104,16 @@ It produces this output:
 .. doxygenfile:: nutshell.h
    :project: nutshell
    :sections: briefdescription innerclass public-type
+   :no-link:
 
 Example with Nested Namespaces
 ------------------------------
 
 .. cpp:namespace:: @ex_file_namespace
 
-This should work::
+This should work:
+
+.. code-block:: rst
 
    .. doxygenfile:: namespacefile.h
       :project: namespace
@@ -126,12 +133,16 @@ Example for Multiple Files
 
 When there are multiple files with the same name in the project, you need to be
 more specific with the filename you provide. For example, in a project with the
-following two files::
+following two files:
+
+.. code-block:: text
 
    /some/long/project/path/parser/Util.h
    /some/long/project/path/finder/Util.h
 
-You should specify::
+You should specify:
+
+.. code-block:: rst
 
    .. doxygenfile:: parser/Util.h
 
@@ -144,11 +155,14 @@ Failing Example
 
 .. cpp:namespace:: @ex_file_failing
 
-This intentionally fails::
+This intentionally fails:
+
+.. code-block:: rst
 
    .. doxygenfile:: made_up_file.h
       :project: nutshell
 
 It produces the following warning message:
 
-.. warning:: Cannot find file "made_up_file.h" in doxygen xml output for project "nutshell" from directory: ../../examples/specific/nutshell/xml/
+.. warning::
+   Cannot find file "made_up_file.h" in doxygen xml output for project "nutshell" from directory: ../../examples/specific/nutshell/xml/

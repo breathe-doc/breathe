@@ -20,7 +20,9 @@ Working Example
 
 .. cpp:namespace:: @ex_function_example
 
-This should work::
+This should work:
+
+.. code-block:: rst
 
    .. doxygenfunction:: open
       :project: structcmd
@@ -35,7 +37,9 @@ Separated Declaration & Implementation Example
 
 .. cpp:namespace:: @ex_function_separated
 
-This should work::
+This should work:
+
+.. code-block:: rst
 
    .. doxygenfunction:: open_di
       :project: decl_impl
@@ -50,12 +54,14 @@ Failing Example
 
 .. cpp:namespace:: @ex_function_failing
 
-This intentionally fails::
+This intentionally fails:
+
+.. code-block:: rst
 
    .. doxygenfunction:: made_up_function
       :project: structcmd
 
 It produces the following warning message:
 
-.. warning:: doxygenfunction: Cannot find function "made_up_function" in doxygen xml output
-
+.. warning::
+   doxygenfunction: Cannot find function "made_up_function" in doxygen xml output
