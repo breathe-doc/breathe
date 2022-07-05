@@ -5,7 +5,10 @@ channels:
 dependencies:
   # doxygen versions available from conda forge are listed at
   # https://anaconda.org/conda-forge/doxygen/files
-  # 
+  #
   # - doxygen=1.9.4 # to specify a specific version of doxygen
   # we'll be using the latest available
   - doxygen
+  - pip
+  - pip:
+    - -r ../requirements/development.txt

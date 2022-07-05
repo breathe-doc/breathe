@@ -2,10 +2,6 @@ version: 2
 
 python:
   version: 3
-  install:
-    - requirements: requirements/development.txt
-    - method: pip
-      path: .
 
 sphinx:
   builder: html
