@@ -1,4 +1,3 @@
-
 /* -- breathe specific styles ----------------------------------------------- */
 
 /* So enum value descriptions are displayed inline to the item */
@@ -9,4 +8,106 @@
 /* So parameter descriptions are displayed inline to the item */
 .breatheparameterlist li tt + p {
   display: inline;
+}
+
+:root {
+  --color-brand-primary-light: hsl(205deg, 52%, 39%);
+  --color-brand-primary-dark: hsl(205deg, 65%, 65%);
+  --breathe-str-char-color-dark: hsl(41, 85%, 46%);
+  --breathe-str-char-color-light: hsl(41, 89%, 37%);
+  --breathe-keyword-type-color-dark: hsl(256, 100%, 65%);
+  --breathe-keyword-type-color-light: hsl(276, 85%, 29%);
+  --breathe-number-color-dark: hsl(157, 81%, 50%);
+  --breathe-number-color-light: hsl(157, 93%, 32%);
+  --breathe-name-color-dark: hsl(88, 72%, 56%);
+  --breathe-name-color-light: hsl(88, 100%, 28%);
+}
+
+/* ************************************************** */
+/* rules to uniform color scheme with breathe-doc.org */
+
+body {
+  --color-brand-primary: var(--color-brand-primary-light);
+  --color-brand-content: var(--color-brand-primary-light);
+  --breathe-str-char-color: var(--breathe-str-char-color-light);
+  --breathe-keyword-type-color: var(--breathe-keyword-type-color-light);
+  --breathe-number-color: var(--breathe-number-color-light);
+  --breathe-name-color: var(--breathe-name-color-light);
+}
+
+/* Enable dark-mode, if requested. */
+body[data-theme="dark"] {
+  --color-brand-primary: var(--color-brand-primary-dark);
+  --color-brand-content: var(--color-brand-primary-dark);
+  --breathe-str-char-color: var(--breathe-str-char-color-dark);
+  --breathe-keyword-type-color: var(--breathe-keyword-type-color-dark);
+  --breathe-number-color: var(--breathe-number-color-dark);
+  --breathe-name-color: var(--breathe-name-color-dark);
+}
+
+/* Enable dark mode, unless explicitly told to avoid. */
+@media (prefers-color-scheme: dark) {
+  body:not([data-theme="light"]) {
+    --color-brand-primary: var(--color-brand-primary-dark);
+    --color-brand-content: var(--color-brand-primary-dark);
+    --breathe-str-char-color: var(--breathe-str-char-color-dark);
+    --breathe-keyword-type-color: var(--breathe-keyword-type-color-dark);
+    --breathe-number-color: var(--breathe-number-color-dark);
+    --breathe-name-color: var(--breathe-name-color-dark);
+  }
+}
+
+.mobile-header {
+  /* background-color: var(--color-header-background); */
+  background-color: #003c66;
+}
+
+.mobile-header .toc-overlay-icon .icon {
+  /* color: var(--color-foreground-secondary); */
+  color: white;
+}
+
+.mobile-header .header-center a {
+  /* color: var(--color-header-text); */
+  color: white;
+}
+
+.mobile-header .theme-toggle svg {
+  /* color: var(--color-foreground-primary); */
+  color: white;
+}
+
+/* C++ specific styling */
+
+.highlight {
+  /* desaturate that ugly yellow color used by most other theme's code snippets */
+  background-color: var(--color-api-background); /* for light theme only */
+}
+
+.sig.c   .k, .sig.c   .kt,
+.sig.cpp .k, .sig.cpp .kt {
+  color: var(--breathe-keyword-type-color);
+}
+
+.sig.c   .m,
+.sig.cpp .m {
+  color: var(--breathe-number-color);
+}
+
+.sig.c   .s, .sig.c   .sc,
+.sig.cpp .s, .sig.cpp .sc {
+  color: var(--breathe-str-char-color);
+}
+
+.sig > .n {
+  color: var(--breathe-name-color);
+}
+
+/*
+bugfix for multi-lined signatures
+(see https://github.com/pradyunsg/furo/discussions/427 )
+*/
+.sig {
+  padding-left: 0.5em;
+  text-indent: revert;
 }

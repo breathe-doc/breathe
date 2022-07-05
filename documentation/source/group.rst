@@ -54,7 +54,6 @@ variable to set it in the ``conf.py``.
 
 .. _doxygen grouping documentation: https://www.doxygen.nl/manual/grouping.html
 
-.. contents::
 
 
 Basic Example

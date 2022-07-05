@@ -45,8 +45,6 @@ variable to set it in the ``conf.py``.
 The output includes references to any base classes and derived classes of the
 specified class.
 
-.. contents::
-
 
 Basic Example
 -------------

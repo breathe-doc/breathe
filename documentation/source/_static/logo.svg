@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+<svg width="500" height="500" version="1.1" viewBox="0 0 132.29 132.29" xmlns="http://www.w3.org/2000/svg">
+ <defs>
+  <linearGradient id="linearGradient863" x1="60.598" x2="60.598" y1="130.21" y2="24.658" gradientUnits="userSpaceOnUse">
+   <stop stop-color="#4782ae" offset="0"/>
+   <stop stop-color="#d6e5ef" offset="1"/>
+  </linearGradient>
+ </defs>
+ <g transform="matrix(.96854 0 0 .96859 2.7506 -.28411)" stroke-width="1.0325">
+  <circle cx="65.454" cy="74.612" r="52.594" fill="none" stroke="#ced6d7" stroke-linecap="round" stroke-linejoin="round" stroke-width=".81951"/>
+  <circle cx="65.454" cy="74.612" r="44.738" fill="none" stroke="#ced6d7" stroke-linecap="round" stroke-linejoin="round" stroke-width=".81951"/>
+  <path d="m14.569 97.403c8.0095 17.537 24.454 29.831 43.54 32.551 4.3705 0.62286 11.576 0.62595 15.947 7e-3 19.106-2.7062 35.572-15.005 43.588-32.558 1.834-4.0156-0.78116-7.4867-5.1994-7.4867h-4.3699c-4.4183 0-9.475 3.3171-12.158 6.8168-5.4199 7.0691-13.19 11.996-21.895 13.883-4.3098 0.93438-11.569 0.93438-15.878 0-8.7055-1.8875-16.476-6.8143-21.895-13.883-2.6832-3.4997-7.7399-6.8168-12.158-6.8168h-4.3213c-4.4183 0-7.0335 3.4711-5.1994 7.4867z" fill="url(#linearGradient863)"/>
+  <g fill="#71a1c5">
+   <circle cx="24.82" cy="65.449" r="3.4954"/>
+   <circle cx="18.787" cy="80.168" r="5.4648"/>
+   <circle cx="104.11" cy="76.217" r="3.4954"/>
+   <circle cx="105.2" cy="49.262" r="3.4954"/>
+   <circle cx="27.911" cy="49.305" r="3.4954"/>
+   <circle cx="17.293" cy="56.258" r="3.0025"/>
+   <circle cx="114.94" cy="84.31" r="3.4954"/>
+  </g>
+  <g fill="#82accc">
+   <circle cx="55.866" cy="17.826" r="1.5789"/>
+   <circle cx="71.561" cy="12.748" r="1.5789"/>
+   <circle cx="44.99" cy="35.249" r="1.5789"/>
+   <circle cx="29.001" cy="32.979" r="1.5789"/>
+   <circle cx="71.755" cy="25.416" r="1.9259"/>
+   <circle cx="89.927" cy="28.528" r="1.9259"/>
+   <circle cx="93.483" cy="41.779" r="1.9259"/>
+   <circle cx="110.94" cy="58.799" r="1.9259"/>
+   <circle cx="113.08" cy="72.962" r="1.9259"/>
+  </g>
+  <g fill="#93b8d3">
+   <circle cx="43.007" cy="22.687" r=".79142"/>
+   <circle cx="62.554" cy="13.926" r=".79142"/>
+   <circle cx="67.844" cy="8.2041" r=".79142"/>
+   <circle cx="58.564" cy="2.7051" r=".79142"/>
+   <circle cx="58.816" cy="30.274" r=".79142"/>
+   <circle cx="104.8" cy="39.681" r=".79142"/>
+   <circle cx="105.28" cy="65.375" r=".79142"/>
+   <circle cx="109.7" cy="80.697" r=".79142"/>
+   <circle cx="25.323" cy="71.549" r=".79142"/>
+   <circle cx="15.745" cy="64.828" r=".79142"/>
+   <circle cx="82.057" cy="34.274" r=".79142"/>
+  </g>
+  <path transform="rotate(51.592)" d="m158.71-5.3528a59.249 59.249 0 0 1-43.914 57.23" fill="none" stroke="#3f7ca4" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.7317"/>
+ </g>
+</svg>
