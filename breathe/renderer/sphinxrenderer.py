@@ -616,7 +616,7 @@ class SphinxRenderer:
             _debug_indent += 1
 
         self.nesting_level += 1
-        nodes = directive.run()
+        nodes_ = directive.run()
         self.nesting_level -= 1
 
         # TODO: the directive_args seems to be reused between different run_directives
@@ -632,9 +632,9 @@ class SphinxRenderer:
         # In some cases of errors with a declaration there are no nodes
         # (e.g., variable in function), so perhaps skip (see #671).
         # If there are nodes, there should be at least 2.
-        if len(nodes) != 0:
-            assert len(nodes) >= 2, nodes
-            rst_node = nodes[1]
+        if len(nodes_) != 0:
+            assert len(nodes_) >= 2, nodes_
+            rst_node = nodes_[1]
             finder = NodeFinder(rst_node.document)
             rst_node.walk(finder)
 
@@ -642,7 +642,7 @@ class SphinxRenderer:
 
             if self.context.child:
                 signode.children = [n for n in signode.children if not n.tagname == "desc_addname"]
-        return nodes
+        return nodes_
 
     def handle_declaration(
         self,
@@ -809,8 +809,8 @@ class SphinxRenderer:
     def create_template_prefix(self, decl) -> str:
         if not decl.templateparamlist:
             return ""
-        nodes = self.render(decl.templateparamlist)
-        return "template<" + "".join(n.astext() for n in nodes) + ">"
+        nodes_ = self.render(decl.templateparamlist)
+        return "template<" + "".join(n.astext() for n in nodes_) + ">"
 
     def run_domain_directive(self, kind, names):
         domain_directive = DomainDirectiveFactory.create(
@@ -831,13 +831,13 @@ class SphinxRenderer:
             )
             _debug_indent += 1
 
-        nodes = domain_directive.run()
+        nodes_ = domain_directive.run()
 
         if config.breathe_debug_trace_directives:
             _debug_indent -= 1
 
         # Filter out outer class names if we are rendering a member as a part of a class content.
-        rst_node = nodes[1]
+        rst_node = nodes_[1]
         finder = NodeFinder(rst_node.document)
         rst_node.walk(finder)
 
@@ -845,7 +845,7 @@ class SphinxRenderer:
 
         if len(names) > 0 and self.context.child:
             signode.children = [n for n in signode.children if not n.tagname == "desc_addname"]
-        return nodes
+        return nodes_
 
     def create_doxygen_target(self, node):
         """Can be overridden to create a target node which uses the doxygen refid information
@@ -970,7 +970,7 @@ class SphinxRenderer:
         obj_type = kwargs.get("objtype", None)
         if obj_type is None:
             obj_type = node.kind
-        nodes = self.run_domain_directive(obj_type, [declaration.replace("\n", " ")])
+        nodes_ = self.run_domain_directive(obj_type, [declaration.replace("\n", " ")])
         if self.app.env.config.breathe_debug_trace_doxygen_ids:
             target = self.create_doxygen_target(node)
             if len(target) == 0:
@@ -978,7 +978,7 @@ class SphinxRenderer:
             else:
                 print("{}Doxygen target (old): {}".format("  " * _debug_indent, target[0]["ids"]))
 
-        rst_node = nodes[1]
+        rst_node = nodes_[1]
         finder = NodeFinder(rst_node.document)
         rst_node.walk(finder)
 
@@ -994,7 +994,7 @@ class SphinxRenderer:
             target = self.create_doxygen_target(node)
         signode.insert(0, target)
         contentnode.extend(description)
-        return nodes
+        return nodes_
 
     def visit_doxygen(self, node) -> List[Node]:
         nodelist: List[Node] = []
@@ -1033,8 +1033,8 @@ class SphinxRenderer:
                 rendered_data = self.render(file_data, parent_context)
                 contentnode.extend(rendered_data)
 
-            nodes = self.handle_declaration(nodeDef, declaration, content_callback=content)
-        return nodes
+            nodes_ = self.handle_declaration(nodeDef, declaration, content_callback=content)
+        return nodes_
 
     def visit_class(self, node) -> List[Node]:
         # Read in the corresponding xml file and process
@@ -1091,16 +1091,16 @@ class SphinxRenderer:
 
             assert kind in ("class", "struct", "interface")
             display_obj_type = "interface" if kind == "interface" else None
-            nodes = self.handle_declaration(
+            nodes_ = self.handle_declaration(
                 nodeDef, declaration, content_callback=content, display_obj_type=display_obj_type
             )
             if "members-only" in self.context.directive_args[2]:
-                assert len(nodes) >= 2
-                assert isinstance(nodes[1], addnodes.desc)
-                assert len(nodes[1]) >= 2
-                assert isinstance(nodes[1][1], addnodes.desc_content)
-                return nodes[1][1].children
-        return nodes
+                assert len(nodes_) >= 2
+                assert isinstance(nodes_[1], addnodes.desc)
+                assert len(nodes_[1]) >= 2
+                assert isinstance(nodes_[1][1], addnodes.desc_content)
+                return nodes_[1][1].children
+        return nodes_
 
     def visit_namespace(self, node) -> List[Node]:
         # Read in the corresponding xml file and process
@@ -1131,10 +1131,10 @@ class SphinxRenderer:
                 contentnode.extend(rendered_data)
 
             display_obj_type = "namespace" if self.get_domain() != "py" else "module"
-            nodes = self.handle_declaration(
+            nodes_ = self.handle_declaration(
                 nodeDef, declaration, content_callback=content, display_obj_type=display_obj_type
             )
-        return nodes
+        return nodes_
 
     def visit_compound(self, node, render_empty_node=True, **kwargs) -> List[Node]:
         # Read in the corresponding xml file and process
@@ -1188,8 +1188,8 @@ class SphinxRenderer:
 
             self.context.directive_args[1] = [arg]
 
-            nodes = self.run_domain_directive(kind, self.context.directive_args[1])
-            rst_node = nodes[1]
+            nodes_ = self.run_domain_directive(kind, self.context.directive_args[1])
+            rst_node = nodes_[1]
 
             finder = NodeFinder(rst_node.document)
             rst_node.walk(finder)
@@ -1200,14 +1200,14 @@ class SphinxRenderer:
                 finder.declarator[0] = addnodes.desc_annotation(kind + " ", kind + " ")
 
             rst_node.children[0].insert(0, doxygen_target)
-            return nodes, finder.content
+            return nodes_, finder.content
 
         refid = self.get_refid(node.refid)
         render_sig = kwargs.get("render_signature", render_signature)
         with WithContext(self, new_context):
             # Pretend that the signature is being rendered in context of the
             # definition, for proper domain detection
-            nodes, contentnode = render_sig(
+            nodes_, contentnode = render_sig(
                 file_data, self.target_handler.create_target(refid), name, kind
             )
 
@@ -1216,7 +1216,7 @@ class SphinxRenderer:
                 contentnode.extend(self.render(include, new_context.create_child_context(include)))
 
         contentnode.extend(rendered_data)
-        return nodes
+        return nodes_
 
     def visit_file(self, node) -> List[Node]:
         def render_signature(file_data, doxygen_target, name, kind):
@@ -2000,8 +2000,8 @@ class SphinxRenderer:
                 elements.append(name)
                 elements.append(node.get_argsstring())
                 declaration = " ".join(elements)
-            nodes = self.handle_declaration(node, declaration)
-            return nodes
+            nodes_ = self.handle_declaration(node, declaration)
+            return nodes_
         else:
             # Get full function signature for the domain directive.
             param_list = []
@@ -2036,7 +2036,7 @@ class SphinxRenderer:
             self.context = cast(RenderContext, self.context)
             self.context.directive_args[1] = [signature]
 
-            nodes = self.run_domain_directive(node.kind, self.context.directive_args[1])
+            nodes_ = self.run_domain_directive(node.kind, self.context.directive_args[1])
 
             assert self.app.env is not None
             if self.app.env.config.breathe_debug_trace_doxygen_ids:
@@ -2048,7 +2048,7 @@ class SphinxRenderer:
                         "{}Doxygen target (old): {}".format("  " * _debug_indent, target[0]["ids"])
                     )
 
-            rst_node = nodes[1]
+            rst_node = nodes_[1]
             finder = NodeFinder(rst_node.document)
             rst_node.walk(finder)
 
@@ -2059,7 +2059,7 @@ class SphinxRenderer:
             rst_node.children[0].insert(0, target)
 
             finder.content.extend(self.description(node))
-            return nodes
+            return nodes_
 
     def visit_define(self, node) -> List[Node]:
         declaration = node.name
