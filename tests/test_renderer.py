@@ -109,6 +109,12 @@ class WrappedCompoundDef(compounddefTypeSub, WrappedDoxygenNode):
         WrappedDoxygenNode.__init__(self, compounddefTypeSub, **kwargs)
 
 
+class MockMemo:
+    def __init__(self):
+        self.title_styles = ""
+        self.section_level = ""
+
+
 class MockState:
     def __init__(self, app):
         from breathe.project import ProjectInfoFactory
@@ -123,7 +129,11 @@ class MockState:
         settings.env = env
         self.document = utils.new_document("", settings)
 
-    def nested_parse(self, content, content_offset, contentnode):
+        # In sphinx 5.3.0 the method state.nested_parse is not called directly
+        # so this memo object should exists here
+        self.memo = MockMemo()
+
+    def nested_parse(self, content, content_offset, contentnode, match_titles=1):
         pass
 
 
