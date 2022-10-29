@@ -15,9 +15,9 @@ jobs:
           - '4.3.2'
           - '4.5.0'
           - '5.0.2'
-          - '5.1.0'
-          - git+https://github.com/sphinx-doc/sphinx.git@5.0.x
-          - git+https://github.com/sphinx-doc/sphinx.git@5.x
+          - '5.1.1',
+          - '5.3.0',
+          - '6.0.0b2',
           - git+https://github.com/sphinx-doc/sphinx.git@master
         exclude:
           # Since sphinx 7e68154e49fbb260f7ffee9791bfafdb7fd2e119 python 3.6
