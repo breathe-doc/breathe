@@ -7,6 +7,8 @@ Inspired by `Keepachangelog.com <http://keepachangelog.com/>`__.
 
   - Pull lone literal blocks in paragraphs up to produce correct doctree.
     `#833 <https://github.com/michaeljones/breathe/pull/833>`__
+  - Fix tests for changes in Sphinx 5.3.
+    `#865 <https://github.com/breathe-doc/breathe/pull/865>`__
 
 - 2022-06-20 - **Breathe v4.34.0**
 
