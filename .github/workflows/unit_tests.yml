@@ -7,7 +7,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ['3.6', '3.7', '3.8', '3.9', '3.10']
+        python-version: ['3.7', '3.8', '3.9', '3.10']
         sphinx-version:
           - '4.0.3'
           - '4.1.2'
@@ -19,10 +19,6 @@ jobs:
           - '5.3.0'
           - git+https://github.com/sphinx-doc/sphinx.git@master
         exclude:
-          # Since sphinx 7e68154e49fbb260f7ffee9791bfafdb7fd2e119 python 3.6
-          # support is removed. Breathe will probably also drop 3.6 soon.
-          - python-version: '3.6'
-            sphinx-version: git+https://github.com/sphinx-doc/sphinx.git@master
           # avoid bug in following configurations
           # sphinx/util/typing.py:37: in <module>
           #     from types import Union as types_Union
@@ -31,6 +27,9 @@ jobs:
             sphinx-version: '4.0.3'
           - python-version: '3.10'
             sphinx-version: '4.1.2'
+          # Sphinx has removed support for Python 3.7, Breathe will follow.
+          - python-version: '3.7'
+            sphinx-version: git+https://github.com/sphinx-doc/sphinx.git@master
 
     steps:
       - uses: actions/checkout@v2
