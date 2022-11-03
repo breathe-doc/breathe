@@ -9,6 +9,8 @@ Inspired by `Keepachangelog.com <http://keepachangelog.com/>`__.
     `#833 <https://github.com/michaeljones/breathe/pull/833>`__
   - Fix tests for changes in Sphinx 5.3.
     `#865 <https://github.com/breathe-doc/breathe/pull/865>`__
+  - Bump Python requirement to 3.7.
+    `#866 <https://github.com/breathe-doc/breathe/pull/866>`__
 
 - 2022-06-20 - **Breathe v4.34.0**
 
