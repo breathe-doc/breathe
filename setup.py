@@ -39,6 +39,7 @@ setup(
         "Development Status :: 4 - Beta",
         "Environment :: Console",
         "Environment :: Web Environment",
+        "Framework :: Sphinx :: Extension",
         "Intended Audience :: Developers",
         "Intended Audience :: Education",
         "License :: OSI Approved :: BSD License",
