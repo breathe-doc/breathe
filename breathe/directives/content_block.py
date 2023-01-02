@@ -28,6 +28,7 @@ class _DoxygenContentBlockDirective(BaseDirective):
         "undoc-members": flag,
         "no-link": flag,
         "desc-only": flag,
+        "sort": flag,
     }
     has_content = False
 

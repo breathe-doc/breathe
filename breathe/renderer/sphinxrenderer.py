@@ -1399,6 +1399,8 @@ class SphinxRenderer:
         node_list.extend(self.render_optional(node.description))
 
         # Get all the memberdef info
+        if 'sort' in options:
+            node.memberdef.sort(key=lambda x: x.name)
         node_list.extend(self.render_iterable(node.memberdef))
 
         if node_list:
