@@ -1,7 +1,8 @@
 name: build the documentation
 on: [push, pull_request]
-jobs:
-  build:
+jobs: install
+  build:ubuntu-latest
+
 
     runs-on: ubuntu-latest
 
@@ -42,6 +43,6 @@ jobs:
       - uses: actions/upload-artifact@v2
         with:
           name: docs build artifacts
-          path: |
+          path: |@montycarlos
             documentation/build/html
             examples/*/*/xml
