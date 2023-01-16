@@ -49,7 +49,7 @@ def _get_outdated(
         return []
 
     stale = []
-    for filename, info in app.env.breathe_file_state.items():  # type: ignore
+    for filename, info in app.env.breathe_file_state.items():
         old_mtime, docnames = info
         if _getmtime(filename) > old_mtime:
             stale.extend(docnames)
@@ -61,14 +61,14 @@ def _purge_doc(app: Sphinx, env: BuildEnvironment, docname: str) -> None:
         return
 
     toremove = []
-    for filename, info in app.env.breathe_file_state.items():  # type: ignore
+    for filename, info in app.env.breathe_file_state.items():
         _, docnames = info
         docnames.discard(docname)
         if not docnames:
             toremove.append(filename)
 
     for filename in toremove:
-        del app.env.breathe_file_state[filename]  # type: ignore
+        del app.env.breathe_file_state[filename]
 
 
 def setup(app: Sphinx):
