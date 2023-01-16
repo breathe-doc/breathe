@@ -649,10 +649,10 @@ class SphinxRenderer:
         node,
         declaration: str,
         *,
-        obj_type: str = None,
-        content_callback: ContentCallback = None,
-        display_obj_type: str = None,
-        declarator_callback: DeclaratorCallback = None,
+        obj_type: Optional[str] = None,
+        content_callback: Optional[ContentCallback] = None,
+        display_obj_type: Optional[str] = None,
+        declarator_callback: Optional[DeclaratorCallback] = None,
         options={},
     ) -> List[Node]:
         if obj_type is None:
