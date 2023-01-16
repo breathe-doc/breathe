@@ -10,7 +10,7 @@ jobs:
       - uses: actions/cache@v1
         with:
           path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ hashFiles('requirements/*.txt') }}
+          key: ${{ runner.os }}-pip-${{ hashFiles('pyproject.toml') }}
           restore-keys: |
             ${{ runner.os }}-pip-
 
@@ -19,9 +19,9 @@ jobs:
 
       - name: install dependencies
         run: |
-          pip install -r requirements/development.txt
           sudo apt-get -y update
           sudo apt-get -y install graphviz libclang1-11 libclang-cpp11
+          pip install -e .[dev]
 
       - name: install doxygen from SF binary archives
         env:

@@ -36,7 +36,7 @@ jobs:
       - uses: actions/cache@v1
         with:
           path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ hashFiles('requirements/*.txt') }}
+          key: ${{ runner.os }}-pip-${{ hashFiles('pyproject.toml') }}
           restore-keys: |
             ${{ runner.os }}-pip-
       - name: set up python ${{ matrix.python-version }}
@@ -54,7 +54,7 @@ jobs:
 
       - name: install dependencies
         run: |
-          pip install -r requirements/development.txt
+          pip install -e .[dev]
 
       - name: run the unit tests
         run: make dev-test

@@ -1,3 +1,76 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "breathe"
+dynamic = ["version"]
+authors = [
+    {name = "Michael Jones", email = "m.pricejones@gmail.com"},
+]
+description = "Sphinx Doxygen renderer"
+license = {text = "BSD-3-Clause"}
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Environment :: Console",
+    "Environment :: Web Environment",
+    "Framework :: Sphinx :: Extension",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Education",
+    "License :: OSI Approved :: BSD License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Topic :: Documentation",
+    "Topic :: Text Processing",
+    "Topic :: Utilities",
+]
+requires-python = ">=3.7"
+dependencies = [
+    "docutils>=0.12",
+    "Jinja2>=2.7.3",
+    "MarkupSafe>=0.23",
+    "Pygments>=1.6",
+    "Sphinx>=4.0,<6,!=5.0.0",
+]
+
+[project.optional-dependencies]
+lint = [
+    "black==22.3.0",
+    "flake8",
+    "mypy>=0.900",
+]
+test = [
+    "pytest",
+]
+dev = [
+    "breathe[lint,test]",
+    "furo",
+    "pip-tools>=0.3.5",
+    "types-docutils>=0.14,<0.18",
+    "types-Pygments",
+    "sphinx-copybutton",
+]
+
+[project.scripts]
+breathe-apidoc = "breathe.apidoc:main"
+
+[project.readme]
+text = """\
+Breathe is an extension to reStructuredText and Sphinx to be able to read and
+render `Doxygen <https://www.doxygen.nl>`__ xml output.
+"""
+content-type = "text/x-rst"
+
+[project.urls]
+Home = "https://www.breathe-doc.org/"
+Repository = "https://github.com/breathe-doc/breathe"
+
+[tool.setuptools.dynamic]
+version = {attr = "breathe.__init__.__version__"}
+
+[tool.setuptools.packages.find]
+include = ["breathe", "breathe.*"]
+
 [tool.black]
 line-length = 100
 extend-exclude = '''
