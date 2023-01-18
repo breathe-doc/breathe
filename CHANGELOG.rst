@@ -11,6 +11,10 @@ Inspired by `Keepachangelog.com <http://keepachangelog.com/>`__.
     `#865 <https://github.com/breathe-doc/breathe/pull/865>`__
   - Bump Python requirement to 3.7.
     `#866 <https://github.com/breathe-doc/breathe/pull/866>`__
+  - Support Sphinx 6.
+    `#885 <https://github.com/breathe-doc/breathe/pull/885>`__
+  - Support ``:sort:`` option to sort sections by name.
+    `#879 <https://github.com/breathe-doc/breathe/pull/879>`__
 
 - 2022-06-20 - **Breathe v4.34.0**
 
