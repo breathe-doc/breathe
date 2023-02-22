@@ -1,5 +1,5 @@
 from unittest import TestCase
-from xml.dom import minidom
+from lxml import etree
 
 from breathe.renderer.sphinxrenderer import get_param_decl, get_definition_without_template_args
 from breathe.parser.compoundsuper import memberdefType
@@ -45,11 +45,10 @@ class TestUtils(TestCase):
         </memberdef>
         """
 
-        doc = minidom.parseString(xml)
+        doc = etree.fromstring(xml)
 
         memberdef = memberdefType.factory()
-        for child in doc.documentElement.childNodes:
-            memberdef.buildChildren(child, "param")
+        memberdef.build(doc, 'memberdef')
 
         self.assertEqual(get_param_decl(memberdef.param[0]), "int a")
         self.assertEqual(get_param_decl(memberdef.param[1]), "float b")
