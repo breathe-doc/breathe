@@ -842,6 +842,9 @@ def raise_parse_error(node, msg):
 
 
 class MixedContainer:
+
+    node_type = "mixedcontainer"
+
     # Constants for category:
     CategoryNone = 0
     CategoryText = 1

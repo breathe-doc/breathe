@@ -63,6 +63,7 @@ SaveElementTreeNode = True
 
 
 class DoxygenTypeSub(supermod.DoxygenType):
+    node_type = "doxygendef"
     def __init__(self, version=None, lang=None, compounddef=None, **kwargs_):
         super(DoxygenTypeSub, self).__init__(version, lang, compounddef,  **kwargs_)
 supermod.DoxygenType.subclass = DoxygenTypeSub
@@ -70,6 +71,7 @@ supermod.DoxygenType.subclass = DoxygenTypeSub
 
 
 class compounddefTypeSub(supermod.compounddefType):
+    node_type = "compounddef"
     def __init__(self, id=None, kind=None, language=None, prot=None, final=None, inline=None, sealed=None, abstract=None, compoundname=None, title=None, basecompoundref=None, derivedcompoundref=None, includes=None, includedby=None, incdepgraph=None, invincdepgraph=None, innerdir=None, innerfile=None, innerclass=None, innerconcept=None, innernamespace=None, innerpage=None, innergroup=None, qualifier=None, templateparamlist=None, sectiondef=None, tableofcontents=None, requiresclause=None, initializer=None, briefdescription=None, detaileddescription=None, inheritancegraph=None, collaborationgraph=None, programlisting=None, location=None, listofallmembers=None, **kwargs_):
         super(compounddefTypeSub, self).__init__(id, kind, language, prot, final, inline, sealed, abstract, compoundname, title, basecompoundref, derivedcompoundref, includes, includedby, incdepgraph, invincdepgraph, innerdir, innerfile, innerclass, innerconcept, innernamespace, innerpage, innergroup, qualifier, templateparamlist, sectiondef, tableofcontents, requiresclause, initializer, briefdescription, detaileddescription, inheritancegraph, collaborationgraph, programlisting, location, listofallmembers,  **kwargs_)
 supermod.compounddefType.subclass = compounddefTypeSub
@@ -77,6 +79,7 @@ supermod.compounddefType.subclass = compounddefTypeSub
 
 
 class listofallmembersTypeSub(supermod.listofallmembersType):
+    node_type = "listofallmembers"
     def __init__(self, member=None, **kwargs_):
         super(listofallmembersTypeSub, self).__init__(member,  **kwargs_)
 supermod.listofallmembersType.subclass = listofallmembersTypeSub
@@ -84,6 +87,7 @@ supermod.listofallmembersType.subclass = listofallmembersTypeSub
 
 
 class memberRefTypeSub(supermod.memberRefType):
+    node_type = "memberref"
     def __init__(self, refid=None, prot=None, virt=None, ambiguityscope=None, scope=None, name=None, **kwargs_):
         super(memberRefTypeSub, self).__init__(refid, prot, virt, ambiguityscope, scope, name,  **kwargs_)
 supermod.memberRefType.subclass = memberRefTypeSub
@@ -98,6 +102,7 @@ supermod.docHtmlOnlyType.subclass = docHtmlOnlyTypeSub
 
 
 class compoundRefTypeSub(supermod.compoundRefType):
+    node_type = "compoundref"
     def __init__(self, refid=None, prot=None, virt=None, valueOf_=None, **kwargs_):
         super(compoundRefTypeSub, self).__init__(refid, prot, virt, valueOf_,  **kwargs_)
 supermod.compoundRefType.subclass = compoundRefTypeSub
@@ -105,6 +110,7 @@ supermod.compoundRefType.subclass = compoundRefTypeSub
 
 
 class reimplementTypeSub(supermod.reimplementType):
+    node_type = "reimplement"
     def __init__(self, refid=None, valueOf_=None, **kwargs_):
         super(reimplementTypeSub, self).__init__(refid, valueOf_,  **kwargs_)
 supermod.reimplementType.subclass = reimplementTypeSub
@@ -112,6 +118,7 @@ supermod.reimplementType.subclass = reimplementTypeSub
 
 
 class incTypeSub(supermod.incType):
+    node_type = "inc"
     def __init__(self, refid=None, local=None, valueOf_=None, **kwargs_):
         super(incTypeSub, self).__init__(refid, local, valueOf_,  **kwargs_)
 supermod.incType.subclass = incTypeSub
@@ -119,6 +126,7 @@ supermod.incType.subclass = incTypeSub
 
 
 class refTypeSub(supermod.refType):
+    node_type = "ref"
     def __init__(self, refid=None, prot=None, inline=None, valueOf_=None, **kwargs_):
         super(refTypeSub, self).__init__(refid, prot, inline, valueOf_,  **kwargs_)
 supermod.refType.subclass = refTypeSub
@@ -126,6 +134,7 @@ supermod.refType.subclass = refTypeSub
 
 
 class refTextTypeSub(supermod.refTextType):
+    node_type = "reftex"
     def __init__(self, refid=None, kindref=None, external=None, tooltip=None, valueOf_=None, **kwargs_):
         super(refTextTypeSub, self).__init__(refid, kindref, external, tooltip, valueOf_,  **kwargs_)
 supermod.refTextType.subclass = refTextTypeSub
@@ -140,6 +149,7 @@ supermod.MemberType.subclass = MemberTypeSub
 
 
 class sectiondefTypeSub(supermod.sectiondefType):
+    node_type = "sectiondef"
     def __init__(self, kind=None, header=None, description=None, memberdef=None, member=None, **kwargs_):
         super(sectiondefTypeSub, self).__init__(kind, header, description, memberdef, member,  **kwargs_)
 supermod.sectiondefType.subclass = sectiondefTypeSub
@@ -147,6 +157,7 @@ supermod.sectiondefType.subclass = sectiondefTypeSub
 
 
 class memberdefTypeSub(supermod.memberdefType):
+    node_type = "memberdef"
     def __init__(self, kind=None, id=None, prot=None, static=None, strong=None, const=None, explicit=None, inline=None, refqual=None, virt=None, volatile=None, mutable=None, noexcept=None, constexpr=None, readable=None, writable=None, initonly=None, settable=None, privatesettable=None, protectedsettable=None, gettable=None, privategettable=None, protectedgettable=None, final=None, sealed=None, new=None, add=None, remove=None, raise_=None, optional=None, required=None, accessor=None, attribute=None, property=None, readonly=None, bound=None, removable=None, constrained=None, transient=None, maybevoid=None, maybedefault=None, maybeambiguous=None, templateparamlist=None, type_=None, definition=None, argsstring=None, name=None, qualifiedname=None, read=None, write=None, bitfield=None, reimplements=None, reimplementedby=None, qualifier=None, param=None, enumvalue=None, requiresclause=None, initializer=None, exceptions=None, briefdescription=None, detaileddescription=None, inbodydescription=None, location=None, references=None, referencedby=None, **kwargs_):
         super(memberdefTypeSub, self).__init__(kind, id, prot, static, strong, const, explicit, inline, refqual, virt, volatile, mutable, noexcept, constexpr, readable, writable, initonly, settable, privatesettable, protectedsettable, gettable, privategettable, protectedgettable, final, sealed, new, add, remove, raise_, optional, required, accessor, attribute, property, readonly, bound, removable, constrained, transient, maybevoid, maybedefault, maybeambiguous, templateparamlist, type_, definition, argsstring, name, qualifiedname, read, write, bitfield, reimplements, reimplementedby, qualifier, param, enumvalue, requiresclause, initializer, exceptions, briefdescription, detaileddescription, inbodydescription, location, references, referencedby,  **kwargs_)
 
@@ -222,6 +233,7 @@ supermod.memberdefType.subclass = memberdefTypeSub
 
 
 class descriptionTypeSub(supermod.descriptionType):
+    node_type = "description"
     def __init__(self, title=None, para=None, internal=None, sect1=None, valueOf_=None, mixedclass_=None, content_=None, **kwargs_):
         super(descriptionTypeSub, self).__init__(title, para, internal, sect1, valueOf_, mixedclass_, content_,  **kwargs_)
 supermod.descriptionType.subclass = descriptionTypeSub
@@ -229,6 +241,7 @@ supermod.descriptionType.subclass = descriptionTypeSub
 
 
 class enumvalueTypeSub(supermod.enumvalueType):
+    node_type = "enumvalue"
     def __init__(self, id=None, prot=None, name=None, initializer=None, briefdescription=None, detaileddescription=None, **kwargs_):
         super(enumvalueTypeSub, self).__init__(id, prot, name, initializer, briefdescription, detaileddescription,  **kwargs_)
 supermod.enumvalueType.subclass = enumvalueTypeSub
@@ -236,6 +249,7 @@ supermod.enumvalueType.subclass = enumvalueTypeSub
 
 
 class templateparamlistTypeSub(supermod.templateparamlistType):
+    node_type = "templateparamlist"
     def __init__(self, param=None, **kwargs_):
         super(templateparamlistTypeSub, self).__init__(param,  **kwargs_)
 supermod.templateparamlistType.subclass = templateparamlistTypeSub
@@ -243,6 +257,7 @@ supermod.templateparamlistType.subclass = templateparamlistTypeSub
 
 
 class paramTypeSub(supermod.paramType):
+    node_type = "param"
     def __init__(self, attributes=None, type_=None, declname=None, defname=None, array=None, defval=None, typeconstraint=None, briefdescription=None, **kwargs_):
         super(paramTypeSub, self).__init__(attributes, type_, declname, defname, array, defval, typeconstraint, briefdescription,  **kwargs_)
 supermod.paramType.subclass = paramTypeSub
@@ -250,6 +265,7 @@ supermod.paramType.subclass = paramTypeSub
 
 
 class linkedTextTypeSub(supermod.linkedTextType):
+    node_type = "linkedtext"
     def __init__(self, ref=None, valueOf_=None, mixedclass_=None, content_=None, **kwargs_):
         super(linkedTextTypeSub, self).__init__(ref, valueOf_, mixedclass_, content_,  **kwargs_)
 supermod.linkedTextType.subclass = linkedTextTypeSub
@@ -257,6 +273,7 @@ supermod.linkedTextType.subclass = linkedTextTypeSub
 
 
 class graphTypeSub(supermod.graphType):
+    node_type = "graph"
     def __init__(self, node=None, **kwargs_):
         super(graphTypeSub, self).__init__(node,  **kwargs_)
 supermod.graphType.subclass = graphTypeSub
@@ -264,6 +281,7 @@ supermod.graphType.subclass = graphTypeSub
 
 
 class nodeTypeSub(supermod.nodeType):
+    node_type = "node"
     def __init__(self, id=None, label=None, link=None, childnode=None, **kwargs_):
         super(nodeTypeSub, self).__init__(id, label, link, childnode,  **kwargs_)
 supermod.nodeType.subclass = nodeTypeSub
@@ -271,6 +289,7 @@ supermod.nodeType.subclass = nodeTypeSub
 
 
 class childnodeTypeSub(supermod.childnodeType):
+    node_type = "childnode"
     def __init__(self, refid=None, relation=None, edgelabel=None, **kwargs_):
         super(childnodeTypeSub, self).__init__(refid, relation, edgelabel,  **kwargs_)
 supermod.childnodeType.subclass = childnodeTypeSub
@@ -278,6 +297,7 @@ supermod.childnodeType.subclass = childnodeTypeSub
 
 
 class linkTypeSub(supermod.linkType):
+    node_type = "link"
     def __init__(self, refid=None, external=None, **kwargs_):
         super(linkTypeSub, self).__init__(refid, external,  **kwargs_)
 supermod.linkType.subclass = linkTypeSub
@@ -285,6 +305,7 @@ supermod.linkType.subclass = linkTypeSub
 
 
 class listingTypeSub(supermod.listingType):
+    node_type = "listing"
     def __init__(self, filename=None, codeline=None, **kwargs_):
         super(listingTypeSub, self).__init__(filename, codeline,  **kwargs_)
 supermod.listingType.subclass = listingTypeSub
@@ -292,6 +313,7 @@ supermod.listingType.subclass = listingTypeSub
 
 
 class codelineTypeSub(supermod.codelineType):
+    node_type = "codeline"
     def __init__(self, lineno=None, refid=None, refkind=None, external=None, highlight=None, **kwargs_):
         super(codelineTypeSub, self).__init__(lineno, refid, refkind, external, highlight,  **kwargs_)
 supermod.codelineType.subclass = codelineTypeSub
@@ -299,6 +321,7 @@ supermod.codelineType.subclass = codelineTypeSub
 
 
 class highlightTypeSub(supermod.highlightType):
+    node_type = "highlight"
     def __init__(self, class_=None, sp=None, ref=None, valueOf_=None, mixedclass_=None, content_=None, **kwargs_):
         super(highlightTypeSub, self).__init__(class_, sp, ref, valueOf_, mixedclass_, content_,  **kwargs_)
 supermod.highlightType.subclass = highlightTypeSub
@@ -313,6 +336,7 @@ supermod.spType.subclass = spTypeSub
 
 
 class referenceTypeSub(supermod.referenceType):
+    node_type = "reference"
     def __init__(self, refid=None, compoundref=None, startline=None, endline=None, valueOf_=None, mixedclass_=None, content_=None, **kwargs_):
         super(referenceTypeSub, self).__init__(refid, compoundref, startline, endline, valueOf_, mixedclass_, content_,  **kwargs_)
 supermod.referenceType.subclass = referenceTypeSub
@@ -320,6 +344,7 @@ supermod.referenceType.subclass = referenceTypeSub
 
 
 class locationTypeSub(supermod.locationType):
+    node_type = "location"
     def __init__(self, file=None, line=None, column=None, declfile=None, declline=None, declcolumn=None, bodyfile=None, bodystart=None, bodyend=None, **kwargs_):
         super(locationTypeSub, self).__init__(file, line, column, declfile, declline, declcolumn, bodyfile, bodystart, bodyend,  **kwargs_)
 supermod.locationType.subclass = locationTypeSub
@@ -327,6 +352,7 @@ supermod.locationType.subclass = locationTypeSub
 
 
 class docSect1TypeSub(supermod.docSect1Type):
+    node_type = "docsect1"
     def __init__(self, id=None, title=None, para=None, internal=None, sect2=None, valueOf_=None, mixedclass_=None, content_=None, **kwargs_):
         super(docSect1TypeSub, self).__init__(id, title, para, internal, sect2, valueOf_, mixedclass_, content_,  **kwargs_)
 supermod.docSect1Type.subclass = docSect1TypeSub
@@ -334,6 +360,7 @@ supermod.docSect1Type.subclass = docSect1TypeSub
 
 
 class docSect2TypeSub(supermod.docSect2Type):
+    node_type = "docsect2"
     def __init__(self, id=None, title=None, para=None, sect3=None, internal=None, valueOf_=None, mixedclass_=None, content_=None, **kwargs_):
         super(docSect2TypeSub, self).__init__(id, title, para, sect3, internal, valueOf_, mixedclass_, content_,  **kwargs_)
 supermod.docSect2Type.subclass = docSect2TypeSub
@@ -341,6 +368,7 @@ supermod.docSect2Type.subclass = docSect2TypeSub
 
 
 class docSect3TypeSub(supermod.docSect3Type):
+    node_type = "docsect3"
     def __init__(self, id=None, title=None, para=None, sect4=None, internal=None, valueOf_=None, mixedclass_=None, content_=None, **kwargs_):
         super(docSect3TypeSub, self).__init__(id, title, para, sect4, internal, valueOf_, mixedclass_, content_,  **kwargs_)
 supermod.docSect3Type.subclass = docSect3TypeSub
@@ -348,6 +376,7 @@ supermod.docSect3Type.subclass = docSect3TypeSub
 
 
 class docSect4TypeSub(supermod.docSect4Type):
+    node_type = "docsect4"
     def __init__(self, id=None, title=None, para=None, internal=None, valueOf_=None, mixedclass_=None, content_=None, **kwargs_):
         super(docSect4TypeSub, self).__init__(id, title, para, internal, valueOf_, mixedclass_, content_,  **kwargs_)
 supermod.docSect4Type.subclass = docSect4TypeSub
@@ -355,6 +384,7 @@ supermod.docSect4Type.subclass = docSect4TypeSub
 
 
 class docInternalTypeSub(supermod.docInternalType):
+    node_type = "docinternal"
     def __init__(self, para=None, sect1=None, valueOf_=None, mixedclass_=None, content_=None, **kwargs_):
         super(docInternalTypeSub, self).__init__(para, sect1, valueOf_, mixedclass_, content_,  **kwargs_)
 supermod.docInternalType.subclass = docInternalTypeSub
@@ -362,6 +392,7 @@ supermod.docInternalType.subclass = docInternalTypeSub
 
 
 class docInternalS1TypeSub(supermod.docInternalS1Type):
+    node_type = "docinternals1"
     def __init__(self, para=None, sect2=None, valueOf_=None, mixedclass_=None, content_=None, **kwargs_):
         super(docInternalS1TypeSub, self).__init__(para, sect2, valueOf_, mixedclass_, content_,  **kwargs_)
 supermod.docInternalS1Type.subclass = docInternalS1TypeSub
@@ -369,6 +400,7 @@ supermod.docInternalS1Type.subclass = docInternalS1TypeSub
 
 
 class docInternalS2TypeSub(supermod.docInternalS2Type):
+    node_type = "docinternals2"
     def __init__(self, para=None, sect3=None, valueOf_=None, mixedclass_=None, content_=None, **kwargs_):
         super(docInternalS2TypeSub, self).__init__(para, sect3, valueOf_, mixedclass_, content_,  **kwargs_)
 supermod.docInternalS2Type.subclass = docInternalS2TypeSub
@@ -376,6 +408,7 @@ supermod.docInternalS2Type.subclass = docInternalS2TypeSub
 
 
 class docInternalS3TypeSub(supermod.docInternalS3Type):
+    node_type = "docinternals3"
     def __init__(self, para=None, sect3=None, valueOf_=None, mixedclass_=None, content_=None, **kwargs_):
         super(docInternalS3TypeSub, self).__init__(para, sect3, valueOf_, mixedclass_, content_,  **kwargs_)
 supermod.docInternalS3Type.subclass = docInternalS3TypeSub
@@ -383,6 +416,7 @@ supermod.docInternalS3Type.subclass = docInternalS3TypeSub
 
 
 class docInternalS4TypeSub(supermod.docInternalS4Type):
+    node_type = "docinternals4"
     def __init__(self, para=None, valueOf_=None, mixedclass_=None, content_=None, **kwargs_):
         super(docInternalS4TypeSub, self).__init__(para, valueOf_, mixedclass_, content_,  **kwargs_)
 supermod.docInternalS4Type.subclass = docInternalS4TypeSub
@@ -390,6 +424,7 @@ supermod.docInternalS4Type.subclass = docInternalS4TypeSub
 
 
 class docTitleTypeSub(supermod.docTitleType):
+    node_type = "doctitle"
     def __init__(self, ulink=None, bold=None, s=None, strike=None, underline=None, emphasis=None, computeroutput=None, subscript=None, superscript=None, center=None, small=None, cite=None, del_=None, ins=None, htmlonly=None, manonly=None, xmlonly=None, rtfonly=None, latexonly=None, docbookonly=None, image=None, dot=None, msc=None, plantuml=None, anchor=None, formula=None, ref=None, emoji=None, linebreak=None, valueOf_=None, mixedclass_=None, content_=None, **kwargs_):
         super(docTitleTypeSub, self).__init__(ulink, bold, s, strike, underline, emphasis, computeroutput, subscript, superscript, center, small, cite, del_, ins, htmlonly, manonly, xmlonly, rtfonly, latexonly, docbookonly, image, dot, msc, plantuml, anchor, formula, ref, emoji, linebreak, valueOf_, mixedclass_, content_,  **kwargs_)
         self.type_ = None
@@ -419,6 +454,7 @@ supermod.docSummaryType.subclass = docSummaryTypeSub
 
 
 class docParaTypeSub(supermod.docParaType):
+    node_type = "docpara"
     def __init__(self, ulink=None, bold=None, s=None, strike=None, underline=None, emphasis=None, computeroutput=None, subscript=None, superscript=None, center=None, small=None, cite=None, del_=None, ins=None, htmlonly=None, manonly=None, xmlonly=None, rtfonly=None, latexonly=None, docbookonly=None, image=None, dot=None, msc=None, plantuml=None, anchor=None, formula=None, ref=None, emoji=None, linebreak=None, hruler=None, preformatted=None, programlisting=None, verbatim=None, javadocliteral=None, javadoccode=None, indexentry=None, orderedlist=None, itemizedlist=None, simplesect=None, title=None, variablelist=None, table=None, heading=None, dotfile=None, mscfile=None, diafile=None, toclist=None, language=None, parameterlist=None, xrefsect=None, copydoc=None, details=None, blockquote=None, parblock=None, valueOf_=None, mixedclass_=None, content_=None, **kwargs_):
         super(docParaTypeSub, self).__init__(ulink, bold, s, strike, underline, emphasis, computeroutput, subscript, superscript, center, small, cite, del_, ins, htmlonly, manonly, xmlonly, rtfonly, latexonly, docbookonly, image, dot, msc, plantuml, anchor, formula, ref, emoji, linebreak, hruler, preformatted, programlisting, verbatim, javadocliteral, javadoccode, indexentry, orderedlist, itemizedlist, simplesect, title, variablelist, table, heading, dotfile, mscfile, diafile, toclist, language, parameterlist, xrefsect, copydoc, details, blockquote, parblock, valueOf_, mixedclass_, content_,  **kwargs_)
 
@@ -552,6 +588,7 @@ supermod.docParaType.subclass = docParaTypeSub
 
 
 class docMarkupTypeSub(supermod.docMarkupType):
+    node_type = "docmarkup"
     def __init__(self, ulink=None, bold=None, s=None, strike=None, underline=None, emphasis=None, computeroutput=None, subscript=None, superscript=None, center=None, small=None, cite=None, del_=None, ins=None, htmlonly=None, manonly=None, xmlonly=None, rtfonly=None, latexonly=None, docbookonly=None, image=None, dot=None, msc=None, plantuml=None, anchor=None, formula=None, ref=None, emoji=None, linebreak=None, hruler=None, preformatted=None, programlisting=None, verbatim=None, javadocliteral=None, javadoccode=None, indexentry=None, orderedlist=None, itemizedlist=None, simplesect=None, title=None, variablelist=None, table=None, heading=None, dotfile=None, mscfile=None, diafile=None, toclist=None, language=None, parameterlist=None, xrefsect=None, copydoc=None, details=None, blockquote=None, parblock=None, valueOf_=None, mixedclass_=None, content_=None, **kwargs_):
         super(docMarkupTypeSub, self).__init__(ulink, bold, s, strike, underline, emphasis, computeroutput, subscript, superscript, center, small, cite, del_, ins, htmlonly, manonly, xmlonly, rtfonly, latexonly, docbookonly, image, dot, msc, plantuml, anchor, formula, ref, emoji, linebreak, hruler, preformatted, programlisting, verbatim, javadocliteral, javadoccode, indexentry, orderedlist, itemizedlist, simplesect, title, variablelist, table, heading, dotfile, mscfile, diafile, toclist, language, parameterlist, xrefsect, copydoc, details, blockquote, parblock, valueOf_, mixedclass_, content_,  **kwargs_)
 
@@ -578,6 +615,7 @@ supermod.docMarkupType.subclass = docMarkupTypeSub
 
 
 class docURLLinkSub(supermod.docURLLink):
+    node_type = "docurllink"
     def __init__(self, url=None, ulink=None, bold=None, s=None, strike=None, underline=None, emphasis=None, computeroutput=None, subscript=None, superscript=None, center=None, small=None, cite=None, del_=None, ins=None, htmlonly=None, manonly=None, xmlonly=None, rtfonly=None, latexonly=None, docbookonly=None, image=None, dot=None, msc=None, plantuml=None, anchor=None, formula=None, ref=None, emoji=None, linebreak=None, valueOf_=None, mixedclass_=None, content_=None, **kwargs_):
         super(docURLLinkSub, self).__init__(url, ulink, bold, s, strike, underline, emphasis, computeroutput, subscript, superscript, center, small, cite, del_, ins, htmlonly, manonly, xmlonly, rtfonly, latexonly, docbookonly, image, dot, msc, plantuml, anchor, formula, ref, emoji, linebreak, valueOf_, mixedclass_, content_,  **kwargs_)
 supermod.docURLLink.subclass = docURLLinkSub
@@ -585,6 +623,7 @@ supermod.docURLLink.subclass = docURLLinkSub
 
 
 class docAnchorTypeSub(supermod.docAnchorType):
+    node_type = "docanchor"
     def __init__(self, id=None, valueOf_=None, mixedclass_=None, content_=None, **kwargs_):
         super(docAnchorTypeSub, self).__init__(id, valueOf_, mixedclass_, content_,  **kwargs_)
 supermod.docAnchorType.subclass = docAnchorTypeSub
@@ -592,6 +631,7 @@ supermod.docAnchorType.subclass = docAnchorTypeSub
 
 
 class docFormulaTypeSub(supermod.docFormulaType):
+    node_type = "docformula"
     def __init__(self, id=None, valueOf_=None, mixedclass_=None, content_=None, **kwargs_):
         super(docFormulaTypeSub, self).__init__(id, valueOf_, mixedclass_, content_,  **kwargs_)
 supermod.docFormulaType.subclass = docFormulaTypeSub
@@ -599,6 +639,7 @@ supermod.docFormulaType.subclass = docFormulaTypeSub
 
 
 class docIndexEntryTypeSub(supermod.docIndexEntryType):
+    node_type = "docindexentry"
     def __init__(self, primaryie=None, secondaryie=None, **kwargs_):
         super(docIndexEntryTypeSub, self).__init__(primaryie, secondaryie,  **kwargs_)
 supermod.docIndexEntryType.subclass = docIndexEntryTypeSub
@@ -606,6 +647,7 @@ supermod.docIndexEntryType.subclass = docIndexEntryTypeSub
 
 
 class docListTypeSub(supermod.docListType):
+    node_type = "doclist"
     def __init__(self, type_=None, start=None, listitem=None, **kwargs_):
         super(docListTypeSub, self).__init__(type_, start, listitem,  **kwargs_)
 supermod.docListType.subclass = docListTypeSub
@@ -613,6 +655,7 @@ supermod.docListType.subclass = docListTypeSub
 
 
 class docListItemTypeSub(supermod.docListItemType):
+    node_type = "doclistitem"
     def __init__(self, value=None, para=None, **kwargs_):
         super(docListItemTypeSub, self).__init__(value, para,  **kwargs_)
 supermod.docListItemType.subclass = docListItemTypeSub
@@ -620,6 +663,7 @@ supermod.docListItemType.subclass = docListItemTypeSub
 
 
 class docSimpleSectTypeSub(supermod.docSimpleSectType):
+    node_type = "docsimplesect"
     def __init__(self, kind=None, title=None, para=None, **kwargs_):
         super(docSimpleSectTypeSub, self).__init__(kind, title, para,  **kwargs_)
 supermod.docSimpleSectType.subclass = docSimpleSectTypeSub
@@ -627,6 +671,7 @@ supermod.docSimpleSectType.subclass = docSimpleSectTypeSub
 
 
 class docVarListEntryTypeSub(supermod.docVarListEntryType):
+    node_type = "docvarlistentry"
     def __init__(self, term=None, **kwargs_):
         super(docVarListEntryTypeSub, self).__init__(term,  **kwargs_)
 
@@ -641,6 +686,7 @@ supermod.docVarListEntryType.subclass = docVarListEntryTypeSub
 
 
 class docVariableListTypeSub(supermod.docVariableListType):
+    node_type = "docvariablelist"
     def __init__(self, varlistentry=None, listitem=None, **kwargs_):
         super(docVariableListTypeSub, self).__init__(varlistentry, listitem,  **kwargs_)
 
@@ -664,6 +710,7 @@ supermod.docVariableListType.subclass = docVariableListTypeSub
 
 
 class docRefTextTypeSub(supermod.docRefTextType):
+    node_type = "docreftext"
     def __init__(self, refid=None, kindref=None, external=None, ulink=None, bold=None, s=None, strike=None, underline=None, emphasis=None, computeroutput=None, subscript=None, superscript=None, center=None, small=None, cite=None, del_=None, ins=None, htmlonly=None, manonly=None, xmlonly=None, rtfonly=None, latexonly=None, docbookonly=None, image=None, dot=None, msc=None, plantuml=None, anchor=None, formula=None, ref=None, emoji=None, linebreak=None, valueOf_=None, mixedclass_=None, content_=None, **kwargs_):
         super(docRefTextTypeSub, self).__init__(refid, kindref, external, ulink, bold, s, strike, underline, emphasis, computeroutput, subscript, superscript, center, small, cite, del_, ins, htmlonly, manonly, xmlonly, rtfonly, latexonly, docbookonly, image, dot, msc, plantuml, anchor, formula, ref, emoji, linebreak, valueOf_, mixedclass_, content_,  **kwargs_)
 
@@ -682,6 +729,7 @@ supermod.docRefTextType.subclass = docRefTextTypeSub
 
 
 class docTableTypeSub(supermod.docTableType):
+    node_type = "doctable"
     def __init__(self, rows=None, cols=None, width=None, caption=None, row=None, **kwargs_):
         super(docTableTypeSub, self).__init__(rows, cols, width, caption, row,  **kwargs_)
 supermod.docTableType.subclass = docTableTypeSub
@@ -689,6 +737,7 @@ supermod.docTableType.subclass = docTableTypeSub
 
 
 class docRowTypeSub(supermod.docRowType):
+    node_type = "docrow"
     def __init__(self, entry=None, **kwargs_):
         super(docRowTypeSub, self).__init__(entry,  **kwargs_)
 supermod.docRowType.subclass = docRowTypeSub
@@ -696,6 +745,7 @@ supermod.docRowType.subclass = docRowTypeSub
 
 
 class docEntryTypeSub(supermod.docEntryType):
+    node_type = "docentry"
     def __init__(self, thead=None, colspan=None, rowspan=None, align=None, valign=None, width=None, class_=None, para=None, **kwargs_):
         super(docEntryTypeSub, self).__init__(thead, colspan, rowspan, align, valign, width, class_, para,  **kwargs_)
 supermod.docEntryType.subclass = docEntryTypeSub
