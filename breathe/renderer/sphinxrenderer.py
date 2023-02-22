@@ -1958,19 +1958,22 @@ class SphinxRenderer:
 
     def visit_function(self, node) -> List[Node]:
         dom = self.get_domain()
+        argsstring = node.get_argsstring()
+        if argsstring is None:
+            argsstring = ''
         if not dom or dom in ("c", "cpp", "py", "cs"):
             names = self.get_qualification()
             names.append(node.get_name())
             name = self.join_nested_name(names)
             if dom == "py":
-                declaration = name + node.get_argsstring()
+                declaration = name + argsstring
             elif dom == "cs":
                 declaration = " ".join(
                     [
                         self.create_template_prefix(node),
                         "".join(n.astext() for n in self.render(node.get_type())),
                         name,
-                        node.get_argsstring(),
+                        argsstring,
                     ]
                 )
             else:
@@ -1998,7 +2001,7 @@ class SphinxRenderer:
                     typ = typ[7:]
                 elements.append(typ)
                 elements.append(name)
-                elements.append(node.get_argsstring())
+                elements.append(argsstring)
                 declaration = " ".join(elements)
             nodes = self.handle_declaration(node, declaration)
             return nodes
@@ -2125,12 +2128,15 @@ class SphinxRenderer:
             declaration = self.create_template_prefix(node)
             declaration += " " + name + " = " + type_
         else:
+            argsstring = node.get_argsstring()
+            if argsstring is None:
+                argsstring = ''
             # TODO: Both "using" and "typedef" keywords get into this function,
             #   and if no @typedef comment was added, the definition should
             #   contain the full text. If a @typedef was used instead, the
             #   definition has only the typename, which makes it impossible to
             #   distinguish between them so fallback to "typedef" behavior here.
-            declaration = " ".join([type_, name, node.get_argsstring()])
+            declaration = " ".join([type_, name, argsstring])
         return self.handle_declaration(node, declaration)
 
     def make_initializer(self, node) -> str:
@@ -2154,6 +2160,9 @@ class SphinxRenderer:
         name = self.join_nested_name(names)
         dom = self.get_domain()
         options = {}
+        argsstring = node.get_argsstring()
+        if argsstring is None:
+            argsstring = ''
         if dom == "py":
             declaration = name
             initializer = self.make_initializer(node).strip().lstrip("=").strip()
@@ -2165,7 +2174,7 @@ class SphinxRenderer:
                     self.create_template_prefix(node),
                     "".join(n.astext() for n in self.render(node.get_type())),
                     name,
-                    node.get_argsstring(),
+                    argsstring,
                 ]
             )
             if node.get_gettable() or node.get_settable():
@@ -2190,7 +2199,7 @@ class SphinxRenderer:
                 typename = typename.replace("::", ".")
             elements.append(typename)
             elements.append(name)
-            elements.append(node.get_argsstring())
+            elements.append(argsstring)
             elements.append(self.make_initializer(node))
             declaration = " ".join(elements)
         if not dom or dom in ("c", "cpp", "py", "cs"):
