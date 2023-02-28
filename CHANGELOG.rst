@@ -3,7 +3,7 @@ Change Log
 
 Inspired by `Keepachangelog.com <http://keepachangelog.com/>`__.
 
-- Unreleased
+- 2023-02-28 - **Breathe v4.35.0**
 
   - Pull lone literal blocks in paragraphs up to produce correct doctree.
     `#833 <https://github.com/michaeljones/breathe/pull/833>`__
