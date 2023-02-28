@@ -557,19 +557,20 @@ def get_directive(app):
 
 def get_matches(datafile):
     from breathe.parser.compoundsuper import sectiondefType
-    from xml.dom import minidom
+    from lxml import etree
+
 
     argsstrings = []
     with open(os.path.join(os.path.dirname(__file__), "data", datafile)) as fid:
         xml = fid.read()
-    doc = minidom.parseString(xml)
+    doc = etree.fromstring(xml)
 
     sectiondef = sectiondefType.factory()
-    for child in doc.documentElement.childNodes:
-        sectiondef.buildChildren(child, "memberdef")
-        if getattr(child, "tagName", None) == "memberdef":
+    sectiondef.build(doc, 'sectiondef')
+    for child in doc:
+        if getattr(child, "tag", None) == "memberdef":
             # Get the argsstring function declaration
-            argsstrings.append(child.getElementsByTagName("argsstring")[0].childNodes[0].data)
+            argsstrings.append(child.find("argsstring").text)
     matches = [[m, sectiondef] for m in sectiondef.memberdef]
     return argsstrings, matches
 
