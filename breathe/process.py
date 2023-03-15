@@ -64,6 +64,9 @@ class AutoDoxygenProcessHandle:
         # Iterate over the projects and generate doxygen xml output for the files for each one into
         # a directory in the Sphinx build area
         for project_name, data in project_files.items():
+            # Update the project name
+            data.auto_project_info._name = project_name
+            
             project_path = self.process(
                 data.auto_project_info, data.files, doxygen_options, doxygen_aliases
             )
