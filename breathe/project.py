@@ -202,7 +202,7 @@ class ProjectInfoFactory:
         return self.project_info_for_auto_store[name]
 
     def create_auto_project_info(self, name: str, source_path) -> AutoProjectInfo:
-        key = source_path
+        key = name if name else source_path
         try:
             return self.auto_project_info_store[key]
         except KeyError:
