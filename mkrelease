@@ -31,10 +31,11 @@ pack()
 	mkdir -- mkrelease_tmp
 
 	git archive \
-		--format=tar.gz \
+		--format=tar \
 		--prefix="breathe-$version/" \
-		-o "mkrelease_tmp/breathe-$version.tar.gz" \
 		-- "v$version" \
+		| gzip -cn \
+		>"mkrelease_tmp/breathe-$version.tar.gz"
 
 	cd -- mkrelease_tmp
 	tar -xf "breathe-$version.tar.gz"
