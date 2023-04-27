@@ -886,8 +886,6 @@ class SphinxRenderer:
         detailed = []
         for candNode in detailedCand:
             pullup(candNode, nodes.field_list, fieldLists)
-            pullup(candNode, nodes.note, admonitions)
-            pullup(candNode, nodes.warning, admonitions)
             # and collapse paragraphs
             for para in candNode.traverse(nodes.paragraph):
                 if (
