@@ -11,4 +11,5 @@ types-Pygments
 black==22.3.0
 
 sphinx-copybutton
+sphinx-argparse
 furo
