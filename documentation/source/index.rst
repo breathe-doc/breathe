@@ -54,6 +54,7 @@ Setup & Usage
    :maxdepth: 1
 
    quickstart
+   apidoc
    directives
    differences
    readthedocs
