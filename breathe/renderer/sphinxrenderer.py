@@ -885,7 +885,14 @@ class SphinxRenderer:
 
         detailed = []
         for candNode in detailedCand:
-            pullup(candNode, nodes.field_list, fieldLists)
+            for nodeTypeString in self.app.config.breathe_detaileddesc_pullup_types:
+                if nodeTypeString == "note":
+                    pullup(candNode, nodes.note, admonitions)
+                elif nodeTypeString == "warning":
+                    pullup(candNode, nodes.warning, admonitions)
+                elif nodeTypeString == "fieldlist":
+                    pullup(candNode, nodes.field_list, fieldLists)
+
             # and collapse paragraphs
             for para in candNode.traverse(nodes.paragraph):
                 if (
