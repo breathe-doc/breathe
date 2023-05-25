@@ -886,8 +886,9 @@ class SphinxRenderer:
         detailed = []
         for candNode in detailedCand:
             breathe_directive_name = self.context.directive_args[0]
-            if breathe_directive_name in self.app.config.breathe_detaileddesc_pullup_types:
-                for nodeTypeString in self.app.config.breathe_detaileddesc_pullup_types[breathe_directive_name]:
+            pullup_types = self.app.config.breathe_detaileddesc_pullup_types
+            if breathe_directive_name in pullup_types:
+                for nodeTypeString in pullup_types[breathe_directive_name]:
                     if nodeTypeString == "note":
                         pullup(candNode, nodes.note, admonitions)
                     elif nodeTypeString == "warning":
