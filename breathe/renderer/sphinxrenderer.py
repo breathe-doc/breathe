@@ -885,13 +885,15 @@ class SphinxRenderer:
 
         detailed = []
         for candNode in detailedCand:
-            for nodeTypeString in self.app.config.breathe_detaileddesc_pullup_types:
-                if nodeTypeString == "note":
-                    pullup(candNode, nodes.note, admonitions)
-                elif nodeTypeString == "warning":
-                    pullup(candNode, nodes.warning, admonitions)
-                elif nodeTypeString == "fieldlist":
-                    pullup(candNode, nodes.field_list, fieldLists)
+            breathe_directive_name = self.context.directive_args[0] # eg doxygenpage
+            if breathe_directive_name in self.app.config.breathe_detaileddesc_pullup_types:
+                for nodeTypeString in self.app.config.breathe_detaileddesc_pullup_types[breathe_directive_name]:
+                    if nodeTypeString == "note":
+                        pullup(candNode, nodes.note, admonitions)
+                    elif nodeTypeString == "warning":
+                        pullup(candNode, nodes.warning, admonitions)
+                    elif nodeTypeString == "fieldlist":
+                        pullup(candNode, nodes.field_list, fieldLists)
 
             # and collapse paragraphs
             for para in candNode.traverse(nodes.paragraph):
