@@ -513,6 +513,48 @@ class compounddefType(GeneratedsSuper):
 # end class compounddefType
 
 
+class MemberType(GeneratedsSuper):
+    subclass = None
+    superclass = None
+    def __init__(self, kind=None, refid=None, name=None):
+        self.kind = kind
+        self.refid = refid
+        self.name = name
+    def factory(*args_, **kwargs_):
+        if MemberType.subclass:
+            return MemberType.subclass(*args_, **kwargs_)
+        else:
+            return MemberType(*args_, **kwargs_)
+    factory = staticmethod(factory)
+    def get_name(self): return self.name
+    def set_name(self, name): self.name = name
+    def get_kind(self): return self.kind
+    def set_kind(self, kind): self.kind = kind
+    def get_refid(self): return self.refid
+    def set_refid(self, refid): self.refid = refid
+    def hasContent_(self):
+        return self.name is not None
+    def build(self, node_):
+        attrs = node_.attributes
+        self.buildAttributes(attrs)
+        for child_ in node_.childNodes:
+            nodeName_ = child_.nodeName.split(':')[-1]
+            self.buildChildren(child_, nodeName_)
+    def buildAttributes(self, attrs):
+        if attrs.get('kind'):
+            self.kind = attrs.get('kind').value
+        if attrs.get('refid'):
+            self.refid = attrs.get('refid').value
+    def buildChildren(self, child_, nodeName_):
+        if child_.nodeType == Node.ELEMENT_NODE and \
+            nodeName_ == 'name':
+            name_ = ''
+            for text__content_ in child_.childNodes:
+                name_ += text__content_.nodeValue
+            self.name = name_
+# end class MemberType
+
+
 class listofallmembersType(GeneratedsSuper):
     subclass = None
     superclass = None
@@ -989,7 +1031,7 @@ class refTextType(GeneratedsSuper):
 class sectiondefType(GeneratedsSuper):
     subclass = None
     superclass = None
-    def __init__(self, kind=None, header=None, description=None, memberdef=None):
+    def __init__(self, kind=None, header=None, description=None, memberdef=None, member=None):
         self.kind = kind
         self.header = header
         self.description = description
@@ -997,6 +1039,10 @@ class sectiondefType(GeneratedsSuper):
             self.memberdef = []
         else:
             self.memberdef = memberdef
+        if member is None:
+            self.member = []
+        else:
+            self.member = member
     def factory(*args_, **kwargs_):
         if sectiondefType.subclass:
             return sectiondefType.subclass(*args_, **kwargs_)
@@ -1011,6 +1057,10 @@ class sectiondefType(GeneratedsSuper):
     def set_memberdef(self, memberdef): self.memberdef = memberdef
     def add_memberdef(self, value): self.memberdef.append(value)
     def insert_memberdef(self, index, value): self.memberdef[index] = value
+    def get_member(self): return self.member
+    def set_member(self, member): self.member = member
+    def add_member(self, value): self.member.append(value)
+    def insert_member(self, index, value): self.member[index] = value
     def get_kind(self): return self.kind
     def set_kind(self, kind): self.kind = kind
     def hasContent_(self):
