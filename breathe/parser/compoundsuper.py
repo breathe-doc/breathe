@@ -1082,22 +1082,24 @@ class sectiondefType(GeneratedsSuper):
         if attrs.get('kind'):
             self.kind = attrs.get('kind').value
     def buildChildren(self, child_, nodeName_):
-        if child_.nodeType == Node.ELEMENT_NODE and \
-            nodeName_ == 'header':
-            header_ = ''
-            for text__content_ in child_.childNodes:
-                header_ += text__content_.nodeValue
-            self.header = header_
-        elif child_.nodeType == Node.ELEMENT_NODE and \
-            nodeName_ == 'description':
-            obj_ = descriptionType.factory()
-            obj_.build(child_)
-            self.set_description(obj_)
-        elif child_.nodeType == Node.ELEMENT_NODE and \
-            nodeName_ == 'memberdef':
-            obj_ = memberdefType.factory()
-            obj_.build(child_)
-            self.memberdef.append(obj_)
+        if child_.nodeType == Node.ELEMENT_NODE:
+            if nodeName_ == 'header':
+                header_ = ''
+                for text__content_ in child_.childNodes:
+                    header_ += text__content_.nodeValue
+                self.header = header_
+            elif nodeName_ == 'description':
+                obj_ = descriptionType.factory()
+                obj_.build(child_)
+                self.set_description(obj_)
+            elif nodeName_ == 'memberdef':
+                obj_ = memberdefType.factory()
+                obj_.build(child_)
+                self.memberdef.append(obj_)
+            elif nodeName_ == 'member':
+                obj_ = MemberType.factory()
+                obj_.build(child_)
+                self.member.append(obj_)
 # end class sectiondefType
 
 
