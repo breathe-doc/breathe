@@ -20,6 +20,16 @@ class _CreateCompoundTypeSubFinder:
         return indexfinder.CompoundTypeSubItemFinder(self.app, compound_parser, project_info, *args)
 
 
+class _CreateSectionDefTypeSubItemFinder:
+    def __init__(self, app: Sphinx, parser_factory: DoxygenParserFactory):
+        self.app = app
+        self.parser_factory = parser_factory
+
+    def __call__(self, project_info: ProjectInfo, *args):
+        compound_parser = self.parser_factory.create_compound_parser(project_info)
+        return compoundfinder.SectionDefTypeSubItemFinder(self.app, compound_parser, project_info, *args)
+
+
 class DoxygenItemFinderFactory:
     def __init__(self, finders: Dict[str, Type[ItemFinder]], project_info: ProjectInfo):
         self.finders = finders
@@ -65,7 +75,7 @@ class FinderFactory:
             "member": indexfinder.MemberTypeSubItemFinder,
             "doxygendef": compoundfinder.DoxygenTypeSubItemFinder,
             "compounddef": compoundfinder.CompoundDefTypeSubItemFinder,
-            "sectiondef": compoundfinder.SectionDefTypeSubItemFinder,
+            "sectiondef": _CreateSectionDefTypeSubItemFinder(self.app, self.parser_factory),  # type: ignore
             "memberdef": compoundfinder.MemberDefTypeSubItemFinder,
             "ref": compoundfinder.RefTypeSubItemFinder,
         }

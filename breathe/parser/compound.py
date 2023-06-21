@@ -140,8 +140,8 @@ class sectiondefTypeSub(supermod.sectiondefType):
 
     node_type = "sectiondef"
 
-    def __init__(self, kind=None, header='', description=None, memberdef=None):
-        supermod.sectiondefType.__init__(self, kind, header, description, memberdef)
+    def __init__(self, kind=None, header='', description=None, memberdef=None, member=None):
+        supermod.sectiondefType.__init__(self, kind, header, description, memberdef, member)
 
 
 supermod.sectiondefType.subclass = sectiondefTypeSub
@@ -235,6 +235,16 @@ class memberdefTypeSub(supermod.memberdefType):
 
 supermod.memberdefType.subclass = memberdefTypeSub
 # end class memberdefTypeSub
+
+
+class MemberTypeSub(supermod.MemberType):
+
+    node_type = "member"
+
+    def __init__(self, kind=None, refid=None, name=''):
+        supermod.MemberType.__init__(self, kind, refid, name)
+supermod.MemberType.subclass = MemberTypeSub
+# end class MemberTypeSub
 
 
 class descriptionTypeSub(supermod.descriptionType):
