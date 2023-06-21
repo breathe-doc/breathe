@@ -47,22 +47,18 @@ class CompoundTypeSubItemFinder(ItemFinder):
             member_finder = self.item_finder_factory.create_finder(member)
             member_finder.filter_(node_stack, filter_, member_matches)
 
+        file_data = self.compound_parser.parse(self.data_object.refid)
+        finder = self.item_finder_factory.create_finder(file_data)
+
         # If there are members in this compound that match the criteria
         # then load up the file for this compound and get the member data objects
-        if member_matches:
-            file_data = self.compound_parser.parse(self.data_object.refid)
-            finder = self.item_finder_factory.create_finder(file_data)
-
-            for member_stack in member_matches:
-                ref_filter = self.filter_factory.create_id_filter(
-                    "memberdef", member_stack[0].refid
-                )
-                finder.filter_(node_stack, ref_filter, matches)
-        else:
-            # Read in the xml file referenced by the compound and descend into that as well
-            file_data = self.compound_parser.parse(self.data_object.refid)
-            finder = self.item_finder_factory.create_finder(file_data)
-            finder.filter_(node_stack, filter_, matches)
+        for member_stack in member_matches:
+            ref_filter = self.filter_factory.create_id_filter(
+                "memberdef", member_stack[0].refid
+            )
+            finder.filter_(node_stack, ref_filter, matches)
+        # Read in the xml file referenced by the compound and descend into that as well
+        finder.filter_(node_stack, filter_, matches)
 
 
 class MemberTypeSubItemFinder(ItemFinder):
