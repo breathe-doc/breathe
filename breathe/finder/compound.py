@@ -3,8 +3,6 @@ from breathe.parser.compound import compounddefTypeSub
 from breathe.renderer.filter import Filter, FilterFactory
 from breathe.parser import DoxygenCompoundParser
 
-from pprint import pprint
-
 from sphinx.application import Sphinx
 
 from typing import Any, List
