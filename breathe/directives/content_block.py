@@ -106,7 +106,10 @@ class DoxygenNamespaceDirective(_DoxygenContentBlockDirective):
 class DoxygenGroupDirective(_DoxygenContentBlockDirective):
     kind = "group"
     option_spec = _DoxygenContentBlockDirective.option_spec.copy()
-    option_spec.update({"inner": flag})
+    option_spec.update({
+      "inner": flag,
+      "no-title": flag
+    })
 
 
 class DoxygenPageDirective(_DoxygenContentBlockDirective):
@@ -115,4 +118,5 @@ class DoxygenPageDirective(_DoxygenContentBlockDirective):
         "path": unchanged_required,
         "project": unchanged_required,
         "content-only": flag,
+        "no-title": flag,
     }
