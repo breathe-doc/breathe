@@ -873,6 +873,7 @@ class SphinxRenderer:
         return brief + detailed
 
     def detaileddescription(self, node) -> List[Node]:
+        self.context = cast(RenderContext, self.context)
         detailedCand = self.render_optional(node.detaileddescription)
         # all field_lists must be at the top-level of the desc_content, so pull them up
         fieldLists: List[nodes.field_list] = []
