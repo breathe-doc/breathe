@@ -484,7 +484,7 @@ class compounddefType(GeneratedsSuper):
         elif child_.nodeType == Node.ELEMENT_NODE and \
             nodeName_ == 'inheritancegraph':
             obj_ = graphType.factory(
-                caption=f"Inheritence diagram for {self.get_compoundname()}:"
+                caption=f"Inheritance diagram for {self.get_compoundname()}:"
             )
             obj_.build(child_)
             self.set_inheritancegraph(obj_)
