@@ -57,5 +57,6 @@ setup(
             "breathe-apidoc = breathe.apidoc:main",
         ],
     },
+    python_requires='>=3.7',
     install_requires=requires,
 )
