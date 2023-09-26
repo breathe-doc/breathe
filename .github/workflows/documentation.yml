@@ -6,8 +6,8 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/cache@v1
+      - uses: actions/checkout@v4
+      - uses: actions/cache@v3
         with:
           path: ~/.cache/pip
           key: ${{ runner.os }}-pip-${{ hashFiles('requirements/*.txt') }}
@@ -15,7 +15,7 @@ jobs:
             ${{ runner.os }}-pip-
 
       - name: set up python
-        uses: actions/setup-python@v1
+        uses: actions/setup-python@v4
 
       - name: install dependencies
         run: |
@@ -39,7 +39,7 @@ jobs:
           make html
           rm documentation/build/html/.buildinfo
 
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v3
         with:
           name: docs build artifacts
           path: |
