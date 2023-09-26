@@ -23,7 +23,6 @@ from sphinx.testing.fixtures import (
     sphinx_test_tempdir,
     rootdir,
 )
-from sphinx.testing.path import path
 
 sphinx.locale.init([], "")
 

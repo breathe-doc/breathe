@@ -14,13 +14,13 @@ __version__ = "4.35.0"
 
 long_desc = """
 Breathe is an extension to reStructuredText and Sphinx to be able to read and
- render `Doxygen <http://www.doxygen.org>`__ xml output.
+ render `Doxygen <https://www.doxygen.nl>`__ xml output.
 """
 
-requires = ["Sphinx>=4.0,!=5.0.0", "docutils>=0.12"]
+requires = ["Sphinx>=4.3,!=5.0.0", "docutils>=0.16"]
 
-if sys.version_info < (3, 7):
-    print("ERROR: Sphinx requires at least Python 3.7 to run.")
+if sys.version_info < (3, 8):
+    print("ERROR: Sphinx requires at least Python 3.8 to run.")
     sys.exit(1)
 
 
@@ -57,6 +57,6 @@ setup(
             "breathe-apidoc = breathe.apidoc:main",
         ],
     },
-    python_requires='>=3.7',
+    python_requires='>=3.8',
     install_requires=requires,
 )
