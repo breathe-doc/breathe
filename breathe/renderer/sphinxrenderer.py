@@ -701,8 +701,6 @@ class SphinxRenderer:
             n = declarator[0]
             newStyle = True
             # the new style was introduced in Sphinx v4
-            if sphinx.version_info[0] < 4:
-                newStyle = False
             # but only for the C and C++ domains
             if self.get_domain() and self.get_domain() not in ("c", "cpp"):
                 newStyle = False
