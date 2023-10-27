@@ -592,3 +592,18 @@ def test_ellipsis(app):
     # Verify that parsing an ellipsis works
     ast_param = cls._parse_args(argsstrings[0])
     ret = cls._resolve_function(matches, ast_param, None)
+
+
+def test_render_constexpr_friend_func(app):
+    member_def = WrappedMemberDef(
+        kind="function",
+        definition="constexpr friend bool operator==",
+        type_="constexpr friend bool",
+        name="operator==",
+        argsstring="(cat const x, int const y)",
+        virt="non-virtual",
+        const="no",
+    )
+    rendered = render(app, member_def)
+    signature = find_node(rendered, "desc_signature")
+    assert signature.astext().startswith("friend constexpr bool")
