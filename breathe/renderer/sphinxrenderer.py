@@ -701,8 +701,6 @@ class SphinxRenderer:
             n = declarator[0]
             newStyle = True
             # the new style was introduced in Sphinx v4
-            if sphinx.version_info[0] < 4:
-                newStyle = False
             # but only for the C and C++ domains
             if self.get_domain() and self.get_domain() not in ("c", "cpp"):
                 newStyle = False
@@ -908,47 +906,6 @@ class SphinxRenderer:
             for fl in fieldLists:
                 fieldList.extend(fl)
             fieldLists = [fieldList]
-
-        # collapse retvals into a single return field
-        if len(fieldLists) != 0 and sphinx.version_info[0:2] < (4, 3):
-            others: List[nodes.field] = []
-            retvals: List[nodes.field] = []
-            f: nodes.field
-            fn: nodes.field_name
-            fb: nodes.field_body
-            for f in fieldLists[0]:
-                fn, fb = f
-                assert len(fn) == 1
-                if fn.astext().startswith("returns "):
-                    retvals.append(f)
-                else:
-                    others.append(f)
-            if len(retvals) != 0:
-                items: List[nodes.paragraph] = []
-                for fn, fb in retvals:
-                    # we created the retvals before, so we made this prefix
-                    assert fn.astext().startswith("returns ")
-                    val = nodes.strong("", fn.astext()[8:])
-                    # assumption from visit_docparamlist: fb is a single paragraph or nothing
-                    assert len(fb) <= 1, fb
-                    bodyNodes = [val, nodes.Text(" -- ")]
-                    if len(fb) == 1:
-                        assert isinstance(fb[0], nodes.paragraph)
-                        bodyNodes.extend(fb[0])
-                    items.append(nodes.paragraph("", "", *bodyNodes))
-                # only make a bullet list if there are multiple retvals
-                body: Node
-                if len(items) == 1:
-                    body = items[0]
-                else:
-                    body = nodes.bullet_list()
-                    for i in items:
-                        body.append(nodes.list_item("", i))
-                fRetvals = nodes.field(
-                    "", nodes.field_name("", "returns"), nodes.field_body("", body)
-                )
-                fl = nodes.field_list("", *others, fRetvals)
-                fieldLists = [fl]
 
         if self.app.config.breathe_order_parameters_first:
             return detailed + fieldLists + admonitions
@@ -2248,7 +2205,7 @@ class SphinxRenderer:
                 dom = "cpp"
             appendDeclName = True
             if insertDeclNameByParsing:
-                if dom == "cpp" and sphinx.version_info >= (4, 1, 0):
+                if dom == "cpp":
                     parser = cpp.DefinitionParser(
                         "".join(n.astext() for n in nodelist),
                         location=self.state.state_machine.get_source_and_line(),
@@ -2313,8 +2270,7 @@ class SphinxRenderer:
             "param": "param",
             "exception": "throws",
             "templateparam": "tparam",
-            # retval support available on Sphinx >= 4.3
-            "retval": "returns" if sphinx.version_info[0:2] < (4, 3) else "retval",
+            "retval": "retval",
         }
 
         # https://docutils.sourceforge.io/docs/ref/doctree.html#field-list

@@ -23,7 +23,6 @@ from sphinx.testing.fixtures import (
     sphinx_test_tempdir,
     rootdir,
 )
-from sphinx.testing.path import path
 
 sphinx.locale.init([], "")
 
@@ -330,21 +329,15 @@ def test_render_func(app):
     )
     signature = find_node(render(app, member_def), "desc_signature")
     assert signature.astext().startswith("void")
-    if sphinx.version_info[0] < 4:
-        assert find_node(signature, "desc_name")[0] == "foo"
-    else:
-        n = find_node(signature, "desc_name")[0]
-        assert isinstance(n, sphinx.addnodes.desc_sig_name)
-        assert len(n) == 1
-        assert n[0] == "foo"
+    n = find_node(signature, "desc_name")[0]
+    assert isinstance(n, sphinx.addnodes.desc_sig_name)
+    assert len(n) == 1
+    assert n[0] == "foo"
     params = find_node(signature, "desc_parameterlist")
     assert len(params) == 1
     param = params[0]
-    if sphinx.version_info[0] < 4:
-        assert param[0] == "int"
-    else:
-        assert isinstance(param[0], sphinx.addnodes.desc_sig_keyword_type)
-        assert param[0][0] == "int"
+    assert isinstance(param[0], sphinx.addnodes.desc_sig_keyword_type)
+    assert param[0][0] == "int"
 
 
 def test_render_typedef(app):
@@ -373,15 +366,8 @@ def test_render_c_function_typedef(app):
     )
     signature = find_node(render(app, member_def, domain="c"), "desc_signature")
     assert signature.astext().startswith("typedef void *")
-    if sphinx.version_info[0] < 4:
-        params = find_node(signature, "desc_parameterlist")
-        assert len(params) == 2
-        assert params[0].astext() == "float"
-        assert params[1].astext() == "int"
-    else:
-        # the use of desc_parameterlist in this case was not correct,
-        # it should only be used for a top-level function
-        pass
+    # the use of desc_parameterlist in this case was not correct,
+    # it should only be used for a top-level function
 
 
 def test_render_using_alias(app):
