@@ -35,7 +35,11 @@ def app(test_params, app_params, make_app, shared_result):
     """
     args, kwargs = app_params
     assert "srcdir" in kwargs
-    kwargs["srcdir"].makedirs(exist_ok=True)
+    try:
+        kwargs["srcdir"].mkdir(parents=True, exist_ok=True)
+    except AttributeError:
+        # old version of Sphinx
+        kwargs["srcdir"].makedirs(exist_ok=True)
     (kwargs["srcdir"] / "conf.py").write_text("")
     app_ = make_app(*args, **kwargs)
     yield app_
