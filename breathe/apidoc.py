@@ -86,7 +86,11 @@ def write_file(name, text, args):
 
 def format_heading(level, text):
     """Create a heading of <level> [1, 2 or 3 supported]."""
-    underlining = ["=", "-", "~",][
+    underlining = [
+        "=",
+        "-",
+        "~",
+    ][
         level - 1
     ] * len(text)
     return "%s\n%s\n\n" % (text, underlining)
@@ -153,78 +157,80 @@ class TypeAction(argparse.Action):
         setattr(namespace, self.dest, value_list)
 
 
-def main():
-    """Parse and check the command line arguments."""
-    parser = argparse.ArgumentParser(
-        description="""\
+"""Parse and check the command line arguments."""
+parser = argparse.ArgumentParser(
+    description="""\
 Parse XML created by Doxygen in <rootpath> and create one reST file with
 breathe generation directives per definition in the <DESTDIR>.
 
 Note: By default this script will not overwrite already created files.""",
-        formatter_class=argparse.RawDescriptionHelpFormatter,
-    )
+    formatter_class=argparse.RawDescriptionHelpFormatter,
+)
 
-    parser.add_argument(
-        "-o",
-        "--output-dir",
-        action="store",
-        dest="destdir",
-        help="Directory to place all output",
-        required=True,
-    )
-    parser.add_argument(
-        "-f", "--force", action="store_true", dest="force", help="Overwrite existing files"
-    )
-    parser.add_argument(
-        "-m",
-        "--members",
-        action="store_true",
-        dest="members",
-        help="Include members for types: %s" % MEMBERS_TYPES,
-    )
-    parser.add_argument(
-        "-n",
-        "--dry-run",
-        action="store_true",
-        dest="dryrun",
-        help="Run the script without creating files",
-    )
-    parser.add_argument(
-        "-T",
-        "--no-toc",
-        action="store_true",
-        dest="notoc",
-        help="Don't create a table of contents file",
-    )
-    parser.add_argument(
-        "-s",
-        "--suffix",
-        action="store",
-        dest="suffix",
-        help="file suffix (default: rst)",
-        default="rst",
-    )
-    parser.add_argument(
-        "-p",
-        "--project",
-        action="store",
-        dest="project",
-        help="project to add to generated directives",
-    )
-    parser.add_argument(
-        "-g",
-        "--generate",
-        action=TypeAction,
-        dest="outtypes",
-        help="types of output to generate, comma-separated list",
-    )
-    parser.add_argument(
-        "-q", "--quiet", action="store_true", dest="quiet", help="suppress informational messages"
-    )
-    parser.add_argument(
-        "--version", action="version", version="Breathe (breathe-apidoc) %s" % __version__
-    )
-    parser.add_argument("rootpath", type=str, help="The directory contains index.xml")
+parser.add_argument(
+    "-o",
+    "--output-dir",
+    action="store",
+    dest="destdir",
+    help="Directory to place all output",
+    required=True,
+)
+parser.add_argument(
+    "-f", "--force", action="store_true", dest="force", help="Overwrite existing files"
+)
+parser.add_argument(
+    "-m",
+    "--members",
+    action="store_true",
+    dest="members",
+    help="Include members for types: %s" % MEMBERS_TYPES,
+)
+parser.add_argument(
+    "-n",
+    "--dry-run",
+    action="store_true",
+    dest="dryrun",
+    help="Run the script without creating files",
+)
+parser.add_argument(
+    "-T",
+    "--no-toc",
+    action="store_true",
+    dest="notoc",
+    help="Don't create a table of contents file",
+)
+parser.add_argument(
+    "-s",
+    "--suffix",
+    action="store",
+    dest="suffix",
+    help="file suffix (default: rst)",
+    default="rst",
+)
+parser.add_argument(
+    "-p",
+    "--project",
+    action="store",
+    dest="project",
+    help="project to add to generated directives",
+)
+parser.add_argument(
+    "-g",
+    "--generate",
+    action=TypeAction,
+    dest="outtypes",
+    help="types of output to generate, comma-separated list",
+)
+parser.add_argument(
+    "-q", "--quiet", action="store_true", dest="quiet", help="suppress informational messages"
+)
+parser.add_argument(
+    "--version", action="version", version="Breathe (breathe-apidoc) %s" % __version__
+)
+parser.add_argument("rootpath", type=str, help="The directory contains index.xml")
+
+
+def main():
     args = parser.parse_args()
 
     if args.suffix.startswith("."):

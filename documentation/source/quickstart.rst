@@ -64,3 +64,7 @@ For each of these commands the following directives may be specified:
 ``path``
    Directly specifies the path to the folder with the doxygen output. This
    overrides the project and default project.
+
+It is also possible to generate API documentation automatically,
+please refer to :ref:`apidoc` for more details.
+
