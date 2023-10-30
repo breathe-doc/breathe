@@ -735,7 +735,7 @@ class FilterFactory:
 
     def _create_public_members_filter(self, options: Dict[str, Any]) -> Filter:
         node = Node()
-        node_is_memberdef = (node.node_type == "memberdef") | (node.node_type == "member")
+        node_is_memberdef = node.node_type == "memberdef"
         node_is_public = node.prot == "public"
 
         parent = Parent()
@@ -772,7 +772,7 @@ class FilterFactory:
     ) -> Filter:
         """'prot' is the doxygen xml term for 'public', 'protected' and 'private' categories."""
         node = Node()
-        node_is_memberdef = (node.node_type == "memberdef") | (node.node_type == "member")
+        node_is_memberdef = node.node_type == "memberdef"
         node_is_public = node.prot == prot
 
         parent = Parent()
@@ -789,7 +789,7 @@ class FilterFactory:
 
     def _create_undoc_members_filter(self, options: Dict[str, Any]) -> Filter:
         node = Node()
-        node_is_memberdef = (node.node_type == "memberdef") | (node.node_type == "member")
+        node_is_memberdef = node.node_type == "memberdef"
 
         node_has_description = (
             node.briefdescription.has_content() | node.detaileddescription.has_content()
@@ -939,7 +939,7 @@ class FilterFactory:
         node = Node()
 
         # Filter for public memberdefs
-        node_is_memberdef = (node.node_type == "memberdef") | (node.node_type == "member")
+        node_is_memberdef = node.node_type == "memberdef"
         node_is_public = node.prot == "public"
 
         public_members = node_is_memberdef & node_is_public
