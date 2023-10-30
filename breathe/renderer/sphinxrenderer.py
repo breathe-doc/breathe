@@ -686,6 +686,14 @@ class SphinxRenderer:
         assert len(desc) >= 1
         sig = desc[0]
         assert isinstance(sig, addnodes.desc_signature)
+
+        # Insert the member name for use in Sphinx-generated table of contents.
+        member_name = node.get_name()
+        if obj_type == "function":
+            member_name += "()"
+        sig.attributes["_toc_name"] = member_name
+        sig.attributes["_toc_parts"] = member_name
+
         # if may or may not be a multiline signature
         isMultiline = sig.get("is_multiline", False)
         declarator: Optional[Declarator] = None
