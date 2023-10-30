@@ -57,8 +57,9 @@ class CompoundTypeSubItemFinder(ItemFinder):
                 "memberdef", member_stack[0].refid
             )
             finder.filter_(node_stack, ref_filter, matches)
-        # Read in the xml file referenced by the compound and descend into that as well
-        finder.filter_(node_stack, filter_, matches)
+        if not member_matches:
+            # Read in the xml file referenced by the compound and descend into that as well
+            finder.filter_(node_stack, filter_, matches)
 
 
 class MemberTypeSubItemFinder(ItemFinder):
