@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from breathe.finder import ItemFinder
 from breathe.finder import index as indexfinder
 from breathe.finder import compound as compoundfinder
@@ -7,7 +9,10 @@ from breathe.renderer.filter import Filter
 
 from sphinx.application import Sphinx
 
-from typing import Dict, Type
+from typing import Any, Callable, TYPE_CHECKING
+
+if TYPE_CHECKING:
+    ItemFinderCreator = Callable[[ProjectInfo,Any,'DoxygenItemFinderFactory'],ItemFinder]
 
 
 class _CreateCompoundTypeSubFinder:
@@ -15,13 +20,13 @@ class _CreateCompoundTypeSubFinder:
         self.app = app
         self.parser_factory = parser_factory
 
-    def __call__(self, project_info: ProjectInfo, *args):
+    def __call__(self, project_info: ProjectInfo, *args) -> indexfinder.CompoundTypeSubItemFinder:
         compound_parser = self.parser_factory.create_compound_parser(project_info)
         return indexfinder.CompoundTypeSubItemFinder(self.app, compound_parser, project_info, *args)
 
 
 class DoxygenItemFinderFactory:
-    def __init__(self, finders: Dict[str, Type[ItemFinder]], project_info: ProjectInfo):
+    def __init__(self, finders: dict[str, ItemFinderCreator], project_info: ProjectInfo):
         self.finders = finders
         self.project_info = project_info
 
@@ -59,9 +64,9 @@ class FinderFactory:
         return self.create_finder_from_root(root, project_info)
 
     def create_finder_from_root(self, root, project_info: ProjectInfo) -> Finder:
-        finders: Dict[str, Type[ItemFinder]] = {
+        finders: dict[str, ItemFinderCreator] = {
             "doxygen": indexfinder.DoxygenTypeSubItemFinder,
-            "compound": _CreateCompoundTypeSubFinder(self.app, self.parser_factory),  # type: ignore
+            "compound": _CreateCompoundTypeSubFinder(self.app, self.parser_factory),
             "member": indexfinder.MemberTypeSubItemFinder,
             "doxygendef": compoundfinder.DoxygenTypeSubItemFinder,
             "compounddef": compoundfinder.CompoundDefTypeSubItemFinder,

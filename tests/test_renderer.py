@@ -1,14 +1,15 @@
 import os
 import pytest
 
+import sphinx.locale
 import sphinx.addnodes
 import sphinx.environment
-from breathe.parser.compound import (
-    compounddefTypeSub,
-    linkedTextTypeSub,
-    memberdefTypeSub,
-    paramTypeSub,
-    refTypeSub,
+from breathe.parser import (
+    Node_compounddefType,
+    Node_linkedTextType,
+    Node_memberdefType,
+    Node_paramType,
+    Node_refType,
     MixedContainer,
 )
 from breathe.renderer.sphinxrenderer import SphinxRenderer
@@ -72,34 +73,6 @@ class WrappedMixedContainer(MixedContainer, WrappedDoxygenNode):
     def __init__(self, **kwargs):
         MixedContainer.__init__(self, None, None, None, None)
         WrappedDoxygenNode.__init__(self, None, **kwargs)
-
-
-class WrappedLinkedText(linkedTextTypeSub, WrappedDoxygenNode):
-    """A test wrapper of Doxygen linked text."""
-
-    def __init__(self, **kwargs):
-        WrappedDoxygenNode.__init__(self, linkedTextTypeSub, **kwargs)
-
-
-class WrappedMemberDef(memberdefTypeSub, WrappedDoxygenNode):
-    """A test wrapper of Doxygen class/file/namespace member symbol such as a function declaration."""
-
-    def __init__(self, **kwargs):
-        WrappedDoxygenNode.__init__(self, memberdefTypeSub, **kwargs)
-
-
-class WrappedParam(paramTypeSub, WrappedDoxygenNode):
-    """A test wrapper of Doxygen parameter."""
-
-    def __init__(self, **kwargs):
-        WrappedDoxygenNode.__init__(self, paramTypeSub, **kwargs)
-
-
-class WrappedRef(refTypeSub, WrappedDoxygenNode):
-    """A test wrapper of Doxygen ref."""
-
-    def __init__(self, node_name, **kwargs):
-        WrappedDoxygenNode.__init__(self, refTypeSub, node_name, **kwargs)
 
 
 class WrappedCompoundDef(compounddefTypeSub, WrappedDoxygenNode):
@@ -317,7 +290,7 @@ def render(
 
 
 def test_render_func(app):
-    member_def = WrappedMemberDef(
+    member_def = Node_memberdefType(
         kind="function",
         definition="void foo",
         type_="void",
@@ -325,7 +298,7 @@ def test_render_func(app):
         argsstring="(int)",
         virt="non-virtual",
         param=[
-            WrappedParam(type_=WrappedLinkedText(content_=[WrappedMixedContainer(value="int")]))
+            Node_paramType(type_=Node_linkedTextType([WrappedMixedContainer(value="int")]))
         ],
     )
     signature = find_node(render(app, member_def), "desc_signature")
@@ -348,7 +321,7 @@ def test_render_func(app):
 
 
 def test_render_typedef(app):
-    member_def = WrappedMemberDef(
+    member_def = Node_memberdefType(
         kind="typedef", definition="typedef int foo", type_="int", name="foo"
     )
     signature = find_node(render(app, member_def), "desc_signature")
@@ -356,7 +329,7 @@ def test_render_typedef(app):
 
 
 def test_render_c_typedef(app):
-    member_def = WrappedMemberDef(
+    member_def = Node_memberdefType(
         kind="typedef", definition="typedef unsigned int bar", type_="unsigned int", name="bar"
     )
     signature = find_node(render(app, member_def, domain="c"), "desc_signature")
@@ -364,7 +337,7 @@ def test_render_c_typedef(app):
 
 
 def test_render_c_function_typedef(app):
-    member_def = WrappedMemberDef(
+    member_def = Node_memberdefType(
         kind="typedef",
         definition="typedef void* (*voidFuncPtr)(float, int)",
         type_="void* (*",
@@ -385,7 +358,7 @@ def test_render_c_function_typedef(app):
 
 
 def test_render_using_alias(app):
-    member_def = WrappedMemberDef(
+    member_def = Node_memberdefType(
         kind="typedef", definition="using foo = int", type_="int", name="foo"
     )
     signature = find_node(render(app, member_def), "desc_signature")
@@ -393,7 +366,7 @@ def test_render_using_alias(app):
 
 
 def test_render_const_func(app):
-    member_def = WrappedMemberDef(
+    member_def = Node_memberdefType(
         kind="function",
         definition="void f",
         type_="void",
@@ -407,7 +380,7 @@ def test_render_const_func(app):
 
 
 def test_render_lvalue_func(app):
-    member_def = WrappedMemberDef(
+    member_def = Node_memberdefType(
         kind="function",
         definition="void f",
         type_="void",
@@ -421,7 +394,7 @@ def test_render_lvalue_func(app):
 
 
 def test_render_rvalue_func(app):
-    member_def = WrappedMemberDef(
+    member_def = Node_memberdefType(
         kind="function",
         definition="void f",
         type_="void",
@@ -435,7 +408,7 @@ def test_render_rvalue_func(app):
 
 
 def test_render_const_lvalue_func(app):
-    member_def = WrappedMemberDef(
+    member_def = Node_memberdefType(
         kind="function",
         definition="void f",
         type_="void",
@@ -450,7 +423,7 @@ def test_render_const_lvalue_func(app):
 
 
 def test_render_const_rvalue_func(app):
-    member_def = WrappedMemberDef(
+    member_def = Node_memberdefType(
         kind="function",
         definition="void f",
         type_="void",
@@ -465,7 +438,7 @@ def test_render_const_rvalue_func(app):
 
 
 def test_render_variable_initializer(app):
-    member_def = WrappedMemberDef(
+    member_def = Node_memberdefType(
         kind="variable",
         definition="const int EOF",
         type_="const int",
@@ -477,20 +450,20 @@ def test_render_variable_initializer(app):
 
 
 def test_render_define_initializer(app):
-    member_def = WrappedMemberDef(
+    member_def = Node_memberdefType(
         kind="define",
         name="MAX_LENGTH",
-        initializer=WrappedLinkedText(content_=[WrappedMixedContainer(value="100")]),
+        initializer=Node_linkedTextType([WrappedMixedContainer(value="100")]),
     )
     signature_w_initializer = find_node(
         render(app, member_def, show_define_initializer=True), "desc_signature"
     )
     assert signature_w_initializer.astext() == "MAX_LENGTH 100"
 
-    member_def_no_show = WrappedMemberDef(
+    member_def_no_show = Node_memberdefType(
         kind="define",
         name="MAX_LENGTH_NO_INITIALIZER",
-        initializer=WrappedLinkedText(content_=[WrappedMixedContainer(value="100")]),
+        initializer=Node_linkedTextType([WrappedMixedContainer(value="100")]),
     )
 
     signature_wo_initializer = find_node(
@@ -501,7 +474,7 @@ def test_render_define_initializer(app):
 
 def test_render_define_no_initializer(app):
     sphinx.addnodes.setup(app)
-    member_def = WrappedMemberDef(kind="define", name="USE_MILK")
+    member_def = Node_memberdefType(kind="define", name="USE_MILK")
     signature = find_node(render(app, member_def), "desc_signature")
     assert signature.astext() == "USE_MILK"
 
@@ -510,13 +483,13 @@ def test_render_innergroup(app):
     refid = "group__innergroup"
     mock_compound_parser = MockCompoundParser(
         {
-            refid: WrappedCompoundDef(
+            refid: Node_compounddefType(
                 kind="group", compoundname="InnerGroup", briefdescription="InnerGroup"
             )
         }
     )
-    ref = WrappedRef("InnerGroup", refid=refid)
-    compound_def = WrappedCompoundDef(
+    ref = Node_refType(["InnerGroup"], refid=refid)
+    compound_def = Node_compounddefType(
         kind="group", compoundname="OuterGroup", briefdescription="OuterGroup", innergroup=[ref]
     )
     assert all(

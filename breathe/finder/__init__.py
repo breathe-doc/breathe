@@ -1,6 +1,12 @@
+from __future__ import annotations
+
 from breathe.project import ProjectInfo
 from breathe.renderer.filter import Filter
 
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from breathe.finder.factory import DoxygenItemFinderFactory
 
 def stack(element, list_):
     """Stack an element on to the start of a list and return as a new list"""
@@ -12,10 +18,9 @@ def stack(element, list_):
 
 
 class ItemFinder:
-    def __init__(self, project_info: ProjectInfo, data_object, item_finder_factory):
+    def __init__(self, project_info: ProjectInfo, data_object, item_finder_factory: DoxygenItemFinderFactory):
         self.data_object = data_object
-        # DoxygenItemFinderFactory, but actually typing it would introduce an import cycle
-        self.item_finder_factory = item_finder_factory
+        self.item_finder_factory: DoxygenItemFinderFactory = item_finder_factory
         self.project_info = project_info
 
     def filter_(self, ancestors, filter_: Filter, matches) -> None:

@@ -1,7 +1,7 @@
 import os
 import sphinx
 
-from breathe.parser import compound, compoundsuper, DoxygenCompoundParser
+from breathe import parser
 from breathe.project import ProjectInfo
 from breathe.renderer import RenderContext
 from breathe.renderer.filter import Filter
@@ -493,7 +493,7 @@ class SphinxRenderer:
         state,
         document: nodes.document,
         target_handler: TargetHandler,
-        compound_parser: DoxygenCompoundParser,
+        compound_parser: parser.DoxygenCompoundParser,
         filter_: Filter,
     ):
         self.app = app
