@@ -41,6 +41,7 @@ is broken into chunks. */
 
 enum {
     CLASS_FROZEN_LIST = 0,
+    CLASS_FROZEN_LIST_ITR,
     CLASS_TAGGED_VALUE,
 //% for type in types|select('used_directly')
     CLASS__{$ type $},
@@ -296,8 +297,8 @@ static tagged_value *create_tagged_value(module_state *state) {
 static void tagged_value_dealloc(tagged_value *tv) {
     PyTypeObject *t = Py_TYPE(tv);
     PyObject_GC_UnTrack(tv);
-    Py_XDECREF(tv->values[0]);
-    Py_XDECREF(tv->values[1]);
+    Py_CLEAR(tv->values[0]);
+    Py_CLEAR(tv->values[1]);
     ((freefunc)PyType_GetSlot(t,Py_tp_free))(tv);
     Py_DECREF(t);
 }
@@ -364,6 +365,14 @@ typedef struct {
     PyObject **content;
 } frozen_list;
 
+/* A type doesn't satisfy collections.abc.Iterable unless is has an __iter__
+method */
+typedef struct {
+    PyObject_HEAD
+    size_t i;
+    frozen_list *fl;
+} frozen_list_itr;
+
 static void init_frozen_list(frozen_list *fl) {
     fl->size = 0;
     fl->capacity = 0;
@@ -410,9 +419,11 @@ static PyObject **frozen_list_push_tagged_value(module_state *state,tagged_union
 
 static void frozen_list_dealloc(frozen_list *obj) {
     size_t i;
+    size_t size = obj->size;
     PyTypeObject *t = Py_TYPE(obj);
     PyObject_GC_UnTrack(obj);
-    for(i=0; i<obj->size; ++i) Py_XDECREF(obj->content[i]);
+    obj->size = 0;
+    for(i=0; i<size; ++i) Py_XDECREF(obj->content[i]);
     if(obj->content) PyMem_Free(obj->content);
     ((freefunc)PyType_GetSlot(t,Py_tp_free))(obj);
     Py_DECREF(t);
@@ -458,11 +469,11 @@ static int frozen_list_fill(frozen_list *fl,PyObject *iterable) {
     return 0;
 }
 
-void raise_no_keyword_allowed(const char *func) {
+static void raise_no_keyword_allowed(const char *func) {
     PyErr_Format(PyExc_TypeError,"%s does not take any keyword arguments",func);
 }
 
-PyObject *frozen_list_tp_new(PyTypeObject *subtype,PyObject *args,PyObject *kwds) {
+static PyObject *frozen_list_tp_new(PyTypeObject *subtype,PyObject *args,PyObject *kwds) {
     frozen_list *r;
     if(kwds != NULL && PyDict_Size(kwds)) {
         raise_no_keyword_allowed("FrozenList.__new__");
@@ -484,12 +495,79 @@ PyObject *frozen_list_tp_new(PyTypeObject *subtype,PyObject *args,PyObject *kwds
     return (PyObject*)r;
 }
 
+static PyObject *frozen_list_tp_iter(frozen_list *self) {
+    PyObject *m;
+    frozen_list_itr *r;
+    
+    m = PyState_FindModule(&module_def);
+    assert(m);
+    r = PyObject_GC_New(frozen_list_itr,((module_state*)PyModule_GetState(m))->classes[CLASS_FROZEN_LIST_ITR]);
+    if(r == NULL) return NULL;
+    r->i = 0;
+    r->fl = NULL;
+    if(self->size) {
+        r->fl = self;
+        Py_INCREF(self);
+    }
+    return (PyObject*)r;
+}
+
 static PyType_Slot frozen_list_slots[] = {
+    {Py_tp_iter,frozen_list_tp_iter},
     {Py_tp_new,frozen_list_tp_new},
     {Py_tp_dealloc,frozen_list_dealloc},
     {Py_sq_length,frozen_list_size},
     {Py_sq_item,frozen_list_item},
     {Py_tp_traverse,frozen_list_traverse},
+    {0,NULL}
+};
+
+static PyObject *frozen_list_itr_tp_iter(PyObject *self) {
+    Py_INCREF(self);
+    return self;
+}
+
+static PyObject *frozen_list_itr_tp_next(frozen_list_itr *self) {
+    PyObject *r;
+
+    if(self->fl == NULL) return NULL;
+
+    assert(self->i < self->fl->size);
+    r = self->fl->content[self->i++];
+    if(self->i == self->fl->size) Py_CLEAR(self->fl);
+    Py_INCREF(r);
+    return r;
+}
+
+static PyObject *frozen_list_itr_length_hint(frozen_list_itr *self,PyObject *Py_UNUSED(x)) {
+    if(self->fl == NULL) return PyLong_FromLong(0);
+    return PyLong_FromLong(self->fl->size - self->i);
+}
+
+static PyMethodDef frozen_list_itr_methods[] = {
+    {"__length_hint__",(PyCFunction)frozen_list_itr_length_hint,METH_NOARGS,NULL},
+    {NULL}
+};
+
+static void frozen_list_itr_dealloc(frozen_list_itr *obj) {
+    PyTypeObject *t = Py_TYPE(obj);
+    PyObject_GC_UnTrack(obj);
+    Py_CLEAR(obj->fl);
+    ((freefunc)PyType_GetSlot(t,Py_tp_free))(obj);
+    Py_DECREF(t);
+}
+
+static int frozen_list_itr_traverse(frozen_list_itr *obj,visitproc visit,void *arg) {
+    if(obj->fl == NULL) return 0;
+    return visit((PyObject*)obj->fl,arg);
+}
+
+static PyType_Slot frozen_list_itr_slots[] = {
+    {Py_tp_iter,frozen_list_itr_tp_iter},
+    {Py_tp_iternext,frozen_list_itr_tp_next},
+    {Py_tp_methods,frozen_list_itr_methods},
+    {Py_tp_dealloc,frozen_list_itr_dealloc},
+    {Py_tp_traverse,frozen_list_itr_traverse},
     {0,NULL}
 };
 
@@ -619,7 +697,7 @@ static void node_tagonly_common_dealloc(node_tagonly_common *obj,size_t field_co
     size_t i;
     PyTypeObject *t = Py_TYPE(obj);
     PyObject_GC_UnTrack(obj);
-    for(i=0; i<field_count; ++i) Py_XDECREF(obj->fields[i]);
+    for(i=0; i<field_count; ++i) Py_CLEAR(obj->fields[i]);
     ((freefunc)PyType_GetSlot(t,Py_tp_free))(obj);
     Py_DECREF(t);
 }
@@ -655,10 +733,12 @@ static node_list_common *create_node_list_common(module_state *state,size_t clas
 
 static void node_list_common_dealloc(node_list_common *obj,size_t field_count) {
     size_t i;
+    size_t size = obj->base.size;
     PyTypeObject *t = Py_TYPE(obj);
     PyObject_GC_UnTrack(obj);
-    for(i=0; i<field_count; ++i) Py_XDECREF(obj->fields[i]);
-    for(i=0; i<obj->base.size; ++i) Py_XDECREF(obj->base.content[i]);
+    obj->base.size = 0;
+    for(i=0; i<field_count; ++i) Py_CLEAR(obj->fields[i]);
+    for(i=0; i<size; ++i) Py_XDECREF(obj->base.content[i]);
     if(obj->base.content) PyMem_Free(obj->base.content);
     ((freefunc)PyType_GetSlot(t,Py_tp_free))(obj);
     Py_DECREF(t);
@@ -876,6 +956,7 @@ static PyMemberDef tuple_item_members__{$ type $}[] = {
 };
 
 PyObject *tuple_item_tp_new__{$ type $}(PyTypeObject *subtype,PyObject *args,PyObject *kwds) {
+    size_t i;
     tuple_item *r = (tuple_item*)((allocfunc)PyType_GetSlot(subtype,Py_tp_alloc))(subtype,0);
     if(r == NULL) return NULL;
 
@@ -888,9 +969,11 @@ PyObject *tuple_item_tp_new__{$ type $}(PyTypeObject *subtype,PyObject *args,PyO
             &r->fields[{$ loop.index0 $}]{$ ',' if not loop.last $}
 //%     endfor
     )) {
+        for(i=0; i<TUPLE_ITEM_FIELD_COUNT__{$ type $}; ++i) r->fields[i] = NULL;
         Py_DECREF(r);
         return NULL;
     }
+    for(i=0; i<TUPLE_ITEM_FIELD_COUNT__{$ type $}; ++i) Py_INCREF(r->fields[i]);
 
     return (PyObject*)r;
 }
@@ -1107,6 +1190,7 @@ static int node_set_py_field(module_state *state,PyObject **field,PyObject *valu
     }
 
     *field = value;
+    Py_INCREF(value);
     return 1;
 }
 
@@ -1307,8 +1391,10 @@ static int node_class_child__{$ type $}(parse_state *state,{$ 'PyObject **fields
 //%     if type is used_directly
 static PyObject *node_class_tp_new__{$ type $}(PyTypeObject *subtype,PyObject *args,PyObject *kwds) {
     static const char *func_name = "Node_{$ type $}.__new__";
+//%       if type|field_count
     PyObject *module;
     module_state *state;
+//%       endif
     node_{$ common_affix(type) $}_common *n;
 //%       if type|field_count
     PyObject *key, *value;
@@ -1329,12 +1415,15 @@ static PyObject *node_class_tp_new__{$ type $}(PyTypeObject *subtype,PyObject *a
     }
 //%       endif
 
+//%       if type|field_count
     module = PyState_FindModule(&module_def);
     assert(module);
     state = PyModule_GetState(module);
+//%       endif
     
-    n = create_node_{$ common_affix(type) $}_common(state,CLASS__{$ type $},FIELD_COUNT__{$ type $});
+    n = (node_{$ common_affix(type) $}_common*)((allocfunc)PyType_GetSlot(subtype,Py_tp_alloc))(subtype,0);
     if(n == NULL) return NULL;
+    init_node_{$ common_affix(type) $}_common(n,FIELD_COUNT__{$ type $});
 
 //%       if type is list_e
     if(frozen_list_fill(&n->base,PyTuple_GetItem(args,0))) {
@@ -1557,6 +1646,7 @@ typedef struct {
 
 static spec_and_is_list class_specs[] = {
     {{FULL_MODULE_STR ".FrozenList",sizeof(frozen_list),0,Py_TPFLAGS_DEFAULT|Py_TPFLAGS_BASETYPE|Py_TPFLAGS_HAVE_GC|Py_TPFLAGS_SEQUENCE,frozen_list_slots},0},
+    {{FULL_MODULE_STR ".FrozenListItr",sizeof(frozen_list_itr),0,Py_TPFLAGS_DEFAULT|Py_TPFLAGS_HAVE_GC,frozen_list_itr_slots},0},
     {{FULL_MODULE_STR ".TaggedValue",sizeof(tagged_value),0,Py_TPFLAGS_DEFAULT|Py_TPFLAGS_HAVE_GC|Py_TPFLAGS_SEQUENCE,tagged_value_slots},0},
 //% for type in types|select('used_directly')
     {{FULL_MODULE_STR ".Node_{$ type $}",offsetof(node_{$ common_affix(type) $}_common,fields){% if type is has_fields %} + sizeof(PyObject*)*FIELD_COUNT__{$ type $}{% endif %},0,Py_TPFLAGS_DEFAULT|Py_TPFLAGS_HAVE_GC,node_class_slots__{$ type $}},{$ '1' if type is list_e else '0' $}},
@@ -1658,17 +1748,17 @@ static int parse_file(parse_state *state,PyObject *file) {
 }
 
 static int parse_str(parse_state *state,PyObject *data) {
-    int r = 0;
+    int r = -1;
     const char *s;
     Py_ssize_t len;
     PyObject *tmp = NULL;
 
     if(PyUnicode_Check(data)) {
+        char *s_tmp;
         tmp = PyUnicode_AsUTF8String(data);
         if(tmp == NULL) return -1;
-        s = PyByteArray_AsString(data);
-        assert(s);
-        len = PyByteArray_Size(data);
+        if(PyBytes_AsStringAndSize(tmp,&s_tmp,&len) < 0) goto end;
+        s = s_tmp;
         XML_SetEncoding(state->parser,"utf-8");
     } else if(PyBytes_Check(data)) {
         char *s_tmp;
@@ -1686,7 +1776,6 @@ static int parse_str(parse_state *state,PyObject *data) {
     while(len > EXPAT_CHUNK_SIZE) {
         if(XML_Parse(state->parser,s,EXPAT_CHUNK_SIZE,0) == XML_STATUS_ERROR) {
             raise_expat_error(state);
-            r = -1;
             goto end;
         }
 
@@ -1696,9 +1785,10 @@ static int parse_str(parse_state *state,PyObject *data) {
 
     if(XML_Parse(state->parser,s,(int)len,1) == XML_STATUS_ERROR) {
         raise_expat_error(state);
-        r = -1;
         goto end;
     }
+
+    r = 0;
 
   end:
     Py_XDECREF(tmp);
@@ -1775,12 +1865,12 @@ static PyMethodDef module_functions[] = {
     {"parse_file",impl_parse_file,METH_O,NULL},
     {NULL}};
 
-static PyObject *load_enum_base(void) {
+static PyObject *load_class_from_mod(const char *cls_name,const char *mod_name) {
     PyObject *cls;
-    PyObject *enum_m = PyImport_ImportModule("enum");
-    if(enum_m == NULL) return NULL;
-    cls = PyObject_GetAttrString(enum_m,"Enum");
-    Py_DECREF(enum_m);
+    PyObject *m = PyImport_ImportModule(mod_name);
+    if(m == NULL) return NULL;
+    cls = PyObject_GetAttrString(m,cls_name);
+    Py_DECREF(m);
     return cls;
 }
 
@@ -1858,6 +1948,7 @@ static int create_enum(
 
 static int module_exec(PyObject *module) {
     PyObject *enum_base=NULL;
+    PyObject *frozen_list_bases=NULL;
     size_t i=0;
     size_t tu_i=0;
     size_t char_i=0;
@@ -1882,7 +1973,7 @@ static int module_exec(PyObject *module) {
     }
 //% endif
 
-    enum_base = load_enum_base();
+    enum_base = load_class_from_mod("Enum","enum");
     if(enum_base == NULL) goto error;
 //% for type in types|select('enumeration_t')
     if(create_enum(
@@ -1898,13 +1989,16 @@ static int module_exec(PyObject *module) {
     enum_base = NULL;
 
     for(; i<CLASS_COUNT; ++i) {
-        if(class_specs[i].list_base) {
-            PyObject *bases = PyTuple_New(1);
-            if(bases == NULL) return -1;
-            PyTuple_SetItem(bases,0,(PyObject*)state->classes[CLASS_FROZEN_LIST]);
-            Py_INCREF(state->classes[CLASS_FROZEN_LIST]);
-            state->classes[i] = (PyTypeObject*)PyType_FromSpecWithBases(&class_specs[i].spec,bases);
-            Py_DECREF(bases);
+        if(i == CLASS_FROZEN_LIST) {
+            state->classes[i] = (PyTypeObject*)PyType_FromSpec(&class_specs[i].spec);
+
+            frozen_list_bases = PyTuple_New(1);
+            if(frozen_list_bases == NULL) goto error;
+            PyTuple_SetItem(frozen_list_bases,0,(PyObject*)state->classes[i]);
+            Py_INCREF(state->classes[i]);
+        } else if(class_specs[i].list_base) {
+            assert(frozen_list_bases != NULL);
+            state->classes[i] = (PyTypeObject*)PyType_FromSpecWithBases(&class_specs[i].spec,frozen_list_bases);
         } else {
             state->classes[i] = (PyTypeObject*)PyType_FromSpec(&class_specs[i].spec);
         }
@@ -1916,10 +2010,13 @@ static int module_exec(PyObject *module) {
         Py_INCREF(state->classes[i]);
     }
 
+    Py_DECREF(frozen_list_bases);
+
     return 0;
 
   error:
     Py_XDECREF(enum_base);
+    Py_XDECREF(frozen_list_bases);
 //% for type in types|select('enumeration_t')
     if(state->enum_values__{$ type $}[0] != NULL) decref_array(state->enum_values__{$ type $},ENUM_VALUE_COUNT__{$ type $});
 //% endfor

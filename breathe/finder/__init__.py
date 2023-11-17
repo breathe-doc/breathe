@@ -1,12 +1,11 @@
 from __future__ import annotations
 
-from breathe.project import ProjectInfo
-from breathe.renderer.filter import Filter
-
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
+    from breathe.project import ProjectInfo
     from breathe.finder.factory import DoxygenItemFinderFactory
+    from breathe.renderer.filter import Filter
 
 def stack(element, list_):
     """Stack an element on to the start of a list and return as a new list"""

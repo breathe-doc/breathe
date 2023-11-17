@@ -8,10 +8,15 @@ U = TypeVar('U')
 class SupportsRead(Protocol):
     def read(self, length: int, /) -> bytes | bytearray: ...
 
+class FrozenListItr(Generic[T]):
+    def __iter__(self) -> FrozenListItr: ...
+    def __next__(self) -> T: ...
+
 class FrozenList(Generic[T]):
     def __init__(self, items: Iterable[T]): ...
     def __len__(self) -> int: ...
     def __getitem__(self, i: SupportsIndex) -> T: ...
+    def __iter__(self) -> FrozenListItr[T]: ...
 
 class TaggedValue(Generic[T, U]):
     name: T
@@ -98,7 +103,7 @@ ListItem_{$ type $} = (
 {$ "invalid content type"|error $}
 //%   endif
 //%   if type is used_directly
-class Node_{$ type $}:
+class Node_{$ type $}{$ '(FrozenList['~list_item_type~'])' if type is list_e $}:
 {$ emit_fields(type) $}
     def __init__(self{$ ', __items: Iterable['~list_item_type~'], /' if type is list_e $}
         {%- if type|field_count -%}, *
@@ -106,12 +111,6 @@ class Node_{$ type $}:
             {%- for f in type.all_fields() if f is optional %}, {$ f.py_name $}: {$ f.py_type(true) $} = ...{% endfor -%}
         {%- endif %}): ...
 
-//%     if type is list_e
-    def __len__(self) -> int: ...
-
-    def __getitem__(self,i: SupportsIndex) -> {$ list_item_type $}: ...
-
-//%     endif
 //%   elif type is enumeration_t
 class {$ type $}(enum.Enum):
 //%     for entry in type.children
