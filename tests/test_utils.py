@@ -1,5 +1,4 @@
 from unittest import TestCase
-from xml.dom import minidom
 
 from breathe.renderer.sphinxrenderer import get_param_decl, get_definition_without_template_args
 from breathe import path_handler, parser

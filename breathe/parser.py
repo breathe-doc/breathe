@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from breathe import file_state_cache, path_handler
 from breathe.project import ProjectInfo
 
@@ -5,18 +7,30 @@ from breathe._parser import *
 
 from sphinx.application import Sphinx
 
+from typing import overload
+
+
 
 class ParserError(RuntimeError):
-    def __init__(self, error: str, filename: str):
-        super().__init__(error)
+    def __init__(self, message: str, filename: str, lineno: int | None = None):
+        super().__init__(message,filename,lineno)
 
-        self.error = error
-        self.filename = filename
+    @property
+    def message(self) -> str:
+        return self.args[0]
+    
+    @property
+    def lineno(self) -> int | None:
+        return self.args[1]
+    
+    @property
+    def filename(self) -> str:
+        return self.args[2]
 
     def __str__(self):
-        # TODO: update _parser.ParseError to store the line number and message
-        # as separate fields for better formatting here
-        return f"file {self.filename}: {self.error}"
+        if self.lineno is None:
+            return f"file {self.filename}: {self.message}"
+        return f"file {self.filename}:{self.lineno}: {self.message}"
 
 
 class FileIOError(RuntimeError):
@@ -28,7 +42,7 @@ class FileIOError(RuntimeError):
 
 
 class Parser:
-    def __init__(self, app: Sphinx, cache):
+    def __init__(self, app: Sphinx, cache: dict[str, Node_DoxygenTypeIndex | Node_DoxygenType]):
         self.app = app
         self.cache = cache
     
@@ -43,10 +57,10 @@ class Parser:
                     result = parse_file(file)
                 if result.name != right_tag:
                     raise ParserError(f'expected "{right_tag}" root element, not "{result.name}"',filename)
-                self.cache[filename] = result
+                self.cache[filename] = result.value
                 return result.value
             except ParseError as e:
-                raise ParserError(str(e), filename)
+                raise ParserError(e.message, filename, e.lineno)
             except IOError as e:
                 raise FileIOError(str(e), filename)
 
@@ -92,3 +106,17 @@ class DoxygenParserFactory:
 
     def create_compound_parser(self, project_info: ProjectInfo) -> DoxygenCompoundParser:
         return DoxygenCompoundParser(self.app, self.cache, project_info)
+
+
+@overload
+def tag_name_value(x: TaggedValue[T, U]) -> tuple[T, U]: ...
+
+@overload
+def tag_name_value(x: str) -> tuple[None,str]: ...
+
+@overload
+def tag_name_value(x: TaggedValue[T, U] | str) -> tuple[T | None, U | str]: ...
+
+def tag_name_value(x):
+    if isinstance(x,str): return None,x
+    return x.name,x.value

@@ -2,7 +2,7 @@ from docutils import nodes
 import textwrap
 
 
-def format_parser_error(name, error, filename, state, lineno, do_unicode_warning):
+def format_parser_error(name: str, error: str, filename: str, state, lineno: int, do_unicode_warning: bool = False) -> list[nodes.Node]:
     warning = '%s: Unable to parse xml file "%s". ' % (name, filename)
     explanation = "Reported error: %s. " % error
 

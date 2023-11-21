@@ -127,7 +127,7 @@
       },
       "content": {
         "internal":             "docInternalType",
-        "para":                 "#string",
+        "para":                 "docParaType",
         "sect1":                "docSect1Type"
       }
     },

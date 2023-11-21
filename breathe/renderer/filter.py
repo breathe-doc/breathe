@@ -22,13 +22,13 @@ As these filters are declared once and then used on multiple nodes, we model the
 hierarchies that encapsulate the required test and take a node (with its context) and return True or
 False.
 
-If you wanted a test which figures out if a node has the node_type 'memberdef' you might create the
-following object hierarchy:
+If you wanted a test which figures out if a node has the 'kind' attribute set to 'function' you
+might create the following object hierarchy:
 
-    node_is_memberdef = InFilter(AttributeAccessor(Node(), 'node_type'), ['memberdef'])
+    kind_is_function = InFilter(AttributeAccessor(Node(), 'kind'), ['function'])
 
-This reads from the inside out, as get the node, then get the node_type attribute from it, and see
-if the value of the attribute is in the list ['memberdef'].
+This reads from the inside out, as get the node, then get the 'kind' attribute from it, and see if
+the value of the attribute is in the list ['function'].
 
 The Node() is called a 'Selector'. Parent() is also a selector. It means given the current context,
 work with the parent of the current node rather than the node itself. This allows you to frame tests
@@ -74,14 +74,14 @@ continue for nodes which don't match.
 An example of a finder filter is:
 
     AndFilter(
-        InFilter(NodeTypeAccessor(Node()), ["compound"]),
+        InFilter(NodeTypeAccessor(Node()), [parser.Node_CompoundType]),
         InFilter(KindAccessor(Node()), ["group"]),
         InFilter(NameAccessor(Node()), ["mygroup"])
         )
 
-This says, return True for all the nodes of node_type 'compound' with 'kind' set to 'group' which
-have the name 'mygroup'. It returns false for everything else, but when a node matching this is
-found then it is added to the matches list by the code above.
+This says, return True for all the nodes of type 'parser.Node_CompoundType' with 'kind' set to
+'group' which have the name 'mygroup'. It returns false for everything else, but when a node
+matching this is found then it is added to the matches list by the code above.
 
 It is therefore relatively easy to write finder filters. If you have two separate node filters like
 the one above and you want to match on both of them then you can do:
@@ -98,34 +98,34 @@ Content Filters
 ~~~~~~~~~~~~~~~
 
 Content filters are harder than the finder filters as they are responsible for halting the iteration
-down the hierarchy if they return false. This means that if you're interested in memberdef nodes
-with a particular attribute then you have to check for that but also include a clause which allows
-all other non-memberdef nodes to pass through as you don't want to interrupt them.
+down the hierarchy if they return false. This means that if you're interested in Node_memberdefType
+nodes with a particular attribute then you have to check for that but also include a clause which
+allows all other non-Node_memberdefType nodes to pass through as you don't want to interrupt them.
 
 This means you end up with filters like this:
 
     OrFilter(
         AndFilter(
-            InFilter(NodeTypeAccessor(Node()), ["compound"]),
+            InFilter(NodeTypeAccessor(Node()), [parser.Node_memberdefType]),
             InFilter(KindAccessor(Node()), ["group"]),
             InFilter(NameAccessor(Node()), ["mygroup"])
             ),
         NotFilter(
             AndFilter(
-                InFilter(NodeTypeAccessor(Node()), ["compound"]),
+                InFilter(NodeTypeAccessor(Node()), [parser.Node_memberdefType]),
                 InFilter(KindAccessor(Node()), ["group"]),
                 )
             )
         )
 
-Which is to say that we want to let through a compound, with kind group, with name 'mygroup' but
-we're also happy if the node is **not** a compund with kind group. Really we just don't want to let
-through any compounds with kind group with name other than 'mygroup'. As such, we can rephrase this
-as:
+Which is to say that we want to let through a Node_memberdefType, with kind group, with name
+'mygroup' but we're also happy if the node is **not** a Node_memberdefType with kind group. Really
+we just don't want to let through any Node_memberdefTypes with kind group with name other than
+'mygroup'. As such, we can rephrase this as:
 
     NotFilter(
         AndFilter(
-            InFilter(NodeTypeAccessor(Node()), ["compound"]),
+            InFilter(NodeTypeAccessor(Node()), [parser.Node_memberdefType]),
             InFilter(KindAccessor(Node()), ["group"]),
             NotFilter(InFilter(NameAccessor(Node()), ["mygroup"]))
             )
@@ -134,13 +134,14 @@ as:
 Using logical manipulation we can rewrite this as:
 
     OrFilter(
-        NotFilter(InFilter(NodeTypeAccessor(Node()), ["compound"])),
+        NotFilter(InFilter(NodeTypeAccessor(Node()), [parser.Node_memberdefType])),
         NotFilter(InFilter(KindAccessor(Node()), ["group"])),
         InFilter(NameAccessor(Node()), ["mygroup"])
         )
 
-We reads: allow if it isn't a compound, or if it is a compound but doesn't have a 'kind' of 'group',
-but if it is a compound and has a 'kind' of 'group then only allow it if it is named 'mygroup'.
+We reads: allow if it isn't a Node_memberdefType, or if it is a Node_memberdefType but doesn't have
+a 'kind' of 'group', but if it is a Node_memberdefType and has a 'kind' of 'group then only allow it
+if it is named 'mygroup'.
 
 
 Helper Syntax
@@ -171,12 +172,12 @@ We also override the binary 'and' (&), 'or' (|) and 'not' (~) operators in Pytho
 AndFilters, OrFilters and NotFilters respectively. We have to override the binary operators as they
 actual 'and', 'or' and 'not' operators cannot be overridden. So:
 
-    (node.node_type == 'compound') & (node.name == 'mygroup')
+    (type.node_type == parser.Node_CompoundType) & (node.name == 'mygroup')
 
 Translates to:
 
     AndFilter(
-        InFilter(NodeTypeAccessor(Node()), ["compound"])),
+        InFilter(NodeTypeAccessor(Node()), [parser.Node_CompoundType])),
         InFilter(NameAccessor(Node()), ["mygroup"])
         )
 
@@ -191,20 +192,23 @@ As the binary operators have a lower operator precedence than '==' and '!=' and 
 we have to include additional parenthesis in the expressions to group them as we want. So instead of
 writing:
 
-    node.node_type == 'compound' & node.name == 'mygroup'
+    node.node_type == parser.Node_CompoundType & node.name == 'mygroup'
 
 We have to write:
 
-    (node.node_type == 'compound') & (node.name == 'mygroup')
+    (node.node_type == parser.Node_CompoundType) & (node.name == 'mygroup')
 
 """
 
-from breathe import path_handler
+from __future__ import annotations
+
+from breathe import path_handler, parser
 
 from sphinx.application import Sphinx
 
 import os
 from typing import Any, Callable, Dict, List
+from collections.abc import Iterable
 
 
 class UnrecognisedKindError(Exception):
@@ -226,7 +230,7 @@ class Selector:
 
     @property
     def kind(self):
-        return AttributeAccessor(self, "kind")
+        return KindAccessor(self)
 
     @property
     def node_name(self):
@@ -269,10 +273,16 @@ class Parent(Selector):
     def __call__(self, node_stack):
         return node_stack[1]
 
+    def __repr__(self) -> str:
+        return 'Parent()'
+
 
 class Node(Selector):
     def __call__(self, node_stack):
         return node_stack[0]
+
+    def __repr__(self) -> str:
+        return 'Node()'
 
 
 ###############################################################################
@@ -287,19 +297,19 @@ class Accessor:
     def __call__(self, node_stack):
         raise NotImplementedError
 
-    def __eq__(self, value: str) -> "InFilter":  # type: ignore
+    def __eq__(self, value: Any) -> InFilter:
         return InFilter(self, [value])
 
-    def __ne__(self, value: str) -> "NotFilter":  # type: ignore
+    def __ne__(self, value: Any) -> NotFilter:
         return NotFilter(InFilter(self, [value]))
 
-    def is_one_of(self, collection: List[str]) -> "InFilter":
+    def is_one_of(self, collection: Iterable[Any]) -> InFilter:
         return InFilter(self, collection)
 
-    def has_content(self) -> "HasContentFilter":
+    def has_content(self) -> HasContentFilter:
         return HasContentFilter(self)
 
-    def endswith(self, options: List[str]) -> "EndsWithFilter":
+    def endswith(self, options: List[str]) -> EndsWithFilter:
         return EndsWithFilter(self, options)
 
 
@@ -319,22 +329,16 @@ class NodeNameAccessor(Accessor):
 
 
 class NodeTypeAccessor(Accessor):
-    def __call__(self, node_stack) -> str:
-        data_object = self.selector(node_stack)
-        try:
-            return data_object.node_type
-        except AttributeError as e:
-            # Horrible hack to silence errors on filtering unicode objects
-            # until we fix the parsing
-            if type(data_object) == str:
-                return "unicode"
-            else:
-                raise e
+    def __call__(self, node_stack) -> type:
+        return type(self.selector(node_stack))
+
+    def __repr__(self) -> str:
+        return f'NodeTypeAccessor({self.selector!r})'
 
 
 class KindAccessor(Accessor):
-    def __call__(self, node_stack) -> str:
-        return self.selector(node_stack).kind
+    def __call__(self, node_stack):
+        return self.selector(node_stack).kind.value
 
 
 class AttributeAccessor(Accessor):
@@ -349,6 +353,9 @@ class AttributeAccessor(Accessor):
 
     def __call__(self, node_stack) -> Any:
         return getattr(self.selector(node_stack), self.attribute_name)
+
+    def __repr__(self) -> str:
+        return f'AttributeAccessor({self.selector!r}, {self.attribute_name!r})'
 
 
 class LambdaAccessor(Accessor):
@@ -374,10 +381,10 @@ class Filter:
     def allow(self, node_stack) -> bool:
         raise NotImplementedError
 
-    def __and__(self, other: "Filter") -> "AndFilter":
+    def __and__(self, other: "Filter") -> AndFilter:
         return AndFilter(self, other)
 
-    def __or__(self, other: "Filter") -> "OrFilter":
+    def __or__(self, other: "Filter") -> OrFilter:
         return OrFilter(self, other)
 
     def __invert__(self) -> "NotFilter":
@@ -407,7 +414,7 @@ class EndsWithFilter(Filter):
     iterable parameter.
     """
 
-    def __init__(self, accessor: Accessor, options: List[str]):
+    def __init__(self, accessor: Accessor, options: list[str]):
         self.accessor = accessor
         self.options = options
 
@@ -422,13 +429,17 @@ class EndsWithFilter(Filter):
 class InFilter(Filter):
     """Checks if what is returned from the accessor is 'in' in the members"""
 
-    def __init__(self, accessor: Accessor, members: List[str]) -> None:
+    def __init__(self, accessor: Accessor, members: Iterable[Any]) -> None:
         self.accessor = accessor
-        self.members = members
+        self.members = frozenset(members)
 
     def allow(self, node_stack) -> bool:
         name = self.accessor(node_stack)
         return name in self.members
+
+    def __repr__(self) -> str:
+        mem_str = ', '.join(repr(m) for m in self.members)
+        return f'InFilter({self.accessor!r}, {{{mem_str}}})'
 
 
 class GlobFilter(Filter):
@@ -502,7 +513,10 @@ class NotFilter(Filter):
 
 class AndFilter(Filter):
     def __init__(self, *filters: Filter):
-        self.filters = filters
+        self.filters = []
+        for f in filters:
+            if isinstance(f,AndFilter): self.filters.extend(f.filters)
+            else: self.filters.append(f)
 
     def allow(self, node_stack) -> bool:
         # If any filter returns False then return False
@@ -511,12 +525,19 @@ class AndFilter(Filter):
                 return False
         return True
 
+    def __repr__(self) -> str:
+        args = ', '.join(map(repr,self.filters))
+        return f'AndFilter({args})'
+
 
 class OrFilter(Filter):
     """Provides a short-cutted 'or' operation between two filters"""
 
     def __init__(self, *filters: Filter):
-        self.filters = filters
+        self.filters = []
+        for f in filters:
+            if isinstance(f,OrFilter): self.filters.extend(f.filters)
+            else: self.filters.append(f)
 
     def allow(self, node_stack) -> bool:
         # If any filter returns True then return True
@@ -524,6 +545,10 @@ class OrFilter(Filter):
             if filter_.allow(node_stack):
                 return True
         return False
+
+    def __repr__(self) -> str:
+        args = ', '.join(map(repr,self.filters))
+        return f'OrFilter({args})'
 
 
 class IfFilter(Filter):
@@ -579,14 +604,14 @@ class FilterFactory:
     def __init__(self, app: Sphinx) -> None:
         self.app = app
 
-    def create_render_filter(self, kind: str, options: Dict[str, Any]) -> Filter:
+    def create_render_filter(self, kind: str, options: dict[str, Any]) -> Filter:
         """Render filter for group & namespace blocks"""
 
         if kind not in ["group", "page", "namespace"]:
             raise UnrecognisedKindError(kind)
 
         # Generate new dictionary from defaults
-        filter_options = dict((entry, "") for entry in self.app.config.breathe_default_members)
+        filter_options: dict[str, Any] = {entry: "" for entry in self.app.config.breathe_default_members}
 
         # Update from the actual options
         filter_options.update(options)
@@ -618,11 +643,11 @@ class FilterFactory:
             & self.create_outline_filter(filter_options)
         )
 
-    def create_class_filter(self, target: str, options: Dict[str, Any]) -> Filter:
+    def create_class_filter(self, target: str, options: dict[str, Any]) -> Filter:
         """Content filter for classes based on various directive options"""
 
         # Generate new dictionary from defaults
-        filter_options = dict((entry, "") for entry in self.app.config.breathe_default_members)
+        filter_options: dict[str, Any] = {entry: "" for entry in self.app.config.breathe_default_members}
 
         # Update from the actual options
         filter_options.update(options)
@@ -651,7 +676,7 @@ class FilterFactory:
         parent_is_compounddef = parent.node_type == "compounddef"
         parent_is_class = parent.kind.is_one_of(["class", "struct", "interface"])
 
-        allowed = set()
+        allowed: set[str] = set()
         all_options = {
             "protected-members": "protected",
             "private-members": "private",
@@ -698,8 +723,8 @@ class FilterFactory:
         except KeyError:
             # Allow through everything except the header-file includes nodes
             return OrFilter(
-                NotFilter(InFilter(NodeTypeAccessor(Parent()), ["compounddef"])),
-                NotFilter(InFilter(NodeTypeAccessor(Node()), ["inc"])),
+                NotFilter(InFilter(NodeTypeAccessor(Parent()), [parser.Node_compounddefType])),
+                NotFilter(InFilter(NodeTypeAccessor(Node()), [parser.Node_incType])),
             )
 
         if text == "header-file":
@@ -708,8 +733,8 @@ class FilterFactory:
 
         # Allow through everything except the header-file includes nodes
         return OrFilter(
-            NotFilter(InFilter(NodeTypeAccessor(Parent()), ["compounddef"])),
-            NotFilter(InFilter(NodeTypeAccessor(Node()), ["inc"])),
+            NotFilter(InFilter(NodeTypeAccessor(Parent()), [parser.Node_compounddefType])),
+            NotFilter(InFilter(NodeTypeAccessor(Node()), [parser.Node_incType])),
         )
 
     def _create_description_filter(
@@ -836,7 +861,7 @@ class FilterFactory:
     def create_outline_filter(self, options: Dict[str, Any]) -> Filter:
         if "outline" in options:
             node = Node()
-            return ~node.node_type.is_one_of(["description", "inc"])
+            return ~node.node_type.is_one_of([parser.Node_descriptionType, parser.Node_incType])
         else:
             return OpenFilter()
 
@@ -853,7 +878,7 @@ class FilterFactory:
                 # the NotFilter this chunk always returns true and
                 # so does not affect the result of the filtering
                 AndFilter(
-                    InFilter(NodeTypeAccessor(Node()), ["compounddef"]),
+                    InFilter(NodeTypeAccessor(Node()), [parser.Node_compounddefType]),
                     InFilter(KindAccessor(Node()), ["file"]),
                     FilePathFilter(LambdaAccessor(Node(), lambda x: x.location), filename),
                     Gather(LambdaAccessor(Node(), lambda x: x.namespaces), valid_names),
@@ -868,8 +893,8 @@ class FilterFactory:
                 # required as the location attribute for the
                 # namespace in the xml is unreliable.
                 AndFilter(
-                    InFilter(NodeTypeAccessor(Parent()), ["compounddef"]),
-                    InFilter(NodeTypeAccessor(Node()), ["ref"]),
+                    InFilter(NodeTypeAccessor(Parent()), [parser.Node_compounddefType]),
+                    InFilter(NodeTypeAccessor(Node()), [parser.Node_refType]),
                     InFilter(NodeNameAccessor(Node()), ["innerclass", "innernamespace"]),
                     NotFilter(
                         InFilter(
@@ -883,8 +908,8 @@ class FilterFactory:
                 # namespace that is going to be rendered as they will be
                 # rendered with that namespace and we don't want them twice
                 AndFilter(
-                    InFilter(NodeTypeAccessor(Parent()), ["compounddef"]),
-                    InFilter(NodeTypeAccessor(Node()), ["ref"]),
+                    InFilter(NodeTypeAccessor(Parent()), [parser.Node_compounddefType]),
+                    InFilter(NodeTypeAccessor(Node()), [parser.Node_refType]),
                     InFilter(NodeNameAccessor(Node()), ["innerclass", "innernamespace"]),
                     NamespaceFilter(
                         NamespaceAccessor(Parent()),
@@ -898,7 +923,7 @@ class FilterFactory:
                 # cross into a namespace xml file which has entries
                 # from multiple files in it
                 AndFilter(
-                    InFilter(NodeTypeAccessor(Node()), ["memberdef"]),
+                    InFilter(NodeTypeAccessor(Node()), [parser.Node_memberdefType]),
                     NotFilter(
                         FilePathFilter(LambdaAccessor(Node(), lambda x: x.location), filename)
                     ),
@@ -914,7 +939,7 @@ class FilterFactory:
                 # location even if they namespace is spread over
                 # multiple files
                 AndFilter(
-                    InFilter(NodeTypeAccessor(Node()), ["compounddef"]),
+                    InFilter(NodeTypeAccessor(Node()), [parser.Node_compounddefType]),
                     NotFilter(InFilter(KindAccessor(Node()), ["namespace"])),
                     NotFilter(
                         FilePathFilter(LambdaAccessor(Node(), lambda x: x.location), filename)
@@ -940,17 +965,17 @@ class FilterFactory:
         node = Node()
 
         # Filter for public memberdefs
-        node_is_memberdef = node.node_type == "memberdef"
+        node_is_memberdef = node.node_type == parser.Node_memberdefType
         node_is_public = node.prot == "public"
 
         public_members = node_is_memberdef & node_is_public
 
         # Filter for public innerclasses
         parent = Parent()
-        parent_is_compounddef = parent.node_type == "compounddef"
+        parent_is_compounddef = parent.node_type == parser.Node_compounddefType
         parent_is_class = parent.kind == kind
 
-        node_is_innerclass = (node.node_type == "ref") & (node.node_name == "innerclass")
+        node_is_innerclass = (node.node_type == parser.Node_refType) & (node.node_name == "innerclass")
         node_is_public = node.prot == "public"
 
         public_innerclass = (
@@ -963,16 +988,16 @@ class FilterFactory:
         filter_ = AndFilter(
             NotFilter(
                 AndFilter(
-                    InFilter(NodeTypeAccessor(Parent()), ["compounddef"]),
-                    InFilter(NodeTypeAccessor(Node()), ["ref"]),
+                    InFilter(NodeTypeAccessor(Parent()), [parser.Node_compounddefType]),
+                    InFilter(NodeTypeAccessor(Node()), [parser.Node_refType]),
                     InFilter(NodeNameAccessor(Node()), ["innerclass", "innernamespace"]),
                 )
             ),
             NotFilter(
                 AndFilter(
-                    InFilter(NodeTypeAccessor(Parent()), ["compounddef"]),
+                    InFilter(NodeTypeAccessor(Parent()), [parser.Node_compounddefType]),
                     InFilter(KindAccessor(Parent()), ["group"]),
-                    InFilter(NodeTypeAccessor(Node()), ["sectiondef"]),
+                    InFilter(NodeTypeAccessor(Node()), [parser.Node_sectiondefType]),
                     InFilter(KindAccessor(Node()), ["func"]),
                 )
             ),
@@ -985,13 +1010,13 @@ class FilterFactory:
 
         return OpenFilter()
 
-    def create_id_filter(self, node_type: str, refid: str) -> Filter:
+    def create_id_filter(self, node_type: type, refid: str) -> Filter:
         node = Node()
         return (node.node_type == node_type) & (node.id == refid)
 
     def create_file_finder_filter(self, filename: str) -> Filter:
         filter_ = AndFilter(
-            InFilter(NodeTypeAccessor(Node()), ["compounddef"]),
+            InFilter(NodeTypeAccessor(Node()), [parser.Node_compounddefType]),
             InFilter(KindAccessor(Node()), ["file"]),
             FilePathFilter(LambdaAccessor(Node(), lambda x: x.location), filename),
         )
@@ -1003,11 +1028,11 @@ class FilterFactory:
         node = Node()
         parent = Parent()
 
-        node_matches = (node.node_type == "member") & (node.kind == kind) & (node.name == name)
+        node_matches = (node.node_type == parser.Node_MemberType) & (node.kind == kind) & (node.name == name)
 
         if namespace:
             parent_matches = (
-                (parent.node_type == "compound")
+                (parent.node_type == parser.Node_CompoundType)
                 & (
                     (parent.kind == "namespace")
                     | (parent.kind == "class")
@@ -1021,7 +1046,7 @@ class FilterFactory:
             is_implementation_file = parent.name.endswith(
                 self.app.config.breathe_implementation_filename_extensions
             )
-            parent_is_compound = parent.node_type == "compound"
+            parent_is_compound = parent.node_type == parser.Node_CompoundType
             parent_is_file = (parent.kind == "file") & (~is_implementation_file)
             parent_is_not_file = parent.kind != "file"
 
@@ -1031,7 +1056,7 @@ class FilterFactory:
 
     def create_function_and_all_friend_finder_filter(self, namespace: str, name: str) -> Filter:
         parent = Parent()
-        parent_is_compound = parent.node_type == "compound"
+        parent_is_compound = parent.node_type == parser.Node_CompoundType
         parent_is_group = parent.kind == "group"
 
         function_filter = self.create_member_finder_filter(namespace, name, "function")
@@ -1045,13 +1070,13 @@ class FilterFactory:
         """Returns a filter which looks for an enumvalue with the specified name."""
 
         node = Node()
-        return (node.node_type == "enumvalue") & (node.name == name)
+        return (node.node_type == parser.Node_enumvalueType) & (node.name == name)
 
     def create_compound_finder_filter(self, name: str, kind: str) -> Filter:
         """Returns a filter which looks for a compound with the specified name and kind."""
 
         node = Node()
-        return (node.node_type == "compound") & (node.kind == kind) & (node.name == name)
+        return (node.node_type == parser.Node_CompoundType) & (node.kind == kind) & (node.name == name)
 
     def create_finder_filter(self, kind: str, name: str) -> Filter:
         """Returns a filter which looks for the compound node from the index which is a group node
@@ -1063,20 +1088,20 @@ class FilterFactory:
 
         if kind == "group":
             filter_ = AndFilter(
-                InFilter(NodeTypeAccessor(Node()), ["compound"]),
+                InFilter(NodeTypeAccessor(Node()), [parser.Node_CompoundType]),
                 InFilter(KindAccessor(Node()), ["group"]),
                 InFilter(NameAccessor(Node()), [name]),
             )
         elif kind == "page":
             filter_ = AndFilter(
-                InFilter(NodeTypeAccessor(Node()), ["compound"]),
+                InFilter(NodeTypeAccessor(Node()), [parser.Node_CompoundType]),
                 InFilter(KindAccessor(Node()), ["page"]),
                 InFilter(NameAccessor(Node()), [name]),
             )
         else:
             # Assume kind == 'namespace'
             filter_ = AndFilter(
-                InFilter(NodeTypeAccessor(Node()), ["compound"]),
+                InFilter(NodeTypeAccessor(Node()), [parser.Node_CompoundType]),
                 InFilter(KindAccessor(Node()), ["namespace"]),
                 InFilter(NameAccessor(Node()), [name]),
             )

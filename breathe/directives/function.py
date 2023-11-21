@@ -1,7 +1,7 @@
 from breathe.directives import BaseDirective
 from breathe.exception import BreatheError
 from breathe.file_state_cache import MTimeError
-from breathe.parser import ParserError, FileIOError
+from breathe import parser
 from breathe.project import ProjectError
 from breathe.renderer import format_parser_error, RenderContext
 from breathe.renderer.sphinxrenderer import WithContext
@@ -217,11 +217,11 @@ class DoxygenFunctionDirective(BaseDirective):
                 self.parser_factory.create_compound_parser(project_info),
                 filter_,
             )
-        except ParserError as e:
+        except parser.ParserError as e:
             return format_parser_error(
-                "doxygenclass", e.error, e.filename, self.state, self.lineno, True
+                "doxygenclass", e.message, e.filename, self.state, self.lineno, True
             )
-        except FileIOError as e:
+        except parser.FileIOError as e:
             return format_parser_error(
                 "doxygenclass", e.error, e.filename, self.state, self.lineno, False
             )
@@ -230,20 +230,20 @@ class DoxygenFunctionDirective(BaseDirective):
         node = node_stack[0]
         with WithContext(object_renderer, context):
             # this part should be kept in sync with visit_function in sphinxrenderer
-            name = node.get_name()
+            name = node.name
             # assume we are only doing this for C++ declarations
             declaration = " ".join(
                 [
                     object_renderer.create_template_prefix(node),
-                    "".join(n.astext() for n in object_renderer.render(node.get_type())),
+                    "".join(n.astext() for n in object_renderer.render(node.type)),
                     name,
-                    node.get_argsstring(),
+                    node.argsstring,
                 ]
             )
-        parser = cpp.DefinitionParser(
+        cpp_parser = cpp.DefinitionParser(
             declaration, location=self.get_source_info(), config=self.config
         )
-        ast = parser.parse_declaration("function", "function")
+        ast = cpp_parser.parse_declaration("function", "function")
         return str(ast)
 
     def _resolve_function(self, matches, args: Optional[cpp.ASTParametersQualifiers], project_info):
@@ -260,7 +260,7 @@ class DoxygenFunctionDirective(BaseDirective):
                 {"no-link": ""}, project_info, self.state.document
             )
             filter_ = self.filter_factory.create_outline_filter(text_options)
-            mask_factory = MaskFactory({"param": NoParameterNamesMask})
+            mask_factory = MaskFactory({parser.Node_paramType: NoParameterNamesMask})
 
             # Override the directive args for this render
             directive_args = self.directive_args[:]

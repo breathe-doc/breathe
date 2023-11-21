@@ -9,8 +9,6 @@ from breathe.renderer.target import create_target_handler
 from docutils.nodes import Node
 from docutils.parsers.rst.directives import unchanged_required, flag
 
-from typing import List
-
 
 class RootDataObject:
     node_type = "root"
@@ -23,12 +21,12 @@ class _BaseIndexDirective(BaseDirective):
     # information is present in the Directive class from the docutils framework that we'd have to
     # pass way too much stuff to a helper object to be reasonable.
 
-    def handle_contents(self, project_info):
+    def handle_contents(self, project_info) -> list[Node]:
         try:
             finder = self.finder_factory.create_finder(project_info)
         except ParserError as e:
             return format_parser_error(
-                self.name, e.error, e.filename, self.state, self.lineno, True
+                self.name, e.message, e.filename, self.state, self.lineno, True
             )
         except FileIOError as e:
             return format_parser_error(self.name, e.error, e.filename, self.state, self.lineno)
@@ -56,7 +54,7 @@ class _BaseIndexDirective(BaseDirective):
             node_list = object_renderer.render(context.node_stack[0], context)
         except ParserError as e:
             return format_parser_error(
-                self.name, e.error, e.filename, self.state, self.lineno, True
+                self.name, e.message, e.filename, self.state, self.lineno, True
             )
         except FileIOError as e:
             return format_parser_error(self.name, e.error, e.filename, self.state, self.lineno)
@@ -99,7 +97,7 @@ class AutoDoxygenIndexDirective(_BaseIndexDirective):
     }
     has_content = False
 
-    def run(self) -> List[Node]:
+    def run(self) -> list[Node]:
         """Extract the project info from the auto project info store and pass it to the helper
         method.
         """

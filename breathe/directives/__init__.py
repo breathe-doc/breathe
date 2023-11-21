@@ -115,7 +115,7 @@ class BaseDirective(SphinxDirective):
             )
         except ParserError as e:
             return format_parser_error(
-                "doxygenclass", e.error, e.filename, self.state, self.lineno, True
+                "doxygenclass", e.message, e.filename, self.state, self.lineno, True
             )
         except FileIOError as e:
             return format_parser_error(

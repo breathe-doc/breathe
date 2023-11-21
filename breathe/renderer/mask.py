@@ -39,20 +39,9 @@ class MaskFactory(MaskFactoryBase):
         self.lookup = lookup
 
     def mask(self, data_object):
-        try:
-            node_type = data_object.node_type
-        except AttributeError as e:
-            # Horrible hack to silence errors on filtering unicode objects
-            # until we fix the parsing
-            if isinstance(data_object, str):
-                node_type = "unicode"
-            else:
-                raise e
-
-        if node_type in self.lookup:
-            Mask = self.lookup[node_type]
-            return Mask(data_object)
-        return data_object
+        m = self.lookup.get(type(data_object))
+        if m is None: return data_object
+        return m(data_object)
 
 
 class NullMaskFactory(MaskFactoryBase):

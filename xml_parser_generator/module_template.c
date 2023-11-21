@@ -10,6 +10,7 @@
 #include <structmember.h>
 #include <expat.h>
 #include <assert.h>
+#include <stdarg.h>
 
 #pragma GCC diagnostic ignored "-Wunused-parameter"
 
@@ -43,6 +44,8 @@ enum {
     CLASS_FROZEN_LIST = 0,
     CLASS_FROZEN_LIST_ITR,
     CLASS_TAGGED_VALUE,
+    CLASS_PARSE_ERROR,
+    CLASS_PARSE_WARNING,
 //% for type in types|select('used_directly')
     CLASS__{$ type $},
 //% endfor
@@ -83,12 +86,6 @@ enum {
 static PyModuleDef module_def;
 
 typedef struct {
-    /* the type of the exception thrown for errors in the input */
-    PyObject *parse_error_exc_type;
-
-    /* the type of the warning category for ignorable problems in the input */
-    PyObject *parse_warn_exc_type;
-
     PyObject *tag_names[TAGGED_UNION_NAME_COUNT];
 
 //% if char_enum_chars
@@ -161,22 +158,39 @@ static void pop_callbacks(parse_state *state) {
 }
 
 static void set_parse_error(parse_state *state,const char *msg) {
-    PyErr_Format(
-        state->py->parse_error_exc_type,
-        "Error on line %li: %s",
-        (long)XML_GetCurrentLineNumber(state->parser),
-        msg);
+    PyObject *exc = PyObject_CallFunction(
+        (PyObject*)state->py->classes[CLASS_PARSE_ERROR],
+        "sl",
+        XML_ErrorString(XML_GetErrorCode(state->parser)),
+        (long)XML_GetCurrentLineNumber(state->parser));
+    if(exc == NULL) return;
+    PyErr_SetObject((PyObject*)state->py->classes[CLASS_PARSE_ERROR],exc);
+    Py_DECREF(exc);
 }
-#define SET_PARSE_ERROR_FMT(state,msg,...) \
-    PyErr_Format(\
-        state->py->parse_error_exc_type,\
-        "Error on line %li: " msg,\
-        (long)XML_GetCurrentLineNumber(state->parser),\
-        __VA_ARGS__)
+static void set_parse_error_format(parse_state *state,const char *msg,...) {
+    PyObject *msg_obj;
+    PyObject *exc;
+    va_list vargs;
+    
+    va_start(vargs,msg);
+    msg_obj = PyUnicode_FromFormatV(msg,vargs);
+    va_end(vargs);
+    if(msg_obj == NULL) return;
+
+    exc = PyObject_CallFunction(
+        (PyObject*)state->py->classes[CLASS_PARSE_ERROR],
+        "Ol",
+        msg_obj,
+        (long)XML_GetCurrentLineNumber(state->parser));
+    Py_DECREF(msg_obj);
+    if(exc == NULL) return;
+    PyErr_SetObject((PyObject*)state->py->classes[CLASS_PARSE_ERROR],exc);
+    Py_DECREF(exc);
+}
 
 static int set_parse_warning(parse_state *state,const char *msg) {
     return PyErr_WarnFormat(
-        state->py->parse_warn_exc_type,
+        (PyObject*)state->py->classes[CLASS_PARSE_WARNING],
         1,
         "Warning on line %li: %s",
         (long)XML_GetCurrentLineNumber(state->parser),
@@ -184,7 +198,7 @@ static int set_parse_warning(parse_state *state,const char *msg) {
 }
 #define SET_PARSE_WARNING_FMT(state,msg,...) \
     PyErr_WarnFormat(\
-        state->py->parse_warn_exc_type,\
+        (PyObject*)state->py->classes[CLASS_PARSE_WARNING],\
         1,\
         "Warning on line %li: " msg,\
         (long)XML_GetCurrentLineNumber(state->parser),\
@@ -326,7 +340,7 @@ static PyMemberDef tagged_value_members[] = {
     {"value",T_OBJECT_EX,offsetof(tagged_value,values) + sizeof(PyObject*),READONLY,NULL},
     {NULL}};
 
-PyObject *tagged_value_tp_new(PyTypeObject *subtype,PyObject *args,PyObject *kwds) {
+static PyObject *tagged_value_tp_new(PyTypeObject *subtype,PyObject *args,PyObject *kwds) {
     tagged_value *r;
     if(kwds != NULL && PyDict_Size(kwds)) {
         PyErr_SetString(PyExc_TypeError,"TaggedValue.__new__ does not take any keyword arguments");
@@ -365,7 +379,7 @@ typedef struct {
     PyObject **content;
 } frozen_list;
 
-/* A type doesn't satisfy collections.abc.Iterable unless is has an __iter__
+/* A type doesn't satisfy collections.abc.Iterable unless it has an __iter__
 method */
 typedef struct {
     PyObject_HEAD
@@ -568,6 +582,54 @@ static PyType_Slot frozen_list_itr_slots[] = {
     {Py_tp_methods,frozen_list_itr_methods},
     {Py_tp_dealloc,frozen_list_itr_dealloc},
     {Py_tp_traverse,frozen_list_itr_traverse},
+    {0,NULL}
+};
+
+static PyObject *parse_error_get_args(PyObject *self) {
+    PyObject *args = PyObject_GetAttrString(self,"args");
+    if(args == NULL) return NULL;
+    if(!PyTuple_Check(args) || PyTuple_Size(args) < 2) {
+        PyErr_SetString(PyExc_TypeError,"\"self.args\" is supposed to be a tuple with a length of 2");
+        Py_DECREF(args);
+        return NULL;
+    }
+    return args;
+}
+
+static PyObject *parse_error_tp_str(PyObject *self) {
+    PyObject *r;
+    PyObject *lineno;
+    PyObject *args = parse_error_get_args(self);
+    if(args == NULL) return NULL;
+    lineno = PyTuple_GetItem(args,1);
+    if(lineno == Py_None) r = PyUnicode_FromFormat("Error: %S",lineno,PyTuple_GetItem(args,0));
+    else r = PyUnicode_FromFormat("Error on line %S: %S",lineno,PyTuple_GetItem(args,0));
+    Py_DECREF(args);
+    return r;
+}
+
+static PyObject *parse_error_get(PyObject *self,void *i) {
+    PyObject *r;
+    PyObject *args = parse_error_get_args(self);
+    if(args == NULL) return NULL;
+    r = PyTuple_GetItem(args,(Py_ssize_t)i);
+    Py_INCREF(r);
+    return r;
+}
+
+static PyGetSetDef parse_error_getset[] = {
+    {"message",parse_error_get,NULL,NULL,(void*)0},
+    {"lineno",parse_error_get,NULL,NULL,(void*)1},
+    {NULL}
+};
+
+static PyType_Slot parse_error_slots[] = {
+    {Py_tp_str,parse_error_tp_str},
+    {Py_tp_getset,parse_error_getset},
+    {0,NULL}
+};
+
+static PyType_Slot parse_warning_slots[] = {
     {0,NULL}
 };
 
@@ -817,7 +879,7 @@ static PyObject **frozen_list_push_tuple_item(parse_state *state,Py_ssize_t tupl
         tuple_item *new_tuple;
 
         if(fl->size && ((tuple_item*)fl->content[fl->size-1])->fields[tuple_size-1] == NULL) {
-            SET_PARSE_ERROR_FMT(
+            set_parse_error_format(
                 state,
                 "\"%s\" element can only come after \"%s\" element or be the first in its group",
                 field_names[0],
@@ -834,7 +896,7 @@ static PyObject **frozen_list_push_tuple_item(parse_state *state,Py_ssize_t tupl
     }
 
     if(!fl->size || ((tuple_item*)fl->content[fl->size-1])->fields[tuple_i-1] == NULL) {
-        SET_PARSE_ERROR_FMT(
+        set_parse_error_format(
             state,
             "\"%s\" element can only come after \"%s\" element",
             field_names[tuple_i],
@@ -851,7 +913,7 @@ static int frozen_list_check_complete_tuple(parse_state *state,Py_ssize_t tuple_
         Py_ssize_t i = tuple_size;
         while(last->fields[i-1] == NULL) --i;
         if(i != tuple_size) {
-            SET_PARSE_ERROR_FMT(
+            set_parse_error_format(
                 state,
                 "\"%s\" element must come after \"%s\" element",
                 field_names[i],
@@ -999,22 +1061,22 @@ static int warn_duplicate_attribute(parse_state *state,const char *name) {
 }
 
 static void raise_duplicate_element_error(parse_state *state,const char *name) {
-    SET_PARSE_ERROR_FMT(state,"\"%s\" cannot appear more than once in this context",name);
+    set_parse_error_format(state,"\"%s\" cannot appear more than once in this context",name);
 }
 
 static void raise_missing_element_error(parse_state *state,const char *name) {
-    SET_PARSE_ERROR_FMT(state,"missing \"%s\" child",name);
+    set_parse_error_format(state,"missing \"%s\" child",name);
 }
 static void raise_empty_list_element_error(parse_state *state,const char *name) {
-    SET_PARSE_ERROR_FMT(state,"at least one \"%s\" child is required",name);
+    set_parse_error_format(state,"at least one \"%s\" child is required",name);
 }
 
 static void raise_invalid_enum_error(parse_state *state,const char *value) {
-    SET_PARSE_ERROR_FMT(state,"\"%s\" is not one of the allowed enumeration values",value);
+    set_parse_error_format(state,"\"%s\" is not one of the allowed enumeration values",value);
 }
 
 static void raise_invalid_char_enum_error(parse_state *state,char c,const char *allowed) {
-    SET_PARSE_ERROR_FMT(state,"\"%c\" is not one of the allowed character values; must be one of \"%s\"",c,allowed);
+    set_parse_error_format(state,"\"%c\" is not one of the allowed character values; must be one of \"%s\"",c,allowed);
 }
 
 int parse_integer(parse_state *state,const char *str,long *value) {
@@ -1053,7 +1115,7 @@ static int set_DoxBool_attribute(parse_state *state,PyObject **field,const XML_C
     if(strcmp(attr[1],"yes") == 0) *field = Py_True;
     else if(strcmp(attr[1],"no") == 0) *field = Py_False;
     else {
-        SET_PARSE_ERROR_FMT(state,"\"%s\" must be \"yes\" or \"no\"",attr[0]);
+        set_parse_error_format(state,"\"%s\" must be \"yes\" or \"no\"",attr[0]);
         return -1;
     }
     Py_INCREF(*field);
@@ -1282,6 +1344,7 @@ static int node_class_new_fields_end__{$ type $}(module_state *state,PyObject **
     if(fields[FIELD__{$ type $}__{$ ref.py_name $}] == NULL) {
 //%       if ref.is_list
         fields[FIELD__{$ type $}__{$ ref.py_name $}] = (PyObject*)create_frozen_list(state);
+        if(fields[FIELD__{$ type $}__{$ ref.py_name $}] == NULL) return -1;
 //%       elif ref.min_items == 0
         fields[FIELD__{$ type $}__{$ ref.py_name $}] = Py_None;
         Py_INCREF(Py_None);
@@ -1648,6 +1711,8 @@ static spec_and_is_list class_specs[] = {
     {{FULL_MODULE_STR ".FrozenList",sizeof(frozen_list),0,Py_TPFLAGS_DEFAULT|Py_TPFLAGS_BASETYPE|Py_TPFLAGS_HAVE_GC|Py_TPFLAGS_SEQUENCE,frozen_list_slots},0},
     {{FULL_MODULE_STR ".FrozenListItr",sizeof(frozen_list_itr),0,Py_TPFLAGS_DEFAULT|Py_TPFLAGS_HAVE_GC,frozen_list_itr_slots},0},
     {{FULL_MODULE_STR ".TaggedValue",sizeof(tagged_value),0,Py_TPFLAGS_DEFAULT|Py_TPFLAGS_HAVE_GC|Py_TPFLAGS_SEQUENCE,tagged_value_slots},0},
+    {{FULL_MODULE_STR ".ParseError",0,0,Py_TPFLAGS_DEFAULT,parse_error_slots},0},
+    {{FULL_MODULE_STR ".ParseWarning",0,0,Py_TPFLAGS_DEFAULT,parse_warning_slots},0},
 //% for type in types|select('used_directly')
     {{FULL_MODULE_STR ".Node_{$ type $}",offsetof(node_{$ common_affix(type) $}_common,fields){% if type is has_fields %} + sizeof(PyObject*)*FIELD_COUNT__{$ type $}{% endif %},0,Py_TPFLAGS_DEFAULT|Py_TPFLAGS_HAVE_GC,node_class_slots__{$ type $}},{$ '1' if type is list_e else '0' $}},
 //% endfor
@@ -1658,11 +1723,14 @@ static spec_and_is_list class_specs[] = {
 
 static void raise_expat_error(parse_state *state) {
     if(!PyErr_Occurred()) {
-        PyErr_Format(
-            state->py->parse_error_exc_type,
-            "Error on line %i: %s",
-            XML_GetErrorLineNumber(state->parser),
-            XML_ErrorString(XML_GetErrorCode(state->parser)));
+        PyObject *exc = PyObject_CallFunction(
+            (PyObject*)state->py->classes[CLASS_PARSE_ERROR],
+            "sl",
+            XML_ErrorString(XML_GetErrorCode(state->parser)),
+            (long)XML_GetErrorLineNumber(state->parser));
+        if(exc == NULL) return;
+        PyErr_SetObject((PyObject*)state->py->classes[CLASS_PARSE_ERROR],exc);
+        Py_DECREF(exc);
     }
 }
 
@@ -1847,7 +1915,14 @@ static PyObject *parse(PyObject *module,expat_source source,PyObject *obj) {
     }
 
     if(r_obj == NULL) {
-        PyErr_SetString(state.py->parse_error_exc_type,"document without a recognized root element");
+        PyObject *exc = PyObject_CallFunction(
+            (PyObject*)state.py->classes[CLASS_PARSE_ERROR],
+            "sO",
+            "document without a recognized root element",
+            Py_None);
+        if(exc == NULL) return NULL;
+        PyErr_SetObject((PyObject*)state.py->classes[CLASS_PARSE_ERROR],exc);
+        Py_DECREF(exc);
     }
 
     return r_obj;
@@ -1953,13 +2028,6 @@ static int module_exec(PyObject *module) {
     size_t tu_i=0;
     size_t char_i=0;
     module_state *state = PyModule_GetState(module);
-    state->parse_error_exc_type = PyErr_NewException(FULL_MODULE_STR ".ParseError",PyExc_RuntimeError,NULL);
-    if(PyModule_AddObject(module,"ParseError",state->parse_error_exc_type)) goto error;
-    Py_INCREF(state->parse_error_exc_type);
-
-    state->parse_warn_exc_type = PyErr_NewException(FULL_MODULE_STR ".ParseWarning",PyExc_UserWarning,NULL);
-    if(PyModule_AddObject(module,"ParseWarning",state->parse_warn_exc_type)) goto error;
-    Py_INCREF(state->parse_warn_exc_type);
 
     for(; tu_i<TAGGED_UNION_NAME_COUNT; ++tu_i) {
         state->tag_names[tu_i] = PyUnicode_FromString(tagged_union_names[tu_i]);
@@ -1996,6 +2064,10 @@ static int module_exec(PyObject *module) {
             if(frozen_list_bases == NULL) goto error;
             PyTuple_SetItem(frozen_list_bases,0,(PyObject*)state->classes[i]);
             Py_INCREF(state->classes[i]);
+        } else if(i == CLASS_PARSE_ERROR) {
+            state->classes[i] = (PyTypeObject*)PyType_FromSpecWithBases(&class_specs[i].spec,PyExc_RuntimeError);
+        } else if(i == CLASS_PARSE_WARNING) {
+            state->classes[i] = (PyTypeObject*)PyType_FromSpecWithBases(&class_specs[i].spec,PyExc_UserWarning);
         } else if(class_specs[i].list_base) {
             assert(frozen_list_bases != NULL);
             state->classes[i] = (PyTypeObject*)PyType_FromSpecWithBases(&class_specs[i].spec,frozen_list_bases);
@@ -2023,9 +2095,7 @@ static int module_exec(PyObject *module) {
     decref_array((PyObject**)state->classes,i);
     decref_array(state->tag_names,tu_i);
     decref_array(state->char_objects,char_i);
-    Py_XDECREF(state->parse_warn_exc_type);
-    Py_DECREF(state->parse_error_exc_type);
-    state->parse_error_exc_type = NULL;
+    state->classes[0] = NULL;
     return -1;
 }
 
@@ -2038,16 +2108,12 @@ static int module_traverse(PyObject *module,visitproc visit,void *arg) {
     r = visit_array(state->enum_values__{$ type $},ENUM_VALUE_COUNT__{$ type $},visit,arg);
     if(r) return r;
 //% endfor
-    r = visit_array((PyObject**)state->classes,CLASS_COUNT,visit,arg);
-    if(r) return r;
-    r = visit(state->parse_warn_exc_type,arg);
-    if(r) return r;
-    return visit(state->parse_error_exc_type,arg);
+    return visit_array((PyObject**)state->classes,CLASS_COUNT,visit,arg);
 }
 
 static void module_free(void *module) {
     module_state *state = PyModule_GetState(module);
-    if(state->parse_error_exc_type == NULL) return;
+    if(state->classes[0] == NULL) return;
 
 //% for type in types|select('enumeration_t')
     decref_array(state->enum_values__{$ type $},ENUM_VALUE_COUNT__{$ type $});
@@ -2055,8 +2121,6 @@ static void module_free(void *module) {
     decref_array((PyObject**)state->classes,CLASS_COUNT);
     decref_array(state->tag_names,TAGGED_UNION_NAME_COUNT);
     decref_array(state->char_objects,ENUM_CHAR_COUNT);
-    Py_DECREF(state->parse_warn_exc_type);
-    Py_DECREF(state->parse_error_exc_type);
 }
 
 /* Python 3.7 doesn't offer a way to get per-module state if multi-phase

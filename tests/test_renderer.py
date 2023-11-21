@@ -74,7 +74,7 @@ class MockState:
         env.temp_data["docname"] = "mock-doc"
         env.temp_data["breathe_project_info_factory"] = ProjectInfoFactory(app)
         env.temp_data["breathe_parser_factory"] = DoxygenParserFactory(app)
-        settings = frontend.OptionParser(components=(docutils.parsers.rst.Parser,)).get_default_values()
+        settings = frontend.get_default_settings(docutils.parsers.rst.Parser) # type: ignore
         settings.env = env
         self.document = utils.new_document("", settings)
 
@@ -142,7 +142,7 @@ class MockTargetHandler:
         pass
 
     def create_target(self, refid):
-        pass
+        return []
 
 
 class MockDocument:
@@ -161,7 +161,7 @@ class MockCompoundParser:
 
     class MockFileData:
         def __init__(self, compounddef):
-            self.compounddef = compounddef
+            self.compounddef = [compounddef]
 
     def parse(self, compoundname):
         compounddef = self.compound_dict[compoundname]
@@ -517,8 +517,6 @@ def get_directive(app):
 
 
 def get_matches(datafile):
-    from xml.dom import minidom
-
     argsstrings = []
     with open(os.path.join(os.path.dirname(__file__), "data", datafile)) as fid:
         xml = fid.read()

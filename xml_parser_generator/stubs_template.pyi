@@ -2,8 +2,8 @@ import enum
 from typing import Generic,Literal,overload,Protocol,SupportsIndex,TypeVar
 from collections.abc import Iterable
 
-T = TypeVar('T')
-U = TypeVar('U')
+T = TypeVar('T',covariant=True)
+U = TypeVar('U',covariant=True)
 
 class SupportsRead(Protocol):
     def read(self, length: int, /) -> bytes | bytearray: ...
@@ -36,7 +36,10 @@ class TaggedValue(Generic[T, U]):
     def __getitem__(self, i: SupportsIndex) -> T | U: ...
 
 class ParseError(RuntimeError):
-    pass
+    @property
+    def message(self) -> str: ...
+    @property
+    def lineno(self) -> int: ...
 
 class ParseWarning(UserWarning):
     pass
@@ -121,3 +124,9 @@ class {$ type $}(enum.Enum):
 {$ type $} = Literal[{% for c in type.values %}{$ "'"~c~"'" $}{$ ',' if not loop.last $}{% endfor %}]
 //%   endif
 //% endfor
+
+Node = (
+//% for type in types|map(attribute='py_name')|sort|unique
+    {$ '| ' if not loop.first $}{$ type $}
+//% endfor
+)

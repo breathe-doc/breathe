@@ -1,25 +1,25 @@
 from breathe.finder import ItemFinder, stack
 from breathe.renderer.filter import Filter, FilterFactory
-from breathe.parser import DoxygenCompoundParser
+from breathe import parser
 
 from sphinx.application import Sphinx
 
 from typing import Any
 
 
-class DoxygenTypeSubItemFinder(ItemFinder):
+class DoxygenTypeSubItemFinder(ItemFinder[parser.Node_DoxygenTypeIndex]):
     def filter_(self, ancestors, filter_: Filter, matches) -> None:
         """Find nodes which match the filter. Doesn't test this node, only its children"""
 
-        compounds = self.data_object.get_compound()
+        compounds = self.data_object.compound
         node_stack = stack(self.data_object, ancestors)
         for compound in compounds:
             compound_finder = self.item_finder_factory.create_finder(compound)
             compound_finder.filter_(node_stack, filter_, matches)
 
 
-class CompoundTypeSubItemFinder(ItemFinder):
-    def __init__(self, app: Sphinx, compound_parser: DoxygenCompoundParser, *args):
+class CompoundTypeSubItemFinder(ItemFinder[parser.Node_CompoundType]):
+    def __init__(self, app: Sphinx, compound_parser: parser.DoxygenCompoundParser, *args):
         super().__init__(*args)
 
         self.filter_factory = FilterFactory(app)
@@ -40,7 +40,7 @@ class CompoundTypeSubItemFinder(ItemFinder):
             matches.append(node_stack)
 
         # Descend to member children
-        members = self.data_object.get_member()
+        members = self.data_object.member
         # TODO: find a more precise type for the Doxygen nodes
         member_matches: list[Any] = []
         for member in members:
@@ -55,7 +55,7 @@ class CompoundTypeSubItemFinder(ItemFinder):
 
             for member_stack in member_matches:
                 ref_filter = self.filter_factory.create_id_filter(
-                    "memberdef", member_stack[0].refid
+                    parser.Node_memberdefType, member_stack[0].refid
                 )
                 finder.filter_(node_stack, ref_filter, matches)
         else:
@@ -65,7 +65,7 @@ class CompoundTypeSubItemFinder(ItemFinder):
             finder.filter_(node_stack, filter_, matches)
 
 
-class MemberTypeSubItemFinder(ItemFinder):
+class MemberTypeSubItemFinder(ItemFinder[parser.Node_memberdefType]):
     def filter_(self, ancestors, filter_: Filter, matches) -> None:
         node_stack = stack(self.data_object, ancestors)
 
