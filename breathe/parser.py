@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import reprlib
 from breathe import file_state_cache, path_handler
 from breathe.project import ProjectInfo
 
@@ -7,13 +8,25 @@ from breathe._parser import *
 
 from sphinx.application import Sphinx
 
-from typing import overload
+from typing import overload, TYPE_CHECKING
 
+if TYPE_CHECKING:
+    NodeOrValue = Node | str | None
+
+@reprlib.recursive_repr()
+def node_repr(self: Node) -> str:
+    cls = type(self)
+    fields = ', '.join(f'{field}={getattr(self,field)!r}' for field in cls._fields)
+    if isinstance(self,FrozenList):
+        pos = ', '.join(map(repr,self))
+        fields = f'[{pos}], {fields}'
+    return f'{cls.__name__}({fields})'
+Node.__repr__ = node_repr # type: ignore
 
 
 class ParserError(RuntimeError):
     def __init__(self, message: str, filename: str, lineno: int | None = None):
-        super().__init__(message,filename,lineno)
+        super().__init__(message,lineno,filename)
 
     @property
     def message(self) -> str:
@@ -29,8 +42,8 @@ class ParserError(RuntimeError):
 
     def __str__(self):
         if self.lineno is None:
-            return f"file {self.filename}: {self.message}"
-        return f"file {self.filename}:{self.lineno}: {self.message}"
+            return f"{self.filename}: {self.message}"
+        return f"{self.filename}:{self.lineno}: {self.message}"
 
 
 class FileIOError(RuntimeError):

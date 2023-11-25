@@ -1,8 +1,10 @@
+from __future__ import annotations
+
 from ..renderer.mask import NullMaskFactory
 from ..directives import BaseDirective
-from ..project import ProjectError
+from breathe import project
 
-from breathe.renderer import RenderContext
+from breathe import renderer, parser
 from breathe.renderer.sphinxrenderer import SphinxRenderer
 from breathe.renderer.target import create_target_handler
 
@@ -18,11 +20,11 @@ class _BaseFileDirective(BaseDirective):
     # information is present in the Directive class from the docutils framework that we'd have to
     # pass way too much stuff to a helper object to be reasonable.
 
-    def handle_contents(self, file_, project_info):
+    def handle_contents(self, file_: str, project_info):
         finder = self.finder_factory.create_finder(project_info)
         finder_filter = self.filter_factory.create_file_finder_filter(file_)
 
-        matches = []
+        matches: list[list[renderer.TaggedNode]] = []
         finder.filter_(finder_filter, matches)
 
         if len(matches) > 1:
@@ -40,7 +42,7 @@ class _BaseFileDirective(BaseDirective):
             object_renderer = SphinxRenderer(
                 self.parser_factory.app,
                 project_info,
-                node_stack,
+                [tv.value for tv in node_stack],
                 self.state,
                 self.state.document,
                 target_handler,
@@ -49,8 +51,10 @@ class _BaseFileDirective(BaseDirective):
             )
 
             mask_factory = NullMaskFactory()
-            context = RenderContext(node_stack, mask_factory, self.directive_args)
-            node_list.extend(object_renderer.render(node_stack[0], context))
+            context = renderer.RenderContext(node_stack, mask_factory, self.directive_args)
+            value = node_stack[0].value
+            assert isinstance(value,parser.Node)
+            node_list.extend(object_renderer.render(value, context))
 
         return node_list
 
@@ -76,7 +80,7 @@ class DoxygenFileDirective(_BaseFileDirective):
         file_ = self.arguments[0]
         try:
             project_info = self.project_info_factory.create_project_info(self.options)
-        except ProjectError as e:
+        except project.ProjectError as e:
             warning = self.create_warning(None)
             return warning.warn("doxygenfile: %s" % e)
 
@@ -104,7 +108,7 @@ class AutoDoxygenFileDirective(_BaseFileDirective):
         file_ = self.arguments[0]
         try:
             project_info = self.project_info_factory.retrieve_project_info_for_auto(self.options)
-        except ProjectError as e:
+        except project.ProjectError as e:
             warning = self.create_warning(None)
             return warning.warn("autodoxygenfile: %s" % e)
 

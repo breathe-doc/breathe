@@ -18,7 +18,7 @@
   <param>
     <type>...</type>
   </param>
-  <location bodyend="0" bodyfile="" bodystart="0" column="0" declcolumn="0" declfile="" declline="0" file="" line="0"></location>
+  <location file="" line="0"></location>
 </memberdef>
 </sectiondef>
 </compounddef>

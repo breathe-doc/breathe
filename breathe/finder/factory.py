@@ -5,6 +5,7 @@ from breathe.finder import index as indexfinder
 from breathe.finder import compound as compoundfinder
 from breathe import parser
 from breathe.project import ProjectInfo
+from breathe.renderer import FakeParentNode, TaggedNode
 from breathe.renderer.filter import Filter
 
 from sphinx.application import Sphinx
@@ -26,7 +27,7 @@ class _CreateCompoundTypeSubFinder:
 
 
 class DoxygenItemFinderFactory:
-    def __init__(self, finders: dict[type[parser.Node], ItemFinderCreator], project_info: ProjectInfo):
+    def __init__(self, finders: dict[type[parser.NodeOrValue], ItemFinderCreator], project_info: ProjectInfo):
         self.finders = finders
         self.project_info = project_info
 
@@ -34,20 +35,16 @@ class DoxygenItemFinderFactory:
         return self.finders[type(data_object)](self.project_info, data_object, self)
 
 
-class _FakeParentNode:
-    node_type = "fakeparent"
-
-
 class Finder:
     def __init__(self, root, item_finder_factory: DoxygenItemFinderFactory) -> None:
         self._root = root
         self.item_finder_factory = item_finder_factory
 
-    def filter_(self, filter_: Filter, matches: list[parser.Node]) -> None:
+    def filter_(self, filter_: Filter, matches: list[list[TaggedNode]]) -> None:
         """Adds all nodes which match the filter into the matches list"""
 
         item_finder = self.item_finder_factory.create_finder(self._root)
-        item_finder.filter_([_FakeParentNode()], filter_, matches)
+        item_finder.filter_([TaggedNode(None,FakeParentNode())], filter_, matches)
 
     def root(self):
         return self._root
@@ -64,7 +61,7 @@ class FinderFactory:
         return self.create_finder_from_root(root, project_info)
 
     def create_finder_from_root(self, root, project_info: ProjectInfo) -> Finder:
-        finders: dict[type[parser.Node], ItemFinderCreator] = {
+        finders: dict[type[parser.NodeOrValue], ItemFinderCreator] = {
             parser.Node_DoxygenTypeIndex: indexfinder.DoxygenTypeSubItemFinder,
             parser.Node_CompoundType: _CreateCompoundTypeSubFinder(self.app, self.parser_factory),
             parser.Node_MemberType: indexfinder.MemberTypeSubItemFinder,

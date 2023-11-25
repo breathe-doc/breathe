@@ -4,7 +4,7 @@ import pytest
 import sphinx.locale
 import sphinx.addnodes
 import sphinx.environment
-from breathe import parser
+from breathe import parser, renderer
 from breathe.renderer.sphinxrenderer import SphinxRenderer
 from breathe.renderer.filter import OpenFilter
 import docutils.parsers.rst
@@ -23,16 +23,7 @@ COMMON_ARGS_memberdefType = {
     'id': '',
     'prot': parser.DoxProtectionKind.public,
     'static': False,
-    'location': parser.Node_locationType(
-        bodyend = 0,
-        bodyfile = '',
-        bodystart = 0,
-        column = 0,
-        declcolumn = 0,
-        declfile = '',
-        declline = 0,
-        file = '',
-        line = 0)
+    'location': parser.Node_locationType(file = '', line = 0)
 }
 
 @pytest.fixture(scope="function")
@@ -74,7 +65,7 @@ class MockState:
         env.temp_data["docname"] = "mock-doc"
         env.temp_data["breathe_project_info_factory"] = ProjectInfoFactory(app)
         env.temp_data["breathe_parser_factory"] = DoxygenParserFactory(app)
-        settings = frontend.get_default_settings(docutils.parsers.rst.Parser) # type: ignore
+        settings = frontend.get_default_settings(docutils.parsers.rst.Parser)
         settings.env = env
         self.document = utils.new_document("", settings)
 
@@ -133,7 +124,7 @@ class MockContext:
         self.child = None
         self.mask_factory = MockMaskFactory()
 
-    def create_child_context(self, attribute):
+    def create_child_context(self, attribute, tag):
         return self
 
 
@@ -516,7 +507,7 @@ def get_directive(app):
     return DoxygenFunctionDirective(*cls_args)
 
 
-def get_matches(datafile):
+def get_matches(datafile) -> tuple[list[str], list[list[renderer.TaggedNode]]]:
     argsstrings = []
     with open(os.path.join(os.path.dirname(__file__), "data", datafile)) as fid:
         xml = fid.read()
@@ -526,7 +517,7 @@ def get_matches(datafile):
     sectiondef = doc.value.compounddef[0].sectiondef[0]
     for child in sectiondef.memberdef:
         if child.argsstring: argsstrings.append(child.argsstring)
-    matches = [[m, sectiondef] for m in sectiondef.memberdef]
+    matches = [[renderer.TaggedNode(None, m), renderer.TaggedNode(None, sectiondef)] for m in sectiondef.memberdef]
     return argsstrings, matches
 
 

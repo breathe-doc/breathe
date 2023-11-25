@@ -7,7 +7,6 @@
     "DoxygenTypeIndex": {
       "kind": "tag_only_element",
       "attributes": {
-        "lang":                 {"type": "#string"},
         "version":              {"type": "#string"}
       },
       "other_attr":             "ignore",
@@ -29,7 +28,6 @@
     "DoxygenType": {
       "kind": "tag_only_element",
       "attributes": {
-        "lang":                 {"type": "#string"},
         "version":              {"type": "#string"}
       },
       "other_attr":             "ignore",
@@ -46,7 +44,7 @@
         "inline":               {"type": "#DoxBool", "optional": true},
         "kind":                 {"type": "DoxCompoundKind"},
         "language":             {"type": "DoxLanguage", "optional": true},
-        "prot":                 {"type": "DoxProtectionKind"},
+        "prot":                 {"type": "DoxProtectionKind", "optional": true},
         "sealed":               {"type": "#DoxBool", "optional": true}
       },
       "children": {
@@ -140,7 +138,7 @@
     "listingType": {
       "kind": "tag_only_element",
       "attributes": {
-        "filename":             {"type": "#string"}
+        "filename":             {"type": "#string", "optional": true}
       },
       "children": {
         "codeline":             {"type": "codelineType", "is_list": true, "min_items": 0}
@@ -149,15 +147,15 @@
     "locationType": {
       "kind": "tag_only_element",
       "attributes": {
-        "bodyend":              {"type": "#integer"},
-        "bodyfile":             {"type": "#string"},
-        "bodystart":            {"type": "#integer"},
-        "column":               {"type": "#integer"},
-        "declcolumn":           {"type": "#integer"},
-        "declfile":             {"type": "#string"},
-        "declline":             {"type": "#integer"},
+        "bodyend":              {"type": "#integer", "optional": true},
+        "bodyfile":             {"type": "#string", "optional": true},
+        "bodystart":            {"type": "#integer", "optional": true},
+        "column":               {"type": "#integer", "optional": true},
+        "declcolumn":           {"type": "#integer", "optional": true},
+        "declfile":             {"type": "#string", "optional": true},
+        "declline":             {"type": "#integer", "optional": true},
         "file":                 {"type": "#string"},
-        "line":                 {"type": "#integer"}
+        "line":                 {"type": "#integer", "optional": true}
       }
     },
     "listofallmembersType": {
@@ -169,7 +167,7 @@
     "memberRefType": {
       "kind": "tag_only_element",
       "attributes": {
-        "ambiguityscope":       {"type": "#string"},
+        "ambiguityscope":       {"type": "#string", "optional": true},
         "prot":                 {"type": "DoxProtectionKind"},
         "refid":                {"type": "#string"},
         "virt":                 {"type": "DoxVirtualKind"}
@@ -292,7 +290,7 @@
       "kind": "union_list_element",
       "allow_text": true,
       "attributes": {
-        "compoundref":          {"type": "#string"},
+        "compoundref":          {"type": "#string", "optional": true},
         "endline":              {"type": "#integer"},
         "refid":                {"type": "#string"},
         "startline":            {"type": "#integer"}
@@ -335,7 +333,7 @@
     "linkType": {
       "kind": "tag_only_element",
       "attributes": {
-        "external":             {"type": "#string"},
+        "external":             {"type": "#string", "optional": true},
         "refid":                {"type": "#string"}
       }
     },
@@ -516,7 +514,7 @@
       "kind": "union_list_element",
       "allow_text": true,
       "attributes": {
-        "direction":            {"type": "DoxParamDir"}
+        "direction":            {"type": "DoxParamDir", "optional": true}
       },
       "content": {
         "ref":                  "refTextType"
@@ -534,7 +532,7 @@
       "kind": "union_list_element",
       "allow_text": true,
       "attributes": {
-        "refid":                {"type": "#string"},
+        "refid":                {"type": "#string", "optional": true},
         "local":                {"type": "#DoxBool"}
       }
     },
@@ -1004,7 +1002,7 @@
       "attributes": {
         "refid":                {"type": "#string"},
         "kindref":              {"type": "#string"},
-        "external":             {"type": "#string"}
+        "external":             {"type": "#string", "optional": true}
       }
     },
     "docHeadingType": {
@@ -1018,6 +1016,7 @@
       "kind": "union_list_element",
       "bases": ["docTitleCmdGroup"],
       "attributes": {
+        "name":                 {"type": "#string", "optional": true},
         "width":                {"type": "#string", "optional": true},
         "height":               {"type": "#string", "optional": true}
       }

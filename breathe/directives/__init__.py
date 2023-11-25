@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from breathe.finder.factory import FinderFactory
-from breathe.parser import FileIOError, ParserError
+from breathe import parser
 from breathe.renderer import format_parser_error, RenderContext
 from breathe.renderer.filter import FilterFactory
 from breathe.renderer.sphinxrenderer import SphinxRenderer
@@ -15,6 +15,7 @@ from typing import Any, TYPE_CHECKING, Sequence
 if TYPE_CHECKING:
     from breathe.parser import DoxygenParserFactory
     from breathe.project import ProjectInfoFactory, ProjectInfo
+    from breathe.renderer import TaggedNode
     from breathe.renderer.filter import Filter
     from breathe.renderer.mask import MaskFactoryBase
     from breathe.renderer.target import TargetHandler
@@ -93,7 +94,7 @@ class BaseDirective(SphinxDirective):
 
     def render(
         self,
-        node_stack,
+        node_stack: list[TaggedNode],
         project_info: ProjectInfo,
         filter_: Filter,
         target_handler: TargetHandler,
@@ -106,21 +107,23 @@ class BaseDirective(SphinxDirective):
             object_renderer = SphinxRenderer(
                 self.parser_factory.app,
                 project_info,
-                node_stack,
+                [tn.value for tn in node_stack],
                 self.state,
                 self.state.document,
                 target_handler,
                 self.parser_factory.create_compound_parser(project_info),
                 filter_,
             )
-        except ParserError as e:
+        except parser.ParserError as e:
             return format_parser_error(
                 "doxygenclass", e.message, e.filename, self.state, self.lineno, True
             )
-        except FileIOError as e:
+        except parser.FileIOError as e:
             return format_parser_error(
                 "doxygenclass", e.error, e.filename, self.state, self.lineno, True
             )
 
         context = RenderContext(node_stack, mask_factory, directive_args)
-        return object_renderer.render(node_stack[0], context)
+        node = node_stack[0].value
+        assert isinstance(node, parser.Node)
+        return object_renderer.render(node, context)

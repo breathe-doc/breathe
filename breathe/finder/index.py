@@ -1,10 +1,16 @@
-from breathe.finder import ItemFinder, stack
-from breathe.renderer.filter import Filter, FilterFactory
+from __future__ import annotations
+
+from breathe.finder import ItemFinder
+from breathe.renderer.filter import FilterFactory
 from breathe import parser
+from breathe.renderer import TaggedNode
 
 from sphinx.application import Sphinx
 
-from typing import Any
+from typing import Any, TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from breathe.renderer.filter import Filter
 
 
 class DoxygenTypeSubItemFinder(ItemFinder[parser.Node_DoxygenTypeIndex]):
@@ -12,7 +18,7 @@ class DoxygenTypeSubItemFinder(ItemFinder[parser.Node_DoxygenTypeIndex]):
         """Find nodes which match the filter. Doesn't test this node, only its children"""
 
         compounds = self.data_object.compound
-        node_stack = stack(self.data_object, ancestors)
+        node_stack = [TaggedNode(None,self.data_object)] + ancestors
         for compound in compounds:
             compound_finder = self.item_finder_factory.create_finder(compound)
             compound_finder.filter_(node_stack, filter_, matches)
@@ -25,7 +31,7 @@ class CompoundTypeSubItemFinder(ItemFinder[parser.Node_CompoundType]):
         self.filter_factory = FilterFactory(app)
         self.compound_parser = compound_parser
 
-    def filter_(self, ancestors, filter_: Filter, matches) -> None:
+    def filter_(self, ancestors: list[TaggedNode], filter_: Filter, matches) -> None:
         """Finds nodes which match the filter and continues checks to children
 
         Requires parsing the xml files referenced by the children for which we use the compound
@@ -33,7 +39,7 @@ class CompoundTypeSubItemFinder(ItemFinder[parser.Node_CompoundType]):
         top level node of the compound file.
         """
 
-        node_stack = stack(self.data_object, ancestors)
+        node_stack = [TaggedNode(None,self.data_object)] + ancestors
 
         # Match against compound object
         if filter_.allow(node_stack):
@@ -67,7 +73,7 @@ class CompoundTypeSubItemFinder(ItemFinder[parser.Node_CompoundType]):
 
 class MemberTypeSubItemFinder(ItemFinder[parser.Node_memberdefType]):
     def filter_(self, ancestors, filter_: Filter, matches) -> None:
-        node_stack = stack(self.data_object, ancestors)
+        node_stack = [TaggedNode(None,self.data_object)] + ancestors
 
         # Match against member object
         if filter_.allow(node_stack):

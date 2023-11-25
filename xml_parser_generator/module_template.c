@@ -41,7 +41,8 @@ is broken into chunks. */
 
 
 enum {
-    CLASS_FROZEN_LIST = 0,
+    CLASS_NODE = 0, /* important: module_exec() assumes this comes before CLASS_FROZEN_LIST */
+    CLASS_FROZEN_LIST,
     CLASS_FROZEN_LIST_ITR,
     CLASS_TAGGED_VALUE,
     CLASS_PARSE_ERROR,
@@ -682,6 +683,11 @@ static const char *py_field_names[] = {
 //%       endfor
 };
 
+typedef struct {
+    unsigned int length;
+    const py_field_type *fields;
+} field_set;
+
 //% macro hash_lookup(f_name,hash_info,count,names,type,default)
 static {$ type $} {$ f_name $}(const char *key) {
 //%   if hash_info
@@ -947,6 +953,17 @@ enum {
 };
 
 //%     if type is has_fields
+//%       if type.direct_field_count
+static const py_field_type FIELD_PY_INDICES__{$ type $}[] = {
+//%         for f in type.fields()
+    PY_FIELD__{$ f.py_name $},
+//%         endfor
+};
+//%       endif
+static Py_ssize_t assign_field_name_tuple__{$ type $}(PyObject *dest,PyObject **names,Py_ssize_t start_i);
+//%     endif
+
+//%     if type is has_fields
 static PyMemberDef node_class_members__{$ type $}[] = {
 //%       for f in type.fields()
     {"{$ f.py_name $}",T_OBJECT_EX,offsetof(node_{$ common_affix(type) $}_common,fields) + FIELD__{$ type $}__{$ f.py_name $} * sizeof(PyObject*),READONLY,NULL},
@@ -984,6 +1001,7 @@ static int node_class_new_fields_end__{$ type $}(module_state *state,PyObject **
 //%     endif
 //%     if type is has_attributes
 static int node_class_attr__{$ type $}(parse_state*,{$ 'PyObject**,' if type is has_fields $}attribute_type,const XML_Char**);
+static int node_class_attr_end__{$ type $}(parse_state*,PyObject**);
 //%     endif
 //%     if type is has_children_or_content
 static int node_class_child__{$ type $}(parse_state*,{$ 'PyObject**,' if type is has_fields $}element_type,const XML_Char**);
@@ -1058,6 +1076,10 @@ static int warn_unexpected_attribute(parse_state *state,const char *name) {
 
 static int warn_duplicate_attribute(parse_state *state,const char *name) {
     return SET_PARSE_WARNING_FMT(state,"duplicate attribute \"%s\"",name);
+}
+
+static void raise_missing_attribute_error(parse_state *state,const char *name) {
+    set_parse_error_format(state,"missing \"%s\" attribute",name);
 }
 
 static void raise_duplicate_element_error(parse_state *state,const char *name) {
@@ -1289,6 +1311,23 @@ static int node_set_py_field_frozen_list(module_state *state,PyObject **field,Py
 //% for type in types
 //%   if type is element
 //%     if type|field_count
+static Py_ssize_t assign_field_name_tuple__{$ type $}(PyObject *dest,PyObject **names,Py_ssize_t start_i) {
+//%       if type.direct_field_count
+    int i;
+//%       endif
+//%       for b in type.bases if b|field_count
+    start_i = assign_field_name_tuple__{$ b $}(dest,start_i);
+//%       endfor
+//%       if type.direct_field_count
+    for(i = 0; i < FIELD_COUNT__{$ type $} - BASE_FIELD_OFFSET__{$ type $}; ++i, ++start_i) {
+        PyObject *name = names[FIELD_PY_INDICES__{$ type $}[i]];
+        PyTuple_SetItem(dest,start_i,name);
+        Py_INCREF(name);
+    }
+//%       endif
+    return start_i;
+}
+
 static void node_class_new_set_fields__{$ type $}(PyObject **fields,PyObject *args,Py_ssize_t start_i) {
 //%       for b in type.bases if b|field_count
     node_class_new_set_fields__{$ b $}(fields + BASE_FIELD_OFFSET__{$ type $}__{$ b $},args,start_i + BASE_FIELD_OFFSET__{$ type $}__{$ b $});
@@ -1375,6 +1414,23 @@ static int node_class_attr__{$ type $}(parse_state *state,{$ 'PyObject **fields,
     default:
         return 0;
     }
+}
+static int node_class_attr_end__{$ type $}(parse_state *state, PyObject **fields) {
+//%       for b in type.bases if b is has_attributes
+    if(node_class_attr_end__{$ b $}(state),fields + BASE_FIELD_OFFSET__{$ type $}__{$ b $}) return -1;
+//%       endfor
+//%       for ref in type|attributes
+    if(fields[FIELD__{$ type $}__{$ ref.py_name $}] == NULL) {
+//%         if ref.optional
+        fields[FIELD__{$ type $}__{$ ref.py_name $}] = Py_None;
+        Py_INCREF(Py_None);
+//%         else
+        raise_missing_attribute_error(state,"{$ ref.name $}");
+        return -1;
+//%         endif
+    }
+//%       endfor
+    return 0;
 }
 //%     endif
 //%     if type is has_children_or_content
@@ -1536,9 +1592,9 @@ static int node_class_start__{$ type $}(parse_state *state,PyObject **dest,const
 //%         endif
 //%       endfor
 
-//%       if type|attributes|length or type.other_attr == OtherAttrAction.error
+//%       if type is has_attributes or type.other_attr == OtherAttrAction.error
     for(; *attr != NULL; attr += 2) {
-//%         if type|attributes|length
+//%         if type is has_attributes
         int r;
         attribute_type attr_index = attribute_lookup(attr[0]);
         r = node_class_attr__{$ type $}(state,n->fields,attr_index,attr);
@@ -1551,6 +1607,9 @@ static int node_class_start__{$ type $}(parse_state *state,PyObject **dest,const
         if(warn_unexpected_attribute(state,attr[0])) return -1;
 //%         endif
     }
+//%       endif
+//%       if type is has_attributes
+    if(node_class_attr_end__{$ type $}(state,n->fields)) return -1;
 //%       endif
 
     cb = push_callbacks(state);
@@ -1702,19 +1761,34 @@ static int toplevel_start(parse_state *state,const XML_Char *child_name,const XM
     }
 }
 
+typedef enum {
+    CLASS_TYPE_OTHER,
+    CLASS_TYPE_NODE_SUB,
+    CLASS_TYPE_LIST_NODE_SUB
+} class_type;
+
 typedef struct {
     PyType_Spec spec;
-    unsigned char list_base;
-} spec_and_is_list;
+    Py_ssize_t field_count;
+    Py_ssize_t (*assign_field_name_tuple)(PyObject*,PyObject**,Py_ssize_t);
+    class_type type;
+} spec_details;
 
-static spec_and_is_list class_specs[] = {
-    {{FULL_MODULE_STR ".FrozenList",sizeof(frozen_list),0,Py_TPFLAGS_DEFAULT|Py_TPFLAGS_BASETYPE|Py_TPFLAGS_HAVE_GC|Py_TPFLAGS_SEQUENCE,frozen_list_slots},0},
-    {{FULL_MODULE_STR ".FrozenListItr",sizeof(frozen_list_itr),0,Py_TPFLAGS_DEFAULT|Py_TPFLAGS_HAVE_GC,frozen_list_itr_slots},0},
-    {{FULL_MODULE_STR ".TaggedValue",sizeof(tagged_value),0,Py_TPFLAGS_DEFAULT|Py_TPFLAGS_HAVE_GC|Py_TPFLAGS_SEQUENCE,tagged_value_slots},0},
-    {{FULL_MODULE_STR ".ParseError",0,0,Py_TPFLAGS_DEFAULT,parse_error_slots},0},
-    {{FULL_MODULE_STR ".ParseWarning",0,0,Py_TPFLAGS_DEFAULT,parse_warning_slots},0},
+static PyType_Slot empty_slots[1] = {{0,NULL}};
+
+static spec_details class_specs[] = {
+    {{FULL_MODULE_STR ".Node",0,0,Py_TPFLAGS_DEFAULT|Py_TPFLAGS_BASETYPE,empty_slots},0,NULL,CLASS_TYPE_OTHER},
+    {{FULL_MODULE_STR ".FrozenList",sizeof(frozen_list),0,Py_TPFLAGS_DEFAULT|Py_TPFLAGS_BASETYPE|Py_TPFLAGS_HAVE_GC|Py_TPFLAGS_SEQUENCE,frozen_list_slots},0,NULL,CLASS_TYPE_OTHER},
+    {{FULL_MODULE_STR ".FrozenListItr",sizeof(frozen_list_itr),0,Py_TPFLAGS_DEFAULT|Py_TPFLAGS_HAVE_GC,frozen_list_itr_slots},0,NULL,CLASS_TYPE_OTHER},
+    {{FULL_MODULE_STR ".TaggedValue",sizeof(tagged_value),0,Py_TPFLAGS_DEFAULT|Py_TPFLAGS_HAVE_GC|Py_TPFLAGS_SEQUENCE,tagged_value_slots},0,NULL,CLASS_TYPE_OTHER},
+    {{FULL_MODULE_STR ".ParseError",0,0,Py_TPFLAGS_DEFAULT,parse_error_slots},0,NULL,CLASS_TYPE_OTHER},
+    {{FULL_MODULE_STR ".ParseWarning",0,0,Py_TPFLAGS_DEFAULT,parse_warning_slots},0,NULL,CLASS_TYPE_OTHER},
 //% for type in types|select('used_directly')
-    {{FULL_MODULE_STR ".Node_{$ type $}",offsetof(node_{$ common_affix(type) $}_common,fields){% if type is has_fields %} + sizeof(PyObject*)*FIELD_COUNT__{$ type $}{% endif %},0,Py_TPFLAGS_DEFAULT|Py_TPFLAGS_HAVE_GC,node_class_slots__{$ type $}},{$ '1' if type is list_e else '0' $}},
+    {{FULL_MODULE_STR ".Node_{$ type $}",offsetof(node_{$ common_affix(type) $}_common,fields){%
+        if type is has_fields %} + sizeof(PyObject*)*FIELD_COUNT__{$ type $}{% endif
+        %},0,Py_TPFLAGS_DEFAULT|Py_TPFLAGS_HAVE_GC,node_class_slots__{$ type $}},FIELD_COUNT__{$ type $},{$
+        'assign_field_name_tuple__'~type if type is has_fields else 'NULL'
+        $},CLASS_TYPE_{$ 'LIST_' if type is list_e $}NODE_SUB},
 //% endfor
 //% for type in types|select('content_tuple')
     {{FULL_MODULE_STR ".ListItem_{$ type $}",offsetof(tuple_item,fields) + sizeof(PyObject*)*TUPLE_ITEM_FIELD_COUNT__{$ type $},0,Py_TPFLAGS_DEFAULT|Py_TPFLAGS_HAVE_GC,tuple_item_slots__{$ type $}},0},
@@ -2022,11 +2096,16 @@ static int create_enum(
 }
 
 static int module_exec(PyObject *module) {
+    PyObject *field_name_objs[PY_FIELD_COUNT];
     PyObject *enum_base=NULL;
     PyObject *frozen_list_bases=NULL;
-    size_t i=0;
+    PyObject *node_bases=NULL;
+    PyObject *fields_str=NULL;
+    size_t i;
+    size_t class_i=0;
     size_t tu_i=0;
     size_t char_i=0;
+    size_t field_i=0;
     module_state *state = PyModule_GetState(module);
 
     for(; tu_i<TAGGED_UNION_NAME_COUNT; ++tu_i) {
@@ -2056,43 +2135,106 @@ static int module_exec(PyObject *module) {
     Py_DECREF(enum_base);
     enum_base = NULL;
 
-    for(; i<CLASS_COUNT; ++i) {
-        if(i == CLASS_FROZEN_LIST) {
-            state->classes[i] = (PyTypeObject*)PyType_FromSpec(&class_specs[i].spec);
+    for(; field_i<PY_FIELD_COUNT; ++field_i) {
+        field_name_objs[field_i] = PyUnicode_FromString(py_field_names[field_i]);
+        if(field_name_objs[field_i] == NULL) goto error;
+    }
 
-            frozen_list_bases = PyTuple_New(1);
+    fields_str = PyUnicode_FromString("_fields");
+    if(fields_str == NULL) goto error;
+
+    for(i=0; i<CLASS_COUNT; ++i) {
+        if(i == CLASS_FROZEN_LIST) {
+            assert(state->classes[CLASS_NODE] != NULL);
+
+            state->classes[i] = (PyTypeObject*)PyType_FromSpec(&class_specs[i].spec);
+            if(state->classes[i] == NULL) goto error;
+            ++class_i;
+
+            frozen_list_bases = PyTuple_New(2);
             if(frozen_list_bases == NULL) goto error;
             PyTuple_SetItem(frozen_list_bases,0,(PyObject*)state->classes[i]);
             Py_INCREF(state->classes[i]);
+            PyTuple_SetItem(frozen_list_bases,1,(PyObject*)state->classes[CLASS_NODE]);
+            Py_INCREF(state->classes[CLASS_NODE]);
+
+            node_bases = PyTuple_New(1);
+            if(node_bases == NULL) goto error;
+            PyTuple_SetItem(node_bases,0,(PyObject*)state->classes[CLASS_NODE]);
+            Py_INCREF(state->classes[CLASS_NODE]);
         } else if(i == CLASS_PARSE_ERROR) {
-            state->classes[i] = (PyTypeObject*)PyType_FromSpecWithBases(&class_specs[i].spec,PyExc_RuntimeError);
+            PyObject *bases = PyTuple_New(1);
+            if(bases == NULL) goto error;
+            PyTuple_SetItem(bases,0,PyExc_RuntimeError);
+            Py_INCREF(PyExc_RuntimeError);
+            state->classes[i] = (PyTypeObject*)PyType_FromSpecWithBases(&class_specs[i].spec,bases);
+            Py_DECREF(bases);
+            if(state->classes[i] == NULL) goto error;
+            ++class_i;
         } else if(i == CLASS_PARSE_WARNING) {
-            state->classes[i] = (PyTypeObject*)PyType_FromSpecWithBases(&class_specs[i].spec,PyExc_UserWarning);
-        } else if(class_specs[i].list_base) {
-            assert(frozen_list_bases != NULL);
-            state->classes[i] = (PyTypeObject*)PyType_FromSpecWithBases(&class_specs[i].spec,frozen_list_bases);
-        } else {
+            PyObject *bases = PyTuple_New(1);
+            if(bases == NULL) goto error;
+            PyTuple_SetItem(bases,0,PyExc_UserWarning);
+            Py_INCREF(PyExc_UserWarning);
+            state->classes[i] = (PyTypeObject*)PyType_FromSpecWithBases(&class_specs[i].spec,bases);
+            Py_DECREF(bases);
+            if(state->classes[i] == NULL) goto error;
+            ++class_i;
+        } else if(class_specs[i].type == CLASS_TYPE_OTHER) {
             state->classes[i] = (PyTypeObject*)PyType_FromSpec(&class_specs[i].spec);
+            if(state->classes[i] == NULL) goto error;
+            ++class_i;
+        } else {
+            PyObject *field_tuple;
+            int r=0;
+
+            assert(frozen_list_bases != NULL && node_bases != NULL);
+            state->classes[i] = (PyTypeObject*)PyType_FromSpecWithBases(
+                &class_specs[i].spec,
+                class_specs[i].type == CLASS_TYPE_LIST_NODE_SUB ? frozen_list_bases : node_bases);
+            
+            if(state->classes[i] == NULL) goto error;
+            ++class_i;
+
+            assert((class_specs[i].field_count == 0) == (class_specs[i].assign_field_name_tuple == NULL));
+            field_tuple = PyTuple_New(class_specs[i].field_count);
+            if(field_tuple == NULL) goto error;
+            if(class_specs[i].field_count) {
+#ifndef NDEBUG
+                Py_ssize_t count = class_specs[i].assign_field_name_tuple(field_tuple,field_name_objs,0);
+                assert(count == class_specs[i].field_count);
+#else
+                class_specs[i].assign_field_name_tuple(field_tuple,field_name_objs,0);
+#endif
+            }
+            r = PyObject_SetAttr((PyObject*)state->classes[i],fields_str,field_tuple);
+            Py_DECREF(field_tuple);
+            if(r < 0) goto error;
         }
-        if(state->classes[i] == NULL) goto error;
+
         if(PyModule_AddObject(module,class_specs[i].spec.name + sizeof(FULL_MODULE_STR),(PyObject*)state->classes[i])) {
-            ++i;
             goto error;
         };
         Py_INCREF(state->classes[i]);
     }
 
     Py_DECREF(frozen_list_bases);
+    Py_DECREF(node_bases);
+    Py_DECREF(fields_str);
+    decref_array(field_name_objs,field_i);
 
     return 0;
 
   error:
+    Py_XDECREF(fields_str);
     Py_XDECREF(enum_base);
+    Py_XDECREF(node_bases);
     Py_XDECREF(frozen_list_bases);
 //% for type in types|select('enumeration_t')
     if(state->enum_values__{$ type $}[0] != NULL) decref_array(state->enum_values__{$ type $},ENUM_VALUE_COUNT__{$ type $});
 //% endfor
-    decref_array((PyObject**)state->classes,i);
+    decref_array(field_name_objs,field_i);
+    decref_array((PyObject**)state->classes,class_i);
     decref_array(state->tag_names,tu_i);
     decref_array(state->char_objects,char_i);
     state->classes[0] = NULL;

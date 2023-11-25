@@ -13,7 +13,7 @@ class TestUtils(TestCase):
         <compounddef id="" kind="type" prot="public">
         <compoundname></compoundname>
         <sectiondef kind="typedef">
-        <memberdef>
+        <memberdef id="" kind="function" prot="public" static="no">
         <name>x</name>
         <param>
           <type>int</type>
@@ -45,7 +45,7 @@ class TestUtils(TestCase):
           <declname>r</declname>
           <array>[3]</array>
         </param>
-        <location bodyend="0" bodyfile="" bodystart="0" column="0" declcolumn="0" declfile="" declline="0" file="" line="0"/>
+        <location file="" line="0"/>
         </memberdef>
         </sectiondef>
         </compounddef>

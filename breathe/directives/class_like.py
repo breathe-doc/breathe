@@ -1,16 +1,18 @@
+from __future__ import annotations
+
 from breathe.directives import BaseDirective
 from breathe.file_state_cache import MTimeError
 from breathe.project import ProjectError
 from breathe.renderer.mask import NullMaskFactory
 from breathe.renderer.target import create_target_handler
 
-from docutils.nodes import Node
 from docutils.parsers.rst.directives import unchanged_required, unchanged, flag
 
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from breathe import parser
+    from breathe import renderer
+    from docutils.nodes import Node
 
 
 class _DoxygenClassLikeDirective(BaseDirective):
@@ -50,7 +52,7 @@ class _DoxygenClassLikeDirective(BaseDirective):
 
         finder_filter = self.filter_factory.create_compound_finder_filter(name, self.kind)
 
-        matches: list[parser.Node] = []
+        matches: list[list[renderer.TaggedNode]] = []
         finder.filter_(finder_filter, matches)
 
         if len(matches) == 0:

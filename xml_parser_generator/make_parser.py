@@ -113,6 +113,10 @@ class ElementType(SchemaType):
         yield from self.attributes.values()
         yield from self.children.values()
 
+    @property
+    def direct_field_count(self):
+        return len(self.attributes) + len(self.children)
+
     def all_fields(self) -> Iterable[TypeRef|Attribute]:
         for b in self.bases:
             if isinstance(b,ElementType):

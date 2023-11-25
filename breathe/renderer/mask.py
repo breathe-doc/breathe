@@ -18,15 +18,24 @@ matching.
 
 """
 
+from __future__ import annotations
 
-class NoParameterNamesMask:
-    def __init__(self, data_object) -> None:
-        self.data_object = data_object
+from typing import Callable
+from breathe import parser
 
-    def __getattr__(self, attr):
-        if attr in ["declname", "defname", "defval"]:
-            return None
-        return getattr(self.data_object, attr)
+
+def no_parameter_names(node: parser.NodeOrValue):
+    assert isinstance(node,parser.Node_paramType)
+    return parser.Node_paramType(
+        array = node.array,
+        attributes = node.attributes,
+        briefdescription = node.briefdescription,
+        declname = None,
+        defname = None,
+        defval = None,
+        type = node.type,
+        typeconstraint = node.typeconstraint
+    )
 
 
 class MaskFactoryBase:
@@ -35,15 +44,15 @@ class MaskFactoryBase:
 
 
 class MaskFactory(MaskFactoryBase):
-    def __init__(self, lookup):
+    def __init__(self, lookup : dict[type[parser.NodeOrValue],Callable[[parser.NodeOrValue],parser.NodeOrValue]]):
         self.lookup = lookup
 
-    def mask(self, data_object):
+    def mask(self, data_object: parser.NodeOrValue) -> parser.NodeOrValue:
         m = self.lookup.get(type(data_object))
         if m is None: return data_object
         return m(data_object)
 
 
 class NullMaskFactory(MaskFactoryBase):
-    def mask(self, data_object):
+    def mask(self, data_object: parser.NodeOrValue) -> parser.NodeOrValue:
         return data_object

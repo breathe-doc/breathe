@@ -1,5 +1,15 @@
+from __future__ import annotations
+
 from docutils import nodes
 import textwrap
+from typing import NamedTuple, TYPE_CHECKING, Union
+
+if TYPE_CHECKING:
+    from breathe import parser
+    from breathe.renderer import mask
+    from breathe.directives.index import RootDataObject
+
+    DataObject = Union[parser.NodeOrValue, RootDataObject, 'FakeParentNode']
 
 
 def format_parser_error(name: str, error: str, filename: str, state, lineno: int, do_unicode_warning: bool = False) -> list[nodes.Node]:
@@ -33,10 +43,16 @@ def format_parser_error(name: str, error: str, filename: str, state, lineno: int
         ),
     ]
 
+class FakeParentNode:
+    pass
+
+class TaggedNode(NamedTuple):
+    tag: str | None
+    value: DataObject
 
 class RenderContext:
     def __init__(
-        self, node_stack, mask_factory, directive_args, domain: str = "", child: bool = False
+        self, node_stack: list[TaggedNode], mask_factory: mask.MaskFactoryBase, directive_args, domain: str = "", child: bool = False
     ) -> None:
         self.node_stack = node_stack
         self.mask_factory = mask_factory
@@ -44,7 +60,7 @@ class RenderContext:
         self.domain = domain
         self.child = child
 
-    def create_child_context(self, data_object) -> "RenderContext":
+    def create_child_context(self, data_object: parser.NodeOrValue, tag: str | None = None) -> RenderContext:
         node_stack = self.node_stack[:]
-        node_stack.insert(0, self.mask_factory.mask(data_object))
+        node_stack.insert(0, TaggedNode(tag,self.mask_factory.mask(data_object)))
         return RenderContext(node_stack, self.mask_factory, self.directive_args, self.domain, True)

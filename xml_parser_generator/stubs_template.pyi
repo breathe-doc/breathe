@@ -1,5 +1,5 @@
 import enum
-from typing import Generic,Literal,overload,Protocol,SupportsIndex,TypeVar
+from typing import ClassVar, Generic, Literal, overload, Protocol, Self, SupportsIndex, TypeVar
 from collections.abc import Iterable
 
 T = TypeVar('T',covariant=True)
@@ -9,7 +9,7 @@ class SupportsRead(Protocol):
     def read(self, length: int, /) -> bytes | bytearray: ...
 
 class FrozenListItr(Generic[T]):
-    def __iter__(self) -> FrozenListItr: ...
+    def __iter__(self) -> Self: ...
     def __next__(self) -> T: ...
 
 class FrozenList(Generic[T]):
@@ -34,6 +34,9 @@ class TaggedValue(Generic[T, U]):
 
     @overload
     def __getitem__(self, i: SupportsIndex) -> T | U: ...
+
+class Node:
+    _fields: ClassVar[tuple[str, ...]]
 
 class ParseError(RuntimeError):
     @property
@@ -106,7 +109,7 @@ ListItem_{$ type $} = (
 {$ "invalid content type"|error $}
 //%   endif
 //%   if type is used_directly
-class Node_{$ type $}{$ '(FrozenList['~list_item_type~'])' if type is list_e $}:
+class Node_{$ type $}({$ 'FrozenList['~list_item_type~'], ' if type is list_e $}Node):
 {$ emit_fields(type) $}
     def __init__(self{$ ', __items: Iterable['~list_item_type~'], /' if type is list_e $}
         {%- if type|field_count -%}, *
@@ -124,9 +127,3 @@ class {$ type $}(enum.Enum):
 {$ type $} = Literal[{% for c in type.values %}{$ "'"~c~"'" $}{$ ',' if not loop.last $}{% endfor %}]
 //%   endif
 //% endfor
-
-Node = (
-//% for type in types|map(attribute='py_name')|sort|unique
-    {$ '| ' if not loop.first $}{$ type $}
-//% endfor
-)

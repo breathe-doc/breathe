@@ -1,7 +1,7 @@
 from breathe.directives import BaseDirective
-from breathe.parser import ParserError, FileIOError
+from breathe import parser
 from breathe.project import ProjectError
-from breathe.renderer import format_parser_error, RenderContext
+from breathe.renderer import format_parser_error, RenderContext, TaggedNode
 from breathe.renderer.mask import NullMaskFactory
 from breathe.renderer.sphinxrenderer import SphinxRenderer
 from breathe.renderer.target import create_target_handler
@@ -11,7 +11,7 @@ from docutils.parsers.rst.directives import unchanged_required, flag
 
 
 class RootDataObject:
-    node_type = "root"
+    pass
 
 
 class _BaseIndexDirective(BaseDirective):
@@ -24,11 +24,11 @@ class _BaseIndexDirective(BaseDirective):
     def handle_contents(self, project_info) -> list[Node]:
         try:
             finder = self.finder_factory.create_finder(project_info)
-        except ParserError as e:
+        except parser.ParserError as e:
             return format_parser_error(
                 self.name, e.message, e.filename, self.state, self.lineno, True
             )
-        except FileIOError as e:
+        except parser.FileIOError as e:
             return format_parser_error(self.name, e.error, e.filename, self.state, self.lineno)
 
         data_object = finder.root()
@@ -48,15 +48,17 @@ class _BaseIndexDirective(BaseDirective):
         )
 
         mask_factory = NullMaskFactory()
-        context = RenderContext([data_object, RootDataObject()], mask_factory, self.directive_args)
+        context = RenderContext([TaggedNode(None,data_object), TaggedNode(None,RootDataObject())], mask_factory, self.directive_args)
 
+        value = context.node_stack[0].value
+        assert isinstance(value,parser.Node)
         try:
-            node_list = object_renderer.render(context.node_stack[0], context)
-        except ParserError as e:
+            node_list = object_renderer.render(value, context)
+        except parser.ParserError as e:
             return format_parser_error(
                 self.name, e.message, e.filename, self.state, self.lineno, True
             )
-        except FileIOError as e:
+        except parser.FileIOError as e:
             return format_parser_error(self.name, e.error, e.filename, self.state, self.lineno)
 
         return node_list
