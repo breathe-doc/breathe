@@ -358,9 +358,8 @@ class LambdaAccessor(Accessor):
 
 class NamespaceAccessor(Accessor):
     def __call__(self, node_stack):
-        r = []
-        r.extend(self.selector(node_stack).value.innernamespace) # type: ignore
-        r.extend(self.selector(node_stack).value.innerclass) # type: ignore
+        r = set(''.join(ns) for ns in self.selector(node_stack).value.innernamespace) # type: ignore
+        r.update(''.join(ns) for ns in self.selector(node_stack).value.innerclass) # type: ignore
         return r
 
 
@@ -881,11 +880,11 @@ class FilterFactory:
             return OpenFilter()
 
     def create_file_filter(self, filename: str, options: dict[str, Any]) -> Filter:
-        valid_names: list[str] = []
+        valid_names: set[str] = set()
 
         def gather_namespaces(node: parser.Node_compounddefType):
-            valid_names.extend(''.join(ns) for ns in node.innernamespace)
-            valid_names.extend(''.join(ns) for ns in node.innerclass)
+            valid_names.update(''.join(ns) for ns in node.innernamespace)
+            valid_names.update(''.join(ns) for ns in node.innerclass)
             return False
 
         filter_ = AndFilter(

@@ -1262,30 +1262,30 @@ class SphinxRenderer(metaclass=NodeVisitor):
             node: HasRefID,
             render_empty_node=True,
             *,
-            get_node_info: Callable[[parser.Node_DoxygenType], tuple[str, parser.CompoundKind]] | None = None,
+            get_node_info: Callable[[parser.Node_DoxygenType], tuple[str, parser.DoxCompoundKind]] | None = None,
             render_signature: Callable[
-                [parser.Node_DoxygenType,Sequence[Element],str,parser.CompoundKind],
+                [parser.Node_DoxygenType,Sequence[Element],str,parser.DoxCompoundKind],
                 tuple[list[Node],addnodes.desc_content]] | None = None) -> list[Node]:
         # Read in the corresponding xml file and process
         file_data = self.compound_parser.parse(node.refid)
         assert len(file_data.compounddef) == 1
 
-        def def_get_node_info(file_data):
+        def def_get_node_info(file_data) -> tuple[str, parser.DoxCompoundKind]:
             assert isinstance(node,parser.Node_CompoundType)
-            return node.name, node.kind
+            return node.name, parser.DoxCompoundKind(node.kind.value)
         if get_node_info is None:
             get_node_info = def_get_node_info
 
         name, kind = get_node_info(file_data)
-        if kind == parser.CompoundKind.union:
+        if kind == parser.DoxCompoundKind.union:
             dom = self.get_domain()
             assert not dom or dom in ("c", "cpp")
             return self.visit_union(node)
-        elif kind in (parser.CompoundKind.struct, parser.CompoundKind.class_, parser.CompoundKind.interface):
+        elif kind in (parser.DoxCompoundKind.struct, parser.DoxCompoundKind.class_, parser.DoxCompoundKind.interface):
             dom = self.get_domain()
             if not dom or dom in ("c", "cpp", "py", "cs"):
                 return self.visit_class(node)
-        elif kind == parser.CompoundKind.namespace:
+        elif kind == parser.DoxCompoundKind.namespace:
             dom = self.get_domain()
             if not dom or dom in ("c", "cpp", "py", "cs"):
                 return self.visit_namespace(node)
@@ -1302,7 +1302,7 @@ class SphinxRenderer(metaclass=NodeVisitor):
                 file_data: parser.Node_DoxygenType,
                 doxygen_target,
                 name,
-                kind: parser.CompoundKind) -> tuple[list[Node],addnodes.desc_content]:
+                kind: parser.DoxCompoundKind) -> tuple[list[Node],addnodes.desc_content]:
             # Defer to domains specific directive.
 
             assert len(file_data.compounddef) == 1
@@ -1310,7 +1310,7 @@ class SphinxRenderer(metaclass=NodeVisitor):
             arg = "%s %s" % (templatePrefix, self.get_fully_qualified_name())
 
             # add base classes
-            if kind in (parser.CompoundKind.class_, parser.CompoundKind.struct):
+            if kind in (parser.DoxCompoundKind.class_, parser.DoxCompoundKind.struct):
                 bs = []
                 for base in file_data.compounddef[0].basecompoundref:
                     b = []
@@ -1593,6 +1593,8 @@ class SphinxRenderer(metaclass=NodeVisitor):
     @node_handler(parser.Node_docRefTextType)
     @node_handler(parser.Node_refTextType)
     def visit_docreftext(self, node: parser.Node_docRefTextType | parser.Node_incType | parser.Node_refTextType) -> list[Node]:
+        nodelist: list[Node]
+
         if isinstance(node,parser.Node_incType):
             nodelist = self.render_iterable(node)
         else:
@@ -1606,7 +1608,8 @@ class SphinxRenderer(metaclass=NodeVisitor):
 
         refid = self.get_refid(node.refid or '')
 
-        nodelist: list[Node] = [
+        assert nodelist
+        nodelist = [
             addnodes.pending_xref(
                 "",
                 reftype="ref",
@@ -1882,10 +1885,10 @@ class SphinxRenderer(metaclass=NodeVisitor):
             self.state.memo.title_styles = surrounding_title_styles
             self.state.memo.section_level = surrounding_section_level
 
-    def visit_verbatim(self, node) -> list[Node]:
-        if not node.text.strip().startswith("embed:rst"):
+    def visit_verbatim(self, node: str) -> list[Node]:
+        if not node.strip().startswith("embed:rst"):
             # Remove trailing new lines. Purely subjective call from viewing results
-            text = node.text.rstrip()
+            text = node.rstrip()
 
             # Handle has a preformatted text
             return [nodes.literal_block(text, text)]
@@ -1897,36 +1900,36 @@ class SphinxRenderer(metaclass=NodeVisitor):
         #   However This would have a side-effect for any users who have an rst-block
         #   consisting of a simple bullet list.
         #   For now we just look for an extended embed tag
-        if node.text.strip().startswith("embed:rst:leading-asterisk"):
-            lines = node.text.splitlines()
+        if node.strip().startswith("embed:rst:leading-asterisk"):
+            lines = node.splitlines()
             # Replace the first * on each line with a blank space
             lines = map(lambda text: text.replace("*", " ", 1), lines)
-            node.text = "\n".join(lines)
+            node = "\n".join(lines)
 
         # do we need to strip leading ///?
-        elif node.text.strip().startswith("embed:rst:leading-slashes"):
-            lines = node.text.splitlines()
+        elif node.strip().startswith("embed:rst:leading-slashes"):
+            lines = node.splitlines()
             # Replace the /// on each line with three blank spaces
             lines = map(lambda text: text.replace("///", "   ", 1), lines)
-            node.text = "\n".join(lines)
+            node = "\n".join(lines)
 
-        elif node.text.strip().startswith("embed:rst:inline"):
+        elif node.strip().startswith("embed:rst:inline"):
             # Inline all text inside the verbatim
-            node.text = "".join(node.text.splitlines())
+            node = "".join(node.splitlines())
             is_inline = True
 
         if is_inline:
-            text = node.text.replace("embed:rst:inline", "", 1)
+            node = node.replace("embed:rst:inline", "", 1)
         else:
             # Remove the first line which is "embed:rst[:leading-asterisk]"
-            text = "\n".join(node.text.split("\n")[1:])
+            node = "\n".join(node.split("\n")[1:])
 
             # Remove starting whitespace
-            text = textwrap.dedent(text)
+            node = textwrap.dedent(node)
 
         # Inspired by autodoc.py in Sphinx
         rst = StringList()
-        for line in text.split("\n"):
+        for line in node.split("\n"):
             rst.append(line, "<breathe>")
 
         # Parent node for the generated node subtree
@@ -1962,7 +1965,7 @@ class SphinxRenderer(metaclass=NodeVisitor):
 
     @node_handler(parser.Node_refType)
     def visit_ref(self, node: parser.Node_refType) -> list[Node]:
-        def get_node_info(file_data):
+        def get_node_info(file_data: parser.Node_DoxygenType):
             name = ''.join(node)
             name = name.rsplit("::", 1)[-1]
             assert len(file_data.compounddef) == 1
@@ -2017,6 +2020,7 @@ class SphinxRenderer(metaclass=NodeVisitor):
         if node.refid is not None:
             refid = self.get_refid(node.refid)
         if refid is not None:
+            assert nodelist
             nodelist = [
                 addnodes.pending_xref(
                     "",
@@ -2168,7 +2172,7 @@ class SphinxRenderer(metaclass=NodeVisitor):
                     elements.append("static")
                 if node.inline:
                     elements.append("inline")
-                if node.kind == "friend":
+                if node.kind == parser.DoxMemberKind.friend:
                     elements.append("friend")
                 if node.virt in (parser.DoxVirtualKind.virtual, parser.DoxVirtualKind.pure_virtual):
                     elements.append("virtual")
@@ -2566,11 +2570,17 @@ class SphinxRenderer(metaclass=NodeVisitor):
             fieldList += field
         return [fieldList]
 
-    def visit_docdot(self, node) -> list[Node]:
+    @node_handler(parser.Node_docDotMscType)
+    def visit_docdot(self, node: parser.Node_docDotMscType) -> list[Node]:
         """Translate node from doxygen's dot command to sphinx's graphviz directive."""
         graph_node = graphviz()
-        if node.content_ and node.content_[0].getValue().rstrip("\n"):
-            graph_node["code"] = node.content_[0].getValue()
+        str_value = ''
+        if len(node):
+            val = node[0]
+            assert isinstance(val,str)
+            str_value = val
+        if str_value.rstrip("\n"):
+            graph_node["code"] = str_value
         else:
             graph_node["code"] = ""  # triggers another warning from sphinx.ext.graphviz
             self.state.document.reporter.warning(
@@ -2585,10 +2595,11 @@ class SphinxRenderer(metaclass=NodeVisitor):
             return [nodes.figure("", graph_node, caption_node)]
         return [graph_node]
 
-    def visit_docdotfile(self, node) -> list[Node]:
+    @node_handler(parser.Node_docImageFileType)
+    def visit_docdotfile(self, node: parser.Node_docImageFileType) -> list[Node]:
         """Translate node from doxygen's dotfile command to sphinx's graphviz directive."""
         dotcode = ""
-        dot_file_path = node.name  # type: str
+        dot_file_path: str = node.name or ''
         # Doxygen v1.9.3+ uses a relative path to specify the dot file.
         # Previously, Doxygen used an absolute path.
         # This relative path is with respect to the XML_OUTPUT path.
@@ -2617,7 +2628,7 @@ class SphinxRenderer(metaclass=NodeVisitor):
         graph_node = graphviz()
         graph_node["code"] = dotcode
         graph_node["options"] = {"docname": dot_file_path}
-        caption = "" if not node.content_ else node.content_[0].getValue()
+        caption = '' if len(node) == 0 else parser.tag_name_value(node[0])[1]
         if caption:
             caption_node = nodes.caption(caption, "")
             caption_node += nodes.Text(caption)
@@ -2742,11 +2753,11 @@ class SphinxRenderer(metaclass=NodeVisitor):
             return self.visit_friendclass(node)
         return self.render_declaration(node, update_signature=self.update_signature)
 
-    #methods: dict[str, Callable[[SphinxRenderer, Any], list[Node]]] = {
-    #    "verbatim": visit_verbatim,
-    #    "docdotfile": visit_docdotfile,
-    #    "docdot": visit_docdot,
-    #}
+    @tagged_node_handler(str)
+    def visit_string(self, tag: str, node: str) -> list[Node]:
+        if tag == 'verbatim':
+            return self.visit_verbatim(node)
+        return self.render_string(node)
 
     @node_handler(str)
     def render_string(self, node: str) -> list[Node]:
@@ -2789,10 +2800,6 @@ class SphinxRenderer(metaclass=NodeVisitor):
         return self.render(item.value)
 
     def render(self, node: parser.NodeOrValue, context: RenderContext | None = None, tag: str | None = None) -> list[Node]:
-        # the filters discriminate based on the tag name for Node_refType
-        # instances
-        assert tag is not None or not isinstance(node,parser.Node_refType)
-
         if context is None:
             assert self.context is not None
             context = self.context.create_child_context(node,tag)
@@ -2802,7 +2809,10 @@ class SphinxRenderer(metaclass=NodeVisitor):
             if not self.filter_.allow(self.context.node_stack):
                 pass
             else:
-                method = self.node_handlers.get(type(node), SphinxRenderer.visit_unknown)
+                method = self.node_handlers.get(type(node))
+                if method is None:
+                    assert type(node) not in self.tagged_node_handlers
+                    method = SphinxRenderer.visit_unknown
                 result = method(self, node)
         return result
 
