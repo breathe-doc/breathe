@@ -5,14 +5,14 @@ from breathe.finder import index as indexfinder
 from breathe.finder import compound as compoundfinder
 from breathe import parser
 from breathe.project import ProjectInfo
-from breathe.renderer import FakeParentNode, TaggedNode
-from breathe.renderer.filter import Filter
+from breathe.renderer import TaggedNode
 
 from sphinx.application import Sphinx
 
 from typing import Any, Callable, TYPE_CHECKING
 
 if TYPE_CHECKING:
+    from breathe.renderer.filter import DoxFilter
     ItemFinderCreator = Callable[[ProjectInfo,Any,'DoxygenItemFinderFactory'],ItemFinder]
 
 
@@ -40,11 +40,11 @@ class Finder:
         self._root = root
         self.item_finder_factory = item_finder_factory
 
-    def filter_(self, filter_: Filter, matches: list[list[TaggedNode]]) -> None:
+    def filter_(self, filter_: DoxFilter, matches: list[list[TaggedNode]]) -> None:
         """Adds all nodes which match the filter into the matches list"""
 
         item_finder = self.item_finder_factory.create_finder(self._root)
-        item_finder.filter_([TaggedNode(None,FakeParentNode())], filter_, matches)
+        item_finder.filter_([], filter_, matches)
 
     def root(self):
         return self._root

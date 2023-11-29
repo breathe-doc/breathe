@@ -9,7 +9,7 @@ if TYPE_CHECKING:
     from breathe.renderer import mask
     from breathe.directives.index import RootDataObject
 
-    DataObject = Union[parser.NodeOrValue, RootDataObject, 'FakeParentNode']
+    DataObject = Union[parser.NodeOrValue, RootDataObject]
 
 
 def format_parser_error(name: str, error: str, filename: str, state, lineno: int, do_unicode_warning: bool = False) -> list[nodes.Node]:
@@ -43,8 +43,6 @@ def format_parser_error(name: str, error: str, filename: str, state, lineno: int
         ),
     ]
 
-class FakeParentNode:
-    pass
 
 class TaggedNode(NamedTuple):
     tag: str | None

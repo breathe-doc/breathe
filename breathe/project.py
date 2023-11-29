@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from .exception import BreatheError
 
 from sphinx.application import Sphinx
@@ -6,7 +8,14 @@ import os
 import fnmatch
 
 
-from typing import Dict
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from typing_extensions import TypedDict
+
+    ProjectOptions = TypedDict('ProjectOptions',{
+        'path': str,
+        'project': str})
 
 
 class ProjectError(BreatheError):
@@ -115,9 +124,9 @@ class ProjectInfoFactory:
         # This can be overridden with the breathe_build_directory config variable
         self._default_build_dir = str(app.doctreedir.parent)
         self.project_count = 0
-        self.project_info_store: Dict[str, ProjectInfo] = {}
-        self.project_info_for_auto_store: Dict[str, AutoProjectInfo] = {}
-        self.auto_project_info_store: Dict[str, AutoProjectInfo] = {}
+        self.project_info_store: dict[str, ProjectInfo] = {}
+        self.project_info_for_auto_store: dict[str, AutoProjectInfo] = {}
+        self.auto_project_info_store: dict[str, AutoProjectInfo] = {}
 
     @property
     def build_dir(self) -> str:
@@ -146,7 +155,7 @@ class ProjectInfoFactory:
                 % config.breathe_default_project
             )
 
-    def create_project_info(self, options) -> ProjectInfo:
+    def create_project_info(self, options: ProjectOptions) -> ProjectInfo:
         config = self.app.config
         name = config.breathe_default_project
 

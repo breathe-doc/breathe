@@ -6,7 +6,6 @@ import sphinx.addnodes
 import sphinx.environment
 from breathe import parser, renderer
 from breathe.renderer.sphinxrenderer import SphinxRenderer
-from breathe.renderer.filter import OpenFilter
 import docutils.parsers.rst
 from docutils import frontend, nodes, utils
 from sphinx.testing.fixtures import (
@@ -250,7 +249,7 @@ def render(
         None,  # document
         MockTargetHandler(),
         compound_parser,
-        OpenFilter(),
+        (lambda nstack: True),
     )
     renderer.context = MockContext(app, [member_def], domain, options)
     return renderer.render(member_def)

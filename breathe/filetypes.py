@@ -2,18 +2,17 @@
 A module to house the methods for resolving a code-blocks language based on filename
 (and extension).
 """
-from typing import Optional
 import os.path
 
 from pygments.lexers import get_lexer_for_filename
 from pygments.util import ClassNotFound
 
 
-def get_pygments_alias(filename: str) -> Optional[str]:
+def get_pygments_alias(filename: str) -> str | None:
     "Find first pygments alias from filename"
     try:
         lexer_cls = get_lexer_for_filename(filename)
-        return lexer_cls.aliases[0]  # type: ignore
+        return lexer_cls.aliases[0]
     except ClassNotFound:
         return None
 

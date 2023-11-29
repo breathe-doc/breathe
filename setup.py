@@ -30,8 +30,8 @@ Breathe is an extension to reStructuredText and Sphinx to be able to read and
 
 requires = ["Sphinx>=4.0,!=5.0.0", "docutils>=0.12"]
 
-if sys.version_info < (3, 7):
-    print("ERROR: Sphinx requires at least Python 3.7 to run.")
+if sys.version_info < (3, 8):
+    print("ERROR: Sphinx requires at least Python 3.8 to run.")
     sys.exit(1)
 
 

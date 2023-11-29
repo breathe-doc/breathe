@@ -18,11 +18,20 @@ from docutils import nodes
 
 import re
 
-from typing import Any, List, Optional, TYPE_CHECKING
+from typing import cast, List, Optional, TYPE_CHECKING
 
 if TYPE_CHECKING:
+    from typing_extensions import NotRequired, TypedDict
     from breathe import project
     from docutils.nodes import Node
+
+    DoxFunctionOptions = TypedDict('DoxFunctionOptions',{
+        'path': str,
+        'project': str,
+        'outline': NotRequired[None],
+        'no-link': NotRequired[None]})
+else:
+    DoxFunctionOptions = None
 
 
 class _NoMatchingFunctionError(BreatheError):
@@ -68,8 +77,10 @@ class DoxygenFunctionDirective(BaseDirective):
         function_name = match.group(2).strip()
         argsStr = match.group(3)
 
+        options = cast(DoxFunctionOptions,self.options)
+
         try:
-            project_info = self.project_info_factory.create_project_info(self.options)
+            project_info = self.project_info_factory.create_project_info(options)
         except ProjectError as e:
             warning = self.create_warning(None)
             return warning.warn("doxygenfunction: %s" % e)
@@ -83,7 +94,7 @@ class DoxygenFunctionDirective(BaseDirective):
         # Extract arguments from the function name.
         try:
             args = self._parse_args(argsStr)
-        except cpp.DefinitionError as e:
+        except cpp.DefinitionError as e: # pyright: ignore
             return self.create_warning(
                 project_info,
                 namespace="%s::" % namespace if namespace else "",
@@ -142,7 +153,7 @@ class DoxygenFunctionDirective(BaseDirective):
             warning_nodes = [nodes.paragraph("", "", nodes.Text(formatted_message)), block]
             result = warning.warn(message, rendered_nodes=warning_nodes, unformatted_suffix=text)
             return result
-        except cpp.DefinitionError as error:
+        except cpp.DefinitionError as error: # pyright: ignore
             warning.context["cpperror"] = str(error)
             return warning.warn(
                 "doxygenfunction: Unable to resolve function "
@@ -150,8 +161,8 @@ class DoxygenFunctionDirective(BaseDirective):
                 "Candidate function could not be parsed. Parsing error is\n{cpperror}"
             )
 
-        target_handler = create_target_handler(self.options, project_info, self.state.document)
-        filter_ = self.filter_factory.create_outline_filter(self.options)
+        target_handler = create_target_handler(options, project_info, self.state.document)
+        filter_ = self.filter_factory.create_outline_filter(options)
 
         return self.render(
             node_stack,

@@ -6,7 +6,7 @@ from breathe.renderer import format_parser_error, RenderContext
 from breathe.renderer.filter import FilterFactory
 from breathe.renderer.sphinxrenderer import SphinxRenderer
 
-from sphinx.directives import SphinxDirective
+from sphinx.directives import SphinxDirective # pyright: ignore
 
 from docutils import nodes
 
@@ -16,7 +16,7 @@ if TYPE_CHECKING:
     from breathe.parser import DoxygenParserFactory
     from breathe.project import ProjectInfoFactory, ProjectInfo
     from breathe.renderer import TaggedNode
-    from breathe.renderer.filter import Filter
+    from breathe.renderer.filter import DoxFilter
     from breathe.renderer.mask import MaskFactoryBase
     from breathe.renderer.target import TargetHandler
 
@@ -77,10 +77,6 @@ class BaseDirective(SphinxDirective):
     def filter_factory(self) -> FilterFactory:
         return FilterFactory(self.env.app)
 
-    @property
-    def kind(self) -> str:
-        raise NotImplementedError
-
     def create_warning(self, project_info: ProjectInfo | None, **kwargs) -> _WarningHandler:
         if project_info:
             tail = 'in doxygen xml output for project "{project}" from directory: {path}'.format(
@@ -96,7 +92,7 @@ class BaseDirective(SphinxDirective):
         self,
         node_stack: list[TaggedNode],
         project_info: ProjectInfo,
-        filter_: Filter,
+        filter_: DoxFilter,
         target_handler: TargetHandler,
         mask_factory: MaskFactoryBase,
         directive_args,

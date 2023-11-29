@@ -4,6 +4,7 @@ import os
 import sphinx
 
 from breathe import parser, filetypes
+from breathe.renderer.filter import NodeStack
 
 from sphinx import addnodes
 from sphinx.domains import cpp, c, python
@@ -19,6 +20,7 @@ import re
 import textwrap
 from typing import Any, Callable, cast, ClassVar, Generic, Optional, Protocol, Type, TypeVar, TYPE_CHECKING, Union
 from collections.abc import Iterable, Sequence
+
 
 php: Any
 try:
@@ -38,7 +40,7 @@ T = TypeVar('T')
 if TYPE_CHECKING:
     from breathe.project import ProjectInfo
     from breathe.renderer import RenderContext, DataObject
-    from breathe.renderer.filter import Filter
+    from breathe.renderer.filter import DoxFilter
     from breathe.renderer.target import TargetHandler
 
     from sphinx.application import Sphinx
@@ -361,7 +363,7 @@ class DomainDirectiveFactory:
 class NodeFinder(nodes.SparseNodeVisitor):
     """Find the Docutils desc_signature declarator and desc_content nodes."""
 
-    def __init__(self, document):
+    def __init__(self, document: nodes.document):
         super().__init__(document)
         self.declarator: Declarator | None = None
         self.content: addnodes.desc_content | None = None
@@ -526,7 +528,7 @@ class NodeHandler(Generic[T]):
     """Dummy callable that associates a set of nodes to a function. This gets
     unwrapped by NodeVisitor and is never actually called."""
 
-    def __init__(self,handler):
+    def __init__(self,handler: Callable[[SphinxRenderer, T], list[Node]]):
         self.handler = handler
         self.nodes: set[type[parser.NodeOrValue]] = set()
 
@@ -537,7 +539,7 @@ class TaggedNodeHandler(Generic[T]):
     """Dummy callable that associates a set of nodes to a function. This gets
     unwrapped by NodeVisitor and is never actually called."""
 
-    def __init__(self,handler):
+    def __init__(self,handler: Callable[[SphinxRenderer, str, T], list[Node]]):
         self.handler = handler
         self.nodes: set[type[parser.NodeOrValue]] = set()
 
@@ -546,18 +548,16 @@ class TaggedNodeHandler(Generic[T]):
 
 def node_handler(node: type[parser.NodeOrValue]):
     def inner(f: Callable[[SphinxRenderer, T], list[Node]]) -> Callable[[SphinxRenderer, T], list[Node]]:
-        if not isinstance(f,NodeHandler):
-            f = NodeHandler(f)
-        f.nodes.add(node)
-        return f
+        handler: NodeHandler = f if isinstance(f,NodeHandler) else NodeHandler(f)
+        handler.nodes.add(node)
+        return handler
     return inner
 
 def tagged_node_handler(node: type[parser.NodeOrValue]):
     def inner(f: Callable[[SphinxRenderer, str, T], list[Node]]) -> Callable[[SphinxRenderer, str, T], list[Node]]:
-        if not isinstance(f,TaggedNodeHandler):
-            f = TaggedNodeHandler(f)
-        f.nodes.add(node)
-        return f
+        handler: TaggedNodeHandler = f if isinstance(f,TaggedNodeHandler) else TaggedNodeHandler(f)
+        handler.nodes.add(node)
+        return handler
     return inner
 
 class NodeVisitor(type):
@@ -602,7 +602,7 @@ class SphinxRenderer(metaclass=NodeVisitor):
         document: nodes.document,
         target_handler: TargetHandler,
         compound_parser: parser.DoxygenCompoundParser,
-        filter_: Filter,
+        filter_: DoxFilter,
     ):
         self.app = app
 
@@ -741,9 +741,11 @@ class SphinxRenderer(metaclass=NodeVisitor):
         # (e.g., variable in function), so perhaps skip (see #671).
         # If there are nodes, there should be at least 2.
         if len(nodes) != 0:
-            assert len(nodes) >= 2, nodes
+            assert len(nodes) >= 2
             rst_node = nodes[1]
-            finder = NodeFinder(rst_node.document)
+            doc = rst_node.document
+            assert doc is not None
+            finder = NodeFinder(doc)
             rst_node.walk(finder)
 
             assert finder.declarator
@@ -849,7 +851,7 @@ class SphinxRenderer(metaclass=NodeVisitor):
         names: list[str] = []
         for node in self.qualification_stack[1:]:
             if config.breathe_debug_trace_qualification:
-                print("{}{}".format(_debug_indent * "  ", debug_print_node(node))) # type: ignore
+                print("{}{}".format(_debug_indent * "  ", debug_print_node(node))) # pyright: ignore
             if isinstance(node,parser.Node_refType) and len(names) == 0:
                 if config.breathe_debug_trace_qualification:
                     print("{}{}".format(_debug_indent * "  ", "res="))
@@ -948,7 +950,9 @@ class SphinxRenderer(metaclass=NodeVisitor):
 
         # Filter out outer class names if we are rendering a member as a part of a class content.
         rst_node = nodes[1]
-        finder = NodeFinder(rst_node.document)
+        doc = rst_node.document
+        assert doc is not None
+        finder = NodeFinder(doc)
         rst_node.walk(finder)
 
         assert finder.declarator is not None
@@ -1009,7 +1013,7 @@ class SphinxRenderer(metaclass=NodeVisitor):
                     para.replace_self(para.children)
 
             # and remove empty top-level paragraphs
-            if isinstance(candNode, nodes.paragraph) and len(candNode) == 0: # type: ignore
+            if isinstance(candNode, nodes.paragraph) and len(candNode) == 0: # pyright: ignore
                 continue
             detailed.append(candNode)
 
@@ -1021,7 +1025,7 @@ class SphinxRenderer(metaclass=NodeVisitor):
             fieldLists = [fieldList]
 
         # collapse retvals into a single return field
-        if len(fieldLists) != 0 and sphinx.version_info[0:2] < (4, 3): # type: ignore
+        if len(fieldLists) != 0 and sphinx.version_info[0:2] < (4, 3): # pyright: ignore
             others: list[nodes.field] = []
             retvals: list[nodes.field] = []
             f: nodes.field
@@ -1091,7 +1095,9 @@ class SphinxRenderer(metaclass=NodeVisitor):
                 print("{}Doxygen target (old): {}".format("  " * _debug_indent, target[0]["ids"]))
 
         rst_node = nodes[1]
-        finder = NodeFinder(rst_node.document)
+        doc = rst_node.document
+        assert doc is not None
+        finder = NodeFinder(doc)
         rst_node.walk(finder)
 
         assert finder.declarator is not None
@@ -1311,11 +1317,11 @@ class SphinxRenderer(metaclass=NodeVisitor):
 
             # add base classes
             if kind in (parser.DoxCompoundKind.class_, parser.DoxCompoundKind.struct):
-                bs = []
+                bs: list[str] = []
                 for base in file_data.compounddef[0].basecompoundref:
-                    b = []
+                    b: list[str] = []
                     if base.prot is not None:
-                        b.append(base.prot)
+                        b.append(base.prot.value)
                     if base.virt == parser.DoxVirtualKind.virtual:
                         b.append("virtual")
                     b.append(base[0])
@@ -1330,7 +1336,9 @@ class SphinxRenderer(metaclass=NodeVisitor):
             nodes = self.run_domain_directive(kind.value, self.context.directive_args[1])
             rst_node = nodes[1]
 
-            finder = NodeFinder(rst_node.document)
+            doc = rst_node.document
+            assert doc is not None
+            finder = NodeFinder(doc)
             rst_node.walk(finder)
             assert finder.declarator is not None
             assert finder.content is not None
@@ -1766,7 +1774,8 @@ class SphinxRenderer(metaclass=NodeVisitor):
         """
         section = nodes.section()
         section["ids"].append(self.get_refid(node.id))
-        section += nodes.title(node.title, node.title)
+        title = node.title or ''
+        section += nodes.title(title, title)
         section += self.create_doxygen_target(node)
         section += self.render_tagged_iterable(node)
         return [section]
@@ -1901,7 +1910,7 @@ class SphinxRenderer(metaclass=NodeVisitor):
         #   consisting of a simple bullet list.
         #   For now we just look for an extended embed tag
         if node.strip().startswith("embed:rst:leading-asterisk"):
-            lines = node.splitlines()
+            lines: Iterable[str] = node.splitlines()
             # Replace the first * on each line with a blank space
             lines = map(lambda text: text.replace("*", " ", 1), lines)
             node = "\n".join(lines)
@@ -2243,7 +2252,9 @@ class SphinxRenderer(metaclass=NodeVisitor):
                     )
 
             rst_node = nodes[1]
-            finder = NodeFinder(rst_node.document)
+            doc = rst_node.document
+            assert doc is not None
+            finder = NodeFinder(doc)
             rst_node.walk(finder)
             assert finder.content is not None
 
@@ -2445,7 +2456,7 @@ class SphinxRenderer(metaclass=NodeVisitor):
                 dom = "cpp"
             appendDeclName = True
             if insertDeclNameByParsing:
-                if dom == "cpp" and sphinx.version_info >= (4, 1, 0): # type: ignore
+                if dom == "cpp" and sphinx.version_info >= (4, 1, 0): # pyright: ignore
                     parser = cpp.DefinitionParser(
                         "".join(n.astext() for n in nodelist),
                         location=self.state.state_machine.get_source_and_line(),
@@ -2467,7 +2478,7 @@ class SphinxRenderer(metaclass=NodeVisitor):
                         # the actual nodes don't matter, as it is astext()-ed later
                         nodelist = [nodes.Text(str(ast))]
                         appendDeclName = False
-                    except cpp.DefinitionError:
+                    except cpp.DefinitionError: # pyright: ignore
                         # happens with "typename ...Args", so for now, just append
                         pass
 
@@ -2508,7 +2519,7 @@ class SphinxRenderer(metaclass=NodeVisitor):
     def visit_docparamlist(self, node: parser.Node_docParamListType) -> list[Node]:
         """Parameter/Exception/TemplateParameter documentation"""
 
-        has_retval = sphinx.version_info[0:2] < (4, 3) # type: ignore
+        has_retval = sphinx.version_info[0:2] < (4, 3) # pyright: ignore
         fieldListName = {
             parser.DoxParamListKind.param: "param",
             parser.DoxParamListKind.exception: "throws",
@@ -2795,7 +2806,7 @@ class SphinxRenderer(metaclass=NodeVisitor):
         if h is not None:
             assert self.context is not None
             with WithContext(self, self.context.create_child_context(item.value, item.name)):
-                if not self.filter_.allow(self.context.node_stack): return []
+                if not self.filter_(NodeStack(self.context.node_stack)): return []
                 return h(self,item.name, item.value)
         return self.render(item.value)
 
@@ -2806,7 +2817,7 @@ class SphinxRenderer(metaclass=NodeVisitor):
         with WithContext(self, context):
             assert self.context is not None
             result: list[Node] = []
-            if not self.filter_.allow(self.context.node_stack):
+            if not self.filter_(NodeStack(self.context.node_stack)):
                 pass
             else:
                 method = self.node_handlers.get(type(node))

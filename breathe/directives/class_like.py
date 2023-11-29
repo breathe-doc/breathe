@@ -8,14 +8,33 @@ from breathe.renderer.target import create_target_handler
 
 from docutils.parsers.rst.directives import unchanged_required, unchanged, flag
 
-from typing import TYPE_CHECKING
+from typing import cast, ClassVar, TYPE_CHECKING
 
 if TYPE_CHECKING:
+    from typing_extensions import NotRequired, TypedDict
     from breathe import renderer
     from docutils.nodes import Node
 
+    DoxClassOptions = TypedDict('DoxClassOptions',{
+        'path': str,
+        'project': str,
+        'members': NotRequired[str],
+        'membergroups': str,
+        'members-only': NotRequired[None],
+        'protected-members': NotRequired[None],
+        'private-members': NotRequired[None],
+        'undoc-members': NotRequired[None],
+        'show': str,
+        'outline': NotRequired[None],
+        'no-link': NotRequired[None],
+        'allow-dot-graphs': NotRequired[None]})
+else:
+    DoxClassOptions = None
+
 
 class _DoxygenClassLikeDirective(BaseDirective):
+    kind: ClassVar[str]
+
     required_arguments = 1
     optional_arguments = 0
     final_argument_whitespace = True
@@ -37,9 +56,10 @@ class _DoxygenClassLikeDirective(BaseDirective):
 
     def run(self) -> list[Node]:
         name = self.arguments[0]
+        options = cast(DoxClassOptions,self.options)
 
         try:
-            project_info = self.project_info_factory.create_project_info(self.options)
+            project_info = self.project_info_factory.create_project_info(options)
         except ProjectError as e:
             warning = self.create_warning(None, kind=self.kind)
             return warning.warn("doxygen{kind}: %s" % e)
@@ -59,8 +79,8 @@ class _DoxygenClassLikeDirective(BaseDirective):
             warning = self.create_warning(project_info, name=name, kind=self.kind)
             return warning.warn('doxygen{kind}: Cannot find class "{name}" {tail}')
 
-        target_handler = create_target_handler(self.options, project_info, self.state.document)
-        filter_ = self.filter_factory.create_class_filter(name, self.options)
+        target_handler = create_target_handler(options, project_info, self.state.document)
+        filter_ = self.filter_factory.create_class_filter(name, options)
 
         mask_factory = NullMaskFactory()
         return self.render(
