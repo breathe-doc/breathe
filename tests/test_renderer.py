@@ -8,14 +8,7 @@ from breathe import parser, renderer
 from breathe.renderer.sphinxrenderer import SphinxRenderer
 import docutils.parsers.rst
 from docutils import frontend, nodes, utils
-from sphinx.testing.fixtures import (
-    test_params,
-    app_params,
-    make_app,
-    shared_result,
-    sphinx_test_tempdir,
-    rootdir,
-)
+
 
 sphinx.locale.init([], "")
 COMMON_ARGS_memberdefType = {
@@ -24,28 +17,6 @@ COMMON_ARGS_memberdefType = {
     'static': False,
     'location': parser.Node_locationType(file = '', line = 0)
 }
-
-@pytest.fixture(scope="function")
-def app(test_params, app_params, make_app, shared_result):
-    """
-    Based on sphinx.testing.fixtures.app
-    """
-    args, kwargs = app_params
-    assert "srcdir" in kwargs
-    kwargs["srcdir"].mkdir(parents=True,exist_ok=True)
-    (kwargs["srcdir"] / "conf.py").write_text("")
-    app_ = make_app(*args, **kwargs)
-    yield app_
-
-    print("# testroot:", kwargs.get("testroot", "root"))
-    print("# builder:", app_.builder.name)
-    print("# srcdir:", app_.srcdir)
-    print("# outdir:", app_.outdir)
-    print("# status:", "\n" + app_._status.getvalue())
-    print("# warning:", "\n" + app_._warning.getvalue())
-
-    if test_params["shared_result"]:
-        shared_result.store(test_params["shared_result"], app_)
 
 
 class MockMemo:
@@ -508,9 +479,8 @@ def get_directive(app):
 
 def get_matches(datafile) -> tuple[list[str], list[list[renderer.TaggedNode]]]:
     argsstrings = []
-    with open(os.path.join(os.path.dirname(__file__), "data", datafile)) as fid:
-        xml = fid.read()
-    doc = parser.parse_str(xml)
+    with open(os.path.join(os.path.dirname(__file__), "data", datafile), 'rb') as fid:
+        doc = parser.parse_file(fid)
     assert isinstance(doc.value,parser.Node_DoxygenType)
 
     sectiondef = doc.value.compounddef[0].sectiondef[0]
