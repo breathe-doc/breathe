@@ -893,9 +893,10 @@ class SphinxRenderer(metaclass=NodeVisitor):
         if isinstance(node.value,parser.Node_CompoundType) and node.value.kind == parser.CompoundKind.namespace:
             names.append(node.value.name)
 
-        for node in node_stack:
-            if isinstance(node.value,parser.Node_refType) and len(names) == 0:
-                return ''.join(node.value)
+        for tval in node_stack:
+            node = tval.value
+            if isinstance(node,parser.Node_refType) and len(names) == 0:
+                return ''.join(node)
             if (
                 isinstance(node,parser.Node_CompoundType) and node.kind not in [parser.CompoundKind.file, parser.CompoundKind.namespace, parser.CompoundKind.group]
             ) or isinstance(node,parser.Node_memberdefType):
@@ -994,7 +995,7 @@ class SphinxRenderer(metaclass=NodeVisitor):
         admonitions: list[Node] = []
 
         def pullup(node, typ, dest):
-            for n in node.findall(typ):
+            for n in list(node.findall(typ)):
                 del n.parent[n.parent.index(n)]
                 dest.append(n)
 
@@ -2519,13 +2520,13 @@ class SphinxRenderer(metaclass=NodeVisitor):
     def visit_docparamlist(self, node: parser.Node_docParamListType) -> list[Node]:
         """Parameter/Exception/TemplateParameter documentation"""
 
-        has_retval = sphinx.version_info[0:2] < (4, 3) # pyright: ignore
+        # retval support available on Sphinx >= 4.3
+        has_retval = sphinx.version_info[0:2] >= (4, 3) # pyright: ignore
         fieldListName = {
             parser.DoxParamListKind.param: "param",
             parser.DoxParamListKind.exception: "throws",
             parser.DoxParamListKind.templateparam: "tparam",
-            # retval support available on Sphinx >= 4.3
-            parser.DoxParamListKind.retval: "returns" if has_retval else "retval",
+            parser.DoxParamListKind.retval: "retval" if has_retval else "returns",
         }
 
         # https://docutils.sourceforge.io/docs/ref/doctree.html#field-list

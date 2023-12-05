@@ -148,11 +148,15 @@ def test_example(make_app, tmp_path, test_input):
         raise ValueError('cannot find doxygen executable')
 
     doxyfile = tmp_path / "Doxyfile"
-    doxyfile.write_text(DOXYFILE_TEMPLATE.format(
+    doxycontent = DOXYFILE_TEMPLATE.format(
         input=" ".join(filter_c_files(test_input.stem.removeprefix('test_'))),
         source_dir=EXAMPLES_SOURCE_DIR,
         output=tmp_path
-    ))
+    )
+    extra_opts = test_input / 'extra_dox_opts.txt'
+    if extra_opts.exists():
+        doxycontent += extra_opts.read_text()
+    doxyfile.write_text(doxycontent)
     (tmp_path / "conf.py").touch()
     shutil.copyfile(test_input / "input.rst", tmp_path / "index.rst")
 
