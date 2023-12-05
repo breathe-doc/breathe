@@ -212,7 +212,7 @@ def render(
     app.config.breathe_debug_trace_directives = False
     app.config.breathe_debug_trace_doxygen_ids = False
     app.config.breathe_debug_trace_qualification = False
-    renderer = SphinxRenderer(
+    r = SphinxRenderer(
         app,
         None,  # project_info
         [],  # node_stack
@@ -222,8 +222,8 @@ def render(
         compound_parser,
         (lambda nstack: True),
     )
-    renderer.context = MockContext(app, [member_def], domain, options)
-    return renderer.render(member_def)
+    r.context = MockContext(app, [renderer.TaggedNode(None,member_def)], domain, options)
+    return r.render(member_def)
 
 
 def test_render_func(app):

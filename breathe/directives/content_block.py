@@ -15,7 +15,13 @@ from docutils.parsers.rst.directives import unchanged_required, flag
 from typing import Any, cast, ClassVar, Literal, TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from typing_extensions import NotRequired, TypedDict
+    import sys
+    if sys.version_info >= (3, 11):
+        from typing import NotRequired, TypedDict
+    else:
+        from typing_extensions import NotRequired, TypedDict
+    from breathe.renderer import TaggedNode
+    from breathe.finder.factory import FinderRoot
 
     DoxContentBlockOptions = TypedDict('DoxContentBlockOptions',{
         'path': str,
@@ -32,6 +38,7 @@ if TYPE_CHECKING:
         'sort': NotRequired[None]})
 else:
     DoxContentBlockOptions = None
+    FinderRoot = None
 
 
 class _DoxygenContentBlockDirective(BaseDirective):
@@ -74,8 +81,7 @@ class _DoxygenContentBlockDirective(BaseDirective):
 
         finder_filter = self.filter_factory.create_finder_filter(self.kind, name)
 
-        # TODO: find a more specific type for the Doxygen nodes
-        matches: list[Any] = []
+        matches: list[list[TaggedNode]] = []
         finder.filter_(finder_filter, matches)
 
         # It shouldn't be possible to have too many matches as namespaces & groups in their nature
@@ -92,10 +98,10 @@ class _DoxygenContentBlockDirective(BaseDirective):
             # Having found the compound node for the namespace or group in the index we want to grab
             # the contents of it which match the filter
             contents_finder = self.finder_factory.create_finder_from_root(
-                node_stack[0], project_info
+                cast(FinderRoot,node_stack[0].value), project_info
             )
-            # TODO: find a more specific type for the Doxygen nodes
-            contents: list[Any] = []
+
+            contents: list[list[TaggedNode]] = []
             contents_finder.filter_(filter_, contents)
 
             # Replaces matches with our new starting points
@@ -109,7 +115,7 @@ class _DoxygenContentBlockDirective(BaseDirective):
             object_renderer = SphinxRenderer(
                 self.parser_factory.app,
                 project_info,
-                node_stack,
+                [item.value for item in node_stack],
                 self.state,
                 self.state.document,
                 target_handler,

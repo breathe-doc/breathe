@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from breathe.directives import BaseDirective
 from breathe import parser
 from breathe.project import ProjectError

@@ -5,13 +5,18 @@ from .exception import BreatheError
 from sphinx.application import Sphinx
 
 import os
+import os.path
 import fnmatch
 
 
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from typing_extensions import TypedDict
+    import sys
+    if sys.version_info >= (3, 11):
+        from typing import TypedDict
+    else:
+        from typing_extensions import TypedDict
 
     ProjectOptions = TypedDict('ProjectOptions',{
         'path': str,
@@ -122,7 +127,10 @@ class ProjectInfoFactory:
         # Assume general build directory is the doctree directory without the last component.
         # We strip off any trailing slashes so that dirname correctly drops the last part.
         # This can be overridden with the breathe_build_directory config variable
-        self._default_build_dir = str(app.doctreedir.parent)
+        if isinstance(app.doctreedir, str):
+            self._default_build_dir = os.path.dirname(app.doctreedir.rstrip(os.sep))
+        else:
+            self._default_build_dir = str(app.doctreedir.parent)
         self.project_count = 0
         self.project_info_store: dict[str, ProjectInfo] = {}
         self.project_info_for_auto_store: dict[str, AutoProjectInfo] = {}

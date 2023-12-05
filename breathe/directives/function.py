@@ -21,7 +21,11 @@ import re
 from typing import cast, List, Optional, TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from typing_extensions import NotRequired, TypedDict
+    import sys
+    if sys.version_info >= (3, 11):
+        from typing import NotRequired, TypedDict
+    else:
+        from typing_extensions import NotRequired, TypedDict
     from breathe import project
     from docutils.nodes import Node
 
@@ -118,7 +122,7 @@ class DoxygenFunctionDirective(BaseDirective):
             # only take functions and friend functions
             # ignore friend classes
             node = m[0].value
-            assert isinstance(node, parser.Node_MemberType)
+            assert isinstance(node, parser.Node_memberdefType)
             if node.kind == "friend" and not node.argsstring:
                 continue
             matches.append(m)

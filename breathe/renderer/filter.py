@@ -50,11 +50,16 @@ from breathe import path_handler, parser
 from sphinx.application import Sphinx
 
 import os
-from typing import Any, Callable, Literal, SupportsIndex, TYPE_CHECKING
+from typing import Any, Callable, Literal, SupportsIndex, TYPE_CHECKING, TypeVar
 from collections.abc import Container, Iterable, Mapping
 
 if TYPE_CHECKING:
-    from typing_extensions import TypeAlias, TypeVar
+    import sys
+
+    if sys.version_info >= (3, 11):
+        from typing import TypeAlias
+    else:
+        from typing_extensions import TypeAlias
     from breathe import renderer
     from breathe.directives.class_like import DoxClassOptions
     from breathe.directives.content_block import DoxContentBlockOptions
@@ -554,12 +559,14 @@ class FilterFactory:
                 )
 
         else:
-            ext = self.app.config.breathe_implementation_filename_extensions
+            ext = tuple(self.app.config.breathe_implementation_filename_extensions)
 
             def filter(nstack: NodeStack) -> bool:
                 parent = nstack.parent
-                return isinstance(parent, parser.Node_CompoundType) and (
-                    parent.kind != parser.CompoundKind.file or parent.name.endswith(ext)
+                return (
+                    node_matches(nstack)
+                    and isinstance(parent, parser.Node_CompoundType)
+                    and (parent.kind != parser.CompoundKind.file or not parent.name.endswith(ext))
                 )
 
         return filter

@@ -11,7 +11,11 @@ from docutils.parsers.rst.directives import unchanged_required, unchanged, flag
 from typing import cast, ClassVar, TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from typing_extensions import NotRequired, TypedDict
+    import sys
+    if sys.version_info >= (3, 11):
+        from typing import NotRequired, TypedDict
+    else:
+        from typing_extensions import NotRequired, TypedDict
     from breathe import renderer
     from docutils.nodes import Node
 

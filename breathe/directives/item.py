@@ -10,11 +10,18 @@ from docutils.nodes import Node
 
 from docutils.parsers.rst.directives import unchanged_required, flag
 
-from typing import Any, cast, ClassVar, TYPE_CHECKING
+from typing import cast, ClassVar, TYPE_CHECKING
 
 if TYPE_CHECKING:
+    import sys
+
+    if sys.version_info >= (3, 11):
+        from typing import NotRequired, TypedDict
+    else:
+        from typing_extensions import NotRequired, TypedDict
+
+    from breathe.renderer import TaggedNode
     from breathe.renderer.filter import DoxFilter
-    from typing_extensions import NotRequired, TypedDict
 
     DoxBaseItemOptions = TypedDict('DoxBaseItemOptions',{
         'path': str,
@@ -44,12 +51,9 @@ class _DoxygenBaseItemDirective(BaseDirective):
         return self.filter_factory.create_member_finder_filter(namespace, name, self.kind)
 
     def run(self) -> list[Node]:
-        options = cast(DoxBaseItemOptions,self.options)
-
-        try:
-            namespace, name = self.arguments[0].rsplit("::", 1)
-        except ValueError:
-            namespace, name = "", self.arguments[0]
+        options = cast(DoxBaseItemOptions, self.options)
+        
+        namespace, _, name = self.arguments[0].rpartition("::")
 
         try:
             project_info = self.project_info_factory.create_project_info(options)
@@ -65,8 +69,7 @@ class _DoxygenBaseItemDirective(BaseDirective):
 
         finder_filter = self.create_finder_filter(namespace, name)
 
-        # TODO: find a more specific type for the Doxygen nodes
-        matches: list[Any] = []
+        matches: list[list[TaggedNode]] = []
         finder.filter_(finder_filter, matches)
 
         if len(matches) == 0:

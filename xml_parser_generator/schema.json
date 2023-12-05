@@ -350,10 +350,10 @@
     "codelineType": {
       "kind": "tag_only_element",
       "attributes": {
-        "external":             {"type": "#DoxBool"},
-        "lineno":               {"type": "#integer"},
-        "refid":                {"type": "#string"},
-        "refkind":              {"type": "DoxRefKind"}
+        "external":             {"type": "#DoxBool", "optional": true},
+        "lineno":               {"type": "#integer", "optional": true},
+        "refid":                {"type": "#string", "optional": true},
+        "refkind":              {"type": "DoxRefKind", "optional": true}
       },
       "children": {
         "highlight":            {"type": "highlightType", "is_list": true, "min_items": 0}
@@ -471,13 +471,13 @@
       "kind": "tag_only_element",
       "any_attr": true,
       "attributes": {
-        "align":                {"type": "DoxAlign"},
-        "class":                {"type": "#string", "py_name": "class_"},
-        "colspan":              {"type": "#integer"},
-        "rowspan":              {"type": "#integer"},
+        "align":                {"type": "DoxAlign", "optional": true},
+        "class":                {"type": "#string", "py_name": "class_", "optional": true},
+        "colspan":              {"type": "#integer", "optional": true},
+        "rowspan":              {"type": "#integer", "optional": true},
         "thead":                {"type": "#DoxBool"},
-        "valign":               {"type": "DoxVerticalAlign"},
-        "width":                {"type": "#string"}
+        "valign":               {"type": "DoxVerticalAlign", "optional": true},
+        "width":                {"type": "#string", "optional": true}
       },
       "children": {
         "para":                 {"type": "docParaType", "is_list": true, "min_items": 0}
@@ -1053,8 +1053,8 @@
       "kind": "list_element",
       "min_items": 1,
       "attributes": {
-        "type":                 {"type": "DoxOlType"},
-        "start":                {"type": "#integer"}
+        "type":                 {"type": "DoxOlType", "optional": true},
+        "start":                {"type": "#integer", "optional": true}
       },
       "content": {
         "listitem":   "docListItemType"
@@ -1063,7 +1063,7 @@
     "docSimpleSectType": {
       "kind": "tag_only_element",
       "attributes": {
-        "type":                 {"type": "DoxSimpleSectKind"}
+        "kind":                 {"type": "DoxSimpleSectKind"}
       },
       "children": {
         "title":                {"type": "docTitleType", "min_items": 0},
@@ -1083,7 +1083,7 @@
       "attributes": {
         "rows":                 {"type": "#integer"},
         "cols":                 {"type": "#integer"},
-        "width":                {"type": "#string"}
+        "width":                {"type": "#string", "optional": true}
       },
       "children": {
         "caption":              {"type": "docCaptionType", "min_items": 0},

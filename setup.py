@@ -9,10 +9,12 @@ except ImportError:
 
 import sys
 import os.path
+from setuptools.command.build import build
 from setuptools.command.build_ext import build_ext
 from distutils import log
 from distutils.dep_util import newer_group
 from distutils.dir_util import mkpath
+from distutils.util import split_quoted
 
 # add xml_parser_generator to the import path list
 base_dir = os.path.dirname(os.path.realpath(__file__))
@@ -31,12 +33,35 @@ Breathe is an extension to reStructuredText and Sphinx to be able to read and
 requires = ["Sphinx>=4.0,!=5.0.0", "docutils>=0.12"]
 
 if sys.version_info < (3, 8):
-    print("ERROR: Sphinx requires at least Python 3.8 to run.")
+    print("ERROR: Breathe requires at least Python 3.8 to run.")
     sys.exit(1)
 
 
+extra_user_options = [
+    ('cpp-opts=',None,
+     'extra command line arguments for the compiler'),
+    ('ld-opts=',None,
+     'extra command line arguments for the linker')]
+
+class CustomBuild(build):
+    """Add extra parameters for 'build' to pass to 'build_ext'
+    """
+    user_options = build.user_options + extra_user_options
+
+    def initialize_options(self):
+        super().initialize_options()
+        self.cpp_opts = ''
+        self.ld_opts = ''
+
+    def finalize_options(self):
+        super().finalize_options()
+        self.cpp_opts = split_quoted(self.cpp_opts)
+        self.ld_opts = split_quoted(self.ld_opts)
+
 class CustomBuildExt(build_ext):
-    """Extend build_ext to automatically generate parser.c"""
+    """Extend build_ext to automatically generate _parser.c"""
+
+    user_options = build_ext.user_options + extra_user_options
 
     SCHEMA_FILE = os.path.join('xml_parser_generator','schema.json')
     MODULE_TEMPLATE = os.path.join('xml_parser_generator','module_template.c')
@@ -44,6 +69,22 @@ class CustomBuildExt(build_ext):
     MAKER_SOURCE = os.path.join('xml_parser_generator','make_parser.py')
 
     DEPENDENCIES = [SCHEMA_FILE,MODULE_TEMPLATE,STUBS_TEMPLATE,MAKER_SOURCE]
+
+    def initialize_options(self):
+        super().initialize_options()
+        self.cpp_opts = None
+        self.ld_opts = None
+
+    def finalize_options(self):
+        if self.cpp_opts is not None:
+            self.cpp_opts = split_quoted(self.cpp_opts)
+        if self.ld_opts is not None:
+            self.ld_opts = split_quoted(self.ld_opts)
+
+        self.set_undefined_options('build',
+            ('cpp_opts','cpp_opts'),
+            ('ld_opts','ld_opts'))
+        super().finalize_options()
 
     def build_extensions(self):
         assert len(self.extensions) == 1
@@ -122,7 +163,7 @@ setup(
             depends=CustomBuildExt.DEPENDENCIES,
             libraries=['expat'],
             define_macros=[
-                ('PARSER_PY_LIMITED_API','0x03070000'), # set Stable ABI version to 3.7
+                ('PARSER_PY_LIMITED_API','0x03080000'), # set Stable ABI version to 3.8
                 ('MODULE_NAME','_parser'),
                 ('FULL_MODULE_STR','"breathe._parser"')
             ],
@@ -136,5 +177,5 @@ setup(
         ],
     },
     install_requires=requires,
-    cmdclass={'build_ext': CustomBuildExt}
+    cmdclass={'build': CustomBuild, 'build_ext': CustomBuildExt}
 )

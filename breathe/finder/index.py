@@ -60,7 +60,7 @@ class CompoundTypeSubItemFinder(ItemFinder[parser.Node_CompoundType]):
             finder = self.item_finder_factory.create_finder(file_data)
 
             for member_stack in member_matches:
-                refid = member_stack[0].refid
+                refid = member_stack[0].value.refid
                 def ref_filter(nstack):
                     node = nstack.node
                     return isinstance(node,parser.Node_memberdefType) and node.id == refid

@@ -680,11 +680,11 @@ class SphinxRenderer(metaclass=NodeVisitor):
 
         assert self.context is not None
         node_stack = self.context.node_stack
-        node = node_stack[0]
+        node = node_stack[0].value
         # An enumvalueType node doesn't have location, so use its parent node
         # for detecting the domain instead.
         if isinstance(node, (str,parser.Node_enumvalueType)):
-            node = node_stack[1]
+            node = node_stack[1].value
         filename = get_filename(node)
         if not filename and isinstance(node,parser.Node_CompoundType):
             file_data = self.compound_parser.parse(node.refid)
@@ -1788,31 +1788,31 @@ class SphinxRenderer(metaclass=NodeVisitor):
         # and it will be pulled up later
         nodelist = self.render_iterable(node.para)
 
-        if node.type in (parser.DoxSimpleSectKind.pre, parser.DoxSimpleSectKind.post, parser.DoxSimpleSectKind.return_):
+        if node.kind in (parser.DoxSimpleSectKind.pre, parser.DoxSimpleSectKind.post, parser.DoxSimpleSectKind.return_):
             return [
                 nodes.field_list(
                     "",
                     nodes.field(
                         "",
-                        nodes.field_name("", nodes.Text(node.type.value)),
+                        nodes.field_name("", nodes.Text(node.kind.value)),
                         nodes.field_body("", *nodelist),
                     ),
                 )
             ]
-        elif node.type == parser.DoxSimpleSectKind.warning:
+        elif node.kind == parser.DoxSimpleSectKind.warning:
             return [nodes.warning("", *nodelist)]
-        elif node.type == parser.DoxSimpleSectKind.note:
+        elif node.kind == parser.DoxSimpleSectKind.note:
             return [nodes.note("", *nodelist)]
-        elif node.type == parser.DoxSimpleSectKind.see:
+        elif node.kind == parser.DoxSimpleSectKind.see:
             return [addnodes.seealso("", *nodelist)]
-        elif node.type == parser.DoxSimpleSectKind.remark:
-            nodelist.insert(0, nodes.title("", nodes.Text(node.type.value.capitalize())))
-            return [nodes.admonition("", classes=[node.type.value], *nodelist)]
+        elif node.kind == parser.DoxSimpleSectKind.remark:
+            nodelist.insert(0, nodes.title("", nodes.Text(node.kind.value.capitalize())))
+            return [nodes.admonition("", classes=[node.kind.value], *nodelist)]
 
-        if node.type == parser.DoxSimpleSectKind.par:
+        if node.kind == parser.DoxSimpleSectKind.par:
             text = self.render(node.title)
         else:
-            text = [nodes.Text(node.type.value.capitalize())]
+            text = [nodes.Text(node.kind.value.capitalize())]
         # TODO: is this working as intended? there is something strange with the types
         title = nodes.strong("", "", *text)
 

@@ -15,6 +15,15 @@ if TYPE_CHECKING:
     from breathe.renderer.filter import DoxFilter
     ItemFinderCreator = Callable[[ProjectInfo,Any,'DoxygenItemFinderFactory'],ItemFinder]
 
+    FinderRoot = (parser.Node_DoxygenTypeIndex
+        | parser.Node_CompoundType
+        | parser.Node_MemberType
+        | parser.Node_DoxygenType
+        | parser.Node_compounddefType
+        | parser.Node_sectiondefType
+        | parser.Node_memberdefType
+        | parser.Node_refType)
+
 
 class _CreateCompoundTypeSubFinder:
     def __init__(self, app: Sphinx, parser_factory: parser.DoxygenParserFactory):
@@ -60,7 +69,7 @@ class FinderFactory:
         root = self.parser.parse(project_info)
         return self.create_finder_from_root(root, project_info)
 
-    def create_finder_from_root(self, root, project_info: ProjectInfo) -> Finder:
+    def create_finder_from_root(self, root: FinderRoot, project_info: ProjectInfo) -> Finder:
         finders: dict[type[parser.NodeOrValue], ItemFinderCreator] = {
             parser.Node_DoxygenTypeIndex: indexfinder.DoxygenTypeSubItemFinder,
             parser.Node_CompoundType: _CreateCompoundTypeSubFinder(self.app, self.parser_factory),
