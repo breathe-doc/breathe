@@ -13,8 +13,7 @@ DEFAULT_OPTS = opts = {
     'path': '',
     'project': '',
     'membergroups': '',
-    'show': '',
-    'undoc-members': None}
+    'show': ''}
 
 @pytest.fixture(scope="module")
 def class_doc():
@@ -56,7 +55,7 @@ def create_class_filter(app, extra_ops):
     opts.update(extra_ops)
     return FilterFactory(app).create_class_filter('Sample', opts)
 
-def test_no_class_members(app, members):
+def test_members(app, members):
     app.config.breathe_default_members = []
 
     filter = create_class_filter(app,{})
@@ -68,52 +67,35 @@ def test_no_class_members(app, members):
     assert not filter(members.private_field)
     assert not filter(members.private_method)
 
-def test_public_class_members(app, members):
+bools = (True, False)
+
+@pytest.mark.parametrize('public', bools)
+@pytest.mark.parametrize('private', bools)
+@pytest.mark.parametrize('protected', bools)
+@pytest.mark.parametrize('undocumented', bools)
+def test_public_class_members(app, members, public, private, protected, undocumented):
     app.config.breathe_default_members = []
 
-    filter = create_class_filter(app,{'members': ''})
+    opts = {}
+    if public: opts['members'] = None
+    if private: opts['private-members'] = None
+    if protected: opts['protected-members'] = None
+    if undocumented: opts['undoc-members'] = None
+    filter = create_class_filter(app,opts)
 
-    assert filter(members.public_field)
-    assert filter(members.public_method)
-    assert not filter(members.protected_field)
-    assert not filter(members.protected_method)
-    assert not filter(members.private_field)
-    assert not filter(members.private_method)
-
-def test_prot_class_members(app, members):
-    app.config.breathe_default_members = []
-
-    filter = create_class_filter(app,{
-        'members': '',
-        'protected-members': None})
-
-    assert filter(members.public_field)
-    assert filter(members.public_method)
-    assert filter(members.protected_field)
-    assert filter(members.protected_method)
-    assert not filter(members.private_field)
-    assert not filter(members.private_method)
-
-def test_all_class_members(app, members):
-    app.config.breathe_default_members = []
-
-    filter = create_class_filter(app,{
-        'members': '',
-        'protected-members': None,
-        'private-members': None})
-
-    assert filter(members.public_field)
-    assert filter(members.public_method)
-    assert filter(members.protected_field)
-    assert filter(members.protected_method)
-    assert filter(members.private_field)
-    assert filter(members.private_method)
+    assert filter(members.public_field) == public
+    assert filter(members.public_method) == (public and undocumented)
+    assert filter(members.protected_field) == (protected and undocumented)
+    assert filter(members.protected_method) == protected
+    assert filter(members.private_field) == private
+    assert filter(members.private_method) == (private and undocumented)
 
 def test_specific_class_members(app, members):
     app.config.breathe_default_members = []
 
     filter = create_class_filter(app,{
-        'members': 'public_method,protected_method,private_field'})
+        'members': 'public_method,protected_method,private_field',
+        'undoc-members': None})
 
     assert not filter(members.public_field)
     assert filter(members.public_method)

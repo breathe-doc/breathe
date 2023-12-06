@@ -293,9 +293,9 @@ class FilterFactory:
             # If the user has specified the 'members' option with arguments then
             # we only pay attention to that and not to any other member settings
             members_str = options["members"]
-            if members_str and members_str.strip():
+            if members_str and not members_str.isspace():
                 # Matches sphinx-autodoc behaviour of comma separated values
-                members = set([x.strip() for x in members_str.split(",")])
+                members = frozenset([x.strip() for x in members_str.split(",")])
 
                 # Accept any nodes which don't have a "sectiondef" as a parent
                 # or, if they do, only accept them if their names are in the
@@ -326,7 +326,7 @@ class FilterFactory:
             # Allow anything that isn't a Node_memberdefType, or if it is only
             # allow the ones with a description
             return (not isinstance(node, parser.Node_memberdefType)) or bool(
-                node.briefdescription or node.detaileddescription
+                parser.description_has_content(node.briefdescription) or parser.description_has_content(node.detaileddescription)
             )
 
         return filter

@@ -2541,11 +2541,8 @@ class SphinxRenderer(metaclass=NodeVisitor):
                 if len(paramNameNodes) != 0:
                     nameNodes = []
                     for paramName in paramNameNodes:
-                        # this is really a list of MixedContainer objects, i.e., a generic object
-                        # we assume there is either 1 or 2 elements, if there is 2 the first is the
-                        # parameter direction
-                        assert len(paramName) == 1 or len(paramName) == 2, list(paramName)
-                        thisName = self.render_tagged(paramName[-1])
+                        assert len(paramName) == 1
+                        thisName = self.render_tagged(paramName[0])
                         if len(nameNodes) != 0:
                             if node.kind == parser.DoxParamListKind.exception:
                                 msg = "Doxygen \\exception commands with multiple names can not be"
@@ -2557,12 +2554,14 @@ class SphinxRenderer(metaclass=NodeVisitor):
                                 continue
                             nameNodes.append(nodes.Text(", "))
                         nameNodes.extend(thisName)
-                        if len(paramName) == 2:
+                        if paramName.direction is not None:
                             # note, each paramName node seems to have the same direction,
                             # so just use the last one
-                            dir = "".join(n.astext() for n in self.render_tagged(paramName[0])).strip()
-                            assert dir in ("[in]", "[out]", "[inout]"), ">" + dir + "<"
-                            parameterDirectionNodes = [nodes.strong(dir, dir), nodes.Text(" ", " ")]
+                            dir = {
+                                parser.DoxParamDir.in_: "[in]",
+                                parser.DoxParamDir.out: "[out]",
+                                parser.DoxParamDir.inout: "[inout]"}[paramName.direction]
+                            parameterDirectionNodes = [nodes.strong(dir, dir), nodes.Text(" ")]
             # it seems that Sphinx expects the name to be a single node,
             # so let's make it that
             txt = fieldListName[node.kind] + " "

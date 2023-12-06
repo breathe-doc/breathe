@@ -29,7 +29,7 @@ ALIASES += "inlinerst=\\verbatim embed:rst:inline"
 """
 
 C_FILE_SUFFIXES = frozenset(('.h', '.c', '.cpp'))
-IGNORED_ELEMENTS = frozenset(('target', 'index'))
+IGNORED_ELEMENTS = frozenset(())
 
 BUFFER_SIZE = 0x1000
 

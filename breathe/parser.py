@@ -23,6 +23,12 @@ def node_repr(self: Node) -> str:
     return f'{cls.__name__}({fields})'
 Node.__repr__ = node_repr # type: ignore
 
+def description_has_content(node: Node_descriptionType | None) -> bool:
+    if node is None: return False
+    if bool(node.title) or len(node) > 1: return True
+    if not len(node): return False
+    item = node[0]
+    return not isinstance(item,str) or (len(item) > 0 and not item.isspace())
 
 class ParserError(RuntimeError):
     def __init__(self, message: str, filename: str, lineno: int | None = None):

@@ -1,4 +1,6 @@
 <?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<!-- don't remove the spaces from briefdescription/detaileddescription, they are
+part of the test -->
 <doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
   <compounddef id="classSample" kind="class" language="C++" prot="public">
     <compoundname>Sample</compoundname>
@@ -10,12 +12,9 @@
         <argsstring></argsstring>
         <name>public_field</name>
         <qualifiedname>Sample::public_field</qualifiedname>
-        <briefdescription>
-        </briefdescription>
-        <detaileddescription>
-        </detaileddescription>
-        <inbodydescription>
-        </inbodydescription>
+        <briefdescription><para>Something</para></briefdescription>
+        <detaileddescription> </detaileddescription>
+        <inbodydescription></inbodydescription>
         <location file="sample.hpp" line="3" column="9" bodyfile="sample.hpp" bodystart="3" bodyend="-1"/>
       </memberdef>
     </sectiondef>
@@ -26,12 +25,9 @@
         <argsstring></argsstring>
         <name>protected_field</name>
         <qualifiedname>Sample::protected_field</qualifiedname>
-        <briefdescription>
-        </briefdescription>
-        <detaileddescription>
-        </detaileddescription>
-        <inbodydescription>
-        </inbodydescription>
+        <briefdescription>   </briefdescription>
+        <detaileddescription> </detaileddescription>
+        <inbodydescription></inbodydescription>
         <location file="sample.hpp" line="6" column="9" bodyfile="sample.hpp" bodystart="6" bodyend="-1"/>
       </memberdef>
     </sectiondef>
@@ -42,12 +38,10 @@
         <argsstring></argsstring>
         <name>private_field</name>
         <qualifiedname>Sample::private_field</qualifiedname>
-        <briefdescription>
-        </briefdescription>
+        <briefdescription><para>Something</para></briefdescription>
         <detaileddescription>
         </detaileddescription>
-        <inbodydescription>
-        </inbodydescription>
+        <inbodydescription></inbodydescription>
         <location file="sample.hpp" line="9" column="9" bodyfile="sample.hpp" bodystart="9" bodyend="-1"/>
       </memberdef>
     </sectiondef>
@@ -62,12 +56,9 @@
           <type>int</type>
           <declname>x</declname>
         </param>
-        <briefdescription>
-        </briefdescription>
-        <detaileddescription>
-        </detaileddescription>
-        <inbodydescription>
-        </inbodydescription>
+        <briefdescription> </briefdescription>
+        <detaileddescription> </detaileddescription>
+        <inbodydescription></inbodydescription>
         <location file="sample.hpp" line="4" column="9"/>
       </memberdef>
     </sectiondef>
@@ -82,12 +73,9 @@
           <type>int</type>
           <declname>x</declname>
         </param>
-        <briefdescription>
-        </briefdescription>
-        <detaileddescription>
-        </detaileddescription>
-        <inbodydescription>
-        </inbodydescription>
+        <briefdescription><para>Something</para></briefdescription>
+        <detaileddescription> </detaileddescription>
+        <inbodydescription></inbodydescription>
         <location file="sample.hpp" line="7" column="9"/>
       </memberdef>
     </sectiondef>
@@ -103,11 +91,10 @@
           <declname>x</declname>
         </param>
         <briefdescription>
+  
         </briefdescription>
-        <detaileddescription>
-        </detaileddescription>
-        <inbodydescription>
-        </inbodydescription>
+        <detaileddescription> </detaileddescription>
+        <inbodydescription></inbodydescription>
         <location file="sample.hpp" line="10" column="9"/>
       </memberdef>
     </sectiondef>
