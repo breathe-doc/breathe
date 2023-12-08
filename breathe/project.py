@@ -113,7 +113,7 @@ class ProjectInfoFactory:
         # Assume general build directory is the doctree directory without the last component.
         # We strip off any trailing slashes so that dirname correctly drops the last part.
         # This can be overridden with the breathe_build_directory config variable
-        self._default_build_dir = os.path.dirname(app.doctreedir.rstrip(os.sep))
+        self._default_build_dir = os.path.dirname(str(app.doctreedir).rstrip(os.sep))
         self.project_count = 0
         self.project_info_store: Dict[str, ProjectInfo] = {}
         self.project_info_for_auto_store: Dict[str, AutoProjectInfo] = {}
