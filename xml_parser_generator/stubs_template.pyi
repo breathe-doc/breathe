@@ -19,8 +19,11 @@ class FrozenList(Generic[T]):
     def __iter__(self) -> FrozenListItr[T]: ...
 
 class TaggedValue(Generic[T, U]):
-    name: T
-    value: U
+    @property
+    def name(self) -> T: ...
+
+    @property
+    def value(self) -> U: ...
 
     def __init__(self, name: T, value: U): ...
 
@@ -109,7 +112,7 @@ ListItem_{$ type $} = (
 {$ "invalid content type"|error $}
 //%   endif
 //%   if type is used_directly
-class Node_{$ type $}({$ 'FrozenList['~list_item_type~'], ' if type is list_e $}Node):
+class Node_{$ type $}(Node{$ ', FrozenList['~list_item_type~']' if type is list_e $}):
 {$ emit_fields(type) $}
     def __init__(self{$ ', __items: Iterable['~list_item_type~'], /' if type is list_e $}
         {%- if type|field_count -%}, *

@@ -16,12 +16,25 @@ if TYPE_CHECKING:
 @reprlib.recursive_repr()
 def node_repr(self: Node) -> str:
     cls = type(self)
-    fields = ', '.join(f'{field}={getattr(self,field)!r}' for field in cls._fields)
+    fields = []
     if isinstance(self,FrozenList):
         pos = ', '.join(map(repr,self))
-        fields = f'[{pos}], {fields}'
-    return f'{cls.__name__}({fields})'
+        fields.append(f'[{pos}]')
+    fields.extend(f'{field}={getattr(self,field)!r}' for field in cls._fields)
+    inner = ', '.join(fields)
+    return f'{cls.__name__}({inner})'
 Node.__repr__ = node_repr # type: ignore
+
+@reprlib.recursive_repr()
+def taggedvalue_repr(self: TaggedValue) -> str:
+    return f'{self.__class__.__name__}({self.name!r}, {self.value!r})'
+TaggedValue.__repr__ = taggedvalue_repr # type: ignore
+
+@reprlib.recursive_repr()
+def frozenlist_repr(self: FrozenList) -> str:
+    inner = ', '.join(map(repr,self))
+    return f'{self.__class__.__name__}([{inner}])'
+FrozenList.__repr__ = frozenlist_repr # type: ignore
 
 def description_has_content(node: Node_descriptionType | None) -> bool:
     if node is None: return False

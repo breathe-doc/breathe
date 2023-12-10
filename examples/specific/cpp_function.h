@@ -8,6 +8,8 @@ struct Class {
 	void (*f_issue_489)(struct Foo *foo, int value);
 
 	int f_issue_338() noexcept;
+
+    int anon_params(int, int, int x, char*);
 };
 
 /** A namespace to demonstrate a namespaced function */

@@ -98,8 +98,10 @@ class NodeStack:
         return self.stack[0].value
 
     @property
-    def tag(self) -> str | None:
-        return self.stack[0].tag
+    def tag(self) -> str:
+        tag = self.stack[0].tag
+        assert tag is not None
+        return tag
 
 
 def path_matches(location: str, target_file: str) -> bool:

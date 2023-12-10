@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from docutils import nodes
 import textwrap
-from typing import NamedTuple, TYPE_CHECKING, Union
+from typing import Generic, NamedTuple, TYPE_CHECKING, TypeVar, Union
 
 if TYPE_CHECKING:
     from breathe import parser
@@ -10,6 +10,9 @@ if TYPE_CHECKING:
     from breathe.directives.index import RootDataObject
 
     DataObject = Union[parser.NodeOrValue, RootDataObject]
+    T_data_object = TypeVar('T_data_object', bound=DataObject, covariant = True)
+else:
+    T_data_object = TypeVar('T_data_object', covariant = True)
 
 
 def format_parser_error(name: str, error: str, filename: str, state, lineno: int, do_unicode_warning: bool = False) -> list[nodes.Node]:
@@ -44,9 +47,9 @@ def format_parser_error(name: str, error: str, filename: str, state, lineno: int
     ]
 
 
-class TaggedNode(NamedTuple):
+class TaggedNode(NamedTuple, Generic[T_data_object]):
     tag: str | None
-    value: DataObject
+    value: T_data_object
 
 class RenderContext:
     def __init__(

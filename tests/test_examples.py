@@ -23,12 +23,13 @@ QUIET            = YES
 JAVADOC_AUTOBRIEF = YES
 GENERATE_HTML = NO
 GENERATE_XML = YES
+WARN_IF_UNDOCUMENTED = NO
 ALIASES = "rst=\\verbatim embed:rst"
 ALIASES += "endrst=\\endverbatim"
 ALIASES += "inlinerst=\\verbatim embed:rst:inline"
 """
 
-C_FILE_SUFFIXES = frozenset(('.h', '.c', '.cpp'))
+C_FILE_SUFFIXES = frozenset(('.h', '.c', '.hpp', '.cpp'))
 IGNORED_ELEMENTS = frozenset(())
 
 BUFFER_SIZE = 0x1000
@@ -43,6 +44,11 @@ class XMLEventType(enum.Enum):
 class XMLElement:
     name: str
     attr: dict[str,str]
+    line_no: int
+    column_no: int
+
+@dataclasses.dataclass
+class XMLElementEnd:
     line_no: int
     column_no: int
 
@@ -89,7 +95,11 @@ def xml_stream(infile):
 
     def handle_end(_):
         dispatch_text()
-        pending_events.append((XMLEventType.E_END,None))
+        pending_events.append((
+            XMLEventType.E_END,
+            XMLElementEnd(
+                p.CurrentLineNumber,
+                p.CurrentColumnNumber)))
     p.EndElementHandler = handle_end
 
     def handle_text(data):
@@ -193,4 +203,4 @@ def test_example(make_app, tmp_path, test_input):
                     o_value = o_node.attr[key]
                     assert o_value == value, f'wrong value for attribute "{key}" at line {o_node.line_no}: expected "{value}", found "{o_value}"'
             elif o_type == XMLEventType.E_TEXT:
-                assert o_node.value == c_node.value, f'wrong content at line {o_node.line_no}: expected "{c_node}", found "{o_node}"'
+                assert o_node.value == c_node.value, f'wrong content at line {o_node.line_no}: expected "{c_node.value}", found "{o_node.value}"'

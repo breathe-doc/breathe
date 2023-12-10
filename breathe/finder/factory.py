@@ -9,20 +9,21 @@ from breathe.renderer import TaggedNode
 
 from sphinx.application import Sphinx
 
-from typing import Any, Callable, TYPE_CHECKING
+from typing import Callable, TYPE_CHECKING, Union
 
 if TYPE_CHECKING:
     from breathe.renderer.filter import DoxFilter
-    ItemFinderCreator = Callable[[ProjectInfo,Any,'DoxygenItemFinderFactory'],ItemFinder]
+    ItemFinderCreator = Callable[[ProjectInfo,TaggedNode,'DoxygenItemFinderFactory'],ItemFinder]
 
-    FinderRoot = (parser.Node_DoxygenTypeIndex
-        | parser.Node_CompoundType
-        | parser.Node_MemberType
-        | parser.Node_DoxygenType
-        | parser.Node_compounddefType
-        | parser.Node_sectiondefType
-        | parser.Node_memberdefType
-        | parser.Node_refType)
+    FinderRoot = Union[
+        parser.Node_DoxygenTypeIndex,
+        parser.Node_CompoundType,
+        parser.Node_MemberType,
+        parser.Node_DoxygenType,
+        parser.Node_compounddefType,
+        parser.Node_sectiondefType,
+        parser.Node_memberdefType,
+        parser.Node_refType]
 
 
 class _CreateCompoundTypeSubFinder:
@@ -40,8 +41,8 @@ class DoxygenItemFinderFactory:
         self.finders = finders
         self.project_info = project_info
 
-    def create_finder(self, data_object) -> ItemFinder:
-        return self.finders[type(data_object)](self.project_info, data_object, self)
+    def create_finder(self, data_object: parser.NodeOrValue, tag: str | None = None) -> ItemFinder:
+        return self.finders[type(data_object)](self.project_info, TaggedNode(tag, data_object), self)
 
 
 class Finder:

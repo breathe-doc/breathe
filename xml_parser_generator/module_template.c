@@ -39,6 +39,17 @@ is broken into chunks. */
 #define Py_TPFLAGS_SEQUENCE 0
 #endif
 
+#if PY_VERSION_HEX >= 0x030900f0
+#define COMPAT_Py_GenericAlias Py_GenericAlias
+#else
+/* Before Python 3.9, there was no types.GenericAlias class, so just return the
+class unchanged */
+static PyObject *COMPAT_Py_GenericAlias(PyObject *cls, PyObject *Py_UNUSED(val)) {
+    Py_INCREF(cls);
+    return cls;
+}
+#endif
+
 
 enum {
     CLASS_NODE = 0, /* important: module_exec() assumes this comes before CLASS_FROZEN_LIST */
@@ -363,6 +374,11 @@ static PyObject *tagged_value_tp_new(PyTypeObject *subtype,PyObject *args,PyObje
     return (PyObject*)r;
 }
 
+static PyMethodDef tagged_value_methods[] = {
+    {"__class_getitem__", COMPAT_Py_GenericAlias, METH_O|METH_CLASS, PyDoc_STR("See PEP 585")},
+    {NULL}
+};
+
 static PyType_Slot tagged_value_slots[] = {
     {Py_tp_new,tagged_value_tp_new},
     {Py_tp_members,tagged_value_members},
@@ -370,6 +386,7 @@ static PyType_Slot tagged_value_slots[] = {
     {Py_sq_length,tagged_value_size},
     {Py_sq_item,tagged_value_item},
     {Py_tp_traverse,tagged_value_traverse},
+    {Py_tp_methods,tagged_value_methods},
     {0,NULL}};
 
 
@@ -527,6 +544,12 @@ static PyObject *frozen_list_tp_iter(frozen_list *self) {
     return (PyObject*)r;
 }
 
+static PyMethodDef frozen_list_methods[] = {
+    {"__class_getitem__", COMPAT_Py_GenericAlias, METH_O|METH_CLASS, PyDoc_STR("See PEP 585")},
+    {NULL}
+};
+
+
 static PyType_Slot frozen_list_slots[] = {
     {Py_tp_iter,frozen_list_tp_iter},
     {Py_tp_new,frozen_list_tp_new},
@@ -534,6 +557,7 @@ static PyType_Slot frozen_list_slots[] = {
     {Py_sq_length,frozen_list_size},
     {Py_sq_item,frozen_list_item},
     {Py_tp_traverse,frozen_list_traverse},
+    {Py_tp_methods,frozen_list_methods},
     {0,NULL}
 };
 
@@ -561,6 +585,7 @@ static PyObject *frozen_list_itr_length_hint(frozen_list_itr *self,PyObject *Py_
 
 static PyMethodDef frozen_list_itr_methods[] = {
     {"__length_hint__",(PyCFunction)frozen_list_itr_length_hint,METH_NOARGS,NULL},
+    {"__class_getitem__", COMPAT_Py_GenericAlias, METH_O|METH_CLASS, PyDoc_STR("See PEP 585")},
     {NULL}
 };
 
@@ -2153,10 +2178,11 @@ static int module_exec(PyObject *module) {
 
             frozen_list_bases = PyTuple_New(2);
             if(frozen_list_bases == NULL) goto error;
-            PyTuple_SetItem(frozen_list_bases,0,(PyObject*)state->classes[i]);
-            Py_INCREF(state->classes[i]);
-            PyTuple_SetItem(frozen_list_bases,1,(PyObject*)state->classes[CLASS_NODE]);
+
+            PyTuple_SetItem(frozen_list_bases,0,(PyObject*)state->classes[CLASS_NODE]);
             Py_INCREF(state->classes[CLASS_NODE]);
+            PyTuple_SetItem(frozen_list_bases,1,(PyObject*)state->classes[i]);
+            Py_INCREF(state->classes[i]);
 
             node_bases = PyTuple_New(1);
             if(node_bases == NULL) goto error;
