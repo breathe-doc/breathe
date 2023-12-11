@@ -1,9 +1,14 @@
 #define PY_SSIZE_T_CLEAN
 #include <pyconfig.h>
 
+#ifdef PARSER_PY_LIMITED_API
 /* Py_LIMITED_API isn't compatible with Py_TRACE_REFS */
-#if !defined(Py_TRACE_REFS) && defined(PARSER_PY_LIMITED_API)
-#define Py_LIMITED_API PARSER_PY_LIMITED_API
+#  if !defined(Py_TRACE_REFS)
+#    define Py_LIMITED_API PARSER_PY_LIMITED_API
+#  endif
+#  define PARSER_PY_VERSION_HEX PARSER_PY_LIMITED_API
+#else
+#  define PARSER_PY_VERSION_HEX PY_VERSION_HEX
 #endif
 
 #include <Python.h>
@@ -39,7 +44,7 @@ is broken into chunks. */
 #define Py_TPFLAGS_SEQUENCE 0
 #endif
 
-#if PY_VERSION_HEX >= 0x030900f0
+#if PARSER_PY_VERSION_HEX >= 0x03090000
 #define COMPAT_Py_GenericAlias Py_GenericAlias
 #else
 /* Before Python 3.9, there was no types.GenericAlias class, so just return the
@@ -2296,7 +2301,7 @@ initialization is used, so for now, single-phase initialization is used.
 
 static PyModuleDef_Slot m_slots[] = {
     {Py_mod_exec,module_exec},
-#if PY_VERSION_HEX >= 0x030c00f0
+#if PARSER_PY_VERSION_HEX >= 0x030c00f0
     {Py_mod_multiple_interpreters,Py_MOD_PER_INTERPRETER_GIL_SUPPORTED},
 #endif
     {0,NULL}};

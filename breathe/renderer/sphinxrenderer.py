@@ -2122,7 +2122,7 @@ class SphinxRenderer(metaclass=NodeVisitor):
         compound_link: list[Node] = [nodes.Text("".join(node))]
         if node.refid:
             compound_link = self.visit_docreftext(node)
-        if node.local == "yes":
+        if node.local:
             text = [nodes.Text('#include "'), *compound_link, nodes.Text('"')]
         else:
             text = [nodes.Text("#include <"), *compound_link, nodes.Text(">")]
@@ -2258,7 +2258,7 @@ class SphinxRenderer(metaclass=NodeVisitor):
     def visit_docentry(self, node: parser.Node_docEntryType) -> list[Node]:
         col = nodes.entry()
         col += self.render_iterable(node.para)
-        if node.thead == "yes":
+        if node.thead:
             col["heading"] = True
         if node.rowspan:
             col["morerows"] = int(node.rowspan) - 1
