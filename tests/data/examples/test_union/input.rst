@@ -1,1 +1,2 @@
-.. doxygenfile:: union.h
+.. doxygenunion:: SeparateUnion
+.. doxygennamespace:: foo

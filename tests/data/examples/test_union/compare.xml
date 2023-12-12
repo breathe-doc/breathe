@@ -25,59 +25,6 @@
             </container>
         </desc_content>
     </desc>
-    <index entries="['single',\ 'ClassWithUnion\ (C++\ class)',\ '_CPPv414ClassWithUnion',\ '',\ None]"></index>
-    <desc classes="cpp class" desctype="class" domain="cpp" objtype="class">
-        <desc_signature _toc_name="ClassWithUnion" _toc_parts="ClassWithUnion" classes="sig sig-object cpp"><desc_signature_line><target names="class_class_with_union"></target><desc_sig_keyword classes="k">class</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">ClassWithUnion</desc_sig_name></desc_name></desc_signature_line></desc_signature>
-        <desc_content>
-            <paragraph>A class with a union. </paragraph>
-            <index entries="['single',\ 'ClassWithUnion::ExtraClass\ (C++\ class)',\ '_CPPv4N14ClassWithUnion10ExtraClassE',\ '',\ None]"></index>
-            <desc classes="cpp class" desctype="class" domain="cpp" objtype="class">
-                <desc_signature _toc_name="ClassWithUnion::ExtraClass" _toc_parts="ClassWithUnion ExtraClass" classes="sig sig-object cpp"><desc_signature_line><target names="class_class_with_union_1_1_extra_class"></target><desc_sig_keyword classes="k">class</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">ExtraClass</desc_sig_name></desc_name></desc_signature_line></desc_signature>
-                <desc_content>
-                    <paragraph>Documented class. </paragraph>
-                    <container classes="breathe-sectiondef" objtype="private-attrib">
-                        <rubric classes="breathe-sectiondef-title">Private Members</rubric>
-                        <index entries="['single',\ 'ClassWithUnion::ExtraClass::a_member\ (C++\ member)',\ '_CPPv4N14ClassWithUnion10ExtraClass8a_memberE',\ '',\ None]"></index>
-                        <desc classes="cpp var" desctype="var" domain="cpp" objtype="var">
-                            <desc_signature _toc_name="ClassWithUnion::ExtraClass::a_member" _toc_parts="ClassWithUnion ExtraClass a_member" classes="sig sig-object cpp"><desc_signature_line><target names="class_class_with_union_1_1_extra_class_1a87206fd5c7948fd31f213d92d0f21f34"></target><desc_sig_keyword_type classes="kt">int</desc_sig_keyword_type><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">a_member</desc_sig_name></desc_name></desc_signature_line></desc_signature>
-                            <desc_content>
-                            </desc_content>
-                        </desc>
-                        <index entries="['single',\ 'ClassWithUnion::ExtraClass::another_member\ (C++\ member)',\ '_CPPv4N14ClassWithUnion10ExtraClass14another_memberE',\ '',\ None]"></index>
-                        <desc classes="cpp var" desctype="var" domain="cpp" objtype="var">
-                            <desc_signature _toc_name="ClassWithUnion::ExtraClass::another_member" _toc_parts="ClassWithUnion ExtraClass another_member" classes="sig sig-object cpp"><desc_signature_line><target names="class_class_with_union_1_1_extra_class_1a13933acd4467be3080ca766bef2114b3"></target><desc_sig_keyword_type classes="kt">float</desc_sig_keyword_type><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">another_member</desc_sig_name></desc_name></desc_signature_line></desc_signature>
-                            <desc_content>
-                            </desc_content>
-                        </desc>
-                    </container>
-                </desc_content>
-            </desc>
-            <index entries="['single',\ 'ClassWithUnion::UnionInClass\ (C++\ union)',\ '_CPPv4N14ClassWithUnion12UnionInClassE',\ '',\ None]"></index>
-            <desc classes="cpp union" desctype="union" domain="cpp" objtype="union">
-                <desc_signature _toc_name="ClassWithUnion::UnionInClass" _toc_parts="ClassWithUnion UnionInClass" classes="sig sig-object cpp"><desc_signature_line><target names="union_class_with_union_1_1_union_in_class"></target><desc_sig_keyword classes="k">union</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">UnionInClass</desc_sig_name></desc_name></desc_signature_line></desc_signature>
-                <desc_content>
-                    <paragraph>A union with two values. </paragraph>
-                    <container classes="breathe-sectiondef" objtype="public-attrib">
-                        <rubric classes="breathe-sectiondef-title">Public Members</rubric>
-                        <index entries="['single',\ 'ClassWithUnion::UnionInClass::intvalue\ (C++\ member)',\ '_CPPv4N14ClassWithUnion12UnionInClass8intvalueE',\ '',\ None]"></index>
-                        <desc classes="cpp var" desctype="var" domain="cpp" objtype="var">
-                            <desc_signature _toc_name="ClassWithUnion::UnionInClass::intvalue" _toc_parts="ClassWithUnion UnionInClass intvalue" classes="sig sig-object cpp"><desc_signature_line><target names="union_class_with_union_1_1_union_in_class_1a99d76dadc0d4ccf48d8e1bc197c89d9a"></target><desc_sig_keyword_type classes="kt">int</desc_sig_keyword_type><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">intvalue</desc_sig_name></desc_name></desc_signature_line></desc_signature>
-                            <desc_content>
-                                <paragraph>An int value. </paragraph>
-                            </desc_content>
-                        </desc>
-                        <index entries="['single',\ 'ClassWithUnion::UnionInClass::floatvalue\ (C++\ member)',\ '_CPPv4N14ClassWithUnion12UnionInClass10floatvalueE',\ '',\ None]"></index>
-                        <desc classes="cpp var" desctype="var" domain="cpp" objtype="var">
-                            <desc_signature _toc_name="ClassWithUnion::UnionInClass::floatvalue" _toc_parts="ClassWithUnion UnionInClass floatvalue" classes="sig sig-object cpp"><desc_signature_line><target names="union_class_with_union_1_1_union_in_class_1ab675380c2df409f1f3d9125112f1b42f"></target><desc_sig_keyword_type classes="kt">float</desc_sig_keyword_type><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">floatvalue</desc_sig_name></desc_name></desc_signature_line></desc_signature>
-                            <desc_content>
-                                <paragraph>A float value. </paragraph>
-                            </desc_content>
-                        </desc>
-                    </container>
-                </desc_content>
-            </desc>
-        </desc_content>
-    </desc>
     <index entries="['single',\ 'foo\ (C++\ type)',\ '_CPPv43foo',\ '',\ None]"></index>
     <desc classes="cpp type" desctype="type" domain="cpp" objtype="type">
         <desc_signature _toc_name="foo" _toc_parts="foo" classes="sig sig-object cpp"><desc_signature_line><target names="namespacefoo"></target><desc_sig_keyword classes="k">namespace</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">foo</desc_sig_name></desc_name></desc_signature_line></desc_signature>

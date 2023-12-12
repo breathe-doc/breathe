@@ -7,17 +7,13 @@ import enum
 import dataclasses
 
 
-EXAMPLES_SOURCE_DIR = pathlib.Path(__file__).parent.parent / 'examples' / 'specific'
-
 DOXYFILE_TEMPLATE = """
 PROJECT_NAME     = "example"
 HAVE_DOT         = YES
-DOTFILE_DIRS     = "{source_dir}"
 GENERATE_LATEX   = NO
 GENERATE_MAN     = NO
 GENERATE_RTF     = NO
 CASE_SENSE_NAMES = NO
-INPUT            = {input}
 OUTPUT_DIRECTORY = "{output}"
 QUIET            = YES
 JAVADOC_AUTOBRIEF = YES
@@ -33,6 +29,14 @@ C_FILE_SUFFIXES = frozenset(('.h', '.c', '.hpp', '.cpp'))
 IGNORED_ELEMENTS = frozenset(())
 
 BUFFER_SIZE = 0x1000
+
+TEST_DATA_DIR = pathlib.Path(__file__).parent / 'data'
+
+DEFAULT_CONF = {
+    'project': 'test',
+    'breathe_default_project': 'example',
+    'breathe_show_include': False,
+    'extensions': ['breathe','sphinx.ext.graphviz']}
 
 
 class XMLEventType(enum.Enum):
@@ -121,15 +125,7 @@ def xml_stream(infile):
 
 
 def get_individual_tests():
-    return (pathlib.Path(__file__).parent / "data" / "examples").glob("test_*")
-
-def filter_c_files(name):
-    for p in EXAMPLES_SOURCE_DIR.glob(name + '.*'):
-        if p.suffix in C_FILE_SUFFIXES:
-            full = str(p)
-            if '"' in full:
-                raise ValueError('quotations marks not allowed in path names')
-            yield f'"{full}"'
+    return (TEST_DATA_DIR / "examples").glob("test_*")
 
 def filtered_xml(infile):
     ignore = 0
@@ -151,44 +147,19 @@ def filtered_xml(infile):
                     node.value = text
                     yield event, node
 
-@pytest.mark.parametrize('test_input', get_individual_tests())
-def test_example(make_app, tmp_path, test_input):
-    doxygen = shutil.which('doxygen')
-    if doxygen is None:
-        raise ValueError('cannot find doxygen executable')
+def conf_overrides(extra):
+    conf = DEFAULT_CONF.copy()
+    conf.update(extra)
+    return conf
 
-    doxyfile = tmp_path / "Doxyfile"
-    doxycontent = DOXYFILE_TEMPLATE.format(
-        input=" ".join(filter_c_files(test_input.stem.removeprefix('test_'))),
-        source_dir=EXAMPLES_SOURCE_DIR,
-        output=tmp_path
-    )
-    extra_opts = test_input / 'extra_dox_opts.txt'
-    if extra_opts.exists():
-        doxycontent += extra_opts.read_text()
-    doxyfile.write_text(doxycontent)
-    (tmp_path / "conf.py").touch()
-    shutil.copyfile(test_input / "input.rst", tmp_path / "index.rst")
-
-    subprocess.run([doxygen, doxyfile], check = True)
-
-    make_app(
-        buildername='xml',
-        srcdir=tmp_path,
-        confoverrides={
-            'project': 'test',
-            'breathe_projects': {'example': str(tmp_path / "xml")},
-            'breathe_default_project': 'example',
-            'breathe_show_include': False,
-            'extensions': ['breathe','sphinx.ext.graphviz']}).build()
-
+def compare_xml(generated, model):
     event_str = {
         XMLEventType.E_START: 'element start',
         XMLEventType.E_END: 'element end',
         XMLEventType.E_TEXT: 'text'
     }
 
-    with open(tmp_path / '_build' / 'xml' / 'index.xml') as o_file, open(test_input / 'compare.xml') as c_file:
+    with open(generated) as o_file, open(model) as c_file:
         for o, c in zip(filtered_xml(o_file),filtered_xml(c_file)):
             o_type, o_node = o
             c_type, c_node = c
@@ -204,3 +175,44 @@ def test_example(make_app, tmp_path, test_input):
                     assert o_value == value, f'wrong value for attribute "{key}" at line {o_node.line_no}: expected "{value}", found "{o_value}"'
             elif o_type == XMLEventType.E_TEXT:
                 assert o_node.value == c_node.value, f'wrong content at line {o_node.line_no}: expected "{c_node.value}", found "{o_node.value}"'
+
+@pytest.mark.parametrize('test_input', get_individual_tests())
+def test_example(make_app, tmp_path, test_input, monkeypatch):
+    monkeypatch.chdir(test_input)
+
+    doxygen = shutil.which('doxygen')
+    if doxygen is None:
+        raise ValueError('cannot find doxygen executable')
+
+    doxyfile = tmp_path / "Doxyfile"
+    doxycontent = DOXYFILE_TEMPLATE.format(output=tmp_path)
+    extra_opts = test_input / 'extra_dox_opts.txt'
+    if extra_opts.exists():
+        doxycontent += extra_opts.read_text()
+    doxyfile.write_text(doxycontent)
+    (tmp_path / "conf.py").touch()
+    shutil.copyfile(test_input / "input.rst", tmp_path / "index.rst")
+
+    subprocess.run([doxygen, doxyfile], check = True)
+
+    make_app(
+        buildername='xml',
+        srcdir=tmp_path,
+        confoverrides=conf_overrides({
+            'breathe_projects': {'example': str(tmp_path / "xml")}})).build()
+
+    compare_xml(tmp_path / '_build' / 'xml' / 'index.xml', test_input / 'compare.xml')
+
+def test_auto(make_app, tmp_path, monkeypatch):
+    test_input = TEST_DATA_DIR / 'auto'
+    monkeypatch.chdir(test_input)
+    (tmp_path / "conf.py").touch()
+    shutil.copyfile(test_input / "input.rst", tmp_path / "index.rst")
+
+    make_app(
+        buildername='xml',
+        srcdir=tmp_path,
+        confoverrides=conf_overrides({
+            'breathe_projects_source': {'example': (test_input, ['auto_class.h', 'auto_function.h'])}})).build()
+    
+    compare_xml(tmp_path / '_build' / 'xml' / 'index.xml', test_input / 'compare.xml')

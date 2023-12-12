@@ -14,7 +14,7 @@ if TYPE_CHECKING:
     NodeOrValue = Node | str | None
 
 @reprlib.recursive_repr()
-def node_repr(self: Node) -> str:
+def node_repr(self: Node) -> str:  # pragma: no cover
     cls = type(self)
     fields = []
     if isinstance(self,FrozenList):
@@ -26,12 +26,12 @@ def node_repr(self: Node) -> str:
 Node.__repr__ = node_repr # type: ignore
 
 @reprlib.recursive_repr()
-def taggedvalue_repr(self: TaggedValue) -> str:
+def taggedvalue_repr(self: TaggedValue) -> str:  # pragma: no cover
     return f'{self.__class__.__name__}({self.name!r}, {self.value!r})'
 TaggedValue.__repr__ = taggedvalue_repr # type: ignore
 
 @reprlib.recursive_repr()
-def frozenlist_repr(self: FrozenList) -> str:
+def frozenlist_repr(self: FrozenList) -> str:  # pragma: no cover
     inner = ', '.join(map(repr,self))
     return f'{self.__class__.__name__}([{inner}])'
 FrozenList.__repr__ = frozenlist_repr # type: ignore
