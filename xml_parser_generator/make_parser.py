@@ -103,12 +103,14 @@ class BuiltinType(SchemaType):
     py_name: str
 
 
+@dataclasses.dataclass(slots=True)
 class SpType(BuiltinType):
-    __slots__ = ()
+    pass
 
 
+@dataclasses.dataclass(slots=True)
 class BuiltinAttributeType(BuiltinType, AttributeType):
-    __slots__ = ()
+    pass
 
 
 class OtherAttrAction(enum.Enum):
