@@ -3,12 +3,12 @@
 <document>
     <index entries="['single',\ 'Unscoped\ (C++\ enum)',\ '_CPPv48Unscoped',\ '',\ None]"></index>
     <desc classes="cpp enum" desctype="enum" domain="cpp" objtype="enum">
-        <desc_signature _toc_name="Unscoped" _toc_parts="Unscoped" classes="sig sig-object cpp"><desc_signature_line><target names="cpp__enum_8h_1a51fbbb5768814cd48b8ed0267e6a5bf4"></target><desc_sig_keyword classes="k">enum</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">Unscoped</desc_sig_name></desc_name></desc_signature_line></desc_signature>
+        <desc_signature _toc_name="Unscoped" _toc_parts="Unscoped" classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword classes="k">enum</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">Unscoped</desc_sig_name></desc_name></desc_signature_line></desc_signature>
         <desc_content>
             <paragraph><emphasis>Values:</emphasis></paragraph>
             <index entries="['single',\ 'Unscoped::UnscopedEnumerator\ (C++\ enumerator)',\ '_CPPv4N8Unscoped18UnscopedEnumeratorE',\ '',\ None]"></index>
             <desc classes="cpp enumerator" desctype="enumerator" domain="cpp" objtype="enumerator">
-                <desc_signature _toc_name="Unscoped::UnscopedEnumerator" _toc_parts="Unscoped UnscopedEnumerator" classes="sig sig-object cpp"><desc_signature_line><target names="cpp__enum_8h_1a51fbbb5768814cd48b8ed0267e6a5bf4a68d7198746d76d18132467029ecaabf3"></target><desc_sig_keyword classes="k">enumerator</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">UnscopedEnumerator</desc_sig_name></desc_name></desc_signature_line></desc_signature>
+                <desc_signature _toc_name="Unscoped::UnscopedEnumerator" _toc_parts="Unscoped UnscopedEnumerator" classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword classes="k">enumerator</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">UnscopedEnumerator</desc_sig_name></desc_name></desc_signature_line></desc_signature>
                 <desc_content>
                 </desc_content>
             </desc>
@@ -16,12 +16,12 @@
     </desc>
     <index entries="['single',\ 'ScopedStruct\ (C++\ enum)',\ '_CPPv412ScopedStruct',\ '',\ None]"></index>
     <desc classes="cpp enum-class" desctype="enum-class" domain="cpp" objtype="enum-class">
-        <desc_signature _toc_name="ScopedStruct" _toc_parts="ScopedStruct" classes="sig sig-object cpp"><desc_signature_line><target names="cpp__enum_8h_1a139ad3cb7b728ee2ec98ce80740149c7"></target><desc_sig_keyword classes="k">enum</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_sig_keyword classes="k">class</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">ScopedStruct</desc_sig_name></desc_name><desc_sig_space classes="w"> </desc_sig_space><desc_sig_punctuation classes="p">:</desc_sig_punctuation><desc_sig_space classes="w"> </desc_sig_space><desc_sig_keyword_type classes="kt">int</desc_sig_keyword_type></desc_signature_line></desc_signature>
+        <desc_signature _toc_name="ScopedStruct" _toc_parts="ScopedStruct" classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword classes="k">enum</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_sig_keyword classes="k">class</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">ScopedStruct</desc_sig_name></desc_name><desc_sig_space classes="w"> </desc_sig_space><desc_sig_punctuation classes="p">:</desc_sig_punctuation><desc_sig_space classes="w"> </desc_sig_space><desc_sig_keyword_type classes="kt">int</desc_sig_keyword_type></desc_signature_line></desc_signature>
         <desc_content>
             <paragraph><emphasis>Values:</emphasis></paragraph>
             <index entries="['single',\ 'ScopedStruct::Enumerator\ (C++\ enumerator)',\ '_CPPv4N12ScopedStruct10EnumeratorE',\ '',\ None]"></index>
             <desc classes="cpp enumerator" desctype="enumerator" domain="cpp" objtype="enumerator">
-                <desc_signature _toc_name="ScopedStruct::Enumerator" _toc_parts="ScopedStruct Enumerator" classes="sig sig-object cpp"><desc_signature_line><target names="cpp__enum_8h_1a139ad3cb7b728ee2ec98ce80740149c7a30309b565fa53a27f30668e22f7cf058"></target><desc_sig_keyword classes="k">enumerator</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">Enumerator</desc_sig_name></desc_name></desc_signature_line></desc_signature>
+                <desc_signature _toc_name="ScopedStruct::Enumerator" _toc_parts="ScopedStruct Enumerator" classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword classes="k">enumerator</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">Enumerator</desc_sig_name></desc_name></desc_signature_line></desc_signature>
                 <desc_content>
                 </desc_content>
             </desc>
@@ -29,12 +29,12 @@
     </desc>
     <index entries="['single',\ 'ScopedClass\ (C++\ enum)',\ '_CPPv411ScopedClass',\ '',\ None]"></index>
     <desc classes="cpp enum-class" desctype="enum-class" domain="cpp" objtype="enum-class">
-        <desc_signature _toc_name="ScopedClass" _toc_parts="ScopedClass" classes="sig sig-object cpp"><desc_signature_line><target names="cpp__enum_8h_1a856cfecb9d082a8998f3d841a4f90961"></target><desc_sig_keyword classes="k">enum</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_sig_keyword classes="k">class</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">ScopedClass</desc_sig_name></desc_name><desc_sig_space classes="w"> </desc_sig_space><desc_sig_punctuation classes="p">:</desc_sig_punctuation><desc_sig_space classes="w"> </desc_sig_space><desc_sig_keyword_type classes="kt">int</desc_sig_keyword_type></desc_signature_line></desc_signature>
+        <desc_signature _toc_name="ScopedClass" _toc_parts="ScopedClass" classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword classes="k">enum</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_sig_keyword classes="k">class</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">ScopedClass</desc_sig_name></desc_name><desc_sig_space classes="w"> </desc_sig_space><desc_sig_punctuation classes="p">:</desc_sig_punctuation><desc_sig_space classes="w"> </desc_sig_space><desc_sig_keyword_type classes="kt">int</desc_sig_keyword_type></desc_signature_line></desc_signature>
         <desc_content>
             <paragraph><emphasis>Values:</emphasis></paragraph>
             <index entries="['single',\ 'ScopedClass::Enumerator\ (C++\ enumerator)',\ '_CPPv4N11ScopedClass10EnumeratorE',\ '',\ None]"></index>
             <desc classes="cpp enumerator" desctype="enumerator" domain="cpp" objtype="enumerator">
-                <desc_signature _toc_name="ScopedClass::Enumerator" _toc_parts="ScopedClass Enumerator" classes="sig sig-object cpp"><desc_signature_line><target names="cpp__enum_8h_1a856cfecb9d082a8998f3d841a4f90961a30309b565fa53a27f30668e22f7cf058"></target><desc_sig_keyword classes="k">enumerator</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">Enumerator</desc_sig_name></desc_name></desc_signature_line></desc_signature>
+                <desc_signature _toc_name="ScopedClass::Enumerator" _toc_parts="ScopedClass Enumerator" classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword classes="k">enumerator</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">Enumerator</desc_sig_name></desc_name></desc_signature_line></desc_signature>
                 <desc_content>
                 </desc_content>
             </desc>
@@ -42,12 +42,12 @@
     </desc>
     <index entries="['single',\ 'ScopedClassNoUnderlying\ (C++\ enum)',\ '_CPPv423ScopedClassNoUnderlying',\ '',\ None]"></index>
     <desc classes="cpp enum-class" desctype="enum-class" domain="cpp" objtype="enum-class">
-        <desc_signature _toc_name="ScopedClassNoUnderlying" _toc_parts="ScopedClassNoUnderlying" classes="sig sig-object cpp"><desc_signature_line><target names="cpp__enum_8h_1aee11b20d870b663bdf42a5285c2e672a"></target><desc_sig_keyword classes="k">enum</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_sig_keyword classes="k">class</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">ScopedClassNoUnderlying</desc_sig_name></desc_name></desc_signature_line></desc_signature>
+        <desc_signature _toc_name="ScopedClassNoUnderlying" _toc_parts="ScopedClassNoUnderlying" classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword classes="k">enum</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_sig_keyword classes="k">class</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">ScopedClassNoUnderlying</desc_sig_name></desc_name></desc_signature_line></desc_signature>
         <desc_content>
             <paragraph><emphasis>Values:</emphasis></paragraph>
             <index entries="['single',\ 'ScopedClassNoUnderlying::Enumerator\ (C++\ enumerator)',\ '_CPPv4N23ScopedClassNoUnderlying10EnumeratorE',\ '',\ None]"></index>
             <desc classes="cpp enumerator" desctype="enumerator" domain="cpp" objtype="enumerator">
-                <desc_signature _toc_name="ScopedClassNoUnderlying::Enumerator" _toc_parts="ScopedClassNoUnderlying Enumerator" classes="sig sig-object cpp"><desc_signature_line><target names="cpp__enum_8h_1aee11b20d870b663bdf42a5285c2e672aa30309b565fa53a27f30668e22f7cf058"></target><desc_sig_keyword classes="k">enumerator</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">Enumerator</desc_sig_name></desc_name></desc_signature_line></desc_signature>
+                <desc_signature _toc_name="ScopedClassNoUnderlying::Enumerator" _toc_parts="ScopedClassNoUnderlying Enumerator" classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword classes="k">enumerator</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">Enumerator</desc_sig_name></desc_name></desc_signature_line></desc_signature>
                 <desc_content>
                 </desc_content>
             </desc>

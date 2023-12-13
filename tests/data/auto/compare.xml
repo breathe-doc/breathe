@@ -3,21 +3,21 @@
 <document>
     <index entries="['single',\ 'AutoClassTest\ (C++\ class)',\ '_CPPv413AutoClassTest',\ '',\ None]"></index>
     <desc classes="cpp class" desctype="class" domain="cpp" objtype="class">
-        <desc_signature _toc_name="AutoClassTest" _toc_parts="AutoClassTest" classes="sig sig-object cpp"><desc_signature_line><target names="class_auto_class_test"></target><desc_sig_keyword classes="k">class</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">AutoClassTest</desc_sig_name></desc_name></desc_signature_line></desc_signature>
+        <desc_signature _toc_name="AutoClassTest" _toc_parts="AutoClassTest" classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword classes="k">class</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">AutoClassTest</desc_sig_name></desc_name></desc_signature_line></desc_signature>
         <desc_content>
             <paragraph>class outside of namespace </paragraph>
             <container classes="breathe-sectiondef" objtype="private-func">
                 <rubric classes="breathe-sectiondef-title">Private Functions</rubric>
                 <index entries="['single',\ 'AutoClassTest::member\ (C++\ function)',\ '_CPPv4N13AutoClassTest6memberEv',\ '',\ None]"></index>
                 <desc classes="cpp function" desctype="function" domain="cpp" objtype="function">
-                    <desc_signature _toc_name="AutoClassTest::member()" _toc_parts="AutoClassTest member" classes="sig sig-object cpp"><desc_signature_line><target names="class_auto_class_test_1a521a5c1963c9701da0c8a2d88728cdae"></target><desc_sig_keyword classes="k">inline</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_sig_keyword_type classes="kt">void</desc_sig_keyword_type><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">member</desc_sig_name></desc_name><desc_parameterlist></desc_parameterlist></desc_signature_line></desc_signature>
+                    <desc_signature _toc_name="AutoClassTest::member()" _toc_parts="AutoClassTest member" classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword classes="k">inline</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_sig_keyword_type classes="kt">void</desc_sig_keyword_type><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">member</desc_sig_name></desc_name><desc_parameterlist></desc_parameterlist></desc_signature_line></desc_signature>
                     <desc_content>
                         <paragraph>non-namespaced class function </paragraph>
                     </desc_content>
                 </desc>
                 <index entries="['single',\ 'AutoClassTest::anotherMember\ (C++\ function)',\ '_CPPv4N13AutoClassTest13anotherMemberEv',\ '',\ None]"></index>
                 <desc classes="cpp function" desctype="function" domain="cpp" objtype="function">
-                    <desc_signature _toc_name="AutoClassTest::anotherMember()" _toc_parts="AutoClassTest anotherMember" classes="sig sig-object cpp"><desc_signature_line><target names="class_auto_class_test_1a2f686636bd3c5b1ee03585a4b760f69e"></target><desc_sig_keyword classes="k">inline</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_sig_keyword_type classes="kt">void</desc_sig_keyword_type><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">anotherMember</desc_sig_name></desc_name><desc_parameterlist></desc_parameterlist></desc_signature_line></desc_signature>
+                    <desc_signature _toc_name="AutoClassTest::anotherMember()" _toc_parts="AutoClassTest anotherMember" classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword classes="k">inline</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_sig_keyword_type classes="kt">void</desc_sig_keyword_type><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">anotherMember</desc_sig_name></desc_name><desc_parameterlist></desc_parameterlist></desc_signature_line></desc_signature>
                     <desc_content>
                         <paragraph>non-namespaced class other function </paragraph>
                     </desc_content>
@@ -29,14 +29,14 @@
         <rubric classes="breathe-sectiondef-title">Functions</rubric>
         <index entries="['single',\ 'autoFunction\ (C++\ function)',\ '_CPPv412autoFunctionv',\ '',\ None]"></index>
         <desc classes="cpp function" desctype="function" domain="cpp" objtype="function">
-            <desc_signature _toc_name="autoFunction()" _toc_parts="autoFunction" classes="sig sig-object cpp"><desc_signature_line><target names="auto__function_8h_1a4134f7b723e07aff2422fa867493cad8"></target><desc_sig_keyword_type classes="kt">void</desc_sig_keyword_type><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">autoFunction</desc_sig_name></desc_name><desc_parameterlist></desc_parameterlist></desc_signature_line></desc_signature>
+            <desc_signature _toc_name="autoFunction()" _toc_parts="autoFunction" classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword_type classes="kt">void</desc_sig_keyword_type><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">autoFunction</desc_sig_name></desc_name><desc_parameterlist></desc_parameterlist></desc_signature_line></desc_signature>
             <desc_content>
                 <paragraph>non-namespaced class function </paragraph>
             </desc_content>
         </desc>
         <index entries="['single',\ 'anotherAutoFunction\ (C++\ function)',\ '_CPPv419anotherAutoFunctionv',\ '',\ None]"></index>
         <desc classes="cpp function" desctype="function" domain="cpp" objtype="function">
-            <desc_signature _toc_name="anotherAutoFunction()" _toc_parts="anotherAutoFunction" classes="sig sig-object cpp"><desc_signature_line><target names="auto__function_8h_1a666965ce94f6f466690b096239316b10"></target><desc_sig_keyword_type classes="kt">void</desc_sig_keyword_type><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">anotherAutoFunction</desc_sig_name></desc_name><desc_parameterlist></desc_parameterlist></desc_signature_line></desc_signature>
+            <desc_signature _toc_name="anotherAutoFunction()" _toc_parts="anotherAutoFunction" classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword_type classes="kt">void</desc_sig_keyword_type><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">anotherAutoFunction</desc_sig_name></desc_name><desc_parameterlist></desc_parameterlist></desc_signature_line></desc_signature>
             <desc_content>
                 <paragraph>non-namespaced class other function </paragraph>
             </desc_content>

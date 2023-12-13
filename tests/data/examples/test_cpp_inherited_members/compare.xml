@@ -3,7 +3,7 @@
 <document>
     <index entries="['single',\ 'Base\ (C++\ class)',\ '_CPPv44Base',\ '',\ None]"></index>
     <desc classes="cpp class" desctype="class" domain="cpp" objtype="class">
-        <desc_signature _toc_name="Base" _toc_parts="Base" classes="sig sig-object cpp"><desc_signature_line><target names="class_base"></target><desc_sig_keyword classes="k">class</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">Base</desc_sig_name></desc_name></desc_signature_line></desc_signature>
+        <desc_signature _toc_name="Base" _toc_parts="Base" classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword classes="k">class</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">Base</desc_sig_name></desc_name></desc_signature_line></desc_signature>
         <desc_content>
             <paragraph><reference internal="True" refid="class_base"><inline classes="std std-ref">Base</inline></reference> class. </paragraph>
             <paragraph>Subclassed by <reference internal="True" refid="class_a"><inline classes="std std-ref">A</inline></reference>, <reference internal="True" refid="class_b"><inline classes="std std-ref">B</inline></reference></paragraph>
@@ -21,7 +21,7 @@
     </desc>
     <index entries="['single',\ 'A\ (C++\ class)',\ '_CPPv41A',\ '',\ None]"></index>
     <desc classes="cpp class" desctype="class" domain="cpp" objtype="class">
-        <desc_signature _toc_name="A" _toc_parts="A" classes="sig sig-object cpp"><desc_signature_line><target names="class_a"></target><desc_sig_keyword classes="k">class</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">A</desc_sig_name></desc_name><desc_sig_space classes="w"> </desc_sig_space><desc_sig_punctuation classes="p">:</desc_sig_punctuation><desc_sig_space classes="w"> </desc_sig_space><desc_sig_keyword classes="k">public</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><reference internal="True" refid="_CPPv44Base" reftitle="Base"><desc_sig_name classes="n">Base</desc_sig_name></reference></desc_signature_line></desc_signature>
+        <desc_signature _toc_name="A" _toc_parts="A" classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword classes="k">class</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">A</desc_sig_name></desc_name><desc_sig_space classes="w"> </desc_sig_space><desc_sig_punctuation classes="p">:</desc_sig_punctuation><desc_sig_space classes="w"> </desc_sig_space><desc_sig_keyword classes="k">public</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><reference internal="True" refid="_CPPv44Base" reftitle="Base"><desc_sig_name classes="n">Base</desc_sig_name></reference></desc_signature_line></desc_signature>
         <desc_content>
             <paragraph>Class <reference internal="True" refid="class_a"><inline classes="std std-ref">A</inline></reference>. </paragraph>
             <container classes="breathe-sectiondef" objtype="public-func">
@@ -38,7 +38,7 @@
     </desc>
     <index entries="['single',\ 'B\ (C++\ class)',\ '_CPPv41B',\ '',\ None]"></index>
     <desc classes="cpp class" desctype="class" domain="cpp" objtype="class">
-        <desc_signature _toc_name="B" _toc_parts="B" classes="sig sig-object cpp"><desc_signature_line><target names="class_b"></target><desc_sig_keyword classes="k">class</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">B</desc_sig_name></desc_name><desc_sig_space classes="w"> </desc_sig_space><desc_sig_punctuation classes="p">:</desc_sig_punctuation><desc_sig_space classes="w"> </desc_sig_space><desc_sig_keyword classes="k">public</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><reference internal="True" refid="_CPPv44Base" reftitle="Base"><desc_sig_name classes="n">Base</desc_sig_name></reference></desc_signature_line></desc_signature>
+        <desc_signature _toc_name="B" _toc_parts="B" classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword classes="k">class</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">B</desc_sig_name></desc_name><desc_sig_space classes="w"> </desc_sig_space><desc_sig_punctuation classes="p">:</desc_sig_punctuation><desc_sig_space classes="w"> </desc_sig_space><desc_sig_keyword classes="k">public</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><reference internal="True" refid="_CPPv44Base" reftitle="Base"><desc_sig_name classes="n">Base</desc_sig_name></reference></desc_signature_line></desc_signature>
         <desc_content>
             <paragraph>Class <reference internal="True" refid="class_b"><inline classes="std std-ref">B</inline></reference>. </paragraph>
             <container classes="breathe-sectiondef" objtype="public-func">

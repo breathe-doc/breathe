@@ -3,7 +3,7 @@
 <document>
     <index entries="['single',\ 'Structy\ (C++\ struct)',\ '_CPPv47Structy',\ '',\ None]"></index>
     <desc classes="cpp struct" desctype="struct" domain="cpp" objtype="struct">
-        <desc_signature _toc_name="Structy" _toc_parts="Structy" classes="sig sig-object cpp"><desc_signature_line><target names="struct_structy"></target><desc_sig_keyword classes="k">struct</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">Structy</desc_sig_name></desc_name></desc_signature_line></desc_signature>
+        <desc_signature _toc_name="Structy" _toc_parts="Structy" classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword classes="k">struct</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">Structy</desc_sig_name></desc_name></desc_signature_line></desc_signature>
         <desc_content>
             <paragraph>Hello. </paragraph>
         </desc_content>

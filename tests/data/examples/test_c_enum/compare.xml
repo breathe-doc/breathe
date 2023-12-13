@@ -3,7 +3,7 @@
 <document>
     <index entries="['single',\ 'GSM_BackupFormat\ (C++\ enum)',\ '_CPPv416GSM_BackupFormat',\ '',\ None]"></index>
     <desc classes="cpp enum" desctype="enum" domain="cpp" objtype="enum">
-        <desc_signature _toc_name="GSM_BackupFormat" _toc_parts="GSM_BackupFormat" classes="sig sig-object cpp"><desc_signature_line><target names="c__enum_8h_1ac5caeb3f1a25ea794e6d5b01323717f1"></target><desc_sig_keyword classes="k">enum</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">GSM_BackupFormat</desc_sig_name></desc_name></desc_signature_line></desc_signature>
+        <desc_signature _toc_name="GSM_BackupFormat" _toc_parts="GSM_BackupFormat" classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword classes="k">enum</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">GSM_BackupFormat</desc_sig_name></desc_name></desc_signature_line></desc_signature>
         <desc_content>
             <paragraph>Backup data. </paragraph>
             <paragraph><emphasis>Values:</emphasis></paragraph>

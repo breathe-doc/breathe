@@ -1,5 +1,7 @@
 name: unit tests
 on: [push, pull_request]
+env:
+  DOXYGEN_VERSION: 1.9.4
 jobs:
   build:
 
@@ -37,16 +39,14 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
-      - uses: actions/cache@v1
-        with:
-          path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ hashFiles('requirements/*.txt') }}
-          restore-keys: |
-            ${{ runner.os }}-pip-
       - name: set up python ${{ matrix.python-version }}
-        uses: actions/setup-python@v1
+        uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
+          cache: 'pip'
+          cache-dependency-path: |
+            requirements/development.txt
+            requirements/production.txt
 
       - name: install sphinx from PyPI or from git
         run: |
@@ -56,12 +56,22 @@ jobs:
               pip install -Iv Sphinx==${{ matrix.sphinx-version }}
           fi
 
-      - name: install doxygen from SF binary archives
-        env:
-          DOXYGEN_VERSION: 1.9.4
+      - name: cache Doxygen
+        id: cache-doxygen
+        uses: actions/cache@v3
+        with:
+          path: doxygen-bin-arc/doxygen.tar.gz
+          key: ${{ runner.os }}-doxygen
+
+      - name: download Doxygen from SF binary archives
+        if: steps.cache-doxygen.outputs.cache-hit != 'true'
         run: |
-          mkdir doxygen-bin-arc && cd doxygen-bin-arc
-          curl -L https://sourceforge.net/projects/doxygen/files/rel-$DOXYGEN_VERSION/doxygen-$DOXYGEN_VERSION.linux.bin.tar.gz > doxygen.tar.gz
+          mkdir doxygen-bin-arc
+          curl -L https://sourceforge.net/projects/doxygen/files/rel-$DOXYGEN_VERSION/doxygen-$DOXYGEN_VERSION.linux.bin.tar.gz > doxygen-bin-arc/doxygen.tar.gz
+
+      - name: install Doxygen
+        run: |
+          cd doxygen-bin-arc
           gunzip doxygen.tar.gz
           tar xf doxygen.tar
           cd doxygen-$DOXYGEN_VERSION
