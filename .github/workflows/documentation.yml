@@ -4,9 +4,7 @@ env:
   DOXYGEN_VERSION: 1.9.4
 jobs:
   cache-doxygen:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: ./.github/workflows/cache_doxygen.yml
+    uses: ./.github/workflows/cache_doxygen.yml
 
   build:
     needs: cache-doxygen
