@@ -17,11 +17,11 @@ jobs:
       - name: set up python
         uses: actions/setup-python@v1
 
-      - name: install dependencies
+      - name: install dependencies and build extension module
         run: |
-          pip install -r requirements/development.txt
           sudo apt-get -y update
           sudo apt-get -y install graphviz libclang1-11 libclang-cpp11
+          pip install --editable .
 
       - name: install doxygen from SF binary archives
         env:

@@ -56,9 +56,9 @@ jobs:
               pip install -Iv Sphinx==${{ matrix.sphinx-version }}
           fi
 
-      - name: install dependencies
+      - name: install dependencies and build extension module
         run: |
-          pip install -r requirements/development.txt
+          pip install --editable .
 
       - name: run the unit tests
         run: make dev-test
