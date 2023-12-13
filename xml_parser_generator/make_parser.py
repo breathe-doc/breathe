@@ -46,7 +46,7 @@ class ContentType(enum.Enum):
     union = enum.auto()
 
 
-@dataclasses.dataclass(slots=True)
+@dataclasses.dataclass()
 class TypeRef:
     name: str
     py_name: str
@@ -64,7 +64,7 @@ class TypeRef:
         return self.type.py_name
 
 
-@dataclasses.dataclass(slots=True)
+@dataclasses.dataclass()
 class Attribute:
     name: str
     py_name: str
@@ -78,7 +78,7 @@ class Attribute:
         return self.type.py_name
 
 
-@dataclasses.dataclass(slots=True)
+@dataclasses.dataclass()
 class SchemaType:
     name: str
 
@@ -93,22 +93,22 @@ class SchemaType:
         raise NotImplementedError
 
 
-@dataclasses.dataclass(slots=True)
+@dataclasses.dataclass()
 class AttributeType(SchemaType):
     pass
 
 
-@dataclasses.dataclass(slots=True)
+@dataclasses.dataclass()
 class BuiltinType(SchemaType):
     py_name: str
 
 
-@dataclasses.dataclass(slots=True)
+@dataclasses.dataclass()
 class SpType(BuiltinType):
     pass
 
 
-@dataclasses.dataclass(slots=True)
+@dataclasses.dataclass()
 class BuiltinAttributeType(BuiltinType, AttributeType):
     pass
 
@@ -118,7 +118,7 @@ class OtherAttrAction(enum.Enum):
     error = enum.auto()
 
 
-@dataclasses.dataclass(slots=True)
+@dataclasses.dataclass()
 class ElementType(SchemaType):
     bases: list[str | SchemaType]
     attributes: dict[str, Attribute]
@@ -145,12 +145,12 @@ class ElementType(SchemaType):
         return f"Node_{self.name}"
 
 
-@dataclasses.dataclass(slots=True)
+@dataclasses.dataclass()
 class TagOnlyElement(ElementType):
     pass
 
 
-@dataclasses.dataclass(slots=True)
+@dataclasses.dataclass()
 class ListElement(ElementType):
     min_items: int
     content: dict[str, str | SchemaType]
@@ -205,7 +205,7 @@ class ListElement(ElementType):
         return types
 
 
-@dataclasses.dataclass(slots=True)
+@dataclasses.dataclass()
 class Schema:
     roots: dict[str, str | SchemaType]
     types: dict[str, SchemaType]
@@ -216,7 +216,7 @@ class EnumEntry(NamedTuple):
     id: str
 
 
-@dataclasses.dataclass(slots=True)
+@dataclasses.dataclass()
 class SchemaEnum(AttributeType):
     children: list[EnumEntry]
     hash: HashData | None = None
@@ -229,7 +229,7 @@ class SchemaEnum(AttributeType):
         return self.name
 
 
-@dataclasses.dataclass(slots=True)
+@dataclasses.dataclass()
 class SchemaCharEnum(AttributeType):
     values: str
 

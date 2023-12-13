@@ -58,6 +58,7 @@ jobs:
 
       - name: install dependencies and build extension module
         run: |
+          pip install -r requirements/development.txt
           pip install --editable .
 
       - name: run the unit tests

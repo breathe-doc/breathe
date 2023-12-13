@@ -21,6 +21,7 @@ jobs:
         run: |
           sudo apt-get -y update
           sudo apt-get -y install graphviz libclang1-11 libclang-cpp11
+          pip install -r requirements/development.txt
           pip install --editable .
 
       - name: install doxygen from SF binary archives
