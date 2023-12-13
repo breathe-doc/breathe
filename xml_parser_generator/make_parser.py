@@ -88,9 +88,10 @@ class SchemaType:
     def content_names(self) -> Iterable[str]:
         return []
 
-    @property
-    def py_name(self) -> str:
-        raise NotImplementedError
+    if TYPE_CHECKING:
+        @property
+        def py_name(self) -> str:
+            raise NotImplementedError
 
 
 @dataclasses.dataclass()
@@ -597,7 +598,7 @@ get_json_int = functools.partial(get_json_value, check_simple(int, "an integer")
 check_string = check_simple(str, "a string")
 get_json_str = functools.partial(get_json_value, check_string)
 
-check_obj = check_simple(cast(type[dict[str, Any]], dict), "an object")
+check_obj = check_simple(cast("type[dict[str, Any]]", dict), "an object")
 get_json_obj = functools.partial(get_json_value, check_obj)
 
 check_list = check_simple(list, "an array")
