@@ -13,14 +13,13 @@ from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     import sys
+
     if sys.version_info >= (3, 11):
         from typing import TypedDict
     else:
         from typing_extensions import TypedDict
 
-    ProjectOptions = TypedDict('ProjectOptions',{
-        'path': str,
-        'project': str})
+    ProjectOptions = TypedDict("ProjectOptions", {"path": str, "project": str})
 
 
 class ProjectError(BreatheError):
@@ -120,6 +119,8 @@ class ProjectInfo:
 
 
 class ProjectInfoFactory:
+    _default_build_dir: str
+
     def __init__(self, app: Sphinx):
         self.app = app
         # note: don't access self.app.config now, as we are instantiated at setup-time.

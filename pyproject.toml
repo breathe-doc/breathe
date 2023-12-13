@@ -4,5 +4,5 @@ requires = ["setuptools", "jinja2", "perfect-hash"]
 [tool.black]
 line-length = 100
 extend-exclude = '''
-^/breathe/parser/.*
+^/examples/.* | ^/tests/data/.*
 '''

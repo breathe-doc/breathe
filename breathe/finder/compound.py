@@ -60,7 +60,7 @@ class MemberDefTypeSubItemFinder(ItemFinder[parser.Node_memberdefType]):
 
         if data_object.kind == parser.DoxMemberKind.enum:
             for value in data_object.enumvalue:
-                value_stack = [TaggedNode('enumvalue',value)] + node_stack
+                value_stack = [TaggedNode("enumvalue", value)] + node_stack
                 if filter_(NodeStack(value_stack)):
                     matches.append(value_stack)
 

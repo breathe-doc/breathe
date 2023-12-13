@@ -6,7 +6,6 @@ from breathe import path_handler, parser
 
 class TestUtils(TestCase):
     def test_param_decl(self):
-
         # From xml from: examples/specific/parameters.h
         xml = """
         <doxygen lang="" version="">
@@ -53,7 +52,7 @@ class TestUtils(TestCase):
         """
 
         doc = parser.parse_str(xml)
-        assert isinstance(doc.value,parser.Node_DoxygenType)
+        assert isinstance(doc.value, parser.Node_DoxygenType)
 
         memberdef = doc.value.compounddef[0].sectiondef[0].memberdef[0]
 

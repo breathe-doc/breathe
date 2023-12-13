@@ -25,16 +25,16 @@ from breathe import parser
 
 
 def no_parameter_names(node: parser.NodeOrValue):
-    assert isinstance(node,parser.Node_paramType)
+    assert isinstance(node, parser.Node_paramType)
     return parser.Node_paramType(
-        array = node.array,
-        attributes = node.attributes,
-        briefdescription = node.briefdescription,
-        declname = None,
-        defname = None,
-        defval = None,
-        type = node.type,
-        typeconstraint = node.typeconstraint
+        array=node.array,
+        attributes=node.attributes,
+        briefdescription=node.briefdescription,
+        declname=None,
+        defname=None,
+        defval=None,
+        type=node.type,
+        typeconstraint=node.typeconstraint,
     )
 
 
@@ -44,12 +44,16 @@ class MaskFactoryBase:
 
 
 class MaskFactory(MaskFactoryBase):
-    def __init__(self, lookup : dict[type[parser.NodeOrValue],Callable[[parser.NodeOrValue],parser.NodeOrValue]]):
+    def __init__(
+        self,
+        lookup: dict[type[parser.NodeOrValue], Callable[[parser.NodeOrValue], parser.NodeOrValue]],
+    ):
         self.lookup = lookup
 
     def mask(self, data_object: parser.NodeOrValue) -> parser.NodeOrValue:
         m = self.lookup.get(type(data_object))
-        if m is None: return data_object
+        if m is None:
+            return data_object
         return m(data_object)
 
 

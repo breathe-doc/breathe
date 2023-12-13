@@ -18,7 +18,7 @@ from distutils.util import split_quoted
 
 # add xml_parser_generator to the import path list
 base_dir = os.path.dirname(os.path.realpath(__file__))
-sys.path.insert(0,os.path.join(base_dir,'xml_parser_generator'))
+sys.path.insert(0, os.path.join(base_dir, "xml_parser_generator"))
 
 import make_parser
 
@@ -38,37 +38,38 @@ if sys.version_info < (3, 8):
 
 
 extra_user_options = [
-    ('cpp-opts=',None,
-     'extra command line arguments for the compiler'),
-    ('ld-opts=',None,
-     'extra command line arguments for the linker')]
+    ("cpp-opts=", None, "extra command line arguments for the compiler"),
+    ("ld-opts=", None, "extra command line arguments for the linker"),
+]
+
 
 class CustomBuild(build):
-    """Add extra parameters for 'build' to pass to 'build_ext'
-    """
+    """Add extra parameters for 'build' to pass to 'build_ext'"""
+
     user_options = build.user_options + extra_user_options
 
     def initialize_options(self):
         super().initialize_options()
-        self.cpp_opts = ''
-        self.ld_opts = ''
+        self.cpp_opts = ""
+        self.ld_opts = ""
 
     def finalize_options(self):
         super().finalize_options()
         self.cpp_opts = split_quoted(self.cpp_opts)
         self.ld_opts = split_quoted(self.ld_opts)
 
+
 class CustomBuildExt(build_ext):
     """Extend build_ext to automatically generate _parser.c"""
 
     user_options = build_ext.user_options + extra_user_options
 
-    SCHEMA_FILE = os.path.join('xml_parser_generator','schema.json')
-    MODULE_TEMPLATE = os.path.join('xml_parser_generator','module_template.c')
-    STUBS_TEMPLATE = os.path.join('xml_parser_generator','stubs_template.pyi')
-    MAKER_SOURCE = os.path.join('xml_parser_generator','make_parser.py')
+    SCHEMA_FILE = os.path.join("xml_parser_generator", "schema.json")
+    MODULE_TEMPLATE = os.path.join("xml_parser_generator", "module_template.c.in")
+    STUBS_TEMPLATE = os.path.join("xml_parser_generator", "stubs_template.pyi.in")
+    MAKER_SOURCE = os.path.join("xml_parser_generator", "make_parser.py")
 
-    DEPENDENCIES = [SCHEMA_FILE,MODULE_TEMPLATE,STUBS_TEMPLATE,MAKER_SOURCE]
+    DEPENDENCIES = [SCHEMA_FILE, MODULE_TEMPLATE, STUBS_TEMPLATE, MAKER_SOURCE]
 
     def initialize_options(self):
         super().initialize_options()
@@ -81,9 +82,7 @@ class CustomBuildExt(build_ext):
         if self.ld_opts is not None:
             self.ld_opts = split_quoted(self.ld_opts)
 
-        self.set_undefined_options('build',
-            ('cpp_opts','cpp_opts'),
-            ('ld_opts','ld_opts'))
+        self.set_undefined_options("build", ("cpp_opts", "cpp_opts"), ("ld_opts", "ld_opts"))
         super().finalize_options()
 
     def build_extensions(self):
@@ -94,39 +93,39 @@ class CustomBuildExt(build_ext):
             # mostly depend on file read and memory allocation speed. Thus it's
             # better to optimize for size.
             c = self.compiler.compiler_type
-            if c == 'msvc':
-                self.extensions[0].extra_compile_args = ['/O1']
-            elif c in {'unix','cygwin','mingw32'}:
-                self.extensions[0].extra_compile_args = ['-Os']
-                self.extensions[0].extra_link_args = ['-s']
+            if c == "msvc":
+                self.extensions[0].extra_compile_args = ["/O1"]
+            elif c in {"unix", "cygwin", "mingw32"}:
+                self.extensions[0].extra_compile_args = ["-Os"]
+                self.extensions[0].extra_link_args = ["-s"]
 
-        source = os.path.join(self.build_temp,self.extensions[0].name+'.c')
+        source = os.path.join(self.build_temp, self.extensions[0].name + ".c")
 
         # put the stub file in the same place that the extension module will be
         ext_dest = self.get_ext_fullpath(self.extensions[0].name)
         libdir = os.path.dirname(ext_dest)
-        stub = os.path.join(libdir,self.extensions[0].name+'.pyi')
+        stub = os.path.join(libdir, self.extensions[0].name + ".pyi")
 
-        mkpath(self.build_temp,dry_run=self.dry_run)
-        mkpath(libdir,dry_run=self.dry_run)
+        mkpath(self.build_temp, dry_run=self.dry_run)
+        mkpath(libdir, dry_run=self.dry_run)
 
-        if (self.force
-                or newer_group(self.DEPENDENCIES,source)
-                or newer_group(self.DEPENDENCIES,stub)):
+        if (
+            self.force
+            or newer_group(self.DEPENDENCIES, source)
+            or newer_group(self.DEPENDENCIES, stub)
+        ):
             log.info(f'generating "{source}" and "{stub}" from templates')
             if not self.dry_run:
                 make_parser.generate_from_json(
-                    self.SCHEMA_FILE,
-                    self.MODULE_TEMPLATE,
-                    self.STUBS_TEMPLATE,
-                    source,
-                    stub)
+                    self.SCHEMA_FILE, self.MODULE_TEMPLATE, self.STUBS_TEMPLATE, source, stub
+                )
         else:
             log.debug(f'"{source}" and "{stub}" are up-to-date')
-        
+
         self.extensions[0].sources.append(source)
 
         super().build_extensions()
+
 
 setup(
     name="breathe",
@@ -155,19 +154,19 @@ setup(
     ],
     platforms="any",
     packages=find_packages(),
-    ext_package='breathe',
+    ext_package="breathe",
     ext_modules=[
         Extension(
-            '_parser',
-            [], # source is generated by CustomBuildExt
+            "_parser",
+            [],  # source is generated by CustomBuildExt
             depends=CustomBuildExt.DEPENDENCIES,
-            libraries=['expat'],
+            libraries=["expat"],
             define_macros=[
-                ('PARSER_PY_LIMITED_API','0x03080000'), # set Stable ABI version to 3.8
-                ('MODULE_NAME','_parser'),
-                ('FULL_MODULE_STR','"breathe._parser"')
+                ("PARSER_PY_LIMITED_API", "0x03080000"),  # set Stable ABI version to 3.8
+                ("MODULE_NAME", "_parser"),
+                ("FULL_MODULE_STR", '"breathe._parser"'),
             ],
-            py_limited_api=True
+            py_limited_api=True,
         )
     ],
     include_package_data=True,
@@ -177,5 +176,5 @@ setup(
         ],
     },
     install_requires=requires,
-    cmdclass={'build': CustomBuild, 'build_ext': CustomBuildExt}
+    cmdclass={"build": CustomBuild, "build_ext": CustomBuildExt},
 )

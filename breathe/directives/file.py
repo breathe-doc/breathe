@@ -53,7 +53,7 @@ class _BaseFileDirective(BaseDirective):
             mask_factory = NullMaskFactory()
             context = renderer.RenderContext(node_stack, mask_factory, self.directive_args)
             value = node_stack[0].value
-            assert isinstance(value,parser.Node)
+            assert isinstance(value, parser.Node)
             node_list.extend(object_renderer.render(value, context))
 
         return node_list

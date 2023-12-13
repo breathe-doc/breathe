@@ -13,7 +13,8 @@ from typing import Callable, TYPE_CHECKING, Union
 
 if TYPE_CHECKING:
     from breathe.renderer.filter import DoxFilter
-    ItemFinderCreator = Callable[[ProjectInfo,TaggedNode,'DoxygenItemFinderFactory'],ItemFinder]
+
+    ItemFinderCreator = Callable[[ProjectInfo, TaggedNode, "DoxygenItemFinderFactory"], ItemFinder]
 
     FinderRoot = Union[
         parser.Node_DoxygenTypeIndex,
@@ -23,7 +24,8 @@ if TYPE_CHECKING:
         parser.Node_compounddefType,
         parser.Node_sectiondefType,
         parser.Node_memberdefType,
-        parser.Node_refType]
+        parser.Node_refType,
+    ]
 
 
 class _CreateCompoundTypeSubFinder:
@@ -37,12 +39,16 @@ class _CreateCompoundTypeSubFinder:
 
 
 class DoxygenItemFinderFactory:
-    def __init__(self, finders: dict[type[parser.NodeOrValue], ItemFinderCreator], project_info: ProjectInfo):
+    def __init__(
+        self, finders: dict[type[parser.NodeOrValue], ItemFinderCreator], project_info: ProjectInfo
+    ):
         self.finders = finders
         self.project_info = project_info
 
     def create_finder(self, data_object: parser.NodeOrValue, tag: str | None = None) -> ItemFinder:
-        return self.finders[type(data_object)](self.project_info, TaggedNode(tag, data_object), self)
+        return self.finders[type(data_object)](
+            self.project_info, TaggedNode(tag, data_object), self
+        )
 
 
 class Finder:

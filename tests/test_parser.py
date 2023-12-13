@@ -1,6 +1,7 @@
 import pytest
 from breathe import parser
 
+
 def test_bad_content():
     xml = """<?xml version='1.0' encoding='UTF-8' standalone='no'?>
         <doxygen version="1.9.8" xml:lang="en-US">
@@ -25,6 +26,7 @@ def test_bad_content():
         parser.parse_str(xml)
     assert exc.value.lineno == 6
 
+
 def test_malformed():
     xml = """<?xml version='1.0' encoding='UTF-8' standalone='no'?>
         <doxygen version="1.9.8" xml:lang="en-US">
@@ -37,6 +39,7 @@ def test_malformed():
 
     with pytest.raises(parser.ParseError):
         parser.parse_str(xml)
+
 
 def test_unknown_tag():
     xml = """<?xml version='1.0' encoding='UTF-8' standalone='no'?>
@@ -64,4 +67,4 @@ def test_unknown_tag():
     with pytest.warns(parser.ParseWarning) as record:
         parser.parse_str(xml)
     assert len(record) == 1
-    assert 'Warning on line 5:' in str(record[0].message)
+    assert "Warning on line 5:" in str(record[0].message)

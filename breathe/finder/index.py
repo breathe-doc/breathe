@@ -63,9 +63,10 @@ class CompoundTypeSubItemFinder(ItemFinder[parser.Node_CompoundType]):
                 mem = member_stack[0].value
                 assert isinstance(mem, parser.Node_MemberType)
                 refid = mem.refid
+
                 def ref_filter(nstack):
                     node = nstack.node
-                    return isinstance(node,parser.Node_memberdefType) and node.id == refid
+                    return isinstance(node, parser.Node_memberdefType) and node.id == refid
 
                 finder.filter_(node_stack, ref_filter, matches)
         else:

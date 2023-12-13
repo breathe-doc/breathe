@@ -328,7 +328,8 @@ class FilterFactory:
             # Allow anything that isn't a Node_memberdefType, or if it is only
             # allow the ones with a description
             return (not isinstance(node, parser.Node_memberdefType)) or bool(
-                parser.description_has_content(node.briefdescription) or parser.description_has_content(node.detaileddescription)
+                parser.description_has_content(node.briefdescription)
+                or parser.description_has_content(node.detaileddescription)
             )
 
         return filter
@@ -352,7 +353,7 @@ class FilterFactory:
 
         undoc_members = cls._create_undoc_members_filter(options)
 
-        prot_filter = ()
+        prot_filter: tuple[parser.DoxProtectionKind, ...] = ()
         if "protected-members" in options:
             prot_filter += (parser.DoxProtectionKind.protected,)
         if "private-members" in options:

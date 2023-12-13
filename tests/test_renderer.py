@@ -1,5 +1,4 @@
 import os
-import pytest
 
 import sphinx.locale
 import sphinx.addnodes
@@ -12,10 +11,10 @@ from docutils import frontend, nodes, utils
 
 sphinx.locale.init([], "")
 COMMON_ARGS_memberdefType = {
-    'id': '',
-    'prot': parser.DoxProtectionKind.public,
-    'static': False,
-    'location': parser.Node_locationType(file = '', line = 0)
+    "id": "",
+    "prot": parser.DoxProtectionKind.public,
+    "static": False,
+    "location": parser.Node_locationType(file="", line=0),
 }
 
 
@@ -222,7 +221,7 @@ def render(
         compound_parser,
         (lambda nstack: True),
     )
-    r.context = MockContext(app, [renderer.TaggedNode(None,member_def)], domain, options)
+    r.context = MockContext(app, [renderer.TaggedNode(None, member_def)], domain, options)
     return r.render(member_def)
 
 
@@ -234,9 +233,7 @@ def test_render_func(app):
         name="foo",
         argsstring="(int)",
         virt=parser.DoxVirtualKind.non_virtual,
-        param=[
-            parser.Node_paramType(type=parser.Node_linkedTextType(["int"]))
-        ],
+        param=[parser.Node_paramType(type=parser.Node_linkedTextType(["int"]))],
         **COMMON_ARGS_memberdefType
     )
     signature = find_node(render(app, member_def), "desc_signature")
@@ -260,7 +257,11 @@ def test_render_func(app):
 
 def test_render_typedef(app):
     member_def = parser.Node_memberdefType(
-        kind=parser.DoxMemberKind.typedef, definition="typedef int foo", type=parser.Node_linkedTextType(["int"]), name="foo", **COMMON_ARGS_memberdefType
+        kind=parser.DoxMemberKind.typedef,
+        definition="typedef int foo",
+        type=parser.Node_linkedTextType(["int"]),
+        name="foo",
+        **COMMON_ARGS_memberdefType
     )
     signature = find_node(render(app, member_def), "desc_signature")
     assert signature.astext() == "typedef int foo"
@@ -268,7 +269,11 @@ def test_render_typedef(app):
 
 def test_render_c_typedef(app):
     member_def = parser.Node_memberdefType(
-        kind=parser.DoxMemberKind.typedef, definition="typedef unsigned int bar", type=parser.Node_linkedTextType(["unsigned int"]), name="bar", **COMMON_ARGS_memberdefType
+        kind=parser.DoxMemberKind.typedef,
+        definition="typedef unsigned int bar",
+        type=parser.Node_linkedTextType(["unsigned int"]),
+        name="bar",
+        **COMMON_ARGS_memberdefType
     )
     signature = find_node(render(app, member_def, domain="c"), "desc_signature")
     assert signature.astext() == "typedef unsigned int bar"
@@ -298,7 +303,11 @@ def test_render_c_function_typedef(app):
 
 def test_render_using_alias(app):
     member_def = parser.Node_memberdefType(
-        kind=parser.DoxMemberKind.typedef, definition="using foo = int", type=parser.Node_linkedTextType(["int"]), name="foo", **COMMON_ARGS_memberdefType
+        kind=parser.DoxMemberKind.typedef,
+        definition="using foo = int",
+        type=parser.Node_linkedTextType(["int"]),
+        name="foo",
+        **COMMON_ARGS_memberdefType
     )
     signature = find_node(render(app, member_def), "desc_signature")
     assert signature.astext() == "using foo = int"
@@ -421,7 +430,9 @@ def test_render_define_initializer(app):
 
 def test_render_define_no_initializer(app):
     sphinx.addnodes.setup(app)
-    member_def = parser.Node_memberdefType(kind=parser.DoxMemberKind.define, name="USE_MILK", **COMMON_ARGS_memberdefType)
+    member_def = parser.Node_memberdefType(
+        kind=parser.DoxMemberKind.define, name="USE_MILK", **COMMON_ARGS_memberdefType
+    )
     signature = find_node(render(app, member_def), "desc_signature")
     assert signature.astext() == "USE_MILK"
 
@@ -431,15 +442,22 @@ def test_render_innergroup(app):
     mock_compound_parser = MockCompoundParser(
         {
             refid: parser.Node_compounddefType(
-                kind=parser.DoxCompoundKind.group, compoundname="InnerGroup", briefdescription=parser.Node_descriptionType(["InnerGroup"]),
-                id='', prot=parser.DoxProtectionKind.public
+                kind=parser.DoxCompoundKind.group,
+                compoundname="InnerGroup",
+                briefdescription=parser.Node_descriptionType(["InnerGroup"]),
+                id="",
+                prot=parser.DoxProtectionKind.public,
             )
         }
     )
     ref = parser.Node_refType(["InnerGroup"], refid=refid)
     compound_def = parser.Node_compounddefType(
-        kind=parser.DoxCompoundKind.group, compoundname="OuterGroup", briefdescription=parser.Node_descriptionType(["OuterGroup"]), innergroup=[ref],
-        id='', prot=parser.DoxProtectionKind.public
+        kind=parser.DoxCompoundKind.group,
+        compoundname="OuterGroup",
+        briefdescription=parser.Node_descriptionType(["OuterGroup"]),
+        innergroup=[ref],
+        id="",
+        prot=parser.DoxProtectionKind.public,
     )
     assert all(
         el.astext() != "InnerGroup"
@@ -479,14 +497,18 @@ def get_directive(app):
 
 def get_matches(datafile) -> tuple[list[str], list[list[renderer.TaggedNode]]]:
     argsstrings = []
-    with open(os.path.join(os.path.dirname(__file__), "data", datafile), 'rb') as fid:
+    with open(os.path.join(os.path.dirname(__file__), "data", datafile), "rb") as fid:
         doc = parser.parse_file(fid)
-    assert isinstance(doc.value,parser.Node_DoxygenType)
+    assert isinstance(doc.value, parser.Node_DoxygenType)
 
     sectiondef = doc.value.compounddef[0].sectiondef[0]
     for child in sectiondef.memberdef:
-        if child.argsstring: argsstrings.append(child.argsstring)
-    matches = [[renderer.TaggedNode(None, m), renderer.TaggedNode(None, sectiondef)] for m in sectiondef.memberdef]
+        if child.argsstring:
+            argsstrings.append(child.argsstring)
+    matches = [
+        [renderer.TaggedNode(None, m), renderer.TaggedNode(None, sectiondef)]
+        for m in sectiondef.memberdef
+    ]
     return argsstrings, matches
 
 

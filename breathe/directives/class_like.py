@@ -12,6 +12,7 @@ from typing import cast, ClassVar, TYPE_CHECKING
 
 if TYPE_CHECKING:
     import sys
+
     if sys.version_info >= (3, 11):
         from typing import NotRequired, TypedDict
     else:
@@ -19,19 +20,23 @@ if TYPE_CHECKING:
     from breathe import renderer
     from docutils.nodes import Node
 
-    DoxClassOptions = TypedDict('DoxClassOptions',{
-        'path': str,
-        'project': str,
-        'members': NotRequired[str],
-        'membergroups': str,
-        'members-only': NotRequired[None],
-        'protected-members': NotRequired[None],
-        'private-members': NotRequired[None],
-        'undoc-members': NotRequired[None],
-        'show': str,
-        'outline': NotRequired[None],
-        'no-link': NotRequired[None],
-        'allow-dot-graphs': NotRequired[None]})
+    DoxClassOptions = TypedDict(
+        "DoxClassOptions",
+        {
+            "path": str,
+            "project": str,
+            "members": NotRequired[str],
+            "membergroups": str,
+            "members-only": NotRequired[None],
+            "protected-members": NotRequired[None],
+            "private-members": NotRequired[None],
+            "undoc-members": NotRequired[None],
+            "show": str,
+            "outline": NotRequired[None],
+            "no-link": NotRequired[None],
+            "allow-dot-graphs": NotRequired[None],
+        },
+    )
 else:
     DoxClassOptions = None
 
@@ -60,7 +65,7 @@ class _DoxygenClassLikeDirective(BaseDirective):
 
     def run(self) -> list[Node]:
         name = self.arguments[0]
-        options = cast(DoxClassOptions,self.options)
+        options = cast(DoxClassOptions, self.options)
 
         try:
             project_info = self.project_info_factory.create_project_info(options)

@@ -50,10 +50,14 @@ class _BaseIndexDirective(BaseDirective):
         )
 
         mask_factory = NullMaskFactory()
-        context = RenderContext([TaggedNode(None,data_object), TaggedNode(None,RootDataObject())], mask_factory, self.directive_args)
+        context = RenderContext(
+            [TaggedNode(None, data_object), TaggedNode(None, RootDataObject())],
+            mask_factory,
+            self.directive_args,
+        )
 
         value = context.node_stack[0].value
-        assert isinstance(value,parser.Node)
+        assert isinstance(value, parser.Node)
         try:
             node_list = object_renderer.render(value, context)
         except parser.ParserError as e:

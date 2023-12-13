@@ -6,7 +6,7 @@ from breathe.renderer import format_parser_error, RenderContext
 from breathe.renderer.filter import FilterFactory
 from breathe.renderer.sphinxrenderer import SphinxRenderer
 
-from sphinx.directives import SphinxDirective # pyright: ignore
+from sphinx.directives import SphinxDirective  # pyright: ignore
 
 from docutils import nodes
 
@@ -31,7 +31,7 @@ class _WarningHandler:
         raw_text: str,
         *,
         rendered_nodes: Sequence[nodes.Node] | None = None,
-        unformatted_suffix: str = ""
+        unformatted_suffix: str = "",
     ) -> list[nodes.Node]:
         raw_text = self.format(raw_text) + unformatted_suffix
         if rendered_nodes is None:

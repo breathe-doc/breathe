@@ -9,16 +9,14 @@ from breathe.renderer import TaggedNode
 from breathe.renderer.filter import FilterFactory, NodeStack
 
 
-DEFAULT_OPTS = opts = {
-    'path': '',
-    'project': '',
-    'membergroups': '',
-    'show': ''}
+DEFAULT_OPTS = opts = {"path": "", "project": "", "membergroups": "", "show": ""}
+
 
 @pytest.fixture(scope="module")
 def class_doc():
     with open(os.path.join(os.path.dirname(__file__), "data", "classSample.xml"), "rb") as fid:
         return parser.parse_file(fid).value
+
 
 class SampleMembers(NamedTuple):
     public_field: NodeStack
@@ -28,37 +26,39 @@ class SampleMembers(NamedTuple):
     private_field: NodeStack
     private_method: NodeStack
 
+
 @pytest.fixture
 def members(class_doc):
-    common = [
-        TaggedNode(None, class_doc.compounddef[0]),
-        TaggedNode(None, class_doc)
-    ]
+    common = [TaggedNode(None, class_doc.compounddef[0]), TaggedNode(None, class_doc)]
 
     memberdefs = {}
 
     for sect in class_doc.compounddef[0].sectiondef:
         member = sect.memberdef[0]
-        memberdefs[member.name] = NodeStack([TaggedNode(None, member), TaggedNode(None, sect)] + common)
+        memberdefs[member.name] = NodeStack(
+            [TaggedNode(None, member), TaggedNode(None, sect)] + common
+        )
 
     return SampleMembers(
-        memberdefs['public_field'],
-        memberdefs['public_method'],
-        memberdefs['protected_field'],
-        memberdefs['protected_method'],
-        memberdefs['private_field'],
-        memberdefs['private_method']
+        memberdefs["public_field"],
+        memberdefs["public_method"],
+        memberdefs["protected_field"],
+        memberdefs["protected_method"],
+        memberdefs["private_field"],
+        memberdefs["private_method"],
     )
+
 
 def create_class_filter(app, extra_ops):
     opts = DEFAULT_OPTS.copy()
     opts.update(extra_ops)
-    return FilterFactory(app).create_class_filter('Sample', opts)
+    return FilterFactory(app).create_class_filter("Sample", opts)
+
 
 def test_members(app, members):
     app.config.breathe_default_members = []
 
-    filter = create_class_filter(app,{})
+    filter = create_class_filter(app, {})
 
     assert not filter(members.public_field)
     assert not filter(members.public_method)
@@ -67,21 +67,27 @@ def test_members(app, members):
     assert not filter(members.private_field)
     assert not filter(members.private_method)
 
+
 bools = (True, False)
 
-@pytest.mark.parametrize('public', bools)
-@pytest.mark.parametrize('private', bools)
-@pytest.mark.parametrize('protected', bools)
-@pytest.mark.parametrize('undocumented', bools)
+
+@pytest.mark.parametrize("public", bools)
+@pytest.mark.parametrize("private", bools)
+@pytest.mark.parametrize("protected", bools)
+@pytest.mark.parametrize("undocumented", bools)
 def test_public_class_members(app, members, public, private, protected, undocumented):
     app.config.breathe_default_members = []
 
     opts = {}
-    if public: opts['members'] = None
-    if private: opts['private-members'] = None
-    if protected: opts['protected-members'] = None
-    if undocumented: opts['undoc-members'] = None
-    filter = create_class_filter(app,opts)
+    if public:
+        opts["members"] = None
+    if private:
+        opts["private-members"] = None
+    if protected:
+        opts["protected-members"] = None
+    if undocumented:
+        opts["undoc-members"] = None
+    filter = create_class_filter(app, opts)
 
     assert filter(members.public_field) == public
     assert filter(members.public_method) == (public and undocumented)
@@ -90,12 +96,13 @@ def test_public_class_members(app, members, public, private, protected, undocume
     assert filter(members.private_field) == private
     assert filter(members.private_method) == (private and undocumented)
 
+
 def test_specific_class_members(app, members):
     app.config.breathe_default_members = []
 
-    filter = create_class_filter(app,{
-        'members': 'public_method,protected_method,private_field',
-        'undoc-members': None})
+    filter = create_class_filter(
+        app, {"members": "public_method,protected_method,private_field", "undoc-members": None}
+    )
 
     assert not filter(members.public_field)
     assert filter(members.public_method)
@@ -104,21 +111,28 @@ def test_specific_class_members(app, members):
     assert filter(members.private_field)
     assert not filter(members.private_method)
 
+
 def test_nested_class_filtered(app):
     app.config.breathe_default_members = []
 
-    doc = parser.parse_str("""<doxygen version="1.9.8">
+    doc = parser.parse_str(
+        """<doxygen version="1.9.8">
         <compounddef id="sample_8hpp" kind="file" language="C++">
             <compoundname>sample.hpp</compoundname>
             <innerclass refid="classSample" prot="public">Sample</innerclass>
             <innerclass refid="classSample_1_1Inner" prot="public">Sample::Inner</innerclass>
             <location file="sample.hpp"/>
         </compounddef>
-        </doxygen>""")
+        </doxygen>"""
+    )
 
     compounddef = doc.value.compounddef[0]
     ref_outer, ref_inner = compounddef.innerclass
 
-    filter = FilterFactory(app).create_file_filter('sample.hpp', DEFAULT_OPTS, init_valid_names=('Sample','Sample::Inner'))
-    assert filter(NodeStack([TaggedNode('innerclass',ref_outer), TaggedNode(None, compounddef)]))
-    assert not filter(NodeStack([TaggedNode('innerclass',ref_inner), TaggedNode(None, compounddef)]))
+    filter = FilterFactory(app).create_file_filter(
+        "sample.hpp", DEFAULT_OPTS, init_valid_names=("Sample", "Sample::Inner")
+    )
+    assert filter(NodeStack([TaggedNode("innerclass", ref_outer), TaggedNode(None, compounddef)]))
+    assert not filter(
+        NodeStack([TaggedNode("innerclass", ref_inner), TaggedNode(None, compounddef)])
+    )

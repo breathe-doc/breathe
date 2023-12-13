@@ -22,6 +22,7 @@ from typing import cast, List, Optional, TYPE_CHECKING
 
 if TYPE_CHECKING:
     import sys
+
     if sys.version_info >= (3, 11):
         from typing import NotRequired, TypedDict
     else:
@@ -29,11 +30,10 @@ if TYPE_CHECKING:
     from breathe import project
     from docutils.nodes import Node
 
-    DoxFunctionOptions = TypedDict('DoxFunctionOptions',{
-        'path': str,
-        'project': str,
-        'outline': NotRequired[None],
-        'no-link': NotRequired[None]})
+    DoxFunctionOptions = TypedDict(
+        "DoxFunctionOptions",
+        {"path": str, "project": str, "outline": NotRequired[None], "no-link": NotRequired[None]},
+    )
 else:
     DoxFunctionOptions = None
 
@@ -81,7 +81,7 @@ class DoxygenFunctionDirective(BaseDirective):
         function_name = match.group(2).strip()
         argsStr = match.group(3)
 
-        options = cast(DoxFunctionOptions,self.options)
+        options = cast(DoxFunctionOptions, self.options)
 
         try:
             project_info = self.project_info_factory.create_project_info(options)
@@ -98,7 +98,7 @@ class DoxygenFunctionDirective(BaseDirective):
         # Extract arguments from the function name.
         try:
             args = self._parse_args(argsStr)
-        except cpp.DefinitionError as e: # pyright: ignore
+        except cpp.DefinitionError as e:  # pyright: ignore
             return self.create_warning(
                 project_info,
                 namespace="%s::" % namespace if namespace else "",
@@ -157,7 +157,7 @@ class DoxygenFunctionDirective(BaseDirective):
             warning_nodes = [nodes.paragraph("", "", nodes.Text(formatted_message)), block]
             result = warning.warn(message, rendered_nodes=warning_nodes, unformatted_suffix=text)
             return result
-        except cpp.DefinitionError as error: # pyright: ignore
+        except cpp.DefinitionError as error:  # pyright: ignore
             warning.context["cpperror"] = str(error)
             return warning.warn(
                 "doxygenfunction: Unable to resolve function "
@@ -221,7 +221,13 @@ class DoxygenFunctionDirective(BaseDirective):
         return paramQual
 
     def _create_function_signature(
-        self, node_stack: list[TaggedNode], project_info, filter_, target_handler, mask_factory, directive_args
+        self,
+        node_stack: list[TaggedNode],
+        project_info,
+        filter_,
+        target_handler,
+        mask_factory,
+        directive_args,
     ) -> str:
         "Standard render process used by subclasses"
 
@@ -248,7 +254,7 @@ class DoxygenFunctionDirective(BaseDirective):
         context = RenderContext(node_stack, mask_factory, directive_args)
         node = node_stack[0].value
         with WithContext(object_renderer, context):
-            assert isinstance(node,parser.Node_memberdefType)
+            assert isinstance(node, parser.Node_memberdefType)
             # this part should be kept in sync with visit_function in sphinxrenderer
             name = node.name
             # assume we are only doing this for C++ declarations
@@ -257,7 +263,7 @@ class DoxygenFunctionDirective(BaseDirective):
                     object_renderer.create_template_prefix(node),
                     "".join(n.astext() for n in object_renderer.render(node.type)),
                     name,
-                    node.argsstring or '',
+                    node.argsstring or "",
                 ]
             )
         cpp_parser = cpp.DefinitionParser(
@@ -266,7 +272,12 @@ class DoxygenFunctionDirective(BaseDirective):
         ast = cpp_parser.parse_declaration("function", "function")
         return str(ast)
 
-    def _resolve_function(self, matches: list[list[TaggedNode]], args: cpp.ASTParametersQualifiers | None, project_info: project.ProjectInfo):
+    def _resolve_function(
+        self,
+        matches: list[list[TaggedNode]],
+        args: cpp.ASTParametersQualifiers | None,
+        project_info: project.ProjectInfo,
+    ):
         if not matches:
             raise _NoMatchingFunctionError()
 

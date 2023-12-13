@@ -23,11 +23,10 @@ if TYPE_CHECKING:
     from breathe.renderer import TaggedNode
     from breathe.renderer.filter import DoxFilter
 
-    DoxBaseItemOptions = TypedDict('DoxBaseItemOptions',{
-        'path': str,
-        'project': str,
-        'outline': NotRequired[None],
-        'no-link': NotRequired[None]})
+    DoxBaseItemOptions = TypedDict(
+        "DoxBaseItemOptions",
+        {"path": str, "project": str, "outline": NotRequired[None], "no-link": NotRequired[None]},
+    )
 else:
     DoxBaseItemOptions = None
 
@@ -52,7 +51,7 @@ class _DoxygenBaseItemDirective(BaseDirective):
 
     def run(self) -> list[Node]:
         options = cast(DoxBaseItemOptions, self.options)
-        
+
         namespace, _, name = self.arguments[0].rpartition("::")
 
         try:

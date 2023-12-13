@@ -1110,8 +1110,13 @@ class SphinxRenderer(metaclass=NodeVisitor):
                         "para",
                         parser.Node_docParaType(
                             [
-                                parser.TaggedValue[Literal["parameterlist"], parser.Node_docParamListType](
-                                    "parameterlist", parser.Node_docParamListType(params, kind=parser.DoxParamListKind.param)
+                                parser.TaggedValue[
+                                    Literal["parameterlist"], parser.Node_docParamListType
+                                ](
+                                    "parameterlist",
+                                    parser.Node_docParamListType(
+                                        params, kind=parser.DoxParamListKind.param
+                                    ),
                                 )
                             ]
                         ),
@@ -2803,6 +2808,7 @@ class SphinxRenderer(metaclass=NodeVisitor):
         graph_node["options"] = {"docname": dot_file_path}
         caption = "" if len(node) == 0 else parser.tag_name_value(node[0])[1]
         if caption:
+            assert isinstance(caption, str)
             caption_node = nodes.caption(caption, "")
             caption_node += nodes.Text(caption)
             return [nodes.figure("", graph_node, caption_node)]
@@ -2822,7 +2828,10 @@ class SphinxRenderer(metaclass=NodeVisitor):
             caption = f"Include dependency graph for {parent.compoundname}:"
         elif tag == "invincdepgraph":
             direction = "back"
-            caption = f"This graph shows which files directly or indirectly include {parent.compoundname}:"
+            caption = (
+                "This graph shows which files directly or indirectly "
+                + f" include {parent.compoundname}:"
+            )
         elif tag == "inheritancegraph":
             caption = f"Inheritance diagram for {parent.compoundname}:"
         else:
