@@ -1,8 +1,15 @@
 name: build the documentation
 on: [push, pull_request]
+env:
+  DOXYGEN_VERSION: 1.9.4
 jobs:
-  build:
+  cache-doxygen:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: ./.github/workflows/cache_doxygen.yml
 
+  build:
+    needs: cache-doxygen
     runs-on: ubuntu-latest
 
     steps:
@@ -22,25 +29,18 @@ jobs:
           pip install -r requirements/development.txt
           pip install --editable .
 
-      - name: cache Doxygen
+      - uses: actions/cache/restore@v3
         id: cache-doxygen
-        uses: actions/cache@v3
         with:
-          path: doxygen-bin-arc/doxygen.tar.gz
-          key: ${{ runner.os }}-doxygen
-
-      - name: download Doxygen from SF binary archives
-        if: steps.cache-doxygen.outputs.cache-hit != 'true'
-        run: |
-          mkdir doxygen-bin-arc
-          curl -L https://sourceforge.net/projects/doxygen/files/rel-$DOXYGEN_VERSION/doxygen-$DOXYGEN_VERSION.linux.bin.tar.gz > doxygen-bin-arc/doxygen.tar.gz
-
+          path: doxygen-bin-arc
+          fail-on-cache-miss: true
+          key: ${{ runner.os }}-doxygen-${{ env.DOXYGEN_VERSION }}
+          restore-keys: |
+            ${{ runner.os }}-doxygen-
+  
       - name: install Doxygen
         run: |
-          cd doxygen-bin-arc
-          gunzip doxygen.tar.gz
-          tar xf doxygen.tar
-          cd doxygen-$DOXYGEN_VERSION
+          cd doxygen-bin-arc/doxygen
           sudo make install
 
       - name: build the documentation
