@@ -18,7 +18,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-doxygen-
 
-      - name: download and build Doxygen from SF binary archives
+      - name: download Doxygen from SF binary archives
         if: steps.cache-doxygen.outputs.cache-hit != 'true'
         run: |
           mkdir doxygen-bin-arc && cd doxygen-bin-arc
@@ -26,8 +26,6 @@ jobs:
           gunzip doxygen.tar.gz
           tar xf doxygen.tar
           mv doxygen-$DOXYGEN_VERSION doxygen
-          cd doxygen
-          make
 
       - uses: actions/cache/save@v3
         if: steps.cache-doxygen.outputs.cache-hit != 'true'
