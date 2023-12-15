@@ -49,9 +49,15 @@ def format_parser_error(
     ]
 
 
-class TaggedNode(NamedTuple, Generic[T_data_object]):
-    tag: str | None
-    value: T_data_object
+if TYPE_CHECKING:
+    class TaggedNode(NamedTuple, Generic[T_data_object]):
+        tag: str | None
+        value: T_data_object
+else:
+    # Python 3.9 and 3.10 don't allow multiple-inheritance with NamedTuple
+    class TaggedNode(NamedTuple):
+        tag: str | None
+        value: ...
 
 
 class RenderContext:

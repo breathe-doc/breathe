@@ -36,7 +36,10 @@ class MockState:
         env.temp_data["docname"] = "mock-doc"
         env.temp_data["breathe_project_info_factory"] = ProjectInfoFactory(app)
         env.temp_data["breathe_parser_factory"] = DoxygenParserFactory(app)
-        settings = frontend.get_default_settings(docutils.parsers.rst.Parser)
+        if hasattr(frontend, "get_default_settings"):
+            settings = frontend.get_default_settings(docutils.parsers.rst.Parser)
+        else:
+            settings = frontend.OptionParser(components=(docutils.parsers.rst.Parser,)).get_default_values()
         settings.env = env
         self.document = utils.new_document("", settings)
 
