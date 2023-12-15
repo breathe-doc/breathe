@@ -3,7 +3,7 @@
 <document>
     <index entries="['single',\ 'Table_1\ (C++\ class)',\ '_CPPv47Table_1',\ '',\ None]"></index>
     <desc classes="cpp class" desctype="class" domain="cpp" objtype="class">
-        <desc_signature _toc_name="Table_1" _toc_parts="Table_1" classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword classes="k">class</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">Table_1</desc_sig_name></desc_name></desc_signature_line></desc_signature>
+        <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword classes="k">class</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">Table_1</desc_sig_name></desc_name></desc_signature_line></desc_signature>
         <desc_content>
             <paragraph>This is a simple Markdown table example. </paragraph>
             <paragraph>Following is a simple table using Markdown syntax.</paragraph>
@@ -13,7 +13,7 @@
     </desc>
     <index entries="['single',\ 'Table_2\ (C++\ class)',\ '_CPPv47Table_2',\ '',\ None]"></index>
     <desc classes="cpp class" desctype="class" domain="cpp" objtype="class">
-        <desc_signature _toc_name="Table_2" _toc_parts="Table_2" classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword classes="k">class</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">Table_2</desc_sig_name></desc_name></desc_signature_line></desc_signature>
+        <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword classes="k">class</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">Table_2</desc_sig_name></desc_name></desc_signature_line></desc_signature>
         <desc_content>
             <paragraph>This is a Markdown table with alignment. </paragraph>
             <paragraph>Following is a table with alignment using Markdown syntax.</paragraph>
@@ -23,7 +23,7 @@
     </desc>
     <index entries="['single',\ 'Table_3\ (C++\ class)',\ '_CPPv47Table_3',\ '',\ None]"></index>
     <desc classes="cpp class" desctype="class" domain="cpp" objtype="class">
-        <desc_signature _toc_name="Table_3" _toc_parts="Table_3" classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword classes="k">class</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">Table_3</desc_sig_name></desc_name></desc_signature_line></desc_signature>
+        <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword classes="k">class</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">Table_3</desc_sig_name></desc_name></desc_signature_line></desc_signature>
         <desc_content>
             <paragraph>This is a Markdown table with rowspan and alignment. </paragraph>
             <paragraph>Following is a table with rowspan and alignment using Markdown syntax.</paragraph>
@@ -33,7 +33,7 @@
     </desc>
     <index entries="['single',\ 'Table_4\ (C++\ class)',\ '_CPPv47Table_4',\ '',\ None]"></index>
     <desc classes="cpp class" desctype="class" domain="cpp" objtype="class">
-        <desc_signature _toc_name="Table_4" _toc_parts="Table_4" classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword classes="k">class</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">Table_4</desc_sig_name></desc_name></desc_signature_line></desc_signature>
+        <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword classes="k">class</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">Table_4</desc_sig_name></desc_name></desc_signature_line></desc_signature>
         <desc_content>
             <paragraph>This is a Markdown table with colspan and alignment. </paragraph>
             <paragraph>Following is a table with colspan and alignment using Markdown syntax.</paragraph>
@@ -43,7 +43,7 @@
     </desc>
     <index entries="['single',\ 'Table_5\ (C++\ class)',\ '_CPPv47Table_5',\ '',\ None]"></index>
     <desc classes="cpp class" desctype="class" domain="cpp" objtype="class">
-        <desc_signature _toc_name="Table_5" _toc_parts="Table_5" classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword classes="k">class</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">Table_5</desc_sig_name></desc_name></desc_signature_line></desc_signature>
+        <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword classes="k">class</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">Table_5</desc_sig_name></desc_name></desc_signature_line></desc_signature>
         <desc_content>
             <paragraph>This is a Doxygen table. </paragraph>
             <paragraph>Following is a table using Doxygen syntax (and all supported features).</paragraph>

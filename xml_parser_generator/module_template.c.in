@@ -2,8 +2,7 @@
 #include <pyconfig.h>
 
 #ifdef PARSER_PY_LIMITED_API
-/* Py_LIMITED_API isn't compatible with Py_TRACE_REFS */
-#  if !defined(Py_TRACE_REFS)
+#  if !defined(Py_TRACE_REFS) && !defined(Py_DEBUG) && !defined(Py_REF_DEBUG)
 #    define Py_LIMITED_API PARSER_PY_LIMITED_API
 #  endif
 #  define PARSER_PY_VERSION_HEX PARSER_PY_LIMITED_API

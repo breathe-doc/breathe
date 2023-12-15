@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from xml.parsers import expat
 import pytest
 import pathlib
@@ -5,6 +7,12 @@ import subprocess
 import shutil
 import enum
 import dataclasses
+import sphinx
+
+if sphinx.version_info < (7, 2, 6):
+    from sphinx.testing.path import path as sphinx_path
+else:
+    sphinx_path = pathlib.Path
 
 
 DOXYFILE_TEMPLATE = """
@@ -15,6 +23,7 @@ GENERATE_MAN     = NO
 GENERATE_RTF     = NO
 CASE_SENSE_NAMES = NO
 OUTPUT_DIRECTORY = "{output}"
+IMAGE_PATH       = "."
 QUIET            = YES
 JAVADOC_AUTOBRIEF = YES
 GENERATE_HTML = NO
@@ -159,7 +168,42 @@ def conf_overrides(extra):
     return conf
 
 
-def compare_xml(generated, model):
+def str_to_set(x):
+    return frozenset(x.split())
+
+
+def attr_compare(name, a, b):
+    if name == "classes":
+        return str_to_set(a) == str_to_set(b)
+
+    return a == b
+
+
+@dataclasses.dataclass
+class VersionedFile:
+    file: str
+    version: tuple[int, ...]
+
+
+def str_to_version(v_str):
+    return tuple(map(int, v_str.strip().split(".")))
+
+
+def versioned_model(p):
+    fname = str(p)
+    return VersionedFile(fname, str_to_version(fname[len("compare-") : -len(".xml")]))
+
+
+def compare_xml(generated, version):
+    alt_models = list(map(versioned_model, pathlib.Path(".").glob("compare-*.xml")))
+    alt_models.sort(key=(lambda f: f.version), reverse=True)
+
+    model = "compare.xml"
+    for alt_m in alt_models:
+        if version >= alt_m.version:
+            model = alt_m.file
+            break
+
     event_str = {
         XMLEventType.E_START: "element start",
         XMLEventType.E_END: "element end",
@@ -183,8 +227,8 @@ def compare_xml(generated, model):
                 for key, value in c_node.attr.items():
                     assert key in o_node.attr, f"missing attribute at line {o_node.line_no}: {key}"
                     o_value = o_node.attr[key]
-                    assert (
-                        o_value == value
+                    assert attr_compare(
+                        key, o_value, value
                     ), f'wrong value for attribute "{key}" at line {o_node.line_no}: expected "{value}", found "{o_value}"'
             elif o_type == XMLEventType.E_TEXT:
                 assert (
@@ -192,50 +236,58 @@ def compare_xml(generated, model):
                 ), f'wrong content at line {o_node.line_no}: expected "{c_node.value}", found "{o_node.value}"'
 
 
-@pytest.mark.parametrize("test_input", get_individual_tests())
-def test_example(make_app, tmp_path, test_input, monkeypatch):
-    monkeypatch.chdir(test_input)
-
-    doxygen = shutil.which("doxygen")
-    if doxygen is None:
+@pytest.fixture(scope="module")
+def doxygen():
+    exc = shutil.which("doxygen")
+    if exc is None:
         raise ValueError("cannot find doxygen executable")
+
+    r = subprocess.run(
+        [exc, "--version"], check=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True
+    )
+    return VersionedFile(exc, str_to_version(r.stdout.split()[0]))
+
+
+@pytest.mark.parametrize("test_input", get_individual_tests())
+def test_example(make_app, tmp_path, test_input, monkeypatch, doxygen):
+    monkeypatch.chdir(test_input)
 
     doxyfile = tmp_path / "Doxyfile"
     doxycontent = DOXYFILE_TEMPLATE.format(output=tmp_path)
-    extra_opts = test_input / "extra_dox_opts.txt"
+    extra_opts = pathlib.Path("extra_dox_opts.txt")
     if extra_opts.exists():
         doxycontent += extra_opts.read_text()
     doxyfile.write_text(doxycontent)
     (tmp_path / "conf.py").touch()
-    shutil.copyfile(test_input / "input.rst", tmp_path / "index.rst")
+    shutil.copyfile("input.rst", tmp_path / "index.rst")
 
-    subprocess.run([doxygen, doxyfile], check=True)
+    subprocess.run([doxygen.file, doxyfile], check=True)
 
     make_app(
         buildername="xml",
-        srcdir=tmp_path,
+        srcdir=sphinx_path(tmp_path),
         confoverrides=conf_overrides({"breathe_projects": {"example": str(tmp_path / "xml")}}),
     ).build()
 
-    compare_xml(tmp_path / "_build" / "xml" / "index.xml", test_input / "compare.xml")
+    compare_xml(tmp_path / "_build" / "xml" / "index.xml", doxygen.version)
 
 
-def test_auto(make_app, tmp_path, monkeypatch):
+def test_auto(make_app, tmp_path, monkeypatch, doxygen):
     test_input = TEST_DATA_DIR / "auto"
     monkeypatch.chdir(test_input)
     (tmp_path / "conf.py").touch()
-    shutil.copyfile(test_input / "input.rst", tmp_path / "index.rst")
+    shutil.copyfile("input.rst", tmp_path / "index.rst")
 
     make_app(
         buildername="xml",
-        srcdir=tmp_path,
+        srcdir=sphinx_path(tmp_path),
         confoverrides=conf_overrides(
             {
                 "breathe_projects_source": {
-                    "example": (test_input, ["auto_class.h", "auto_function.h"])
+                    "example": (str(test_input.absolute()), ["auto_class.h", "auto_function.h"])
                 }
             }
         ),
     ).build()
 
-    compare_xml(tmp_path / "_build" / "xml" / "index.xml", test_input / "compare.xml")
+    compare_xml(tmp_path / "_build" / "xml" / "index.xml", doxygen.version)

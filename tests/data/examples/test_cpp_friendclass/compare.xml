@@ -3,19 +3,19 @@
 <document>
     <index entries="['single',\ 'A\ (C++\ struct)',\ '_CPPv41A',\ '',\ None]"></index>
     <desc classes="cpp struct" desctype="struct" domain="cpp" objtype="struct">
-        <desc_signature _toc_name="A" _toc_parts="A" classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword classes="k">struct</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">A</desc_sig_name></desc_name></desc_signature_line></desc_signature>
+        <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword classes="k">struct</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">A</desc_sig_name></desc_name></desc_signature_line></desc_signature>
         <desc_content>
         </desc_content>
     </desc>
     <index entries="['single',\ 'B\ (C++\ struct)',\ '_CPPv41B',\ '',\ None]"></index>
     <desc classes="cpp struct" desctype="struct" domain="cpp" objtype="struct">
-        <desc_signature _toc_name="B" _toc_parts="B" classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword classes="k">struct</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">B</desc_sig_name></desc_name></desc_signature_line></desc_signature>
+        <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword classes="k">struct</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">B</desc_sig_name></desc_name></desc_signature_line></desc_signature>
         <desc_content>
         </desc_content>
     </desc>
     <index entries="['single',\ 'C\ (C++\ struct)',\ '_CPPv41C',\ '',\ None]"></index>
     <desc classes="cpp struct" desctype="struct" domain="cpp" objtype="struct">
-        <desc_signature _toc_name="C" _toc_parts="C" classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword classes="k">struct</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">C</desc_sig_name></desc_name></desc_signature_line></desc_signature>
+        <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword classes="k">struct</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">C</desc_sig_name></desc_name></desc_signature_line></desc_signature>
         <desc_content>
             <container classes="breathe-sectiondef" objtype="friend">
                 <rubric classes="breathe-sectiondef-title">Friends</rubric>

@@ -1,18 +1,14 @@
 # -*- coding: utf-8 -*-
-try:
-    from setuptools import setup, find_packages, Extension
-except ImportError:
-    import distribute_setup
-
-    distribute_setup.use_setuptools()
-    from setuptools import setup, find_packages, Extension
-
 import sys
 import os.path
+from setuptools import setup, find_packages, Extension
 from setuptools.command.build import build
 from setuptools.command.build_ext import build_ext
+try:
+    from setuptools.dep_util import newer_group
+except ImportError:
+    from distutils.dep_util import newer_group
 from distutils import log
-from distutils.dep_util import newer_group
 from distutils.dir_util import mkpath
 from distutils.util import split_quoted
 

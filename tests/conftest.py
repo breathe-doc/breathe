@@ -1,3 +1,4 @@
+import pathlib
 import pytest
 from sphinx.testing.fixtures import (
     test_params,
@@ -16,7 +17,7 @@ def app(test_params, app_params, make_app, shared_result):
     """
     args, kwargs = app_params
     assert "srcdir" in kwargs
-    kwargs["srcdir"].mkdir(parents=True, exist_ok=True)
+    pathlib.Path(kwargs["srcdir"]).mkdir(parents=True, exist_ok=True)
     (kwargs["srcdir"] / "conf.py").write_text("")
     app_ = make_app(*args, **kwargs)
     yield app_

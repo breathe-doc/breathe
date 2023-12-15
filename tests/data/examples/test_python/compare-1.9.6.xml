@@ -59,11 +59,11 @@
                             </desc_content>
                         </desc>
                     </container>
-                    <container classes="breathe-sectiondef" objtype="private-attrib">
-                        <rubric classes="breathe-sectiondef-title" ids="breathe-section-title-private-members">Private Members</rubric>
+                    <container classes="breathe-sectiondef" objtype="protected-attrib">
+                        <rubric classes="breathe-sectiondef-title">Protected Attributes</rubric>
                         <index entries="['single',\ '_memVar\ (pyexample.PyClass\ attribute)',\ 'pyexample.PyClass._memVar',\ '',\ None]"></index>
                         <desc classes="py attribute" desctype="attribute" domain="py" objtype="attribute">
-                            <desc_signature class="pyexample.PyClass" classes="sig sig-object py sig sig-object" fullname="pyexample.PyClass._memVar" ids="pyexample.PyClass._memVar" module="True"><target></target><desc_name classes="sig-name descname sig-name descname">_memVar</desc_name></desc_signature>
+                            <desc_signature class="pyexample.PyClass" classes="sig sig-object py" fullname="pyexample.PyClass._memVar" module="True"><target></target><desc_name classes="sig-name descname">_memVar</desc_name></desc_signature>
                             <desc_content>
                                 <paragraph>a member variable </paragraph>
                             </desc_content>
