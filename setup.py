@@ -4,6 +4,7 @@ import os.path
 from setuptools import setup, find_packages, Extension
 from setuptools.command.build import build
 from setuptools.command.build_ext import build_ext
+
 try:
     from setuptools.dep_util import newer_group
 except ImportError:

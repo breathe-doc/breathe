@@ -50,9 +50,11 @@ def format_parser_error(
 
 
 if TYPE_CHECKING:
+
     class TaggedNode(NamedTuple, Generic[T_data_object]):
         tag: str | None
         value: T_data_object
+
 else:
     # Python 3.9 and 3.10 don't allow multiple-inheritance with NamedTuple
     class TaggedNode(NamedTuple):

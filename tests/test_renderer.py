@@ -39,7 +39,9 @@ class MockState:
         if hasattr(frontend, "get_default_settings"):
             settings = frontend.get_default_settings(docutils.parsers.rst.Parser)
         else:
-            settings = frontend.OptionParser(components=(docutils.parsers.rst.Parser,)).get_default_values()
+            settings = frontend.OptionParser(
+                components=(docutils.parsers.rst.Parser,)
+            ).get_default_values()
         settings.env = env
         self.document = utils.new_document("", settings)
 
@@ -239,7 +241,7 @@ def test_render_func(app):
         argsstring="(int)",
         virt=parser.DoxVirtualKind.non_virtual,
         param=[parser.Node_paramType(type=parser.Node_linkedTextType(["int"]))],
-        **COMMON_ARGS_memberdefType
+        **COMMON_ARGS_memberdefType,
     )
     signature = find_node(render(app, member_def), "desc_signature")
     assert signature.astext().startswith("void")
@@ -266,7 +268,7 @@ def test_render_typedef(app):
         definition="typedef int foo",
         type=parser.Node_linkedTextType(["int"]),
         name="foo",
-        **COMMON_ARGS_memberdefType
+        **COMMON_ARGS_memberdefType,
     )
     signature = find_node(render(app, member_def), "desc_signature")
     assert signature.astext() == "typedef int foo"
@@ -278,7 +280,7 @@ def test_render_c_typedef(app):
         definition="typedef unsigned int bar",
         type=parser.Node_linkedTextType(["unsigned int"]),
         name="bar",
-        **COMMON_ARGS_memberdefType
+        **COMMON_ARGS_memberdefType,
     )
     signature = find_node(render(app, member_def, domain="c"), "desc_signature")
     assert signature.astext() == "typedef unsigned int bar"
@@ -291,7 +293,7 @@ def test_render_c_function_typedef(app):
         type=parser.Node_linkedTextType(["void* (*"]),
         name="voidFuncPtr",
         argsstring=")(float, int)",
-        **COMMON_ARGS_memberdefType
+        **COMMON_ARGS_memberdefType,
     )
     signature = find_node(render(app, member_def, domain="c"), "desc_signature")
     assert signature.astext().startswith("typedef void *")
@@ -312,7 +314,7 @@ def test_render_using_alias(app):
         definition="using foo = int",
         type=parser.Node_linkedTextType(["int"]),
         name="foo",
-        **COMMON_ARGS_memberdefType
+        **COMMON_ARGS_memberdefType,
     )
     signature = find_node(render(app, member_def), "desc_signature")
     assert signature.astext() == "using foo = int"
@@ -327,7 +329,7 @@ def test_render_const_func(app):
         argsstring="() const",
         virt=parser.DoxVirtualKind.non_virtual,
         const=True,
-        **COMMON_ARGS_memberdefType
+        **COMMON_ARGS_memberdefType,
     )
     signature = find_node(render(app, member_def), "desc_signature")
     assert "_CPPv2NK1fEv" in signature["ids"]
@@ -342,7 +344,7 @@ def test_render_lvalue_func(app):
         argsstring="() &",
         virt=parser.DoxVirtualKind.non_virtual,
         refqual=parser.DoxRefQualifierKind.lvalue,
-        **COMMON_ARGS_memberdefType
+        **COMMON_ARGS_memberdefType,
     )
     signature = find_node(render(app, member_def), "desc_signature")
     assert signature.astext().endswith("&")
@@ -357,7 +359,7 @@ def test_render_rvalue_func(app):
         argsstring="() &&",
         virt=parser.DoxVirtualKind.non_virtual,
         refqual=parser.DoxRefQualifierKind.rvalue,
-        **COMMON_ARGS_memberdefType
+        **COMMON_ARGS_memberdefType,
     )
     signature = find_node(render(app, member_def), "desc_signature")
     assert signature.astext().endswith("&&")
@@ -373,7 +375,7 @@ def test_render_const_lvalue_func(app):
         virt=parser.DoxVirtualKind.non_virtual,
         const=True,
         refqual=parser.DoxRefQualifierKind.lvalue,
-        **COMMON_ARGS_memberdefType
+        **COMMON_ARGS_memberdefType,
     )
     signature = find_node(render(app, member_def), "desc_signature")
     assert signature.astext().endswith("const &")
@@ -389,7 +391,7 @@ def test_render_const_rvalue_func(app):
         virt=parser.DoxVirtualKind.non_virtual,
         const=True,
         refqual=parser.DoxRefQualifierKind.rvalue,
-        **COMMON_ARGS_memberdefType
+        **COMMON_ARGS_memberdefType,
     )
     signature = find_node(render(app, member_def), "desc_signature")
     assert signature.astext().endswith("const &&")
@@ -402,7 +404,7 @@ def test_render_variable_initializer(app):
         type=parser.Node_linkedTextType(["const int"]),
         name="EOF",
         initializer=parser.Node_linkedTextType(["= -1"]),
-        **COMMON_ARGS_memberdefType
+        **COMMON_ARGS_memberdefType,
     )
     signature = find_node(render(app, member_def), "desc_signature")
     assert signature.astext() == "const int EOF = -1"
@@ -413,7 +415,7 @@ def test_render_define_initializer(app):
         kind=parser.DoxMemberKind.define,
         name="MAX_LENGTH",
         initializer=parser.Node_linkedTextType(["100"]),
-        **COMMON_ARGS_memberdefType
+        **COMMON_ARGS_memberdefType,
     )
     signature_w_initializer = find_node(
         render(app, member_def, show_define_initializer=True), "desc_signature"
@@ -424,7 +426,7 @@ def test_render_define_initializer(app):
         kind=parser.DoxMemberKind.define,
         name="MAX_LENGTH_NO_INITIALIZER",
         initializer=parser.Node_linkedTextType(["100"]),
-        **COMMON_ARGS_memberdefType
+        **COMMON_ARGS_memberdefType,
     )
 
     signature_wo_initializer = find_node(

@@ -14,7 +14,7 @@ def get_pygments_alias(filename: str) -> str | None:
     "Find first pygments alias from filename"
     try:
         lexer_cls = get_lexer_for_filename(filename)
-        return lexer_cls.aliases[0]
+        return lexer_cls.aliases[0]  # type: ignore
     except ClassNotFound:
         return None
 

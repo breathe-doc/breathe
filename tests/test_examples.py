@@ -9,6 +9,10 @@ import enum
 import dataclasses
 import sphinx
 
+from typing import Any
+
+sphinx_path: Any
+
 if sphinx.version_info < (7, 2, 6):
     from sphinx.testing.path import path as sphinx_path
 else:
@@ -35,7 +39,7 @@ ALIASES += "inlinerst=\\verbatim embed:rst:inline"
 """
 
 C_FILE_SUFFIXES = frozenset((".h", ".c", ".hpp", ".cpp"))
-IGNORED_ELEMENTS = frozenset(())
+IGNORED_ELEMENTS: frozenset[str] = frozenset(())
 
 BUFFER_SIZE = 0x1000
 

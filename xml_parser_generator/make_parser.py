@@ -89,6 +89,7 @@ class SchemaType:
         return []
 
     if TYPE_CHECKING:
+
         @property
         def py_name(self) -> str:
             raise NotImplementedError
