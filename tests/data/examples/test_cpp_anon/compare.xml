@@ -7,12 +7,12 @@
         <desc_content>
             <container classes="breathe-sectiondef" objtype="public-type">
                 <rubric classes="breathe-sectiondef-title">Public Types</rubric>
-                <index entries=""></index>
+                <index entries="['single',\ 'ClassWithAnonEntities::[anonymous]\ (C++\ enum)',\ '_CPPv4N21ClassWithAnonEntitiesUt1_4E',\ '',\ None]"></index>
                 <desc classes="cpp enum" desctype="enum" domain="cpp" objtype="enum">
-                    <desc_signature classes="sig sig-object cpp"><target></target><desc_name classes="sig-name descname"></desc_name></desc_signature>
+                    <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword classes="k">enum</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">[anonymous]</desc_sig_name></desc_name></desc_signature_line></desc_signature>
                     <desc_content>
                         <paragraph><emphasis>Values:</emphasis></paragraph>
-                        <index entries="['single',\ 'ClassWithAnonEntities::PhonyNameDueToError::Enumerator\ (C++\ enumerator)',\ '_CPPv4N21ClassWithAnonEntities19PhonyNameDueToError10EnumeratorE',\ '',\ None]"></index>
+                        <index entries="['single',\ 'ClassWithAnonEntities::[anonymous]::Enumerator\ (C++\ enumerator)',\ '_CPPv4N21ClassWithAnonEntitiesUt1_410EnumeratorE',\ '',\ None]"></index>
                         <desc classes="cpp enumerator" desctype="enumerator" domain="cpp" objtype="enumerator">
                             <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword classes="k">enumerator</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">Enumerator</desc_sig_name></desc_name></desc_signature_line></desc_signature>
                             <desc_content>
@@ -29,9 +29,9 @@
                     <desc_content>
                     </desc_content>
                 </desc>
-                <index entries=""></index>
+                <index entries="['single',\ 'ClassWithAnonEntities::[anonymous]\ (C++\ member)',\ '_CPPv4N21ClassWithAnonEntitiesUt1_1E',\ '',\ None]"></index>
                 <desc classes="cpp var" desctype="var" domain="cpp" objtype="var">
-                    <desc_signature classes="sig sig-object cpp"><target></target><desc_name classes="sig-name descname">struct ClassWithAnonEntities</desc_name></desc_signature>
+                    <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword classes="k">struct</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><reference internal="True" refid="_CPPv421ClassWithAnonEntities" reftitle="ClassWithAnonEntities"><desc_sig_name classes="n">ClassWithAnonEntities</desc_sig_name></reference><desc_sig_punctuation classes="p">::</desc_sig_punctuation><desc_sig_name classes="n">[anonymous]</desc_sig_name><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">[anonymous]</desc_sig_name></desc_name></desc_signature_line></desc_signature>
                     <desc_content>
                     </desc_content>
                 </desc>
@@ -41,9 +41,9 @@
                     <desc_content>
                     </desc_content>
                 </desc>
-                <index entries=""></index>
+                <index entries="['single',\ 'ClassWithAnonEntities::[anonymous]\ (C++\ member)',\ '_CPPv4N21ClassWithAnonEntitiesUt1_3E',\ '',\ None]"></index>
                 <desc classes="cpp var" desctype="var" domain="cpp" objtype="var">
-                    <desc_signature classes="sig sig-object cpp"><target></target><desc_name classes="sig-name descname">union ClassWithAnonEntities</desc_name></desc_signature>
+                    <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword classes="k">union</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><reference internal="True" refid="_CPPv421ClassWithAnonEntities" reftitle="ClassWithAnonEntities"><desc_sig_name classes="n">ClassWithAnonEntities</desc_sig_name></reference><desc_sig_punctuation classes="p">::</desc_sig_punctuation><desc_sig_name classes="n">[anonymous]</desc_sig_name><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">[anonymous]</desc_sig_name></desc_name></desc_signature_line></desc_signature>
                     <desc_content>
                     </desc_content>
                 </desc>

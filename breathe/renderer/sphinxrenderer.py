@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import os
+from collections import defaultdict
 import sphinx
 
 from breathe import parser, filetypes
@@ -2313,10 +2314,10 @@ class SphinxRenderer(metaclass=NodeVisitor):
         # "envelop" rows there, namely thead and tbody (eg it will need to be updated
         # if Doxygen one day adds support for tfoot)
 
-        tags: dict[str, list] = {}
+        tags: defaultdict[str, list] = defaultdict(list)
         for row in rows:
             assert isinstance(row, nodes.Element)
-            tags[row.starttag()] = [row.next_node()]
+            tags[row.starttag()].append(row.next_node())
 
         def merge_row_types(root, elem, elems):
             for node in elems:
