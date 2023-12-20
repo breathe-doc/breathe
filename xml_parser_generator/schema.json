@@ -291,9 +291,9 @@
       "allow_text": true,
       "attributes": {
         "compoundref":          {"type": "#string", "optional": true},
-        "endline":              {"type": "#integer"},
+        "endline":              {"type": "#integer", "optional": true},
         "refid":                {"type": "#string"},
-        "startline":            {"type": "#integer"}
+        "startline":            {"type": "#integer", "optional": true}
       }
     },
     "docInternalType": {

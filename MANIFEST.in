@@ -1,0 +1,9 @@
+recursive-include xml_parser_generator *.py *.in *.json 
+include requirements/*.txt tests/*.py
+graft tests/data
+exclude breathe/_parser.pyi
+prune scripts
+prune examples
+prune documentation
+prune requirements
+global-exclude *.py[cod] *.so *~ *.gitignore
