@@ -286,7 +286,7 @@ class DoxygenFunctionDirective(BaseDirective):
 
             res.append((entry, signature))
 
-        if len(res) == 1:
+        if len(res) == 1 or all(x == candSignatures[0] for x in candSignatures):
             return res[0][0]
         else:
             raise _UnableToResolveFunctionError(candSignatures)
