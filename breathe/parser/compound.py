@@ -243,6 +243,8 @@ class MemberTypeSub(supermod.MemberType):
 
     def __init__(self, kind=None, refid=None, name=''):
         supermod.MemberType.__init__(self, kind, refid, name)
+
+
 supermod.MemberType.subclass = MemberTypeSub
 # end class MemberTypeSub
 
