@@ -1335,13 +1335,26 @@ class SphinxRenderer:
                 if node is None:
                     return []
                 output = self.render_iterable(node)
-                if not output:
+                subclasses = options.get("subclasses", "paragraph")
+                if not output or subclasses == "none":
                     return []
-                return [
-                    nodes.paragraph(
-                        "", "", nodes.Text("Subclassed by "), *intersperse(output, nodes.Text(", "))
-                    )
-                ]
+                if subclasses == "paragraph":
+                    return [
+                        nodes.paragraph(
+                            "", "", nodes.Text("Subclassed by "), *intersperse(output, nodes.Text(", "))
+                        )
+                    ]
+                if subclasses == "list":
+                    body = nodes.bullet_list()
+                    for o in output:
+                        body.append(nodes.list_item("", nodes.paragraph("", "", o)))
+                    return [
+                        nodes.paragraph(
+                            "", "", nodes.Text("Subclassed by:")
+                        ),
+                        body
+                    ]
+                raise RuntimeError(f'Unrecognized "subclasses" option: {options["inheritance"]}')
 
             addnode(
                 "derivedcompoundref", lambda: render_derivedcompoundref(node.derivedcompoundref)
