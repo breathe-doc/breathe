@@ -1,6 +1,7 @@
 from breathe.finder import ItemFinder, stack
 from breathe.renderer.filter import Filter, FilterFactory
 from breathe.parser import DoxygenCompoundParser
+from breathe.parser.compoundsuper import memberdefType
 
 from sphinx.application import Sphinx
 
@@ -62,7 +63,8 @@ class SectionDefTypeSubItemFinder(ItemFinder):
         # If there are members in this sectiondef that match the criteria
         # then load up the file for the group they're in and get the member data objects
         if member_matches:
-            matched_member_ids = (member.id for stack in matches for member in stack)
+            matched_member_ids = {member.id for stack in matches for member in stack
+                                  if isinstance(member, memberdefType)}
             member_refid = member_matches[0][0].refid
             filename = member_refid.rsplit('_', 1)[0]
             file_data = self.compound_parser.parse(filename)
