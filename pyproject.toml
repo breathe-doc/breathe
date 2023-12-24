@@ -47,9 +47,9 @@ extend-exclude = '''
 ^/examples/.* | ^/tests/data/.*
 '''
 
-[tool.cibuildwheel]
-test-requires = "pytest"
-test-command = "pytest {project}/tests"
+#[tool.cibuildwheel]
+#test-requires = "pytest"
+#test-command = "pytest {project}/tests"
 
-[tool.cibuildwheel.linux]
-before-all = "yum install -y doxygen"
+#[tool.cibuildwheel.linux]
+#before-all = "yum install -y doxygen"

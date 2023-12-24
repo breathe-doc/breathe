@@ -1,14 +1,138 @@
 from __future__ import annotations
 
+import os.path
+
 from ..renderer.mask import NullMaskFactory
 from ..directives import BaseDirective
-from breathe import project
+from breathe import project, path_handler, renderer, parser
 
-from breathe import renderer, parser
 from breathe.renderer.sphinxrenderer import SphinxRenderer
 from breathe.renderer.target import create_target_handler
+from breathe.renderer import filter
 
 from docutils.parsers.rst.directives import unchanged_required, flag
+
+from typing import Any, TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from collections.abc import Iterable, Mapping
+    from docutils.nodes import Node
+
+
+def path_matches(location: str, target_file: str) -> bool:
+    if path_handler.includes_directory(target_file):
+        # If the target_file contains directory separators then
+        # match against the same length at the end of the location
+        #
+        location_match = location[-len(target_file) :]
+        return location_match == target_file
+
+    # If there are no separators, match against the whole filename
+    # at the end of the location
+    #
+    # This is to prevent "Util.cpp" matching "PathUtil.cpp"
+    #
+    location_basename = os.path.basename(location)
+    return location_basename == target_file
+
+
+def location_matches(location: parser.Node_locationType | None, target_file: str) -> bool:
+    return location is not None and path_matches(location.file, target_file)
+
+
+def namespace_matches(name: str, node: parser.Node_compounddefType):
+    to_find = name.rpartition("::")[0]
+    return any(to_find == "".join(ns) for ns in node.innernamespace) or any(
+        to_find == "".join(ns) for ns in node.innerclass
+    )
+
+
+def create_file_filter(
+    filename: str,
+    options: Mapping[str, Any],
+    *,
+    init_valid_names: Iterable[str] | None = None,
+) -> filter.DoxFilter:
+    valid_names: set[str] = set()
+    if init_valid_names:
+        valid_names.update(init_valid_names)
+
+    outline_filter = filter.create_outline_filter(options)
+
+    def filter_(nstack: filter.NodeStack) -> bool:
+        if not outline_filter(nstack):
+            return False
+
+        node = nstack.node
+        parent = nstack.parent
+        if isinstance(node, parser.Node_compounddefType):
+            if node.kind == parser.DoxCompoundKind.file:
+                # Gather the "namespaces" attribute from the
+                # compounddef for the file we're rendering and
+                # store the information in the "valid_names" list
+                if location_matches(node.location, filename):
+                    valid_names.update("".join(ns) for ns in node.innernamespace)
+                    valid_names.update("".join(ns) for ns in node.innerclass)
+
+            if node.kind != parser.DoxCompoundKind.namespace:
+                # Ignore compounddefs which are from another file
+                # (normally means classes and structs which are in a
+                # namespace that we have other interests in) but only
+                # check it if the compounddef is not a namespace
+                # itself, as for some reason compounddefs for
+                # namespaces are registered with just a single file
+                # location even if they namespace is spread over
+                # multiple files
+                return location_matches(node.location, filename)
+
+        elif isinstance(node, parser.Node_refType):
+            name = "".join(node)
+            if isinstance(parent, parser.Node_compounddefType) and nstack.tag in {
+                "innerclass",
+                "innernamespace",
+            }:
+                # Take the valid_names and every time we handle an
+                # innerclass or innernamespace, check that its name
+                # was one of those initial valid names so that we
+                # never end up rendering a namespace or class that
+                # wasn't in the initial file. Notably this is
+                # required as the location attribute for the
+                # namespace in the xml is unreliable.
+                if name not in valid_names:
+                    return False
+
+                # Ignore innerclasses and innernamespaces that are inside a
+                # namespace that is going to be rendered as they will be
+                # rendered with that namespace and we don't want them twice
+                if namespace_matches(name, parent):
+                    return False
+
+        elif isinstance(node, parser.Node_memberdefType):
+            # Ignore memberdefs from files which are different to
+            # the one we're rendering. This happens when we have to
+            # cross into a namespace xml file which has entries
+            # from multiple files in it
+            return path_matches(node.location.file, filename)
+
+        return True
+
+    return filter_
+
+
+def file_finder_filter(
+    filename: str,
+    d_parser: parser.DoxygenParser,
+    project_info: project.ProjectInfo,
+    index: parser.DoxygenIndex,
+    matches: list[filter.FinderMatch],
+) -> None:
+    for c in index.file_compounds:
+        if not path_matches(c.name, filename):
+            continue
+        for cd in d_parser.parse_compound(c.refid, project_info).root.compounddef:
+            if cd.kind != parser.DoxCompoundKind.file:
+                continue
+            matches.append([renderer.TaggedNode(None, cd)])
 
 
 class _BaseFileDirective(BaseDirective):
@@ -20,12 +144,10 @@ class _BaseFileDirective(BaseDirective):
     # information is present in the Directive class from the docutils framework that we'd have to
     # pass way too much stuff to a helper object to be reasonable.
 
-    def handle_contents(self, file_: str, project_info):
-        finder = self.finder_factory.create_finder(project_info)
-        finder_filter = self.filter_factory.create_file_finder_filter(file_)
-
-        matches: list[list[renderer.TaggedNode]] = []
-        finder.filter_(finder_filter, matches)
+    def handle_contents(self, file_: str, project_info: project.ProjectInfo) -> list[Node]:
+        d_index = self.get_doxygen_index(project_info)
+        matches: list[filter.FinderMatch] = []
+        file_finder_filter(file_, self.dox_parser, project_info, d_index, matches)
 
         if len(matches) > 1:
             warning = self.create_warning(None, file=file_, directivename=self.directive_name)
@@ -35,18 +157,18 @@ class _BaseFileDirective(BaseDirective):
             return warning.warn('{directivename}: Cannot find file "{file} {tail}')
 
         target_handler = create_target_handler(self.options, project_info, self.state.document)
-        filter_ = self.filter_factory.create_file_filter(file_, self.options)
+        filter_ = create_file_filter(file_, self.options)
 
-        node_list = []
+        node_list: list[Node] = []
         for node_stack in matches:
             object_renderer = SphinxRenderer(
-                self.parser_factory.app,
+                self.dox_parser.app,
                 project_info,
                 [tv.value for tv in node_stack],
                 self.state,
                 self.state.document,
                 target_handler,
-                self.parser_factory.create_compound_parser(project_info),
+                self.dox_parser,
                 filter_,
             )
 

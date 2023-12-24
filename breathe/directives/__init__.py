@@ -1,24 +1,25 @@
 from __future__ import annotations
 
-from breathe.finder.factory import FinderFactory
+from breathe.finder import factory
 from breathe import parser
 from breathe.renderer import format_parser_error, RenderContext
-from breathe.renderer.filter import FilterFactory
 from breathe.renderer.sphinxrenderer import SphinxRenderer
 
 from sphinx.directives import SphinxDirective  # pyright: ignore
 
 from docutils import nodes
 
-from typing import Any, TYPE_CHECKING, Sequence
+from typing import Any, TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from breathe.parser import DoxygenParserFactory
+    from breathe.parser import DoxygenParser
     from breathe.project import ProjectInfoFactory, ProjectInfo
     from breathe.renderer import TaggedNode
     from breathe.renderer.filter import DoxFilter
     from breathe.renderer.mask import MaskFactoryBase
     from breathe.renderer.target import TargetHandler
+    from sphinx.application import Sphinx
+    from collections.abc import Sequence
 
 
 class _WarningHandler:
@@ -66,16 +67,20 @@ class BaseDirective(SphinxDirective):
         return self.env.temp_data["breathe_project_info_factory"]
 
     @property
-    def parser_factory(self) -> DoxygenParserFactory:
-        return self.env.temp_data["breathe_parser_factory"]
+    def dox_parser(self) -> DoxygenParser:
+        return self.env.temp_data["breathe_dox_parser"]
 
     @property
-    def finder_factory(self) -> FinderFactory:
-        return FinderFactory(self.env.app, self.parser_factory)
+    def app(self) -> Sphinx:
+        return self.env.app
 
-    @property
-    def filter_factory(self) -> FilterFactory:
-        return FilterFactory(self.env.app)
+    def get_doxygen_index(self, project_info: ProjectInfo) -> parser.DoxygenIndex:
+        return self.dox_parser.parse_index(project_info)
+
+    def create_finder_from_root(
+        self, root: factory.FinderRoot, project_info: ProjectInfo
+    ) -> factory.Finder:
+        return factory.create_finder_from_root(self.env.app, self.dox_parser, root, project_info)
 
     def create_warning(self, project_info: ProjectInfo | None, **kwargs) -> _WarningHandler:
         if project_info:
@@ -101,13 +106,13 @@ class BaseDirective(SphinxDirective):
 
         try:
             object_renderer = SphinxRenderer(
-                self.parser_factory.app,
+                self.dox_parser.app,
                 project_info,
                 [tn.value for tn in node_stack],
                 self.state,
                 self.state.document,
                 target_handler,
-                self.parser_factory.create_compound_parser(project_info),
+                self.dox_parser,
                 filter_,
             )
         except parser.ParserError as e:

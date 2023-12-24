@@ -1,4 +1,4 @@
-name: download and compile Doxygen
+name: download and cache Doxygen
 on:
   workflow_call
 env:

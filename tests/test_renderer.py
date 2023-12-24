@@ -10,6 +10,11 @@ from breathe.renderer.sphinxrenderer import SphinxRenderer
 import docutils.parsers.rst
 from docutils import frontend, nodes, utils
 
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from breathe.renderer import filter
+
 
 sphinx.locale.init([], "")
 COMMON_ARGS_memberdefType = {
@@ -29,13 +34,13 @@ class MockMemo:
 class MockState:
     def __init__(self, app):
         from breathe.project import ProjectInfoFactory
-        from breathe.parser import DoxygenParserFactory
+        from breathe.parser import DoxygenParser
 
         env = sphinx.environment.BuildEnvironment(app)
         env.setup(app)
         env.temp_data["docname"] = "mock-doc"
         env.temp_data["breathe_project_info_factory"] = ProjectInfoFactory(app)
-        env.temp_data["breathe_parser_factory"] = DoxygenParserFactory(app)
+        env.temp_data["breathe_dox_parser"] = DoxygenParser(app)
         if hasattr(frontend, "get_default_settings"):
             settings = frontend.get_default_settings(docutils.parsers.rst.Parser)
         else:
@@ -130,9 +135,13 @@ class MockCompoundParser:
         def __init__(self, compounddef):
             self.compounddef = [compounddef]
 
-    def parse(self, compoundname):
+    class MockCompound:
+        def __init__(self, root):
+            self.root = root
+
+    def parse_compound(self, compoundname, project_info):
         compounddef = self.compound_dict[compoundname]
-        return self.MockFileData(compounddef)
+        return self.MockCompound(self.MockFileData(compounddef))
 
 
 class NodeFinder(nodes.NodeVisitor):
@@ -207,7 +216,7 @@ def test_find_node():
 
 
 def render(
-    app, member_def, domain=None, show_define_initializer=False, compound_parser=None, options=[]
+    app, member_def, domain=None, show_define_initializer=False, dox_parser=None, options=[]
 ):
     """Render Doxygen *member_def* with *renderer_class*."""
 
@@ -225,7 +234,7 @@ def render(
         None,  # state
         None,  # document
         MockTargetHandler(),
-        compound_parser,
+        dox_parser,
         (lambda nstack: True),
     )
     r.context = MockContext(app, [renderer.TaggedNode(None, member_def)], domain, options)
@@ -468,11 +477,11 @@ def test_render_innergroup(app):
     )
     assert all(
         el.astext() != "InnerGroup"
-        for el in render(app, compound_def, compound_parser=mock_compound_parser)
+        for el in render(app, compound_def, dox_parser=mock_compound_parser)
     )
     assert any(
         el.astext() == "InnerGroup"
-        for el in render(app, compound_def, compound_parser=mock_compound_parser, options=["inner"])
+        for el in render(app, compound_def, dox_parser=mock_compound_parser, options=["inner"])
     )
 
 
@@ -502,7 +511,7 @@ def get_directive(app):
     return DoxygenFunctionDirective(*cls_args)
 
 
-def get_matches(datafile) -> tuple[list[str], list[list[renderer.TaggedNode]]]:
+def get_matches(datafile) -> tuple[list[str], list[filter.FinderMatch]]:
     argsstrings = []
     with open(os.path.join(os.path.dirname(__file__), "data", datafile), "rb") as fid:
         doc = parser.parse_file(fid)

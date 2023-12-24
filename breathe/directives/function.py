@@ -5,7 +5,7 @@ from breathe.exception import BreatheError
 from breathe.file_state_cache import MTimeError
 from breathe import parser
 from breathe.project import ProjectError
-from breathe.renderer import format_parser_error, RenderContext, mask, TaggedNode
+from breathe.renderer import format_parser_error, RenderContext, mask, TaggedNode, filter
 from breathe.renderer.sphinxrenderer import WithContext
 from breathe.renderer.sphinxrenderer import SphinxRenderer
 from breathe.renderer.target import create_target_handler
@@ -29,6 +29,7 @@ if TYPE_CHECKING:
         from typing_extensions import NotRequired, TypedDict
     from breathe import project
     from docutils.nodes import Node
+    from sphinx.application import Sphinx
 
     DoxFunctionOptions = TypedDict(
         "DoxFunctionOptions",
@@ -45,6 +46,34 @@ class _NoMatchingFunctionError(BreatheError):
 class _UnableToResolveFunctionError(BreatheError):
     def __init__(self, signatures: List[str]) -> None:
         self.signatures = signatures
+
+
+def function_and_all_friend_finder_filter(
+    app: Sphinx,
+    namespace: str,
+    name: str,
+    d_parser: parser.DoxygenParser,
+    project_info: project.ProjectInfo,
+    index: parser.DoxygenIndex,
+    matches: list[filter.FinderMatch],
+) -> None:
+    # Get matching functions but only ones where the parent is not a group.
+    # We want to skip function entries in groups as we'll find the same
+    # functions in a file's xml output elsewhere and having more than one
+    # match is confusing for our logic later on.
+    for f_match in filter.member_finder_filter(
+        app,
+        namespace,
+        name,
+        d_parser,
+        project_info,
+        (parser.MemberKind.function, parser.MemberKind.friend),
+        index,
+    ):
+        cd = f_match[2].value
+        assert isinstance(cd, parser.Node_compounddefType)
+        if cd.kind != parser.DoxCompoundKind.group:
+            matches.append(f_match)
 
 
 class DoxygenFunctionDirective(BaseDirective):
@@ -90,7 +119,7 @@ class DoxygenFunctionDirective(BaseDirective):
             return warning.warn("doxygenfunction: %s" % e)
 
         try:
-            finder = self.finder_factory.create_finder(project_info)
+            d_index = self.get_doxygen_index(project_info)
         except MTimeError as e:
             warning = self.create_warning(None)
             return warning.warn("doxygenfunction: %s" % e)
@@ -108,16 +137,15 @@ class DoxygenFunctionDirective(BaseDirective):
             ).warn(
                 "doxygenfunction: Unable to resolve function "
                 '"{namespace}{function}" with arguments "{args}".\n'
-                "Could not parse arguments. Parsing eror is\n{cpperror}"
+                "Could not parse arguments. Parsing error is\n{cpperror}"
             )
 
-        finder_filter = self.filter_factory.create_function_and_all_friend_finder_filter(
-            namespace, function_name
+        matchesAll: list[filter.FinderMatch] = []
+        function_and_all_friend_finder_filter(
+            self.app, namespace, function_name, self.dox_parser, project_info, d_index, matchesAll
         )
 
-        matchesAll: list[list[TaggedNode]] = []
-        finder.filter_(finder_filter, matchesAll)
-        matches: list[list[TaggedNode]] = []
+        matches: list[filter.FinderMatch] = []
         for m in matchesAll:
             # only take functions and friend functions
             # ignore friend classes
@@ -166,7 +194,7 @@ class DoxygenFunctionDirective(BaseDirective):
             )
 
         target_handler = create_target_handler(options, project_info, self.state.document)
-        filter_ = self.filter_factory.create_outline_filter(options)
+        filter_ = filter.create_outline_filter(options)
 
         return self.render(
             node_stack,
@@ -233,13 +261,13 @@ class DoxygenFunctionDirective(BaseDirective):
 
         try:
             object_renderer = SphinxRenderer(
-                self.parser_factory.app,
+                self.dox_parser.app,
                 project_info,
                 [tn.value for tn in node_stack],
                 self.state,
                 self.state.document,
                 target_handler,
-                self.parser_factory.create_compound_parser(project_info),
+                self.dox_parser,
                 filter_,
             )
         except parser.ParserError as e:
@@ -274,7 +302,7 @@ class DoxygenFunctionDirective(BaseDirective):
 
     def _resolve_function(
         self,
-        matches: list[list[TaggedNode]],
+        matches: list[filter.FinderMatch],
         args: cpp.ASTParametersQualifiers | None,
         project_info: project.ProjectInfo,
     ):
@@ -290,7 +318,7 @@ class DoxygenFunctionDirective(BaseDirective):
             target_handler = create_target_handler(
                 {"no-link": ""}, project_info, self.state.document
             )
-            filter_ = self.filter_factory.create_outline_filter(text_options)
+            filter_ = filter.create_outline_filter(text_options)
             mask_factory = mask.MaskFactory({parser.Node_paramType: mask.no_parameter_names})
 
             # Override the directive args for this render

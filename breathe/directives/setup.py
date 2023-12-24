@@ -20,7 +20,7 @@ from breathe.directives.item import (
     DoxygenEnumValueDirective,
     DoxygenTypedefDirective,
 )
-from breathe.parser import DoxygenParserFactory
+from breathe.parser import DoxygenParser
 from breathe.project import ProjectInfoFactory
 from breathe.process import AutoDoxygenProcessHandle
 
@@ -59,14 +59,14 @@ def setup(app: Sphinx) -> None:
     # note: the project_info_factory also contains some caching stuff
     # TODO: is that actually safe for when reading in parallel?
     project_info_factory = ProjectInfoFactory(app)
-    parser_factory = DoxygenParserFactory(app)
+    dox_parser = DoxygenParser(app)
 
     def set_temp_data(
-        app: Sphinx, project_info_factory=project_info_factory, parser_factory=parser_factory
+        app: Sphinx, project_info_factory=project_info_factory, parser_factory=dox_parser
     ):
         assert app.env is not None
         app.env.temp_data["breathe_project_info_factory"] = project_info_factory
-        app.env.temp_data["breathe_parser_factory"] = parser_factory
+        app.env.temp_data["breathe_dox_parser"] = parser_factory
 
     app.connect("source-read", lambda app, docname, source: set_temp_data(app))
 

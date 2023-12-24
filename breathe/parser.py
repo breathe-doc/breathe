@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import reprlib
+import collections
 from breathe import file_state_cache, path_handler
 from breathe.project import ProjectInfo
 
@@ -10,10 +11,12 @@ from breathe._parser import *
 
 from sphinx.application import Sphinx
 
-from typing import overload, TYPE_CHECKING
+from typing import overload, TYPE_CHECKING, TypeVar
 
 if TYPE_CHECKING:
     NodeOrValue = Node | str | None
+
+T_inv = TypeVar("T_inv")
 
 
 @reprlib.recursive_repr()
@@ -89,72 +92,95 @@ class FileIOError(RuntimeError):
         self.filename = filename
 
 
-class Parser:
-    def __init__(self, app: Sphinx, cache: dict[str, Node_DoxygenTypeIndex | Node_DoxygenType]):
-        self.app = app
-        self.cache = cache
+class DoxygenIndex:
+    def __init__(self, root: Node_DoxygenTypeIndex):
+        self.root = root
+        self.compounds: collections.defaultdict[
+            str, list[Node_CompoundType]
+        ] = collections.defaultdict(list)
+        self.members: collections.defaultdict[
+            str, list[tuple[Node_MemberType, Node_CompoundType]]
+        ] = collections.defaultdict(list)
 
-    def _parse_common(
-        self, filename: str, right_tag: str
-    ) -> Node_DoxygenTypeIndex | Node_DoxygenType:
-        try:
-            # Try to get from our cache
-            return self.cache[filename]
-        except KeyError:
-            # If that fails, parse it afresh
-            try:
-                with open(filename, "rb") as file:
-                    result = parse_file(file)
-                if result.name != right_tag:
-                    raise ParserError(
-                        f'expected "{right_tag}" root element, not "{result.name}"', filename
-                    )
-                self.cache[filename] = result.value
-                return result.value
-            except ParseError as e:
-                raise ParserError(e.message, filename, e.lineno)
-            except IOError as e:
-                raise FileIOError(str(e), filename)
+        self.file_compounds: list[Node_CompoundType] = []
+
+        for c in root.compound:
+            self.compounds[c.name].append(c)
+            if c.kind == CompoundKind.file:
+                self.file_compounds.append(c)
+            for m in c.member:
+                self.members[m.name].append((m, c))
 
 
-class DoxygenIndexParser(Parser):
-    def parse(self, project_info: ProjectInfo) -> Node_DoxygenTypeIndex:
-        filename = path_handler.resolve_path(self.app, project_info.project_path(), "index.xml")
-        file_state_cache.update(self.app, filename)
+class DoxygenCompound:
+    def __init__(self, root: Node_DoxygenType):
+        self.root = root
+        self.members_by_id: dict[
+            str, tuple[Node_memberdefType, Node_sectiondefType, Node_compounddefType]
+        ] = {}
+        self.enumvalue_by_id: dict[
+            str,
+            tuple[
+                Node_enumvalueType, Node_memberdefType, Node_sectiondefType, Node_compounddefType
+            ],
+        ] = {}
 
-        r = self._parse_common(filename, "doxygenindex")
-        assert isinstance(r, Node_DoxygenTypeIndex)
-        return r
-
-
-class DoxygenCompoundParser(Parser):
-    def __init__(self, app: Sphinx, cache, project_info: ProjectInfo) -> None:
-        super().__init__(app, cache)
-
-        self.project_info = project_info
-
-    def parse(self, refid: str) -> Node_DoxygenType:
-        filename = path_handler.resolve_path(
-            self.app, self.project_info.project_path(), f"{refid}.xml"
-        )
-
-        file_state_cache.update(self.app, filename)
-
-        r = self._parse_common(filename, "doxygen")
-        assert isinstance(r, Node_DoxygenType)
-        return r
+        for c in root.compounddef:
+            for s in c.sectiondef:
+                for m in s.memberdef:
+                    self.members_by_id[m.id] = (m, s, c)
+                    for ev in m.enumvalue:
+                        self.enumvalue_by_id[ev.id] = (ev, m, s, c)
 
 
-class DoxygenParserFactory:
+def _parse_common(filename: str, right_tag: str) -> Node_DoxygenType | Node_DoxygenTypeIndex:
+    try:
+        with open(filename, "rb") as file:
+            result = parse_file(file)
+        if result.name != right_tag:
+            raise ParserError(f'expected "{right_tag}" root element, not "{result.name}"', filename)
+
+        return result.value
+    except ParseError as e:
+        raise ParserError(e.message, filename, e.lineno)
+    except IOError as e:
+        raise FileIOError(str(e), filename)
+
+
+class DoxygenParser:
     def __init__(self, app: Sphinx) -> None:
         self.app = app
-        self.cache: dict[str, Node_DoxygenType | Node_DoxygenTypeIndex] = {}
+        self.compound_index: DoxygenIndex | None = None
+        self.compound_cache: dict[str, DoxygenCompound] = {}
 
-    def create_index_parser(self) -> DoxygenIndexParser:
-        return DoxygenIndexParser(self.app, self.cache)
+    def parse_index(self, project_info: ProjectInfo) -> DoxygenIndex:
+        r: DoxygenIndex | None = self.compound_index
+        if r is None:
+            filename = path_handler.resolve_path(self.app, project_info.project_path(), "index.xml")
 
-    def create_compound_parser(self, project_info: ProjectInfo) -> DoxygenCompoundParser:
-        return DoxygenCompoundParser(self.app, self.cache, project_info)
+            file_state_cache.update(self.app, filename)
+
+            n = _parse_common(filename, "doxygenindex")
+            assert isinstance(n, Node_DoxygenTypeIndex)
+            r = DoxygenIndex(n)
+
+            self.compound_index = r
+        return r
+
+    def parse_compound(self, refid: str, project_info: ProjectInfo) -> DoxygenCompound:
+        r = self.compound_cache.get(refid)
+        if r is None:
+            filename = path_handler.resolve_path(
+                self.app, project_info.project_path(), f"{refid}.xml"
+            )
+
+            file_state_cache.update(self.app, filename)
+
+            n = _parse_common(filename, "doxygen")
+            assert isinstance(n, Node_DoxygenType)
+            r = DoxygenCompound(n)
+            self.compound_cache[refid] = r
+        return r
 
 
 @overload

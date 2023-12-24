@@ -664,7 +664,7 @@ class SphinxRenderer(metaclass=NodeVisitor):
         state,
         document: nodes.document,
         target_handler: TargetHandler,
-        compound_parser: parser.DoxygenCompoundParser,
+        dox_parser: parser.DoxygenParser,
         filter_: DoxFilter,
     ):
         self.app = app
@@ -675,7 +675,7 @@ class SphinxRenderer(metaclass=NodeVisitor):
         self.state = state
         self.document = document
         self.target_handler = target_handler
-        self.compound_parser = compound_parser
+        self.dox_parser = dox_parser
         self.filter_ = filter_
 
         self.context: RenderContext | None = None
@@ -731,6 +731,9 @@ class SphinxRenderer(metaclass=NodeVisitor):
         else:
             return refid
 
+    def parse_compound(self, refid: str) -> parser.Node_DoxygenType:
+        return self.dox_parser.parse_compound(refid, self.project_info).root
+
     def get_domain(self) -> str:
         """Returns the domain for the current node."""
 
@@ -750,7 +753,7 @@ class SphinxRenderer(metaclass=NodeVisitor):
             node = node_stack[1].value
         filename = get_filename(node)
         if not filename and isinstance(node, parser.Node_CompoundType):
-            file_data = self.compound_parser.parse(node.refid)
+            file_data = self.parse_compound(node.refid)
             filename = get_filename(file_data.compounddef)
         return self.project_info.domain_for_file(filename) if filename else ""
 
@@ -815,7 +818,9 @@ class SphinxRenderer(metaclass=NodeVisitor):
             signode = finder.declarator
 
             if self.context.child:
-                signode.children = [n for n in signode.children if not n.tagname == "desc_addname"]  # type: ignore
+                signode.children = [
+                    n for n in signode.children if n.tagname != "desc_addname"
+                ]  # type: ignore
         return nodes
 
     def handle_compounddef_declaration(
@@ -1283,7 +1288,7 @@ class SphinxRenderer(metaclass=NodeVisitor):
 
     def visit_union(self, node: HasRefID) -> list[nodes.Node]:
         # Read in the corresponding xml file and process
-        file_data = self.compound_parser.parse(node.refid)
+        file_data = self.parse_compound(node.refid)
         assert len(file_data.compounddef) == 1
         nodeDef = file_data.compounddef[0]
 
@@ -1306,7 +1311,7 @@ class SphinxRenderer(metaclass=NodeVisitor):
 
     def visit_class(self, node: HasRefID) -> list[nodes.Node]:
         # Read in the corresponding xml file and process
-        file_data = self.compound_parser.parse(node.refid)
+        file_data = self.parse_compound(node.refid)
         assert len(file_data.compounddef) == 1
         nodeDef = file_data.compounddef[0]
 
@@ -1374,7 +1379,7 @@ class SphinxRenderer(metaclass=NodeVisitor):
 
     def visit_namespace(self, node: HasRefID) -> list[nodes.Node]:
         # Read in the corresponding xml file and process
-        file_data = self.compound_parser.parse(node.refid)
+        file_data = self.parse_compound(node.refid)
         assert len(file_data.compounddef) == 1
         nodeDef = file_data.compounddef[0]
 
@@ -1418,7 +1423,7 @@ class SphinxRenderer(metaclass=NodeVisitor):
         | None = None,
     ) -> list[nodes.Node]:
         # Read in the corresponding xml file and process
-        file_data = self.compound_parser.parse(node.refid)
+        file_data = self.parse_compound(node.refid)
         assert len(file_data.compounddef) == 1
 
         def def_get_node_info(file_data) -> tuple[str, parser.DoxCompoundKind]:
@@ -1708,7 +1713,7 @@ class SphinxRenderer(metaclass=NodeVisitor):
 
         if "inner" in options:
             for cnode in node.innergroup:
-                file_data = self.compound_parser.parse(cnode.refid)
+                file_data = self.parse_compound(cnode.refid)
                 assert len(file_data.compounddef) == 1
                 inner = file_data.compounddef[0]
                 addnode("innergroup", lambda: self.visit_compounddef(inner))

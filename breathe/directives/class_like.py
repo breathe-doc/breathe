@@ -3,6 +3,7 @@ from __future__ import annotations
 from breathe.directives import BaseDirective
 from breathe.file_state_cache import MTimeError
 from breathe.project import ProjectError
+from breathe.renderer import filter
 from breathe.renderer.mask import NullMaskFactory
 from breathe.renderer.target import create_target_handler
 
@@ -17,7 +18,6 @@ if TYPE_CHECKING:
         from typing import NotRequired, TypedDict
     else:
         from typing_extensions import NotRequired, TypedDict
-    from breathe import renderer
     from docutils.nodes import Node
 
     DoxClassOptions = TypedDict(
@@ -74,22 +74,21 @@ class _DoxygenClassLikeDirective(BaseDirective):
             return warning.warn("doxygen{kind}: %s" % e)
 
         try:
-            finder = self.finder_factory.create_finder(project_info)
+            d_index = self.get_doxygen_index(project_info)
         except MTimeError as e:
             warning = self.create_warning(None, kind=self.kind)
             return warning.warn("doxygen{kind}: %s" % e)
 
-        finder_filter = self.filter_factory.create_compound_finder_filter(name, self.kind)
-
-        matches: list[list[renderer.TaggedNode]] = []
-        finder.filter_(finder_filter, matches)
+        matches: list[filter.FinderMatch] = list(
+            filter.compound_finder_filter(name, self.kind, d_index)
+        )
 
         if len(matches) == 0:
             warning = self.create_warning(project_info, name=name, kind=self.kind)
             return warning.warn('doxygen{kind}: Cannot find class "{name}" {tail}')
 
         target_handler = create_target_handler(options, project_info, self.state.document)
-        filter_ = self.filter_factory.create_class_filter(name, options)
+        filter_ = filter.create_class_filter(self.app, name, options)
 
         mask_factory = NullMaskFactory()
         return self.render(

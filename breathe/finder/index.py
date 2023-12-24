@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from breathe.finder import ItemFinder
-from breathe.renderer.filter import FilterFactory, NodeStack
+from breathe.renderer.filter import NodeStack
 from breathe import parser
 from breathe.renderer import TaggedNode
 
@@ -10,7 +10,7 @@ from sphinx.application import Sphinx
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from breathe.renderer.filter import DoxFilter
+    from breathe.renderer.filter import DoxFilter, FinderMatch
 
 
 class DoxygenTypeSubItemFinder(ItemFinder[parser.Node_DoxygenTypeIndex]):
@@ -20,16 +20,13 @@ class DoxygenTypeSubItemFinder(ItemFinder[parser.Node_DoxygenTypeIndex]):
         compounds = self.node.value.compound
         node_stack = [self.node] + ancestors
         for compound in compounds:
-            compound_finder = self.item_finder_factory.create_finder(compound)
-            compound_finder.filter_(node_stack, filter_, matches)
+            self.run_filter(filter_, matches, node_stack, compound)
 
 
 class CompoundTypeSubItemFinder(ItemFinder[parser.Node_CompoundType]):
-    def __init__(self, app: Sphinx, compound_parser: parser.DoxygenCompoundParser, *args):
+    def __init__(self, app: Sphinx, dox_parser: parser.DoxygenParser, *args):
         super().__init__(*args)
-
-        self.filter_factory = FilterFactory(app)
-        self.compound_parser = compound_parser
+        self.dox_parser = dox_parser
 
     def filter_(self, ancestors: list[TaggedNode], filter_: DoxFilter, matches) -> None:
         """Finds nodes which match the filter and continues checks to children
@@ -48,16 +45,16 @@ class CompoundTypeSubItemFinder(ItemFinder[parser.Node_CompoundType]):
         # Descend to member children
         members = self.node.value.member
 
-        member_matches: list[list[TaggedNode]] = []
+        member_matches: list[FinderMatch] = []
         for member in members:
-            member_finder = self.item_finder_factory.create_finder(member)
-            member_finder.filter_(node_stack, filter_, member_matches)
+            self.run_filter(filter_, member_matches, node_stack, member)
 
         # If there are members in this compound that match the criteria
         # then load up the file for this compound and get the member data objects
         if member_matches:
-            file_data = self.compound_parser.parse(self.node.value.refid)
-            finder = self.item_finder_factory.create_finder(file_data)
+            file_data = self.dox_parser.parse_compound(
+                self.node.value.refid, self.project_info
+            ).root
 
             for member_stack in member_matches:
                 mem = member_stack[0].value
@@ -68,12 +65,13 @@ class CompoundTypeSubItemFinder(ItemFinder[parser.Node_CompoundType]):
                     node = nstack.node
                     return isinstance(node, parser.Node_memberdefType) and node.id == refid
 
-                finder.filter_(node_stack, ref_filter, matches)
+                self.run_filter(ref_filter, matches, node_stack, file_data)
         else:
             # Read in the xml file referenced by the compound and descend into that as well
-            file_data = self.compound_parser.parse(self.node.value.refid)
-            finder = self.item_finder_factory.create_finder(file_data)
-            finder.filter_(node_stack, filter_, matches)
+            file_data = self.dox_parser.parse_compound(
+                self.node.value.refid, self.project_info
+            ).root
+            self.run_filter(filter_, matches, node_stack, file_data)
 
 
 class MemberTypeSubItemFinder(ItemFinder[parser.Node_memberdefType]):
