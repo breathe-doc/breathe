@@ -44,20 +44,64 @@ def comma_join(items: Sequence[str], indent: int = 4):
 
 
 class ContentType(enum.Enum):
+    """A value specifying how children are organized when parsing an array-type
+    element"""
+
     bare = enum.auto()
+    """Child values are added directly to the array.
+    
+    There can only be one child type, which can be an element or text.
+    """
+
     tuple = enum.auto()
+    """Child elements are grouped into named tuple-like objects.
+    
+    Each batch of child elements must appear in order in the XML document. Text
+    content is not allowed."""
+
     union = enum.auto()
+    """Each item is either a tagged union (an instance of TaggedValue) or a
+    plain string"""
 
 
 @dataclasses.dataclass()
 class TypeRef:
+    """An XML element"""
+
     name: str
+    """the name of the element as it will appear in the XML file"""
+
     py_name: str
+    """The Python field name that will hold the parsed value.
+    
+    This will be different from "name" if "name" is not a valid Python
+    identifier.
+    """
+
     type: str | SchemaType
+    """While the schema is being parsed, this will be a string containing the
+    name of attribute's type. After parsing, this is set to the object
+    representing the type.
+    """
+
     is_list: bool
+    """Whether this element can appear more than once in its context"""
+
     min_items: Literal[0] | Literal[1]
+    """If this is zero, the element is optional.
+    
+    This can only be zero or one.
+    """
 
     def py_type(self, as_param=False) -> str:
+        """Get the Python type annotation describing the type of this element.
+
+        If "as_param" is True, this represents a parameter type that can be
+        converted to the actual type. For example with a given type "T": the
+        generated parser uses FrozenList[T] to store arrays, but constructors
+        accept Iterable[T] for array fields.
+        """
+
         assert isinstance(self.type, SchemaType)
         if self.is_list:
             container = "Iterable" if as_param else "FrozenList"
@@ -69,12 +113,38 @@ class TypeRef:
 
 @dataclasses.dataclass()
 class Attribute:
+    """An XML attribute"""
+
     name: str
+    """the name of the attribute as it will appear in the XML file"""
+
     py_name: str
+    """The Python field name that will hold the parsed value.
+    
+    This will be different from "name" if "name" is not a valid Python
+    identifier.
+    """
+
     type: str | AttributeType
+    """While the schema is being parsed, this will be a string containing the
+    name of attribute's type. After parsing, this is set to the object
+    representing the type.
+    """
+
     optional: bool
+    """Whether the attribute may be omitted.
+    
+    Fields corresponding to omitted attributes are set to None"""
 
     def py_type(self, as_param=False) -> str:
+        """Get the Python type annotation describing the type of this attribute.
+
+        If "as_param" is True, this represents a parameter type that can be
+        converted to the actual type. For example with a given type "T": the
+        generated parser uses FrozenList[T] to store arrays, but constructors
+        accept Iterable[T] for array fields.
+        """
+
         assert isinstance(self.type, SchemaType)
         if self.optional:
             return f"{self.type.py_name} | None"
@@ -86,6 +156,11 @@ class SchemaType:
     name: str
 
     def __str__(self):
+        """This is equal to self.name.
+
+        This is important for the Jinja template, which frequently uses the
+        names of types.
+        """
         return self.name
 
     def content_names(self) -> Iterable[str]:
@@ -93,6 +168,8 @@ class SchemaType:
 
     @property
     def extra_args(self) -> str:
+        """A string to add before the closing bracket of the C function call to
+        the type's element start handler"""
         return ""
 
     if TYPE_CHECKING:
@@ -104,22 +181,35 @@ class SchemaType:
 
 @dataclasses.dataclass()
 class AttributeType(SchemaType):
-    pass
+    """A type that can be used in attributes and elements.
+
+    When used for an element, the element will not have any attributes or child
+    elements.
+    """
 
 
 @dataclasses.dataclass()
 class BuiltinType(SchemaType):
     py_name: str
+    """the name of the Python data type that will represent a value of this
+    type"""
 
 
 @dataclasses.dataclass()
 class SpType(BuiltinType):
-    pass
+    """This element represents an arbitrary character whose code point is
+    given in the attribute "value".
+
+    If "value" isn't present, the character is a space.
+    """
 
 
 @dataclasses.dataclass()
 class CodePointType(BuiltinType):
+    """This element represents a specific character."""
+
     char: int
+    """The unicode code-point of the character"""
 
     def __init__(self, char: int):
         self.name = "const_char"
@@ -143,11 +233,24 @@ class OtherAttrAction(enum.Enum):
 
 @dataclasses.dataclass()
 class ElementType(SchemaType):
+    """An element type specified by the schema"""
+
     bases: list[str | SchemaType]
+    """the types to derive from"""
+
     attributes: dict[str, Attribute]
+    """XML attributes"""
+
     other_attr: OtherAttrAction
+    """how to handle attributes not in "attributes" """
+
     children: dict[str, TypeRef]
+    """XML child elements"""
+
     used_directly: bool
+    """Each element that is used directly, corresponds to a separate Python
+    class. If this is False, this element is only used as a base element for
+    other types and does not produce any Python classes."""
 
     def fields(self) -> Iterable[TypeRef | Attribute]:
         yield from self.attributes.values()
@@ -170,16 +273,30 @@ class ElementType(SchemaType):
 
 @dataclasses.dataclass()
 class TagOnlyElement(ElementType):
-    pass
+    """A simple element that cannot contain text (not counting whitespace) and
+    does not preserve the order of its child elements"""
 
 
 @dataclasses.dataclass()
 class ListElement(ElementType):
+    """An element type that gets parsed as an array type.
+
+    The items of the array depend on "content", "content_type" and "allow_text".
+    """
+
     min_items: int
+
     content: dict[str, str | SchemaType]
+    """Child elements that will be stored as array items.
+
+    While the schema is being parsed, the values will be strings containing the
+    names of the elements' types. After parsing, they are set to the objects
+    representing the types.
+    """
+
     content_type: ContentType
+
     allow_text: bool
-    sp_tag: str | None = None
 
     def content_names(self) -> Iterable[str]:
         for b in self.bases:
@@ -193,13 +310,6 @@ class ListElement(ElementType):
                 yield from b.content.values()
         yield from self.content.values()
 
-    def py_item_type_union_size(self) -> int:
-        size = len(self.content) if self.content_type == ContentType.union else 0
-        for b in self.bases:
-            if isinstance(b, ListElement):
-                size += b.py_item_type_union_size()
-        return size
-
     def py_union_ref(self) -> list[str]:
         types = self.py_union_list()
         if len(types) <= 1:
@@ -207,6 +317,12 @@ class ListElement(ElementType):
         return ["ListItem_" + self.name]
 
     def py_union_list(self) -> list[str]:
+        """Return a list of type annotations, the union of which, represent
+        every possible value of this array's elements.
+
+        This assumes self.content_type == ContentType.union.
+        """
+        assert self.content_type == ContentType.union
         by_type = collections.defaultdict(list)
         needs_str = False
         for name, t in self.content.items():
@@ -250,6 +366,11 @@ class EnumEntry(NamedTuple):
 
 @dataclasses.dataclass()
 class SchemaEnum(AttributeType):
+    """A type representing an enumeration.
+
+    This type is represented in python with enum.Enum.
+    """
+
     children: list[EnumEntry]
     hash: HashData | None = None
 
@@ -263,6 +384,11 @@ class SchemaEnum(AttributeType):
 
 @dataclasses.dataclass()
 class SchemaCharEnum(AttributeType):
+    """An enumeration type whose elements are single characters.
+
+    Unlike SchemaEnum, the values are represented as strings.
+    """
+
     values: str
 
     @property
@@ -276,14 +402,16 @@ def unknown_type_error(ref: str, context: str, is_element: bool) -> NoReturn:
 
 
 def check_type_ref(schema: Schema, ref: str, context: str, is_element: bool = True) -> SchemaType:
+    """Get the schema type that represent the type named by "ref" """
+
     t = schema.types.get(ref)
     if t is None:
         m = RE_CHAR_TYPE.fullmatch(ref)
         if m is not None:
             char = int(m.group(1), 16)
-            if char > 0xFFFF:
+            if char > 0x10FFFF:
                 raise ValueError(
-                    f'"char" type at "{context}" must have a value between 0 and 0xFFFF'
+                    f'"char" type at "{context}" must have a value between 0 and 0x10FFFF inclusive'
                 )
             return CodePointType(char)
         unknown_type_error(ref, context, is_element)
@@ -291,6 +419,9 @@ def check_type_ref(schema: Schema, ref: str, context: str, is_element: bool = Tr
 
 
 def check_attr_type_ref(schema: Schema, ref: str, context: str) -> AttributeType:
+    """Get the schema type that represent the type named by "ref" and raise an
+    exception if it's not usable in an XML attribute"""
+
     r = check_type_ref(schema, ref, context, False)
     if isinstance(r, AttributeType):
         return r
@@ -299,6 +430,8 @@ def check_attr_type_ref(schema: Schema, ref: str, context: str) -> AttributeType
 
 
 def check_py_name(name: str) -> None:
+    """Raise ValueError if "name" is not suitable as a Python field name"""
+
     if (not name.isidentifier()) or keyword.iskeyword(name):
         raise ValueError(f'"{name}" is not a valid Python identifier')
     if name == "_children":
@@ -306,8 +439,8 @@ def check_py_name(name: str) -> None:
 
 
 def resolve_refs(schema: Schema) -> tuple[list[str], list[str]]:
-    """Check that all referenced types exist and return the lists of all
-    element names and attribute names"""
+    """Replace all type reference names with actual types and return the lists
+    of all element names and attribute names"""
 
     elements: set[str] = set()
     attributes: set[str] = set()
@@ -384,6 +517,9 @@ def generate_hash(items: list[str]) -> HashData:
 def collect_field_names(
     all_fields: set[str], cur_fields: set[str], refs: Iterable[Attribute | TypeRef], type_name: str
 ) -> None:
+    """Gather all field names into "all_fields" and make sure they are unique in
+    "cur_fields" """
+
     for ref in refs:
         all_fields.add(ref.py_name)
         if ref.py_name in cur_fields:

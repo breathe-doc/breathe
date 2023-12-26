@@ -1545,8 +1545,8 @@ static int node_class_child__{$ type $}(parse_state *state,{$ 'PyObject **fields
             if(n->base.size && PyUnicode_CheckExact(n->base.content[n->base.size-1])) {
                 dest = &n->base.content[n->base.size-1];
             } else {
-                dest = frozen_list_push_tagged_value(state->py,TAGGED_UNION_NAME__{$ cname $},&n->base,NODE_LIST_INITIAL_CAPACITY);
-                if(dest == NULL) return -1;
+                if(frozen_list_push_object(&n->base,NULL,NODE_LIST_INITIAL_CAPACITY)) return -1;
+                dest = &n->base.content[n->base.size-1];
             }
 //%           else
             PyObject **dest = frozen_list_push_tagged_value(state->py,TAGGED_UNION_NAME__{$ cname $},&n->base,NODE_LIST_INITIAL_CAPACITY);
