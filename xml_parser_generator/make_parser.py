@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import re
 import sys
 import json
 import enum
@@ -31,6 +32,8 @@ BUILTIN_ATTR_SCHEMA_TYPES = [
     ("integer", "int"),
     ("empty", "None"),
 ]
+
+RE_CHAR_TYPE = re.compile(r"\s*#\s*char\s*\(([^\s)]+)\s*\)\s*")
 
 
 def comma_join(items: Sequence[str], indent: int = 4):
@@ -88,6 +91,10 @@ class SchemaType:
     def content_names(self) -> Iterable[str]:
         return []
 
+    @property
+    def extra_args(self) -> str:
+        return ""
+
     if TYPE_CHECKING:
 
         @property
@@ -108,6 +115,20 @@ class BuiltinType(SchemaType):
 @dataclasses.dataclass()
 class SpType(BuiltinType):
     pass
+
+
+@dataclasses.dataclass()
+class CodePointType(BuiltinType):
+    char: int
+
+    def __init__(self, char: int):
+        self.name = "const_char"
+        self.py_name = "str"
+        self.char = char
+
+    @property
+    def extra_args(self) -> str:
+        return f",{self.char:#x}"
 
 
 @dataclasses.dataclass()
@@ -187,9 +208,13 @@ class ListElement(ElementType):
 
     def py_union_list(self) -> list[str]:
         by_type = collections.defaultdict(list)
+        needs_str = False
         for name, t in self.content.items():
             assert isinstance(t, SchemaType)
-            by_type[t.py_name].append(name)
+            if not isinstance(t, (SpType, CodePointType)):
+                by_type[t.py_name].append(name)
+            else:
+                needs_str = True
         types = [
             "TaggedValue[Literal[{}], {}]".format(
                 comma_join(sorted(f"'{n}'" for n in names), 26), t
@@ -204,6 +229,11 @@ class ListElement(ElementType):
                     str_included = True
         if self.allow_text and not str_included:
             types.append("str")
+        elif needs_str:
+            raise ValueError(
+                f'type "{self.name}" cannot have #spType or '
+                + '#char(...) items unless "allow_text" is true'
+            )
         return types
 
 
@@ -248,6 +278,14 @@ def unknown_type_error(ref: str, context: str, is_element: bool) -> NoReturn:
 def check_type_ref(schema: Schema, ref: str, context: str, is_element: bool = True) -> SchemaType:
     t = schema.types.get(ref)
     if t is None:
+        m = RE_CHAR_TYPE.fullmatch(ref)
+        if m is not None:
+            char = int(m.group(1), 16)
+            if char > 0xFFFF:
+                raise ValueError(
+                    f'"char" type at "{context}" must have a value between 0 and 0xFFFF'
+                )
+            return CodePointType(char)
         unknown_type_error(ref, context, is_element)
     return t
 
@@ -515,7 +553,7 @@ def make_env(schema: Schema) -> jinja2.Environment:
             "builtin_t": (lambda x: isinstance(x, BuiltinType)),
             "enumeration_t": (lambda x: isinstance(x, SchemaEnum)),
             "char_enum_t": (lambda x: isinstance(x, SchemaCharEnum)),
-            "appends_str": (lambda x: isinstance(x, SpType)),
+            "appends_str": (lambda x: isinstance(x, (SpType, CodePointType))),
             "used_directly": used_directly,
             "allow_text": allow_text,
             "has_attributes": has_attributes,

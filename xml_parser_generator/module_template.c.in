@@ -1279,6 +1279,34 @@ static int node_start_spType(parse_state *state,PyObject **dest,const XML_Char *
     return 1;
 }
 
+static int node_start_const_char(parse_state *state,PyObject **dest,const XML_Char **attr,int c) {
+    parse_callbacks *cb;
+    PyObject *c_obj;
+
+    for(; *attr != NULL; attr += 2) {
+        if(warn_unexpected_attribute(state,attr[0])) return -1;
+    }
+
+    c_obj = PyUnicode_FromOrdinal(c);
+    if(c_obj == NULL) return -1;
+    if(*dest == NULL) *dest = c_obj;
+    else {
+        int r = append_str_obj(dest,c_obj);
+        Py_DECREF(c_obj);
+        if(r) return -1;
+    }
+
+    cb = push_callbacks(state);
+    if(cb == NULL) return -1;
+
+    cb->value = NULL;
+    cb->cs_call = NULL;
+    cb->f_call = NULL;
+    cb->t_call = NULL;
+
+    return 1;
+}
+
 static void raise_dup_field_error(const char *name) {
     PyErr_Format(PyExc_TypeError,"received more than one value for \"%s\"",name);
 }
@@ -1485,14 +1513,14 @@ static int node_class_child__{$ type $}(parse_state *state,{$ 'PyObject **fields
         {
             frozen_list *fl = (frozen_list*)fields[FIELD__{$ type $}__{$ cref.py_name $}];
             if(frozen_list_push_object(fl,NULL,NODE_LIST_INITIAL_CAPACITY)) return -1;
-            return node_{$ 'start_' if cref.type is builtin_t else 'class_start__' $}{$ cref.type $}(state,fl->content + (fl->size-1),attr);
+            return node_{$ 'start_' if cref.type is builtin_t else 'class_start__' $}{$ cref.type $}(state,fl->content + (fl->size-1),attr{$ cref.type.extra_args $});
         }
 //%         else
         if(fields[FIELD__{$ type $}__{$ cref.py_name $}] != NULL) {
             raise_duplicate_element_error(state,"{$ cref.name $}");
             return -1;
         }
-        return node_{$ 'start_' if cref.type is builtin_t else 'class_start__' $}{$ cref.type $}(state,&fields[FIELD__{$ type $}__{$ cref.py_name $}],attr);
+        return node_{$ 'start_' if cref.type is builtin_t else 'class_start__' $}{$ cref.type $}(state,&fields[FIELD__{$ type $}__{$ cref.py_name $}],attr{$ cref.type.extra_args $});
 //%         endif
 //%       endfor
 //%       for cname,ctype in type|content
@@ -1508,7 +1536,7 @@ static int node_class_child__{$ type $}(parse_state *state,{$ 'PyObject **fields
                 &n->base,
                 NODE_LIST_INITIAL_CAPACITY);
             if(dest == NULL) return -1;
-            return node_{$ 'start_' if ctype is builtin_t else 'class_start__' $}{$ ctype $}(state,dest,attr);
+            return node_{$ 'start_' if ctype is builtin_t else 'class_start__' $}{$ ctype $}(state,dest,attr{$ ctype.extra_args $});
         }
 //%         elif type is content_union
         {
@@ -1524,11 +1552,11 @@ static int node_class_child__{$ type $}(parse_state *state,{$ 'PyObject **fields
             PyObject **dest = frozen_list_push_tagged_value(state->py,TAGGED_UNION_NAME__{$ cname $},&n->base,NODE_LIST_INITIAL_CAPACITY);
             if(dest == NULL) return -1;
 //%           endif
-            return node_{$ 'start_' if ctype is builtin_t else 'class_start__' $}{$ ctype $}(state,dest,attr);
+            return node_{$ 'start_' if ctype is builtin_t else 'class_start__' $}{$ ctype $}(state,dest,attr{$ ctype.extra_args $});
         }
 //%         else
         if(frozen_list_push_object(&n->base,NULL,NODE_LIST_INITIAL_CAPACITY)) return -1;
-        return node_{$ 'start_' if ctype is builtin_t else 'class_start__' $}{$ ctype $}(state,n->base.content + (n->base.size-1),attr);
+        return node_{$ 'start_' if ctype is builtin_t else 'class_start__' $}{$ ctype $}(state,n->base.content + (n->base.size-1),attr{$ ctype.extra_args $});
 //%         endif
 //%       endfor
     default:
