@@ -1,3 +1,132 @@
+/*
+Python module to parse Doxygen's XML output.
+
+This module defines the following types:
+
+* FrozenList -- represented in C with frozen_list.
+
+    FrozenList is an array type that can be modified and resized while parsing
+    but is immutable when exposed in Python.
+
+* FrozenListItr -- represented in C with frozen_list_itr.
+
+    FrozenListItr is the iterator for FrozenList.
+
+* TaggedValue -- represented in C with tagged_value.
+
+    TaggedValue is a name/value pair for tagged union values.
+
+* Node -- no corresponding C type.
+
+    Node is an empty class used as a base type for all classes that start with
+    "Node_". It has no use in C code but breathe/parser.py adds a __repr__
+    method to it that is defined in Python.
+
+* Node_X not derived from FrozenList -- always represented by
+    node_tagonly_common.
+
+    These classes are generated according the input schema.
+
+* Node_X derived from FrozenList -- always represented by node_list_common.
+
+    These classes are generated according the input schema.
+
+* ParseError -- no corresponding C type.
+
+    The exception raised when there is a problem with the XML input that cannot
+    be ignored.
+
+* ParseWarning -- no corresponding C type.
+
+    The warning class for possible problems in the XML input. Currently this
+    is only issued for unexpected elements and attributes.
+
+
+Each Node_X type has some or all of the following functions:
+
+* int node_class_child_start__ELEMENT(parse_state *state,const XML_Char *child_name,const XML_Char **attr)
+
+    The element start handler for a child element of ELEMENT.
+
+    This mostly delegates to node_class_child__ELEMENT. This returns 1 if it was
+    handled, 0 if not and -1 if a Python exception has been raised.
+
+* int node_class_finish__ELEMENT(parse_state *state)
+
+    The element end handler for a child element of ELEMENT.
+
+    This mostly delegates to node_class_finish_fields__ELEMENT. This returns 1
+    if it was handled, 0 if not and -1 if a Python exception has been raised.
+
+* int node_class_start__ELEMENT(parse_state *state,PyObject **dest,const XML_Char **attr)
+
+    This has three responsibilities:
+    - To create the object corresponding to ELEMENT and set *dest to the
+      reference.
+    - To add the new object and the appropriate XML event handlers to the top of
+      the parser stack.
+    - To handle the XML attributes.
+
+    This returns 1 on success and -1 if a Python exception is raised. 1 is
+    returned instead of 0 because these functions are always called from
+    functions that return 1 if an element was handled.
+
+* void node_class_new_set_fields__ELEMENT(PyObject **fields,PyObject *args,Py_ssize_t start_i)
+
+    Set the fields of ELEMENT from the positional arguments in "args".
+
+    "start_i" is the index of what should be considered the first argument. This
+    function always succeeds. This is a separate function so that derived
+    elements can use it.
+
+* int node_class_new_set_kw_field__ELEMENT(module_state *state,PyObject **fields,py_field_type field,PyObject *value)
+
+    Set the field in ELEMENT corresponding to the keyword argument "field".
+
+    This returns 1 if the argument was assigned to a field, 0 if it doesn't
+    correspond to a field of ELEMENT and -1 if a Python exception was raised.
+    This is a separate function so that derived elements can use it.
+
+* int node_class_new_fields_end__ELEMENT(module_state *state,PyObject **fields)
+
+    This is called after all arguments are processed in a Python constructor
+    (the __new__ method). It is used to check for unset fields and to fill them
+    with default values or raise a Python exception. This returns 0 on success
+    and -1 if a Python exception is raised. This is a separate function so that
+    derived elements can use it.
+
+* int node_class_attr__ELEMENT(parse_state *state,[PyObject **fields,]attribute_type,const XML_Char**)
+
+    Handle a single attribute for ELEMENT.
+
+    This returns 1 if it was handled, 0 if not and -1 if a Python exception has
+    been raised. This is a separate function so that derived elements can use
+    it.
+
+* int node_class_attr_end__ELEMENT(parse_state *state,PyObject **fields)
+
+    This is called after all attributes are handled. It is used to check for
+    unset fields and to fill them with default values or raise a Python
+    exception. This returns 0 on success and -1 if a Python exception is raised.
+    This is a separate function so that derived elements can use it.
+
+* int node_class_child__ELEMENT(parse_state *state,[PyObject**,]element_type,const XML_Char**)
+
+    Handle a single child element for ELEMENT.
+
+    This returns 1 if it was handled, 0 if not and -1 if a Python exception has
+    been raised. This is a separate function so that derived elements can use
+    it.
+
+* int node_class_finish_fields__ELEMENT(parse_state *state,PyObject **fields)
+
+    This is called after all child elements are handled. It is used to check for
+    unset fields and to fill them with default values or raise a Python
+    exception. This returns 0 on success and -1 if a Python exception is raised.
+    This is a separate function so that derived elements can use it.
+
+*/
+
 #define PY_SSIZE_T_CLEAN
 #include <pyconfig.h>
 
@@ -71,8 +200,8 @@ enum {
     CLASS_COUNT
 };
 
+/* it's "ENUM_VALUE" because it refers to a Python enum value */
 //% for type in types|select('enumeration_t')
-/* it's ENUM_VALUE because it refers to a Python enum value */
 enum {
 //% for value in type.children
     ENUM_VALUE__{$ type $}__{$ value.id $}{$ ' = 0' if loop.first $},
@@ -124,12 +253,34 @@ typedef int (*finish_callback)(struct _parse_state*);
 typedef int (*text_callback)(struct _parse_state*,const XML_Char*,int);
 
 typedef struct _parse_callbacks {
+    /* A pointer to the value corresponding the currently visited XML element.
+    
+    The callbacks below are free to set this to a different Python reference.
+    */
     PyObject **value;
+
+    /* A callback for a child of the current element.
+    
+    This may be NULL if no child elements are allowed.
+    */
     child_start_callback cs_call;
+
+    /* A callback for text contained directly inside the current element.
+    
+    This may be NULL if text is not allowed. If NULL, whitespace is ignored.
+    */
     text_callback t_call;
+
+    /* A callback for when the current element is closed.
+    
+    This may be NULL if no action is needed. */
     finish_callback f_call;
 } parse_callbacks;
 
+/* A "block" or the parser callbacks stack.
+
+The stack is broken into fixed sized "blocks" kept in a double-linked list.
+*/
 typedef struct _callback_stack_block {
     struct _callback_stack_block *prev;
     struct _callback_stack_block *next;
@@ -137,10 +288,31 @@ typedef struct _callback_stack_block {
 } callback_stack_block;
 
 typedef struct _parse_state {
+    /* The block that contains the top stack item.
+    
+    There may be blocks before but also blocks after. Blocks are not freed until
+    parsing is done. All the blocks have to be accessed through this pointer as
+    it is the only pointer to a block that is not inside another block.
+    */
     callback_stack_block *block;
+
+    /* The number of stack items inside the current block.
+
+    All previous blocks are full and all subsequent blocks are empty.
+    */
     unsigned int block_used;
+
     XML_Parser parser;
+
+    /* White this is greater than zero all XML content is ignored.
+
+    This starts at zero. When an unexpected element start is encountered, a
+    warning is issued (via PyErr_WarnFormat) and this is set to 1. Any
+    subsequent element-starts increment this and element-ends decrement this
+    until this is zero again, and normal parsing resumes.
+    */
     int ignore_level;
+
     module_state *py;
 } parse_state;
 
@@ -260,13 +432,12 @@ static void XMLCALL end_element(void *user,const XML_Char *Py_UNUSED(name)) {
 int non_whitespace(const char *s,int len) {
     int i;
     for(i=0; i<len; ++i) {
-        switch(*s) {
+        switch(s[i]) {
         case ' ':
         case '\t':
         case '\n':
         case '\r':
         case '\v':
-            ++s;
             break;
         case '\0':
             return len >= 0;

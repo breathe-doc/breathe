@@ -38,9 +38,6 @@ homepage = "https://github.com/michaeljones/breathe"
 [project.scripts]
 breathe-apidoc = "breathe.apidoc:main"
 
-[tool.setuptools.packages.find]
-include = ["breathe*"]
-
 [tool.black]
 line-length = 100
 extend-exclude = '''

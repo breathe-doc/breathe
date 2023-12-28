@@ -1,3 +1,6 @@
+"""Parse a JSON schema file and generate the C code for a Python module to parse
+XML"""
+
 from __future__ import annotations
 
 import re
@@ -134,7 +137,8 @@ class Attribute:
     optional: bool
     """Whether the attribute may be omitted.
     
-    Fields corresponding to omitted attributes are set to None"""
+    Fields corresponding to omitted attributes are set to None.
+    """
 
     def py_type(self, as_param=False) -> str:
         """Get the Python type annotation describing the type of this attribute.
@@ -196,7 +200,12 @@ class BuiltinType(SchemaType):
 
 
 @dataclasses.dataclass()
-class SpType(BuiltinType):
+class AddsToStringType(BuiltinType):
+    pass
+
+
+@dataclasses.dataclass()
+class SpType(AddsToStringType):
     """This element represents an arbitrary character whose code point is
     given in the attribute "value".
 
@@ -205,7 +214,7 @@ class SpType(BuiltinType):
 
 
 @dataclasses.dataclass()
-class CodePointType(BuiltinType):
+class CodePointType(AddsToStringType):
     """This element represents a specific character."""
 
     char: int
@@ -327,7 +336,7 @@ class ListElement(ElementType):
         needs_str = False
         for name, t in self.content.items():
             assert isinstance(t, SchemaType)
-            if not isinstance(t, (SpType, CodePointType)):
+            if not isinstance(t, AddsToStringType):
                 by_type[t.py_name].append(name)
             else:
                 needs_str = True
@@ -559,7 +568,9 @@ def make_env(schema: Schema) -> jinja2.Environment:
                 if t.used_directly:
                     list_element_field_counts.add(field_count(t))
                 if t.content_type == ContentType.union:
-                    tag_names.update(t.content)
+                    tag_names.update(
+                        name for name, t in t.content.items() if not isinstance(t, AddsToStringType)
+                    )
                 elif t.content_type == ContentType.tuple:
                     tuple_field_counts.add(len(t.content))
                     tagonly_and_tuple_field_counts.add(len(t.content))
@@ -689,7 +700,7 @@ def make_env(schema: Schema) -> jinja2.Environment:
             "builtin_t": (lambda x: isinstance(x, BuiltinType)),
             "enumeration_t": (lambda x: isinstance(x, SchemaEnum)),
             "char_enum_t": (lambda x: isinstance(x, SchemaCharEnum)),
-            "appends_str": (lambda x: isinstance(x, (SpType, CodePointType))),
+            "appends_str": (lambda x: isinstance(x, AddsToStringType)),
             "used_directly": used_directly,
             "allow_text": allow_text,
             "has_attributes": has_attributes,
