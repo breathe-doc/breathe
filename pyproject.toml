@@ -44,9 +44,6 @@ extend-exclude = '''
 ^/examples/.* | ^/tests/data/.*
 '''
 
-#[tool.cibuildwheel]
-#test-requires = "pytest"
-#test-command = "pytest {project}/tests"
-
-#[tool.cibuildwheel.linux]
-#before-all = "yum install -y doxygen"
+[tool.cibuildwheel]
+test-requires = "pytest"
+test-command = "BREATHE_DOXYGEN_TEST_CACHE={project}/tests/data/examples/_cache pytest {project}/tests"

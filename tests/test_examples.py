@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import os
 from xml.parsers import expat
 import pytest
 import pathlib
@@ -8,6 +9,8 @@ import shutil
 import enum
 import dataclasses
 import sphinx
+
+from breathe.process import AutoDoxygenProcessHandle
 
 from typing import Any
 
@@ -18,25 +21,6 @@ if sphinx.version_info < (7, 2, 6):
 else:
     sphinx_path = pathlib.Path
 
-
-DOXYFILE_TEMPLATE = """
-PROJECT_NAME     = "example"
-HAVE_DOT         = YES
-GENERATE_LATEX   = NO
-GENERATE_MAN     = NO
-GENERATE_RTF     = NO
-CASE_SENSE_NAMES = NO
-OUTPUT_DIRECTORY = "{output}"
-IMAGE_PATH       = "."
-QUIET            = YES
-JAVADOC_AUTOBRIEF = YES
-GENERATE_HTML = NO
-GENERATE_XML = YES
-WARN_IF_UNDOCUMENTED = NO
-ALIASES = "rst=\\verbatim embed:rst"
-ALIASES += "endrst=\\endverbatim"
-ALIASES += "inlinerst=\\verbatim embed:rst:inline"
-"""
 
 C_FILE_SUFFIXES = frozenset((".h", ".c", ".hpp", ".cpp"))
 IGNORED_ELEMENTS: frozenset[str] = frozenset(())
@@ -51,6 +35,8 @@ DEFAULT_CONF = {
     "breathe_show_include": False,
     "extensions": ["breathe", "sphinx.ext.graphviz"],
 }
+
+DOXYGEN_CACHE_KEY = "BREATHE_DOXYGEN_TEST_CACHE"
 
 
 class XMLEventType(enum.Enum):
@@ -189,6 +175,11 @@ class VersionedFile:
     version: tuple[int, ...]
 
 
+@dataclasses.dataclass
+class DoxygenExe(VersionedFile):
+    template: str
+
+
 def str_to_version(v_str):
     return tuple(map(int, v_str.strip().split(".")))
 
@@ -241,23 +232,44 @@ def compare_xml(generated, version):
 
 
 @pytest.fixture(scope="module")
-def doxygen():
-    exc = shutil.which("doxygen")
-    if exc is None:
-        raise ValueError("cannot find doxygen executable")
+def doxygen_cache():
+    dc = os.environ.get(DOXYGEN_CACHE_KEY)
+    if not dc:
+        return None
+    return pathlib.Path(dc).absolute()
 
-    r = subprocess.run(
-        [exc, "--version"], check=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True
+
+@pytest.fixture(scope="module")
+def doxygen(doxygen_cache):
+    if doxygen_cache is None:
+        exc = shutil.which("doxygen")
+        if not exc:
+            raise ValueError("cannot find doxygen executable")
+
+        v_str = subprocess.run(
+            [exc, "--version"],
+            check=True,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
+            text=True,
+        ).stdout
+    else:
+        exc = ""
+        v_str = (doxygen_cache / "version.txt").read_text()
+
+    return DoxygenExe(
+        exc,
+        str_to_version(v_str.split()[0]),
+        (TEST_DATA_DIR / "examples" / "doxyfile_template").read_text(),
     )
-    return VersionedFile(exc, str_to_version(r.stdout.split()[0]))
 
 
 @pytest.mark.parametrize("test_input", get_individual_tests())
-def test_example(make_app, tmp_path, test_input, monkeypatch, doxygen):
+def test_example(make_app, tmp_path, test_input, monkeypatch, doxygen, doxygen_cache):
     monkeypatch.chdir(test_input)
 
     doxyfile = tmp_path / "Doxyfile"
-    doxycontent = DOXYFILE_TEMPLATE.format(output=tmp_path)
+    doxycontent = doxygen.template.format(output=tmp_path)
     extra_opts = pathlib.Path("extra_dox_opts.txt")
     if extra_opts.exists():
         doxycontent += extra_opts.read_text()
@@ -265,7 +277,15 @@ def test_example(make_app, tmp_path, test_input, monkeypatch, doxygen):
     (tmp_path / "conf.py").touch()
     shutil.copyfile("input.rst", tmp_path / "index.rst")
 
-    subprocess.run([doxygen.file, doxyfile], check=True)
+    if doxygen_cache is not None:
+        # instead of passing a different path to breathe_projects.example, the
+        # folder is copied to the same place it would be without caching so that
+        # all paths in the generated output remain the same
+        shutil.copytree(
+            doxygen_cache / test_input.name / "xml",
+            tmp_path / "xml")
+    else:
+        subprocess.run([doxygen.file, doxyfile], check=True)
 
     make_app(
         buildername="xml",
@@ -276,9 +296,14 @@ def test_example(make_app, tmp_path, test_input, monkeypatch, doxygen):
     compare_xml(tmp_path / "_build" / "xml" / "index.xml", doxygen.version)
 
 
-def test_auto(make_app, tmp_path, monkeypatch, doxygen):
+def test_auto(make_app, tmp_path, monkeypatch, doxygen, doxygen_cache):
     test_input = TEST_DATA_DIR / "auto"
     monkeypatch.chdir(test_input)
+
+    if doxygen_cache is not None:
+        xml_path = str(doxygen_cache / "auto" / "xml")
+        monkeypatch.setattr(AutoDoxygenProcessHandle, "process", (lambda *args, **kwds: xml_path))
+
     (tmp_path / "conf.py").touch()
     shutil.copyfile("input.rst", tmp_path / "index.rst")
 

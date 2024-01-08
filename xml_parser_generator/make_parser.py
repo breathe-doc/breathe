@@ -688,6 +688,7 @@ def make_env(schema: Schema) -> jinja2.Environment:
 
     for t in schema.types.values():
         if isinstance(t, ElementType) and any(field_count(cast(ElementType, b)) for b in t.bases):
+            # the code was written to support this but it has never been tested
             raise ValueError(
                 'elements having bases that have "attributes" or "children" are not currently supported'
             )

@@ -3,65 +3,130 @@ Python module to parse Doxygen's XML output.
 
 This module defines the following types:
 
-* FrozenList -- represented in C with frozen_list.
+- FrozenList -- represented in C with frozen_list.
 
     FrozenList is an array type that can be modified and resized while parsing
     but is immutable when exposed in Python.
 
-* FrozenListItr -- represented in C with frozen_list_itr.
+- FrozenListItr -- represented in C with frozen_list_itr.
 
     FrozenListItr is the iterator for FrozenList.
 
-* TaggedValue -- represented in C with tagged_value.
+- TaggedValue -- represented in C with tagged_value.
 
     TaggedValue is a name/value pair for tagged union values.
 
-* Node -- no corresponding C type.
+- Node -- no corresponding C type.
 
     Node is an empty class used as a base type for all classes that start with
     "Node_". It has no use in C code but breathe/parser.py adds a __repr__
     method to it that is defined in Python.
 
-* Node_X not derived from FrozenList -- always represented by
+- Node_X not derived from FrozenList -- always represented by
     node_tagonly_common.
 
     These classes are generated according the input schema.
 
-* Node_X derived from FrozenList -- always represented by node_list_common.
+- Node_X derived from FrozenList -- always represented by node_list_common.
 
     These classes are generated according the input schema.
 
-* ParseError -- no corresponding C type.
+- ListItem_X -- represented in C with "tuple_item".
+
+    Types that have "kind" equal to "tuple_list_element" in the schema also have
+    a companion class for their elements. It will have the same name as the main
+    class except it starts with ListItem_ instead of Node_. These classes are
+    similar to named tuples.
+
+- ParseError -- no corresponding C type.
 
     The exception raised when there is a problem with the XML input that cannot
     be ignored.
 
-* ParseWarning -- no corresponding C type.
+- ParseWarning -- no corresponding C type.
 
     The warning class for possible problems in the XML input. Currently this
     is only issued for unexpected elements and attributes.
 
 
-Each Node_X type has some or all of the following functions:
+Each non-simple type has some or all of the following functions:
 
-* int node_class_child_start__ELEMENT(parse_state *state,const XML_Char *child_name,const XML_Char **attr)
+- void node_class_new_set_fields__X(PyObject **fields,PyObject *args,Py_ssize_t start_i)
 
-    The element start handler for a child element of ELEMENT.
+    Set the fields of Node_X from the positional arguments in "args".
 
-    This mostly delegates to node_class_child__ELEMENT. This returns 1 if it was
+    "start_i" is the index of what should be considered the first argument. This
+    function always succeeds. This is a separate function so that derived
+    elements can use it.
+
+- int node_class_new_set_kw_field__X(module_state *state,PyObject **fields,py_field_type field,PyObject *value)
+
+    Set the field in Node_X corresponding to the keyword argument "field".
+
+    This returns 1 if the argument was assigned to a field, 0 if it doesn't
+    correspond to a field of Node_X and -1 if a Python exception was raised.
+    This is a separate function so that derived elements can use it.
+
+- int node_class_new_fields_end__X(module_state *state,PyObject **fields)
+
+    This is called after all arguments are processed in a Python constructor
+    (the __new__ method). It is used to check for unset fields and to fill them
+    with default values or raise a Python exception. This returns 0 on success
+    and -1 if a Python exception is raised. This is a separate function so that
+    derived elements can use it.
+
+- int node_class_attr__X(parse_state *state,[PyObject **fields,]attribute_type,const XML_Char**)
+
+    Handle a single attribute for element X.
+
+    This returns 1 if it was handled, 0 if not and -1 if a Python exception has
+    been raised. This is a separate function so that derived elements can use
+    it.
+
+- int node_class_attr_end__X(parse_state *state,PyObject **fields)
+
+    This is called after all attributes are handled. It is used to check for
+    unset fields and to fill them with default values or raise a Python
+    exception. This returns 0 on success and -1 if a Python exception is raised.
+    This is a separate function so that derived elements can use it.
+
+- int node_class_child__X(parse_state *state,[PyObject**,]element_type,const XML_Char**)
+
+    Handle a single child element for element X.
+
+    This returns 1 if it was handled, 0 if not and -1 if a Python exception has
+    been raised. This is a separate function so that derived elements can use
+    it.
+
+- int node_class_finish_fields__X(parse_state *state,PyObject **fields)
+
+    This is called after all child elements are handled. It is used to check for
+    unset fields and to fill them with default values or raise a Python
+    exception. This returns 0 on success and -1 if a Python exception is raised.
+    This is a separate function so that derived elements can use it.
+
+
+If the type is used directly, it will have its own Python class and the
+following C functions:
+
+- int node_class_child_start__X(parse_state *state,const XML_Char *child_name,const XML_Char **attr)
+
+    The element start handler for a child element of element X.
+
+    This mostly delegates to node_class_child__X. This returns 1 if it was
     handled, 0 if not and -1 if a Python exception has been raised.
 
-* int node_class_finish__ELEMENT(parse_state *state)
+- int node_class_finish__X(parse_state *state)
 
-    The element end handler for a child element of ELEMENT.
+    The element end handler for a child element of element X.
 
-    This mostly delegates to node_class_finish_fields__ELEMENT. This returns 1
-    if it was handled, 0 if not and -1 if a Python exception has been raised.
+    This mostly delegates to node_class_finish_fields__X. This returns 1 if it
+    was handled, 0 if not and -1 if a Python exception has been raised.
 
-* int node_class_start__ELEMENT(parse_state *state,PyObject **dest,const XML_Char **attr)
+- int node_class_start__X(parse_state *state,PyObject **dest,const XML_Char **attr)
 
     This has three responsibilities:
-    - To create the object corresponding to ELEMENT and set *dest to the
+    - To create the object corresponding to element X and set *dest to the
       reference.
     - To add the new object and the appropriate XML event handlers to the top of
       the parser stack.
@@ -70,60 +135,6 @@ Each Node_X type has some or all of the following functions:
     This returns 1 on success and -1 if a Python exception is raised. 1 is
     returned instead of 0 because these functions are always called from
     functions that return 1 if an element was handled.
-
-* void node_class_new_set_fields__ELEMENT(PyObject **fields,PyObject *args,Py_ssize_t start_i)
-
-    Set the fields of ELEMENT from the positional arguments in "args".
-
-    "start_i" is the index of what should be considered the first argument. This
-    function always succeeds. This is a separate function so that derived
-    elements can use it.
-
-* int node_class_new_set_kw_field__ELEMENT(module_state *state,PyObject **fields,py_field_type field,PyObject *value)
-
-    Set the field in ELEMENT corresponding to the keyword argument "field".
-
-    This returns 1 if the argument was assigned to a field, 0 if it doesn't
-    correspond to a field of ELEMENT and -1 if a Python exception was raised.
-    This is a separate function so that derived elements can use it.
-
-* int node_class_new_fields_end__ELEMENT(module_state *state,PyObject **fields)
-
-    This is called after all arguments are processed in a Python constructor
-    (the __new__ method). It is used to check for unset fields and to fill them
-    with default values or raise a Python exception. This returns 0 on success
-    and -1 if a Python exception is raised. This is a separate function so that
-    derived elements can use it.
-
-* int node_class_attr__ELEMENT(parse_state *state,[PyObject **fields,]attribute_type,const XML_Char**)
-
-    Handle a single attribute for ELEMENT.
-
-    This returns 1 if it was handled, 0 if not and -1 if a Python exception has
-    been raised. This is a separate function so that derived elements can use
-    it.
-
-* int node_class_attr_end__ELEMENT(parse_state *state,PyObject **fields)
-
-    This is called after all attributes are handled. It is used to check for
-    unset fields and to fill them with default values or raise a Python
-    exception. This returns 0 on success and -1 if a Python exception is raised.
-    This is a separate function so that derived elements can use it.
-
-* int node_class_child__ELEMENT(parse_state *state,[PyObject**,]element_type,const XML_Char**)
-
-    Handle a single child element for ELEMENT.
-
-    This returns 1 if it was handled, 0 if not and -1 if a Python exception has
-    been raised. This is a separate function so that derived elements can use
-    it.
-
-* int node_class_finish_fields__ELEMENT(parse_state *state,PyObject **fields)
-
-    This is called after all child elements are handled. It is used to check for
-    unset fields and to fill them with default values or raise a Python
-    exception. This returns 0 on success and -1 if a Python exception is raised.
-    This is a separate function so that derived elements can use it.
 
 */
 
@@ -304,7 +315,7 @@ typedef struct _parse_state {
 
     XML_Parser parser;
 
-    /* White this is greater than zero all XML content is ignored.
+    /* While this is greater than zero all XML content is ignored.
 
     This starts at zero. When an unexpected element start is encountered, a
     warning is issued (via PyErr_WarnFormat) and this is set to 1. Any
@@ -429,7 +440,7 @@ static void XMLCALL end_element(void *user,const XML_Char *Py_UNUSED(name)) {
     pop_callbacks(state);
 }
 
-int non_whitespace(const char *s,int len) {
+static int non_whitespace(const char *s,int len) {
     int i;
     for(i=0; i<len; ++i) {
         switch(s[i]) {
@@ -1221,7 +1232,7 @@ enum {
     TUPLE_ITEM_FIELD_COUNT__{$ type $}
 };
 
-const char *tuple_item_field_names__{$ type $}[] = {
+static const char *tuple_item_field_names__{$ type $}[] = {
 //%       for field,ftype in type|content
     "{$ field $}",
 //%       endfor
@@ -1235,7 +1246,7 @@ static PyMemberDef tuple_item_members__{$ type $}[] = {
     {NULL}
 };
 
-PyObject *tuple_item_tp_new__{$ type $}(PyTypeObject *subtype,PyObject *args,PyObject *kwds) {
+static PyObject *tuple_item_tp_new__{$ type $}(PyTypeObject *subtype,PyObject *args,PyObject *kwds) {
     size_t i;
     tuple_item *r = (tuple_item*)((allocfunc)PyType_GetSlot(subtype,Py_tp_alloc))(subtype,0);
     if(r == NULL) return NULL;

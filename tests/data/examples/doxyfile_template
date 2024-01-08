@@ -1,0 +1,17 @@
+PROJECT_NAME     = "example"
+HAVE_DOT         = YES
+DOTFILE_DIRS     = "."
+GENERATE_LATEX   = NO
+GENERATE_MAN     = NO
+GENERATE_RTF     = NO
+CASE_SENSE_NAMES = NO
+OUTPUT_DIRECTORY = "{output}"
+IMAGE_PATH       = "."
+QUIET            = YES
+JAVADOC_AUTOBRIEF = YES
+GENERATE_HTML = NO
+GENERATE_XML = YES
+WARN_IF_UNDOCUMENTED = NO
+ALIASES = "rst=\verbatim embed:rst"
+ALIASES += "endrst=\endverbatim"
+ALIASES += "inlinerst=\verbatim embed:rst:inline"
