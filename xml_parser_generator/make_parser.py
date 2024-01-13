@@ -60,7 +60,11 @@ class ContentType(enum.Enum):
     """Child elements are grouped into named tuple-like objects.
     
     Each batch of child elements must appear in order in the XML document. Text
-    content is not allowed."""
+    content is not allowed.
+    
+    Currently, tuple child element names must be valid Python identifiers as
+    there isn't a way to have different field names.
+    """
 
     union = enum.auto()
     """Each item is either a tagged union (an instance of TaggedValue) or a
@@ -112,6 +116,17 @@ class TypeRef:
         if self.min_items == 0:
             return f"{self.type.py_name} | None"
         return self.type.py_name
+
+    def needs_finish(self) -> bool:
+        """Return True if the field value will need to be checked at the end of
+        parsing the element.
+
+        This is the case case for all fields except list fields with no minimum.
+        For most fields, we need to know how many corresponding child elements
+        exist, which can't be known until the parent element is fully parsed,
+        but list fields without minimums accept any number of child elements.
+        """
+        return not self.is_list or self.min_items > 0
 
 
 @dataclasses.dataclass()
@@ -175,6 +190,11 @@ class SchemaType:
         """A string to add before the closing bracket of the C function call to
         the type's element start handler"""
         return ""
+
+    def add_sorted(self, dest: list[SchemaType], visited: set[int]) -> None:
+        if id(self) not in visited:
+            visited.add(id(self))
+            dest.append(self)
 
     if TYPE_CHECKING:
 
@@ -278,6 +298,14 @@ class ElementType(SchemaType):
     @property
     def py_name(self) -> str:
         return f"Node_{self.name}"
+
+    def add_sorted(self, dest: list[SchemaType], visited: set[int]) -> None:
+        if id(self) not in visited:
+            for b in self.bases:
+                assert isinstance(b, SchemaType)
+                b.add_sorted(dest, visited)
+            visited.add(id(self))
+            dest.append(self)
 
 
 @dataclasses.dataclass()
@@ -672,6 +700,25 @@ def make_env(schema: Schema) -> jinja2.Environment:
             return ref.is_list or ref.min_items == 0
         return ref.optional
 
+    def array_field(ref) -> bool:
+        if isinstance(ref, TypeRef):
+            return ref.is_list
+        return False
+
+    def needs_finish_fields_call(t):
+        if not isinstance(t, ElementType):
+            return False
+        return any(c.needs_finish() for c in t.children.values()) or any(
+            map(needs_finish_fields_call, t.bases)
+        )
+
+    def needs_finish_call(t):
+        return needs_finish_fields_call(t) or (
+            isinstance(t, ListElement)
+            and t.content_type == ContentType.tuple
+            and len(t.content) > 1
+        )
+
     def error(msg):
         raise TypeError(msg)
 
@@ -686,7 +733,12 @@ def make_env(schema: Schema) -> jinja2.Environment:
             self.used = True
             return self.content
 
+    # types sorted topologically with regard to base elements
+    sorted_types: list[SchemaType] = []
+    visited_types: set[SchemaType] = set()
+
     for t in schema.types.values():
+        t.add_sorted(sorted_types, visited_types)
         if isinstance(t, ElementType) and any(field_count(cast(ElementType, b)) for b in t.bases):
             # the code was written to support this but it has never been tested
             raise ValueError(
@@ -702,6 +754,8 @@ def make_env(schema: Schema) -> jinja2.Environment:
             "enumeration_t": (lambda x: isinstance(x, SchemaEnum)),
             "char_enum_t": (lambda x: isinstance(x, SchemaCharEnum)),
             "appends_str": (lambda x: isinstance(x, AddsToStringType)),
+            "code_point_t": (lambda x: isinstance(x, CodePointType)),
+            "sp_t": (lambda x: isinstance(x, CodePointType)),
             "used_directly": used_directly,
             "allow_text": allow_text,
             "has_attributes": has_attributes,
@@ -709,10 +763,13 @@ def make_env(schema: Schema) -> jinja2.Environment:
             "has_children_or_content": has_children_or_content,
             "has_fields": lambda x: field_count(x) > 0,
             "has_children_or_tuple_content": has_children_or_tuple_content,
+            "needs_finish_fields_call": needs_finish_fields_call,
+            "needs_finish_call": needs_finish_call,
             "content_bare": content_type(ContentType.bare),
             "content_tuple": content_type(ContentType.tuple),
             "content_union": content_type(ContentType.union),
             "optional": optional,
+            "array_field": array_field,
         }
     )
     tmpl_env.filters.update(
@@ -728,7 +785,7 @@ def make_env(schema: Schema) -> jinja2.Environment:
     )
     tmpl_env.globals.update(
         {
-            "types": list(schema.types.values()),
+            "types": sorted_types,
             "root_elements": list(schema.roots.items()),
             "element_names": elements,
             "attribute_names": attributes,
@@ -951,24 +1008,14 @@ def check_schema(x) -> Schema:
     return r
 
 
-def generate_from_json(
-    json_path, c_template_file, pyi_template_file, c_output_file, pyi_output_file
-) -> None:
+def generate_from_json(json_path, template_files) -> None:
     with open(json_path, "rb") as ifile:
         schema = check_schema(json.load(ifile))
 
     env = make_env(schema)
 
-    with open(c_template_file) as tfile:
-        template_str = tfile.read()
-    with open(c_output_file, "w") as ofile:
-        env.from_string(template_str).stream().dump(ofile)
-
-    with open(pyi_template_file) as tfile:
-        template_str = tfile.read()
-    with open(pyi_output_file, "w") as ofile:
-        env.from_string(template_str).stream().dump(ofile)
-
-
-if __name__ == "__main__":
-    generate_from_json(sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4], sys.argv[5])
+    for i_file, o_file in template_files:
+        with open(i_file) as tfile:
+            template_str = tfile.read()
+        with open(o_file, "w") as ofile:
+            env.from_string(template_str).stream().dump(ofile)

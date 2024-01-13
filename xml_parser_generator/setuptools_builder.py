@@ -45,16 +45,19 @@ class CustomBuild(build):
 
 
 class CustomBuildExt(build_ext):
-    """Extend build_ext to automatically generate _parser.c"""
+    """Extend build_ext to automatically generate the parser module"""
 
     user_options = build_ext.user_options + extra_user_options
 
     SCHEMA_FILE = os.path.join("xml_parser_generator", "schema.json")
     MODULE_TEMPLATE = os.path.join("xml_parser_generator", "module_template.c.in")
+    PY_MODULE_TEMPLATE = os.path.join("xml_parser_generator", "module_template.py.in")
     STUBS_TEMPLATE = os.path.join("xml_parser_generator", "stubs_template.pyi.in")
     MAKER_SOURCE = os.path.join("xml_parser_generator", "make_parser.py")
 
-    DEPENDENCIES = [SCHEMA_FILE, MODULE_TEMPLATE, STUBS_TEMPLATE, MAKER_SOURCE]
+    M_DEPENDENCIES = [SCHEMA_FILE, MODULE_TEMPLATE, MAKER_SOURCE]
+    PY_M_DEPENDENCIES = [SCHEMA_FILE, PY_MODULE_TEMPLATE, MAKER_SOURCE]
+    S_DEPENDENCIES = [SCHEMA_FILE, STUBS_TEMPLATE, MAKER_SOURCE]
 
     def initialize_options(self):
         super().initialize_options()
@@ -86,26 +89,31 @@ class CustomBuildExt(build_ext):
 
         source = os.path.join(self.build_temp, self.extensions[0].name + ".c")
 
-        # put the stub file in the same place that the extension module will be
+        # put the stub and Python file in the same place that the extension
+        # module will be
         ext_dest = self.get_ext_fullpath(self.extensions[0].name)
         libdir = os.path.dirname(ext_dest)
         stub = os.path.join(libdir, self.extensions[0].name + ".pyi")
+        py_source = os.path.join(libdir, self.extensions[0].name + "_py.py")
 
         mkpath(self.build_temp, dry_run=self.dry_run)
         mkpath(libdir, dry_run=self.dry_run)
 
-        if (
-            self.force
-            or newer_group(self.DEPENDENCIES, source)
-            or newer_group(self.DEPENDENCIES, stub)
+        regen = []
+        for dep, out, tmpl in (
+            (self.M_DEPENDENCIES, source, self.MODULE_TEMPLATE),
+            (self.PY_M_DEPENDENCIES, py_source, self.PY_MODULE_TEMPLATE),
+            (self.S_DEPENDENCIES, stub, self.STUBS_TEMPLATE),
         ):
-            log.info(f'generating "{source}" and "{stub}" from templates')
+            if self.force or newer_group(dep, out):
+                regen.append((tmpl, out))
+
+        if regen:
+            log.info("generating module source from templates")
             if not self.dry_run:
-                make_parser.generate_from_json(
-                    self.SCHEMA_FILE, self.MODULE_TEMPLATE, self.STUBS_TEMPLATE, source, stub
-                )
+                make_parser.generate_from_json(self.SCHEMA_FILE, regen)
         else:
-            log.debug(f'"{source}" and "{stub}" are up-to-date')
+            log.debug(f'"{source}", "{py_source}" and "{stub}" are up-to-date')
 
         self.extensions[0].sources.append(source)
 

@@ -109,6 +109,13 @@ Each non-simple type has some or all of the following functions:
 If the type is used directly, it will have its own Python class and the
 following C functions:
 
+- Py_ssize_t assign_field_name_tuple__X(PyObject *dest,PyObject **names,Py_ssize_t start_i)
+
+    Populate the tuple "dest" with the full list of field names of X.
+
+    The return value is the number of fields set. This is compared to the number
+    of fields expected, in an assert statement.
+
 - int node_class_child_start__X(parse_state *state,const XML_Char *child_name,const XML_Char **attr)
 
     The element start handler for a child element of element X.
@@ -814,7 +821,7 @@ static PyObject *parse_error_tp_str(PyObject *self) {
     PyObject *args = parse_error_get_args(self);
     if(args == NULL) return NULL;
     lineno = PyTuple_GetItem(args,1);
-    if(lineno == Py_None) r = PyUnicode_FromFormat("Error: %S",lineno,PyTuple_GetItem(args,0));
+    if(lineno == Py_None) r = PyUnicode_FromFormat("Error: %S",PyTuple_GetItem(args,0));
     else r = PyUnicode_FromFormat("Error on line %S: %S",lineno,PyTuple_GetItem(args,0));
     Py_DECREF(args);
     return r;
@@ -1199,7 +1206,7 @@ static PyType_Slot node_class_slots__{$ type $}[] = {
 //%     if type is has_children_or_content
 static int node_class_child_start__{$ type $}(parse_state*,const XML_Char*,const XML_Char**);
 //%     endif
-//%     if type is has_children_or_tuple_content
+//%     if type is needs_finish_call
 static int node_class_finish__{$ type $}(parse_state*);
 //%     endif
 static int node_class_start__{$ type $}(parse_state*,PyObject**,const XML_Char**);
@@ -1217,7 +1224,7 @@ static int node_class_attr_end__{$ type $}(parse_state*,PyObject**);
 //%     if type is has_children_or_content
 static int node_class_child__{$ type $}(parse_state*,{$ 'PyObject**,' if type is has_fields $}element_type,const XML_Char**);
 //%     endif
-//%     if type is has_children
+//%     if type is needs_finish_fields_call
 static int node_class_finish_fields__{$ type $}(parse_state *state,PyObject **fields);
 //%     endif
 //%   elif type is enumeration_t or type is char_enum_t
@@ -1270,6 +1277,7 @@ static PyObject *tuple_item_tp_new__{$ type $}(PyTypeObject *subtype,PyObject *a
 }
 
 static PyType_Slot tuple_item_slots__{$ type $}[] = {
+    {Py_tp_new,tuple_item_tp_new__{$ type $}},
     {Py_tp_members,tuple_item_members__{$ type $}},
     {Py_tp_dealloc,node_tagonly_common_dealloc_{$ type.content|length $}},
     {Py_tp_traverse,node_tagonly_common_traverse_{$ type.content|length $}},
@@ -1605,7 +1613,7 @@ static int node_class_new_set_kw_field__{$ type $}(module_state *state,PyObject 
 }
 static int node_class_new_fields_end__{$ type $}(module_state *state,PyObject **fields) {
 //%     for b in type.bases if b|field_count
-    if(node_class_new_fields_end__{$ b $}(fields + BASE_FIELD_OFFSET__{$ type $}__{$ b $})) return -1;
+    if(node_class_new_fields_end__{$ b $}(state,fields + BASE_FIELD_OFFSET__{$ type $}__{$ b $})) return -1;
 //%     endfor
 //%     for ref in type|attributes
     if(fields[FIELD__{$ type $}__{$ ref.py_name $}] == NULL) {
@@ -1656,7 +1664,7 @@ static int node_class_attr__{$ type $}(parse_state *state,{$ 'PyObject **fields,
 }
 static int node_class_attr_end__{$ type $}(parse_state *state, PyObject **fields) {
 //%       for b in type.bases if b is has_attributes
-    if(node_class_attr_end__{$ b $}(state),fields + BASE_FIELD_OFFSET__{$ type $}__{$ b $}) return -1;
+    if(node_class_attr_end__{$ b $}(state,fields + BASE_FIELD_OFFSET__{$ type $}__{$ b $})) return -1;
 //%       endfor
 //%       for ref in type|attributes
     if(fields[FIELD__{$ type $}__{$ ref.py_name $}] == NULL) {
@@ -1724,12 +1732,9 @@ static int node_class_child__{$ type $}(parse_state *state,{$ 'PyObject **fields
         {
 //%           if ctype is appends_str
             PyObject **dest;
-            if(n->base.size && PyUnicode_CheckExact(n->base.content[n->base.size-1])) {
-                dest = &n->base.content[n->base.size-1];
-            } else {
-                if(frozen_list_push_object(&n->base,NULL,NODE_LIST_INITIAL_CAPACITY)) return -1;
-                dest = &n->base.content[n->base.size-1];
-            }
+            if((!n->base.size || !PyUnicode_CheckExact(n->base.content[n->base.size-1])) &&
+                frozen_list_push_object(&n->base,NULL,NODE_LIST_INITIAL_CAPACITY)) return -1;
+            dest = &n->base.content[n->base.size-1];
 //%           else
             PyObject **dest = frozen_list_push_tagged_value(state->py,TAGGED_UNION_NAME__{$ cname $},&n->base,NODE_LIST_INITIAL_CAPACITY);
             if(dest == NULL) return -1;
@@ -1861,7 +1866,7 @@ static int node_class_start__{$ type $}(parse_state *state,PyObject **dest,const
 //%       else
     cb->cs_call = NULL;
 //%       endif
-//%       if type is has_children_or_tuple_content
+//%       if type is needs_finish_call
     cb->f_call = node_class_finish__{$ type $};
 //%       else
     cb->f_call = NULL;
@@ -1883,9 +1888,9 @@ static int node_class_child_start__{$ type $}(parse_state *state,const XML_Char 
     return node_class_child__{$ type $}(state,{$ 'n->fields,' if type is has_fields $}element_lookup(child_name),attr);
 }
 //%       endif
-//%       if type is has_children
+//%       if type is needs_finish_fields_call
 static int node_class_finish_fields__{$ type $}(parse_state *state,PyObject **fields) {
-//%         for b in type.bases|select('has_children')
+//%         for b in type.bases|select('needs_finish_fields_call')
     if(node_class_finish_fields__{$ b $}(state,fields+BASE_FIELD_OFFSET__{$ type $}__{$ b $})) return -1;
 //%         endfor
 //%         for ref in type|children
@@ -1912,11 +1917,11 @@ static int node_class_finish_fields__{$ type $}(parse_state *state,PyObject **fi
     return 0;
 }
 //%       endif
-//%       if type is has_children_or_tuple_content
+//%       if type is needs_finish_call
 static int node_class_finish__{$ type $}(parse_state *state) {
     assert(Py_TYPE(*top_callbacks(state)->value) == state->py->classes[CLASS__{$ type $}]);
     node_{$ common_affix(type) $}_common *n = (node_{$ common_affix(type) $}_common*)*top_callbacks(state)->value;
-//%         if type is has_children
+//%         if type is needs_finish_fields_call
     if(node_class_finish_fields__{$ type $}(state,n->fields)) return -1;
 //%         endif
 //%         if type is content_tuple and type.content|length > 1
