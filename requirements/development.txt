@@ -13,4 +13,3 @@ black==22.3.0
 sphinx-copybutton
 furo
 
-perfect-hash

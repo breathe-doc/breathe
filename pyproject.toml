@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools", "jinja2", "perfect-hash"]
+requires = ["setuptools", "jinja2"]
 build-backend = "setuptools.build_meta"
 
 [project]
@@ -43,7 +43,3 @@ line-length = 100
 extend-exclude = '''
 ^/examples/.* | ^/tests/data/.*
 '''
-
-[tool.cibuildwheel]
-test-requires = "pytest"
-test-command = "BREATHE_DOXYGEN_TEST_CACHE={project}/tests/data/examples/_cache pytest {project}/tests"

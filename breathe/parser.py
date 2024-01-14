@@ -6,7 +6,7 @@ import reprlib
 import collections
 from breathe import file_state_cache, path_handler
 from breathe.project import ProjectInfo
-
+from breathe._parser import *
 
 from sphinx.application import Sphinx
 
@@ -18,41 +18,19 @@ if TYPE_CHECKING:
 T_inv = TypeVar("T_inv")
 
 
-try:
-    from breathe._parser import *
-except ImportError:
-    from breathe._parser_py import *
-else:
-    @reprlib.recursive_repr()
-    def node_repr(self: Node) -> str:  # pragma: no cover
-        cls = type(self)
-        fields = []
-        if isinstance(self, FrozenList):
-            pos = ", ".join(map(repr, self))
-            fields.append(f"[{pos}]")
-        fields.extend(f"{field}={getattr(self,field)!r}" for field in cls._fields)
-        inner = ", ".join(fields)
-        return f"{cls.__name__}({inner})"
+@reprlib.recursive_repr()
+def node_repr(self: Node) -> str:  # pragma: no cover
+    cls = type(self)
+    fields = []
+    if isinstance(self, list):
+        pos = ", ".join(map(repr, self))
+        fields.append(f"[{pos}]")
+    fields.extend(f"{field}={getattr(self,field)!r}" for field in cls._fields)
+    inner = ", ".join(fields)
+    return f"{cls.__name__}({inner})"
 
 
-    Node.__repr__ = node_repr  # type: ignore
-
-
-    @reprlib.recursive_repr()
-    def taggedvalue_repr(self: TaggedValue) -> str:  # pragma: no cover
-        return f"{self.__class__.__name__}({self.name!r}, {self.value!r})"
-
-
-    TaggedValue.__repr__ = taggedvalue_repr  # type: ignore
-
-
-    @reprlib.recursive_repr()
-    def frozenlist_repr(self: FrozenList) -> str:  # pragma: no cover
-        inner = ", ".join(map(repr, self))
-        return f"{self.__class__.__name__}([{inner}])"
-
-
-    FrozenList.__repr__ = frozenlist_repr  # type: ignore
+Node.__repr__ = node_repr  # type: ignore
 
 
 def description_has_content(node: Node_descriptionType | None) -> bool:
@@ -188,7 +166,7 @@ class DoxygenParser:
 
 
 @overload
-def tag_name_value(x: TaggedValue[T, U]) -> tuple[T, U]:
+def tag_name_value(x: TaggedValue[T_covar, U_covar]) -> tuple[T_covar, U_covar]:
     ...
 
 
@@ -198,7 +176,7 @@ def tag_name_value(x: str) -> tuple[None, str]:
 
 
 @overload
-def tag_name_value(x: TaggedValue[T, U] | str) -> tuple[T | None, U | str]:
+def tag_name_value(x: TaggedValue[T_covar, U_covar] | str) -> tuple[T_covar | None, U_covar | str]:
     ...
 
 

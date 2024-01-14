@@ -1,5 +1,5 @@
 recursive-include xml_parser_generator *.py *.in *.json 
 include requirements/*.txt tests/*.py
 graft tests/data
-exclude breathe/_parser.pyi
+exclude breathe/_parser.py
 global-exclude *.py[cod]

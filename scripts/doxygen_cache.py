@@ -1,9 +1,4 @@
-"""Run Doxygen on all test samples and save the results.
-
-This allows running the tests in multiple Docker containers with different
-architectures, without requiring each of them to download and build a specific
-version of Doxygen.
-"""
+"""Run Doxygen on all test samples and save the results."""
 
 import os
 import pathlib

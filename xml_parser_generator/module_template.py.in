@@ -85,61 +85,22 @@ import warnings
 import functools
 from collections.abc import Iterable, Sequence
 from xml.parsers import expat
-from typing import Any, Callable, Literal, NamedTuple, NoReturn, TYPE_CHECKING
-
-try:
-    from types import GenericAlias
-except ImportError:
-    GenericAlias = lambda cls: cls
-
+from typing import (
+    Any, Callable, ClassVar, Generic, Literal, NamedTuple, NoReturn, TYPE_CHECKING, TypeVar
+)
 
 if TYPE_CHECKING:
-    ChildStartCallback = Callable[["_ParseState", Any, Iterable[tuple[str, str]]], None]
-    FinishCallback = Callable[["_ParseState"], None]
-    TextCallback = Callable[["_ParseState", str], None]
-    Setter = Callable[[Any], None]
+    import sys
 
+    if sys.version_info >= (3, 11):
+        from typing import TypeAlias
+    else:
+        from typing_extensions import TypeAlias
 
-_GLOBAL_type = type
-_GLOBAL_list = list
+    T = TypeVar("T")
+    T_covar = TypeVar("T_covar", covariant=True)
+    U_covar = TypeVar("U_covar", covariant=True)
 
-class _ParseCallbacks:
-    __slots__ = "value", "setter", "cs_call", "f_call", "t_call"
-
-    value: Any
-    """The value corresponding the currently visited XML element."""
-
-    setter: Setter | None
-    """A callback given by the parent element to consume the value.
-    
-    This may be None if no action is needed.
-    """
-
-    cs_call: dict[str, ChildStartCallback] | None
-    """A mapping of element names to callbacks for a children of the current
-    element.
-    
-    This may be None if no child elements are allowed.
-    """
-
-    f_call: FinishCallback | None
-    """A callback for when the current element is closed.
-    
-    This may be None if no action is needed.
-    """
-
-    t_call: TextCallback | None
-    """A callback for text contained directly inside the current element.
-    
-    This may be None if text is not allowed. If None, whitespace is ignored.
-    """
-
-    def __init__(self, value=None, setter=None, cs_call=None, f_call=None, t_call=None):
-        self.value = value
-        self.setter = setter
-        self.cs_call = cs_call
-        self.f_call = f_call
-        self.t_call = t_call
 
 class ParseError(RuntimeError):
     @property
@@ -157,6 +118,193 @@ class ParseError(RuntimeError):
 
 class ParseWarning(UserWarning):
     pass
+
+
+class Node:
+    __slots__ = ()
+
+    _fields: ClassVar[tuple[str, ...]]
+
+# This needs to run on Python 3.8, where built-in types don't implement
+# __class_getitem__, and Python 3.9 and 3.10, which don't allow
+# multiple-inheritance with NamedTuple.
+if TYPE_CHECKING:
+    class ListNode(list[T], Node, Generic[T]):
+        ...
+
+    class TaggedValue(NamedTuple, Generic[T_covar, U_covar]):
+        name: T_covar
+        value: U_covar
+else:
+    class TaggedValue(NamedTuple):
+        name: str
+        value: Any
+
+        __class_getitem__ = classmethod(lambda cls, x: cls)
+
+    class ListNode(list, Node):
+        __slots__ = ()
+
+        __class_getitem__ = classmethod(lambda cls, x: cls)
+
+
+//% macro emit_fields(type)
+{%- for b in type.bases %}{$ emit_fields(b) $}{% endfor -%}
+//%   for ref in type|attributes
+    {$ ref.py_name $}: {$ ref.py_type() $}
+//%   endfor
+//%   for ref in type|children
+    {$ ref.py_name $}: {$ ref.py_type() $}
+//%   endfor
+//% endmacro
+
+//% macro emit_content_fields(type)
+{%- for b in type.bases %}{$ emit_content_fields(b) $}{% endfor -%}
+//%   for cname,ctype in type|content
+    {$ cname $}: {$ ctype.py_name $}
+//%   endfor
+//% endmacro
+
+
+//% for type in types
+//%   if type is element
+//%     if type is content_union
+//%       set members = type.py_union_list(true)|sort
+//%       if members|length > 1
+if TYPE_CHECKING:
+    ListItem_{$ type $}: TypeAlias = (
+//%         for m in members
+        {$ '| ' if not loop.first $}{$ m $}
+//%         endfor
+)
+
+//%       endif
+//%     endif
+//%     if type is used_directly
+//%       if type is content_tuple
+//%         set list_item_type = 'ListItem_'~type
+class ListItem_{$ type $}(NamedTuple):
+//%         for cname,ctype in type|content
+    {$ cname $}: {$ ctype.py_name $}
+//%         endfor
+
+//%       elif type is content_union
+//%         if members|length > 1
+//%           set list_item_type = 'ListItem_'~type
+//%         else
+//%           set list_item_type = members|first
+//%         endif
+//%       elif type is content_bare
+//%       set list_item_type = (type|content|first)[1].py_name
+//%       elif type is list_e
+{$ "invalid content type"|error $}
+//%       endif
+class Node_{$ type $}({$ 'ListNode["'~list_item_type~'"]' if type is list_e else 'Node' $}):
+    __slots__ = (
+//%       for f in type.all_fields()
+        "{$ f.py_name $}",
+//%       endfor
+    )
+
+    _fields = __slots__
+
+//%       if type is list_e or type is has_fields
+    def __init__(
+        self,
+//%         if type is list_e
+        __children,
+//%         endif
+//%         for f in type.all_fields() if f is not optional
+        {$ f.py_name $}: {$ f.py_type(true) $},
+//%         endfor
+//%         for f in type.all_fields() if f is optional
+        {$ f.py_name $}: {$ f.py_type(true) $} = {$ '()' if f is array_field else 'None' $},
+//%         endfor
+    ):  # pragma: no cover
+//%         if type is list_e
+        super().__init__(__children)
+//%         endif
+//%         for f in type.all_fields()
+//%           if f is array_field
+        self.{$ f.py_name $} = {$ f.py_name $} if _GLOBAL_type({$ f.py_name $}) is _GLOBAL_list else _GLOBAL_list({$ f.py_name $})
+//%           else
+        self.{$ f.py_name $} = {$ f.py_name $}
+//%           endif
+//%         endfor
+
+//%       endif
+//%     endif
+//%   elif type is enumeration_t
+class {$ type $}(enum.Enum):
+//%     for entry in type.children
+    {$ entry.id $} = "{$ entry.xml $}"
+//%     endfor
+
+//%   elif type is char_enum_t
+{$ type $} = Literal[{% for c in type.values %}{$ "'"~c~"'" $}{$ ',' if not loop.last $}{% endfor %}]
+//%   endif
+//% endfor
+
+
+def parse_str(data: str, /):
+    return _parse(data, expat.XMLParserType.Parse)
+
+def parse_file(file, /):
+    return _parse(file, expat.XMLParserType.ParseFile)
+
+
+
+if TYPE_CHECKING:
+    _ChildStartCallback = Callable[["_ParseState", Any, Iterable[tuple[str, str]]], None]
+    _FinishCallback = Callable[["_ParseState"], None]
+    _TextCallback = Callable[["_ParseState", str], None]
+    _Setter = Callable[[Any], None]
+
+    _T_covar = TypeVar("_T_covar", covariant=True)
+    _U_covar = TypeVar("_U_covar", covariant=True)
+
+
+_GLOBAL_type = type
+_GLOBAL_list = list
+
+
+class _ParseCallbacks:
+    __slots__ = "value", "setter", "cs_call", "f_call", "t_call"
+
+    value: Any
+    """The value corresponding the currently visited XML element."""
+
+    setter: _Setter | None
+    """A callback given by the parent element to consume the value.
+    
+    This may be None if no action is needed.
+    """
+
+    cs_call: dict[str, _ChildStartCallback] | None
+    """A mapping of element names to callbacks for a children of the current
+    element.
+    
+    This may be None if no child elements are allowed.
+    """
+
+    f_call: _FinishCallback | None
+    """A callback for when the current element is closed.
+    
+    This may be None if no action is needed.
+    """
+
+    t_call: _TextCallback | None
+    """A callback for text contained directly inside the current element.
+    
+    This may be None if text is not allowed. If None, whitespace is ignored.
+    """
+
+    def __init__(self, value=None, setter=None, cs_call=None, f_call=None, t_call=None):
+        self.value = value
+        self.setter = setter
+        self.cs_call = cs_call
+        self.f_call = f_call
+        self.t_call = t_call
 
 
 class _ParseState:
@@ -221,20 +369,6 @@ class _ParseState:
         warnings.warn(ParseWarning(f'Warning on line {self.parser.CurrentLineNumber}: {msg}'))
 
 
-class TaggedValue(NamedTuple):
-    name: str
-    value: Any
-
-    __class_getitem__ = classmethod(GenericAlias)
-
-
-class Node:
-    __slots__ = ()
-
-class ListNode(list, Node):
-    __slots__ = ()
-
-
 def _node_list_common_text(state: _ParseState, data: str, /):
     value = state.parse_callbacks[-1].value
 
@@ -242,7 +376,6 @@ def _node_list_common_text(state: _ParseState, data: str, /):
         value[-1] += data
     else:
         value.append(data)
-
 
 
 def _push_tuple_item(
@@ -326,14 +459,14 @@ def _parse_DoxBool_attribute(state: _ParseState, name: str, value: str, /) -> bo
 def _node_string_text(state: _ParseState, data: str) -> None:
     state.parse_callbacks[-1].value += data
 
-def _node_start_string(state: _ParseState, setter: Setter, attr: Iterable[tuple[str, str]], /):
+def _node_start_string(state: _ParseState, setter: _Setter, attr: Iterable[tuple[str, str]], /):
     for name, _ in attr:
         _warn_unexpected_attribute(state, name)
 
     state.parse_callbacks.append(_ParseCallbacks('', setter, None, None, _node_string_text))
 
 
-def _node_start_empty(state: _ParseState, setter: Setter, attr: Iterable[tuple[str, str]], /):
+def _node_start_empty(state: _ParseState, setter: _Setter, attr: Iterable[tuple[str, str]], /):
     for name, _ in attr:
         _warn_unexpected_attribute(state, name)
 
@@ -494,48 +627,14 @@ def _e__{$ type $}__{$ cname $}(state: _ParseState, obj, attr: Iterable[tuple[st
 //%     endif
 //%     if type is used_directly
 //%       if type is content_tuple
-class ListItem_{$ type $}(NamedTuple):
-//%         for cname,ctype in type|content
-    {$ cname $}: {$ ctype.py_name $}
-//%         endfor
-
 _tuple_item_tag_names__{$ type $} = ListItem_{$ type $}._fields
 
+//%       elif type is content_union
+//%       elif type is content_bare
+//%         set list_item_type = (type|content|first)[1].py_name
+//%       elif type is list_e
+{$ "invalid content type"|error $}
 //%       endif
-class Node_{$ type $}({$ 'List' if type is list_e $}Node):
-    __slots__ = (
-//%       for f in type.all_fields()
-        "{$ f.py_name $}",
-//%       endfor
-    )
-
-    _fields = __slots__
-
-//%       if type is list_e or type is has_fields
-    def __init__(
-        self,
-//%         if type is list_e
-        __children,
-//%         endif
-//%         for f in type.all_fields() if f is not optional
-        {$ f.py_name $}: {$ f.py_type(true) $},
-//%         endfor
-//%         for f in type.all_fields() if f is optional
-        {$ f.py_name $}: {$ f.py_type(true) $} = {$ '()' if f is array_field else 'None' $},
-//%         endfor
-    ):
-//%         if type is list_e
-        super().__init__(__children)
-//%         endif
-//%         for f in type.all_fields()
-//%           if f is array_field
-        self.{$ f.py_name $} = {$ f.py_name $} if _GLOBAL_type({$ f.py_name $}) is _GLOBAL_list else _GLOBAL_list({$ f.py_name $})
-//%           else
-        self.{$ f.py_name $} = {$ f.py_name $}
-//%           endif
-//%         endfor
-//%       endif
-
 
 def _node_class_start__{$ type $}(state: _ParseState, setter: Callable, attr: Iterable[tuple[str, str]], /):
     n = Node_{$ type $}.__new__(Node_{$ type $})
@@ -618,15 +717,7 @@ def _node_class_finish__{$ type $}(state: _ParseState, /):
 
 //%       endif
 //%     endif
-//%   elif type is enumeration_t
-class {$ type $}(enum.Enum):
-//%     for entry in type.children
-    {$ entry.id $} = "{$ entry.xml $}"
-//%     endfor
-
 //%   elif type is char_enum_t
-{$ type $} = Literal[{% for c in type.values %}{$ "'"~c~"'" $}{$ ',' if not loop.last $}{% endfor %}]
-
 def _parse__{$ type $}(state: _ParseState, data, /):
     data = data.strip()
     if len(data) != 1:
@@ -684,9 +775,3 @@ def _parse(obj, meth, /):
         raise ParseError("document without a recognized root element", None)
 
     return value
-
-def parse_str(data: str, /):
-    return _parse(data, expat.XMLParserType.Parse)
-
-def parse_file(file, /):
-    return _parse(file, expat.XMLParserType.ParseFile)
