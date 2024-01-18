@@ -11,4 +11,4 @@ dependencies:
   - doxygen
   - pip
   - pip:
-    - -r ../requirements/development.txt
+    - ..[dev]

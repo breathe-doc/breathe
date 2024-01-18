@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-#
 # Test Breathe Warnings documentation build configuration file, created by
 # sphinx-quickstart on Thu Jun  5 18:57:21 2014.
 #
