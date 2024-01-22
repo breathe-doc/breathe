@@ -28,6 +28,7 @@ def run_one(p, name, template, exec):
 
     subprocess.run([exec, doxyfile], check=True)
 
+
 def make_cache():
     template = (EXAMPLES_DIR / "doxyfile_template").read_text()
 

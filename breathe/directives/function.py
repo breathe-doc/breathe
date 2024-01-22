@@ -1,24 +1,28 @@
 from __future__ import annotations
 
+import re
 from breathe.directives import BaseDirective
 from breathe.exception import BreatheError
 from breathe.file_state_cache import MTimeError
 from breathe import parser
 from breathe.project import ProjectError
-from breathe.renderer import format_parser_error, RenderContext, mask, TaggedNode, filter
+from breathe.renderer import RenderContext, mask, TaggedNode, filter
 from breathe.renderer.sphinxrenderer import WithContext
 from breathe.renderer.sphinxrenderer import SphinxRenderer
 from breathe.renderer.target import create_target_handler
 
 from docutils.parsers.rst.directives import unchanged_required, flag
-
+from docutils import nodes
 from sphinx.domains import cpp
 
-from docutils import nodes
+from typing import Any, cast, List, Optional, TYPE_CHECKING
 
-import re
+cppast: Any
+try:
+    from sphinx.domains.cpp import _ast as cppast
+except ImportError:
+    cppast = cpp
 
-from typing import cast, List, Optional, TYPE_CHECKING
 
 if TYPE_CHECKING:
     import sys
@@ -205,7 +209,7 @@ class DoxygenFunctionDirective(BaseDirective):
             self.directive_args,
         )
 
-    def _parse_args(self, function_description: str) -> Optional[cpp.ASTParametersQualifiers]:
+    def _parse_args(self, function_description: str) -> Optional[cppast.ASTParametersQualifiers]:
         # Note: the caller must catch cpp.DefinitionError
         if function_description == "":
             return None
@@ -233,11 +237,11 @@ class DoxygenFunctionDirective(BaseDirective):
                 def stripDeclarator(declarator):
                     if hasattr(declarator, "next"):
                         stripDeclarator(declarator.next)
-                        if isinstance(declarator, cpp.ASTDeclaratorParen):
+                        if isinstance(declarator, cppast.ASTDeclaratorParen):
                             assert hasattr(declarator, "inner")
                             stripDeclarator(declarator.inner)
                     else:
-                        assert isinstance(declarator, cpp.ASTDeclaratorNameParamQual)
+                        assert isinstance(declarator, cppast.ASTDeclaratorNameParamQual)
                         assert hasattr(declarator, "declId")
                         declarator.declId = None
                         if declarator.paramQual is not None:
@@ -294,7 +298,7 @@ class DoxygenFunctionDirective(BaseDirective):
     def _resolve_function(
         self,
         matches: list[filter.FinderMatch],
-        args: cpp.ASTParametersQualifiers | None,
+        args: cppast.ASTParametersQualifiers | None,
         project_info: project.ProjectInfo,
     ):
         if not matches:

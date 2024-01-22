@@ -10,7 +10,7 @@ from breathe._parser import *
 
 from sphinx.application import Sphinx
 
-from typing import overload, TYPE_CHECKING
+from typing import overload, NamedTuple, TYPE_CHECKING
 
 if TYPE_CHECKING:
     NodeOrValue = Node | str | None
@@ -128,7 +128,7 @@ def _parse_common(filename: str, right_tag: str) -> Node_DoxygenType | Node_Doxy
 
 
 class ProjectData(NamedTuple):
-    index: DoxygenIndex
+    d_index: DoxygenIndex
     compound_cache: dict[str, DoxygenCompound]
 
 
@@ -152,7 +152,7 @@ class DoxygenParser:
         return r
 
     def parse_index(self, project_info: ProjectInfo) -> DoxygenIndex:
-        return self._get_project_data(project_info).index
+        return self._get_project_data(project_info).d_index
 
     def parse_compound(self, refid: str, project_info: ProjectInfo) -> DoxygenCompound:
         cache = self._get_project_data(project_info).compound_cache

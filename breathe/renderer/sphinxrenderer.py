@@ -540,15 +540,18 @@ def get_content(node: parser.Node_docParaType):
 
 
 def get_parameterlists(node: parser.Node_docParaType) -> Iterable[parser.Node_docParamListType]:
-    return (value for name, value in map(parser.tag_name_value, node) if name == "parameterlist")  # type: ignore
+    pairs = map(parser.tag_name_value, node)  # type: ignore
+    return (value for name, value in pairs if name == "parameterlist")  # type: ignore
 
 
 def get_simplesects(node: parser.Node_docParaType) -> Iterable[parser.Node_docSimpleSectType]:
-    return (value for name, value in map(parser.tag_name_value, node) if name == "simplesect")  # type: ignore
+    pairs = map(parser.tag_name_value, node)  # type: ignore
+    return (value for name, value in pairs if name == "simplesect")  # type: ignore
 
 
 def get_images(node: parser.Node_docParaType) -> Iterable[parser.Node_docImageType]:
-    return (value for name, value in map(parser.tag_name_value, node) if name == "image")  # type: ignore
+    pairs = map(parser.tag_name_value, node)  # type: ignore
+    return (value for name, value in pairs if name == "image")  # type: ignore
 
 
 class NodeHandler(Generic[T]):
@@ -818,9 +821,7 @@ class SphinxRenderer(metaclass=NodeVisitor):
             signode = finder.declarator
 
             if self.context.child:
-                signode.children = [
-                    n for n in signode.children if n.tagname != "desc_addname"
-                ]
+                signode.children = [n for n in signode.children if n.tagname != "desc_addname"]
         return nodes
 
     def handle_compounddef_declaration(
