@@ -572,7 +572,8 @@
       }
     },
     "reimplementType": {
-      "kind": "union_list_element","allow_text": true,
+      "kind": "union_list_element",
+      "allow_text": true,
       "attributes": {
         "refid":                {"type": "#string"}
       }

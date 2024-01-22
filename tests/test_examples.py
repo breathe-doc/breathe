@@ -185,15 +185,14 @@ def str_to_version(v_str):
 
 
 def versioned_model(p):
-    fname = str(p)
-    return VersionedFile(fname, str_to_version(fname[len("compare-") : -len(".xml")]))
+    return VersionedFile(str(p), str_to_version(str(p.name)[len("compare-") : -len(".xml")]))
 
 
-def compare_xml(generated, version):
-    alt_models = list(map(versioned_model, pathlib.Path(".").glob("compare-*.xml")))
+def compare_xml(generated, input_dir, version):
+    alt_models = list(map(versioned_model, input_dir.glob("compare-*.xml")))
     alt_models.sort(key=(lambda f: f.version), reverse=True)
 
-    model = "compare.xml"
+    model = input_dir / "compare.xml"
     for alt_m in alt_models:
         if version >= alt_m.version:
             model = alt_m.file
@@ -264,36 +263,50 @@ def doxygen(doxygen_cache):
     )
 
 
-@pytest.mark.parametrize("test_input", get_individual_tests())
-def test_example(make_app, tmp_path, test_input, monkeypatch, doxygen, doxygen_cache):
-    monkeypatch.chdir(test_input)
-
+def run_doxygen_with_template(doxygen, tmp_path, cache, example_name, output_name):
     doxyfile = tmp_path / "Doxyfile"
     doxycontent = doxygen.template.format(output=tmp_path)
     extra_opts = pathlib.Path("extra_dox_opts.txt")
     if extra_opts.exists():
         doxycontent += extra_opts.read_text()
     doxyfile.write_text(doxycontent)
-    (tmp_path / "conf.py").touch()
-    shutil.copyfile("input.rst", tmp_path / "index.rst")
 
-    if doxygen_cache is not None:
+    if cache is not None:
         # instead of passing a different path to breathe_projects.example, the
         # folder is copied to the same place it would be without caching so that
         # all paths in the generated output remain the same
-        shutil.copytree(
-            doxygen_cache / test_input.name / "xml",
-            tmp_path / "xml")
+        shutil.copytree(cache / example_name / output_name, tmp_path / output_name)
     else:
         subprocess.run([doxygen.file, doxyfile], check=True)
+        if output_name != "xml":
+            os.rename(tmp_path / "xml", tmp_path / output_name)
+
+
+def run_sphinx_and_compare(make_app, tmp_path, test_input, overrides, version):
+    (tmp_path / "conf.py").touch()
+    shutil.copyfile(test_input / "input.rst", tmp_path / "index.rst")
 
     make_app(
         buildername="xml",
         srcdir=sphinx_path(tmp_path),
-        confoverrides=conf_overrides({"breathe_projects": {"example": str(tmp_path / "xml")}}),
+        confoverrides=conf_overrides(overrides),
     ).build()
 
-    compare_xml(tmp_path / "_build" / "xml" / "index.xml", doxygen.version)
+    compare_xml(tmp_path / "_build" / "xml" / "index.xml", test_input, version)
+
+
+@pytest.mark.parametrize("test_input", get_individual_tests())
+def test_example(make_app, tmp_path, test_input, monkeypatch, doxygen, doxygen_cache):
+    monkeypatch.chdir(test_input)
+
+    run_doxygen_with_template(doxygen, tmp_path, doxygen_cache, test_input.name, "xml")
+    run_sphinx_and_compare(
+        make_app,
+        tmp_path,
+        test_input,
+        {"breathe_projects": {"example": str(tmp_path / "xml")}},
+        doxygen.version,
+    )
 
 
 def test_auto(make_app, tmp_path, monkeypatch, doxygen, doxygen_cache):
@@ -304,19 +317,37 @@ def test_auto(make_app, tmp_path, monkeypatch, doxygen, doxygen_cache):
         xml_path = str(doxygen_cache / "auto" / "xml")
         monkeypatch.setattr(AutoDoxygenProcessHandle, "process", (lambda *args, **kwds: xml_path))
 
+    run_sphinx_and_compare(
+        make_app,
+        tmp_path,
+        test_input,
+        {
+            "breathe_projects_source": {
+                "example": (str(test_input.absolute()), ["auto_class.h", "auto_function.h"])
+            }
+        },
+        doxygen.version,
+    )
+
+
+def test_multiple_projects(make_app, tmp_path, monkeypatch, doxygen, doxygen_cache):
+    test_input = TEST_DATA_DIR / "multi_project"
+
+    for c in "ABC":
+        monkeypatch.chdir(test_input / c)
+        run_doxygen_with_template(doxygen, tmp_path, doxygen_cache, f"multi_project.{c}", f"xml{c}")
+
     (tmp_path / "conf.py").touch()
-    shutil.copyfile("input.rst", tmp_path / "index.rst")
+    (tmp_path / "index.rst").write_text(
+        (test_input / "input.rst").read_text().format(project_c_path=str(tmp_path / "xmlC"))
+    )
 
     make_app(
         buildername="xml",
         srcdir=sphinx_path(tmp_path),
         confoverrides=conf_overrides(
-            {
-                "breathe_projects_source": {
-                    "example": (str(test_input.absolute()), ["auto_class.h", "auto_function.h"])
-                }
-            }
+            {"breathe_projects": {"A": str(tmp_path / "xmlA"), "B": str(tmp_path / "xmlB")}}
         ),
     ).build()
 
-    compare_xml(tmp_path / "_build" / "xml" / "index.xml", doxygen.version)
+    compare_xml(tmp_path / "_build" / "xml" / "index.xml", test_input, doxygen.version)

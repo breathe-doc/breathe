@@ -56,7 +56,7 @@ class AutoDoxygenProcessHandle:
         doxygen_options: Mapping[str, str],
         doxygen_aliases: Mapping[str, str],
     ) -> None:
-        project_files: Mapping[str, ProjectData] = {}
+        project_files: dict[str, ProjectData] = {}
 
         # First collect together all the files which need to be doxygen processed for each project
         for project_name, file_structure in projects_source.items():

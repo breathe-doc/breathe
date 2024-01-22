@@ -50,5 +50,4 @@ examples/doxygen/example.tag
 examples/specific/dot_graphs/xml/dotfile.dot
 
 # generated in editable install
-/breathe/_parser.pyi
-/breathe/_parser.abi3.*
+/breathe/_parser.py

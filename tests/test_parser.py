@@ -69,6 +69,7 @@ def test_unknown_tag():
     assert len(record) == 1
     assert "Warning on line 5:" in str(record[0].message)
 
+
 def test_string_coalesce():
     xml = """<?xml version='1.0' encoding='UTF-8' standalone='no'?>
         <doxygen version="1.9.8" xml:lang="en-US">

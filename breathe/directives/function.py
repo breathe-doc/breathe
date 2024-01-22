@@ -259,25 +259,16 @@ class DoxygenFunctionDirective(BaseDirective):
     ) -> str:
         "Standard render process used by subclasses"
 
-        try:
-            object_renderer = SphinxRenderer(
-                self.dox_parser.app,
-                project_info,
-                [tn.value for tn in node_stack],
-                self.state,
-                self.state.document,
-                target_handler,
-                self.dox_parser,
-                filter_,
-            )
-        except parser.ParserError as e:
-            return format_parser_error(
-                "doxygenclass", e.message, e.filename, self.state, self.lineno, True
-            )
-        except parser.FileIOError as e:
-            return format_parser_error(
-                "doxygenclass", e.error, e.filename, self.state, self.lineno, False
-            )
+        object_renderer = SphinxRenderer(
+            self.dox_parser.app,
+            project_info,
+            [tn.value for tn in node_stack],
+            self.state,
+            self.state.document,
+            target_handler,
+            self.dox_parser,
+            filter_,
+        )
 
         context = RenderContext(node_stack, mask_factory, directive_args)
         node = node_stack[0].value

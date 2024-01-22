@@ -4,7 +4,6 @@ XML"""
 from __future__ import annotations
 
 import re
-import sys
 import json
 import enum
 import dataclasses
@@ -15,7 +14,6 @@ import collections
 from typing import Any, Callable, cast, Literal, NamedTuple, NoReturn, TYPE_CHECKING, TypeVar
 
 import jinja2
-#import perfect_hash
 
 if TYPE_CHECKING:
     from collections.abc import Iterable, Sequence
@@ -542,7 +540,7 @@ class HashData(NamedTuple):
     g: list[int]
 
 
-#def generate_hash(items: list[str]) -> HashData:
+# def generate_hash(items: list[str]) -> HashData:
 #    try:
 #        f1, f2, g = perfect_hash.generate_hash(items)
 #        return HashData(f1.salt, f2.salt, g)
@@ -579,7 +577,7 @@ def make_env(schema: Schema) -> jinja2.Environment:
         return len(t.attributes) + len(t.children) + sum(cast(int, field_count(b)) for b in t.bases)
 
     for t in schema.types.values():
-        #if isinstance(t, SchemaEnum):
+        # if isinstance(t, SchemaEnum):
         #    if len(t.children) >= HASH_LOOKUP_THRESHOLD:
         #        t.hash = generate_hash([item.xml for item in t.children])
         if isinstance(t, SchemaCharEnum):
@@ -790,9 +788,9 @@ def make_env(schema: Schema) -> jinja2.Environment:
             "element_names": elements,
             "attribute_names": attributes,
             "py_field_names": py_field_names,
-            #"e_hash": generate_hash(elements),
-            #"a_hash": generate_hash(attributes),
-            #"py_f_hash": generate_hash(py_field_names),
+            # "e_hash": generate_hash(elements),
+            # "a_hash": generate_hash(attributes),
+            # "py_f_hash": generate_hash(py_field_names),
             "union_tag_names": sorted(tag_names),
             "char_enum_chars": {c: i for i, c in enumerate(sorted(char_enum_chars))},
             "list_element_field_counts": list(list_element_field_counts),

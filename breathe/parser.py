@@ -10,12 +10,10 @@ from breathe._parser import *
 
 from sphinx.application import Sphinx
 
-from typing import overload, TYPE_CHECKING, TypeVar
+from typing import overload, TYPE_CHECKING
 
 if TYPE_CHECKING:
     NodeOrValue = Node | str | None
-
-T_inv = TypeVar("T_inv")
 
 
 @reprlib.recursive_repr()
@@ -129,14 +127,19 @@ def _parse_common(filename: str, right_tag: str) -> Node_DoxygenType | Node_Doxy
         raise FileIOError(str(e), filename)
 
 
+class ProjectData(NamedTuple):
+    index: DoxygenIndex
+    compound_cache: dict[str, DoxygenCompound]
+
+
 class DoxygenParser:
     def __init__(self, app: Sphinx) -> None:
         self.app = app
-        self.compound_index: DoxygenIndex | None = None
-        self.compound_cache: dict[str, DoxygenCompound] = {}
+        self.parsed_data: dict[str, ProjectData] = {}
 
-    def parse_index(self, project_info: ProjectInfo) -> DoxygenIndex:
-        r: DoxygenIndex | None = self.compound_index
+    def _get_project_data(self, project_info: ProjectInfo) -> ProjectData:
+        key = project_info.project_path()
+        r = self.parsed_data.get(key)
         if r is None:
             filename = path_handler.resolve_path(self.app, project_info.project_path(), "index.xml")
 
@@ -144,13 +147,16 @@ class DoxygenParser:
 
             n = _parse_common(filename, "doxygenindex")
             assert isinstance(n, Node_DoxygenTypeIndex)
-            r = DoxygenIndex(n)
-
-            self.compound_index = r
+            r = ProjectData(DoxygenIndex(n), {})
+            self.parsed_data[key] = r
         return r
 
+    def parse_index(self, project_info: ProjectInfo) -> DoxygenIndex:
+        return self._get_project_data(project_info).index
+
     def parse_compound(self, refid: str, project_info: ProjectInfo) -> DoxygenCompound:
-        r = self.compound_cache.get(refid)
+        cache = self._get_project_data(project_info).compound_cache
+        r = cache.get(refid)
         if r is None:
             filename = path_handler.resolve_path(
                 self.app, project_info.project_path(), f"{refid}.xml"
@@ -161,7 +167,7 @@ class DoxygenParser:
             n = _parse_common(filename, "doxygen")
             assert isinstance(n, Node_DoxygenType)
             r = DoxygenCompound(n)
-            self.compound_cache[refid] = r
+            cache[refid] = r
         return r
 
 
@@ -175,12 +181,7 @@ def tag_name_value(x: str) -> tuple[None, str]:
     ...
 
 
-@overload
 def tag_name_value(x: TaggedValue[T_covar, U_covar] | str) -> tuple[T_covar | None, U_covar | str]:
-    ...
-
-
-def tag_name_value(x):
     if isinstance(x, str):
         return None, x
     return x.name, x.value

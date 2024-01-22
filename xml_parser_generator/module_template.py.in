@@ -1,3 +1,5 @@
+# flake8: noqa
+
 """
 Python module to parse Doxygen's XML output.
 
@@ -308,8 +310,8 @@ class _ParseCallbacks:
 
 
 class _ParseState:
-    def __init__(self, parser, /):
-        self.parser: expat.XMLParserType = parser
+    def __init__(self, parser: expat.XMLParserType, /):
+        self.parser = parser
         self.parse_callbacks: list[_ParseCallbacks] = []
 
         # While this is greater than zero all XML content is ignored.
@@ -397,7 +399,7 @@ def _push_tuple_item(
             obj[-1] = cls._make(obj[-1])
 
         # tuples are immutable so a list is used while collecting the values
-        new_tuple = []
+        new_tuple: list[Any] = []
         obj.append(new_tuple)
 
         return new_tuple.append
@@ -509,6 +511,7 @@ def _union_codepoint_element(c):
         _node_start_const_char(state, attr)
     return inner
 
+_cur_list: dict[str, Callable]
 def _add_to_list(name):
     def inner(f):
         global _cur_list
