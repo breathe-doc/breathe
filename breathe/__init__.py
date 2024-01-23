@@ -1,6 +1,6 @@
 from sphinx.application import Sphinx
 
-# Keep in sync with setup.py __version__
+# Keep in sync with pyproject.toml "version"
 __version__ = "4.35.0"
 
 

@@ -146,3 +146,9 @@ class CustomBuildPy(build_py):
     def run(self):
         super().run()
         self.make_parser()
+
+
+if __name__ == "__main__":
+    make_parser.generate_from_json(
+        CustomBuildPy.SCHEMA_FILE, [(CustomBuildPy.PY_MODULE_TEMPLATE, CustomBuildPy.PARSER_DEST)]
+    )
