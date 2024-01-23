@@ -24,7 +24,7 @@ from typing import Callable
 from breathe import parser
 
 
-def no_parameter_names(node: parser.NodeOrValue):
+def no_parameter_names(node: parser.NodeOrValue) -> parser.Node_paramType:
     assert isinstance(node, parser.Node_paramType)
     return parser.Node_paramType(
         array=node.array,

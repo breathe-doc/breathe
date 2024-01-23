@@ -818,7 +818,9 @@ class SphinxRenderer(metaclass=NodeVisitor):
             rst_node.walk(finder)
 
             assert finder.declarator
-            signode = finder.declarator
+            # the type is set to "Any" to get around missing typing info in
+            # docutils 0.20.1
+            signode: Any = finder.declarator
 
             if self.context.child:
                 signode.children = [n for n in signode.children if n.tagname != "desc_addname"]
@@ -2446,7 +2448,10 @@ class SphinxRenderer(metaclass=NodeVisitor):
             if not self.app.env.config.breathe_debug_trace_doxygen_ids:
                 target = self.create_doxygen_target(node)
             assert target is not None
-            rst_node.children[0].insert(0, target)
+
+            # the type is cast to "Any" to get around missing typing info in
+            # docutils 0.20.1
+            cast(Any, rst_node.children[0]).insert(0, target)
 
             finder.content.extend(self.description(node))
             return nodes_

@@ -17,11 +17,13 @@ from sphinx.domains import cpp
 
 from typing import Any, cast, List, Optional, TYPE_CHECKING
 
-cppast: Any
-try:
-    from sphinx.domains.cpp import _ast as cppast
-except ImportError:
-    cppast = cpp
+if TYPE_CHECKING:
+    cppast: Any
+else:
+    try:
+        from sphinx.domains.cpp import _ast as cppast
+    except ImportError:
+        cppast = cpp
 
 
 if TYPE_CHECKING:
