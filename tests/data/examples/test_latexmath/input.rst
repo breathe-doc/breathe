@@ -1,0 +1,1 @@
+.. doxygenclass:: MathHelper

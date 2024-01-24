@@ -1,3 +1,6 @@
+<doxygen lang="" version="">
+<compounddef id="" kind="type" prot="public">
+<compoundname></compoundname>
 <sectiondef kind="typedef">
 <memberdef kind="function" id="1" prot="public" static="no" const="yes" explicit="no" inline="no" virt="non-virtual">
   <type><ref refid="classat_1_1_tensor" kindref="compound">Tensor</ref></type>
@@ -13,6 +16,7 @@
     <declname>options</declname>
     <defval>{}</defval>
   </param>
+  <location file="" line="0"/>
 </memberdef>
 <memberdef kind="function" id="2" prot="public" static="no" const="yes" explicit="no" inline="no" virt="non-virtual">
   <type><ref refid="classat_1_1_tensor" kindref="compound">Tensor</ref></type>
@@ -39,6 +43,7 @@
     <type><ref refid="classc10_1_1optional" kindref="compound">c10::optional</ref>&lt; bool &gt;</type>
     <declname>pin_memory</declname>
   </param>
+  <location file="" line="0"/>
 </memberdef>
 <memberdef kind="function" id="3" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
   <type><ref refid="classat_1_1_tensor" kindref="compound">Tensor</ref></type>
@@ -58,6 +63,7 @@
     <declname>options</declname>
     <defval>{}</defval>
   </param>
+  <location file="" line="0"/>
 </memberdef>
 <memberdef kind="function" id="4" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
   <type><ref refid="classat_1_1_tensor" kindref="compound">Tensor</ref></type>
@@ -88,6 +94,7 @@
     <type><ref refid="classc10_1_1optional" kindref="compound">c10::optional</ref>&lt; bool &gt;</type>
     <declname>pin_memory</declname>
   </param>
+  <location file="" line="0"/>
 </memberdef>
 <memberdef kind="function" id="5" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
   <type><ref refid="classat_1_1_tensor" kindref="compound">Tensor</ref></type>
@@ -111,6 +118,7 @@
     <declname>options</declname>
     <defval>{}</defval>
   </param>
+  <location file="" line="0"/>
 </memberdef>
 <memberdef kind="function" id="6" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
   <type><ref refid="classat_1_1_tensor" kindref="compound">Tensor</ref></type>
@@ -145,5 +153,8 @@
     <type><ref refid="classc10_1_1optional" kindref="compound">c10::optional</ref>&lt; bool &gt;</type>
     <declname>pin_memory</declname>
   </param>
+  <location file="" line="0"/>
 </memberdef>
 </sectiondef>
+</compounddef>
+</doxygen>
