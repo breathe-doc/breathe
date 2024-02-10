@@ -44,7 +44,7 @@ class SectionDefTypeSubItemFinder(ItemFinder[parser.Node_sectiondefType]):
 
         for memberdef in self.node.value.memberdef:
             self.run_filter(filter_, matches, node_stack, memberdef)
-        
+
         for member in self.node.value.member:
             self.run_filter(filter_, matches, node_stack, member)
 
