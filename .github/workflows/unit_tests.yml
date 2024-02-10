@@ -62,7 +62,7 @@ jobs:
               pip install -Iv Sphinx==${{ matrix.sphinx-version }}
           fi
 
-      - uses: actions/cache/restore@v3
+      - uses: actions/cache/restore@v4
         id: cache-doxygen
         with:
           path: doxygen-bin-arc

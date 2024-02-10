@@ -27,7 +27,7 @@ jobs:
           pip install -r requirements/development.txt
           pip install --editable .
 
-      - uses: actions/cache/restore@v3
+      - uses: actions/cache/restore@v4
         id: cache-doxygen
         with:
           path: doxygen-bin-arc
