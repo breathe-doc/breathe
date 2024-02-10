@@ -33,12 +33,13 @@ jobs:
           path: doxygen-bin-arc
           fail-on-cache-miss: true
           key: ${{ runner.os }}-doxygen-${{ env.DOXYGEN_VERSION }}
-          restore-keys: |
-            ${{ runner.os }}-doxygen-
   
       - name: install Doxygen
         run: |
-          cd doxygen-bin-arc/doxygen
+          cd doxygen-bin-arc
+          gunzip doxygen.tar.gz
+          tar xf doxygen.tar
+          cd doxygen-${{ env.DOXYGEN_VERSION }}
           sudo make install
 
       - name: build the documentation
