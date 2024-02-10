@@ -24,7 +24,7 @@ jobs:
         if: steps.cache-doxygen.outputs.cache-hit != 'true'
         run: |
           mkdir doxygen-bin-arc && cd doxygen-bin-arc
-          curl -L https://sourceforge.net/projects/doxygen/files/rel-${{ matrix.doxygen-version }}/doxygen-${{ matrix.doxygen-version }}.linux.bin.tar.gz > doxygen-${{ matrix.doxygen-version }}.tar.gz
+          curl -L https://sourceforge.net/projects/doxygen/files/rel-${{ matrix.doxygen-version }}/doxygen-${{ matrix.doxygen-version }}.linux.bin.tar.gz > doxygen.tar.gz
 
       - uses: actions/cache/save@v3
         if: steps.cache-doxygen.outputs.cache-hit != 'true'
