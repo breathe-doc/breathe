@@ -1,24 +1,48 @@
+from __future__ import annotations
+
+import re
 from breathe.directives import BaseDirective
 from breathe.exception import BreatheError
 from breathe.file_state_cache import MTimeError
-from breathe.parser import ParserError, FileIOError
+from breathe import parser
 from breathe.project import ProjectError
-from breathe.renderer import format_parser_error, RenderContext
+from breathe.renderer import RenderContext, mask, TaggedNode, filter
 from breathe.renderer.sphinxrenderer import WithContext
-from breathe.renderer.mask import MaskFactory, NullMaskFactory, NoParameterNamesMask
 from breathe.renderer.sphinxrenderer import SphinxRenderer
 from breathe.renderer.target import create_target_handler
 
-from docutils.nodes import Node
 from docutils.parsers.rst.directives import unchanged_required, flag
-
+from docutils import nodes
 from sphinx.domains import cpp
 
-from docutils import nodes
+from typing import Any, cast, List, Optional, TYPE_CHECKING
 
-import re
+if TYPE_CHECKING:
+    cppast: Any
+else:
+    try:
+        from sphinx.domains.cpp import _ast as cppast
+    except ImportError:
+        cppast = cpp
 
-from typing import Any, List, Optional
+
+if TYPE_CHECKING:
+    import sys
+
+    if sys.version_info >= (3, 11):
+        from typing import NotRequired, TypedDict
+    else:
+        from typing_extensions import NotRequired, TypedDict
+    from breathe import project
+    from docutils.nodes import Node
+    from sphinx.application import Sphinx
+
+    DoxFunctionOptions = TypedDict(
+        "DoxFunctionOptions",
+        {"path": str, "project": str, "outline": NotRequired[None], "no-link": NotRequired[None]},
+    )
+else:
+    DoxFunctionOptions = None
 
 
 class _NoMatchingFunctionError(BreatheError):
@@ -28,6 +52,29 @@ class _NoMatchingFunctionError(BreatheError):
 class _UnableToResolveFunctionError(BreatheError):
     def __init__(self, signatures: List[str]) -> None:
         self.signatures = signatures
+
+
+def function_and_all_friend_finder_filter(
+    app: Sphinx,
+    namespace: str,
+    name: str,
+    d_parser: parser.DoxygenParser,
+    project_info: project.ProjectInfo,
+    index: parser.DoxygenIndex,
+    matches: list[filter.FinderMatch],
+) -> None:
+    for f_match in filter.member_finder_filter(
+        app,
+        namespace,
+        name,
+        d_parser,
+        project_info,
+        (parser.MemberKind.function, parser.MemberKind.friend),
+        index,
+    ):
+        cd = f_match[2].value
+        assert isinstance(cd, parser.Node_compounddefType)
+        matches.append(f_match)
 
 
 class DoxygenFunctionDirective(BaseDirective):
@@ -64,14 +111,16 @@ class DoxygenFunctionDirective(BaseDirective):
         function_name = match.group(2).strip()
         argsStr = match.group(3)
 
+        options = cast(DoxFunctionOptions, self.options)
+
         try:
-            project_info = self.project_info_factory.create_project_info(self.options)
+            project_info = self.project_info_factory.create_project_info(options)
         except ProjectError as e:
             warning = self.create_warning(None)
             return warning.warn("doxygenfunction: %s" % e)
 
         try:
-            finder = self.finder_factory.create_finder(project_info)
+            d_index = self.get_doxygen_index(project_info)
         except MTimeError as e:
             warning = self.create_warning(None)
             return warning.warn("doxygenfunction: %s" % e)
@@ -79,7 +128,7 @@ class DoxygenFunctionDirective(BaseDirective):
         # Extract arguments from the function name.
         try:
             args = self._parse_args(argsStr)
-        except cpp.DefinitionError as e:
+        except cpp.DefinitionError as e:  # pyright: ignore
             return self.create_warning(
                 project_info,
                 namespace="%s::" % namespace if namespace else "",
@@ -89,21 +138,20 @@ class DoxygenFunctionDirective(BaseDirective):
             ).warn(
                 "doxygenfunction: Unable to resolve function "
                 '"{namespace}{function}" with arguments "{args}".\n'
-                "Could not parse arguments. Parsing eror is\n{cpperror}"
+                "Could not parse arguments. Parsing error is\n{cpperror}"
             )
 
-        finder_filter = self.filter_factory.create_function_and_all_friend_finder_filter(
-            namespace, function_name
+        matchesAll: list[filter.FinderMatch] = []
+        function_and_all_friend_finder_filter(
+            self.app, namespace, function_name, self.dox_parser, project_info, d_index, matchesAll
         )
 
-        # TODO: find a more specific type for the Doxygen nodes
-        matchesAll: List[Any] = []
-        finder.filter_(finder_filter, matchesAll)
-        matches = []
+        matches: list[filter.FinderMatch] = []
         for m in matchesAll:
             # only take functions and friend functions
             # ignore friend classes
-            node = m[0]
+            node = m[0].value
+            assert isinstance(node, parser.Node_memberdefType)
             if node.kind == "friend" and not node.argsstring:
                 continue
             matches.append(m)
@@ -138,7 +186,7 @@ class DoxygenFunctionDirective(BaseDirective):
             warning_nodes = [nodes.paragraph("", "", nodes.Text(formatted_message)), block]
             result = warning.warn(message, rendered_nodes=warning_nodes, unformatted_suffix=text)
             return result
-        except cpp.DefinitionError as error:
+        except cpp.DefinitionError as error:  # pyright: ignore
             warning.context["cpperror"] = str(error)
             return warning.warn(
                 "doxygenfunction: Unable to resolve function "
@@ -146,19 +194,19 @@ class DoxygenFunctionDirective(BaseDirective):
                 "Candidate function could not be parsed. Parsing error is\n{cpperror}"
             )
 
-        target_handler = create_target_handler(self.options, project_info, self.state.document)
-        filter_ = self.filter_factory.create_outline_filter(self.options)
+        target_handler = create_target_handler(options, project_info, self.state.document)
+        filter_ = filter.create_outline_filter(options)
 
         return self.render(
             node_stack,
             project_info,
             filter_,
             target_handler,
-            NullMaskFactory(),
+            mask.NullMaskFactory(),
             self.directive_args,
         )
 
-    def _parse_args(self, function_description: str) -> Optional[cpp.ASTParametersQualifiers]:
+    def _parse_args(self, function_description: str) -> Optional[cppast.ASTParametersQualifiers]:
         # Note: the caller must catch cpp.DefinitionError
         if function_description == "":
             return None
@@ -186,11 +234,11 @@ class DoxygenFunctionDirective(BaseDirective):
                 def stripDeclarator(declarator):
                     if hasattr(declarator, "next"):
                         stripDeclarator(declarator.next)
-                        if isinstance(declarator, cpp.ASTDeclaratorParen):
+                        if isinstance(declarator, cppast.ASTDeclaratorParen):
                             assert hasattr(declarator, "inner")
                             stripDeclarator(declarator.inner)
                     else:
-                        assert isinstance(declarator, cpp.ASTDeclaratorNameParamQual)
+                        assert isinstance(declarator, cppast.ASTDeclaratorNameParamQual)
                         assert hasattr(declarator, "declId")
                         declarator.declId = None
                         if declarator.paramQual is not None:
@@ -202,51 +250,54 @@ class DoxygenFunctionDirective(BaseDirective):
         return paramQual
 
     def _create_function_signature(
-        self, node_stack, project_info, filter_, target_handler, mask_factory, directive_args
+        self,
+        node_stack: list[TaggedNode],
+        project_info,
+        filter_,
+        target_handler,
+        mask_factory,
+        directive_args,
     ) -> str:
         "Standard render process used by subclasses"
 
-        try:
-            object_renderer = SphinxRenderer(
-                self.parser_factory.app,
-                project_info,
-                node_stack,
-                self.state,
-                self.state.document,
-                target_handler,
-                self.parser_factory.create_compound_parser(project_info),
-                filter_,
-            )
-        except ParserError as e:
-            return format_parser_error(
-                "doxygenclass", e.error, e.filename, self.state, self.lineno, True
-            )
-        except FileIOError as e:
-            return format_parser_error(
-                "doxygenclass", e.error, e.filename, self.state, self.lineno, False
-            )
+        object_renderer = SphinxRenderer(
+            self.dox_parser.app,
+            project_info,
+            [tn.value for tn in node_stack],
+            self.state,
+            self.state.document,
+            target_handler,
+            self.dox_parser,
+            filter_,
+        )
 
         context = RenderContext(node_stack, mask_factory, directive_args)
-        node = node_stack[0]
+        node = node_stack[0].value
         with WithContext(object_renderer, context):
+            assert isinstance(node, parser.Node_memberdefType)
             # this part should be kept in sync with visit_function in sphinxrenderer
-            name = node.get_name()
+            name = node.name
             # assume we are only doing this for C++ declarations
             declaration = " ".join(
                 [
                     object_renderer.create_template_prefix(node),
-                    "".join(n.astext() for n in object_renderer.render(node.get_type())),
+                    "".join(n.astext() for n in object_renderer.render(node.type)),
                     name,
-                    node.get_argsstring(),
+                    node.argsstring or "",
                 ]
             )
-        parser = cpp.DefinitionParser(
+        cpp_parser = cpp.DefinitionParser(
             declaration, location=self.get_source_info(), config=self.config
         )
-        ast = parser.parse_declaration("function", "function")
+        ast = cpp_parser.parse_declaration("function", "function")
         return str(ast)
 
-    def _resolve_function(self, matches, args: Optional[cpp.ASTParametersQualifiers], project_info):
+    def _resolve_function(
+        self,
+        matches: list[filter.FinderMatch],
+        args: cppast.ASTParametersQualifiers | None,
+        project_info: project.ProjectInfo,
+    ):
         if not matches:
             raise _NoMatchingFunctionError()
 
@@ -259,8 +310,8 @@ class DoxygenFunctionDirective(BaseDirective):
             target_handler = create_target_handler(
                 {"no-link": ""}, project_info, self.state.document
             )
-            filter_ = self.filter_factory.create_outline_filter(text_options)
-            mask_factory = MaskFactory({"param": NoParameterNamesMask})
+            filter_ = filter.create_outline_filter(text_options)
+            mask_factory = mask.MaskFactory({parser.Node_paramType: mask.no_parameter_names})
 
             # Override the directive args for this render
             directive_args = self.directive_args[:]

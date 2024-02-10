@@ -1,0 +1,780 @@
+# flake8: noqa
+
+"""
+Python module to parse Doxygen's XML output.
+
+This module defines the following types:
+
+- TaggedValue
+
+    TaggedValue is a name/value pair for tagged union values.
+
+- Node
+
+    Node is an empty class used as a base type for all classes that start with
+    "Node_".
+
+- Node_X
+
+    These classes are generated according the input schema.
+
+- ListItem_X
+
+    Types that have "kind" equal to "tuple_list_element" in the schema also have
+    a companion class for their elements. It will have the same name as the main
+    class except it starts with ListItem_ instead of Node_. These are named
+    tuples.
+
+- ParseError
+
+    The exception raised when there is a problem with the XML input that cannot
+    be ignored.
+
+- ParseWarning
+
+    The warning class for possible problems in the XML input. Currently this
+    is only issued for unexpected elements and attributes.
+
+
+Each non-simple type has some or all of the following entities:
+
+- _node_class_attr__X
+
+    Attribute handlers for element X.
+
+    This is a mapping of attribute names to functions that handle the
+    attributes.
+
+- def _node_class_attr_end__X(state: _ParseState, obj)
+
+    This is called after all attributes are handled. It is used to check for
+    unset fields and to fill them with default values or raise an exception.
+    This is a separate function so that derived elements can use it.
+
+- _node_class_child__X
+
+    Element handlers for element X.
+
+    This is a mapping of element names to functions that handle the elements.
+
+- def _node_class_finish_fields__X(state: _ParseState, obj)
+
+    This is called after all child elements are handled. It is used to check for
+    unset fields and to fill them with default values or raise an exception.
+    This is a separate function so that derived elements can use it.
+
+
+If the type is used directly, it will have its own class and the following
+function:
+
+- def _node_class_start__X(state: _ParseState, setter: Callable, attr: Iterable[tuple[str, str]]):
+
+    This has three responsibilities:
+    - To create the object corresponding to element X.
+    - To handle the XML attributes.
+    - To add the new object and the appropriate XML event handlers to the top of
+      the parser stack.
+
+    This function doesn't return a value immediately, instead "setter" is called
+    with the value when it's ready.
+
+"""
+
+from __future__ import annotations
+
+import enum
+import warnings
+import functools
+from collections.abc import Iterable, Sequence
+from xml.parsers import expat
+from typing import (
+    Any, Callable, ClassVar, Generic, Literal, NamedTuple, NoReturn, TYPE_CHECKING, TypeVar
+)
+
+if TYPE_CHECKING:
+    import sys
+
+    if sys.version_info >= (3, 11):
+        from typing import TypeAlias
+    else:
+        from typing_extensions import TypeAlias
+
+    T = TypeVar("T")
+    T_covar = TypeVar("T_covar", covariant=True)
+    U_covar = TypeVar("U_covar", covariant=True)
+
+
+class ParseError(RuntimeError):
+    @property
+    def message(self, /) -> str:
+        return self.args[0]
+
+    @property
+    def lineno(self, /) -> int:
+        return self.args[1]
+    
+    def __str__(self, /) -> str:
+        if self.lineno is None:
+            return "Error: " + self.message
+        return f"Error on line {self.lineno}: {self.message}"
+
+class ParseWarning(UserWarning):
+    pass
+
+
+class Node:
+    __slots__ = ()
+
+    _fields: ClassVar[tuple[str, ...]]
+
+# This needs to run on Python 3.8, where built-in types don't implement
+# __class_getitem__, and Python 3.9 and 3.10, which don't allow
+# multiple-inheritance with NamedTuple.
+if TYPE_CHECKING:
+    class ListNode(list[T], Node, Generic[T]):
+        ...
+
+    class TaggedValue(NamedTuple, Generic[T_covar, U_covar]):
+        name: T_covar
+        value: U_covar
+else:
+    class TaggedValue(NamedTuple):
+        name: str
+        value: Any
+
+        __class_getitem__ = classmethod(lambda cls, x: cls)
+
+    class ListNode(list, Node):
+        __slots__ = ()
+
+        __class_getitem__ = classmethod(lambda cls, x: cls)
+
+
+//% macro emit_fields(type)
+{%- for b in type.bases %}{$ emit_fields(b) $}{% endfor -%}
+//%   for ref in type|attributes
+    {$ ref.py_name $}: {$ ref.py_type() $}
+//%   endfor
+//%   for ref in type|children
+    {$ ref.py_name $}: {$ ref.py_type() $}
+//%   endfor
+//% endmacro
+
+//% macro emit_content_fields(type)
+{%- for b in type.bases %}{$ emit_content_fields(b) $}{% endfor -%}
+//%   for cname,ctype in type|content
+    {$ cname $}: {$ ctype.py_name $}
+//%   endfor
+//% endmacro
+
+
+//% for type in types
+//%   if type is element
+//%     if type is content_union
+//%       set members = type.py_union_list(true)|sort
+//%       if members|length > 1
+if TYPE_CHECKING:
+    ListItem_{$ type $}: TypeAlias = (
+//%         for m in members
+        {$ '| ' if not loop.first $}{$ m $}
+//%         endfor
+)
+
+//%       endif
+//%     endif
+//%     if type is used_directly
+//%       if type is content_tuple
+//%         set list_item_type = 'ListItem_'~type
+class ListItem_{$ type $}(NamedTuple):
+//%         for cname,ctype in type|content
+    {$ cname $}: {$ ctype.py_name $}
+//%         endfor
+
+//%       elif type is content_union
+//%         if members|length > 1
+//%           set list_item_type = 'ListItem_'~type
+//%         else
+//%           set list_item_type = members|first
+//%         endif
+//%       elif type is content_bare
+//%       set list_item_type = (type|content|first)[1].py_name
+//%       elif type is list_e
+{$ "invalid content type"|error $}
+//%       endif
+class Node_{$ type $}({$ 'ListNode["'~list_item_type~'"]' if type is list_e else 'Node' $}):
+    __slots__ = (
+//%       for f in type.all_fields()
+        "{$ f.py_name $}",
+//%       endfor
+    )
+
+    _fields = __slots__
+
+//%       if type is list_e or type is has_fields
+    def __init__(
+        self,
+//%         if type is list_e
+        __children,
+//%         endif
+//%         for f in type.all_fields() if f is not optional
+        {$ f.py_name $}: {$ f.py_type(true) $},
+//%         endfor
+//%         for f in type.all_fields() if f is optional
+        {$ f.py_name $}: {$ f.py_type(true) $} = {$ '()' if f is array_field else 'None' $},
+//%         endfor
+    ):  # pragma: no cover
+//%         if type is list_e
+        super().__init__(__children)
+//%         endif
+//%         for f in type.all_fields()
+//%           if f is array_field
+        self.{$ f.py_name $} = {$ f.py_name $} if _GLOBAL_type({$ f.py_name $}) is _GLOBAL_list else _GLOBAL_list({$ f.py_name $})
+//%           else
+        self.{$ f.py_name $} = {$ f.py_name $}
+//%           endif
+//%         endfor
+
+//%       endif
+//%     endif
+//%   elif type is enumeration_t
+class {$ type $}(enum.Enum):
+//%     for entry in type.children
+    {$ entry.id $} = "{$ entry.xml $}"
+//%     endfor
+
+//%   elif type is char_enum_t
+{$ type $} = Literal[{% for c in type.values %}{$ "'"~c~"'" $}{$ ',' if not loop.last $}{% endfor %}]
+//%   endif
+//% endfor
+
+
+def parse_str(data: str, /):
+    return _parse(data, expat.XMLParserType.Parse)
+
+def parse_file(file, /):
+    return _parse(file, expat.XMLParserType.ParseFile)
+
+
+
+if TYPE_CHECKING:
+    _ChildStartCallback = Callable[["_ParseState", Any, Iterable[tuple[str, str]]], None]
+    _FinishCallback = Callable[["_ParseState"], None]
+    _TextCallback = Callable[["_ParseState", str], None]
+    _Setter = Callable[[Any], None]
+
+    _T_covar = TypeVar("_T_covar", covariant=True)
+    _U_covar = TypeVar("_U_covar", covariant=True)
+
+
+_GLOBAL_type = type
+_GLOBAL_list = list
+
+
+class _ParseCallbacks:
+    __slots__ = "value", "setter", "cs_call", "f_call", "t_call"
+
+    value: Any
+    """The value corresponding the currently visited XML element."""
+
+    setter: _Setter | None
+    """A callback given by the parent element to consume the value.
+    
+    This may be None if no action is needed.
+    """
+
+    cs_call: dict[str, _ChildStartCallback] | None
+    """A mapping of element names to callbacks for a children of the current
+    element.
+    
+    This may be None if no child elements are allowed.
+    """
+
+    f_call: _FinishCallback | None
+    """A callback for when the current element is closed.
+    
+    This may be None if no action is needed.
+    """
+
+    t_call: _TextCallback | None
+    """A callback for text contained directly inside the current element.
+    
+    This may be None if text is not allowed. If None, whitespace is ignored.
+    """
+
+    def __init__(self, value=None, setter=None, cs_call=None, f_call=None, t_call=None):
+        self.value = value
+        self.setter = setter
+        self.cs_call = cs_call
+        self.f_call = f_call
+        self.t_call = t_call
+
+
+class _ParseState:
+    def __init__(self, parser: expat.XMLParserType, /):
+        self.parser = parser
+        self.parse_callbacks: list[_ParseCallbacks] = []
+
+        # While this is greater than zero all XML content is ignored.
+        # 
+        # This starts at zero. When an unexpected element start is encountered,
+        # a warning is issued (via PyErr_WarnFormat) and this is set to 1. Any
+        # subsequent element-starts increment this and element-ends decrement
+        # this until this is zero again, and normal parsing resumes.
+        self.ignore_level: int = 0
+
+    def start_element(self, name: str, attrs: dict[str, str], /) -> None:
+        if self.ignore_level:
+            self.ignore_level += 1
+            return
+
+        cb = self.parse_callbacks[-1]
+
+        if cb.cs_call is not None:
+            handler = cb.cs_call.get(name)
+            if handler is not None:
+                handler(self, cb.value, attrs.items())
+                return
+
+        self.set_parse_warning(f'unexpected element "{name}"')
+
+        self.ignore_level = 1
+
+
+    def end_element(self, unused, /) -> None:
+        if self.ignore_level:
+            self.ignore_level -= 1
+            return
+        
+        cb = self.parse_callbacks[-1]
+
+        if cb.f_call is not None:
+            cb.f_call(self)
+
+        if cb.setter is not None:
+            cb.setter(cb.value)
+        self.parse_callbacks.pop()
+
+    def character_data(self, s: str, /) -> None:
+        if self.ignore_level: return
+
+        cb = self.parse_callbacks[-1]
+
+        if cb.t_call is not None:
+            cb.t_call(self, s)
+        elif s and not s.isspace():
+            self.set_parse_warning("unexpected character data")
+
+    def raise_parse_error(self, msg, /) -> NoReturn:
+        raise ParseError(msg, self.parser.CurrentLineNumber)
+
+    def set_parse_warning(self, msg, /) -> None:
+        warnings.warn(ParseWarning(f'Warning on line {self.parser.CurrentLineNumber}: {msg}'))
+
+
+def _node_list_common_text(state: _ParseState, data: str, /):
+    value = state.parse_callbacks[-1].value
+
+    if value and type(value[-1]) is str:
+        value[-1] += data
+    else:
+        value.append(data)
+
+
+def _push_tuple_item(
+        state: _ParseState,
+        tuple_i: int,
+        tag_names: Sequence[str],
+        cls,
+        obj,
+        /
+):
+    if tuple_i == 0:
+        if len(obj):
+            tuple_size = len(tag_names)
+            if len(obj[-1]) < tuple_size:
+                state.raise_parse_error(
+                    f'"{tag_names[0]}" element can only come after "{tag_names[tuple_size-1]}" element or be the first in its group',
+                )
+            
+            obj[-1] = cls._make(obj[-1])
+
+        # tuples are immutable so a list is used while collecting the values
+        new_tuple: list[Any] = []
+        obj.append(new_tuple)
+
+        return new_tuple.append
+
+
+    if not obj or len(obj[-1]) < tuple_i:
+        state.raise_parse_error(
+            f'"{tag_names[tuple_i]}" element can only come after "{tag_names[tuple_i-1]}" element'
+        )
+
+    return obj[-1].append
+
+
+def _check_complete_tuple(state: _ParseState, tag_names: Sequence[str], cls, obj, /):
+    if obj:
+        last = obj[-1]
+
+        if len(last) != len(tag_names):
+            state.raise_parse_error(
+                f'"{tag_names[len(last)]}" element must come after "{tag_names[len(last)-1]}" element'
+            )
+
+        obj[-1] = cls._make(last)
+
+
+def _warn_unexpected_attribute(state: _ParseState, name: str, /):
+    state.set_parse_warning(f'unexpected attribute "{name}"')
+
+def _raise_missing_attribute_error(state: _ParseState, name: str, /):
+    state.raise_parse_error(f'missing "{name}" attribute')
+
+def _raise_duplicate_element_error(state: _ParseState, name: str, /):
+    state.raise_parse_error(f'"{name}" cannot appear more than once in this context')
+
+def _raise_missing_element_error(state: _ParseState, name: str, /):
+    state.raise_parse_error(f'missing "{name}" child')
+
+def _raise_empty_list_element_error(state: _ParseState, name: str, /):
+    state.raise_parse_error(f'at least one "{name}" child is required')
+
+def _raise_invalid_int_error(state: _ParseState, value: str, /):
+    state.raise_parse_error(f'"{value}" is not a valid integer')
+
+def _raise_invalid_enum_error(state: _ParseState, value: str, /):
+    state.raise_parse_error(f'"{value}" is not one of the allowed enumeration values')
+
+def _raise_invalid_char_enum_error(state: _ParseState, c: str, allowed: str, /):
+    state.raise_parse_error(f'"{c}" is not one of the allowed character values; must be one of "{allowed}"')
+
+
+def _parse_DoxBool_attribute(state: _ParseState, name: str, value: str, /) -> bool:
+    if value == "yes":
+        return True
+    if value == "no":
+        return False
+
+    state.raise_parse_error(f'"{name}" must be "yes" or "no"')
+
+def _node_string_text(state: _ParseState, data: str) -> None:
+    state.parse_callbacks[-1].value += data
+
+def _node_start_string(state: _ParseState, setter: _Setter, attr: Iterable[tuple[str, str]], /):
+    for name, _ in attr:
+        _warn_unexpected_attribute(state, name)
+
+    state.parse_callbacks.append(_ParseCallbacks('', setter, None, None, _node_string_text))
+
+
+def _node_start_empty(state: _ParseState, setter: _Setter, attr: Iterable[tuple[str, str]], /):
+    for name, _ in attr:
+        _warn_unexpected_attribute(state, name)
+
+    setter(None)
+    state.parse_callbacks.append(_ParseCallbacks())
+
+
+def _node_start_spType(state: _ParseState, attr: Iterable[tuple[str, str]], /):
+    c = ' '
+
+    for name, value in attr:
+        if name != "value":
+            _warn_unexpected_attribute(state, name)
+
+        try:
+            c_i = int(value, 10)
+        except ValueError:
+            state.raise_parse_error('"value" must be a valid integer')
+        if 0 > c_i > 127:
+            state.raise_parse_error('"value" must be between 0 and 127')
+
+        c = chr(c_i)
+
+    state.parse_callbacks.append(_ParseCallbacks())
+    return c
+
+def _node_start_const_char(state: _ParseState, attr: Iterable[tuple[str, str]], /):
+    for name, _ in attr:
+        _warn_unexpected_attribute(state, name)
+
+    state.parse_callbacks.append(_ParseCallbacks())
+
+def _union_codepoint_element(c):
+    def inner(state: _ParseState, obj, attr: Iterable[tuple[str, str]], /) -> None:
+        if obj and type(obj[-1]) is str:
+            obj[-1] += c
+        else:
+            obj.append(c)
+        
+        _node_start_const_char(state, attr)
+    return inner
+
+_cur_list: dict[str, Callable]
+def _add_to_list(name):
+    def inner(f):
+        global _cur_list
+        _cur_list[name] = f
+    return inner
+
+//% for type in types
+//%   if type is element
+//%     if type is has_attributes
+_node_class_attr__{$ type $} = _cur_list = {}
+//%       for b in type.bases|select('has_attributes')
+_node_class_attr__{$ type $}.update(node_class_attr__{$ b $})
+//%       endfor
+
+//%       for attr in type|attributes
+@_add_to_list("{$ attr.name $}")
+def _a__{$ type $}__{$ attr.name $}(state: _ParseState, obj, value: str, /):
+//%         if attr.type is builtin_t
+//%           if attr.type.name == "string"
+    obj.{$ attr.py_name $} = value
+//%           elif attr.type.name == "integer"
+    try:
+        obj.{$ attr.py_name $} = int(value, 10)
+    except ValueError:
+        _raise_invalid_int_error(state, value)
+//%           else
+    obj.{$ attr.py_name $} = _parse_{$ attr.type $}_attribute(state, "{$ attr.name $}", value)
+//%           endif
+//%         elif attr.type is enumeration_t
+    try:
+        obj.{$ attr.py_name $} = {$ attr.type $}(value.strip())
+    except ValueError:
+        _raise_invalid_enum_error(state, value)
+//%         else
+    obj.{$ attr.py_name $} = _parse__{$ attr.type $}(state, value)
+//%         endif
+
+//%       endfor
+def _node_class_attr_end__{$ type $}(state: _ParseState, obj, /):
+//%       for b in type.bases if b is has_attributes
+    _node_class_attr_end__{$ b $}(state, obj)
+//%       endfor
+//%       for ref in type|attributes
+    if not hasattr(obj, "{$ ref.py_name $}"):
+//%         if ref.optional
+        obj.{$ ref.py_name $} = None
+//%         else
+        _raise_missing_attribute_error(state,"{$ ref.name $}")
+//%         endif
+//%       endfor
+
+//%     endif
+//%     if type is has_children_or_content
+_node_class_child__{$ type $} = _cur_list = {}
+//%       for b in type.bases|select('has_children_or_content')
+_node_class_child__{$ type $}.update(_node_class_child__{$ b $})
+//%       endfor
+
+//%       for cref in type|children
+@_add_to_list("{$ cref.name $}")
+def _e__{$ type $}__{$ cref.name $}(state: _ParseState, obj, attr: Iterable[tuple[str, str]], /):
+//%         if cref.is_list
+    _node_{$ 'start_' if cref.type is builtin_t else 'class_start__' $}{$ cref.type $}(
+        state,
+        obj.{$ cref.py_name $}.append,
+        attr{$ cref.type.extra_args $})
+//%         else
+    if hasattr(obj, "{$ cref.py_name $}"):
+        _raise_duplicate_element_error(state, "{$ cref.name $}")
+
+    _node_{$ 'start_' if cref.type is builtin_t else 'class_start__' $}{$ cref.type $}(
+        state,
+        functools.partial(setattr, obj, "{$ cref.py_name $}"),
+        attr{$ cref.type.extra_args $})
+//%         endif
+
+//%       endfor
+//%       for cname,ctype in type|content
+//%         if type is content_union and ctype is code_point_t
+_add_to_list("{$ cname $}")(_union_codepoint_element(chr({$ ctype.char $})))
+//%         else
+@_add_to_list("{$ cname $}")
+def _e__{$ type $}__{$ cname $}(state: _ParseState, obj, attr: Iterable[tuple[str, str]], /):
+//%           if type is content_tuple
+    _node_{$ 'start_' if ctype is builtin_t else 'class_start__' $}{$ ctype $}(
+        state,
+        _push_tuple_item(
+            state,
+            {$ loop.index0 $},
+            _tuple_item_tag_names__{$ type $},
+            ListItem_{$ type $},
+            obj),
+        attr{$ ctype.extra_args $})
+//%           elif type is content_union
+//%             if ctype is appends_str
+    c = _node_{$ 'start_' if ctype is builtin_t else 'class_start__' $}{$ ctype $}(state, attr)
+    if obj and type(obj[-1]) is str:
+        obj[-1] += c
+    else:
+        obj.append(c)
+//%             else
+    _node_{$ 'start_' if ctype is builtin_t else 'class_start__' $}{$ ctype $}(
+        state,
+        (lambda x: obj.append(TaggedValue("{$ cname $}", x))),
+        attr{$ ctype.extra_args $})
+//%             endif
+//%           else
+    _node_{$ 'start_' if ctype is builtin_t else 'class_start__' $}{$ ctype $}(
+        state,
+        obj.append,
+        attr{$ ctype.extra_args $})
+//%           endif
+//%         endif
+
+//%       endfor
+//%     endif
+//%     if type is used_directly
+//%       if type is content_tuple
+_tuple_item_tag_names__{$ type $} = ListItem_{$ type $}._fields
+
+//%       elif type is content_union
+//%       elif type is content_bare
+//%         set list_item_type = (type|content|first)[1].py_name
+//%       elif type is list_e
+{$ "invalid content type"|error $}
+//%       endif
+
+def _node_class_start__{$ type $}(state: _ParseState, setter: Callable, attr: Iterable[tuple[str, str]], /):
+    n = Node_{$ type $}.__new__(Node_{$ type $})
+
+//%       for ref in type|children if ref.is_list
+    n.{$ ref.py_name $} = []
+//%       endfor
+
+//%       if type is has_attributes or type.other_attr == OtherAttrAction.error
+    for name, value in attr:
+//%         if type is has_attributes
+        handler = _node_class_attr__{$ type $}.get(name)
+
+        if handler is not None:
+            handler(state, n, value)
+//%           if type.other_attr == OtherAttrAction.error
+        else:
+            _warn_unexpected_attribute(state, name)
+//%           endif
+//%         else
+        _warn_unexpected_attribute(state, name)
+//%         endif
+
+//%       endif
+//%       if type is has_attributes
+    _node_class_attr_end__{$ type $}(state, n)
+//%       endif
+
+    state.parse_callbacks.append(_ParseCallbacks(
+        n,
+        setter,
+//%       if type is has_children_or_content
+        _node_class_child__{$ type $},
+//%       else
+        None,
+//%       endif
+//%       if type is needs_finish_call
+        _node_class_finish__{$ type $},
+//%       else
+        None,
+//%       endif
+//%       if type is allow_text
+        _node_list_common_text,
+//%       else
+        None,
+//%       endif
+    ))
+
+
+//%       if type is needs_finish_fields_call
+def _node_class_finish_fields__{$ type $}(state: _ParseState, obj, /) -> None:
+//%         for b in type.bases|select('needs_finish_fields_call')
+    _node_class_finish_fields__{$ b $}(state, obj)
+//%         endfor
+//%         for ref in type|children
+//%           if ref.min_items
+//%             if ref.is_list
+    if len(obj.{$ ref.py_name $}) < 1:
+        _raise_empty_list_element_error(state,"{$ ref.name $}")
+//%             else
+    if not hasattr(obj, "{$ ref.py_name $}"):
+        _raise_missing_element_error(state,"{$ ref.name $}")
+//%             endif
+//%           elif not ref.is_list
+    if not hasattr(obj, "{$ ref.py_name $}"):
+        obj.{$ ref.py_name $} = None
+//%           endif
+//%         endfor
+
+//%       endif
+//%       if type is needs_finish_call
+def _node_class_finish__{$ type $}(state: _ParseState, /):
+    n = state.parse_callbacks[-1].value
+//%         if type is needs_finish_fields_call
+    _node_class_finish_fields__{$ type $}(state, n)
+//%         endif
+//%         if type is content_tuple and type.content|length > 1
+    _check_complete_tuple(state, _tuple_item_tag_names__{$ type $}, ListItem_{$ type $}, n)
+//%         endif
+
+//%       endif
+//%     endif
+//%   elif type is char_enum_t
+def _parse__{$ type $}(state: _ParseState, data, /):
+    data = data.strip()
+    if len(data) != 1:
+        state.raise_parse_error("value must be a single character")
+    
+    if data not in "{$ type.values $}":
+        _raise_invalid_char_enum_error(state, data,"{$ type.values $}")
+    
+    return data
+
+//%   endif
+//% endfor
+
+_top_level_handlers = _cur_list = {}
+
+//% for name,type in root_elements
+@_add_to_list("{$ name $}")
+def _(state: _ParseState, obj, attr: Iterable[tuple[str, str]], /):
+    cb = state.parse_callbacks[-1]
+    if obj is not None:
+        state.raise_parse_error("cannot have more than one root element")
+
+    def setter(x):
+        cb.value = TaggedValue("{$ name $}", x)
+
+    return _node_{$ 'start_' if ctype is builtin_t else 'class_start__' $}{$ type $}(state, setter, attr)
+//% endfor
+
+
+def _parse(obj, meth, /):
+    p = expat.ParserCreate()
+    state = _ParseState(p)
+
+    state.parse_callbacks.append(_ParseCallbacks(
+        None,
+        None,
+        _top_level_handlers))
+
+    p.StartElementHandler = state.start_element
+    p.EndElementHandler = state.end_element
+    p.CharacterDataHandler = state.character_data
+
+    try:
+        meth(p, obj)
+    except expat.ExpatError as e:
+        raise ParseError(expat.errors.messages[e.code], e.lineno)
+    finally:
+        # break reference cycle for faster garbage collection
+        p.StartElementHandler = None
+        p.EndElementHandler = None
+        p.CharacterDataHandler = None
+
+    value = state.parse_callbacks[0].value
+    if value is None:
+        raise ParseError("document without a recognized root element", None)
+
+    return value

@@ -20,7 +20,7 @@ from breathe.directives.item import (
     DoxygenEnumValueDirective,
     DoxygenTypedefDirective,
 )
-from breathe.parser import DoxygenParserFactory
+from breathe.parser import DoxygenParser
 from breathe.project import ProjectInfoFactory
 from breathe.process import AutoDoxygenProcessHandle
 
@@ -59,36 +59,36 @@ def setup(app: Sphinx) -> None:
     # note: the project_info_factory also contains some caching stuff
     # TODO: is that actually safe for when reading in parallel?
     project_info_factory = ProjectInfoFactory(app)
-    parser_factory = DoxygenParserFactory(app)
+    dox_parser = DoxygenParser(app)
 
     def set_temp_data(
-        app: Sphinx, project_info_factory=project_info_factory, parser_factory=parser_factory
+        app: Sphinx, project_info_factory=project_info_factory, parser_factory=dox_parser
     ):
         assert app.env is not None
         app.env.temp_data["breathe_project_info_factory"] = project_info_factory
-        app.env.temp_data["breathe_parser_factory"] = parser_factory
+        app.env.temp_data["breathe_dox_parser"] = parser_factory
 
     app.connect("source-read", lambda app, docname, source: set_temp_data(app))
 
     for name, directive in directives.items():
         app.add_directive(name, directive)
 
-    app.add_config_value("breathe_projects", {}, True)  # Dict[str, str]
-    app.add_config_value("breathe_default_project", "", True)  # str
+    app.add_config_value("breathe_projects", {}, "env")  # Dict[str, str]
+    app.add_config_value("breathe_default_project", "", "env")  # str
     # Provide reasonable defaults for domain_by_extension mapping. Can be overridden by users.
     app.add_config_value(
-        "breathe_domain_by_extension", {"py": "py", "cs": "cs"}, True
+        "breathe_domain_by_extension", {"py": "py", "cs": "cs"}, "env"
     )  # Dict[str, str]
-    app.add_config_value("breathe_domain_by_file_pattern", {}, True)  # Dict[str, str]
-    app.add_config_value("breathe_projects_source", {}, True)
-    app.add_config_value("breathe_build_directory", "", True)
-    app.add_config_value("breathe_default_members", (), True)
+    app.add_config_value("breathe_domain_by_file_pattern", {}, "env")  # Dict[str, str]
+    app.add_config_value("breathe_projects_source", {}, "env")
+    app.add_config_value("breathe_build_directory", "", "env")
+    app.add_config_value("breathe_default_members", (), "env")
     app.add_config_value("breathe_show_define_initializer", False, "env")
     app.add_config_value("breathe_show_enumvalue_initializer", False, "env")
     app.add_config_value("breathe_show_include", True, "env")
-    app.add_config_value("breathe_implementation_filename_extensions", [".c", ".cc", ".cpp"], True)
-    app.add_config_value("breathe_doxygen_config_options", {}, True)
-    app.add_config_value("breathe_doxygen_aliases", {}, True)
+    app.add_config_value("breathe_implementation_filename_extensions", [".c", ".cc", ".cpp"], "env")
+    app.add_config_value("breathe_doxygen_config_options", {}, "env")
+    app.add_config_value("breathe_doxygen_aliases", {}, "env")
     app.add_config_value("breathe_use_project_refids", False, "env")
     app.add_config_value("breathe_order_parameters_first", False, "env")
     app.add_config_value("breathe_separate_member_pages", False, "env")

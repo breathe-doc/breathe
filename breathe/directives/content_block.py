@@ -1,19 +1,115 @@
+from __future__ import annotations
+
 from breathe.directives import BaseDirective
 from breathe.file_state_cache import MTimeError
 from breathe.project import ProjectError
-from breathe.renderer import RenderContext
+from breathe.renderer import RenderContext, filter
 from breathe.renderer.mask import NullMaskFactory
 from breathe.renderer.sphinxrenderer import SphinxRenderer
 from breathe.renderer.target import create_target_handler
+from breathe import parser
 
 from docutils.nodes import Node
 from docutils.parsers.rst.directives import unchanged_required, flag
 
-from typing import Any, List
+from typing import cast, ClassVar, Literal, TYPE_CHECKING
+
+if TYPE_CHECKING:
+    import sys
+
+    if sys.version_info >= (3, 11):
+        from typing import NotRequired, TypedDict
+    else:
+        from typing_extensions import NotRequired, TypedDict
+    from breathe.finder.factory import FinderRoot
+    from sphinx.application import Sphinx
+
+    DoxContentBlockOptions = TypedDict(
+        "DoxContentBlockOptions",
+        {
+            "path": str,
+            "project": str,
+            "content-only": NotRequired[None],
+            "members": NotRequired[str],
+            "protected-members": NotRequired[None],
+            "private-members": NotRequired[None],
+            "undoc-members": NotRequired[None],
+            "show": str,
+            "outline": NotRequired[None],
+            "no-link": NotRequired[None],
+            "desc-only": NotRequired[None],
+            "sort": NotRequired[None],
+        },
+    )
+else:
+    DoxContentBlockOptions = None
+    FinderRoot = None
+
+
+def create_render_filter(
+    app: Sphinx, kind: Literal["group", "page", "namespace"], options: DoxContentBlockOptions
+) -> filter.DoxFilter:
+    """Render filter for group & namespace blocks"""
+
+    filter_options = filter.set_defaults(app, options)
+
+    if "desc-only" in filter_options:
+        return filter.create_description_filter(True, parser.Node_compounddefType)
+
+    cm_filter = filter.create_class_member_filter(filter_options)
+    ic_filter = filter.create_innerclass_filter(filter_options)
+    o_filter = filter.create_outline_filter(filter_options)
+
+    def filter_(nstack: filter.NodeStack) -> bool:
+        grandparent = nstack.ancestor(2)
+        return (
+            (
+                cm_filter(nstack)
+                or (
+                    isinstance(grandparent, parser.Node_compounddefType)
+                    and grandparent.kind not in filter.CLASS_LIKE_COMPOUNDDEF
+                    and isinstance(nstack.node, parser.Node_memberdefType)
+                )
+            )
+            and ic_filter(nstack)
+            and o_filter(nstack)
+        )
+
+    return filter_
+
+
+def create_content_filter(kind: Literal["group", "page", "namespace"]) -> filter.DoxFilter:
+    """Returns a filter which matches the contents of the or namespace but not the group or
+    namepace name or description.
+
+    This allows the groups to be used to structure sections of the documentation rather than to
+    structure and further document groups of documentation
+
+    As a finder/content filter we only need to match exactly what we're interested in.
+    """
+
+    def filter_(nstack: filter.NodeStack) -> bool:
+        node = nstack.node
+        parent = nstack.parent
+
+        if isinstance(node, parser.Node_memberdefType):
+            return node.prot == parser.DoxProtectionKind.public
+
+        return (
+            isinstance(node, parser.Node_refType)
+            and isinstance(parent, parser.Node_compounddefType)
+            and parent.kind.value == kind
+            and nstack.tag == "innerclass"
+            and node.prot == parser.DoxProtectionKind.public
+        )
+
+    return filter_
 
 
 class _DoxygenContentBlockDirective(BaseDirective):
     """Base class for namespace and group directives which have very similar behaviours"""
+
+    kind: ClassVar[Literal["group", "page", "namespace"]]
 
     required_arguments = 1
     optional_arguments = 1
@@ -32,26 +128,25 @@ class _DoxygenContentBlockDirective(BaseDirective):
     }
     has_content = False
 
-    def run(self) -> List[Node]:
+    def run(self) -> list[Node]:
         name = self.arguments[0]
+        options = cast(DoxContentBlockOptions, self.options)
 
         try:
-            project_info = self.project_info_factory.create_project_info(self.options)
+            project_info = self.project_info_factory.create_project_info(options)
         except ProjectError as e:
             warning = self.create_warning(None, kind=self.kind)
             return warning.warn("doxygen{kind}: %s" % e)
 
         try:
-            finder = self.finder_factory.create_finder(project_info)
+            d_index = self.get_doxygen_index(project_info)
         except MTimeError as e:
             warning = self.create_warning(None, kind=self.kind)
             return warning.warn("doxygen{kind}: %s" % e)
 
-        finder_filter = self.filter_factory.create_finder_filter(self.kind, name)
-
-        # TODO: find a more specific type for the Doxygen nodes
-        matches: List[Any] = []
-        finder.filter_(finder_filter, matches)
+        matches: list[filter.FinderMatch] = list(
+            filter.compound_finder_filter(name, self.kind, d_index)
+        )
 
         # It shouldn't be possible to have too many matches as namespaces & groups in their nature
         # are merged together if there are multiple declarations, so we only check for no matches
@@ -59,42 +154,44 @@ class _DoxygenContentBlockDirective(BaseDirective):
             warning = self.create_warning(project_info, name=name, kind=self.kind)
             return warning.warn('doxygen{kind}: Cannot find {kind} "{name}" {tail}')
 
-        if "content-only" in self.options and self.kind != "page":
+        if "content-only" in options and self.kind != "page":
             # Unpack the single entry in the matches list
             (node_stack,) = matches
 
-            filter_ = self.filter_factory.create_content_filter(self.kind, self.options)
+            filter_ = create_content_filter(self.kind)
             # Having found the compound node for the namespace or group in the index we want to grab
             # the contents of it which match the filter
-            contents_finder = self.finder_factory.create_finder_from_root(
-                node_stack[0], project_info
+            contents_finder = self.create_finder_from_root(
+                cast(FinderRoot, node_stack[0].value), project_info
             )
-            # TODO: find a more specific type for the Doxygen nodes
-            contents: List[Any] = []
+
+            contents: list[filter.FinderMatch] = []
             contents_finder.filter_(filter_, contents)
 
             # Replaces matches with our new starting points
             matches = contents
 
-        target_handler = create_target_handler(self.options, project_info, self.state.document)
-        filter_ = self.filter_factory.create_render_filter(self.kind, self.options)
+        target_handler = create_target_handler(options, project_info, self.state.document)
+        filter_ = create_render_filter(self.app, self.kind, options)
 
-        node_list: List[Node] = []
+        node_list: list[Node] = []
         for node_stack in matches:
             object_renderer = SphinxRenderer(
-                self.parser_factory.app,
+                self.dox_parser.app,
                 project_info,
-                node_stack,
+                [item.value for item in node_stack],
                 self.state,
                 self.state.document,
                 target_handler,
-                self.parser_factory.create_compound_parser(project_info),
+                self.dox_parser,
                 filter_,
             )
 
             mask_factory = NullMaskFactory()
             context = RenderContext(node_stack, mask_factory, self.directive_args)
-            node_list.extend(object_renderer.render(context.node_stack[0], context))
+            value = context.node_stack[0].value
+            assert isinstance(value, parser.Node)
+            node_list.extend(object_renderer.render(value, context))
 
         return node_list
 

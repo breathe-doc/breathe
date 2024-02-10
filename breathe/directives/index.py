@@ -1,7 +1,9 @@
+from __future__ import annotations
+
 from breathe.directives import BaseDirective
-from breathe.parser import ParserError, FileIOError
+from breathe import parser
 from breathe.project import ProjectError
-from breathe.renderer import format_parser_error, RenderContext
+from breathe.renderer import format_parser_error, RenderContext, TaggedNode, filter
 from breathe.renderer.mask import NullMaskFactory
 from breathe.renderer.sphinxrenderer import SphinxRenderer
 from breathe.renderer.target import create_target_handler
@@ -9,11 +11,41 @@ from breathe.renderer.target import create_target_handler
 from docutils.nodes import Node
 from docutils.parsers.rst.directives import unchanged_required, flag
 
-from typing import List
+from typing import Any, TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from collections.abc import Mapping
 
 
 class RootDataObject:
-    node_type = "root"
+    pass
+
+
+def create_index_filter(options: Mapping[str, Any]) -> filter.DoxFilter:
+    outline_filter = filter.create_outline_filter(options)
+
+    def filter_(nstack: filter.NodeStack) -> bool:
+        if not outline_filter(nstack):
+            return False
+
+        node = nstack.node
+        parent = nstack.parent
+        return not (
+            isinstance(parent, parser.Node_compounddefType)
+            and (
+                (
+                    isinstance(node, parser.Node_refType)
+                    and nstack.tag in ("innerclass", "innernamespace")
+                )
+                or (
+                    parent.kind == parser.DoxCompoundKind.group
+                    and isinstance(node, parser.Node_sectiondefType)
+                    and node.kind == parser.DoxSectionKind.func
+                )
+            )
+        )
+
+    return filter_
 
 
 class _BaseIndexDirective(BaseDirective):
@@ -23,42 +55,46 @@ class _BaseIndexDirective(BaseDirective):
     # information is present in the Directive class from the docutils framework that we'd have to
     # pass way too much stuff to a helper object to be reasonable.
 
-    def handle_contents(self, project_info):
+    def handle_contents(self, project_info) -> list[Node]:
         try:
-            finder = self.finder_factory.create_finder(project_info)
-        except ParserError as e:
+            d_index = self.get_doxygen_index(project_info)
+        except parser.ParserError as e:
             return format_parser_error(
-                self.name, e.error, e.filename, self.state, self.lineno, True
+                self.name, e.message, e.filename, self.state, self.lineno, True
             )
-        except FileIOError as e:
+        except parser.FileIOError as e:
             return format_parser_error(self.name, e.error, e.filename, self.state, self.lineno)
 
-        data_object = finder.root()
-
         target_handler = create_target_handler(self.options, project_info, self.state.document)
-        filter_ = self.filter_factory.create_index_filter(self.options)
+        filter_ = create_index_filter(self.options)
 
         object_renderer = SphinxRenderer(
-            self.parser_factory.app,
+            self.dox_parser.app,
             project_info,
-            [data_object],
+            [d_index.root],
             self.state,
             self.state.document,
             target_handler,
-            self.parser_factory.create_compound_parser(project_info),
+            self.dox_parser,
             filter_,
         )
 
         mask_factory = NullMaskFactory()
-        context = RenderContext([data_object, RootDataObject()], mask_factory, self.directive_args)
+        context = RenderContext(
+            [TaggedNode(None, d_index.root), TaggedNode(None, RootDataObject())],
+            mask_factory,
+            self.directive_args,
+        )
 
+        value = context.node_stack[0].value
+        assert isinstance(value, parser.Node)
         try:
-            node_list = object_renderer.render(context.node_stack[0], context)
-        except ParserError as e:
+            node_list = object_renderer.render(value, context)
+        except parser.ParserError as e:
             return format_parser_error(
-                self.name, e.error, e.filename, self.state, self.lineno, True
+                self.name, e.message, e.filename, self.state, self.lineno, True
             )
-        except FileIOError as e:
+        except parser.FileIOError as e:
             return format_parser_error(self.name, e.error, e.filename, self.state, self.lineno)
 
         return node_list
@@ -99,7 +135,7 @@ class AutoDoxygenIndexDirective(_BaseIndexDirective):
     }
     has_content = False
 
-    def run(self) -> List[Node]:
+    def run(self) -> list[Node]:
         """Extract the project info from the auto project info store and pass it to the helper
         method.
         """

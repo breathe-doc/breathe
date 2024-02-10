@@ -1,0 +1,2 @@
+.. doxygenclass:: TestClass
+    :members:
