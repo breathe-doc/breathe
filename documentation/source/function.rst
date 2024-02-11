@@ -24,13 +24,13 @@ This should work:
 
 .. code-block:: rst
 
-   .. doxygenfunction:: func2
-      :project: group_cpp
+   .. doxygenfunction:: open
+      :project: structcmd
 
 It produces this output:
 
-.. doxygenfunction:: func2
-   :project: group_cpp
+.. doxygenfunction:: open
+   :project: structcmd
 
 Separated Declaration & Implementation Example
 ----------------------------------------------

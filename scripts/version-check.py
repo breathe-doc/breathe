@@ -9,12 +9,13 @@ import re
 import breathe
 
 setup_version = ""
-with open("setup.py") as setup:
-    for line in setup:
-        if line.startswith("__version__"):
-            match = re.search('"(?P<version>[^"]*)"', line)
+with open("pyproject.toml") as project:
+    for line in project:
+        if line.startswith("version"):
+            match = re.search('"([^"]*)"', line)
             if match:
-                setup_version = match.group("version")
+                setup_version = match.group(1)
+                break
 
 if setup_version == breathe.__version__:
     print("Versions match")

@@ -1,0 +1,1431 @@
+{
+  "roots": {
+    "doxygen": "DoxygenType",
+    "doxygenindex": "DoxygenTypeIndex"
+  },
+  "types": {
+    "DoxygenTypeIndex": {
+      "kind": "tag_only_element",
+      "attributes": {
+        "version":              {"type": "#string"}
+      },
+      "other_attr":             "ignore",
+      "children": {
+        "compound":             {"type": "CompoundType", "is_list": true, "min_items": 0}
+      }
+    },
+    "CompoundType": {
+      "kind": "tag_only_element",
+      "attributes": {
+        "refid":                {"type": "#string"},
+        "kind":                 {"type": "CompoundKind"}
+      },
+      "children": {
+        "name":                 {"type": "#string"},
+        "member":               {"type": "MemberType", "is_list": true, "min_items": 0}
+      }
+    },
+    "DoxygenType": {
+      "kind": "tag_only_element",
+      "attributes": {
+        "version":              {"type": "#string"}
+      },
+      "other_attr":             "ignore",
+      "children": {
+        "compounddef":          {"type": "compounddefType", "is_list": true, "min_items": 0}
+      }
+    },
+    "compounddefType": {
+      "kind": "tag_only_element",
+      "attributes": {
+        "abstract":             {"type": "#DoxBool", "optional": true},
+        "final":                {"type": "#DoxBool", "optional": true},
+        "id":                   {"type": "#string"},
+        "inline":               {"type": "#DoxBool", "optional": true},
+        "kind":                 {"type": "DoxCompoundKind"},
+        "language":             {"type": "DoxLanguage", "optional": true},
+        "prot":                 {"type": "DoxProtectionKind", "optional": true},
+        "sealed":               {"type": "#DoxBool", "optional": true}
+      },
+      "children": {
+        "basecompoundref":      {"type": "compoundRefType", "is_list": true, "min_items": 0},
+        "briefdescription":     {"type": "descriptionType", "min_items": 0},
+        "collaborationgraph":   {"type": "graphType", "min_items": 0},
+        "compoundname":         {"type": "#string"},
+        "derivedcompoundref":   {"type": "compoundRefType", "is_list": true, "min_items": 0},
+        "detaileddescription":  {"type": "descriptionType", "min_items": 0},
+        "exports":              {"type": "exportsType", "min_items": 0},
+        "incdepgraph":          {"type": "graphType", "min_items": 0},
+        "includedby":           {"type": "incType", "is_list": true, "min_items": 0},
+        "includes":             {"type": "incType", "is_list": true, "min_items": 0},
+        "inheritancegraph":     {"type": "graphType", "min_items": 0},
+        "initializer":          {"type": "linkedTextType", "min_items": 0},
+        "innerclass":           {"type": "refType", "is_list": true, "min_items": 0},
+        "innerconcept":         {"type": "refType", "is_list": true, "min_items": 0},
+        "innerdir":             {"type": "refType", "is_list": true, "min_items": 0},
+        "innerfile":            {"type": "refType", "is_list": true, "min_items": 0},
+        "innergroup":           {"type": "refType", "is_list": true, "min_items": 0},
+        "innermodule":          {"type": "refType", "is_list": true, "min_items": 0},
+        "innernamespace":       {"type": "refType", "is_list": true, "min_items": 0},
+        "innerpage":            {"type": "refType", "is_list": true, "min_items": 0},
+        "invincdepgraph":       {"type": "graphType", "min_items": 0},
+        "listofallmembers":     {"type": "listofallmembersType", "min_items": 0},
+        "location":             {"type": "locationType", "min_items": 0},
+        "programlisting":       {"type": "listingType", "min_items": 0},
+        "qualifier":            {"type": "#string", "is_list": true, "min_items": 0},
+        "requiresclause":       {"type": "linkedTextType", "min_items": 0},
+        "sectiondef":           {"type": "sectiondefType", "is_list": true, "min_items": 0},
+        "tableofcontents":      {"type": "tableofcontentsType", "min_items": 0},
+        "templateparamlist":    {"type": "templateparamlistType", "min_items": 0},
+        "title":                {"type": "#string", "min_items": 0}
+      }
+    },
+    "graphType": {
+      "kind": "tag_only_element",
+      "children": {
+        "node":                 {"type": "nodeType", "is_list": true, "min_items": 1}
+      }
+    },
+    "templateparamlistType": {
+      "kind": "tag_only_element",
+      "children": {
+        "param":                {"type": "paramType", "is_list": true, "min_items": 0}
+      }
+    },
+    "sectiondefType": {
+      "kind": "tag_only_element",
+      "attributes": {
+        "kind":                 {"type": "DoxSectionKind"}
+      },
+      "children": {
+        "description":          {"type": "descriptionType", "min_items": 0},
+        "header":               {"type": "#string", "min_items": 0},
+        "member":               {"type": "MemberType", "is_list": true, "min_items": 0},
+        "memberdef":            {"type": "memberdefType", "is_list": true, "min_items": 0}
+      }
+    },
+    "tableofcontentsType": {
+      "kind": "tag_only_element",
+      "children": {
+        "tocsect":              {"type": "tableofcontentsKindType", "is_list": true, "min_items": 1}
+      }
+    },
+    "linkedTextType": {
+      "kind": "union_list_element",
+      "allow_text": true,
+      "content": {
+        "ref":                  "refTextType"
+      }
+    },
+    "descriptionType": {
+      "kind": "union_list_element",
+      "allow_text": true,
+      "children": {
+        "title":                {"type": "#string", "min_items": 0}
+      },
+      "content": {
+        "internal":             "docInternalType",
+        "para":                 "docParaType",
+        "sect1":                "docSect1Type"
+      }
+    },
+    "exportsType": {
+      "kind": "tag_only_element",
+      "children": {
+        "export":               {"type": "exportType", "is_list": true, "min_items": 1}
+      }
+    },
+    "listingType": {
+      "kind": "tag_only_element",
+      "attributes": {
+        "filename":             {"type": "#string", "optional": true}
+      },
+      "children": {
+        "codeline":             {"type": "codelineType", "is_list": true, "min_items": 0}
+      }
+    },
+    "locationType": {
+      "kind": "tag_only_element",
+      "attributes": {
+        "bodyend":              {"type": "#integer", "optional": true},
+        "bodyfile":             {"type": "#string", "optional": true},
+        "bodystart":            {"type": "#integer", "optional": true},
+        "column":               {"type": "#integer", "optional": true},
+        "declcolumn":           {"type": "#integer", "optional": true},
+        "declfile":             {"type": "#string", "optional": true},
+        "declline":             {"type": "#integer", "optional": true},
+        "file":                 {"type": "#string"},
+        "line":                 {"type": "#integer", "optional": true}
+      }
+    },
+    "listofallmembersType": {
+      "kind": "tag_only_element",
+      "children": {
+        "member":               {"type": "memberRefType", "is_list": true, "min_items": 0}
+      }
+    },
+    "memberRefType": {
+      "kind": "tag_only_element",
+      "attributes": {
+        "ambiguityscope":       {"type": "#string", "optional": true},
+        "prot":                 {"type": "DoxProtectionKind"},
+        "refid":                {"type": "#string"},
+        "virt":                 {"type": "DoxVirtualKind"}
+      },
+      "children": {
+        "name":                 {"type": "#string"},
+        "scope":                {"type": "#string"}
+      }
+    },
+    "memberdefType": {
+      "kind": "tag_only_element",
+      "attributes": {
+        "accessor":             {"type": "DoxAccessor", "optional": true},
+        "add":                  {"type": "#DoxBool", "optional": true},
+        "attribute":            {"type": "#DoxBool", "optional": true},
+        "bound":                {"type": "#DoxBool", "optional": true},
+        "const":                {"type": "#DoxBool", "optional": true},
+        "constexpr":            {"type": "#DoxBool", "optional": true},
+        "constrained":          {"type": "#DoxBool", "optional": true},
+        "explicit":             {"type": "#DoxBool", "optional": true},
+        "extern":               {"type": "#DoxBool", "optional": true},
+        "final":                {"type": "#DoxBool", "optional": true},
+        "gettable":             {"type": "#DoxBool", "optional": true},
+        "id":                   {"type": "#string"},
+        "initonly":             {"type": "#DoxBool", "optional": true},
+        "inline":               {"type": "#DoxBool", "optional": true},
+        "kind":                 {"type": "DoxMemberKind"},
+        "maybeambiguous":       {"type": "#DoxBool", "optional": true},
+        "maybedefault":         {"type": "#DoxBool", "optional": true},
+        "maybevoid":            {"type": "#DoxBool", "optional": true},
+        "mutable":              {"type": "#DoxBool", "optional": true},
+        "new":                  {"type": "#DoxBool", "optional": true},
+        "noexcept":             {"type": "#DoxBool", "optional": true},
+        "optional":             {"type": "#DoxBool", "optional": true},
+        "privategettable":      {"type": "#DoxBool", "optional": true},
+        "privatesettable":      {"type": "#DoxBool", "optional": true},
+        "property":             {"type": "#DoxBool", "optional": true},
+        "prot":                 {"type": "DoxProtectionKind"},
+        "protectedgettable":    {"type": "#DoxBool", "optional": true},
+        "protectedsettable":    {"type": "#DoxBool", "optional": true},
+        "raise":                {"type": "#DoxBool", "optional": true, "py_name": "raise_"},
+        "readable":             {"type": "#DoxBool", "optional": true},
+        "readonly":             {"type": "#DoxBool", "optional": true},
+        "refqual":              {"type": "DoxRefQualifierKind", "optional": true},
+        "removable":            {"type": "#DoxBool", "optional": true},
+        "remove":               {"type": "#DoxBool", "optional": true},
+        "required":             {"type": "#DoxBool", "optional": true},
+        "sealed":               {"type": "#DoxBool", "optional": true},
+        "settable":             {"type": "#DoxBool", "optional": true},
+        "static":               {"type": "#DoxBool"},
+        "strong":               {"type": "#DoxBool", "optional": true},
+        "transient":            {"type": "#DoxBool", "optional": true},
+        "virt":                 {"type": "DoxVirtualKind", "optional": true},
+        "volatile":             {"type": "#DoxBool", "optional": true},
+        "writable":             {"type": "#DoxBool", "optional": true}
+      },
+      "children": {
+        "argsstring":           {"type": "#string", "min_items": 0},
+        "bitfield":             {"type": "#string", "min_items": 0},
+        "briefdescription":     {"type": "descriptionType", "min_items": 0},
+        "definition":           {"type": "#string", "min_items": 0},
+        "detaileddescription":  {"type": "descriptionType", "min_items": 0},
+        "enumvalue":            {"type": "enumvalueType", "is_list": true, "min_items": 0},
+        "exceptions":           {"type": "linkedTextType", "min_items": 0},
+        "inbodydescription":    {"type": "descriptionType", "min_items": 0},
+        "initializer":          {"type": "linkedTextType", "min_items": 0},
+        "location":             {"type": "locationType"},
+        "name":                 {"type": "#string"},
+        "param":                {"type": "paramType", "is_list": true, "min_items": 0},
+        "qualifiedname":        {"type": "#string", "min_items": 0},
+        "qualifier":            {"type": "#string", "is_list": true, "min_items": 0},
+        "read":                 {"type": "#string", "min_items": 0},
+        "referencedby":         {"type": "referenceType", "is_list": true, "min_items": 0},
+        "references":           {"type": "referenceType", "is_list": true, "min_items": 0},
+        "reimplementedby":      {"type": "reimplementType", "is_list": true, "min_items": 0},
+        "reimplements":         {"type": "reimplementType", "is_list": true, "min_items": 0},
+        "requiresclause":       {"type": "linkedTextType", "min_items": 0},
+        "templateparamlist":    {"type": "templateparamlistType", "min_items": 0},
+        "type":                 {"type": "linkedTextType", "min_items": 0},
+        "write":                {"type": "#string", "min_items": 0}
+      }
+    },
+    "MemberType": {
+      "kind": "tag_only_element",
+      "attributes": {
+        "kind":                 {"type": "MemberKind"},
+        "refid":                {"type": "#string"}
+      },
+      "children": {
+        "name":                 {"type": "#string"}
+      }
+    },
+    "paramType": {
+      "kind": "tag_only_element",
+      "children": {
+        "array":                {"type": "#string", "min_items": 0},
+        "attributes":           {"type": "#string", "min_items": 0},
+        "briefdescription":     {"type": "descriptionType", "min_items": 0},
+        "declname":             {"type": "#string", "min_items": 0},
+        "defname":              {"type": "#string", "min_items": 0},
+        "defval":               {"type": "linkedTextType", "min_items": 0},
+        "type":                 {"type": "linkedTextType", "min_items": 0},
+        "typeconstraint":       {"type": "linkedTextType", "min_items": 0}
+      }
+    },
+    "enumvalueType": {
+      "kind": "tag_only_element",
+      "attributes": {
+        "id":                   {"type": "#string"},
+        "prot":                 {"type": "DoxProtectionKind"}
+      },
+      "children": {
+        "briefdescription":     {"type": "descriptionType", "min_items": 0},
+        "detaileddescription":  {"type": "descriptionType", "min_items": 0},
+        "initializer":          {"type": "linkedTextType", "min_items": 0},
+        "name":                 {"type": "#string"}
+      }
+    },
+    "referenceType": {
+      "kind": "union_list_element",
+      "allow_text": true,
+      "attributes": {
+        "compoundref":          {"type": "#string", "optional": true},
+        "endline":              {"type": "#integer", "optional": true},
+        "refid":                {"type": "#string"},
+        "startline":            {"type": "#integer", "optional": true}
+      }
+    },
+    "docInternalType": {
+      "kind": "union_list_element",
+      "allow_text": true,
+      "content": {
+        "para":                 "#string",
+        "sect1":                "docSect1Type"
+      }
+    },
+    "docSect1Type": {
+      "kind": "union_list_element",
+      "allow_text": true,
+      "attributes": {
+        "id":                   {"type": "#string"}
+      },
+      "children": {
+        "title":                {"type": "#string", "min_items": 0}
+      },
+      "content": {
+        "para":                 "docParaType",
+        "sect4":                "docSect2Type",
+        "internal":             "docInternalS1Type"
+      }
+    },
+    "nodeType": {
+      "kind": "tag_only_element",
+      "attributes": {
+        "id":                   {"type": "#string"}
+      },
+      "children": {
+        "childnode":            {"type": "childnodeType", "is_list": true, "min_items": 0},
+        "label":                {"type": "#string"},
+        "link":                 {"type": "linkType", "min_items": 0}
+      }
+    },
+    "linkType": {
+      "kind": "tag_only_element",
+      "attributes": {
+        "external":             {"type": "#string", "optional": true},
+        "refid":                {"type": "#string"}
+      }
+    },
+    "childnodeType": {
+      "kind": "tag_only_element",
+      "attributes": {
+        "refid":                {"type": "#string"},
+        "relation":             {"type": "DoxGraphRelation"}
+      },
+      "children": {
+        "edgelabel":            {"type": "#string", "is_list": true, "min_items": 0}
+      }
+    },
+    "codelineType": {
+      "kind": "tag_only_element",
+      "attributes": {
+        "external":             {"type": "#DoxBool", "optional": true},
+        "lineno":               {"type": "#integer", "optional": true},
+        "refid":                {"type": "#string", "optional": true},
+        "refkind":              {"type": "DoxRefKind", "optional": true}
+      },
+      "children": {
+        "highlight":            {"type": "highlightType", "is_list": true, "min_items": 0}
+      }
+    },
+    "highlightType": {
+      "kind": "union_list_element",
+      "allow_text": true,
+      "attributes": {
+        "class":                {"type": "DoxHighlightClass", "py_name": "class_"}
+      },
+      "content": {
+        "sp":                   "#spType",
+        "ref":                  "refTextType"
+      }
+    },
+    "docInternalS1Type": {
+      "kind": "union_list_element",
+      "allow_text": true,
+      "content": {
+        "para":                 "#string",
+        "sect2":                "docSect2Type"
+      }
+    },
+    "docSect2Type": {
+      "kind": "union_list_element",
+      "allow_text": true,
+      "attributes": {
+        "id":                   {"type": "#string"}
+      },
+      "children": {
+        "title":                {"type": "#string"}
+      },
+      "content": {
+        "para":                 "docParaType",
+        "sect3":                "docSect3Type",
+        "internal":             "docInternalS2Type"
+      }
+    },
+    "docSect3Type": {
+      "kind": "union_list_element",
+      "allow_text": true,
+      "attributes": {
+        "id":                   {"type": "#string"}
+      },
+      "children": {
+        "title":                {"type": "#string"}
+      },
+      "content": {
+        "para":                 "docParaType",
+        "sect4":                "docSect4Type",
+        "internal":             "docInternalS3Type"
+      }
+    },
+    "docInternalS2Type": {
+      "kind": "union_list_element",
+      "allow_text": true,
+      "content": {
+        "para":                 "#string",
+        "sect3":                "docSect3Type"
+      }
+    },
+    "docSect4Type": {
+      "kind": "union_list_element",
+      "allow_text": true,
+      "attributes": {
+        "id":                   {"type": "#string"}
+      },
+      "children": {
+        "title":                {"type": "#string"}
+      },
+      "content": {
+        "para":                 "docParaType",
+        "internal":             "docInternalS4Type"
+      }
+    },
+    "docInternalS3Type": {
+      "kind": "union_list_element",
+      "allow_text": true,
+      "content": {
+        "para":                 "#string",
+        "sect3":                "docSect4Type"
+      }
+    },
+    "docInternalS4Type": {
+      "kind": "union_list_element",
+      "allow_text": true,
+      "content": {
+        "para":                 "#string"
+      }
+    },
+    "docListItemType": {
+      "kind": "list_element",
+      "attributes": {
+        "value":                {"type": "#integer", "optional": true}
+      },
+      "content": {
+        "para":                 "docParaType"
+      }
+    },
+    "docCaptionType": {
+      "kind": "union_list_element",
+      "allow_text": true,
+      "attributes": {
+        "id":                   {"type": "#string"}
+      }
+    },
+    "docRowType": {
+      "kind": "tag_only_element",
+      "children": {
+        "entry":                {"type": "docEntryType", "is_list": true, "min_items": 0}
+      }
+    },
+    "docEntryType": {
+      "kind": "tag_only_element",
+      "any_attr": true,
+      "attributes": {
+        "align":                {"type": "DoxAlign", "optional": true},
+        "class":                {"type": "#string", "py_name": "class_", "optional": true},
+        "colspan":              {"type": "#integer", "optional": true},
+        "rowspan":              {"type": "#integer", "optional": true},
+        "thead":                {"type": "#DoxBool"},
+        "valign":               {"type": "DoxVerticalAlign", "optional": true},
+        "width":                {"type": "#string", "optional": true}
+      },
+      "children": {
+        "para":                 {"type": "docParaType", "is_list": true, "min_items": 0}
+      }
+    },
+    "docTocItemType": {
+      "kind": "union_list_element","allow_text": true,
+      "attributes": {
+        "id":                   {"type": "#string"}
+      }
+    },
+    "docParamListItem": {
+      "kind": "tag_only_element",
+      "children": {
+        "parameterdescription": {"type": "descriptionType"},
+        "parameternamelist":    {"type": "docParamNameList", "is_list": true, "min_items": 0}
+      }
+    },
+    "docParamNameList": {
+      "kind": "tag_only_element",
+      "children": {
+        "parametername":        {"type": "docParamName", "is_list": true, "min_items": 0},
+        "parametertype":        {"type": "docParamType", "is_list": true, "min_items": 0}
+      }
+    },
+    "docParamType": {
+      "kind": "union_list_element",
+      "allow_text": true,
+      "content": {
+        "ref":                  "refTextType"
+      }
+    },
+    "docParamName": {
+      "kind": "union_list_element",
+      "allow_text": true,
+      "attributes": {
+        "direction":            {"type": "DoxParamDir", "optional": true}
+      },
+      "content": {
+        "ref":                  "refTextType"
+      }
+    },
+    "tableofcontentsKindType": {
+      "kind": "tag_only_element",
+      "children": {
+        "name":                 {"type": "#string"},
+        "reference":            {"type": "#string"},
+        "tableofcontents":      {"type": "tableofcontentsType", "is_list": true, "min_items": 0}
+      }
+    },
+    "incType": {
+      "kind": "union_list_element",
+      "allow_text": true,
+      "attributes": {
+        "refid":                {"type": "#string", "optional": true},
+        "local":                {"type": "#DoxBool"}
+      }
+    },
+    "compoundRefType": {
+      "kind": "union_list_element",
+      "allow_text": true,
+      "attributes": {
+        "refid":                {"type": "#string", "optional": true},
+        "prot":                 {"type": "DoxProtectionKind"},
+        "virt":                 {"type": "DoxVirtualKind"}
+      }
+    },
+    "refType": {
+      "kind": "union_list_element",
+      "allow_text": true,
+      "attributes": {
+        "refid":                {"type": "#string"},
+        "prot":                 {"type": "DoxProtectionKind", "optional": true},
+        "inline":               {"type": "#DoxBool", "optional": true}
+      }
+    },
+    "exportType": {
+      "kind": "union_list_element",
+      "allow_text": true,
+      "attributes": {
+        "refid":                {"type": "#string", "optional": true}
+      }
+    },
+    "refTextType": {
+      "kind": "union_list_element",
+      "allow_text": true,
+      "attributes": {
+        "refid":                {"type": "#string"},
+        "kindref":              {"type": "DoxRefKind"},
+        "external":             {"type": "#string", "optional": true},
+        "tooltip":              {"type": "#string", "optional": true}
+      }
+    },
+    "reimplementType": {
+      "kind": "union_list_element",
+      "allow_text": true,
+      "attributes": {
+        "refid":                {"type": "#string"}
+      }
+    },
+    "DoxRefKind": {
+      "kind": "enumeration",
+      "values": ["compound", "member"]
+    },
+    "MemberKind": {
+      "kind": "enumeration",
+      "values": [
+        "define",
+        "property",
+        "event",
+        "variable",
+        "typedef",
+        "enum",
+        "enumvalue",
+        "function",
+        "signal",
+        "prototype",
+        "friend",
+        "dcop",
+        "slot"
+      ]
+    },
+    "DoxMemberKind": {
+      "kind": "enumeration",
+      "values": [
+        "define",
+        "property",
+        "event",
+        "variable",
+        "typedef",
+        "enum",
+        "function",
+        "signal",
+        "prototype",
+        "friend",
+        "dcop",
+        "slot",
+        "interface",
+        "service"
+      ]
+    },
+    "docTitleCmdGroup": {
+      "kind": "union_list_element","allow_text": true,
+      "content": {
+        "ulink": "docURLLink",
+        "bold": "docMarkupType",
+        "s": "docMarkupType",
+        "strike": "docMarkupType",
+        "underline": "docMarkupType",
+        "emphasis": "docMarkupType",
+        "computeroutput": "docMarkupType",
+        "subscript": "docMarkupType",
+        "superscript": "docMarkupType",
+        "center": "docMarkupType",
+        "small": "docMarkupType",
+        "cite": "docMarkupType",
+        "del": "docMarkupType",
+        "ins": "docMarkupType",
+        "htmlonly": "docHtmlOnlyType",
+        "manonly": "#string",
+        "xmlonly": "#string",
+        "rtfonly": "#string",
+        "latexonly": "#string",
+        "docbookonly": "#string",
+        "image": "docImageType",
+        "dot": "docDotMscType",
+        "msc": "docDotMscType",
+        "plantuml": "docPlantumlType",
+        "anchor": "docAnchorType",
+        "formula": "docFormulaType",
+        "ref": "docRefTextType",
+        "emoji": "docEmojiType",
+        "linebreak": "#char(A)",
+        "nonbreakablespace": "#char(A0)",
+        "iexcl": "#char(A1)",
+        "cent": "#char(A2)",
+        "pound": "#char(A3)",
+        "curren": "#char(A4)",
+        "yen": "#char(A5)",
+        "brvbar": "#char(A6)",
+        "sect": "#char(A7)",
+        "umlaut": "#char(A8)",
+        "copy": "#char(A9)",
+        "ordf": "#char(AA)",
+        "laquo": "#char(AB)",
+        "not": "#char(AC)",
+        "shy": "#char(AD)",
+        "registered": "#char(AE)",
+        "macr": "#char(AF)",
+        "deg": "#char(B0)",
+        "plusmn": "#char(B1)",
+        "sup2": "#char(B2)",
+        "sup3": "#char(B3)",
+        "acute": "#char(B4)",
+        "micro": "#char(B5)",
+        "para": "#char(B6)",
+        "middot": "#char(B7)",
+        "cedil": "#char(B8)",
+        "sup1": "#char(B9)",
+        "ordm": "#char(BA)",
+        "raquo": "#char(BB)",
+        "frac14": "#char(BC)",
+        "frac12": "#char(BD)",
+        "frac34": "#char(BE)",
+        "iquest": "#char(BF)",
+        "Agrave": "#char(C0)",
+        "Aacute": "#char(C1)",
+        "Acirc": "#char(C2)",
+        "Atilde": "#char(C3)",
+        "Aumlaut": "#char(C4)",
+        "Aring": "#char(C5)",
+        "AElig": "#char(C6)",
+        "Ccedil": "#char(C7)",
+        "Egrave": "#char(C8)",
+        "Eacute": "#char(C9)",
+        "Ecirc": "#char(CA)",
+        "Eumlaut": "#char(CB)",
+        "Igrave": "#char(CC)",
+        "Iacute": "#char(CD)",
+        "Icirc": "#char(CE)",
+        "Iumlaut": "#char(CF)",
+        "ETH": "#char(D0)",
+        "Ntilde": "#char(D1)",
+        "Ograve": "#char(D2)",
+        "Oacute": "#char(D3)",
+        "Ocirc": "#char(D4)",
+        "Otilde": "#char(D5)",
+        "Oumlaut": "#char(D6)",
+        "times": "#char(D7)",
+        "Oslash": "#char(D8)",
+        "Ugrave": "#char(D9)",
+        "Uacute": "#char(DA)",
+        "Ucirc": "#char(DB)",
+        "Uumlaut": "#char(DC)",
+        "Yacute": "#char(DD)",
+        "THORN": "#char(DE)",
+        "szlig": "#char(DF)",
+        "agrave": "#char(E0)",
+        "aacute": "#char(E1)",
+        "acirc": "#char(E2)",
+        "atilde": "#char(E3)",
+        "aumlaut": "#char(E4)",
+        "aring": "#char(E5)",
+        "aelig": "#char(E6)",
+        "ccedil": "#char(E7)",
+        "egrave": "#char(E8)",
+        "eacute": "#char(E9)",
+        "ecirc": "#char(EA)",
+        "eumlaut": "#char(EB)",
+        "igrave": "#char(EC)",
+        "iacute": "#char(ED)",
+        "icirc": "#char(EE)",
+        "iumlaut": "#char(EF)",
+        "eth": "#char(F0)",
+        "ntilde": "#char(F1)",
+        "ograve": "#char(F2)",
+        "oacute": "#char(F3)",
+        "ocirc": "#char(F4)",
+        "otilde": "#char(F5)",
+        "oumlaut": "#char(F6)",
+        "divide": "#char(F7)",
+        "oslash": "#char(F8)",
+        "ugrave": "#char(F9)",
+        "uacute": "#char(FA)",
+        "ucirc": "#char(FB)",
+        "uumlaut": "#char(FC)",
+        "yacute": "#char(FD)",
+        "thorn": "#char(FE)",
+        "yumlaut": "#char(FF)",
+        "fnof": "#char(192)",
+        "Alpha": "#char(391)",
+        "Beta": "#char(392)",
+        "Gamma": "#char(393)",
+        "Delta": "#char(394)",
+        "Epsilon": "#char(395)",
+        "Zeta": "#char(396)",
+        "Eta": "#char(397)",
+        "Theta": "#char(398)",
+        "Iota": "#char(399)",
+        "Kappa": "#char(39A)",
+        "Lambda": "#char(39B)",
+        "Mu": "#char(39C)",
+        "Nu": "#char(39D)",
+        "Xi": "#char(39E)",
+        "Omicron": "#char(39F)",
+        "Pi": "#char(3A0)",
+        "Rho": "#char(3A1)",
+        "Sigma": "#char(3A3)",
+        "Tau": "#char(3A4)",
+        "Upsilon": "#char(3A5)",
+        "Phi": "#char(3A6)",
+        "Chi": "#char(3A7)",
+        "Psi": "#char(3A8)",
+        "Omega": "#char(3A9)",
+        "alpha": "#char(3B1)",
+        "beta": "#char(3B2)",
+        "gamma": "#char(3B3)",
+        "delta": "#char(3B4)",
+        "epsilon": "#char(3B5)",
+        "zeta": "#char(3B6)",
+        "eta": "#char(3B7)",
+        "theta": "#char(3B8)",
+        "iota": "#char(3B9)",
+        "kappa": "#char(3BA)",
+        "lambda": "#char(3BB)",
+        "mu": "#char(3BC)",
+        "nu": "#char(3BD)",
+        "xi": "#char(3BE)",
+        "omicron": "#char(3BF)",
+        "pi": "#char(3C0)",
+        "rho": "#char(3C1)",
+        "sigmaf": "#char(3C2)",
+        "sigma": "#char(3C3)",
+        "tau": "#char(3C4)",
+        "upsilon": "#char(3C5)",
+        "phi": "#char(3C6)",
+        "chi": "#char(3C7)",
+        "psi": "#char(3C8)",
+        "omega": "#char(3C9)",
+        "thetasym": "#char(3D1)",
+        "upsih": "#char(3D2)",
+        "piv": "#char(3D6)",
+        "bull": "#char(2022)",
+        "hellip": "#char(2026)",
+        "prime": "#char(2032)",
+        "Prime": "#char(2033)",
+        "oline": "#char(203E)",
+        "frasl": "#char(2044)",
+        "weierp": "#char(2118)",
+        "imaginary": "#char(2111)",
+        "real": "#char(211C)",
+        "trademark": "#char(2122)",
+        "alefsym": "#char(2135)",
+        "larr": "#char(2190)",
+        "uarr": "#char(2191)",
+        "rarr": "#char(2192)",
+        "darr": "#char(2193)",
+        "harr": "#char(2194)",
+        "crarr": "#char(21B5)",
+        "lArr": "#char(21D0)",
+        "uArr": "#char(21D1)",
+        "rArr": "#char(21D2)",
+        "dArr": "#char(21D3)",
+        "hArr": "#char(21D4)",
+        "forall": "#char(2200)",
+        "part": "#char(2202)",
+        "exist": "#char(2203)",
+        "empty": "#char(2205)",
+        "nabla": "#char(2207)",
+        "isin": "#char(2208)",
+        "notin": "#char(2209)",
+        "ni": "#char(220B)",
+        "prod": "#char(220F)",
+        "sum": "#char(2211)",
+        "minus": "#char(2212)",
+        "lowast": "#char(2217)",
+        "radic": "#char(221A)",
+        "prop": "#char(221D)",
+        "infin": "#char(221E)",
+        "ang": "#char(2220)",
+        "and": "#char(2227)",
+        "or": "#char(2228)",
+        "cap": "#char(2229)",
+        "cup": "#char(222A)",
+        "int": "#char(222B)",
+        "there4": "#char(2234)",
+        "sim": "#char(223C)",
+        "cong": "#char(2245)",
+        "asymp": "#char(2248)",
+        "ne": "#char(2260)",
+        "equiv": "#char(2261)",
+        "le": "#char(2264)",
+        "ge": "#char(2265)",
+        "sub": "#char(2282)",
+        "sup": "#char(2283)",
+        "nsub": "#char(2284)",
+        "sube": "#char(2286)",
+        "supe": "#char(2287)",
+        "oplus": "#char(2295)",
+        "otimes": "#char(2297)",
+        "perp": "#char(22A5)",
+        "sdot": "#char(22C5)",
+        "lceil": "#char(2308)",
+        "rceil": "#char(2309)",
+        "lfloor": "#char(230A)",
+        "rfloor": "#char(230B)",
+        "lang": "#char(27E8)",
+        "rang": "#char(27E9)",
+        "loz": "#char(25CA)",
+        "spades": "#char(2660)",
+        "clubs": "#char(2663)",
+        "hearts": "#char(2665)",
+        "diams": "#char(2666)",
+        "OElig": "#char(152)",
+        "oelig": "#char(153)",
+        "Scaron": "#char(160)",
+        "scaron": "#char(161)",
+        "Yumlaut": "#char(178)",
+        "circ": "#char(2C6)",
+        "tilde": "#char(2DC)",
+        "ensp": "#char(2002)",
+        "emsp": "#char(2003)",
+        "thinsp": "#char(2009)",
+        "zwnj": "#char(200C)",
+        "zwj": "#char(200D)",
+        "lrm": "#char(200E)",
+        "rlm": "#char(200F)",
+        "ndash": "#char(2013)",
+        "mdash": "#char(2014)",
+        "lsquo": "#char(2018)",
+        "rsquo": "#char(2019)",
+        "sbquo": "#char(201A)",
+        "ldquo": "#char(201C)",
+        "rdquo": "#char(201D)",
+        "bdquo": "#char(201E)",
+        "dagger": "#char(2020)",
+        "Dagger": "#char(2021)",
+        "permil": "#char(2030)",
+        "lsaquo": "#char(2039)",
+        "rsaquo": "#char(203A)",
+        "euro": "#char(20AC)",
+        "tm": "#char(2122)"
+      }
+    },
+    "docCmdGroup": {
+      "kind": "union_list_element","allow_text": true,
+      "bases": ["docTitleCmdGroup"],
+      "content": {
+        "hruler": "#empty",
+        "preformatted": "docMarkupType",
+        "programlisting": "listingType",
+        "verbatim": "#string",
+        "javadocliteral": "#string",
+        "javadoccode": "#string",
+        "indexentry": "docIndexEntryType",
+        "orderedlist": "docListType",
+        "itemizedlist": "docListType",
+        "simplesect": "docSimpleSectType",
+        "title": "docTitleType",
+        "variablelist": "docVariableListType",
+        "table": "docTableType",
+        "heading": "docHeadingType",
+        "dotfile": "docImageFileType",
+        "mscfile": "docImageFileType",
+        "diafile": "docImageFileType",
+        "toclist": "docTocListType",
+        "language": "docLanguageType",
+        "parameterlist": "docParamListType",
+        "xrefsect": "docXRefSectType",
+        "copydoc": "docCopyType",
+        "details": "docDetailsType",
+        "blockquote": "docBlockQuoteType",
+        "parblock": "docParBlockType"
+      }
+    },
+    "docParaType": {
+      "kind": "union_list_element",
+      "bases": ["docCmdGroup"]
+    },
+    "docMarkupType": {
+      "kind": "union_list_element",
+      "bases": ["docCmdGroup"]
+    },
+    "docTitleType": {
+      "kind": "union_list_element",
+      "bases": ["docTitleCmdGroup"]
+    },
+    "docSummaryType": {
+      "kind": "union_list_element",
+      "bases": ["docTitleCmdGroup"]
+    },
+    "docURLLink": {
+      "kind": "union_list_element",
+      "bases": ["docTitleCmdGroup"],
+      "attributes": {
+        "url":  {"type": "#string"}
+      }
+    },
+    "docHtmlOnlyType": {
+      "kind": "union_list_element",
+      "allow_text": true,
+      "attributes": {
+        "block":  {"type": "#string"}
+      }
+    },
+    "docImageType": {
+      "kind": "union_list_element",
+      "bases": ["docTitleCmdGroup"],
+      "attributes": {
+        "type":                 {"type": "DoxImageKind", "optional": true},
+        "name":                 {"type": "#string", "optional": true},
+        "width":                {"type": "#string", "optional": true},
+        "height":               {"type": "#string", "optional": true},
+        "alt":                  {"type": "#string", "optional": true},
+        "inline":               {"type": "#DoxBool", "optional": true},
+        "caption":              {"type": "#string", "optional": true}
+      }
+    },
+    "docDotMscType": {
+      "kind": "union_list_element",
+      "bases": ["docTitleCmdGroup"],
+      "attributes": {
+        "name":                 {"type": "#string", "optional": true},
+        "width":                {"type": "#string", "optional": true},
+        "height":               {"type": "#string", "optional": true},
+        "caption":              {"type": "#string", "optional": true}
+      }
+    },
+    "docPlantumlType": {
+      "kind": "union_list_element",
+      "bases": ["docTitleCmdGroup"],
+      "attributes": {
+        "name":                 {"type": "#string", "optional": true},
+        "width":                {"type": "#string", "optional": true},
+        "height":               {"type": "#string", "optional": true},
+        "caption":              {"type": "#string", "optional": true},
+        "engine":               {"type": "DoxPlantumlEngine", "optional": true}
+      }
+    },
+    "docRefTextType": {
+      "kind": "union_list_element",
+      "bases": ["docTitleCmdGroup"],
+      "attributes": {
+        "refid":                {"type": "#string"},
+        "kindref":              {"type": "#string"},
+        "external":             {"type": "#string", "optional": true}
+      }
+    },
+    "docHeadingType": {
+      "kind": "union_list_element",
+      "bases": ["docTitleCmdGroup"],
+      "attributes": {
+        "level":                {"type": "#integer"}
+      }
+    },
+    "docImageFileType": {
+      "kind": "union_list_element",
+      "bases": ["docTitleCmdGroup"],
+      "attributes": {
+        "name":                 {"type": "#string", "optional": true},
+        "width":                {"type": "#string", "optional": true},
+        "height":               {"type": "#string", "optional": true}
+      }
+    },
+    "docAnchorType": {
+      "kind": "union_list_element",
+      "allow_text": true,
+      "attributes": {
+        "id":                   {"type": "#string"}
+      }
+    },
+    "docFormulaType": {
+      "kind": "union_list_element",
+      "allow_text": true,
+      "attributes": {
+        "id":                   {"type": "#string"}
+      }
+    },
+    "docEmojiType": {
+      "kind": "tag_only_element",
+      "attributes": {
+        "name":                 {"type": "#string"},
+        "unicode":              {"type": "#string"}
+      }
+    },
+    "docIndexEntryType": {
+      "kind": "tag_only_element",
+      "children": {
+        "primaryie":            {"type": "#string"},
+        "secondaryie":          {"type": "#string"}
+      }
+    },
+    "docListType": {
+      "kind": "list_element",
+      "min_items": 1,
+      "attributes": {
+        "type":                 {"type": "DoxOlType", "optional": true},
+        "start":                {"type": "#integer", "optional": true}
+      },
+      "content": {
+        "listitem":   "docListItemType"
+      }
+    },
+    "docSimpleSectType": {
+      "kind": "tag_only_element",
+      "attributes": {
+        "kind":                 {"type": "DoxSimpleSectKind"}
+      },
+      "children": {
+        "title":                {"type": "docTitleType", "min_items": 0},
+        "para":                 {"type": "docParaType", "is_list": true}
+      }
+    },
+    "docVariableListType": {
+      "kind": "tuple_list_element",
+      "min_items": 1,
+      "content": {
+        "varlistentry":  "docVarListEntryType",
+        "listitem":      "docListItemType"
+      }
+    },
+    "docTableType" : {
+      "kind": "tag_only_element",
+      "attributes": {
+        "rows":                 {"type": "#integer"},
+        "cols":                 {"type": "#integer"},
+        "width":                {"type": "#string", "optional": true}
+      },
+      "children": {
+        "caption":              {"type": "docCaptionType", "min_items": 0},
+        "row":                  {"type": "docRowType", "is_list": true, "min_items": 0}
+      }
+    },
+    "docTocListType": {
+      "kind": "list_element",
+      "content": {
+        "tocitem": "docTocItemType"
+      }
+    },
+    "docLanguageType": {
+      "kind": "list_element",
+      "attributes": {
+        "langid":               {"type": "#string"}
+      },
+      "content": {
+        "para": "docParaType"
+      }
+    },
+    "docParamListType": {
+      "kind": "list_element",
+      "attributes": {
+        "kind":                 {"type": "DoxParamListKind"}
+      },
+      "content": {
+        "parameteritem": "docParamListItem"
+      }
+    },
+    "docXRefSectType": {
+      "kind": "tag_only_element",
+      "attributes": {
+        "id":    {"type": "#string"}
+      },
+      "children": {
+        "xreftitle":            {"type": "#string", "is_list": true, "min_items": 0},
+        "xrefdescription":      {"type": "descriptionType"}
+      }
+    },
+    "docCopyType": {
+      "kind": "tag_only_element",
+      "attributes": {
+        "link":    {"type": "#string"}
+      },
+      "children": {
+        "para":                 {"type": "docParaType", "is_list": true, "min_items": 0},
+        "sec1":                 {"type": "docSect1Type", "is_list": true, "min_items": 0},
+        "internal":             {"type": "docInternalType", "min_items": 0}
+      }
+    },
+    "docDetailsType": {
+      "kind": "tag_only_element",
+      "children": {
+        "summary":              {"type": "docSummaryType", "min_items": 0},
+        "para":                 {"type": "docParaType", "is_list": true, "min_items": 0}
+      }
+    },
+    "docBlockQuoteType": {
+      "kind": "list_element",
+      "content": {
+        "para": "docParaType"
+      }
+    },
+    "docParBlockType": {
+      "kind": "list_element",
+      "content": {
+        "para": "docParaType"
+      }
+    },
+    "docVarListEntryType": {
+      "kind": "tag_only_element",
+      "children": {
+        "term":                 {"type": "docTitleType"}
+      }
+    },
+    "DoxCompoundKind": {
+      "kind": "enumeration",
+      "values": [
+        {"xml": "class", "id": "class_"},
+        "struct",
+        "union",
+        "interface",
+        "protocol",
+        "category",
+        "exception",
+        "service",
+        "singleton",
+        "module",
+        "type",
+        "file",
+        "namespace",
+        "group",
+        "page",
+        "example",
+        "dir",
+        "concept"
+      ]
+    },
+    "CompoundKind": {
+      "kind": "enumeration",
+      "values": [
+        {"xml": "class", "id": "class_"},
+        "struct",
+        "union",
+        "interface",
+        "protocol",
+        "category",
+        "exception",
+        "module",
+        "type",
+        "file",
+        "namespace",
+        "group",
+        "page",
+        "example",
+        "dir",
+        "concept"
+      ]
+    },
+    "DoxLanguage": {
+      "kind": "enumeration",
+      "values": [
+        "Unknown",
+        "IDL",
+        "Java",
+        {"xml": "C#", "id": "CSharp"},
+        "D",
+        "PHP",
+        {"xml": "Objective-C", "id": "Objective_C"},
+        {"xml": "C++", "id": "CPlusPlus"},
+        "JavaScript",
+        "Python",
+        "Fortran",
+        "VHDL",
+        "XML",
+        "SQL",
+        "Markdown",
+        "Slice",
+        "Lex"
+      ]
+    },
+    "DoxProtectionKind": {
+      "kind": "enumeration",
+      "values": [
+        "public",
+        "protected",
+        "private",
+        "package"
+      ]
+    },
+    "DoxRefQualifierKind": {
+      "kind": "enumeration",
+      "values": [
+        "lvalue",
+        "rvalue"
+      ]
+    },
+    "DoxVirtualKind": {
+      "kind": "enumeration",
+      "values": [
+        {"xml": "non-virtual", "id": "non_virtual"},
+        "virtual",
+        {"xml": "pure-virtual", "id": "pure_virtual"}
+      ]
+    },
+    "DoxSectionKind": {
+      "kind": "enumeration",
+      "values": [
+        {"xml": "user-defined", "id": "user_defined"},
+        {"xml": "public-type", "id": "public_type"},
+        {"xml": "public-func", "id": "public_func"},
+        {"xml": "public-attrib", "id": "public_attrib"},
+        {"xml": "public-slot", "id": "public_slot"},
+        "signal",
+        {"xml": "dcop-func", "id": "dcop_func"},
+        "property",
+        "event",
+        {"xml": "public-static-func", "id": "public_static_func"},
+        {"xml": "public-static-attrib", "id": "public_static_attrib"},
+        {"xml": "protected-type", "id": "protected_type"},
+        {"xml": "protected-func", "id": "protected_func"},
+        {"xml": "protected-attrib", "id": "protected_attrib"},
+        {"xml": "protected-slot", "id": "protected_slot"},
+        {"xml": "protected-static-func", "id": "protected_static_func"},
+        {"xml": "protected-static-attrib", "id": "protected_static_attrib"},
+        {"xml": "package-type", "id": "package_type"},
+        {"xml": "package-func", "id": "package_func"},
+        {"xml": "package-attrib", "id": "package_attrib"},
+        {"xml": "package-static-func", "id": "package_static_func"},
+        {"xml": "package-static-attrib", "id": "package_static_attrib"},
+        {"xml": "private-type", "id": "private_type"},
+        {"xml": "private-func", "id": "private_func"},
+        {"xml": "private-attrib", "id": "private_attrib"},
+        {"xml": "private-slot", "id": "private_slot"},
+        {"xml": "private-static-func", "id": "private_static_func"},
+        {"xml": "private-static-attrib", "id": "private_static_attrib"},
+        "friend",
+        "related",
+        "define",
+        "prototype",
+        "typedef",
+        "enum",
+        "func",
+        "var"
+      ]
+    },
+    "DoxHighlightClass": {
+      "kind": "enumeration",
+      "values": [
+        "comment",
+        "normal",
+        "preprocessor",
+        "keyword",
+        "keywordtype",
+        "keywordflow",
+        "stringliteral",
+        "xmlcdata",
+        "charliteral",
+        "vhdlkeyword",
+        "vhdllogic",
+        "vhdlchar",
+        "vhdldigit"
+      ]
+    },
+    "DoxSimpleSectKind": {
+      "kind": "enumeration",
+      "values": [
+        "see",
+        {"xml": "return", "id": "return_"},
+        "author",
+        "authors",
+        "version",
+        "since",
+        "date",
+        "note",
+        "warning",
+        "pre",
+        "post",
+        "copyright",
+        "invariant",
+        "remark",
+        "attention",
+        "par",
+        "rcs"
+      ]
+    },
+    "DoxImageKind": {
+      "kind": "enumeration",
+      "values": [
+        "html",
+        "latex",
+        "docbook",
+        "rtf",
+        "xml"
+      ]
+    },
+    "DoxPlantumlEngine": {
+      "kind": "enumeration",
+      "values": [
+        "uml",
+        "bpm",
+        "wire",
+        "dot",
+        "ditaa",
+        "salt",
+        "math",
+        "latex",
+        "gantt",
+        "mindmap",
+        "wbs",
+        "yaml",
+        "creole",
+        "json",
+        "flow",
+        "board",
+        "git",
+        "hcl",
+        "regex",
+        "ebnf"
+      ]
+    },
+    "DoxParamListKind": {
+      "kind": "enumeration",
+      "values": [
+        "param",
+        "retval",
+        "exception",
+        "templateparam"
+      ]
+    },
+    "DoxParamDir": {
+      "kind": "enumeration",
+      "values": [
+        {"xml": "in", "id": "in_"},
+        "out",
+        "inout"
+      ]
+    },
+    "DoxAccessor": {
+      "kind": "enumeration",
+      "values": [
+        "retain",
+        "copy",
+        "assign",
+        "weak",
+        "strong",
+        "unretained"
+      ]
+    },
+    "DoxAlign": {
+      "kind": "enumeration",
+      "values": [
+        "left",
+        "right",
+        "center"
+      ]
+    },
+    "DoxVerticalAlign": {
+      "kind": "enumeration",
+      "values": [
+        "bottom",
+        "top",
+        "middle"
+      ]
+    },
+    "DoxGraphRelation": {
+      "kind": "enumeration",
+      "values": [
+        "include",
+        "usage",
+        {"xml": "template-instance", "id": "template_instance"},
+        {"xml": "public-inheritance", "id": "public_inheritance"},
+        {"xml": "protected-inheritance", "id": "protected_inheritance"},
+        {"xml": "private-inheritance", "id": "private_inheritance"},
+        {"xml": "type-constraint", "id": "type_constraint"}
+      ]
+    },
+    "DoxOlType": {
+      "kind": "char_enumeration",
+      "values": "1aAiI"
+    }
+  }
+}

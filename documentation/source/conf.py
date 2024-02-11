@@ -60,7 +60,6 @@ git_tag = subprocess.Popen(["git", "describe", "--tags"], stdout=subprocess.PIPE
 git_tag = git_tag.decode("ascii")
 
 if travis_build:
-
     # Don't attempt to set the path as breathe is installed to virtualenv on travis
 
     # Set values with simple strings
@@ -69,7 +68,6 @@ if travis_build:
     documentation_build = "travis"
 
 elif read_the_docs_build:
-
     # On RTD we'll be in the 'source' directory
     sys.path.append("../../")
 
@@ -96,7 +94,6 @@ elif read_the_docs_build:
         documentation_build = "readthedocs_latest"
 
 else:
-
     # For our usual dev build we'll be in the 'documentation' directory but Sphinx seems to set the
     # current working directory to 'source' so we append relative to that
     sys.path.append("../../")
@@ -250,7 +247,6 @@ breathe_projects = {
     "membergroups": "../../examples/specific/membergroups/xml/",
     "simplesect": "../../examples/specific/simplesect/xml/",
     "dot_graphs": "../../examples/specific/dot_graphs/xml/",
-    "group_cpp": "../../examples/doxygen/group/xml/",
 }
 
 breathe_projects_source = {"auto": ("../../examples/specific", ["auto_function.h", "auto_class.h"])}
@@ -397,7 +393,6 @@ def generate_doxygen_xml(app):
     read_the_docs_build = os.environ.get("READTHEDOCS", None) == "True"
 
     if read_the_docs_build:
-
         # Attempt to build the doxygen files on the RTD server. Explicitly override the path/name used
         # for executing doxygen to simply be 'doxygen' to stop the makefiles looking for the executable.
         # This is because the `which doxygen` effort seemed to fail when tested on the RTD server.
@@ -407,7 +402,6 @@ def generate_doxygen_xml(app):
 
 
 def setup(app):
-
     # Approach borrowed from the Sphinx docs
     app.add_object_type(
         "confval",

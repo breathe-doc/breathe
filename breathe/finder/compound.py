@@ -1,100 +1,71 @@
-from breathe.finder import ItemFinder, stack
-from breathe.renderer.filter import Filter, FilterFactory
-from breathe.parser import DoxygenCompoundParser
-from breathe.parser.compoundsuper import memberdefType
+from __future__ import annotations
 
-from sphinx.application import Sphinx
+from breathe.finder import ItemFinder
+from breathe.renderer.filter import NodeStack
+from breathe import parser
+from breathe.renderer import TaggedNode
+from typing import TYPE_CHECKING
 
-from typing import Any, List
+if TYPE_CHECKING:
+    from breathe.renderer.filter import DoxFilter, FinderMatch
 
 
-class DoxygenTypeSubItemFinder(ItemFinder):
-    def filter_(self, ancestors, filter_: Filter, matches) -> None:
+class DoxygenTypeSubItemFinder(ItemFinder[parser.Node_DoxygenType]):
+    def filter_(self, ancestors, filter_: DoxFilter, matches: list[FinderMatch]) -> None:
         """Find nodes which match the filter. Doesn't test this node, only its children"""
 
-        node_stack = stack(self.data_object, ancestors)
-        compound_finder = self.item_finder_factory.create_finder(self.data_object.compounddef)
-        compound_finder.filter_(node_stack, filter_, matches)
+        node_stack = [self.node] + ancestors
+        assert len(self.node.value.compounddef) == 1
+        self.run_filter(filter_, matches, node_stack, self.node.value.compounddef[0])
 
 
-class CompoundDefTypeSubItemFinder(ItemFinder):
-    def filter_(self, ancestors, filter_: Filter, matches) -> None:
+class CompoundDefTypeSubItemFinder(ItemFinder[parser.Node_compounddefType]):
+    def filter_(self, ancestors, filter_: DoxFilter, matches: list[FinderMatch]) -> None:
         """Finds nodes which match the filter and continues checks to children"""
 
-        node_stack = stack(self.data_object, ancestors)
-        if filter_.allow(node_stack):
+        node_stack = [self.node] + ancestors
+        if filter_(NodeStack(node_stack)):
             matches.append(node_stack)
 
-        for sectiondef in self.data_object.sectiondef:
-            finder = self.item_finder_factory.create_finder(sectiondef)
-            finder.filter_(node_stack, filter_, matches)
+        for sectiondef in self.node.value.sectiondef:
+            self.run_filter(filter_, matches, node_stack, sectiondef)
 
-        for innerclass in self.data_object.innerclass:
-            finder = self.item_finder_factory.create_finder(innerclass)
-            finder.filter_(node_stack, filter_, matches)
+        for innerclass in self.node.value.innerclass:
+            self.run_filter(filter_, matches, node_stack, innerclass, "innerclass")
 
 
-class SectionDefTypeSubItemFinder(ItemFinder):
-    def __init__(self, app: Sphinx, compound_parser: DoxygenCompoundParser, *args):
-        super().__init__(*args)
-
-        self.filter_factory = FilterFactory(app)
-        self.compound_parser = compound_parser
-
-    def filter_(self, ancestors, filter_: Filter, matches) -> None:
+class SectionDefTypeSubItemFinder(ItemFinder[parser.Node_sectiondefType]):
+    def filter_(self, ancestors, filter_: DoxFilter, matches: list[FinderMatch]) -> None:
         """Find nodes which match the filter. Doesn't test this node, only its children"""
 
-        node_stack = stack(self.data_object, ancestors)
-        if filter_.allow(node_stack):
+        node_stack = [self.node] + ancestors
+        if filter_(NodeStack(node_stack)):
             matches.append(node_stack)
 
-        for memberdef in self.data_object.memberdef:
-            finder = self.item_finder_factory.create_finder(memberdef)
-            finder.filter_(node_stack, filter_, matches)
+        for memberdef in self.node.value.memberdef:
+            self.run_filter(filter_, matches, node_stack, memberdef)
 
-        # Descend to member children (Doxygen 1.9.7 or newer)
-        members = self.data_object.get_member()
-        # TODO: find a more precise type for the Doxygen nodes
-        member_matches: List[Any] = []
-        for member in members:
-            member_finder = self.item_finder_factory.create_finder(member)
-            member_finder.filter_(node_stack, filter_, member_matches)
-
-        # If there are members in this sectiondef that match the criteria
-        # then load up the file for the group they're in and get the member data objects
-        if member_matches:
-            matched_member_ids = {member.id for stack in matches for member in stack
-                                  if isinstance(member, memberdefType)}
-            member_refid = member_matches[0][0].refid
-            filename = member_refid.rsplit('_', 1)[0]
-            file_data = self.compound_parser.parse(filename)
-            finder = self.item_finder_factory.create_finder(file_data)
-            for member_stack in member_matches:
-                member = member_stack[0]
-                if member.refid not in matched_member_ids:
-                    ref_filter = self.filter_factory.create_id_filter(
-                        "memberdef", member.refid
-                    )
-                    finder.filter_(node_stack, ref_filter, matches)
+        for member in self.node.value.member:
+            self.run_filter(filter_, matches, node_stack, member)
 
 
-class MemberDefTypeSubItemFinder(ItemFinder):
-    def filter_(self, ancestors, filter_: Filter, matches) -> None:
-        data_object = self.data_object
-        node_stack = stack(data_object, ancestors)
+class MemberDefTypeSubItemFinder(ItemFinder[parser.Node_memberdefType]):
+    def filter_(self, ancestors, filter_: DoxFilter, matches: list[FinderMatch]) -> None:
+        data_object = self.node.value
+        node_stack = [self.node] + ancestors
 
-        if filter_.allow(node_stack):
+        if filter_(NodeStack(node_stack)):
             matches.append(node_stack)
 
-        if data_object.kind == "enum":
+        if data_object.kind == parser.DoxMemberKind.enum:
             for value in data_object.enumvalue:
-                value_stack = stack(value, node_stack)
-                if filter_.allow(value_stack):
+                value_stack = [TaggedNode("enumvalue", value)] + node_stack
+                if filter_(NodeStack(value_stack)):
                     matches.append(value_stack)
 
 
-class RefTypeSubItemFinder(ItemFinder):
-    def filter_(self, ancestors, filter_: Filter, matches) -> None:
-        node_stack = stack(self.data_object, ancestors)
-        if filter_.allow(node_stack):
+class RefTypeSubItemFinder(ItemFinder[parser.Node_refType]):
+    def filter_(self, ancestors, filter_: DoxFilter, matches: list[FinderMatch]) -> None:
+        node_stack = [self.node] + ancestors
+        if filter_(NodeStack(node_stack)):
             matches.append(node_stack)

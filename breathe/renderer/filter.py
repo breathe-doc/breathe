@@ -12,44 +12,6 @@ two different purposes:
    DoxygenToRstRendererFactory.
 
 
-General Implementation
-~~~~~~~~~~~~~~~~~~~~~~
-
-Filters are essential just tests to see if a node matches certain parameters that are needed to
-decide whether or not to include it in some output.
-
-As these filters are declared once and then used on multiple nodes, we model them as object
-hierarchies that encapsulate the required test and take a node (with its context) and return True or
-False.
-
-If you wanted a test which figures out if a node has the node_type 'memberdef' you might create the
-following object hierarchy:
-
-    node_is_memberdef = InFilter(AttributeAccessor(Node(), 'node_type'), ['memberdef'])
-
-This reads from the inside out, as get the node, then get the node_type attribute from it, and see
-if the value of the attribute is in the list ['memberdef'].
-
-The Node() is called a 'Selector'. Parent() is also a selector. It means given the current context,
-work with the parent of the current node rather than the node itself. This allows you to frame tests
-in terms of a node's parent as well as the node which helps when we want nodes with particular
-parents and not others.
-
-The AttributeAccessor() is called an 'Accessor'. It wraps up an attempt to access a particular
-attribute on the selected node. There are quite a few different specific accessors but they can
-mostly be generalised with the AttributeAccessor. This code has evolved over time and initially the
-implementation involved specific accessor classes (which are still used in large parts of it.)
-
-The InFilter() is unsurprisingly called a 'Filter'. There are lots of different filters. Filters
-either act on the results of Accessors or on the results of other Filters and they always return
-True or False. The AndFilter and the OrFilter can be used to combine the outputs of other Filters
-with logical 'and' and 'or' operations.
-
-You can build up some pretty complex expressions with this level of freedom as you
-might imagine. The complexity is unfortunate but necessary as the nature of filtering the xml is
-quite complex.
-
-
 Finder Filters
 ~~~~~~~~~~~~~~
 
@@ -60,7 +22,7 @@ They are called like this:
     # Descend down the hierarchy
     # ...
 
-    if filter_.allow(node_stack):
+    if filter_(node_stack):
         matches.append(self.data_object)
 
     # Keep on descending
@@ -71,1013 +33,353 @@ more nodes. This simplifies the filters as they only have to return true for the
 are interested in and they don't have to worry about allowing the iteration down the hierarchy to
 continue for nodes which don't match.
 
-An example of a finder filter is:
-
-    AndFilter(
-        InFilter(NodeTypeAccessor(Node()), ["compound"]),
-        InFilter(KindAccessor(Node()), ["group"]),
-        InFilter(NameAccessor(Node()), ["mygroup"])
-        )
-
-This says, return True for all the nodes of node_type 'compound' with 'kind' set to 'group' which
-have the name 'mygroup'. It returns false for everything else, but when a node matching this is
-found then it is added to the matches list by the code above.
-
-It is therefore relatively easy to write finder filters. If you have two separate node filters like
-the one above and you want to match on both of them then you can do:
-
-    OrFilter(
-        node_filter_1,
-        node_filter_2
-        )
-
-To combine them.
-
 
 Content Filters
 ~~~~~~~~~~~~~~~
 
 Content filters are harder than the finder filters as they are responsible for halting the iteration
-down the hierarchy if they return false. This means that if you're interested in memberdef nodes
-with a particular attribute then you have to check for that but also include a clause which allows
-all other non-memberdef nodes to pass through as you don't want to interrupt them.
-
-This means you end up with filters like this:
-
-    OrFilter(
-        AndFilter(
-            InFilter(NodeTypeAccessor(Node()), ["compound"]),
-            InFilter(KindAccessor(Node()), ["group"]),
-            InFilter(NameAccessor(Node()), ["mygroup"])
-            ),
-        NotFilter(
-            AndFilter(
-                InFilter(NodeTypeAccessor(Node()), ["compound"]),
-                InFilter(KindAccessor(Node()), ["group"]),
-                )
-            )
-        )
-
-Which is to say that we want to let through a compound, with kind group, with name 'mygroup' but
-we're also happy if the node is **not** a compund with kind group. Really we just don't want to let
-through any compounds with kind group with name other than 'mygroup'. As such, we can rephrase this
-as:
-
-    NotFilter(
-        AndFilter(
-            InFilter(NodeTypeAccessor(Node()), ["compound"]),
-            InFilter(KindAccessor(Node()), ["group"]),
-            NotFilter(InFilter(NameAccessor(Node()), ["mygroup"]))
-            )
-        )
-
-Using logical manipulation we can rewrite this as:
-
-    OrFilter(
-        NotFilter(InFilter(NodeTypeAccessor(Node()), ["compound"])),
-        NotFilter(InFilter(KindAccessor(Node()), ["group"])),
-        InFilter(NameAccessor(Node()), ["mygroup"])
-        )
-
-We reads: allow if it isn't a compound, or if it is a compound but doesn't have a 'kind' of 'group',
-but if it is a compound and has a 'kind' of 'group then only allow it if it is named 'mygroup'.
-
-
-Helper Syntax
-~~~~~~~~~~~~~
-
-Some of these filter declarations get a little awkward to read and write. They are not laid out in
-manner which reads smoothly. Additional helper methods and operator overloads have been introduced
-to help with this.
-
-AttributeAccessor objects are created in property methods on the Selector classes so:
-
-    node.kind
-
-Where node has been declared as a Node() instance. Results in:
-
-    AttributeAccessor(Node(), 'kind')
-
-The '==' and '!=' operators on the Accessors have been overloaded to return the appropriate filters
-so that:
-
-    node.kind == 'group'
-
-Results in:
-
-    InFilter(AttributeAccessor(Node(), 'kind'), ['kind'])
-
-We also override the binary 'and' (&), 'or' (|) and 'not' (~) operators in Python to apply
-AndFilters, OrFilters and NotFilters respectively. We have to override the binary operators as they
-actual 'and', 'or' and 'not' operators cannot be overridden. So:
-
-    (node.node_type == 'compound') & (node.name == 'mygroup')
-
-Translates to:
-
-    AndFilter(
-        InFilter(NodeTypeAccessor(Node()), ["compound"])),
-        InFilter(NameAccessor(Node()), ["mygroup"])
-        )
-
-Where the former is hopefully more readable without sacrificing too much to the abstract magic of
-operator overloads.
-
-
-Operator Precedences & Extra Parenthesis
-''''''''''''''''''''''''''''''''''''''''
-
-As the binary operators have a lower operator precedence than '==' and '!=' and some other operators
-we have to include additional parenthesis in the expressions to group them as we want. So instead of
-writing:
-
-    node.node_type == 'compound' & node.name == 'mygroup'
-
-We have to write:
-
-    (node.node_type == 'compound') & (node.name == 'mygroup')
-
+down the hierarchy if they return false. This means that if you're interested in Node_memberdefType
+nodes with a particular attribute then you have to check for that but also include a clause which
+allows all other non-Node_memberdefType nodes to pass through as you don't want to interrupt them.
 """
 
-from breathe import path_handler
+from __future__ import annotations
+
+from breathe import parser, renderer
 
 from sphinx.application import Sphinx
 
-import os
-from typing import Any, Callable, Dict, List
+from typing import Any, Callable, SupportsIndex, TYPE_CHECKING, TypeVar
+from collections.abc import Container, Iterable, Mapping
+
+if TYPE_CHECKING:
+    import sys
+
+    if sys.version_info >= (3, 11):
+        from typing import TypeAlias
+    else:
+        from typing_extensions import TypeAlias
+
+    from breathe.directives.class_like import DoxClassOptions
+    from breathe.directives.content_block import DoxContentBlockOptions
+    from breathe.project import ProjectInfo
+
+    DoxFilter: TypeAlias = Callable[["NodeStack"], bool]
+
+    FinderMatch: TypeAlias = list[renderer.TaggedNode]
+    FinderMatchItr: TypeAlias = Iterable[FinderMatch]
+
+    DoxIndexFilter: TypeAlias = Callable[[parser.DoxygenIndex], FinderMatchItr]
+
+    DoxNamespaceOptions: TypeAlias = DoxClassOptions | DoxContentBlockOptions
+
+    T_options = TypeVar("T_options", DoxClassOptions, DoxContentBlockOptions)
 
 
-class UnrecognisedKindError(Exception):
-    pass
+CLASS_LIKE_COMPOUNDDEF = (
+    parser.DoxCompoundKind.class_,
+    parser.DoxCompoundKind.struct,
+    parser.DoxCompoundKind.interface,
+)
 
 
-###############################################################################
-# Selectors
-###############################################################################
+class NodeStack:
+    def __init__(self, stack: list[renderer.TaggedNode]):
+        self.stack = stack
 
-
-class Selector:
-    def __call__(self, node_stack):
-        raise NotImplementedError
-
-    @property
-    def node_type(self):
-        return NodeTypeAccessor(self)
-
-    @property
-    def kind(self):
-        return AttributeAccessor(self, "kind")
-
-    @property
-    def node_name(self):
-        return AttributeAccessor(self, "node_name")
-
-    @property
-    def name(self):
-        return AttributeAccessor(self, "name")
-
-    @property
-    def briefdescription(self):
-        return AttributeAccessor(self, "briefdescription")
-
-    @property
-    def detaileddescription(self):
-        return AttributeAccessor(self, "detaileddescription")
-
-    @property
-    def prot(self):
-        return AttributeAccessor(self, "prot")
+    def ancestor(self, generations: SupportsIndex) -> renderer.DataObject | None:
+        i = generations.__index__()
+        return self.stack[i].value if len(self.stack) > i else None
 
     @property
-    def valueOf(self):
-        return AttributeAccessor(self, "valueOf_")
+    def parent(self) -> renderer.DataObject | None:
+        return self.stack[1].value if len(self.stack) > 1 else None
 
     @property
-    def id(self):
-        return AttributeAccessor(self, "id")
+    def node(self) -> renderer.DataObject:
+        return self.stack[0].value
 
+    @property
+    def tag(self) -> str:
+        tag = self.stack[0].tag
+        assert tag is not None
+        return tag
 
-class Ancestor(Selector):
-    def __init__(self, generations):
-        self.generations = generations
 
-    def __call__(self, node_stack):
-        return node_stack[self.generations]
+def set_defaults(app: Sphinx, options: T_options) -> T_options:
+    r: Any = options.copy()
+    for m in app.config.breathe_default_members:
+        r.setdefault(m, "")
+    return r
 
 
-class Parent(Selector):
-    def __call__(self, node_stack):
-        return node_stack[1]
+def create_show_filter(options: Mapping[str, Any]) -> DoxFilter:
+    """Currently only handles the header-file entry"""
 
+    if options.get("show") == "header-file":
+        return lambda nstack: True
 
-class Node(Selector):
-    def __call__(self, node_stack):
-        return node_stack[0]
-
-
-###############################################################################
-# Accessors
-###############################################################################
-
-
-class Accessor:
-    def __init__(self, selector: Selector) -> None:
-        self.selector = selector
-
-    def __call__(self, node_stack):
-        raise NotImplementedError
-
-    def __eq__(self, value: str) -> "InFilter":  # type: ignore
-        return InFilter(self, [value])
-
-    def __ne__(self, value: str) -> "NotFilter":  # type: ignore
-        return NotFilter(InFilter(self, [value]))
-
-    def is_one_of(self, collection: List[str]) -> "InFilter":
-        return InFilter(self, collection)
-
-    def has_content(self) -> "HasContentFilter":
-        return HasContentFilter(self)
-
-    def endswith(self, options: List[str]) -> "EndsWithFilter":
-        return EndsWithFilter(self, options)
-
-
-class NameAccessor(Accessor):
-    def __call__(self, node_stack) -> str:
-        return self.selector(node_stack).name
-
-
-class NodeNameAccessor(Accessor):
-    """Check the .node_name member which is declared on refTypeSub nodes
-
-    It distinguishes between innerclass, innernamespace, etc.
-    """
-
-    def __call__(self, node_stack) -> str:
-        return self.selector(node_stack).node_name
-
-
-class NodeTypeAccessor(Accessor):
-    def __call__(self, node_stack) -> str:
-        data_object = self.selector(node_stack)
-        try:
-            return data_object.node_type
-        except AttributeError as e:
-            # Horrible hack to silence errors on filtering unicode objects
-            # until we fix the parsing
-            if type(data_object) == str:
-                return "unicode"
-            else:
-                raise e
-
-
-class KindAccessor(Accessor):
-    def __call__(self, node_stack) -> str:
-        return self.selector(node_stack).kind
-
-
-class AttributeAccessor(Accessor):
-    """Returns the value of a particular attribute on the selected node.
-
-    AttributeAccessor(Node(), 'name') returns the value of ``node.name``.
-    """
-
-    def __init__(self, selector: Selector, attribute_name: str) -> None:
-        super().__init__(selector)
-        self.attribute_name = attribute_name
-
-    def __call__(self, node_stack) -> Any:
-        return getattr(self.selector(node_stack), self.attribute_name)
-
-
-class LambdaAccessor(Accessor):
-    def __init__(self, selector: Selector, func: Callable[[Any], str]):
-        super().__init__(selector)
-        self.func = func
-
-    def __call__(self, node_stack):
-        return self.func(self.selector(node_stack))
-
-
-class NamespaceAccessor(Accessor):
-    def __call__(self, node_stack):
-        return self.selector(node_stack).namespaces
-
-
-###############################################################################
-# Filters
-###############################################################################
-
-
-class Filter:
-    def allow(self, node_stack) -> bool:
-        raise NotImplementedError
-
-    def __and__(self, other: "Filter") -> "AndFilter":
-        return AndFilter(self, other)
-
-    def __or__(self, other: "Filter") -> "OrFilter":
-        return OrFilter(self, other)
-
-    def __invert__(self) -> "NotFilter":
-        return NotFilter(self)
-
-
-class HasAncestorFilter(Filter):
-    def __init__(self, generations: int) -> None:
-        self.generations = generations
-
-    def allow(self, node_stack) -> bool:
-        return len(node_stack) > self.generations
-
-
-class HasContentFilter(Filter):
-    def __init__(self, accessor: Accessor):
-        self.accessor = accessor
-
-    def allow(self, node_stack) -> bool:
-        """Detects if the node in questions has an empty .content_ property."""
-
-        return bool(self.accessor(node_stack).content_)
-
-
-class EndsWithFilter(Filter):
-    """Detects if the string result of the accessor ends with any of the strings in the ``options``
-    iterable parameter.
-    """
-
-    def __init__(self, accessor: Accessor, options: List[str]):
-        self.accessor = accessor
-        self.options = options
-
-    def allow(self, node_stack) -> bool:
-        string = self.accessor(node_stack)
-        for entry in self.options:
-            if string.endswith(entry):
-                return True
-        return False
-
-
-class InFilter(Filter):
-    """Checks if what is returned from the accessor is 'in' in the members"""
-
-    def __init__(self, accessor: Accessor, members: List[str]) -> None:
-        self.accessor = accessor
-        self.members = members
-
-    def allow(self, node_stack) -> bool:
-        name = self.accessor(node_stack)
-        return name in self.members
-
-
-class GlobFilter(Filter):
-    def __init__(self, accessor: Accessor, glob):
-        self.accessor = accessor
-        self.glob = glob
-
-    def allow(self, node_stack) -> bool:
-        text = self.accessor(node_stack)
-        return self.glob.match(text)
-
-
-class FilePathFilter(Filter):
-    def __init__(self, accessor: Accessor, target_file: str):
-        self.accessor = accessor
-        self.target_file = target_file
-
-    def allow(self, node_stack) -> bool:
-        location = self.accessor(node_stack).file
-
-        if path_handler.includes_directory(self.target_file):
-            # If the target_file contains directory separators then
-            # match against the same length at the end of the location
-            #
-            location_match = location[-len(self.target_file) :]
-            return location_match == self.target_file
-        else:
-            # If there are no separators, match against the whole filename
-            # at the end of the location
-            #
-            # This is to prevent "Util.cpp" matching "PathUtil.cpp"
-            #
-            location_basename = os.path.basename(location)
-            return location_basename == self.target_file
-
-
-class NamespaceFilter(Filter):
-    def __init__(self, namespace_accessor: Accessor, name_accessor: Accessor):
-        self.namespace_accessor = namespace_accessor
-        self.name_accessor = name_accessor
-
-    def allow(self, node_stack) -> bool:
-        namespaces = self.namespace_accessor(node_stack)
-        name = self.name_accessor(node_stack)
-
-        try:
-            namespace, name = name.rsplit("::", 1)
-        except ValueError:
-            namespace, name = "", name
-
-        return namespace in namespaces
-
-
-class OpenFilter(Filter):
-    def allow(self, node_stack) -> bool:
-        return True
-
-
-class ClosedFilter(Filter):
-    def allow(self, node_stack) -> bool:
-        return False
-
-
-class NotFilter(Filter):
-    def __init__(self, child_filter: Filter):
-        self.child_filter = child_filter
-
-    def allow(self, node_stack) -> bool:
-        return not self.child_filter.allow(node_stack)
-
-
-class AndFilter(Filter):
-    def __init__(self, *filters: Filter):
-        self.filters = filters
-
-    def allow(self, node_stack) -> bool:
-        # If any filter returns False then return False
-        for filter_ in self.filters:
-            if not filter_.allow(node_stack):
-                return False
-        return True
-
-
-class OrFilter(Filter):
-    """Provides a short-cutted 'or' operation between two filters"""
-
-    def __init__(self, *filters: Filter):
-        self.filters = filters
-
-    def allow(self, node_stack) -> bool:
-        # If any filter returns True then return True
-        for filter_ in self.filters:
-            if filter_.allow(node_stack):
-                return True
-        return False
-
-
-class IfFilter(Filter):
-    def __init__(self, condition, if_true, if_false):
-        self.condition = condition
-        self.if_true = if_true
-        self.if_false = if_false
-
-    def allow(self, node_stack) -> bool:
-        if self.condition.allow(node_stack):
-            return self.if_true.allow(node_stack)
-        else:
-            return self.if_false.allow(node_stack)
-
-
-class Gather(Filter):
-    def __init__(self, accessor: Accessor, names: List[str]):
-        self.accessor = accessor
-        self.names = names
-
-    def allow(self, node_stack) -> bool:
-        self.names.extend(self.accessor(node_stack))
-        return False
-
-
-###############################################################################
-# Other stuff
-###############################################################################
-
-
-class Glob:
-    def __init__(self, method, pattern):
-        self.method = method
-        self.pattern = pattern
-
-    def match(self, name):
-        return self.method(name, self.pattern)
-
-
-class FilterFactory:
-    # C++ style public entries
-    public_kinds = set(
-        [
-            "public-type",
-            "public-func",
-            "public-attrib",
-            "public-slot",
-            "public-static-func",
-            "public-static-attrib",
-        ]
-    )
-
-    def __init__(self, app: Sphinx) -> None:
-        self.app = app
-
-    def create_render_filter(self, kind: str, options: Dict[str, Any]) -> Filter:
-        """Render filter for group & namespace blocks"""
-
-        if kind not in ["group", "page", "namespace"]:
-            raise UnrecognisedKindError(kind)
-
-        # Generate new dictionary from defaults
-        filter_options = dict((entry, "") for entry in self.app.config.breathe_default_members)
-
-        # Update from the actual options
-        filter_options.update(options)
-
-        # Convert the doxygengroup members flag (which just stores None as the value) to an empty
-        # string to allow the create_class_member_filter to process it properly
-        if "members" in filter_options:
-            filter_options["members"] = ""
-
-        if "desc-only" in filter_options:
-            return self._create_description_filter(True, "compounddef", options)
-
-        node = Node()
-        grandparent = Ancestor(2)
-        has_grandparent = HasAncestorFilter(2)
-
-        non_class_memberdef = (
-            has_grandparent
-            & (grandparent.node_type == "compounddef")
-            & (grandparent.kind != "class")
-            & (grandparent.kind != "struct")
-            & (grandparent.kind != "interface")
-            & (node.node_type == "memberdef")
+    # Allow through everything except the header-file includes nodes
+    def filter_(nstack: NodeStack) -> bool:
+        return not (
+            isinstance(nstack.parent, parser.Node_compounddefType)
+            and isinstance(nstack.node, parser.Node_incType)
         )
+
+    return filter_
+
+
+def _create_undoc_members_filter(options: DoxNamespaceOptions) -> DoxFilter:
+    if "undoc-members" in options:
+        return lambda nstack: True
+
+    def filter_(nstack: NodeStack) -> bool:
+        node = nstack.node
+        # Allow anything that isn't a Node_memberdefType, or if it is only
+        # allow the ones with a description
+        return (not isinstance(node, parser.Node_memberdefType)) or bool(
+            parser.description_has_content(node.briefdescription)
+            or parser.description_has_content(node.detaileddescription)
+        )
+
+    return filter_
+
+
+def _create_public_members_filter(
+    options: DoxNamespaceOptions,
+) -> Callable[[parser.Node_memberdefType], bool]:
+    if "members" in options:
+        # If the user has specified the 'members' option with arguments then
+        # we only pay attention to that and not to any other member settings
+        members_str = options["members"]
+        if members_str and not members_str.isspace():
+            # Matches sphinx-autodoc behaviour of comma separated values
+            members = frozenset([x.strip() for x in members_str.split(",")])
+
+            # Accept any nodes which don't have a "sectiondef" as a parent
+            # or, if they do, only accept them if their names are in the
+            # members list
+            def filter_(node: parser.Node_memberdefType) -> bool:
+                return node.name in members
+
+        else:
+            # Select anything that doesn't have a parent which is a
+            # sectiondef, or, if it does, only select the public ones
+            def filter_(node: parser.Node_memberdefType) -> bool:
+                return node.prot == parser.DoxProtectionKind.public
+
+    else:
+        # Nothing with a parent that's a sectiondef
+        def filter_(node: parser.Node_memberdefType) -> bool:
+            return False
+
+    return filter_
+
+
+def create_description_filter(allow: bool, level: type[parser.Node]) -> DoxFilter:
+    """Whether or not we allow descriptions is determined by the calling function and we just do
+    whatever the 'allow' function parameter tells us.
+    """
+
+    if allow:
+        # Let through any description children of sectiondefs if we output any kind members
+        def filter_(nstack: NodeStack) -> bool:
+            return not isinstance(nstack.parent, level) or isinstance(
+                nstack.node, parser.Node_descriptionType
+            )
+
+    else:
+        # Nothing with a parent that's a sectiondef
+        def filter_(nstack: NodeStack) -> bool:
+            return not isinstance(nstack.parent, level)
+
+    return filter_
+
+
+def create_class_member_filter(options: DoxNamespaceOptions) -> DoxFilter:
+    """Content filter based on :members: and :private-members: classes"""
+
+    # I can't fully explain the filtering of descriptions here. More testing needed to figure
+    # out when it is needed. This approach reflects the old code that was here but it wasn't
+    # commented (my fault.) I wonder if maybe the public and private declarations themselves can
+    # be documented and we need to let them through. Not sure.
+    allow = "members" in options or "protected-members" in options or "private-members" in options
+
+    description = create_description_filter(allow, parser.Node_sectiondefType)
+
+    # Create all necessary filters and combine them
+    public_members = _create_public_members_filter(options)
+
+    undoc_members = _create_undoc_members_filter(options)
+
+    prot_filter: tuple[parser.DoxProtectionKind, ...] = ()
+    if "protected-members" in options:
+        prot_filter += (parser.DoxProtectionKind.protected,)
+    if "private-members" in options:
+        prot_filter += (parser.DoxProtectionKind.private,)
+
+    # Allow anything that isn't a memberdef, or if it is, and 'prot' is not
+    # empty, allow the ones with an equal 'prot' attribute
+    def filter_(nstack: NodeStack) -> bool:
+        node = nstack.node
+        return (
+            (
+                not (
+                    isinstance(node, parser.Node_memberdefType)
+                    and isinstance(nstack.parent, parser.Node_sectiondefType)
+                )
+                or (bool(prot_filter) and node.prot in prot_filter)
+                or public_members(node)
+            )
+            and undoc_members(nstack)
+        ) or description(nstack)
+
+    return filter_
+
+
+def create_innerclass_filter(options: DoxNamespaceOptions, outerclass: str = "") -> DoxFilter:
+    """
+    :param outerclass: Should be the class/struct being target by the directive calling this
+                        code. If it is a group or namespace directive then it should be left
+                        blank. It is used when looking for names listed in the :members: option.
+
+                        The name should include any additional namespaces that the target class
+                        is in.
+    """
+    allowed: set[parser.DoxProtectionKind] = set()
+    if "protected-members" in options:
+        allowed.add(parser.DoxProtectionKind.protected)
+    if "private-members" in options:
+        allowed.add(parser.DoxProtectionKind.private)
+
+    description = create_description_filter(True, parser.Node_compounddefType)
+
+    members: set[str] | None = None
+    if "members" in options:
+        members_str = options["members"]
+        if members_str and members_str.strip():
+            prefix = ("%s::" % outerclass) if outerclass else ""
+
+            # Matches sphinx-autodoc behaviour of comma separated values
+            members = set(["%s%s" % (prefix, x.strip()) for x in members_str.split(",")])
+        else:
+            allowed.add(parser.DoxProtectionKind.public)
+
+    def filter_(nstack: NodeStack) -> bool:
+        node = nstack.node
+        parent = nstack.parent
 
         return (
-            (self.create_class_member_filter(filter_options) | non_class_memberdef)
-            & self.create_innerclass_filter(filter_options)
-            & self.create_outline_filter(filter_options)
+            not (
+                isinstance(node, parser.Node_refType)
+                and nstack.tag == "innerclass"
+                and isinstance(parent, parser.Node_compounddefType)
+                and parent.kind in CLASS_LIKE_COMPOUNDDEF
+            )
+            or node.prot in allowed
+            or (members is not None and "".join(node) in members)
+            or description(nstack)
         )
 
-    def create_class_filter(self, target: str, options: Dict[str, Any]) -> Filter:
-        """Content filter for classes based on various directive options"""
+    return filter_
 
-        # Generate new dictionary from defaults
-        filter_options = dict((entry, "") for entry in self.app.config.breathe_default_members)
 
-        # Update from the actual options
-        filter_options.update(options)
+def create_class_filter(app: Sphinx, target: str, options: DoxClassOptions) -> DoxFilter:
+    """Content filter for classes based on various directive options"""
 
-        return AndFilter(
-            self.create_class_member_filter(filter_options),
-            self.create_innerclass_filter(filter_options, outerclass=target),
-            self.create_outline_filter(filter_options),
-            self.create_show_filter(filter_options),
+    filter_options = set_defaults(app, options)
+
+    cm_filter = create_class_member_filter(filter_options)
+    ic_filter = create_innerclass_filter(filter_options, outerclass=target)
+    o_filter = create_outline_filter(filter_options)
+    s_filter = create_show_filter(filter_options)
+
+    return (
+        lambda nstack: cm_filter(nstack)
+        and ic_filter(nstack)
+        and o_filter(nstack)
+        and s_filter(nstack)
+    )
+
+
+def create_outline_filter(options: Mapping[str, Any]) -> DoxFilter:
+    if "outline" in options:
+        return lambda nstack: not isinstance(
+            nstack.node, (parser.Node_descriptionType, parser.Node_incType)
         )
 
-    def create_innerclass_filter(self, options: Dict[str, Any], outerclass: str = "") -> Filter:
-        """
-        :param outerclass: Should be the class/struct being target by the directive calling this
-                           code. If it is a group or namespace directive then it should be left
-                           blank. It is used when looking for names listed in the :members: option.
+    return lambda nstack: True
 
-                           The name should include any additional namespaces that the target class
-                           is in.
-        """
 
-        node = Node()
-        node_is_innerclass = (node.node_type == "ref") & (node.node_name == "innerclass")
+def extend_member_with_compound(
+    d_parser: parser.DoxygenParser,
+    project_info: ProjectInfo,
+    m: parser.Node_MemberType,
+    c: parser.Node_CompoundType,
+    index: parser.Node_DoxygenTypeIndex,
+) -> FinderMatch:
+    dc = d_parser.parse_compound(c.refid, project_info)
+    mdef, sdef, cdef = dc.members_by_id[m.refid]
 
-        parent = Parent()
-        parent_is_compounddef = parent.node_type == "compounddef"
-        parent_is_class = parent.kind.is_one_of(["class", "struct", "interface"])
+    TN = renderer.TaggedNode
+    return [
+        TN("memberdef", mdef),
+        TN("sectiondef", sdef),
+        TN("compounddef", cdef),
+        TN("doxygen", dc.root),
+        TN("compound", c),
+        TN("doxygenindex", index),
+    ]
 
-        allowed = set()
-        all_options = {
-            "protected-members": "protected",
-            "private-members": "private",
+
+def member_finder_filter(
+    app: Sphinx,
+    namespace: str,
+    name: str,
+    d_parser: parser.DoxygenParser,
+    project_info: ProjectInfo,
+    kinds: Container[parser.MemberKind] | str,
+    index: parser.DoxygenIndex,
+) -> FinderMatchItr:
+    """Looks for a member with the specified name and kind."""
+
+    if isinstance(kinds, str):
+        kinds = (parser.MemberKind(kinds),)
+
+    if namespace:
+        c_kinds = {
+            parser.CompoundKind.namespace,
+            parser.CompoundKind.class_,
+            parser.CompoundKind.struct,
+            parser.CompoundKind.interface,
         }
 
-        for option, scope in all_options.items():
-            if option in options:
-                allowed.add(scope)
-
-        node_is_innerclass_in_class = parent_is_compounddef & parent_is_class & node_is_innerclass
-
-        public_innerclass_filter = ClosedFilter()
-
-        if "members" in options:
-            if options["members"].strip():
-                text = options["members"]
-                prefix = ("%s::" % outerclass) if outerclass else ""
-
-                # Matches sphinx-autodoc behaviour of comma separated values
-                members = set(["%s%s" % (prefix, x.strip()) for x in text.split(",")])
-                node_valueOf_is_in_members = node.valueOf.is_one_of(members)
-
-                # Accept any nodes which don't have a "sectiondef" as a parent or, if they do, only
-                # accept them if their names are in the members list
-                public_innerclass_filter = ~node_is_innerclass_in_class | node_valueOf_is_in_members
-
-            else:
-                allowed.add("public")
-
-        node_is_in_allowed_scope = node.prot.is_one_of(allowed)
-
-        innerclass = ~node_is_innerclass_in_class | node_is_in_allowed_scope
-        description = self._create_description_filter(True, "compounddef", options)
-
-        # Put parent check last as we only want to check parents of innerclass's otherwise we have
-        # to check the parent's type as well
-        return innerclass | public_innerclass_filter | description
-
-    def create_show_filter(self, options: Dict[str, Any]) -> Filter:
-        """Currently only handles the header-file entry"""
-
-        try:
-            text = options["show"]
-        except KeyError:
-            # Allow through everything except the header-file includes nodes
-            return OrFilter(
-                NotFilter(InFilter(NodeTypeAccessor(Parent()), ["compounddef"])),
-                NotFilter(InFilter(NodeTypeAccessor(Node()), ["inc"])),
-            )
-
-        if text == "header-file":
-            # Allow through everything, including header-file includes
-            return OpenFilter()
-
-        # Allow through everything except the header-file includes nodes
-        return OrFilter(
-            NotFilter(InFilter(NodeTypeAccessor(Parent()), ["compounddef"])),
-            NotFilter(InFilter(NodeTypeAccessor(Node()), ["inc"])),
-        )
-
-    def _create_description_filter(
-        self, allow: bool, level: str, options: Dict[str, Any]
-    ) -> Filter:
-        """Whether or not we allow descriptions is determined by the calling function and we just do
-        whatever the 'allow' function parameter tells us.
-        """
-
-        node = Node()
-        node_is_description = node.node_type == "description"
-        parent = Parent()
-        parent_is_level = parent.node_type == level
-
-        # Nothing with a parent that's a sectiondef
-        description_filter = ~parent_is_level
-
-        # Let through any description children of sectiondefs if we output any kind members
-        if allow:
-            description_filter = (parent_is_level & node_is_description) | ~parent_is_level
-
-        return description_filter
-
-    def _create_public_members_filter(self, options: Dict[str, Any]) -> Filter:
-        node = Node()
-        node_is_memberdef = node.node_type == "memberdef"
-        node_is_public = node.prot == "public"
-
-        parent = Parent()
-        parent_is_sectiondef = parent.node_type == "sectiondef"
-
-        # Nothing with a parent that's a sectiondef
-        is_memberdef = parent_is_sectiondef & node_is_memberdef
-        public_members_filter = ~is_memberdef
-
-        # If the user has specified the 'members' option with arguments then we only pay attention
-        # to that and not to any other member settings
-        if "members" in options:
-            if options["members"].strip():
-                text = options["members"]
-
-                # Matches sphinx-autodoc behaviour of comma separated values
-                members = set([x.strip() for x in text.split(",")])
-
-                node_name_is_in_members = node.name.is_one_of(members)
-
-                # Accept any nodes which don't have a "sectiondef" as a parent or, if they do, only
-                # accept them if their names are in the members list
-                public_members_filter = (
-                    parent_is_sectiondef & node_name_is_in_members
-                ) | ~parent_is_sectiondef
-            else:
-                # Select anything that doesn't have a parent which is a sectiondef, or, if it does,
-                # only select the public ones
-                public_members_filter = (is_memberdef & node_is_public) | ~is_memberdef
-        return public_members_filter
-
-    def _create_non_public_members_filter(
-        self, prot: str, option_name: str, options: Dict[str, Any]
-    ) -> Filter:
-        """'prot' is the doxygen xml term for 'public', 'protected' and 'private' categories."""
-        node = Node()
-        node_is_memberdef = node.node_type == "memberdef"
-        node_is_public = node.prot == prot
-
-        parent = Parent()
-        parent_is_sectiondef = parent.node_type == "sectiondef"
-
-        # Nothing with a parent that's a sectiondef
-        is_memberdef = parent_is_sectiondef & node_is_memberdef
-        filter_ = ~is_memberdef
-
-        if option_name in options:
-            # Allow anything that isn't a memberdef, or if it is only allow the public ones
-            filter_ = ~is_memberdef | node_is_public
-        return filter_
-
-    def _create_undoc_members_filter(self, options: Dict[str, Any]) -> Filter:
-        node = Node()
-        node_is_memberdef = node.node_type == "memberdef"
-
-        node_has_description = (
-            node.briefdescription.has_content() | node.detaileddescription.has_content()
-        )
-
-        # Allow anything that isn't a memberdef, or if it is only allow the ones with a description
-        undoc_members_filter = ~node_is_memberdef | node_has_description
-
-        if "undoc-members" in options:
-            undoc_members_filter = OpenFilter()
-        return undoc_members_filter
-
-    def create_class_member_filter(self, options: Dict[str, Any]) -> Filter:
-        """Content filter based on :members: and :private-members: classes"""
-
-        # I can't fully explain the filtering of descriptions here. More testing needed to figure
-        # out when it is needed. This approach reflects the old code that was here but it wasn't
-        # commented (my fault.) I wonder if maybe the public and private declarations themselves can
-        # be documented and we need to let them through. Not sure.
-        allow = (
-            "members" in options or "protected-members" in options or "private-members" in options
-        )
-
-        description = self._create_description_filter(allow, "sectiondef", options)
-
-        # Create all necessary filters and combine them
-        public_members = self._create_public_members_filter(options)
-
-        protected_members = self._create_non_public_members_filter(
-            "protected", "protected-members", options
-        )
-
-        private_members = self._create_non_public_members_filter(
-            "private", "private-members", options
-        )
-
-        undoc_members = self._create_undoc_members_filter(options)
-
-        # Allow any public/private members which also fit the undoc filter and all the descriptions
-        allowed_members = (public_members | protected_members | private_members) & undoc_members
-        return allowed_members | description
-
-    def create_outline_filter(self, options: Dict[str, Any]) -> Filter:
-        if "outline" in options:
-            node = Node()
-            return ~node.node_type.is_one_of(["description", "inc"])
-        else:
-            return OpenFilter()
-
-    def create_file_filter(self, filename: str, options: Dict[str, Any]) -> Filter:
-        valid_names: List[str] = []
-
-        filter_ = AndFilter(
-            NotFilter(
-                # Gather the "namespaces" attribute from the
-                # compounddef for the file we're rendering and
-                # store the information in the "valid_names" list
-                #
-                # Gather always returns false, so, combined with
-                # the NotFilter this chunk always returns true and
-                # so does not affect the result of the filtering
-                AndFilter(
-                    InFilter(NodeTypeAccessor(Node()), ["compounddef"]),
-                    InFilter(KindAccessor(Node()), ["file"]),
-                    FilePathFilter(LambdaAccessor(Node(), lambda x: x.location), filename),
-                    Gather(LambdaAccessor(Node(), lambda x: x.namespaces), valid_names),
-                )
-            ),
-            NotFilter(
-                # Take the valid_names and everytime we handle an
-                # innerclass or innernamespace, check that its name
-                # was one of those initial valid names so that we
-                # never end up rendering a namespace or class that
-                # wasn't in the initial file. Notably this is
-                # required as the location attribute for the
-                # namespace in the xml is unreliable.
-                AndFilter(
-                    InFilter(NodeTypeAccessor(Parent()), ["compounddef"]),
-                    InFilter(NodeTypeAccessor(Node()), ["ref"]),
-                    InFilter(NodeNameAccessor(Node()), ["innerclass", "innernamespace"]),
-                    NotFilter(
-                        InFilter(
-                            LambdaAccessor(Node(), lambda x: x.content_[0].getValue()), valid_names
-                        )
-                    ),
-                )
-            ),
-            NotFilter(
-                # Ignore innerclasses and innernamespaces that are inside a
-                # namespace that is going to be rendered as they will be
-                # rendered with that namespace and we don't want them twice
-                AndFilter(
-                    InFilter(NodeTypeAccessor(Parent()), ["compounddef"]),
-                    InFilter(NodeTypeAccessor(Node()), ["ref"]),
-                    InFilter(NodeNameAccessor(Node()), ["innerclass", "innernamespace"]),
-                    NamespaceFilter(
-                        NamespaceAccessor(Parent()),
-                        LambdaAccessor(Node(), lambda x: x.content_[0].getValue()),
-                    ),
-                )
-            ),
-            NotFilter(
-                # Ignore memberdefs from files which are different to
-                # the one we're rendering. This happens when we have to
-                # cross into a namespace xml file which has entries
-                # from multiple files in it
-                AndFilter(
-                    InFilter(NodeTypeAccessor(Node()), ["memberdef"]),
-                    NotFilter(
-                        FilePathFilter(LambdaAccessor(Node(), lambda x: x.location), filename)
-                    ),
-                )
-            ),
-            NotFilter(
-                # Ignore compounddefs which are from another file
-                # (normally means classes and structs which are in a
-                # namespace that we have other interests in) but only
-                # check it if the compounddef is not a namespace
-                # itself, as for some reason compounddefs for
-                # namespaces are registered with just a single file
-                # location even if they namespace is spread over
-                # multiple files
-                AndFilter(
-                    InFilter(NodeTypeAccessor(Node()), ["compounddef"]),
-                    NotFilter(InFilter(KindAccessor(Node()), ["namespace"])),
-                    NotFilter(
-                        FilePathFilter(LambdaAccessor(Node(), lambda x: x.location), filename)
-                    ),
-                )
-            ),
-        )
-        return AndFilter(self.create_outline_filter(options), filter_)
-
-    def create_content_filter(self, kind: str, options: Dict[str, Any]) -> Filter:
-        """Returns a filter which matches the contents of the or namespace but not the group or
-        namepace name or description.
-
-        This allows the groups to be used to structure sections of the documentation rather than to
-        structure and further document groups of documentation
-
-        As a finder/content filter we only need to match exactly what we're interested in.
-        """
-
-        if kind not in ["group", "page", "namespace"]:
-            raise UnrecognisedKindError(kind)
-
-        node = Node()
-
-        # Filter for public memberdefs
-        node_is_memberdef = node.node_type == "memberdef"
-        node_is_public = node.prot == "public"
-
-        public_members = node_is_memberdef & node_is_public
-
-        # Filter for public innerclasses
-        parent = Parent()
-        parent_is_compounddef = parent.node_type == "compounddef"
-        parent_is_class = parent.kind == kind
-
-        node_is_innerclass = (node.node_type == "ref") & (node.node_name == "innerclass")
-        node_is_public = node.prot == "public"
-
-        public_innerclass = (
-            parent_is_compounddef & parent_is_class & node_is_innerclass & node_is_public
-        )
-
-        return public_members | public_innerclass
-
-    def create_index_filter(self, options: Dict[str, Any]) -> Filter:
-        filter_ = AndFilter(
-            NotFilter(
-                AndFilter(
-                    InFilter(NodeTypeAccessor(Parent()), ["compounddef"]),
-                    InFilter(NodeTypeAccessor(Node()), ["ref"]),
-                    InFilter(NodeNameAccessor(Node()), ["innerclass", "innernamespace"]),
-                )
-            ),
-            NotFilter(
-                AndFilter(
-                    InFilter(NodeTypeAccessor(Parent()), ["compounddef"]),
-                    InFilter(KindAccessor(Parent()), ["group"]),
-                    InFilter(NodeTypeAccessor(Node()), ["sectiondef"]),
-                    InFilter(KindAccessor(Node()), ["func"]),
-                )
-            ),
-        )
-
-        return AndFilter(self.create_outline_filter(options), filter_)
-
-    def create_open_filter(self) -> Filter:
-        """Returns a completely open filter which matches everything"""
-
-        return OpenFilter()
-
-    def create_id_filter(self, node_type: str, refid: str) -> Filter:
-        node = Node()
-        return (node.node_type == node_type) & (node.id == refid)
-
-    def create_file_finder_filter(self, filename: str) -> Filter:
-        filter_ = AndFilter(
-            InFilter(NodeTypeAccessor(Node()), ["compounddef"]),
-            InFilter(KindAccessor(Node()), ["file"]),
-            FilePathFilter(LambdaAccessor(Node(), lambda x: x.location), filename),
-        )
-        return filter_
-
-    def create_member_finder_filter(self, namespace: str, name: str, kind: str) -> Filter:
-        """Returns a filter which looks for a member with the specified name and kind."""
-
-        node = Node()
-        parent = Parent()
-
-        node_matches = (node.node_type == "member") & (node.kind == kind) & (node.name == name)
-
-        if namespace:
-            parent_matches = (
-                (parent.node_type == "compound")
-                & (
-                    (parent.kind == "namespace")
-                    | (parent.kind == "class")
-                    | (parent.kind == "struct")
-                    | (parent.kind == "interface")
-                )
-                & (parent.name == namespace)
-            )
-            return parent_matches & node_matches
-        else:
-            is_implementation_file = parent.name.endswith(
-                self.app.config.breathe_implementation_filename_extensions
-            )
-            parent_is_compound = parent.node_type == "compound"
-            parent_is_sectiondef = parent.node_type == "sectiondef"
-            parent_is_file = (parent.kind == "file") & (~is_implementation_file)
-            parent_is_not_file = parent.kind != "file"
-
-            return (parent_is_compound & parent_is_file & node_matches) | (
-                parent_is_compound & parent_is_not_file & node_matches) | (
-                parent_is_sectiondef & parent_is_not_file & node_matches)
-
-    def create_function_and_all_friend_finder_filter(self, namespace: str, name: str) -> Filter:
-        parent = Parent()
-        parent_is_compound = parent.node_type == "compound"
-        parent_is_group = parent.kind == "group"
-
-        function_filter = self.create_member_finder_filter(namespace, name, "function")
-        friend_filter = self.create_member_finder_filter(namespace, name, "friend")
-        # Get matching functions but only ones where the parent is not a group. We want to skip
-        # function entries in groups as we'll find the same functions in a file's xml output
-        # elsewhere and having more than one match is confusing for our logic later on.
-        return (function_filter | friend_filter) & ~(parent_is_compound & parent_is_group)
-
-    def create_enumvalue_finder_filter(self, name: str) -> Filter:
-        """Returns a filter which looks for an enumvalue with the specified name."""
-
-        node = Node()
-        return (node.node_type == "enumvalue") & (node.name == name)
-
-    def create_compound_finder_filter(self, name: str, kind: str) -> Filter:
-        """Returns a filter which looks for a compound with the specified name and kind."""
-
-        node = Node()
-        return (node.node_type == "compound") & (node.kind == kind) & (node.name == name)
-
-    def create_finder_filter(self, kind: str, name: str) -> Filter:
-        """Returns a filter which looks for the compound node from the index which is a group node
-        (kind=group) and has the appropriate name
-
-        The compound node should reference the group file which we can parse for the group
-        contents.
-        """
-
-        if kind == "group":
-            filter_ = AndFilter(
-                InFilter(NodeTypeAccessor(Node()), ["compound"]),
-                InFilter(KindAccessor(Node()), ["group"]),
-                InFilter(NameAccessor(Node()), [name]),
-            )
-        elif kind == "page":
-            filter_ = AndFilter(
-                InFilter(NodeTypeAccessor(Node()), ["compound"]),
-                InFilter(KindAccessor(Node()), ["page"]),
-                InFilter(NameAccessor(Node()), [name]),
-            )
-        else:
-            # Assume kind == 'namespace'
-            filter_ = AndFilter(
-                InFilter(NodeTypeAccessor(Node()), ["compound"]),
-                InFilter(KindAccessor(Node()), ["namespace"]),
-                InFilter(NameAccessor(Node()), [name]),
-            )
-        return filter_
+        for m, c in index.members[name]:
+            if c.kind in c_kinds and c.name == namespace:
+                if m.kind in kinds:
+                    yield extend_member_with_compound(d_parser, project_info, m, c, index.root)
+
+    else:
+        ext = tuple(app.config.breathe_implementation_filename_extensions)
+
+        for m, c in index.members[name]:
+            if c.kind != parser.CompoundKind.file or not c.name.endswith(ext):
+                if m.kind in kinds:
+                    yield extend_member_with_compound(d_parser, project_info, m, c, index.root)
+
+
+def compound_finder_filter(
+    name: str,
+    kind: str,
+    index: parser.DoxygenIndex,
+) -> FinderMatchItr:
+    """Looks for a compound with the specified name and kind."""
+
+    for c in index.compounds[name]:
+        if c.kind.value != kind:
+            continue
+
+        yield [
+            renderer.TaggedNode("compound", c),
+            renderer.TaggedNode("doxygenindex", index.root),
+        ]

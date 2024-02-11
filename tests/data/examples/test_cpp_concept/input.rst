@@ -1,0 +1,1 @@
+.. doxygenconcept:: Hashable
