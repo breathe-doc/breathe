@@ -1,0 +1,1 @@
+.. doxygenfile:: class.h

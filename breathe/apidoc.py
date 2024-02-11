@@ -14,8 +14,6 @@
     :copyright: Originally by Sphinx Team, C++ modifications by Tatsuyuki Ishi
     :license: BSD, see LICENSE for details.
 """
-from __future__ import print_function
-
 import os
 import sys
 import argparse
@@ -23,13 +21,6 @@ import errno
 import xml.etree.ElementTree
 
 from breathe import __version__
-
-# Account for FileNotFoundError in Python 2
-# IOError is broader but will hopefully suffice
-try:
-    FileNotFoundError
-except NameError:
-    FileNotFoundError = IOError
 
 
 # Reference: Doxygen XSD schema file, CompoundKind only
@@ -76,9 +67,10 @@ def write_file(name, text, args):
                 if orig == text:
                     print_info("File %s up to date, skipping." % fname, args)
                     return
-        except FileNotFoundError:
+        except OSError as exc:
             # Don't mind if it isn't there
-            pass
+            if exc.errno != errno.ENOENT:
+                raise
 
         with open(fname, "w") as target:
             target.write(text)
@@ -146,6 +138,7 @@ class TypeAction(argparse.Action):
         self.metavar = ",".join(TYPEDICT.keys())
 
     def __call__(self, parser, namespace, values, option_string=None):
+        assert isinstance(values, str)
         value_list = values.split(",")
         for value in value_list:
             if value not in TYPEDICT:

@@ -1,0 +1,11 @@
+.. doxygenenum:: GSM_BackupFormat
+.. doxygenenumvalue:: GSM_Backup_Auto
+.. doxygenenumvalue:: GSM_Backup_AutoUnicode
+.. doxygenenumvalue:: GSM_Backup_LMB
+.. doxygenenumvalue:: GSM_Backup_VCalendar
+.. doxygenenumvalue:: GSM_Backup_VCard
+.. doxygenenumvalue:: GSM_Backup_LDIF
+.. doxygenenumvalue:: GSM_Backup_ICS
+.. doxygenenumvalue:: GSM_Backup_Gammu
+.. doxygenenumvalue:: GSM_Backup_GammuUCS2
+.. doxygenenumvalue:: GSM_Backup_VNote

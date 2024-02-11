@@ -1,22 +1,29 @@
-from breathe.finder.factory import FinderFactory
-from breathe.parser import DoxygenParserFactory
-from breathe.parser import FileIOError, ParserError
-from breathe.project import ProjectInfoFactory, ProjectInfo
-from breathe.renderer import format_parser_error, RenderContext
-from breathe.renderer.filter import Filter, FilterFactory
-from breathe.renderer.mask import MaskFactoryBase
-from breathe.renderer.sphinxrenderer import SphinxRenderer
-from breathe.renderer.target import TargetHandler
+from __future__ import annotations
 
-from sphinx.directives import SphinxDirective
+from breathe.finder import factory
+from breathe import parser
+from breathe.renderer import format_parser_error, RenderContext
+from breathe.renderer.sphinxrenderer import SphinxRenderer
+
+from sphinx.directives import SphinxDirective  # pyright: ignore
 
 from docutils import nodes
 
-from typing import Any, Dict, List, Optional, Sequence
+from typing import Any, TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from breathe.parser import DoxygenParser
+    from breathe.project import ProjectInfoFactory, ProjectInfo
+    from breathe.renderer import TaggedNode
+    from breathe.renderer.filter import DoxFilter
+    from breathe.renderer.mask import MaskFactoryBase
+    from breathe.renderer.target import TargetHandler
+    from sphinx.application import Sphinx
+    from collections.abc import Sequence
 
 
 class _WarningHandler:
-    def __init__(self, state, context: Dict[str, Any]) -> None:
+    def __init__(self, state, context: dict[str, Any]) -> None:
         self.state = state
         self.context = context
 
@@ -24,9 +31,9 @@ class _WarningHandler:
         self,
         raw_text: str,
         *,
-        rendered_nodes: Optional[Sequence[nodes.Node]] = None,
-        unformatted_suffix: str = ""
-    ) -> List[nodes.Node]:
+        rendered_nodes: Sequence[nodes.Node] | None = None,
+        unformatted_suffix: str = "",
+    ) -> list[nodes.Node]:
         raw_text = self.format(raw_text) + unformatted_suffix
         if rendered_nodes is None:
             rendered_nodes = [nodes.paragraph("", "", nodes.Text(raw_text))]
@@ -60,22 +67,22 @@ class BaseDirective(SphinxDirective):
         return self.env.temp_data["breathe_project_info_factory"]
 
     @property
-    def parser_factory(self) -> DoxygenParserFactory:
-        return self.env.temp_data["breathe_parser_factory"]
+    def dox_parser(self) -> DoxygenParser:
+        return self.env.temp_data["breathe_dox_parser"]
 
     @property
-    def finder_factory(self) -> FinderFactory:
-        return FinderFactory(self.env.app, self.parser_factory)
+    def app(self) -> Sphinx:
+        return self.env.app
 
-    @property
-    def filter_factory(self) -> FilterFactory:
-        return FilterFactory(self.env.app)
+    def get_doxygen_index(self, project_info: ProjectInfo) -> parser.DoxygenIndex:
+        return self.dox_parser.parse_index(project_info)
 
-    @property
-    def kind(self) -> str:
-        raise NotImplementedError
+    def create_finder_from_root(
+        self, root: factory.FinderRoot, project_info: ProjectInfo
+    ) -> factory.Finder:
+        return factory.create_finder_from_root(self.env.app, self.dox_parser, root, project_info)
 
-    def create_warning(self, project_info: Optional[ProjectInfo], **kwargs) -> _WarningHandler:
+    def create_warning(self, project_info: ProjectInfo | None, **kwargs) -> _WarningHandler:
         if project_info:
             tail = 'in doxygen xml output for project "{project}" from directory: {path}'.format(
                 project=project_info.name(), path=project_info.project_path()
@@ -88,34 +95,36 @@ class BaseDirective(SphinxDirective):
 
     def render(
         self,
-        node_stack,
+        node_stack: list[TaggedNode],
         project_info: ProjectInfo,
-        filter_: Filter,
+        filter_: DoxFilter,
         target_handler: TargetHandler,
         mask_factory: MaskFactoryBase,
         directive_args,
-    ) -> List[nodes.Node]:
+    ) -> list[nodes.Node]:
         "Standard render process used by subclasses"
 
         try:
             object_renderer = SphinxRenderer(
-                self.parser_factory.app,
+                self.dox_parser.app,
                 project_info,
-                node_stack,
+                [tn.value for tn in node_stack],
                 self.state,
                 self.state.document,
                 target_handler,
-                self.parser_factory.create_compound_parser(project_info),
+                self.dox_parser,
                 filter_,
             )
-        except ParserError as e:
+        except parser.ParserError as e:
             return format_parser_error(
-                "doxygenclass", e.error, e.filename, self.state, self.lineno, True
+                "doxygenclass", e.message, e.filename, self.state, self.lineno, True
             )
-        except FileIOError as e:
+        except parser.FileIOError as e:
             return format_parser_error(
                 "doxygenclass", e.error, e.filename, self.state, self.lineno, True
             )
 
         context = RenderContext(node_stack, mask_factory, directive_args)
-        return object_renderer.render(node_stack[0], context)
+        node = node_stack[0].value
+        assert isinstance(node, parser.Node)
+        return object_renderer.render(node, context)
