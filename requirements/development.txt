@@ -8,7 +8,7 @@ mypy>=0.900
 types-docutils>=0.14,<0.18
 types-Pygments
 
-black==22.3.0
+black==24.3.0
 
 sphinx-copybutton
 furo
