@@ -5,7 +5,7 @@ from collections import defaultdict
 import sphinx
 
 from breathe import parser, filetypes
-from breathe.renderer.filter import NodeStack
+from breathe.renderer.filter import current_cpp_namespace, NodeStack
 
 from sphinx import addnodes
 from sphinx.domains import cpp, c, python
@@ -33,7 +33,7 @@ from typing import (
     TYPE_CHECKING,
     Union,
 )
-from collections.abc import Iterable, Sequence
+from collections.abc import Iterable, Iterator, Sequence
 
 
 php: Any
@@ -554,36 +554,86 @@ def get_images(node: parser.Node_docParaType) -> Iterable[parser.Node_docImageTy
     return (value for name, value in pairs if name == "image")  # type: ignore
 
 
-class NodeHandler(Generic[T]):
+RE_NAME_PART = re.compile(r"([<>()[\]]|::)")
+
+
+def _check_pair(dest: list[str], tokens: Iterator[str], start: str, end: str) -> bool:
+    if dest[-1] == start:
+        for tok in tokens:
+            dest.append(tok)
+            if tok == end:
+                break
+            # If we're inside angle brackets, we assume "<" and ">" are brackets
+            # and not comparison operators. Once we're inside other brackets, we
+            # only need to worry about recursive brackets and can ignore the
+            # other types.
+            if start == "<":
+                _check_all_pairs(dest, tokens)
+            else:
+                _check_pair(dest, tokens, start, end)
+        return True
+    return False
+
+
+def _check_all_pairs(dest: list[str], tokens: Iterator[str]) -> None:
+    if not _check_pair(dest, tokens, "<", ">"):
+        if not _check_pair(dest, tokens, "(", ")"):
+            _check_pair(dest, tokens, "[", "]")
+
+
+def split_name(name: str) -> list[str]:
+    """Split a qualified C++ name into the namespace components.
+
+    E.g. turn "A<B::C>::D::E<(F>G::H),(I<J)>" into
+    ["A<B::C>","D","E<(F>G::H),(I<J)>"]
+    """
+    last = []
+    parts = [last]
+    tokens = iter(RE_NAME_PART.split(name))
+    for tok in tokens:
+        if tok == "::":
+            last = []
+            parts.append(last)
+        else:
+            last.append(tok)
+            _check_all_pairs(last, tokens)
+
+    return ["".join(subparts) for subparts in parts]
+
+
+T_sphinxrenderer = TypeVar("T_sphinxrenderer", bound="SphinxRenderer")
+
+
+class NodeHandler(Generic[T_sphinxrenderer, T]):
     """Dummy callable that associates a set of nodes to a function. This gets
     unwrapped by NodeVisitor and is never actually called."""
 
-    def __init__(self, handler: Callable[[SphinxRenderer, T], list[nodes.Node]]):
+    def __init__(self, handler: Callable[[T_sphinxrenderer, T], list[nodes.Node]]):
         self.handler = handler
         self.nodes: set[type[parser.NodeOrValue]] = set()
 
-    def __call__(self, r: SphinxRenderer, node: T, /) -> list[nodes.Node]:  # pragma: no cover
+    def __call__(self, r: T_sphinxrenderer, node: T, /) -> list[nodes.Node]:  # pragma: no cover
         raise TypeError()
 
 
-class TaggedNodeHandler(Generic[T]):
+class TaggedNodeHandler(Generic[T_sphinxrenderer, T]):
     """Dummy callable that associates a set of nodes to a function. This gets
     unwrapped by NodeVisitor and is never actually called."""
 
-    def __init__(self, handler: Callable[[SphinxRenderer, str, T], list[nodes.Node]]):
+    def __init__(self, handler: Callable[[T_sphinxrenderer, str, T], list[nodes.Node]]):
         self.handler = handler
         self.nodes: set[type[parser.NodeOrValue]] = set()
 
     def __call__(
-        self, r: SphinxRenderer, tag: str, node: T, /
+        self, r: T_sphinxrenderer, tag: str, node: T, /
     ) -> list[nodes.Node]:  # pragma: no cover
         raise TypeError()
 
 
 def node_handler(node: type[parser.NodeOrValue]):
     def inner(
-        f: Callable[[SphinxRenderer, T], list[nodes.Node]]
-    ) -> Callable[[SphinxRenderer, T], list[nodes.Node]]:
+        f: Callable[[T_sphinxrenderer, T], list[nodes.Node]]
+    ) -> Callable[[T_sphinxrenderer, T], list[nodes.Node]]:
         handler: NodeHandler = f if isinstance(f, NodeHandler) else NodeHandler(f)
         handler.nodes.add(node)
         return handler
@@ -593,8 +643,8 @@ def node_handler(node: type[parser.NodeOrValue]):
 
 def tagged_node_handler(node: type[parser.NodeOrValue]):
     def inner(
-        f: Callable[[SphinxRenderer, str, T], list[nodes.Node]]
-    ) -> Callable[[SphinxRenderer, str, T], list[nodes.Node]]:
+        f: Callable[[T_sphinxrenderer, str, T], list[nodes.Node]]
+    ) -> Callable[[T_sphinxrenderer, str, T], list[nodes.Node]]:
         handler: TaggedNodeHandler = f if isinstance(f, TaggedNodeHandler) else TaggedNodeHandler(f)
         handler.nodes.add(node)
         return handler
@@ -762,7 +812,14 @@ class SphinxRenderer(metaclass=NodeVisitor):
 
     def join_nested_name(self, names: list[str]) -> str:
         dom = self.get_domain()
-        sep = "::" if not dom or dom == "cpp" else "."
+        if not dom or dom == "cpp":
+            sep = "::"
+            # strip the current namespace from the start
+            omit = current_cpp_namespace(self.app.env)
+            if omit and len(names) > len(omit) and omit == names[0 : len(omit)]:
+                names = names[len(omit) :]
+        else:
+            sep = "."
         return sep.join(names)
 
     def run_directive(
@@ -903,21 +960,14 @@ class SphinxRenderer(metaclass=NodeVisitor):
         assert declarator is not None
         if display_obj_type is not None:
             n = declarator[0]
-            newStyle = True
-            # the new style was introduced in Sphinx v4
-            if sphinx.version_info[0] < 4:
-                newStyle = False
-            # but only for the C and C++ domains
             if self.get_domain() and self.get_domain() not in ("c", "cpp"):
-                newStyle = False
-            if newStyle:
-                assert isinstance(n, addnodes.desc_sig_keyword)
-                declarator[0] = addnodes.desc_sig_keyword(display_obj_type, display_obj_type)
-            else:
                 assert isinstance(n, addnodes.desc_annotation)
                 assert n.astext()[-1] == " "
                 txt = display_obj_type + " "
                 declarator[0] = addnodes.desc_annotation(txt, txt)
+            else:
+                assert isinstance(n, addnodes.desc_sig_keyword)
+                declarator[0] = addnodes.desc_sig_keyword(display_obj_type, display_obj_type)
         if target is None:
             target = self.create_doxygen_target(node)
         declarator.insert(0, target)
@@ -967,7 +1017,7 @@ class SphinxRenderer(metaclass=NodeVisitor):
                 # also have the 'compounddef' entry in our node stack and we'll get it from that. We
                 # need the 'compounddef' entry because if we find the object through the 'file'
                 # entry in the index.xml file then we need to get the namespace name from somewhere
-                names.append(node.name)
+                names.extend(reversed(split_name(node.name)))
             if (
                 isinstance(node, parser.Node_compounddefType)
                 and node.kind == parser.DoxCompoundKind.namespace
@@ -988,7 +1038,7 @@ class SphinxRenderer(metaclass=NodeVisitor):
 
     # ===================================================================================
 
-    def get_fully_qualified_name(self):
+    def get_qualified_name(self) -> str:
         assert self.context
         names = []
         node_stack = self.context.node_stack
@@ -1020,7 +1070,7 @@ class SphinxRenderer(metaclass=NodeVisitor):
                 # also have the 'compounddef' entry in our node stack and we'll get it from that. We
                 # need the 'compounddef' entry because if we find the object through the 'file'
                 # entry in the index.xml file then we need to get the namespace name from somewhere
-                names.insert(0, node.name)
+                names.extend(reversed(split_name(node.name)))
             if (
                 isinstance(node, parser.Node_compounddefType)
                 and node.kind == parser.DoxCompoundKind.namespace
@@ -1029,10 +1079,11 @@ class SphinxRenderer(metaclass=NodeVisitor):
                 # compoundname is 'foo::bar' instead of just 'bar' for namespace 'bar' nested in
                 # namespace 'foo'. We need full compoundname because node_stack doesn't necessarily
                 # include parent namespaces and we stop here in case it does.
-                names.insert(0, node.compoundname)
+                names.extend(reversed(node.compoundname.split("::")))
                 break
 
-        return "::".join(names)
+        names.reverse()
+        return self.join_nested_name(names)
 
     def create_template_prefix(self, decl: HasTemplateParamList) -> str:
         if not decl.templateparamlist:
@@ -1239,7 +1290,7 @@ class SphinxRenderer(metaclass=NodeVisitor):
         self, node: parser.Node_memberdefType, declaration=None, description=None, **kwargs
     ):
         if declaration is None:
-            declaration = self.get_fully_qualified_name()
+            declaration = self.get_qualified_name()
         obj_type = kwargs.get("objtype", None)
         if obj_type is None:
             obj_type = node.kind.value
@@ -1331,12 +1382,11 @@ class SphinxRenderer(metaclass=NodeVisitor):
             # Defer to domains specific directive.
 
             names = self.get_qualification()
-            # TODO: this breaks if it's a template specialization
-            #       and one of the arguments contain '::'
+            cname = split_name(nodeDef.compoundname)
             if self.nesting_level == 0:
-                names.extend(nodeDef.compoundname.split("::"))
+                names.extend(cname)
             else:
-                names.append(nodeDef.compoundname.split("::")[-1])
+                names.append(cname[-1])
             decls = [
                 self.create_template_prefix(nodeDef),
                 self.join_nested_name(names),
@@ -1469,7 +1519,7 @@ class SphinxRenderer(metaclass=NodeVisitor):
 
             assert len(file_data.compounddef) == 1
             templatePrefix = self.create_template_prefix(file_data.compounddef[0])
-            arg = "%s %s" % (templatePrefix, self.get_fully_qualified_name())
+            arg = "%s %s" % (templatePrefix, self.get_qualified_name())
 
             # add base classes
             if kind in (parser.DoxCompoundKind.class_, parser.DoxCompoundKind.struct):

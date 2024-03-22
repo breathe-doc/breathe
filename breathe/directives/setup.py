@@ -92,6 +92,7 @@ def setup(app: Sphinx) -> None:
     app.add_config_value("breathe_use_project_refids", False, "env")
     app.add_config_value("breathe_order_parameters_first", False, "env")
     app.add_config_value("breathe_separate_member_pages", False, "env")
+    app.add_config_value("breathe_use_cpp_namespace", False, "env")
 
     breathe_css = "breathe.css"
     if os.path.exists(os.path.join(app.confdir, "_static", breathe_css)):

@@ -80,7 +80,7 @@ class _DoxygenClassLikeDirective(BaseDirective):
             return warning.warn("doxygen{kind}: %s" % e)
 
         matches: list[filter.FinderMatch] = list(
-            filter.compound_finder_filter(name, self.kind, d_index)
+            filter.compound_finder_filter(name, self.kind, d_index, self.env)
         )
 
         if len(matches) == 0:

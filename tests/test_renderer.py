@@ -227,6 +227,7 @@ def render(
     app.config.breathe_debug_trace_directives = False
     app.config.breathe_debug_trace_doxygen_ids = False
     app.config.breathe_debug_trace_qualification = False
+    app.config.breathe_use_cpp_namespace = False
     r = SphinxRenderer(
         app,
         None,  # project_info

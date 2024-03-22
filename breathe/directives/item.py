@@ -146,7 +146,7 @@ class DoxygenConceptDirective(_DoxygenBaseItemDirective):
         # type dependent
         #
         xml_name = "%s::%s" % (namespace, name) if namespace else name
-        matches.extend(filter.compound_finder_filter(xml_name, "concept", index))
+        matches.extend(filter.compound_finder_filter(xml_name, "concept", index, self.env))
 
 
 class DoxygenEnumDirective(_DoxygenBaseItemDirective):
@@ -205,4 +205,4 @@ class DoxygenUnionDirective(_DoxygenBaseItemDirective):
         # type dependent
         #
         xml_name = "%s::%s" % (namespace, name) if namespace else name
-        matches.extend(filter.compound_finder_filter(xml_name, "union", index))
+        matches.extend(filter.compound_finder_filter(xml_name, "union", index, self.env))

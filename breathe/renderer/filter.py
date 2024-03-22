@@ -49,6 +49,11 @@ from breathe import parser, renderer
 
 from sphinx.application import Sphinx
 
+try:
+    from sphinx.domains.cpp._ast import ASTNestedNameElement
+except ImportError:
+    from sphinx.domains.cpp import ASTNestedNameElement
+
 from typing import Any, Callable, SupportsIndex, TYPE_CHECKING, TypeVar
 from collections.abc import Container, Iterable, Mapping
 
@@ -63,6 +68,7 @@ if TYPE_CHECKING:
     from breathe.directives.class_like import DoxClassOptions
     from breathe.directives.content_block import DoxContentBlockOptions
     from breathe.project import ProjectInfo
+    from sphinx.environment import BuildEnvironment
 
     DoxFilter: TypeAlias = Callable[["NodeStack"], bool]
 
@@ -332,6 +338,40 @@ def extend_member_with_compound(
     ]
 
 
+# this function may need further tweaking to match Doxygen output
+def _cpp_name_element_to_str(item) -> str:
+    """Convert an instance of ASTNestedNameElement to a string formatted the
+    same way Doxygen formats symbol names in XML files"""
+
+    if not isinstance(item, ASTNestedNameElement):
+        return item._stringify(_cpp_name_element_to_str)
+
+    r = [str(item.identOrOp)]
+    if item.templateArgs:
+        r.append("<")
+        started = False
+        for arg in item.templateArgs.args:
+            if started:
+                r.append(", ")
+            else:
+                started = True
+                r.append(" ")
+            r.append(str(arg))
+        r.append(" >")
+    return "".join(r)
+
+
+def current_cpp_namespace(env: BuildEnvironment) -> list[str]:
+    ns_parts: list[str] = []
+    if env.config.breathe_use_cpp_namespace:
+        pk = env.ref_context.get("cpp:parent_key")
+        if pk is not None:
+            for item in pk.data:
+                ns_parts.append(_cpp_name_element_to_str(item[0]))
+
+    return ns_parts
+
+
 def member_finder_filter(
     app: Sphinx,
     namespace: str,
@@ -354,6 +394,10 @@ def member_finder_filter(
             parser.CompoundKind.interface,
         }
 
+        cpp_ns = current_cpp_namespace(app.env)
+        if cpp_ns:
+            namespace = "::".join(cpp_ns + [namespace])
+
         for m, c in index.members[name]:
             if c.kind in c_kinds and c.name == namespace:
                 if m.kind in kinds:
@@ -372,10 +416,14 @@ def compound_finder_filter(
     name: str,
     kind: str,
     index: parser.DoxygenIndex,
+    env: BuildEnvironment,
 ) -> FinderMatchItr:
     """Looks for a compound with the specified name and kind."""
 
-    for c in index.compounds[name]:
+    ns_parts = current_cpp_namespace(env)
+    ns_parts.append(name)
+
+    for c in index.compounds["::".join(ns_parts)]:
         if c.kind.value != kind:
             continue
 

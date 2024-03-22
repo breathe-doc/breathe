@@ -145,7 +145,7 @@ class _DoxygenContentBlockDirective(BaseDirective):
             return warning.warn("doxygen{kind}: %s" % e)
 
         matches: list[filter.FinderMatch] = list(
-            filter.compound_finder_filter(name, self.kind, d_index)
+            filter.compound_finder_filter(name, self.kind, d_index, self.env)
         )
 
         # It shouldn't be possible to have too many matches as namespaces & groups in their nature

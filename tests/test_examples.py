@@ -283,8 +283,12 @@ def run_doxygen_with_template(doxygen, tmp_path, cache, example_name, output_nam
 
 
 def run_sphinx_and_compare(make_app, tmp_path, test_input, overrides, version):
-    (tmp_path / "conf.py").touch()
-    shutil.copyfile(test_input / "input.rst", tmp_path / "index.rst")
+    dest = tmp_path / "conf.py"
+    ec = pathlib.Path("extra_conf.py")
+    if ec.exists():
+        shutil.copyfile(ec, dest)
+    else:
+        dest.touch()
 
     make_app(
         buildername="xml",
@@ -295,11 +299,14 @@ def run_sphinx_and_compare(make_app, tmp_path, test_input, overrides, version):
     compare_xml(tmp_path / "_build" / "xml" / "index.xml", test_input, version)
 
 
-@pytest.mark.parametrize("test_input", get_individual_tests())
+@pytest.mark.parametrize(
+    "test_input", get_individual_tests(), ids=(lambda x: x.name.removeprefix("test_"))
+)
 def test_example(make_app, tmp_path, test_input, monkeypatch, doxygen, doxygen_cache):
     monkeypatch.chdir(test_input)
 
     run_doxygen_with_template(doxygen, tmp_path, doxygen_cache, test_input.name, "xml")
+    shutil.copyfile(test_input / "input.rst", tmp_path / "index.rst")
     run_sphinx_and_compare(
         make_app,
         tmp_path,
@@ -317,6 +324,7 @@ def test_auto(make_app, tmp_path, monkeypatch, doxygen, doxygen_cache):
         xml_path = str(doxygen_cache / "auto" / "xml")
         monkeypatch.setattr(AutoDoxygenProcessHandle, "process", (lambda *args, **kwds: xml_path))
 
+    shutil.copyfile(test_input / "input.rst", tmp_path / "index.rst")
     run_sphinx_and_compare(
         make_app,
         tmp_path,
@@ -337,17 +345,13 @@ def test_multiple_projects(make_app, tmp_path, monkeypatch, doxygen, doxygen_cac
         monkeypatch.chdir(test_input / c)
         run_doxygen_with_template(doxygen, tmp_path, doxygen_cache, f"multi_project.{c}", f"xml{c}")
 
-    (tmp_path / "conf.py").touch()
     (tmp_path / "index.rst").write_text(
         (test_input / "input.rst").read_text().format(project_c_path=str(tmp_path / "xmlC"))
     )
-
-    make_app(
-        buildername="xml",
-        srcdir=sphinx_path(tmp_path),
-        confoverrides=conf_overrides(
-            {"breathe_projects": {"A": str(tmp_path / "xmlA"), "B": str(tmp_path / "xmlB")}}
-        ),
-    ).build()
-
-    compare_xml(tmp_path / "_build" / "xml" / "index.xml", test_input, doxygen.version)
+    run_sphinx_and_compare(
+        make_app,
+        tmp_path,
+        test_input,
+        {"breathe_projects": {"A": str(tmp_path / "xmlA"), "B": str(tmp_path / "xmlB")}},
+        doxygen.version,
+    )
