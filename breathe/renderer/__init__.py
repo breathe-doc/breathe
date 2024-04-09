@@ -75,6 +75,15 @@ class RenderContext:
         self.mask_factory = mask_factory
         self.directive_args = directive_args
         self.domain = domain
+
+        # When this is True, the nodes rendered for the current element are
+        # stripped of namespace qualifiers.
+        #
+        # As far as I can tell, this isn't even needed except for a few elements
+        # such as classes, where this always ends up True. I don't think that's
+        # intentional but I have left it in place, in case it is. When the
+        # "breathe_use_cpp_namespace" option is used, this is ignored.
+        #     -- Rouslan
         self.child = child
 
     def create_child_context(

@@ -2,9 +2,11 @@
 
 .. cpp:namespace-push:: Namespace
 
-.. doxygenvariable:: var
+.. doxygenvariable:: Var
 
 .. doxygenclass:: ClassB
+    :members:
+    :undoc-members:
 
 .. cpp:namespace-push:: ClassB
 
@@ -21,3 +23,18 @@
 .. doxygentypedef:: SomeType
 
 .. doxygenconcept:: SomeConcept
+
+.. doxygenconcept:: ClassB::NestedConcept
+
+.. doxygenvariable:: ClassB::MemberVar
+
+.. doxygenvariable:: ClassC::SpecialVarA
+
+
+.. Superfluous spaces added deliberately for testing
+
+.. doxygenvariable:: ClassC<   unsigned  long  >::SpecialVarA
+
+.. cpp:namespace-push:: ClassC<  unsigned   long   >
+
+.. doxygenvariable:: SpecialVarB

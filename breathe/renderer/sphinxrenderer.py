@@ -578,7 +578,8 @@ def _check_pair(dest: list[str], tokens: Iterator[str], start: str, end: str) ->
 def _check_all_pairs(dest: list[str], tokens: Iterator[str]) -> None:
     if not _check_pair(dest, tokens, "<", ">"):
         if not _check_pair(dest, tokens, "(", ")"):
-            _check_pair(dest, tokens, "[", "]")
+            if not _check_pair(dest, tokens, "[", "]"):
+                _check_pair(dest, tokens, "{", "}")
 
 
 def split_name(name: str) -> list[str]:
@@ -586,8 +587,11 @@ def split_name(name: str) -> list[str]:
 
     E.g. turn "A<B::C>::D::E<(F>G::H),(I<J)>" into
     ["A<B::C>","D","E<(F>G::H),(I<J)>"]
+
+    This can produce incorrect results if any of the template paramters are
+    strings containing brackets.
     """
-    last = []
+    last: list[str] = []
     parts = [last]
     tokens = iter(RE_NAME_PART.split(name))
     for tok in tokens:
@@ -599,6 +603,35 @@ def split_name(name: str) -> list[str]:
             _check_all_pairs(last, tokens)
 
     return ["".join(subparts) for subparts in parts]
+
+
+def legacy_namespace_strip(config, nodes: list[nodes.Node]):
+    """
+    As far as I can tell, this doesn't work the way it was originally intended
+    to, but I decided to play it safe and leave the current behavior by default
+    and only change it when the new "breathe_use_cpp_namespace" option is used.
+        -- Rouslan
+
+    The following is the original comment:
+
+        Filter out outer class names if we are rendering a member as a part of a class content.
+        In some cases of errors with a declaration there are no nodes
+        (e.g., variable in function), so perhaps skip (see #671).
+        If there are nodes, there should be at least 2.
+    """
+    if not config.breathe_use_cpp_namespace and len(nodes) != 0:
+        assert len(nodes) >= 2
+        rst_node = nodes[1]
+        doc = rst_node.document
+        assert doc is not None
+        finder = NodeFinder(doc)
+        rst_node.walk(finder)
+
+        assert finder.declarator
+        # the type is set to "Any" to get around missing typing info in
+        # docutils 0.20.1
+        signode: Any = finder.declarator
+        signode.children = [n for n in signode.children if n.tagname != "desc_addname"]
 
 
 T_sphinxrenderer = TypeVar("T_sphinxrenderer", bound="SphinxRenderer")
@@ -655,7 +688,7 @@ def tagged_node_handler(node: type[parser.NodeOrValue]):
 class NodeVisitor(type):
     """Metaclass that collects all methods marked as @node_handler and
     @tagged_node_handler into the dicts 'node_handlers' and
-    'tagged_node_handlers' respectively, and assigns them to the class"""
+    'tagged_node_handlers' respectively, and assigns the dicts to the class"""
 
     def __new__(cls, name, bases, members):
         handlers = {}
@@ -862,25 +895,8 @@ class SphinxRenderer(metaclass=NodeVisitor):
         if config.breathe_debug_trace_directives:  # pragma: no cover
             _debug_indent -= 1
 
-        # Filter out outer class names if we are rendering a member as a part of a class content.
-        # In some cases of errors with a declaration there are no nodes
-        # (e.g., variable in function), so perhaps skip (see #671).
-        # If there are nodes, there should be at least 2.
-        if len(nodes) != 0:
-            assert len(nodes) >= 2
-            rst_node = nodes[1]
-            doc = rst_node.document
-            assert doc is not None
-            finder = NodeFinder(doc)
-            rst_node.walk(finder)
-
-            assert finder.declarator
-            # the type is set to "Any" to get around missing typing info in
-            # docutils 0.20.1
-            signode: Any = finder.declarator
-
-            if self.context.child:
-                signode.children = [n for n in signode.children if n.tagname != "desc_addname"]
+        if self.context.child:
+            legacy_namespace_strip(config, nodes)
         return nodes
 
     def handle_compounddef_declaration(
@@ -1018,15 +1034,15 @@ class SphinxRenderer(metaclass=NodeVisitor):
                 # need the 'compounddef' entry because if we find the object through the 'file'
                 # entry in the index.xml file then we need to get the namespace name from somewhere
                 names.extend(reversed(split_name(node.name)))
-            if (
-                isinstance(node, parser.Node_compounddefType)
-                and node.kind == parser.DoxCompoundKind.namespace
+            if isinstance(node, parser.Node_compounddefType) and node.kind not in (
+                parser.DoxCompoundKind.file,
+                parser.DoxCompoundKind.group,
             ):
                 # Nested namespaces include their parent namespace(s) in compoundname. ie,
                 # compoundname is 'foo::bar' instead of just 'bar' for namespace 'bar' nested in
                 # namespace 'foo'. We need full compoundname because node_stack doesn't necessarily
                 # include parent namespaces and we stop here in case it does.
-                names.extend(reversed(node.compoundname.split("::")))
+                names.extend(reversed(split_name(node.compoundname)))
                 break
 
         names.reverse()
@@ -1117,18 +1133,8 @@ class SphinxRenderer(metaclass=NodeVisitor):
         if config.breathe_debug_trace_directives:  # pragma: no cover
             _debug_indent -= 1
 
-        # Filter out outer class names if we are rendering a member as a part of a class content.
-        rst_node = nodes[1]
-        doc = rst_node.document
-        assert doc is not None
-        finder = NodeFinder(doc)
-        rst_node.walk(finder)
-
-        assert finder.declarator is not None
-        signode = finder.declarator
-
-        if len(names) > 0 and self.context.child:
-            signode.children = [n for n in signode.children if not n.tagname == "desc_addname"]
+        if self.context.child:
+            legacy_namespace_strip(config, nodes)
         return nodes
 
     def create_doxygen_target(self, node):
