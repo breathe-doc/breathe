@@ -63,10 +63,6 @@ def function_and_all_friend_finder_filter(
     index: parser.DoxygenIndex,
     matches: list[filter.FinderMatch],
 ) -> None:
-    # Get matching functions but only ones where the parent is not a group.
-    # We want to skip function entries in groups as we'll find the same
-    # functions in a file's xml output elsewhere and having more than one
-    # match is confusing for our logic later on.
     for f_match in filter.member_finder_filter(
         app,
         namespace,
@@ -78,8 +74,7 @@ def function_and_all_friend_finder_filter(
     ):
         cd = f_match[2].value
         assert isinstance(cd, parser.Node_compounddefType)
-        if cd.kind != parser.DoxCompoundKind.group:
-            matches.append(f_match)
+        matches.append(f_match)
 
 
 class DoxygenFunctionDirective(BaseDirective):
@@ -342,7 +337,7 @@ class DoxygenFunctionDirective(BaseDirective):
 
             res.append((entry, signature))
 
-        if len(res) == 1:
+        if len(res) == 1 or (len(res) > 1 and all(x[1] == res[0][1] for x in res)):
             return res[0][0]
         else:
             raise _UnableToResolveFunctionError(candSignatures)

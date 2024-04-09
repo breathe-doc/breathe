@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - name: set up python
         uses: actions/setup-python@v4
         with:
@@ -27,18 +27,19 @@ jobs:
           pip install -r requirements/development.txt
           pip install --editable .
 
-      - uses: actions/cache/restore@v3
+      - uses: actions/cache/restore@v4
         id: cache-doxygen
         with:
           path: doxygen-bin-arc
           fail-on-cache-miss: true
           key: ${{ runner.os }}-doxygen-${{ env.DOXYGEN_VERSION }}
-          restore-keys: |
-            ${{ runner.os }}-doxygen-
   
       - name: install Doxygen
         run: |
-          cd doxygen-bin-arc/doxygen
+          cd doxygen-bin-arc
+          gunzip doxygen.tar.gz
+          tar xf doxygen.tar
+          cd doxygen-${{ env.DOXYGEN_VERSION }}
           sudo make install
 
       - name: build the documentation
@@ -46,7 +47,7 @@ jobs:
           make html
           rm documentation/build/html/.buildinfo
 
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v4
         with:
           name: docs build artifacts
           path: |

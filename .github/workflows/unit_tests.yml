@@ -1,7 +1,5 @@
 name: unit tests
 on: [push, pull_request]
-env:
-  DOXYGEN_VERSION: 1.9.4
 jobs:
   cache-doxygen:
     uses: ./.github/workflows/cache_doxygen.yml
@@ -12,6 +10,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
+        doxygen-version: ['1.9.4', '1.9.7']
         python-version: ['3.8', '3.9', '3.10', '3.11', '3.12']
         sphinx-version:
           - '4.2.0'
@@ -63,18 +62,19 @@ jobs:
               pip install -Iv Sphinx==${{ matrix.sphinx-version }}
           fi
 
-      - uses: actions/cache/restore@v3
+      - uses: actions/cache/restore@v4
         id: cache-doxygen
         with:
           path: doxygen-bin-arc
           fail-on-cache-miss: true
-          key: ${{ runner.os }}-doxygen-${{ env.DOXYGEN_VERSION }}
-          restore-keys: |
-            ${{ runner.os }}-doxygen-
+          key: ${{ runner.os }}-doxygen-${{ matrix.doxygen-version }}
 
       - name: install Doxygen
         run: |
-          cd doxygen-bin-arc/doxygen
+          cd doxygen-bin-arc
+          gunzip doxygen.tar.gz
+          tar xf doxygen.tar
+          cd doxygen-${{ matrix.doxygen-version }}
           sudo make install
 
       - name: install dependencies and build extension module
