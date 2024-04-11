@@ -37,11 +37,13 @@ jobs:
       - name: install Doxygen
         run: |
           cd doxygen-bin-arc
-          if ! test -d doxygen-${{ env.DOXYGEN_VERSION }}; then
+          if test -d doxygen; then
+            cd doxygen
+          else
             gunzip doxygen.tar.gz
             tar xf doxygen.tar
+            cd doxygen-${{ env.DOXYGEN_VERSION }}
           fi
-          cd doxygen-${{ env.DOXYGEN_VERSION }}
           sudo make install
 
       - name: build the documentation
