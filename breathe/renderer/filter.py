@@ -49,11 +49,6 @@ from breathe import parser, renderer
 
 from sphinx.application import Sphinx
 
-try:
-    from sphinx.domains.cpp._ast import ASTNestedNameElement
-except ImportError:
-    from sphinx.domains.cpp import ASTNestedNameElement
-
 from typing import Any, Callable, SupportsIndex, TYPE_CHECKING, TypeVar
 from collections.abc import Container, Iterable, Mapping
 
@@ -80,6 +75,13 @@ if TYPE_CHECKING:
     DoxNamespaceOptions: TypeAlias = DoxClassOptions | DoxContentBlockOptions
 
     T_options = TypeVar("T_options", DoxClassOptions, DoxContentBlockOptions)
+
+    ASTNestedNameElement: Any = ...
+else:
+    try:
+        from sphinx.domains.cpp._ast import ASTNestedNameElement
+    except ImportError:
+        from sphinx.domains.cpp import ASTNestedNameElement
 
 
 CLASS_LIKE_COMPOUNDDEF = (

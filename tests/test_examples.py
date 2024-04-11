@@ -299,9 +299,7 @@ def run_sphinx_and_compare(make_app, tmp_path, test_input, overrides, version):
     compare_xml(tmp_path / "_build" / "xml" / "index.xml", test_input, version)
 
 
-@pytest.mark.parametrize(
-    "test_input", get_individual_tests(), ids=(lambda x: x.name.removeprefix("test_"))
-)
+@pytest.mark.parametrize("test_input", get_individual_tests(), ids=(lambda x: x.name[5:]))
 def test_example(make_app, tmp_path, test_input, monkeypatch, doxygen, doxygen_cache):
     monkeypatch.chdir(test_input)
 
