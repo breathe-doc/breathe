@@ -72,8 +72,10 @@ jobs:
       - name: install Doxygen
         run: |
           cd doxygen-bin-arc
-          gunzip doxygen.tar.gz
-          tar xf doxygen.tar
+          if ! test -d doxygen-${{ matrix.doxygen-version }}; then
+            gunzip doxygen.tar.gz
+            tar xf doxygen.tar
+          fi
           cd doxygen-${{ matrix.doxygen-version }}
           sudo make install
 
