@@ -38,3 +38,7 @@
 .. cpp:namespace-push:: ClassC<  unsigned   long   >
 
 .. doxygenvariable:: SpecialVarB
+
+.. cpp:namespace-pop::
+
+.. doxygennamespace:: Namespace2::Namespace3

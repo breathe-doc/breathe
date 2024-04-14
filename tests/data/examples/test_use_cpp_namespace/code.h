@@ -30,4 +30,13 @@ namespace Namespace {
         int SpecialVarA;
         float SpecialVarB;
     };
+
+    namespace Namespace2 {
+        namespace Namespace3 {
+            namespace Namespace4 {
+                class ClassD {};
+                void AnotherFunc(int x);
+            }
+        }
+    }
 }
