@@ -29,6 +29,7 @@ BUFFER_SIZE = 0x1000
 
 TEST_DATA_DIR = pathlib.Path(__file__).parent / "data"
 
+# if this is changed, tests/data/examples/README.rst should be updated
 DEFAULT_CONF = {
     "project": "test",
     "breathe_default_project": "example",

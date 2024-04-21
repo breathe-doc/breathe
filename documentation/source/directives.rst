@@ -700,7 +700,7 @@ Config Values
    The namespace specified by the aforementioned directives shall be referred to
    as the "current" namespace in this text.
 
-   With the exception of ``doxygendefine`` all ``doxygen-`` directives will
+   With the exception of ``doxygendefine``, all ``doxygen-`` directives will
    search for a symbol under the current C++ namespace. Parent namespaces will
    not be searched. In other words: if the symbol isn't found in the current
    namespace, it is not found at all.

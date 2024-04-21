@@ -26,6 +26,9 @@ TEST_DATA_DIR = pathlib.Path(__file__).parent.parent / "tests" / "data"
 CSS_PATH = TEST_DATA_DIR / "docutils.css"
 
 C_FILE_SUFFIXES = frozenset((".h", ".c", ".hpp", ".cpp"))
+
+# if either of these are changed, tests/data/examples/README.rst should be
+# updated
 IGNORED_ELEMENTS = frozenset(())
 IGNORED_ATTRIBUTES = frozenset(
     (
