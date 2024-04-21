@@ -1,5 +1,5 @@
 -r production.txt
-
+Sphinx[test]
 flake8
 pip-tools>=0.3.5
 pytest
