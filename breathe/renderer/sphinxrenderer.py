@@ -86,6 +86,8 @@ DeclaratorCallback = Callable[[Declarator], None]
 
 _debug_indent = 0
 
+_findall_compat = getattr(nodes.Node, "findall", getattr(nodes.Node, "traverse"))
+
 
 class WithContext:
     def __init__(self, parent: SphinxRenderer, context: RenderContext):
@@ -1209,7 +1211,7 @@ class SphinxRenderer(metaclass=NodeVisitor):
         admonitions: list[nodes.Node] = []
 
         def pullup(node, typ, dest):
-            for n in list(node.findall(typ)):
+            for n in list(_findall_compat(node, typ)):
                 del n.parent[n.parent.index(n)]
                 dest.append(n)
 
@@ -1219,7 +1221,7 @@ class SphinxRenderer(metaclass=NodeVisitor):
             pullup(candNode, nodes.note, admonitions)
             pullup(candNode, nodes.warning, admonitions)
             # and collapse paragraphs
-            for para in candNode.findall(nodes.paragraph):
+            for para in _findall_compat(candNode, nodes.paragraph):
                 parent = para.parent
                 assert parent is None or isinstance(parent, nodes.Element)
                 if parent and len(parent) == 1 and isinstance(parent, nodes.paragraph):
