@@ -20,7 +20,8 @@ paragraph {
     display: block;
     margin: 1em 0;
 }
-emphasis { font-weight: bold; }
+emphasis { font-style: italic; }
+strong { font-weight: bold; }
 comment { color: darkgreen; }
 index::before {
     display: block;
@@ -41,3 +42,9 @@ table entry {
     padding: 0 0.3em;
 }
 colspec { display: none; }
+
+section { display: block; }
+section title { font-size: 1.5em; display: block; font-weight: bold; }
+section section title { font-size: 1.17em; }
+section section section title { font-size: 1em; }
+

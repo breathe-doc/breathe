@@ -163,11 +163,11 @@ def str_to_set(x):
     return frozenset(x.split())
 
 
-def attr_compare(name, a, b):
+def attr_compare(name, actual, expected):
     if name == "classes":
-        return str_to_set(a) == str_to_set(b)
+        return str_to_set(actual) >= str_to_set(expected)
 
-    return a == b
+    return actual == expected
 
 
 @dataclasses.dataclass

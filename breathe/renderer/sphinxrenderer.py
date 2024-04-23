@@ -86,7 +86,7 @@ DeclaratorCallback = Callable[[Declarator], None]
 
 _debug_indent = 0
 
-_findall_compat = getattr(nodes.Node, "findall", getattr(nodes.Node, "traverse"))
+_findall_compat = getattr(nodes.Node, "findall", getattr(nodes.Node, "traverse", None))
 
 
 class WithContext:
@@ -1996,25 +1996,55 @@ class SphinxRenderer(metaclass=NodeVisitor):
         return [creator("", "", *nodelist)]
 
     @node_handler(parser.Node_docSect1Type)
+    def visit_docsect1(self, node: parser.Node_docSect1Type) -> list[nodes.Node]:
+        return self.visit_docsectN(node, 0)
+
     @node_handler(parser.Node_docSect2Type)
+    def visit_docsect2(self, node: parser.Node_docSect2Type) -> list[nodes.Node]:
+        return self.visit_docsectN(node, 1)
+
     @node_handler(parser.Node_docSect3Type)
+    def visit_docsect3(self, node: parser.Node_docSect3Type) -> list[nodes.Node]:
+        return self.visit_docsectN(node, 2)
+
     def visit_docsectN(
-        self, node: parser.Node_docSect1Type | parser.Node_docSect2Type | parser.Node_docSect3Type
+        self, node: parser.Node_docSect1Type | parser.Node_docSect2Type | parser.Node_docSect3Type, depth: int
     ) -> list[nodes.Node]:
         """
-        Docutils titles are defined by their level inside the document so
-        the proper structure is only guaranteed by the Doxygen XML.
+        Docutils titles are defined by their level inside the document.
 
         Doxygen command mapping to XML element name:
         @section == sect1, @subsection == sect2, @subsubsection == sect3
         """
-        section = nodes.section()
-        section["ids"].append(self.get_refid(node.id))
+        # sect2 and sect3 elements can appear outside of sect1/sect2 elements so
+        # we need to check how deep we actually are
+        actual_d = 0
+        assert self.context
+        for n in self.context.node_stack[1:]:
+            if isinstance(n.value,(parser.Node_docSect1Type,parser.Node_docSect2Type,parser.Node_docSect3Type)):
+                actual_d += 1
+
         title = node.title or ""
-        section += nodes.title(title, title)
-        section += self.create_doxygen_target(node)
-        section += self.render_tagged_iterable(node)
-        return [section]
+        if actual_d == depth:
+            section = nodes.section()
+            section["ids"].append(self.get_refid(node.id))
+            section += nodes.title(title, title)
+            section += self.create_doxygen_target(node)
+            section += self.render_tagged_iterable(node)
+            return [section]
+        else:
+            # If the actual depth doesn't match the specified depth, don't
+            # create a section element, just use an emphasis element as the
+            # title.
+            #
+            # This is probably not the best way to handle such a case. I chose
+            # it because it's what visit_docheading does. It shouldn't come up
+            # often, anyway.
+            #     -- Rouslan
+            content: list[nodes.Node] = [nodes.emphasis(text=title)]
+            content.extend(self.create_doxygen_target(node))
+            content.extend(self.render_tagged_iterable(node))
+            return content
 
     @node_handler(parser.Node_docSimpleSectType)
     def visit_docsimplesect(self, node: parser.Node_docSimpleSectType) -> list[nodes.Node]:
