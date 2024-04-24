@@ -26,23 +26,6 @@ jobs:
           - python-version: '3.8'
             sphinx-version: git+https://github.com/sphinx-doc/sphinx.git@master
 
-          # avoid bug in following configurations
-          # sphinx/util/typing.py:37: in <module>
-          #     from types import Union as types_Union
-          # ImportError: cannot import name 'Union' from 'types'
-          - python-version: '3.10'
-            sphinx-version: '4.0.3'
-          - python-version: '3.10'
-            sphinx-version: '4.1.2'
-          - python-version: '3.11'
-            sphinx-version: '4.0.3'
-          - python-version: '3.11'
-            sphinx-version: '4.1.2'
-          - python-version: '3.12'
-            sphinx-version: '4.0.3'
-          - python-version: '3.12'
-            sphinx-version: '4.1.2'
-
     steps:
       - uses: actions/checkout@v2
       - name: set up python ${{ matrix.python-version }}

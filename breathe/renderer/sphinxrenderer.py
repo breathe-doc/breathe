@@ -86,7 +86,9 @@ DeclaratorCallback = Callable[[Declarator], None]
 
 _debug_indent = 0
 
-_findall_compat = getattr(nodes.Node, "findall", getattr(nodes.Node, "traverse", None))
+_findall_compat = cast(
+    Callable, getattr(nodes.Node, "findall", getattr(nodes.Node, "traverse", None))
+)
 
 
 class WithContext:
@@ -2008,7 +2010,9 @@ class SphinxRenderer(metaclass=NodeVisitor):
         return self.visit_docsectN(node, 2)
 
     def visit_docsectN(
-        self, node: parser.Node_docSect1Type | parser.Node_docSect2Type | parser.Node_docSect3Type, depth: int
+        self,
+        node: parser.Node_docSect1Type | parser.Node_docSect2Type | parser.Node_docSect3Type,
+        depth: int,
     ) -> list[nodes.Node]:
         """
         Docutils titles are defined by their level inside the document.
@@ -2021,7 +2025,10 @@ class SphinxRenderer(metaclass=NodeVisitor):
         actual_d = 0
         assert self.context
         for n in self.context.node_stack[1:]:
-            if isinstance(n.value,(parser.Node_docSect1Type,parser.Node_docSect2Type,parser.Node_docSect3Type)):
+            if isinstance(
+                n.value,
+                (parser.Node_docSect1Type, parser.Node_docSect2Type, parser.Node_docSect3Type),
+            ):
                 actual_d += 1
 
         title = node.title or ""

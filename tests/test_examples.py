@@ -220,6 +220,14 @@ def compare_xml(generated, input_dir, version):
 
                 # ignore extra attributes in o_node
                 for key, value in c_node.attr.items():
+                    if (
+                        c_node.name == "desc_inline"
+                        and key == "domain"
+                        and sphinx.version_info[0] < 6
+                    ):
+                        # prior to Sphinx 6, this attribute was not present
+                        continue
+
                     assert key in o_node.attr, f"missing attribute at line {o_node.line_no}: {key}"
                     o_value = o_node.attr[key]
                     assert attr_compare(
