@@ -13,16 +13,23 @@ jobs:
         doxygen-version: ['1.9.4', '1.9.7']
         python-version: ['3.8', '3.9', '3.10', '3.11', '3.12']
         sphinx-version:
-          - '4.2.0'
           - '4.3.2'
           - '4.5.0'
           - '5.0.2'
           - '5.1.1'
           - '5.3.0'
           - '6.1.3'
+          - '7.2.6'
+          # version 7.3 broke up the domain modules into packages, changing
+          # where some classes had to be imported from
+          - '7.3.0'
           - git+https://github.com/sphinx-doc/sphinx.git@master
         exclude:
-          # the git version isn't compatible with Python 3.8
+          # Sphinx version 7.2 and up isn't compatible with Python 3.8
+          - python-version: '3.8'
+            sphinx-version: '7.2.6'
+          - python-version: '3.8'
+            sphinx-version: '7.3.0'
           - python-version: '3.8'
             sphinx-version: git+https://github.com/sphinx-doc/sphinx.git@master
 
@@ -36,14 +43,27 @@ jobs:
           cache-dependency-path: |
             requirements/development.txt
             requirements/production.txt
+      
+      # the latest sphinxcontrib- packages don't work with Sphinx version 4
+      - name: install compatible version of sphinxcontrib-applehelp
+        if: ${{ ! contains(matrix.sphinx-version, 'git') && matrix.sphinx-version[0] < 5 }}
+        run: >
+          pip install -Iv
+            sphinxcontrib-applehelp==1.0.4
+            sphinxcontrib-devhelp==1.0.2
+            sphinxcontrib-htmlhelp==2.0.1
+            sphinxcontrib-serializinghtml==1.1.5
+            sphinxcontrib-qthelp==1.0.3
 
-      - name: install sphinx from PyPI or from git
+      - name: install sphinx from PyPI
+        if: ${{ ! contains(matrix.sphinx-version, 'git') }}
         run: |
-          if echo "${{ matrix.sphinx-version }}"|grep -q git; then
-              pip install ${{ matrix.sphinx-version }}
-          else
-              pip install -Iv Sphinx==${{ matrix.sphinx-version }}
-          fi
+          pip install -Iv Sphinx==${{ matrix.sphinx-version }}
+      
+      - name: install sphinx from git
+        if: contains(matrix.sphinx-version, 'git')
+        run: |
+          pip install ${{ matrix.sphinx-version }}
 
       - uses: actions/cache/restore@v4
         id: cache-doxygen
@@ -53,6 +73,8 @@ jobs:
           key: ${{ runner.os }}-doxygen-${{ matrix.doxygen-version }}
 
       - name: install Doxygen
+        # at some point actions/cache/restore@4 started unpacking doxygen.tar.gz
+        # automatically and I don't know why -- Rouslan
         run: |
           cd doxygen-bin-arc
           if test -d doxygen; then
