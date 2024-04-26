@@ -49,11 +49,11 @@ jobs:
         if: ${{ ! contains(matrix.sphinx-version, 'git') && matrix.sphinx-version[0] < 5 }}
         run: >
           pip install -Iv
-            sphinxcontrib-applehelp==1.0.4
-            sphinxcontrib-devhelp==1.0.2
-            sphinxcontrib-htmlhelp==2.0.1
-            sphinxcontrib-serializinghtml==1.1.5
-            sphinxcontrib-qthelp==1.0.3
+          sphinxcontrib-applehelp==1.0.4
+          sphinxcontrib-devhelp==1.0.2
+          sphinxcontrib-htmlhelp==2.0.1
+          sphinxcontrib-serializinghtml==1.1.5
+          sphinxcontrib-qthelp==1.0.3
 
       - name: install sphinx from PyPI
         if: ${{ ! contains(matrix.sphinx-version, 'git') }}
