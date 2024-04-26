@@ -46,7 +46,7 @@ jobs:
       
       # the latest sphinxcontrib- packages don't work with Sphinx version 4
       - name: install sphinx from PyPI with compatible versions of sphinxcontrib- packages
-        if: ${{ ! contains(matrix.sphinx-version, 'git') && matrix.sphinx-version[0] < 5 }}
+        if: ${{ startsWith(matrix.sphinx-version, '4.') }}
         run: >
           pip install -Iv
           Sphinx==${{ matrix.sphinx-version }}
@@ -57,12 +57,12 @@ jobs:
           sphinxcontrib-qthelp==1.0.3
 
       - name: install sphinx from PyPI
-        if: ${{ ! contains(matrix.sphinx-version, 'git') && matrix.sphinx-version[0] >= 5 }}
+        if: ${{ ! startsWith(matrix.sphinx-version, 'git') && ! startsWith(matrix.sphinx-version, '4.') }}
         run: |
           pip install -Iv Sphinx==${{ matrix.sphinx-version }}
       
       - name: install sphinx from git
-        if: contains(matrix.sphinx-version, 'git')
+        if: startsWith(matrix.sphinx-version, 'git')
         run: |
           pip install ${{ matrix.sphinx-version }}
 
