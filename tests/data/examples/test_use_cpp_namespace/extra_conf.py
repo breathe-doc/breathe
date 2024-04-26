@@ -1,0 +1,1 @@
+breathe_use_cpp_namespace = True

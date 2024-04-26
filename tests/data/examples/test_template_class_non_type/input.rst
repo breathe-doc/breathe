@@ -1,0 +1,2 @@
+.. doxygenclass:: anothertemplateclass
+    :members:

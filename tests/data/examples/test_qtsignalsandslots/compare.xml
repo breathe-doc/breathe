@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<?xml-stylesheet href="../../docutils.css"?>
+<document>
+    <index entries="['single',\ 'QtSignalSlotExample\ (C++\ class)',\ '_CPPv419QtSignalSlotExample',\ '',\ None]"></index>
+    <desc classes="cpp class" desctype="class" domain="cpp" objtype="class">
+        <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword classes="k">class</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">QtSignalSlotExample</desc_sig_name></desc_name><desc_sig_space classes="w"> </desc_sig_space><desc_sig_punctuation classes="p">:</desc_sig_punctuation><desc_sig_space classes="w"> </desc_sig_space><desc_sig_keyword classes="k">public</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_sig_name classes="n">QObject</desc_sig_name></desc_signature_line></desc_signature>
+        <desc_content>
+            <container classes="breathe-sectiondef" objtype="public-func">
+                <rubric classes="breathe-sectiondef-title">Public Functions</rubric>
+                <index entries="['single',\ 'QtSignalSlotExample::workingFunction\ (C++\ function)',\ '_CPPv4N19QtSignalSlotExample15workingFunctionEi',\ '',\ None]"></index>
+                <desc classes="cpp function" desctype="function" domain="cpp" objtype="function">
+                    <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword classes="k">inline</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_sig_keyword_type classes="kt">void</desc_sig_keyword_type><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">workingFunction</desc_sig_name></desc_name><desc_parameterlist><desc_parameter noemph="True"><desc_sig_keyword_type classes="kt">int</desc_sig_keyword_type><desc_sig_space classes="w"> </desc_sig_space><desc_sig_name classes="n sig-param">iShownParameter</desc_sig_name></desc_parameter></desc_parameterlist></desc_signature_line></desc_signature>
+                    <desc_content>
+                        <field_list>
+                            <field>
+                                <field_name>Parameters</field_name>
+                                <field_body>
+                                    <paragraph><literal_strong>iShownParameter</literal_strong> – This is shown in declaration </paragraph>
+                                </field_body>
+                            </field>
+                        </field_list>
+                    </desc_content>
+                </desc>
+            </container>
+            <container classes="breathe-sectiondef" objtype="public-slot">
+                <rubric classes="breathe-sectiondef-title">Public Slots</rubric>
+                <index entries="['single',\ 'QtSignalSlotExample::workingSlot\ (C++\ function)',\ '_CPPv4N19QtSignalSlotExample11workingSlotEi',\ '',\ None]"></index>
+                <desc classes="cpp function" desctype="function" domain="cpp" objtype="function">
+                    <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword classes="k">inline</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_sig_keyword_type classes="kt">void</desc_sig_keyword_type><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">workingSlot</desc_sig_name></desc_name><desc_parameterlist><desc_parameter noemph="True"><desc_sig_keyword_type classes="kt">int</desc_sig_keyword_type><desc_sig_space classes="w"> </desc_sig_space><desc_sig_name classes="n sig-param">iShown</desc_sig_name></desc_parameter></desc_parameterlist></desc_signature_line></desc_signature>
+                    <desc_content>
+                        <field_list>
+                            <field>
+                                <field_name>Parameters</field_name>
+                                <field_body>
+                                    <paragraph><literal_strong>iShown</literal_strong> – This is in function declaration </paragraph>
+                                </field_body>
+                            </field>
+                        </field_list>
+                    </desc_content>
+                </desc>
+            </container>
+            <container classes="breathe-sectiondef" objtype="signal">
+                <rubric classes="breathe-sectiondef-title">Signals</rubric>
+                <index entries="['single',\ 'QtSignalSlotExample::workingSignal\ (C++\ function)',\ '_CPPv4N19QtSignalSlotExample13workingSignalEi',\ '',\ None]"></index>
+                <desc classes="cpp function" desctype="function" domain="cpp" objtype="function">
+                    <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword_type classes="kt">void</desc_sig_keyword_type><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">workingSignal</desc_sig_name></desc_name><desc_parameterlist><desc_parameter noemph="True"><desc_sig_keyword_type classes="kt">int</desc_sig_keyword_type><desc_sig_space classes="w"> </desc_sig_space><desc_sig_name classes="n sig-param">iShown</desc_sig_name></desc_parameter></desc_parameterlist></desc_signature_line></desc_signature>
+                    <desc_content>
+                        <field_list>
+                            <field>
+                                <field_name>Parameters</field_name>
+                                <field_body>
+                                    <paragraph><literal_strong>iShown</literal_strong> – This is in function declaration </paragraph>
+                                </field_body>
+                            </field>
+                        </field_list>
+                    </desc_content>
+                </desc>
+            </container>
+        </desc_content>
+    </desc>
+</document>

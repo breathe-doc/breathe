@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="utf-8"?>
+<?xml-stylesheet href="../../docutils.css"?>
+<document>
+    <index entries="['single',\ 'ClassA\ (C++\ class)',\ '_CPPv46ClassA',\ '',\ None]"></index>
+    <desc classes="cpp class" desctype="class" domain="cpp" objtype="class">
+        <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword classes="k">class</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">ClassA</desc_sig_name></desc_name></desc_signature_line></desc_signature>
+        <desc_content>
+        </desc_content>
+    </desc>
+    <index entries="['single',\ 'Namespace::Var\ (C++\ member)',\ '_CPPv4N9Namespace3VarE',\ '',\ None]"></index>
+    <desc classes="cpp var" desctype="var" domain="cpp" objtype="var">
+        <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword_type classes="kt">int</desc_sig_keyword_type><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">Var</desc_sig_name></desc_name></desc_signature_line></desc_signature>
+        <desc_content>
+        </desc_content>
+    </desc>
+    <index entries="['single',\ 'Namespace::ClassB\ (C++\ class)',\ '_CPPv4N9Namespace6ClassBE',\ '',\ None]"></index>
+    <desc classes="cpp class" desctype="class" domain="cpp" objtype="class">
+        <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword classes="k">class</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">ClassB</desc_sig_name></desc_name></desc_signature_line></desc_signature>
+        <desc_content>
+            <container classes="breathe-sectiondef" objtype="public-func">
+                <rubric classes="breathe-sectiondef-title">Public Functions</rubric>
+                <index entries="['single',\ 'Namespace::ClassB::SomeFunc\ (C++\ function)',\ '_CPPv4N9Namespace6ClassB8SomeFuncEv',\ '',\ None]"></index>
+                <desc classes="cpp function" desctype="function" domain="cpp" objtype="function">
+                    <desc_signature classes="sig sig-object cpp"><desc_signature_line><target dupnames="class_namespace_1_1_class_b_1a6635cb4fda87e8c3bc115c1a38c41d4f"></target><desc_sig_keyword_type classes="kt">void</desc_sig_keyword_type><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">SomeFunc</desc_sig_name></desc_name><desc_parameterlist></desc_parameterlist></desc_signature_line></desc_signature>
+                    <desc_content>
+                    </desc_content>
+                </desc>
+            </container>
+            <container classes="breathe-sectiondef" objtype="public-attrib">
+                <rubric classes="breathe-sectiondef-title">Public Members</rubric>
+                <index entries="['single',\ 'Namespace::ClassB::MemberVar\ (C++\ member)',\ '_CPPv4N9Namespace6ClassB9MemberVarE',\ '',\ None]"></index>
+                <desc classes="cpp var" desctype="var" domain="cpp" objtype="var">
+                    <desc_signature classes="sig sig-object cpp"><desc_signature_line><target dupnames="class_namespace_1_1_class_b_1a8b34942ea207698fc3d2172f4fd45ca1"></target><desc_sig_keyword_type classes="kt">char</desc_sig_keyword_type><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">MemberVar</desc_sig_name></desc_name></desc_signature_line></desc_signature>
+                    <desc_content>
+                    </desc_content>
+                </desc>
+            </container>
+            <index entries="['single',\ 'Namespace::ClassB::NestedStruct\ (C++\ struct)',\ '_CPPv4N9Namespace6ClassB12NestedStructE',\ '',\ None]"></index>
+            <desc classes="cpp struct" desctype="struct" domain="cpp" objtype="struct">
+                <desc_signature classes="sig sig-object cpp"><desc_signature_line><target dupnames="struct_namespace_1_1_class_b_1_1_nested_struct"></target><desc_sig_keyword classes="k">struct</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">NestedStruct</desc_sig_name></desc_name></desc_signature_line></desc_signature>
+                <desc_content>
+                    <container classes="breathe-sectiondef" objtype="public-type">
+                        <rubric classes="breathe-sectiondef-title">Public Types</rubric>
+                        <index entries="['single',\ 'Namespace::ClassB::NestedStruct::SomeEnum\ (C++\ enum)',\ '_CPPv4N9Namespace6ClassB12NestedStruct8SomeEnumE',\ '',\ None]"></index>
+                        <desc classes="cpp enum" desctype="enum" domain="cpp" objtype="enum">
+                            <desc_signature classes="sig sig-object cpp"><desc_signature_line><target dupnames="struct_namespace_1_1_class_b_1_1_nested_struct_1ac974773adcc4889779a2fed3867b9f60"></target><desc_sig_keyword classes="k">enum</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">SomeEnum</desc_sig_name></desc_name></desc_signature_line></desc_signature>
+                            <desc_content>
+                                <paragraph><emphasis>Values:</emphasis></paragraph>
+                                <index entries="['single',\ 'Namespace::ClassB::NestedStruct::SomeEnum::VALUE1\ (C++\ enumerator)',\ '_CPPv4N9Namespace6ClassB12NestedStruct8SomeEnum6VALUE1E',\ '',\ None]"></index>
+                                <desc classes="cpp enumerator" desctype="enumerator" domain="cpp" objtype="enumerator">
+                                    <desc_signature classes="sig sig-object cpp"><desc_signature_line><target dupnames="struct_namespace_1_1_class_b_1_1_nested_struct_1ac974773adcc4889779a2fed3867b9f60a58071c99edcfe8b39bd37bfea3f0bb4f"></target><desc_sig_keyword classes="k">enumerator</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">VALUE1</desc_sig_name></desc_name></desc_signature_line></desc_signature>
+                                    <desc_content>
+                                    </desc_content>
+                                </desc>
+                                <index entries="['single',\ 'Namespace::ClassB::NestedStruct::SomeEnum::VALUE2\ (C++\ enumerator)',\ '_CPPv4N9Namespace6ClassB12NestedStruct8SomeEnum6VALUE2E',\ '',\ None]"></index>
+                                <desc classes="cpp enumerator" desctype="enumerator" domain="cpp" objtype="enumerator">
+                                    <desc_signature classes="sig sig-object cpp"><desc_signature_line><target dupnames="struct_namespace_1_1_class_b_1_1_nested_struct_1ac974773adcc4889779a2fed3867b9f60ac5fabc9b7019a7117b3ae550d394aab2"></target><desc_sig_keyword classes="k">enumerator</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">VALUE2</desc_sig_name></desc_name></desc_signature_line></desc_signature>
+                                    <desc_content>
+                                    </desc_content>
+                                </desc>
+                                <index entries="['single',\ 'Namespace::ClassB::NestedStruct::SomeEnum::VALUE3\ (C++\ enumerator)',\ '_CPPv4N9Namespace6ClassB12NestedStruct8SomeEnum6VALUE3E',\ '',\ None]"></index>
+                                <desc classes="cpp enumerator" desctype="enumerator" domain="cpp" objtype="enumerator">
+                                    <desc_signature classes="sig sig-object cpp"><desc_signature_line><target dupnames="struct_namespace_1_1_class_b_1_1_nested_struct_1ac974773adcc4889779a2fed3867b9f60ac47f7471623a45f73cfcc88a568115e8"></target><desc_sig_keyword classes="k">enumerator</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">VALUE3</desc_sig_name></desc_name></desc_signature_line></desc_signature>
+                                    <desc_content>
+                                    </desc_content>
+                                </desc>
+                            </desc_content>
+                        </desc>
+                    </container>
+                </desc_content>
+            </desc>
+        </desc_content>
+    </desc>
+    <index entries="['single',\ 'Namespace::ClassB::SomeFunc\ (C++\ function)',\ '_CPPv4N9Namespace6ClassB8SomeFuncEv',\ '',\ None]"></index>
+    <desc classes="cpp function" desctype="function" domain="cpp" objtype="function">
+        <desc_signature classes="sig sig-object cpp"><desc_signature_line><target dupnames="class_namespace_1_1_class_b_1a6635cb4fda87e8c3bc115c1a38c41d4f"></target><desc_sig_keyword_type classes="kt">void</desc_sig_keyword_type><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">SomeFunc</desc_sig_name></desc_name><desc_parameterlist></desc_parameterlist></desc_signature_line></desc_signature>
+        <desc_content>
+        </desc_content>
+    </desc>
+    <index entries="['single',\ 'SOME_MACRO\ (C\ macro)',\ 'c.SOME_MACRO',\ '',\ None]"></index>
+    <desc classes="cpp macro" desctype="macro" domain="cpp" objtype="macro">
+        <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_name classes="sig-name descname"><desc_sig_name classes="n">SOME_MACRO</desc_sig_name></desc_name></desc_signature_line></desc_signature>
+        <desc_content>
+        </desc_content>
+    </desc>
+    <index entries="['single',\ 'Namespace::ClassB::NestedStruct::SomeEnum\ (C++\ enum)',\ '_CPPv4N9Namespace6ClassB12NestedStruct8SomeEnumE',\ '',\ None]"></index>
+    <desc classes="cpp enum" desctype="enum" domain="cpp" objtype="enum">
+        <desc_signature classes="sig sig-object cpp"><desc_signature_line><target dupnames="struct_namespace_1_1_class_b_1_1_nested_struct_1ac974773adcc4889779a2fed3867b9f60"></target><desc_sig_keyword classes="k">enum</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_addname classes="sig-prename descclassname"><reference internal="True" refid="_CPPv4N9Namespace6ClassB12NestedStructE" reftitle="Namespace::ClassB::NestedStruct"><desc_sig_name classes="n">NestedStruct</desc_sig_name></reference><desc_sig_punctuation classes="p">::</desc_sig_punctuation></desc_addname><desc_name classes="sig-name descname"><desc_sig_name classes="n">SomeEnum</desc_sig_name></desc_name></desc_signature_line></desc_signature>
+        <desc_content>
+            <paragraph><emphasis>Values:</emphasis></paragraph>
+            <index entries="['single',\ 'Namespace::ClassB::NestedStruct::SomeEnum::VALUE1\ (C++\ enumerator)',\ '_CPPv4N9Namespace6ClassB12NestedStruct8SomeEnum6VALUE1E',\ '',\ None]"></index>
+            <desc classes="cpp enumerator" desctype="enumerator" domain="cpp" objtype="enumerator">
+                <desc_signature classes="sig sig-object cpp"><desc_signature_line><target dupnames="struct_namespace_1_1_class_b_1_1_nested_struct_1ac974773adcc4889779a2fed3867b9f60a58071c99edcfe8b39bd37bfea3f0bb4f"></target><desc_sig_keyword classes="k">enumerator</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">VALUE1</desc_sig_name></desc_name></desc_signature_line></desc_signature>
+                <desc_content>
+                </desc_content>
+            </desc>
+            <index entries="['single',\ 'Namespace::ClassB::NestedStruct::SomeEnum::VALUE2\ (C++\ enumerator)',\ '_CPPv4N9Namespace6ClassB12NestedStruct8SomeEnum6VALUE2E',\ '',\ None]"></index>
+            <desc classes="cpp enumerator" desctype="enumerator" domain="cpp" objtype="enumerator">
+                <desc_signature classes="sig sig-object cpp"><desc_signature_line><target dupnames="struct_namespace_1_1_class_b_1_1_nested_struct_1ac974773adcc4889779a2fed3867b9f60ac5fabc9b7019a7117b3ae550d394aab2"></target><desc_sig_keyword classes="k">enumerator</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">VALUE2</desc_sig_name></desc_name></desc_signature_line></desc_signature>
+                <desc_content>
+                </desc_content>
+            </desc>
+            <index entries="['single',\ 'Namespace::ClassB::NestedStruct::SomeEnum::VALUE3\ (C++\ enumerator)',\ '_CPPv4N9Namespace6ClassB12NestedStruct8SomeEnum6VALUE3E',\ '',\ None]"></index>
+            <desc classes="cpp enumerator" desctype="enumerator" domain="cpp" objtype="enumerator">
+                <desc_signature classes="sig sig-object cpp"><desc_signature_line><target dupnames="struct_namespace_1_1_class_b_1_1_nested_struct_1ac974773adcc4889779a2fed3867b9f60ac47f7471623a45f73cfcc88a568115e8"></target><desc_sig_keyword classes="k">enumerator</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">VALUE3</desc_sig_name></desc_name></desc_signature_line></desc_signature>
+                <desc_content>
+                </desc_content>
+            </desc>
+        </desc_content>
+    </desc>
+    <index entries="['single',\ 'Namespace::ClassB::NestedStruct\ (C++\ struct)',\ '_CPPv4N9Namespace6ClassB12NestedStructE',\ '',\ None]"></index>
+    <desc classes="cpp struct" desctype="struct" domain="cpp" objtype="struct">
+        <desc_signature classes="sig sig-object cpp"><desc_signature_line><target dupnames="struct_namespace_1_1_class_b_1_1_nested_struct"></target><desc_sig_keyword classes="k">struct</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_addname classes="sig-prename descclassname"><reference internal="True" refid="_CPPv4N9Namespace6ClassBE" reftitle="Namespace::ClassB"><desc_sig_name classes="n">ClassB</desc_sig_name></reference><desc_sig_punctuation classes="p">::</desc_sig_punctuation></desc_addname><desc_name classes="sig-name descname"><desc_sig_name classes="n">NestedStruct</desc_sig_name></desc_name></desc_signature_line></desc_signature>
+        <desc_content>
+        </desc_content>
+    </desc>
+    <index entries="['single',\ 'Namespace::SomeType\ (C++\ type)',\ '_CPPv4N9Namespace8SomeTypeE',\ '',\ None]"></index>
+    <desc classes="cpp type" desctype="type" domain="cpp" objtype="type">
+        <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword classes="k">using</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">SomeType</desc_sig_name></desc_name><desc_sig_space classes="w"> </desc_sig_space><desc_sig_punctuation classes="p">=</desc_sig_punctuation><desc_sig_space classes="w"> </desc_sig_space><reference internal="True" refid="_CPPv4N9Namespace6ClassBE" reftitle="Namespace::ClassB"><desc_sig_name classes="n">ClassB</desc_sig_name></reference><desc_sig_punctuation classes="p">::</desc_sig_punctuation><reference internal="True" refid="_CPPv4N9Namespace6ClassB12NestedStructE" reftitle="Namespace::ClassB::NestedStruct"><desc_sig_name classes="n">NestedStruct</desc_sig_name></reference></desc_signature_line></desc_signature>
+        <desc_content>
+        </desc_content>
+    </desc>
+    <index entries="['single',\ 'Namespace::SomeConcept\ (C++\ concept)',\ '_CPPv4I0EN9Namespace11SomeConceptE',\ '',\ None]"></index>
+    <desc classes="cpp concept" desctype="concept" domain="cpp" objtype="concept">
+        <desc_signature classes="sig sig-object cpp"><target></target><desc_signature_line><desc_sig_keyword classes="k">template</desc_sig_keyword><desc_sig_punctuation classes="p">&lt;</desc_sig_punctuation><desc_sig_keyword classes="k">typename</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">T</desc_sig_name></desc_name><desc_sig_punctuation classes="p">&gt;</desc_sig_punctuation></desc_signature_line><desc_signature_line><desc_sig_keyword classes="k">concept</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">SomeConcept</desc_sig_name></desc_name></desc_signature_line></desc_signature>
+        <desc_content>
+        </desc_content>
+    </desc>
+    <index entries="['single',\ 'Namespace::ClassB::NestedConcept\ (C++\ concept)',\ '_CPPv4I0EN9Namespace6ClassB13NestedConceptE',\ '',\ None]"></index>
+    <desc classes="cpp concept" desctype="concept" domain="cpp" objtype="concept">
+        <desc_signature classes="sig sig-object cpp"><target></target><desc_signature_line><desc_sig_keyword classes="k">template</desc_sig_keyword><desc_sig_punctuation classes="p">&lt;</desc_sig_punctuation><desc_sig_keyword classes="k">typename</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">T</desc_sig_name></desc_name><desc_sig_punctuation classes="p">&gt;</desc_sig_punctuation></desc_signature_line><desc_signature_line><desc_sig_keyword classes="k">concept</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_addname classes="sig-prename descclassname"><reference internal="True" refid="_CPPv4N9Namespace6ClassBE" reftitle="Namespace::ClassB"><desc_sig_name classes="n">ClassB</desc_sig_name></reference><desc_sig_punctuation classes="p">::</desc_sig_punctuation></desc_addname><desc_name classes="sig-name descname"><desc_sig_name classes="n">NestedConcept</desc_sig_name></desc_name></desc_signature_line></desc_signature>
+        <desc_content>
+        </desc_content>
+    </desc>
+    <index entries="['single',\ 'Namespace::ClassB::MemberVar\ (C++\ member)',\ '_CPPv4N9Namespace6ClassB9MemberVarE',\ '',\ None]"></index>
+    <desc classes="cpp var" desctype="var" domain="cpp" objtype="var">
+        <desc_signature classes="sig sig-object cpp"><desc_signature_line><target dupnames="class_namespace_1_1_class_b_1a8b34942ea207698fc3d2172f4fd45ca1"></target><desc_sig_keyword_type classes="kt">char</desc_sig_keyword_type><desc_sig_space classes="w"> </desc_sig_space><desc_addname classes="sig-prename descclassname"><reference internal="True" refid="_CPPv4N9Namespace6ClassBE" reftitle="Namespace::ClassB"><desc_sig_name classes="n">ClassB</desc_sig_name></reference><desc_sig_punctuation classes="p">::</desc_sig_punctuation></desc_addname><desc_name classes="sig-name descname"><desc_sig_name classes="n">MemberVar</desc_sig_name></desc_name></desc_signature_line></desc_signature>
+        <desc_content>
+        </desc_content>
+    </desc>
+    <index entries="['single',\ 'Namespace::ClassC::SpecialVarA\ (C++\ member)',\ '_CPPv4N9Namespace6ClassC11SpecialVarAE',\ '',\ None]"></index>
+    <desc classes="cpp var" desctype="var" domain="cpp" objtype="var">
+        <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword_type classes="kt">float</desc_sig_keyword_type><desc_sig_space classes="w"> </desc_sig_space><desc_addname classes="sig-prename descclassname"><desc_sig_name classes="n">ClassC</desc_sig_name><desc_sig_punctuation classes="p">::</desc_sig_punctuation></desc_addname><desc_name classes="sig-name descname"><desc_sig_name classes="n">SpecialVarA</desc_sig_name></desc_name></desc_signature_line></desc_signature>
+        <desc_content>
+        </desc_content>
+    </desc>
+    <comment>Superfluous spaces added deliberately for testing</comment>
+    <index entries="['single',\ 'Namespace::ClassC&lt;unsigned\ long&gt;::SpecialVarB\ (C++\ member)',\ '_CPPv4N9Namespace6ClassCImE11SpecialVarBE',\ '',\ None]"></index>
+    <desc classes="cpp var" desctype="var" domain="cpp" objtype="var">
+        <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword_type classes="kt">float</desc_sig_keyword_type><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">SpecialVarB</desc_sig_name></desc_name></desc_signature_line></desc_signature>
+        <desc_content>
+        </desc_content>
+    </desc>
+    <index entries="['single',\ 'Namespace::Namespace2::Namespace3\ (C++\ type)',\ '_CPPv4N9Namespace10Namespace210Namespace3E',\ '',\ None]"></index>
+    <desc classes="cpp type" desctype="type" domain="cpp" objtype="type">
+        <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword classes="k">namespace</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_addname classes="sig-prename descclassname"><desc_sig_name classes="n">Namespace2</desc_sig_name><desc_sig_punctuation classes="p">::</desc_sig_punctuation></desc_addname><desc_name classes="sig-name descname"><desc_sig_name classes="n">Namespace3</desc_sig_name></desc_name></desc_signature_line></desc_signature>
+        <desc_content>
+            <index entries="['single',\ 'Namespace::Namespace2::Namespace3::Namespace4\ (C++\ type)',\ '_CPPv4N9Namespace10Namespace210Namespace310Namespace4E',\ '',\ None]"></index>
+            <desc classes="cpp type" desctype="type" domain="cpp" objtype="type">
+                <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword classes="k">namespace</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">Namespace4</desc_sig_name></desc_name></desc_signature_line></desc_signature>
+                <desc_content>
+                    <container classes="breathe-sectiondef" objtype="func">
+                        <rubric classes="breathe-sectiondef-title">Functions</rubric>
+                        <index entries="['single',\ 'Namespace::Namespace2::Namespace3::Namespace4::AnotherFunc\ (C++\ function)',\ '_CPPv4N9Namespace10Namespace210Namespace310Namespace411AnotherFuncEi',\ '',\ None]"></index>
+                        <desc classes="cpp function" desctype="function" domain="cpp" objtype="function">
+                            <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword_type classes="kt">void</desc_sig_keyword_type><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">AnotherFunc</desc_sig_name></desc_name><desc_parameterlist><desc_parameter noemph="True"><desc_sig_keyword_type classes="kt">int</desc_sig_keyword_type><desc_sig_space classes="w"> </desc_sig_space><desc_sig_name classes="n sig-param">x</desc_sig_name></desc_parameter></desc_parameterlist></desc_signature_line></desc_signature>
+                            <desc_content>
+                            </desc_content>
+                        </desc>
+                    </container>
+                    <index entries="['single',\ 'Namespace::Namespace2::Namespace3::Namespace4::ClassD\ (C++\ class)',\ '_CPPv4N9Namespace10Namespace210Namespace310Namespace46ClassDE',\ '',\ None]"></index>
+                    <desc classes="cpp class" desctype="class" domain="cpp" objtype="class">
+                        <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword classes="k">class</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">ClassD</desc_sig_name></desc_name></desc_signature_line></desc_signature>
+                        <desc_content>
+                        </desc_content>
+                    </desc>
+                </desc_content>
+            </desc>
+        </desc_content>
+    </desc>
+</document>

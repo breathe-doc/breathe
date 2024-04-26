@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<?xml-stylesheet href="../../docutils.css"?>
+<document>
+    <index entries="['single',\ 'MathHelper\ (C++\ class)',\ '_CPPv410MathHelper',\ '',\ None]"></index>
+    <desc classes="cpp class" desctype="class" domain="cpp" objtype="class">
+        <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword classes="k">class</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">MathHelper</desc_sig_name></desc_name></desc_signature_line></desc_signature>
+        <desc_content>
+            <paragraph>A class. </paragraph>
+            <paragraph>A inline formula: <math docname="index" label="True" nowrap="False" number="True"> f(x) = a + b </math></paragraph>
+            <paragraph>A display style formula:  <math_block docname="index" label="True" nowrap="False" number="True">
+\int_a^b f(x) dx = F(b) - F(a)
+</math_block></paragraph>
+        </desc_content>
+    </desc>
+</document>

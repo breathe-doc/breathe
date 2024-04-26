@@ -1,17 +1,19 @@
 from unittest import TestCase
-from xml.dom import minidom
 
 from breathe.renderer.sphinxrenderer import get_param_decl, get_definition_without_template_args
-from breathe.parser.compoundsuper import memberdefType
-from breathe import path_handler
+from breathe import path_handler, parser
 
 
 class TestUtils(TestCase):
     def test_param_decl(self):
-
         # From xml from: examples/specific/parameters.h
         xml = """
-        <memberdef>
+        <doxygen lang="" version="">
+        <compounddef id="" kind="type" prot="public">
+        <compoundname></compoundname>
+        <sectiondef kind="typedef">
+        <memberdef id="" kind="function" prot="public" static="no">
+        <name>x</name>
         <param>
           <type>int</type>
           <declname>a</declname>
@@ -42,14 +44,17 @@ class TestUtils(TestCase):
           <declname>r</declname>
           <array>[3]</array>
         </param>
+        <location file="" line="0"/>
         </memberdef>
+        </sectiondef>
+        </compounddef>
+        </doxygen>
         """
 
-        doc = minidom.parseString(xml)
+        doc = parser.parse_str(xml)
+        assert isinstance(doc.value, parser.Node_DoxygenType)
 
-        memberdef = memberdefType.factory()
-        for child in doc.documentElement.childNodes:
-            memberdef.buildChildren(child, "param")
+        memberdef = doc.value.compounddef[0].sectiondef[0].memberdef[0]
 
         self.assertEqual(get_param_decl(memberdef.param[0]), "int a")
         self.assertEqual(get_param_decl(memberdef.param[1]), "float b")

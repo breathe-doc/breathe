@@ -1,0 +1,33 @@
+name: download and cache Doxygen
+on:
+  workflow_call
+jobs:
+  install:
+    runs-on: ubuntu-latest
+    concurrency:
+      group: linux-doxygen-${{ matrix.doxygen-version }}-cache
+    strategy:
+      fail-fast: false
+      matrix:
+        doxygen-version: ['1.9.4', '1.9.7']
+    steps:
+      - uses: actions/cache/restore@v4
+        id: cache-doxygen
+        with:
+          path: doxygen-bin-arc
+          key: ${{ runner.os }}-doxygen-${{ matrix.doxygen-version }}
+          lookup-only: true
+          restore-keys: |
+            ${{ runner.os }}-doxygen-
+
+      - name: download Doxygen from SF binary archives
+        if: steps.cache-doxygen.outputs.cache-hit != 'true'
+        run: |
+          mkdir doxygen-bin-arc && cd doxygen-bin-arc
+          curl -L https://sourceforge.net/projects/doxygen/files/rel-${{ matrix.doxygen-version }}/doxygen-${{ matrix.doxygen-version }}.linux.bin.tar.gz > doxygen.tar.gz
+
+      - uses: actions/cache/save@v4
+        if: steps.cache-doxygen.outputs.cache-hit != 'true'
+        with:
+          path: doxygen-bin-arc
+          key: ${{ steps.cache-doxygen.outputs.cache-primary-key }}

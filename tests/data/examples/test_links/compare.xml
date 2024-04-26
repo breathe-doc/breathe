@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<?xml-stylesheet href="../../docutils.css"?>
+<document>
+    <index entries="['single',\ 'LinksTest\ (C++\ class)',\ '_CPPv49LinksTest',\ '',\ None]"></index>
+    <desc classes="cpp class" desctype="class" domain="cpp" objtype="class">
+        <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword classes="k">class</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">LinksTest</desc_sig_name></desc_name></desc_signature_line></desc_signature>
+        <desc_content>
+            <paragraph>first struct inside of namespace </paragraph>
+            <paragraph>This is a longer description with a link to a webpage in the text <reference refuri="http://www.github.com">http://www.github.com</reference> in order to test out Breathe’s handling of links. </paragraph>
+        </desc_content>
+    </desc>
+</document>
