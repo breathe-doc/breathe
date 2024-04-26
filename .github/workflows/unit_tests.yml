@@ -45,10 +45,11 @@ jobs:
             requirements/production.txt
       
       # the latest sphinxcontrib- packages don't work with Sphinx version 4
-      - name: install compatible version of sphinxcontrib-applehelp
+      - name: install sphinx from PyPI with compatible versions of sphinxcontrib- packages
         if: ${{ ! contains(matrix.sphinx-version, 'git') && matrix.sphinx-version[0] < 5 }}
         run: >
           pip install -Iv
+          Sphinx==${{ matrix.sphinx-version }}
           sphinxcontrib-applehelp==1.0.4
           sphinxcontrib-devhelp==1.0.2
           sphinxcontrib-htmlhelp==2.0.1
@@ -56,7 +57,7 @@ jobs:
           sphinxcontrib-qthelp==1.0.3
 
       - name: install sphinx from PyPI
-        if: ${{ ! contains(matrix.sphinx-version, 'git') }}
+        if: ${{ ! contains(matrix.sphinx-version, 'git') && matrix.sphinx-version[0] >= 5 }}
         run: |
           pip install -Iv Sphinx==${{ matrix.sphinx-version }}
       
