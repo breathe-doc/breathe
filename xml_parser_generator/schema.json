@@ -126,7 +126,9 @@
       "content": {
         "internal":             "docInternalType",
         "para":                 "docParaType",
-        "sect1":                "docSect1Type"
+        "sect1":                "docSect1Type",
+        "sect2":                "docSect2Type",
+        "sect3":                "docSect3Type"
       }
     },
     "exportsType": {
@@ -315,7 +317,8 @@
       },
       "content": {
         "para":                 "docParaType",
-        "sect4":                "docSect2Type",
+        "sect2":                "docSect2Type",
+        "sect3":                "docSect3Type",
         "internal":             "docInternalS1Type"
       }
     },

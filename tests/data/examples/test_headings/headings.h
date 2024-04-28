@@ -15,4 +15,36 @@ Text
 ### Header ###
 Text
 */
-class HeadingsTest {};
+class HeadingsTest1 {};
+
+/*!
+# Header 1
+
+Blah
+
+## Header 2
+
+Blah blah
+
+### Header 3
+
+Blah blah blah
+*/
+class HeadingsTest2 {};
+
+/*!
+### Header3 ###
+Text
+*/
+class HeadingsTest3 {};
+
+/*!
+# Header 1
+
+Text
+
+### Header 3
+
+Text text text
+*/
+class HeadingsTest4 {};

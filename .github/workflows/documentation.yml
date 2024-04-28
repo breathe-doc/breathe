@@ -35,11 +35,17 @@ jobs:
           key: ${{ runner.os }}-doxygen-${{ env.DOXYGEN_VERSION }}
   
       - name: install Doxygen
+        # at some point actions/cache/restore@4 started unpacking doxygen.tar.gz
+        # automatically and I don't know why -- Rouslan
         run: |
           cd doxygen-bin-arc
-          gunzip doxygen.tar.gz
-          tar xf doxygen.tar
-          cd doxygen-${{ env.DOXYGEN_VERSION }}
+          if test -d doxygen; then
+            cd doxygen
+          else
+            gunzip doxygen.tar.gz
+            tar xf doxygen.tar
+            cd doxygen-${{ env.DOXYGEN_VERSION }}
+          fi
           sudo make install
 
       - name: build the documentation

@@ -33,7 +33,7 @@ from typing import (
     TYPE_CHECKING,
     Union,
 )
-from collections.abc import Iterable, Sequence
+from collections.abc import Iterable, Iterator, Sequence
 
 
 php: Any
@@ -85,6 +85,10 @@ Declarator = Union[addnodes.desc_signature, addnodes.desc_signature_line]
 DeclaratorCallback = Callable[[Declarator], None]
 
 _debug_indent = 0
+
+_findall_compat = cast(
+    Callable, getattr(nodes.Node, "findall", getattr(nodes.Node, "traverse", None))
+)
 
 
 class WithContext:
@@ -554,36 +558,109 @@ def get_images(node: parser.Node_docParaType) -> Iterable[parser.Node_docImageTy
     return (value for name, value in pairs if name == "image")  # type: ignore
 
 
-class NodeHandler(Generic[T]):
+RE_NAME_PART = re.compile(r"([<>()[\]]|::)")
+
+
+def _check_pair(dest: list[str], tokens: Iterator[str], start: str, end: str) -> bool:
+    if dest[-1] == start:
+        for tok in tokens:
+            dest.append(tok)
+            if tok == end:
+                break
+            # If we're inside angle brackets, we assume "<" and ">" are brackets
+            # and not comparison operators. Once we're inside other brackets, we
+            # only need to worry about recursive brackets and can ignore the
+            # other types.
+            if start == "<":
+                _check_all_pairs(dest, tokens)
+            else:
+                _check_pair(dest, tokens, start, end)
+        return True
+    return False
+
+
+def _check_all_pairs(dest: list[str], tokens: Iterator[str]) -> None:
+    if not _check_pair(dest, tokens, "<", ">"):
+        if not _check_pair(dest, tokens, "(", ")"):
+            if not _check_pair(dest, tokens, "[", "]"):
+                _check_pair(dest, tokens, "{", "}")
+
+
+def split_name(name: str) -> list[str]:
+    """Split a qualified C++ name into the namespace components.
+
+    E.g. turn "A<B::C>::D::E<(F>G::H),(I<J)>" into
+    ["A<B::C>","D","E<(F>G::H),(I<J)>"]
+
+    This can produce incorrect results if any of the template paramters are
+    strings containing brackets.
+    """
+    last: list[str] = []
+    parts = [last]
+    tokens = iter(RE_NAME_PART.split(name))
+    for tok in tokens:
+        if tok == "::":
+            last = []
+            parts.append(last)
+        else:
+            last.append(tok)
+            _check_all_pairs(last, tokens)
+
+    return ["".join(subparts) for subparts in parts]
+
+
+def namespace_strip(config, nodes: list[nodes.Node]):
+    # In some cases of errors with a declaration there are no nodes
+    # (e.g., variable in function), so perhaps skip (see #671).
+    # If there are nodes, there should be at least 2.
+    if len(nodes) != 0:
+        assert len(nodes) >= 2
+        rst_node = nodes[1]
+        doc = rst_node.document
+        assert doc is not None
+        finder = NodeFinder(doc)
+        rst_node.walk(finder)
+
+        assert finder.declarator
+        # the type is set to "Any" to get around missing typing info in
+        # docutils 0.20.1
+        signode: Any = finder.declarator
+        signode.children = [n for n in signode.children if n.tagname != "desc_addname"]
+
+
+T_sphinxrenderer = TypeVar("T_sphinxrenderer", bound="SphinxRenderer")
+
+
+class NodeHandler(Generic[T_sphinxrenderer, T]):
     """Dummy callable that associates a set of nodes to a function. This gets
     unwrapped by NodeVisitor and is never actually called."""
 
-    def __init__(self, handler: Callable[[SphinxRenderer, T], list[nodes.Node]]):
+    def __init__(self, handler: Callable[[T_sphinxrenderer, T], list[nodes.Node]]):
         self.handler = handler
         self.nodes: set[type[parser.NodeOrValue]] = set()
 
-    def __call__(self, r: SphinxRenderer, node: T, /) -> list[nodes.Node]:  # pragma: no cover
+    def __call__(self, r: T_sphinxrenderer, node: T, /) -> list[nodes.Node]:  # pragma: no cover
         raise TypeError()
 
 
-class TaggedNodeHandler(Generic[T]):
+class TaggedNodeHandler(Generic[T_sphinxrenderer, T]):
     """Dummy callable that associates a set of nodes to a function. This gets
     unwrapped by NodeVisitor and is never actually called."""
 
-    def __init__(self, handler: Callable[[SphinxRenderer, str, T], list[nodes.Node]]):
+    def __init__(self, handler: Callable[[T_sphinxrenderer, str, T], list[nodes.Node]]):
         self.handler = handler
         self.nodes: set[type[parser.NodeOrValue]] = set()
 
     def __call__(
-        self, r: SphinxRenderer, tag: str, node: T, /
+        self, r: T_sphinxrenderer, tag: str, node: T, /
     ) -> list[nodes.Node]:  # pragma: no cover
         raise TypeError()
 
 
 def node_handler(node: type[parser.NodeOrValue]):
     def inner(
-        f: Callable[[SphinxRenderer, T], list[nodes.Node]]
-    ) -> Callable[[SphinxRenderer, T], list[nodes.Node]]:
+        f: Callable[[T_sphinxrenderer, T], list[nodes.Node]]
+    ) -> Callable[[T_sphinxrenderer, T], list[nodes.Node]]:
         handler: NodeHandler = f if isinstance(f, NodeHandler) else NodeHandler(f)
         handler.nodes.add(node)
         return handler
@@ -593,8 +670,8 @@ def node_handler(node: type[parser.NodeOrValue]):
 
 def tagged_node_handler(node: type[parser.NodeOrValue]):
     def inner(
-        f: Callable[[SphinxRenderer, str, T], list[nodes.Node]]
-    ) -> Callable[[SphinxRenderer, str, T], list[nodes.Node]]:
+        f: Callable[[T_sphinxrenderer, str, T], list[nodes.Node]]
+    ) -> Callable[[T_sphinxrenderer, str, T], list[nodes.Node]]:
         handler: TaggedNodeHandler = f if isinstance(f, TaggedNodeHandler) else TaggedNodeHandler(f)
         handler.nodes.add(node)
         return handler
@@ -605,7 +682,7 @@ def tagged_node_handler(node: type[parser.NodeOrValue]):
 class NodeVisitor(type):
     """Metaclass that collects all methods marked as @node_handler and
     @tagged_node_handler into the dicts 'node_handlers' and
-    'tagged_node_handlers' respectively, and assigns them to the class"""
+    'tagged_node_handlers' respectively, and assigns the dicts to the class"""
 
     def __new__(cls, name, bases, members):
         handlers = {}
@@ -806,24 +883,8 @@ class SphinxRenderer(metaclass=NodeVisitor):
             _debug_indent -= 1
 
         # Filter out outer class names if we are rendering a member as a part of a class content.
-        # In some cases of errors with a declaration there are no nodes
-        # (e.g., variable in function), so perhaps skip (see #671).
-        # If there are nodes, there should be at least 2.
-        if len(nodes) != 0:
-            assert len(nodes) >= 2
-            rst_node = nodes[1]
-            doc = rst_node.document
-            assert doc is not None
-            finder = NodeFinder(doc)
-            rst_node.walk(finder)
-
-            assert finder.declarator
-            # the type is set to "Any" to get around missing typing info in
-            # docutils 0.20.1
-            signode: Any = finder.declarator
-
-            if self.context.child:
-                signode.children = [n for n in signode.children if n.tagname != "desc_addname"]
+        if self.context.child:
+            namespace_strip(config, nodes)
         return nodes
 
     def handle_compounddef_declaration(
@@ -903,21 +964,14 @@ class SphinxRenderer(metaclass=NodeVisitor):
         assert declarator is not None
         if display_obj_type is not None:
             n = declarator[0]
-            newStyle = True
-            # the new style was introduced in Sphinx v4
-            if sphinx.version_info[0] < 4:
-                newStyle = False
-            # but only for the C and C++ domains
             if self.get_domain() and self.get_domain() not in ("c", "cpp"):
-                newStyle = False
-            if newStyle:
-                assert isinstance(n, addnodes.desc_sig_keyword)
-                declarator[0] = addnodes.desc_sig_keyword(display_obj_type, display_obj_type)
-            else:
                 assert isinstance(n, addnodes.desc_annotation)
                 assert n.astext()[-1] == " "
                 txt = display_obj_type + " "
                 declarator[0] = addnodes.desc_annotation(txt, txt)
+            else:
+                assert isinstance(n, addnodes.desc_sig_keyword)
+                declarator[0] = addnodes.desc_sig_keyword(display_obj_type, display_obj_type)
         if target is None:
             target = self.create_doxygen_target(node)
         declarator.insert(0, target)
@@ -1067,17 +1121,8 @@ class SphinxRenderer(metaclass=NodeVisitor):
             _debug_indent -= 1
 
         # Filter out outer class names if we are rendering a member as a part of a class content.
-        rst_node = nodes[1]
-        doc = rst_node.document
-        assert doc is not None
-        finder = NodeFinder(doc)
-        rst_node.walk(finder)
-
-        assert finder.declarator is not None
-        signode = finder.declarator
-
-        if len(names) > 0 and self.context.child:
-            signode.children = [n for n in signode.children if not n.tagname == "desc_addname"]
+        if self.context.child:
+            namespace_strip(config, nodes)
         return nodes
 
     def create_doxygen_target(self, node):
@@ -1152,7 +1197,7 @@ class SphinxRenderer(metaclass=NodeVisitor):
         admonitions: list[nodes.Node] = []
 
         def pullup(node, typ, dest):
-            for n in list(node.findall(typ)):
+            for n in list(_findall_compat(node, typ)):
                 del n.parent[n.parent.index(n)]
                 dest.append(n)
 
@@ -1162,7 +1207,7 @@ class SphinxRenderer(metaclass=NodeVisitor):
             pullup(candNode, nodes.note, admonitions)
             pullup(candNode, nodes.warning, admonitions)
             # and collapse paragraphs
-            for para in candNode.findall(nodes.paragraph):
+            for para in _findall_compat(candNode, nodes.paragraph):
                 parent = para.parent
                 assert parent is None or isinstance(parent, nodes.Element)
                 if parent and len(parent) == 1 and isinstance(parent, nodes.paragraph):
@@ -1331,12 +1376,11 @@ class SphinxRenderer(metaclass=NodeVisitor):
             # Defer to domains specific directive.
 
             names = self.get_qualification()
-            # TODO: this breaks if it's a template specialization
-            #       and one of the arguments contain '::'
+            cname = split_name(nodeDef.compoundname)
             if self.nesting_level == 0:
-                names.extend(nodeDef.compoundname.split("::"))
+                names.extend(cname)
             else:
-                names.append(nodeDef.compoundname.split("::")[-1])
+                names.append(cname[-1])
             decls = [
                 self.create_template_prefix(nodeDef),
                 self.join_nested_name(names),
@@ -1938,25 +1982,60 @@ class SphinxRenderer(metaclass=NodeVisitor):
         return [creator("", "", *nodelist)]
 
     @node_handler(parser.Node_docSect1Type)
+    def visit_docsect1(self, node: parser.Node_docSect1Type) -> list[nodes.Node]:
+        return self.visit_docsectN(node, 0)
+
     @node_handler(parser.Node_docSect2Type)
+    def visit_docsect2(self, node: parser.Node_docSect2Type) -> list[nodes.Node]:
+        return self.visit_docsectN(node, 1)
+
     @node_handler(parser.Node_docSect3Type)
+    def visit_docsect3(self, node: parser.Node_docSect3Type) -> list[nodes.Node]:
+        return self.visit_docsectN(node, 2)
+
     def visit_docsectN(
-        self, node: parser.Node_docSect1Type | parser.Node_docSect2Type | parser.Node_docSect3Type
+        self,
+        node: parser.Node_docSect1Type | parser.Node_docSect2Type | parser.Node_docSect3Type,
+        depth: int,
     ) -> list[nodes.Node]:
         """
-        Docutils titles are defined by their level inside the document so
-        the proper structure is only guaranteed by the Doxygen XML.
+        Docutils titles are defined by their level inside the document.
 
         Doxygen command mapping to XML element name:
         @section == sect1, @subsection == sect2, @subsubsection == sect3
         """
-        section = nodes.section()
-        section["ids"].append(self.get_refid(node.id))
+        # sect2 and sect3 elements can appear outside of sect1/sect2 elements so
+        # we need to check how deep we actually are
+        actual_d = 0
+        assert self.context
+        for n in self.context.node_stack[1:]:
+            if isinstance(
+                n.value,
+                (parser.Node_docSect1Type, parser.Node_docSect2Type, parser.Node_docSect3Type),
+            ):
+                actual_d += 1
+
         title = node.title or ""
-        section += nodes.title(title, title)
-        section += self.create_doxygen_target(node)
-        section += self.render_tagged_iterable(node)
-        return [section]
+        if actual_d == depth:
+            section = nodes.section()
+            section["ids"].append(self.get_refid(node.id))
+            section += nodes.title(title, title)
+            section += self.create_doxygen_target(node)
+            section += self.render_tagged_iterable(node)
+            return [section]
+        else:
+            # If the actual depth doesn't match the specified depth, don't
+            # create a section element, just use an emphasis element as the
+            # title.
+            #
+            # This is probably not the best way to handle such a case. I chose
+            # it because it's what visit_docheading does. It shouldn't come up
+            # often, anyway.
+            #     -- Rouslan
+            content: list[nodes.Node] = [nodes.emphasis(text=title)]
+            content.extend(self.create_doxygen_target(node))
+            content.extend(self.render_tagged_iterable(node))
+            return content
 
     @node_handler(parser.Node_docSimpleSectType)
     def visit_docsimplesect(self, node: parser.Node_docSimpleSectType) -> list[nodes.Node]:
