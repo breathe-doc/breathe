@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<?xml-stylesheet href="../../docutils.css"?>
+<document>
+    <container classes="breathe-sectiondef" objtype="func">
+        <rubric classes="breathe-sectiondef-title">Functions</rubric>
+        <index entries="['single',\ 'with_standard_code_block\ (C++\ function)',\ '_CPPv424with_standard_code_blockv',\ '',\ None]"></index>
+        <desc classes="cpp function" desctype="function" domain="cpp" objtype="function">
+            <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword_type classes="kt">void</desc_sig_keyword_type><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">with_standard_code_block</desc_sig_name></desc_name><desc_parameterlist></desc_parameterlist></desc_signature_line></desc_signature>
+            <desc_content>
+                <paragraph>A function with an unannotated code block with C/C++ code. </paragraph>
+                <literal_block force="False" language="default" linenos="False">char* buffer = new char[42];
+int charsAdded = sprintf(buffer, "Tabs are normally %d spaces\n", 8);</literal_block>
+            </desc_content>
+        </desc>
+        <index entries="['single',\ 'with_unannotated_cmake_code_block\ (C++\ function)',\ '_CPPv433with_unannotated_cmake_code_blockv',\ '',\ None]"></index>
+        <desc classes="cpp function" desctype="function" domain="cpp" objtype="function">
+            <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword_type classes="kt">void</desc_sig_keyword_type><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">with_unannotated_cmake_code_block</desc_sig_name></desc_name><desc_parameterlist></desc_parameterlist></desc_signature_line></desc_signature>
+            <desc_content>
+                <paragraph>A function with an unannotated code block with non-C/C++ code. </paragraph>
+                <literal_block force="False" language="default" linenos="False">set(user_list A B C)
+foreach(element ${user_list})
+    message(STATUS "Element is ${element}")
+endforeach()</literal_block>
+                <paragraph>Another code-block that explicitly remains not highlighted. <literal_block language="text" linenos="False">Show this as is.</literal_block></paragraph>
+            </desc_content>
+        </desc>
+        <index entries="['single',\ 'with_annotated_cmake_code_block\ (C++\ function)',\ '_CPPv431with_annotated_cmake_code_blockv',\ '',\ None]"></index>
+        <desc classes="cpp function" desctype="function" domain="cpp" objtype="function">
+            <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword_type classes="kt">void</desc_sig_keyword_type><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">with_annotated_cmake_code_block</desc_sig_name></desc_name><desc_parameterlist></desc_parameterlist></desc_signature_line></desc_signature>
+            <desc_content>
+                <paragraph>A function with an annotated cmake code block. </paragraph>
+                <literal_block language="cmake" linenos="False">set(user_list A B C)
+foreach(element ${user_list})
+    message(STATUS "Element is ${element}")
+endforeach()</literal_block>
+            </desc_content>
+        </desc>
+    </container>
+</document>

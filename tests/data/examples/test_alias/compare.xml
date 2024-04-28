@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<?xml-stylesheet href="../../docutils.css"?>
+<document>
+    <container classes="breathe-sectiondef" objtype="func">
+        <rubric classes="breathe-sectiondef-title">Functions</rubric>
+        <index entries="['single',\ 'frob_foos\ (C++\ function)',\ '_CPPv49frob_foosPv',\ '',\ None]"></index>
+        <desc classes="cpp function" desctype="function" domain="cpp" objtype="function">
+            <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword_type classes="kt">void</desc_sig_keyword_type><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">frob_foos</desc_sig_name></desc_name><desc_parameterlist><desc_parameter noemph="True"><desc_sig_keyword_type classes="kt">void</desc_sig_keyword_type><desc_sig_space classes="w"> </desc_sig_space><desc_sig_punctuation classes="p">*</desc_sig_punctuation><desc_sig_name classes="n sig-param">Frobs</desc_sig_name></desc_parameter></desc_parameterlist></desc_signature_line></desc_signature>
+            <desc_content>
+                <paragraph>Foo frob routine. </paragraph>
+                <paragraph><definition_list><definition_list_item><term><strong>bob this something else</strong></term><definition><paragraph></paragraph></definition></definition_list_item><definition_list_item><term><strong>Side Effects</strong></term><definition><paragraph>Frobs any foos.</paragraph></definition></definition_list_item><definition_list_item><term><strong>bob this something else</strong></term><definition><paragraph></paragraph></definition></definition_list_item><definition_list_item><term><strong>Side Effects</strong></term><definition><paragraph>Frobs any foos.</paragraph></definition></definition_list_item></definition_list></paragraph>
+                <field_list>
+                    <field>
+                        <field_name>Parameters</field_name>
+                        <field_body>
+                            <paragraph><literal_strong>Frobs</literal_strong> – <strong>[out]</strong> any foos. </paragraph>
+                        </field_body>
+                    </field>
+                </field_list>
+            </desc_content>
+        </desc>
+    </container>
+</document>

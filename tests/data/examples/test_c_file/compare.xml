@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="utf-8"?>
+<?xml-stylesheet href="../../docutils.css"?>
+<document>
+    <container classes="breathe-sectiondef" objtype="define">
+        <rubric classes="breathe-sectiondef-title">Defines</rubric>
+        <index entries="['single',\ 'WRITE_TREE_MISSING_OK\ (C\ macro)',\ 'c.WRITE_TREE_MISSING_OK',\ '',\ None]"></index>
+        <desc classes="cpp macro" desctype="macro" domain="cpp" objtype="macro">
+            <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_name classes="sig-name descname"><desc_sig_name classes="n">WRITE_TREE_MISSING_OK</desc_sig_name></desc_name></desc_signature_line></desc_signature>
+            <desc_content>
+                <paragraph>bitmasks to write_cache_as_tree flags </paragraph>
+            </desc_content>
+        </desc>
+        <index entries="['single',\ 'WRITE_TREE_IGNORE_CACHE_TREE\ (C\ macro)',\ 'c.WRITE_TREE_IGNORE_CACHE_TREE',\ '',\ None]"></index>
+        <desc classes="cpp macro" desctype="macro" domain="cpp" objtype="macro">
+            <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_name classes="sig-name descname"><desc_sig_name classes="n">WRITE_TREE_IGNORE_CACHE_TREE</desc_sig_name></desc_name></desc_signature_line></desc_signature>
+            <desc_content>
+            </desc_content>
+        </desc>
+        <index entries="['single',\ 'WRITE_TREE_UNREADABLE_INDEX\ (C\ macro)',\ 'c.WRITE_TREE_UNREADABLE_INDEX',\ '',\ None]"></index>
+        <desc classes="cpp macro" desctype="macro" domain="cpp" objtype="macro">
+            <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_name classes="sig-name descname"><desc_sig_name classes="n">WRITE_TREE_UNREADABLE_INDEX</desc_sig_name></desc_name></desc_signature_line></desc_signature>
+            <desc_content>
+                <paragraph>error return codes </paragraph>
+            </desc_content>
+        </desc>
+        <index entries="['single',\ 'WRITE_TREE_UNMERGED_INDEX\ (C\ macro)',\ 'c.WRITE_TREE_UNMERGED_INDEX',\ '',\ None]"></index>
+        <desc classes="cpp macro" desctype="macro" domain="cpp" objtype="macro">
+            <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_name classes="sig-name descname"><desc_sig_name classes="n">WRITE_TREE_UNMERGED_INDEX</desc_sig_name></desc_name></desc_signature_line></desc_signature>
+            <desc_content>
+            </desc_content>
+        </desc>
+        <index entries="['single',\ 'WRITE_TREE_PREFIX_ERROR\ (C\ macro)',\ 'c.WRITE_TREE_PREFIX_ERROR',\ '',\ None]"></index>
+        <desc classes="cpp macro" desctype="macro" domain="cpp" objtype="macro">
+            <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_name classes="sig-name descname"><desc_sig_name classes="n">WRITE_TREE_PREFIX_ERROR</desc_sig_name></desc_name></desc_signature_line></desc_signature>
+            <desc_content>
+            </desc_content>
+        </desc>
+    </container>
+    <container classes="breathe-sectiondef" objtype="func">
+        <rubric classes="breathe-sectiondef-title">Functions</rubric>
+        <index entries="['single',\ 'cache_tree\ (C++\ function)',\ '_CPPv410cache_treev',\ '',\ None]"></index>
+        <desc classes="cpp function" desctype="function" domain="cpp" objtype="function">
+            <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword classes="k">struct</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><reference internal="True" refid="_CPPv410cache_treev" reftitle="cache_tree"><desc_sig_name classes="n">cache_tree</desc_sig_name></reference><desc_sig_space classes="w"> </desc_sig_space><desc_sig_punctuation classes="p">*</desc_sig_punctuation><desc_name classes="sig-name descname"><desc_sig_name classes="n">cache_tree</desc_sig_name></desc_name><desc_parameterlist><desc_parameter noemph="True"><desc_sig_keyword_type classes="kt">void</desc_sig_keyword_type></desc_parameter></desc_parameterlist></desc_signature_line></desc_signature>
+            <desc_content>
+            </desc_content>
+        </desc>
+        <index entries="['single',\ 'cache_tree_free\ (C++\ function)',\ '_CPPv415cache_tree_freePP10cache_tree',\ '',\ None]"></index>
+        <desc classes="cpp function" desctype="function" domain="cpp" objtype="function">
+            <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword_type classes="kt">void</desc_sig_keyword_type><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">cache_tree_free</desc_sig_name></desc_name><desc_parameterlist><desc_parameter noemph="True"><desc_sig_keyword classes="k">struct</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><reference internal="True" refid="_CPPv410cache_treev" reftitle="cache_tree"><desc_sig_name classes="n">cache_tree</desc_sig_name></reference><desc_sig_punctuation classes="p">*</desc_sig_punctuation><desc_sig_punctuation classes="p">*</desc_sig_punctuation></desc_parameter></desc_parameterlist></desc_signature_line></desc_signature>
+            <desc_content>
+            </desc_content>
+        </desc>
+        <index entries="['single',\ 'cache_tree_invalidate_path\ (C++\ function)',\ '_CPPv426cache_tree_invalidate_pathP10cache_treePKc',\ '',\ None]"></index>
+        <desc classes="cpp function" desctype="function" domain="cpp" objtype="function">
+            <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword_type classes="kt">void</desc_sig_keyword_type><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">cache_tree_invalidate_path</desc_sig_name></desc_name><desc_parameterlist><desc_parameter noemph="True"><desc_sig_keyword classes="k">struct</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><reference internal="True" refid="_CPPv410cache_treev" reftitle="cache_tree"><desc_sig_name classes="n">cache_tree</desc_sig_name></reference><desc_sig_punctuation classes="p">*</desc_sig_punctuation></desc_parameter><desc_parameter noemph="True"><desc_sig_keyword classes="k">const</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_sig_keyword_type classes="kt">char</desc_sig_keyword_type><desc_sig_punctuation classes="p">*</desc_sig_punctuation></desc_parameter></desc_parameterlist></desc_signature_line></desc_signature>
+            <desc_content>
+            </desc_content>
+        </desc>
+        <index entries="['single',\ 'cache_tree_sub\ (C++\ function)',\ '_CPPv414cache_tree_subP10cache_treePKc',\ '',\ None]"></index>
+        <desc classes="cpp function" desctype="function" domain="cpp" objtype="function">
+            <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword classes="k">struct</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><reference internal="True" refid="_CPPv414cache_tree_subP10cache_treePKc" reftitle="cache_tree_sub"><desc_sig_name classes="n">cache_tree_sub</desc_sig_name></reference><desc_sig_space classes="w"> </desc_sig_space><desc_sig_punctuation classes="p">*</desc_sig_punctuation><desc_name classes="sig-name descname"><desc_sig_name classes="n">cache_tree_sub</desc_sig_name></desc_name><desc_parameterlist><desc_parameter noemph="True"><desc_sig_keyword classes="k">struct</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><reference internal="True" refid="_CPPv410cache_treev" reftitle="cache_tree"><desc_sig_name classes="n">cache_tree</desc_sig_name></reference><desc_sig_punctuation classes="p">*</desc_sig_punctuation></desc_parameter><desc_parameter noemph="True"><desc_sig_keyword classes="k">const</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_sig_keyword_type classes="kt">char</desc_sig_keyword_type><desc_sig_punctuation classes="p">*</desc_sig_punctuation></desc_parameter></desc_parameterlist></desc_signature_line></desc_signature>
+            <desc_content>
+            </desc_content>
+        </desc>
+        <index entries="['single',\ 'cache_tree_write\ (C++\ function)',\ '_CPPv416cache_tree_writeP6strbufP10cache_tree',\ '',\ None]"></index>
+        <desc classes="cpp function" desctype="function" domain="cpp" objtype="function">
+            <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword_type classes="kt">void</desc_sig_keyword_type><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">cache_tree_write</desc_sig_name></desc_name><desc_parameterlist><desc_parameter noemph="True"><desc_sig_keyword classes="k">struct</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_sig_name classes="n">strbuf</desc_sig_name><desc_sig_punctuation classes="p">*</desc_sig_punctuation></desc_parameter><desc_parameter noemph="True"><desc_sig_keyword classes="k">struct</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><reference internal="True" refid="_CPPv410cache_treev" reftitle="cache_tree"><desc_sig_name classes="n">cache_tree</desc_sig_name></reference><desc_sig_space classes="w"> </desc_sig_space><desc_sig_punctuation classes="p">*</desc_sig_punctuation><desc_sig_name classes="n sig-param">root</desc_sig_name></desc_parameter></desc_parameterlist></desc_signature_line></desc_signature>
+            <desc_content>
+            </desc_content>
+        </desc>
+        <index entries="['single',\ 'cache_tree_read\ (C++\ function)',\ '_CPPv415cache_tree_readPKcm',\ '',\ None]"></index>
+        <desc classes="cpp function" desctype="function" domain="cpp" objtype="function">
+            <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword classes="k">struct</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><reference internal="True" refid="_CPPv410cache_treev" reftitle="cache_tree"><desc_sig_name classes="n">cache_tree</desc_sig_name></reference><desc_sig_space classes="w"> </desc_sig_space><desc_sig_punctuation classes="p">*</desc_sig_punctuation><desc_name classes="sig-name descname"><desc_sig_name classes="n">cache_tree_read</desc_sig_name></desc_name><desc_parameterlist><desc_parameter noemph="True"><desc_sig_keyword classes="k">const</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_sig_keyword_type classes="kt">char</desc_sig_keyword_type><desc_sig_space classes="w"> </desc_sig_space><desc_sig_punctuation classes="p">*</desc_sig_punctuation><desc_sig_name classes="n sig-param">buffer</desc_sig_name></desc_parameter><desc_parameter noemph="True"><desc_sig_keyword_type classes="kt">unsigned</desc_sig_keyword_type><desc_sig_space classes="w"> </desc_sig_space><desc_sig_keyword_type classes="kt">long</desc_sig_keyword_type><desc_sig_space classes="w"> </desc_sig_space><desc_sig_name classes="n sig-param">size</desc_sig_name></desc_parameter></desc_parameterlist></desc_signature_line></desc_signature>
+            <desc_content>
+            </desc_content>
+        </desc>
+        <index entries="['single',\ 'cache_tree_fully_valid\ (C++\ function)',\ '_CPPv422cache_tree_fully_validP10cache_tree',\ '',\ None]"></index>
+        <desc classes="cpp function" desctype="function" domain="cpp" objtype="function">
+            <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword_type classes="kt">int</desc_sig_keyword_type><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">cache_tree_fully_valid</desc_sig_name></desc_name><desc_parameterlist><desc_parameter noemph="True"><desc_sig_keyword classes="k">struct</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><reference internal="True" refid="_CPPv410cache_treev" reftitle="cache_tree"><desc_sig_name classes="n">cache_tree</desc_sig_name></reference><desc_sig_punctuation classes="p">*</desc_sig_punctuation></desc_parameter></desc_parameterlist></desc_signature_line></desc_signature>
+            <desc_content>
+            </desc_content>
+        </desc>
+        <index entries="['single',\ 'cache_tree_update\ (C++\ function)',\ '_CPPv417cache_tree_updateP10cache_treePP11cache_entryiii',\ '',\ None]"></index>
+        <desc classes="cpp function" desctype="function" domain="cpp" objtype="function">
+            <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword_type classes="kt">int</desc_sig_keyword_type><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">cache_tree_update</desc_sig_name></desc_name><desc_parameterlist><desc_parameter noemph="True"><desc_sig_keyword classes="k">struct</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><reference internal="True" refid="_CPPv410cache_treev" reftitle="cache_tree"><desc_sig_name classes="n">cache_tree</desc_sig_name></reference><desc_sig_punctuation classes="p">*</desc_sig_punctuation></desc_parameter><desc_parameter noemph="True"><desc_sig_keyword classes="k">struct</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_sig_name classes="n">cache_entry</desc_sig_name><desc_sig_punctuation classes="p">*</desc_sig_punctuation><desc_sig_punctuation classes="p">*</desc_sig_punctuation></desc_parameter><desc_parameter noemph="True"><desc_sig_keyword_type classes="kt">int</desc_sig_keyword_type></desc_parameter><desc_parameter noemph="True"><desc_sig_keyword_type classes="kt">int</desc_sig_keyword_type></desc_parameter><desc_parameter noemph="True"><desc_sig_keyword_type classes="kt">int</desc_sig_keyword_type></desc_parameter></desc_parameterlist></desc_signature_line></desc_signature>
+            <desc_content>
+            </desc_content>
+        </desc>
+        <index entries="['single',\ 'write_cache_as_tree\ (C++\ function)',\ '_CPPv419write_cache_as_treePhiPKc',\ '',\ None]"></index>
+        <desc classes="cpp function" desctype="function" domain="cpp" objtype="function">
+            <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword_type classes="kt">int</desc_sig_keyword_type><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">write_cache_as_tree</desc_sig_name></desc_name><desc_parameterlist><desc_parameter noemph="True"><desc_sig_keyword_type classes="kt">unsigned</desc_sig_keyword_type><desc_sig_space classes="w"> </desc_sig_space><desc_sig_keyword_type classes="kt">char</desc_sig_keyword_type><desc_sig_space classes="w"> </desc_sig_space><desc_sig_punctuation classes="p">*</desc_sig_punctuation><desc_sig_name classes="n sig-param">sha1</desc_sig_name></desc_parameter><desc_parameter noemph="True"><desc_sig_keyword_type classes="kt">int</desc_sig_keyword_type><desc_sig_space classes="w"> </desc_sig_space><desc_sig_name classes="n sig-param">flags</desc_sig_name></desc_parameter><desc_parameter noemph="True"><desc_sig_keyword classes="k">const</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_sig_keyword_type classes="kt">char</desc_sig_keyword_type><desc_sig_space classes="w"> </desc_sig_space><desc_sig_punctuation classes="p">*</desc_sig_punctuation><desc_sig_name classes="n sig-param">prefix</desc_sig_name></desc_parameter></desc_parameterlist></desc_signature_line></desc_signature>
+            <desc_content>
+            </desc_content>
+        </desc>
+        <index entries="['single',\ 'prime_cache_tree\ (C++\ function)',\ '_CPPv416prime_cache_treePP10cache_treeP4tree',\ '',\ None]"></index>
+        <desc classes="cpp function" desctype="function" domain="cpp" objtype="function">
+            <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword_type classes="kt">void</desc_sig_keyword_type><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">prime_cache_tree</desc_sig_name></desc_name><desc_parameterlist><desc_parameter noemph="True"><desc_sig_keyword classes="k">struct</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><reference internal="True" refid="_CPPv410cache_treev" reftitle="cache_tree"><desc_sig_name classes="n">cache_tree</desc_sig_name></reference><desc_sig_punctuation classes="p">*</desc_sig_punctuation><desc_sig_punctuation classes="p">*</desc_sig_punctuation></desc_parameter><desc_parameter noemph="True"><desc_sig_keyword classes="k">struct</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_sig_name classes="n">tree</desc_sig_name><desc_sig_punctuation classes="p">*</desc_sig_punctuation></desc_parameter></desc_parameterlist></desc_signature_line></desc_signature>
+            <desc_content>
+            </desc_content>
+        </desc>
+        <index entries="['single',\ 'cache_tree_matches_traversal\ (C++\ function)',\ '_CPPv428cache_tree_matches_traversalP10cache_treeP10name_entryP13traverse_info',\ '',\ None]"></index>
+        <desc classes="cpp function" desctype="function" domain="cpp" objtype="function">
+            <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword_type classes="kt">int</desc_sig_keyword_type><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">cache_tree_matches_traversal</desc_sig_name></desc_name><desc_parameterlist><desc_parameter noemph="True"><desc_sig_keyword classes="k">struct</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><reference internal="True" refid="_CPPv410cache_treev" reftitle="cache_tree"><desc_sig_name classes="n">cache_tree</desc_sig_name></reference><desc_sig_punctuation classes="p">*</desc_sig_punctuation></desc_parameter><desc_parameter noemph="True"><desc_sig_keyword classes="k">struct</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_sig_name classes="n">name_entry</desc_sig_name><desc_sig_space classes="w"> </desc_sig_space><desc_sig_punctuation classes="p">*</desc_sig_punctuation><desc_sig_name classes="n sig-param">ent</desc_sig_name></desc_parameter><desc_parameter noemph="True"><desc_sig_keyword classes="k">struct</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_sig_name classes="n">traverse_info</desc_sig_name><desc_sig_space classes="w"> </desc_sig_space><desc_sig_punctuation classes="p">*</desc_sig_punctuation><desc_sig_name classes="n sig-param">info</desc_sig_name></desc_parameter></desc_parameterlist></desc_signature_line></desc_signature>
+            <desc_content>
+            </desc_content>
+        </desc>
+    </container>
+    <container classes="breathe-sectiondef" objtype="var">
+        <rubric classes="breathe-sectiondef-title">Variables</rubric>
+        <index entries="['single',\ 'global_cache_tree\ (C++\ member)',\ '_CPPv417global_cache_tree',\ '',\ None]"></index>
+        <desc classes="cpp var" desctype="var" domain="cpp" objtype="var">
+            <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword classes="k">struct</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><reference internal="True" refid="_CPPv410cache_treev" reftitle="cache_tree"><desc_sig_name classes="n">cache_tree</desc_sig_name></reference><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">global_cache_tree</desc_sig_name></desc_name></desc_signature_line></desc_signature>
+            <desc_content>
+                <paragraph>Shared cache tree instance. </paragraph>
+            </desc_content>
+        </desc>
+    </container>
+    <index entries="['single',\ 'cache_tree_sub\ (C++\ struct)',\ '_CPPv414cache_tree_sub',\ '',\ None]"></index>
+    <desc classes="cpp struct" desctype="struct" domain="cpp" objtype="struct">
+        <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword classes="k">struct</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">cache_tree_sub</desc_sig_name></desc_name></desc_signature_line></desc_signature>
+        <desc_content>
+        </desc_content>
+    </desc>
+    <index entries="['single',\ 'cache_tree\ (C++\ struct)',\ '_CPPv410cache_tree',\ '',\ None]"></index>
+    <desc classes="cpp struct" desctype="struct" domain="cpp" objtype="struct">
+        <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword classes="k">struct</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">cache_tree</desc_sig_name></desc_name></desc_signature_line></desc_signature>
+        <desc_content>
+        </desc_content>
+    </desc>
+</document>

@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<?xml-stylesheet href="../../docutils.css"?>
+<document>
+    <index entries="['single',\ 'Table_1\ (C++\ class)',\ '_CPPv47Table_1',\ '',\ None]"></index>
+    <desc classes="cpp class" desctype="class" domain="cpp" objtype="class">
+        <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword classes="k">class</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">Table_1</desc_sig_name></desc_name></desc_signature_line></desc_signature>
+        <desc_content>
+            <paragraph>This is a simple Markdown table example. </paragraph>
+            <paragraph>Following is a simple table using Markdown syntax.</paragraph>
+            <paragraph><table classes="colwidths-auto"><tgroup cols="2"><colspec colwidth="auto"></colspec><colspec colwidth="auto"></colspec><thead><row><entry heading="True"><paragraph>First Header   </paragraph></entry><entry heading="True"><paragraph>Second Header    </paragraph></entry></row></thead><tbody><row><entry><paragraph>Content Cell   </paragraph></entry><entry><paragraph>Content Cell    </paragraph></entry></row><row><entry><paragraph>Content Cell   </paragraph></entry><entry><paragraph>Content Cell   </paragraph></entry></row></tbody></tgroup></table></paragraph>
+            <paragraph>And this is some more text. </paragraph>
+        </desc_content>
+    </desc>
+    <index entries="['single',\ 'Table_2\ (C++\ class)',\ '_CPPv47Table_2',\ '',\ None]"></index>
+    <desc classes="cpp class" desctype="class" domain="cpp" objtype="class">
+        <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword classes="k">class</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">Table_2</desc_sig_name></desc_name></desc_signature_line></desc_signature>
+        <desc_content>
+            <paragraph>This is a Markdown table with alignment. </paragraph>
+            <paragraph>Following is a table with alignment using Markdown syntax.</paragraph>
+            <paragraph><table classes="colwidths-auto"><tgroup cols="3"><colspec colwidth="auto"></colspec><colspec colwidth="auto"></colspec><colspec colwidth="auto"></colspec><thead><row><entry heading="True"><paragraph>Right   </paragraph></entry><entry heading="True"><paragraph>Center   </paragraph></entry><entry heading="True"><paragraph>Left    </paragraph></entry></row></thead><tbody><row><entry><paragraph>10   </paragraph></entry><entry><paragraph>10   </paragraph></entry><entry><paragraph>10    </paragraph></entry></row><row><entry><paragraph>1000   </paragraph></entry><entry><paragraph>1000   </paragraph></entry><entry><paragraph>1000   </paragraph></entry></row></tbody></tgroup></table></paragraph>
+            <paragraph>And this is some more text. </paragraph>
+        </desc_content>
+    </desc>
+    <index entries="['single',\ 'Table_3\ (C++\ class)',\ '_CPPv47Table_3',\ '',\ None]"></index>
+    <desc classes="cpp class" desctype="class" domain="cpp" objtype="class">
+        <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword classes="k">class</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">Table_3</desc_sig_name></desc_name></desc_signature_line></desc_signature>
+        <desc_content>
+            <paragraph>This is a Markdown table with rowspan and alignment. </paragraph>
+            <paragraph>Following is a table with rowspan and alignment using Markdown syntax.</paragraph>
+            <paragraph><table classes="colwidths-auto"><tgroup cols="3"><colspec colwidth="auto"></colspec><colspec colwidth="auto"></colspec><colspec colwidth="auto"></colspec><thead><row><entry heading="True"><paragraph>Right   </paragraph></entry><entry heading="True"><paragraph>Center   </paragraph></entry><entry heading="True"><paragraph>Left    </paragraph></entry></row></thead><tbody><row><entry morerows="1"><paragraph>10   </paragraph></entry><entry><paragraph>10   </paragraph></entry><entry><paragraph>10    </paragraph></entry></row><row><entry><paragraph>1000   </paragraph></entry><entry><paragraph>1000   </paragraph></entry></row></tbody></tgroup></table></paragraph>
+            <paragraph>And this is some more text. </paragraph>
+        </desc_content>
+    </desc>
+    <index entries="['single',\ 'Table_4\ (C++\ class)',\ '_CPPv47Table_4',\ '',\ None]"></index>
+    <desc classes="cpp class" desctype="class" domain="cpp" objtype="class">
+        <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword classes="k">class</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">Table_4</desc_sig_name></desc_name></desc_signature_line></desc_signature>
+        <desc_content>
+            <paragraph>This is a Markdown table with colspan and alignment. </paragraph>
+            <paragraph>Following is a table with colspan and alignment using Markdown syntax.</paragraph>
+            <paragraph><table classes="colwidths-auto"><tgroup cols="3"><colspec colwidth="auto"></colspec><colspec colwidth="auto"></colspec><colspec colwidth="auto"></colspec><thead><row><entry heading="True"><paragraph>Right   </paragraph></entry><entry heading="True"><paragraph>Center   </paragraph></entry><entry heading="True"><paragraph>Left    </paragraph></entry></row></thead><tbody><row><entry><paragraph>10   </paragraph></entry><entry><paragraph>10   </paragraph></entry><entry><paragraph>10    </paragraph></entry></row><row><entry morecols="2"><paragraph>1000   </paragraph></entry></row></tbody></tgroup></table></paragraph>
+            <paragraph>And this is some more text. </paragraph>
+        </desc_content>
+    </desc>
+    <index entries="['single',\ 'Table_5\ (C++\ class)',\ '_CPPv47Table_5',\ '',\ None]"></index>
+    <desc classes="cpp class" desctype="class" domain="cpp" objtype="class">
+        <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword classes="k">class</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">Table_5</desc_sig_name></desc_name></desc_signature_line></desc_signature>
+        <desc_content>
+            <paragraph>This is a Doxygen table. </paragraph>
+            <paragraph>Following is a table using Doxygen syntax (and all supported features).</paragraph>
+            <paragraph><table classes="colwidths-auto"><tgroup cols="3"><colspec colwidth="auto"></colspec><colspec colwidth="auto"></colspec><colspec colwidth="auto"></colspec><thead><row><entry heading="True"><paragraph>Column 1 </paragraph></entry><entry heading="True"><paragraph>Column 2 </paragraph></entry><entry heading="True"><paragraph>Column 3 </paragraph></entry></row></thead><tbody><row><entry morerows="1"><paragraph>cell row=1+2,col=1</paragraph></entry><entry><paragraph>cell row=1,col=2</paragraph></entry><entry><paragraph>cell row=1,col=3 </paragraph></entry></row><row><entry morerows="1"><paragraph>cell row=2+3,col=2 </paragraph></entry><entry><paragraph>cell row=2,col=3 </paragraph></entry></row><row><entry><paragraph>cell row=3,col=1 </paragraph></entry><entry morerows="1"><paragraph>cell row=3+4,col=3 </paragraph></entry></row><row><entry morecols="1"><paragraph>cell row=4,col=1+2 </paragraph></entry></row><row><entry><paragraph>cell row=5,col=1 </paragraph></entry><entry morecols="1"><paragraph>cell row=5,col=2+3 </paragraph></entry></row><row><entry morecols="1" morerows="1"><paragraph>cell row=6+7,col=1+2 </paragraph></entry><entry><paragraph>cell row=6,col=3 </paragraph></entry></row><row><entry><paragraph>cell row=7,col=3 </paragraph></entry></row><row><entry><paragraph>cell row=8,col=1 </paragraph></entry><entry><paragraph>cell row=8,col=2<table classes="colwidths-auto"><tgroup cols="2"><colspec colwidth="auto"></colspec><colspec colwidth="auto"></colspec><tbody><row><entry><paragraph>Inner cell row=1,col=1</paragraph></entry><entry><paragraph>Inner cell row=1,col=2 </paragraph></entry></row><row><entry><paragraph>Inner cell row=2,col=1</paragraph></entry><entry><paragraph>Inner cell row=2,col=2 </paragraph></entry></row></tbody></tgroup></table></paragraph></entry><entry><paragraph>cell row=8,col=3 <bullet_list><list_item><paragraph>Item 1 </paragraph></list_item><list_item><paragraph>Item 2 </paragraph></list_item></bullet_list></paragraph></entry></row></tbody></tgroup></table></paragraph>
+            <paragraph>And this is some more text. </paragraph>
+        </desc_content>
+    </desc>
+</document>

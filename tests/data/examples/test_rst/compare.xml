@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<?xml-stylesheet href="../../docutils.css"?>
+<document>
+    <index entries="['single',\ 'TestClass\ (C++\ class)',\ '_CPPv49TestClass',\ '',\ None]"></index>
+    <desc classes="cpp class" desctype="class" domain="cpp" objtype="class">
+        <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword classes="k">class</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">TestClass</desc_sig_name></desc_name></desc_signature_line></desc_signature>
+        <desc_content>
+            <paragraph>first class inside of namespace </paragraph>
+            <container classes="breathe-sectiondef" objtype="public-func">
+                <rubric classes="breathe-sectiondef-title">Public Functions</rubric>
+                <index entries="['single',\ 'TestClass::function\ (C++\ function)',\ '_CPPv4NK9TestClass8functionEv',\ '',\ None]"></index>
+                <desc classes="cpp function" desctype="function" domain="cpp" objtype="function">
+                    <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword classes="k">virtual</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_sig_keyword_type classes="kt">void</desc_sig_keyword_type><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">function</desc_sig_name></desc_name><desc_parameterlist></desc_parameterlist><desc_sig_space classes="w"> </desc_sig_space><desc_sig_keyword classes="k">const</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_sig_punctuation classes="p">=</desc_sig_punctuation><desc_sig_space classes="w"> </desc_sig_space><desc_sig_literal_number classes="m">0</desc_sig_literal_number></desc_signature_line></desc_signature>
+                    <desc_content>
+                        <paragraph>Inserting additional reStructuredText information.</paragraph>
+                        <paragraph>This is some funky non-XML compliant text: &lt;&amp; !&gt;&lt;</paragraph>
+                        <paragraph>This is just a standard verbatim block with code:</paragraph>
+                        <literal_block force="False" language="default" linenos="False">    child = 0;
+    while( child = parent-&gt;IterateChildren( child ) )</literal_block>
+                        <note>
+                            <paragraph>This reStructuredText has been handled correctly.</paragraph>
+                        </note>
+                    </desc_content>
+                </desc>
+                <index entries="['single',\ 'TestClass::rawVerbatim\ (C++\ function)',\ '_CPPv4NK9TestClass11rawVerbatimEv',\ '',\ None]"></index>
+                <desc classes="cpp function" desctype="function" domain="cpp" objtype="function">
+                    <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword classes="k">virtual</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_sig_keyword_type classes="kt">void</desc_sig_keyword_type><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">rawVerbatim</desc_sig_name></desc_name><desc_parameterlist></desc_parameterlist><desc_sig_space classes="w"> </desc_sig_space><desc_sig_keyword classes="k">const</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_sig_punctuation classes="p">=</desc_sig_punctuation><desc_sig_space classes="w"> </desc_sig_space><desc_sig_literal_number classes="m">0</desc_sig_literal_number></desc_signature_line></desc_signature>
+                    <desc_content>
+                        <paragraph>Inserting additional reStructuredText information. <paragraph></paragraph></paragraph>
+                        <note>
+                            <paragraph>This reStructuredText has been handled correctly.</paragraph>
+                        </note>
+                    </desc_content>
+                </desc>
+                <index entries="['single',\ 'TestClass::rawLeadingAsteriskVerbatim\ (C++\ function)',\ '_CPPv4NK9TestClass26rawLeadingAsteriskVerbatimEv',\ '',\ None]"></index>
+                <desc classes="cpp function" desctype="function" domain="cpp" objtype="function">
+                    <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword classes="k">virtual</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_sig_keyword_type classes="kt">void</desc_sig_keyword_type><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">rawLeadingAsteriskVerbatim</desc_sig_name></desc_name><desc_parameterlist></desc_parameterlist><desc_sig_space classes="w"> </desc_sig_space><desc_sig_keyword classes="k">const</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_sig_punctuation classes="p">=</desc_sig_punctuation><desc_sig_space classes="w"> </desc_sig_space><desc_sig_literal_number classes="m">0</desc_sig_literal_number></desc_signature_line></desc_signature>
+                    <desc_content>
+                        <paragraph>Inserting additional reStructuredText information.</paragraph>
+                        <paragraph><paragraph>Some example code:</paragraph><literal_block force="False" language="default" linenos="False">int example(int x) {
+    return x * 2;
+}</literal_block></paragraph>
+                    </desc_content>
+                </desc>
+                <index entries="['single',\ 'TestClass::rawLeadingSlashesVerbatim\ (C++\ function)',\ '_CPPv4NK9TestClass25rawLeadingSlashesVerbatimEi',\ '',\ None]"></index>
+                <desc classes="cpp function" desctype="function" domain="cpp" objtype="function">
+                    <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword classes="k">virtual</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_sig_keyword_type classes="kt">void</desc_sig_keyword_type><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">rawLeadingSlashesVerbatim</desc_sig_name></desc_name><desc_parameterlist><desc_parameter noemph="True"><desc_sig_keyword_type classes="kt">int</desc_sig_keyword_type><desc_sig_space classes="w"> </desc_sig_space><desc_sig_name classes="n sig-param">something</desc_sig_name></desc_parameter></desc_parameterlist><desc_sig_space classes="w"> </desc_sig_space><desc_sig_keyword classes="k">const</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_sig_punctuation classes="p">=</desc_sig_punctuation><desc_sig_space classes="w"> </desc_sig_space><desc_sig_literal_number classes="m">0</desc_sig_literal_number></desc_signature_line></desc_signature>
+                    <desc_content>
+                        <paragraph>Some kind of method. </paragraph>
+                        <paragraph><paragraph><literal_block force="False" highlight_args="{}" language="c" linenos="True">bool foo(bool something) {
+    return something;
+};</literal_block></paragraph> </paragraph>
+                        <note>
+                            <paragraph>Documentation using <literal>///</literal> should begin and end in a blank line. </paragraph>
+                        </note>
+                        <field_list>
+                            <field>
+                                <field_name>Parameters</field_name>
+                                <field_body>
+                                    <paragraph><literal_strong>something</literal_strong> – a parameter</paragraph>
+                                </field_body>
+                            </field>
+                        </field_list>
+                    </desc_content>
+                </desc>
+                <index entries="['single',\ 'TestClass::rawInlineVerbatim\ (C++\ function)',\ '_CPPv4NK9TestClass17rawInlineVerbatimEv',\ '',\ None]"></index>
+                <desc classes="cpp function" desctype="function" domain="cpp" objtype="function">
+                    <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword classes="k">virtual</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_sig_keyword_type classes="kt">void</desc_sig_keyword_type><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">rawInlineVerbatim</desc_sig_name></desc_name><desc_parameterlist></desc_parameterlist><desc_sig_space classes="w"> </desc_sig_space><desc_sig_keyword classes="k">const</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_sig_punctuation classes="p">=</desc_sig_punctuation><desc_sig_space classes="w"> </desc_sig_space><desc_sig_literal_number classes="m">0</desc_sig_literal_number></desc_signature_line></desc_signature>
+                    <desc_content>
+                        <paragraph>Inserting an inline reStructuredText snippet. Linking to another function: <inline> <reference internal="True" refid="_CPPv4NK9TestClass11rawVerbatimEv" reftitle="TestClass::rawVerbatim"><literal classes="xref cpp cpp-func">TestClass::rawVerbatim()</literal></reference> </inline></paragraph>
+                    </desc_content>
+                </desc>
+                <index entries="['single',\ 'TestClass::testFunction\ (C++\ function)',\ '_CPPv4NK9TestClass12testFunctionEv',\ '',\ None]"></index>
+                <desc classes="cpp function" desctype="function" domain="cpp" objtype="function">
+                    <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword classes="k">inline</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_sig_keyword classes="k">virtual</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_sig_keyword_type classes="kt">void</desc_sig_keyword_type><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">testFunction</desc_sig_name></desc_name><desc_parameterlist></desc_parameterlist><desc_sig_space classes="w"> </desc_sig_space><desc_sig_keyword classes="k">const</desc_sig_keyword></desc_signature_line></desc_signature>
+                    <desc_content>
+                        <paragraph>Brief description. </paragraph>
+                    </desc_content>
+                </desc>
+            </container>
+        </desc_content>
+    </desc>
+</document>

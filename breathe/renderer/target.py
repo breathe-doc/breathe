@@ -1,9 +1,13 @@
-from breathe.project import ProjectInfo
+from __future__ import annotations
 
 from docutils import nodes
-from docutils.nodes import Element
 
-from typing import Any, Dict, List, Sequence
+from typing import Any, TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from collections.abc import Mapping, Sequence
+    from docutils.nodes import Element
+    from breathe.project import ProjectInfo
 
 
 class TargetHandler:
@@ -16,7 +20,7 @@ class _RealTargetHandler(TargetHandler):
         self.project_info = project_info
         self.document = document
 
-    def create_target(self, refid: str) -> List[Element]:
+    def create_target(self, refid: str) -> list[Element]:
         """Creates a target node and registers it with the document and returns it in a list"""
 
         target = nodes.target(ids=[refid], names=[refid])
@@ -29,12 +33,12 @@ class _RealTargetHandler(TargetHandler):
 
 
 class _NullTargetHandler(TargetHandler):
-    def create_target(self, refid: str) -> List[Element]:
+    def create_target(self, refid: str) -> list[Element]:
         return []
 
 
 def create_target_handler(
-    options: Dict[str, Any], project_info: ProjectInfo, document: nodes.document
+    options: Mapping[str, Any], project_info: ProjectInfo, document: nodes.document
 ) -> TargetHandler:
     if "no-link" in options:
         return _NullTargetHandler()

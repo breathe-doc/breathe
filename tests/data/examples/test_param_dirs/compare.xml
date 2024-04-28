@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<?xml-stylesheet href="../../docutils.css"?>
+<document>
+    <index entries="['single',\ 'process\ (C++\ function)',\ '_CPPv47processPvPvPv',\ '',\ None]"></index>
+    <desc classes="cpp function" desctype="function" domain="cpp" objtype="function">
+        <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword_type classes="kt">int</desc_sig_keyword_type><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">process</desc_sig_name></desc_name><desc_parameterlist><desc_parameter noemph="True"><desc_sig_keyword_type classes="kt">void</desc_sig_keyword_type><desc_sig_space classes="w"> </desc_sig_space><desc_sig_punctuation classes="p">*</desc_sig_punctuation><desc_sig_name classes="n sig-param">i</desc_sig_name></desc_parameter><desc_parameter noemph="True"><desc_sig_keyword_type classes="kt">void</desc_sig_keyword_type><desc_sig_space classes="w"> </desc_sig_space><desc_sig_punctuation classes="p">*</desc_sig_punctuation><desc_sig_name classes="n sig-param">o</desc_sig_name></desc_parameter><desc_parameter noemph="True"><desc_sig_keyword_type classes="kt">void</desc_sig_keyword_type><desc_sig_space classes="w"> </desc_sig_space><desc_sig_punctuation classes="p">*</desc_sig_punctuation><desc_sig_name classes="n sig-param">io</desc_sig_name></desc_parameter></desc_parameterlist></desc_signature_line></desc_signature>
+        <desc_content>
+            <field_list>
+                <field>
+                    <field_name>Parameters</field_name>
+                    <field_body>
+                        <bullet_list>
+                            <list_item>
+                                <paragraph><literal_strong>i</literal_strong> – <strong>[in]</strong> Input </paragraph>
+                            </list_item>
+                            <list_item>
+                                <paragraph><literal_strong>o</literal_strong> – <strong>[out]</strong> Output </paragraph>
+                            </list_item>
+                            <list_item>
+                                <paragraph><literal_strong>io</literal_strong> – <strong>[inout]</strong> Input and output </paragraph>
+                            </list_item>
+                        </bullet_list>
+                    </field_body>
+                </field>
+            </field_list>
+        </desc_content>
+    </desc>
+</document>

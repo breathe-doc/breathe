@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<?xml-stylesheet href="../../docutils.css"?>
+<document>
+    <index entries="['single',\ 'USE_STUFF\ (C\ macro)',\ 'c.USE_STUFF',\ '',\ None]"></index>
+    <desc classes="cpp macro" desctype="macro" domain="cpp" objtype="macro">
+        <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_name classes="sig-name descname"><desc_sig_name classes="n">USE_STUFF</desc_sig_name></desc_name></desc_signature_line></desc_signature>
+        <desc_content>
+            <paragraph>A simple define without a value. </paragraph>
+        </desc_content>
+    </desc>
+    <index entries="['single',\ 'MAX_LENGTH\ (C\ macro)',\ 'c.MAX_LENGTH',\ '',\ None]"></index>
+    <desc classes="cpp macro" desctype="macro" domain="cpp" objtype="macro">
+        <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_name classes="sig-name descname"><desc_sig_name classes="n">MAX_LENGTH</desc_sig_name></desc_name></desc_signature_line></desc_signature>
+        <desc_content>
+            <paragraph>A define with a simple value. </paragraph>
+        </desc_content>
+    </desc>
+    <index entries="['single',\ 'MAXIMUM\ (C\ macro)',\ 'c.MAXIMUM',\ '',\ None]"></index>
+    <desc classes="cpp macro" desctype="macro" domain="cpp" objtype="macro">
+        <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_name classes="sig-name descname"><desc_sig_name classes="n">MAXIMUM</desc_sig_name></desc_name><desc_parameterlist><desc_parameter noemph="True"><desc_sig_name classes="n">A</desc_sig_name></desc_parameter><desc_parameter noemph="True"><desc_sig_name classes="n">B</desc_sig_name></desc_parameter></desc_parameterlist></desc_signature_line></desc_signature>
+        <desc_content>
+            <paragraph>A define with some parameters. </paragraph>
+            <field_list>
+                <field>
+                    <field_name>Parameters</field_name>
+                    <field_body>
+                        <bullet_list>
+                            <list_item>
+                                <paragraph><literal_strong>A</literal_strong> – The parameter A </paragraph>
+                            </list_item>
+                            <list_item>
+                                <paragraph><literal_strong>B</literal_strong> – The parameter B</paragraph>
+                            </list_item>
+                        </bullet_list>
+                    </field_body>
+                </field>
+                <field>
+                    <field_name>Returns</field_name>
+                    <field_body>
+                        <paragraph>The maximum of A and B </paragraph>
+                    </field_body>
+                </field>
+            </field_list>
+        </desc_content>
+    </desc>
+    <index entries="['single',\ 'SWAP\ (C\ macro)',\ 'c.SWAP',\ '',\ None]"></index>
+    <desc classes="cpp macro" desctype="macro" domain="cpp" objtype="macro">
+        <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_name classes="sig-name descname"><desc_sig_name classes="n">SWAP</desc_sig_name></desc_name><desc_parameterlist><desc_parameter noemph="True"><desc_sig_name classes="n">A</desc_sig_name></desc_parameter><desc_parameter noemph="True"><desc_sig_name classes="n">B</desc_sig_name></desc_parameter></desc_parameterlist></desc_signature_line></desc_signature>
+        <desc_content>
+            <paragraph>A define which spans multiple lines. </paragraph>
+        </desc_content>
+    </desc>
+</document>

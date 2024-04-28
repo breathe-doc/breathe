@@ -1,0 +1,50 @@
+/* A style sheet for the "compare.xml" files in the example tests.
+
+This lets the files be viewed in a browser and makes them much easier to
+inspect manually. */
+
+document { display: block; }
+desc {
+    display: block;
+    margin-bottom: 1em;
+}
+desc_content {
+    display: block;
+    margin-left: 2em;
+}
+desc_signature_line { display: block; }
+desc_sig_keyword { color: rgb(9, 9, 167); }
+desc_sig_keyword_type { color: rgb(57, 93, 160); }
+desc_name { color: darkcyan; }
+paragraph {
+    display: block;
+    margin: 1em 0;
+}
+emphasis { font-style: italic; }
+strong { font-weight: bold; }
+comment { color: darkgreen; }
+index::before {
+    display: block;
+    content: attr(entries);
+    color: gray;
+    font-style: italic;
+}
+desc_parameterlist::before { content: "("; }
+desc_parameterlist::after { content: ")"; }
+desc_parameter + desc_parameter::before { content: ", "; }
+
+table tgroup { display: table; }
+table thead { display: table-header-group; }
+table tbody { display: table-row-group; }
+table row { display: table-row; }
+table entry {
+    display: table-cell;
+    padding: 0 0.3em;
+}
+colspec { display: none; }
+
+section { display: block; }
+section title { font-size: 1.5em; display: block; font-weight: bold; }
+section section title { font-size: 1.17em; }
+section section section title { font-size: 1em; }
+

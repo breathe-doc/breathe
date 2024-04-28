@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<?xml-stylesheet href="../../docutils.css"?>
+<document>
+    <index entries="['single',\ 'SimpleList_1\ (C++\ class)',\ '_CPPv412SimpleList_1',\ '',\ None]"></index>
+    <desc classes="cpp class" desctype="class" domain="cpp" objtype="class">
+        <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword classes="k">class</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">SimpleList_1</desc_sig_name></desc_name></desc_signature_line></desc_signature>
+        <desc_content>
+            <paragraph>This is a list example. </paragraph>
+            <paragraph>Following is a list using ‘+’ for bullets:<bullet_list><list_item><paragraph>One item.</paragraph></list_item><list_item><paragraph>Two items.</paragraph></list_item><list_item><paragraph>Three items.</paragraph></list_item><list_item><paragraph>Four.</paragraph></list_item></bullet_list></paragraph>
+            <paragraph>And this is some more text. </paragraph>
+        </desc_content>
+    </desc>
+    <index entries="['single',\ 'SimpleList_2\ (C++\ class)',\ '_CPPv412SimpleList_2',\ '',\ None]"></index>
+    <desc classes="cpp class" desctype="class" domain="cpp" objtype="class">
+        <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword classes="k">class</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">SimpleList_2</desc_sig_name></desc_name></desc_signature_line></desc_signature>
+        <desc_content>
+            <paragraph>This is a list example. </paragraph>
+            <paragraph>Following is a list using ‘-’ for bullets:<bullet_list><list_item><paragraph>One item.</paragraph></list_item><list_item><paragraph>Two items.</paragraph></list_item><list_item><paragraph>Three items.</paragraph></list_item><list_item><paragraph>Four.</paragraph></list_item></bullet_list></paragraph>
+            <paragraph>And this is some more text. </paragraph>
+        </desc_content>
+    </desc>
+    <index entries="['single',\ 'SimpleList_3\ (C++\ class)',\ '_CPPv412SimpleList_3',\ '',\ None]"></index>
+    <desc classes="cpp class" desctype="class" domain="cpp" objtype="class">
+        <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword classes="k">class</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">SimpleList_3</desc_sig_name></desc_name></desc_signature_line></desc_signature>
+        <desc_content>
+            <paragraph>This is a list example. </paragraph>
+            <paragraph>Following is a list using ‘*’ for bullets:<bullet_list><list_item><paragraph>One item.</paragraph></list_item><list_item><paragraph>Two items.</paragraph></list_item><list_item><paragraph>Three items.</paragraph></list_item><list_item><paragraph>Four.</paragraph></list_item></bullet_list></paragraph>
+            <paragraph>And this is some more text. </paragraph>
+        </desc_content>
+    </desc>
+    <index entries="['single',\ 'SimpleList_4\ (C++\ class)',\ '_CPPv412SimpleList_4',\ '',\ None]"></index>
+    <desc classes="cpp class" desctype="class" domain="cpp" objtype="class">
+        <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword classes="k">class</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">SimpleList_4</desc_sig_name></desc_name></desc_signature_line></desc_signature>
+        <desc_content>
+            <paragraph>This is a list example. </paragraph>
+            <paragraph>Following is an auto-numbered list:<enumerated_list enumtype="loweralpha" prefix="" suffix="."><list_item><paragraph>One item.</paragraph></list_item><list_item><paragraph>Two items.</paragraph></list_item><list_item><paragraph>Three items.</paragraph></list_item><list_item><paragraph>Four.</paragraph></list_item></enumerated_list></paragraph>
+            <paragraph>And this is some more text. </paragraph>
+        </desc_content>
+    </desc>
+    <index entries="['single',\ 'SimpleList_5\ (C++\ class)',\ '_CPPv412SimpleList_5',\ '',\ None]"></index>
+    <desc classes="cpp class" desctype="class" domain="cpp" objtype="class">
+        <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword classes="k">class</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">SimpleList_5</desc_sig_name></desc_name></desc_signature_line></desc_signature>
+        <desc_content>
+            <paragraph>This is a list example. </paragraph>
+            <paragraph>Following is a numbered list:<enumerated_list enumtype="loweralpha" prefix="" suffix="."><list_item><paragraph>One item.</paragraph></list_item><list_item><paragraph>Two items.</paragraph></list_item><list_item><paragraph>Three items.</paragraph></list_item><list_item><paragraph>Four.</paragraph></list_item></enumerated_list></paragraph>
+            <paragraph>And this is some more text. </paragraph>
+        </desc_content>
+    </desc>
+    <index entries="['single',\ 'SimpleList_6\ (C++\ class)',\ '_CPPv412SimpleList_6',\ '',\ None]"></index>
+    <desc classes="cpp class" desctype="class" domain="cpp" objtype="class">
+        <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword classes="k">class</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">SimpleList_6</desc_sig_name></desc_name></desc_signature_line></desc_signature>
+        <desc_content>
+            <paragraph>This is a list example. </paragraph>
+            <paragraph>Following is an unordered list using ‘HTML’ tags: <bullet_list><list_item><paragraph>One item. </paragraph></list_item><list_item><paragraph>Two items. </paragraph></list_item><list_item><paragraph>Three items. </paragraph></list_item><list_item><paragraph>Four. </paragraph></list_item></bullet_list></paragraph>
+            <paragraph>And this is some more text. </paragraph>
+        </desc_content>
+    </desc>
+    <index entries="['single',\ 'NestedLists_1\ (C++\ class)',\ '_CPPv413NestedLists_1',\ '',\ None]"></index>
+    <desc classes="cpp class" desctype="class" domain="cpp" objtype="class">
+        <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword classes="k">class</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">NestedLists_1</desc_sig_name></desc_name></desc_signature_line></desc_signature>
+        <desc_content>
+            <paragraph>A list of events: </paragraph>
+            <paragraph><bullet_list><list_item><paragraph>mouse events<enumerated_list enumtype="loweralpha" prefix="" suffix="."><list_item><paragraph>mouse move event</paragraph></list_item><list_item><paragraph><paragraph>mouse click event</paragraph><paragraph>More info about the click event.</paragraph></paragraph></list_item><list_item><paragraph>mouse double click event</paragraph></list_item></enumerated_list></paragraph></list_item><list_item><paragraph>keyboard events<enumerated_list enumtype="loweralpha" prefix="" suffix="."><list_item><paragraph>key down event</paragraph></list_item><list_item><paragraph>key up event</paragraph></list_item></enumerated_list></paragraph></list_item></bullet_list></paragraph>
+            <paragraph>More text here. </paragraph>
+        </desc_content>
+    </desc>
+    <index entries="['single',\ 'NestedLists_2\ (C++\ class)',\ '_CPPv413NestedLists_2',\ '',\ None]"></index>
+    <desc classes="cpp class" desctype="class" domain="cpp" objtype="class">
+        <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword classes="k">class</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">NestedLists_2</desc_sig_name></desc_name></desc_signature_line></desc_signature>
+        <desc_content>
+            <paragraph>Text before the list. </paragraph>
+            <paragraph><bullet_list><list_item><paragraph>list item 1<bullet_list><list_item><paragraph>sub item 1<bullet_list><list_item><paragraph>sub sub item 1</paragraph></list_item><list_item><paragraph>sub sub item 2</paragraph></list_item></bullet_list>
+                                        The dot above ends the sub sub item list.</paragraph><paragraph>More text for the first sub item</paragraph></list_item></bullet_list>
+                            The dot above ends the first sub item.</paragraph><paragraph>More text for the first list item<bullet_list><list_item><paragraph>sub item 2</paragraph></list_item><list_item><paragraph>sub item 3</paragraph></list_item></bullet_list></paragraph></list_item><list_item><paragraph>list item 2</paragraph></list_item></bullet_list>
+                More text in the same paragraph.</paragraph>
+            <paragraph>More text in a new paragraph. </paragraph>
+        </desc_content>
+    </desc>
+    <index entries="['single',\ 'NestedLists_3\ (C++\ class)',\ '_CPPv413NestedLists_3',\ '',\ None]"></index>
+    <desc classes="cpp class" desctype="class" domain="cpp" objtype="class">
+        <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword classes="k">class</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">NestedLists_3</desc_sig_name></desc_name></desc_signature_line></desc_signature>
+        <desc_content>
+            <paragraph>A list of events: <bullet_list><list_item><paragraph>mouse events <enumerated_list enumtype="loweralpha" prefix="" suffix="."><list_item><paragraph>mouse move event </paragraph></list_item><list_item><paragraph><paragraph>mouse click event</paragraph><paragraph>More info about the click event.</paragraph></paragraph></list_item><list_item><paragraph>mouse double click event </paragraph></list_item></enumerated_list></paragraph></list_item><list_item><paragraph>keyboard events <enumerated_list enumtype="loweralpha" prefix="" suffix="."><list_item><paragraph>key down event </paragraph></list_item><list_item><paragraph>key up event </paragraph></list_item></enumerated_list></paragraph></list_item></bullet_list>
+                More text here. </paragraph>
+        </desc_content>
+    </desc>
+    <index entries="['single',\ 'NestedLists_4\ (C++\ class)',\ '_CPPv413NestedLists_4',\ '',\ None]"></index>
+    <desc classes="cpp class" desctype="class" domain="cpp" objtype="class">
+        <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword classes="k">class</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">NestedLists_4</desc_sig_name></desc_name></desc_signature_line></desc_signature>
+        <desc_content>
+            <paragraph>A list of events: </paragraph>
+            <paragraph><enumerated_list enumtype="loweralpha" prefix="" suffix="."><list_item><paragraph>mouse events<enumerated_list enumtype="lowerroman" prefix="" suffix="."><list_item><paragraph>mouse move event<enumerated_list enumtype="upperalpha" prefix="" suffix="."><list_item><paragraph>swipe event</paragraph></list_item><list_item><paragraph>circle event</paragraph></list_item><list_item><paragraph>wave event</paragraph></list_item></enumerated_list></paragraph></list_item><list_item><paragraph><paragraph>mouse click event</paragraph><paragraph>More info about the click event.</paragraph></paragraph></list_item><list_item><paragraph>mouse double click event</paragraph></list_item></enumerated_list></paragraph></list_item><list_item><paragraph>keyboard events<enumerated_list enumtype="lowerroman" prefix="" suffix="."><list_item><paragraph>key down event</paragraph></list_item><list_item><paragraph>key up event</paragraph></list_item></enumerated_list></paragraph></list_item><list_item><paragraph>touch events<enumerated_list enumtype="lowerroman" prefix="" suffix="."><list_item><paragraph>pinch event</paragraph></list_item><list_item><paragraph>swipe event More text here. </paragraph></list_item></enumerated_list></paragraph></list_item></enumerated_list></paragraph>
+        </desc_content>
+    </desc>
+    <index entries="['single',\ 'NestedLists_5\ (C++\ class)',\ '_CPPv413NestedLists_5',\ '',\ None]"></index>
+    <desc classes="cpp class" desctype="class" domain="cpp" objtype="class">
+        <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword classes="k">class</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">NestedLists_5</desc_sig_name></desc_name></desc_signature_line></desc_signature>
+        <desc_content>
+            <paragraph>A deeply nested list of events: </paragraph>
+            <paragraph><enumerated_list enumtype="loweralpha" prefix="" suffix="."><list_item><paragraph>mouse events<enumerated_list enumtype="lowerroman" prefix="" suffix="."><list_item><paragraph>mouse move event<enumerated_list enumtype="upperalpha" prefix="" suffix="."><list_item><paragraph>swipe event<enumerated_list enumtype="upperroman" prefix="" suffix="."><list_item><paragraph>swipe left</paragraph></list_item><list_item><paragraph>swipe right</paragraph></list_item></enumerated_list></paragraph></list_item><list_item><paragraph>circle event</paragraph></list_item><list_item><paragraph>wave event</paragraph></list_item></enumerated_list></paragraph></list_item><list_item><paragraph><paragraph>mouse click event</paragraph><paragraph>More info about the click event.</paragraph></paragraph></list_item><list_item><paragraph>mouse double click event</paragraph></list_item></enumerated_list></paragraph></list_item><list_item><paragraph>keyboard events<enumerated_list enumtype="lowerroman" prefix="" suffix="."><list_item><paragraph>key down event</paragraph></list_item><list_item><paragraph>key up event</paragraph></list_item></enumerated_list></paragraph></list_item><list_item><paragraph>touch events<enumerated_list enumtype="lowerroman" prefix="" suffix="."><list_item><paragraph>pinch event</paragraph></list_item><list_item><paragraph>swipe event More text here. </paragraph></list_item></enumerated_list></paragraph></list_item></enumerated_list></paragraph>
+        </desc_content>
+    </desc>
+</document>
