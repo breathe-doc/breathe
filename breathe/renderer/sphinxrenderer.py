@@ -2306,7 +2306,7 @@ class SphinxRenderer:
                             # so just use the last one
                             dir = "".join(n.astext() for n in self.render(content[0])).strip()
                             assert dir in ("[in]", "[out]", "[inout]"), ">" + dir + "<"
-                            parameterDirectionNodes = [nodes.strong(dir, dir), nodes.Text(" ", " ")]
+                            parameterDirectionNodes = [nodes.strong(dir, dir), nodes.Text(" ")]
             # it seems that Sphinx expects the name to be a single node,
             # so let's make it that
             txt = fieldListName[node.kind] + " "

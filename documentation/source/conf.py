@@ -406,5 +406,5 @@ def setup(app):
     # Add hook for building doxygen xml when needed
     app.connect("builder-inited", generate_doxygen_xml)
 
-    app.add_config_value("documentation_build", "development", True)
+    app.add_config_value("documentation_build", "development", "env")
     app.add_config_value("doxygen_version", (0, 0, 0), "env")
