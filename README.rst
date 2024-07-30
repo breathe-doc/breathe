@@ -1,35 +1,28 @@
-.. raw:: html
+.. image:: https://www.breathe-doc.org/img/logo.svg
+   :align: center
+   :alt: Breathe logo
+   :width: 200
+   :height: 200
+   :target: https://www.breathe-doc.org
 
-   <div align="center">
-     <a href="https://www.breathe-doc.org">
-       <img width="200" height="200" src="https://www.breathe-doc.org/img/logo.svg">
-     </a>
-   </div>
+Breathe
+=======
 
-   <h1 align="center">
-     Breathe
-   </h1>
+**Your technical docs, beautifully integrated**
 
-   <p align="center">
-      Your technical docs, beautifully integrated
-   </p>
+.. image:: https://github.com/breathe-doc/breathe/actions/workflows/unit_tests.yml/badge.svg
+   :target: https://github.com/breathe-doc/breathe/actions/workflows/unit_tests.yml
+   :alt: Build Status
 
-   <p align="center">
-        <a href="https://www.breathe-doc.org/">Website</a>
-      • <a href="https://breathe.readthedocs.io/en/latest/">Documentation</a>
-      • <a href="https://opencollective.com/breathe">Sponsor</a>
-   </p>
-
-   <p align="center">
-      <a href="https://github.com/michaeljones/breathe/actions?query=workflow%3A%22unit+tests%22">
-         <img src="https://github.com/michaeljones/breathe/workflows/unit%20tests/badge.svg">
-      </a>
-   </p>
-
+Website_ • Documentation_ • Sponsor_
 
 **Sponsor**: If you benefit from using Breathe as a company or an individual, you
 can financially support the Breathe project with recurring or one off
 contributions via `Open Collective <https://opencollective.com/breathe>`_.
+
+.. _Website: https://www.breathe-doc.org/
+.. _Documentation: https://breathe.readthedocs.io/en/latest/
+.. _Sponsor: https://opencollective.com/breathe
 
 ----
 
