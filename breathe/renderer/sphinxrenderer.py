@@ -1192,9 +1192,17 @@ class SphinxRenderer:
                 title_signode.extend(targets)
 
                 # Set up the title
-                title_signode.append(nodes.emphasis(text=kind))
-                title_signode.append(nodes.Text(" "))
-                title_signode.append(addnodes.desc_name(text=name))
+
+                if kind in ["group", "page"] and file_data.compounddef and file_data.compounddef.title:
+                    if "no-title" not in options:
+                        full_title = " ".join([i.getValue() for i in file_data.compounddef.title.content_])
+                        title_signode.append(nodes.emphasis(text=kind))
+                        title_signode.append(nodes.Text(" "))
+                        title_signode.append(addnodes.desc_name(text=full_title))
+                else:
+                    title_signode.append(nodes.emphasis(text=kind))
+                    title_signode.append(nodes.Text(" "))
+                    title_signode.append(addnodes.desc_name(text=name))
 
                 rst_node.append(title_signode)
 
