@@ -123,7 +123,7 @@ if comparison:
     release = "compare"
 
 # Only add spelling extension if it is available. We don't know if it is installed as we don't want
-# to put it in the setup.py file as a dependency as we don't want Breathe to be dependent on it as
+# to put it in pyproject.toml as a dependency as we don't want Breathe to be dependent on it as
 # people should be able to use Breathe without 'spelling'. There might be a better way to handle
 # this.
 try:
