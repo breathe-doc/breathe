@@ -59,6 +59,7 @@ lint = [
     "mypy>=1",
     "types-docutils",
     "types-Pygments",
+    "pytest>=8.0",  # for mypy
 ]
 test = [
     "pytest>=8.0",

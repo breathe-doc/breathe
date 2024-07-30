@@ -326,7 +326,7 @@ class NodeTypeAccessor(Accessor):
         except AttributeError as e:
             # Horrible hack to silence errors on filtering unicode objects
             # until we fix the parsing
-            if type(data_object) == str:
+            if type(data_object) is str:
                 return "unicode"
             else:
                 raise e

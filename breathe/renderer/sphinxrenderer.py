@@ -1,5 +1,4 @@
 import os
-import sphinx
 
 from breathe.parser import compound, compoundsuper, DoxygenCompoundParser
 from breathe.project import ProjectInfo
