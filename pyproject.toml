@@ -44,11 +44,7 @@ classifiers = [
     "Topic :: Utilities",
 ]
 dependencies = [
-    "Sphinx>=5.0.2",
-    "docutils>=0.16",
-    "Jinja2>=2.10",
-    "MarkupSafe>=2.0",
-    "Pygments>=2.0",
+    "Sphinx>=6.2",
 ]
 dynamic = ["version"]
 
