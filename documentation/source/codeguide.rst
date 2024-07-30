@@ -4,6 +4,7 @@
 How It Works
 ============
 
+
 There are three main sections to Breathe: parser, finders and renderers.
 Briefly:
 
@@ -21,11 +22,36 @@ Briefly:
       object hierarchies rendering the objects, their children, their children's
       children and so on. Found in ``breathe.renderer``.
 
+The following flow chart shows how the different components of Breathe transform 
+data. The shaded region indicates which components are part of Breathe.
+
+.. image:: ../assets/BreatheFlowChart.svg
+  :width: 500
+  :alt: A flow chart showing that the initial input format is code. Doxgyen converts 
+        code to XML. The Breathe parser converts XML to a hierarchy of python objects.
+        The Breathe Filter identifies which of these objects need to be rendered. The
+        Breathe Renderer converts these objects into reStructuredText (RST) nodes.
+        Finally, the RST node objects are passed to Sphinx to be turned into actual
+        HTML or LaTeX documents. 
+  :class: only-light
+  :align: center
+
+.. image:: ../assets/BreatheFlowChart_DarkMode.svg
+  :width: 500
+  :alt: A flow chart showing that the initial input format is code. Doxgyen converts 
+        code to XML. The Breathe parser converts XML to a hierarchy of python objects.
+        The Breathe Filter identifies which of these objects need to be rendered. The
+        Breathe Renderer converts these objects into reStructuredText (RST) nodes.
+        Finally, the RST node objects are passed to Sphinx to be turned into actual
+        HTML or LaTeX documents.
+  :class: only-dark
+  :align: center
+
 
 Parser
 ------
 
-The parsers job is to parse the doxygen xml output and create a hierarchy of
+The parser's job is to parse the doxygen xml output and create a hierarchy of
 Python objects to represent the xml data.
 
 Doxygen XML Output
@@ -230,3 +256,138 @@ code, the use of them is not something I've found very well documented and my
 code largely operates on a basis of trial and error. 
 
 One day I'm sure I'll be enlightened, until then expect fairly naive code.
+
+Testing
+-------
+
+Tests for Breathe can be found in the ``tests`` directory. They can be run by
+running ``make test`` in your terminal (assuming that you have pytest installed).
+The bulk of Breathe's test suite is in  ``tests/test_renderer.py``, and this is
+where any renderer-related tests should be added. This documentation will focus
+on how to write more renderer tests, as this is the most common region of the code
+to add new features to and perhaps the hardest to test.
+
+Creating Python Doxygen Nodes
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+As indicated in the diagram at the top of this page, the renderer is expecting to 
+be run after the parser has created a hierarchy of python objects. Thus, there is
+a lot of set-up that would usually happen before the renderer is invoked. For ease
+of testing, it is often expedient to skip straight to the step where you have a
+hierarchy of Python objects representing some hypothetical XML that doxygen could
+have produced. 
+
+``test_renderer.py`` contains a number of classes designed to assist with this
+process. For just about any node that could show up in the XML produced by doxygen,
+there is a class that quickly instantiates it in Python. For example, if you want
+to test the rendering of a member definition, you can use the ``WrappedMemebrDef``
+class. Figuring out how nodes fit together can be challenging; until you're
+comfortable with the type of XML produced by doxygen, the easiest process is likely:
+
+#. Write C++ code containing the behavior you would like to test.
+#. Run Doxygen on it, which will produce an XML file (likely inside a directory 
+   called xml within your doxygen output directory)
+#. Re-build the relevant part of the xml file in Python using the ``Wrapped*`` 
+   classes.
+
+For example, lets say you have a struct representing a cat.
+
+Your C++ might look something like this (inspired by Sy Brand's
+`blog post <https://devblogs.microsoft.com/cppblog/clear-functional-c-documentation-with-sphinx-breathe-doxygen-cmake/>`_):
+
+.. code-block:: cpp
+
+   /**
+   A fluffy feline
+   */
+   struct cat {
+   /**
+      Make this cat look super cute
+   */
+      void make_cute();
+   };
+
+Running Doxygen on this might give you XML something like this:
+
+.. code-block:: xml
+
+   <?xml version='1.0' encoding='UTF-8' standalone='no'?>
+   <doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.7" xml:lang="en-US">
+   <compounddef id="structcat" kind="struct" language="C++" prot="public">
+      <compoundname>cat</compoundname>
+      <includes refid="test__cpp_8hpp" local="no">test_cpp.hpp</includes>
+         <sectiondef kind="public-func">
+            <memberdef kind="function" id="structcat_1" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+               <type>void</type>
+               <definition>void cat::make_cute</definition>
+               <argsstring>()</argsstring>
+               <name>make_cute</name>
+               <qualifiedname>cat::make_cute</qualifiedname>
+               <briefdescription>
+               </briefdescription>
+               <detaileddescription>
+                  <para>Make this cat look super cute </para>
+               </detaileddescription>
+               <inbodydescription>
+               </inbodydescription>
+               <location file="test_cpp.hpp" line="8" column="8"/>
+            </memberdef>
+         </sectiondef>
+      <briefdescription>
+      </briefdescription>
+      <detaileddescription>
+         <para>A fluffy feline </para>
+      </detaileddescription>
+      <location file="test_cpp.hpp" line="4" column="1" bodyfile="test_cpp.hpp" bodystart="4" bodyend="15"/>
+      <listofallmembers>
+         <member refid="structcat_1" prot="public" virt="non-virtual"><scope>cat</scope><name>make_cute</name></member>
+      </listofallmembers>
+   </compounddef>
+   </doxygen>
+
+There's a lot here. For now, let's just say we're testing something related to 
+member function definitions, and we only need to test that part of the 
+hierarchy. We can load the ``memberdef`` part of this XML into a 
+``WrappedMemberDef`` object as follows:
+
+.. code-block:: python
+
+   member_def = WrappedMemberDef(
+      kind="function", #  From "kind" in open memberdef tag
+      definition="void cat::make_cute", #  From <definition> tag
+      type="void", #  From <type> tag
+      name="make_cute", #  From <name> tag
+      argstring="()", #  From <argstring> tag
+      virt="non-virtual", #  From "virt" in open memberdef tag
+   )
+
+As you can see, all of the arguments to the constructor are pulled directly out
+of the XML, either from options on the original memberdef or tags nested under 
+it. There are a lot more optional arguments that can be provided to specify
+additional details of the memberdef.
+
+More advanced hierarchies can be represented by nesting nodes inside each
+other. For example, if our function took arguments, it would have ``<param>``
+tags nested within it. We could represent these as a list of ``WrappedParam``
+objects passed into the ``param`` keyword argument.
+
+To test that the node renders correctly, you can use the ``render`` function
+provided in ``test_renderer.py``:
+
+.. code-block:: python
+
+   # Render the node and grab its description
+   signature = find_node(render(app, member_def), "desc_signature")
+   # You can now examine the contents of signature.astext() and assert that
+   # they are as expected
+
+
+Mocks
+~~~~~
+
+If you want to do more elaborate tests, it is useful to be aware of the various
+Mock objects provided in ``test_renderer.py``. Because the renderer is 
+expecting to be executing in the context of a full Sphinx run, there are a lot
+of objects that it is expecting to have access to. For example, rendering some
+nodes requires making reference to a context object. The ``MockContext`` class 
+can serve as a stand-in.
