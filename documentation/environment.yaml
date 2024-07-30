@@ -11,4 +11,4 @@ dependencies:
   - doxygen
   - pip
   - pip:
-    - ..[dev]
+    - ".[docs,lint,test]"

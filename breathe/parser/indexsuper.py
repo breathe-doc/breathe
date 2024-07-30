@@ -129,7 +129,7 @@ class MixedContainer:
         return self.name
 
 
-class _MemberSpec(object):
+class _MemberSpec:
     def __init__(self, name='', data_type='', container=0):
         self.name = name
         self.data_type = data_type

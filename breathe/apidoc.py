@@ -13,7 +13,6 @@
     :copyright: Originally by Sphinx Team, C++ modifications by Tatsuyuki Ishi
     :license: BSD, see LICENSE for details.
 """
-from __future__ import print_function
 
 import os
 import sys
@@ -22,14 +21,6 @@ import errno
 import xml.etree.ElementTree
 
 from breathe import __version__
-
-# Account for FileNotFoundError in Python 2
-# IOError is broader but will hopefully suffice
-try:
-    FileNotFoundError
-except NameError:
-    FileNotFoundError = IOError
-
 
 # Reference: Doxygen XSD schema file, CompoundKind only
 # Only what breathe supports are included
@@ -70,7 +61,7 @@ def write_file(name, text, args):
                 if exc.errno != errno.EEXIST:
                     raise
         try:
-            with open(fname, "r") as target:
+            with open(fname) as target:
                 orig = target.read()
                 if orig == text:
                     print_info("File %s up to date, skipping." % fname, args)
@@ -140,7 +131,7 @@ def recurse_tree(args):
 
 class TypeAction(argparse.Action):
     def __init__(self, option_strings, dest, **kwargs):
-        super(TypeAction, self).__init__(option_strings, dest, **kwargs)
+        super().__init__(option_strings, dest, **kwargs)
         self.default = TYPEDICT.keys()
         self.metavar = ",".join(TYPEDICT.keys())
 

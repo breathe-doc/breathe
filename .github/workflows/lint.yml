@@ -15,7 +15,7 @@ jobs:
 
       - name: install dependencies
         run: |
-          pip install -e .[lint]
+          pip install ".[lint]"
 
       - name: lint the source code
         run: make flake8

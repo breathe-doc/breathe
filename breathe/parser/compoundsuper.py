@@ -134,7 +134,7 @@ class MixedContainer:
         return self.name
 
 
-class _MemberSpec(object):
+class _MemberSpec:
     def __init__(self, name='', data_type='', container=0):
         self.name = name
         self.data_type = data_type
@@ -484,7 +484,7 @@ class compounddefType(GeneratedsSuper):
         elif child_.nodeType == Node.ELEMENT_NODE and \
             nodeName_ == 'inheritancegraph':
             obj_ = graphType.factory(
-                caption=f"Inheritence diagram for {self.get_compoundname()}:"
+                caption=f"Inheritance diagram for {self.get_compoundname()}:"
             )
             obj_.build(child_)
             self.set_inheritancegraph(obj_)
@@ -2632,7 +2632,7 @@ class highlightType(GeneratedsSuper):
                 value_.append(text_.nodeValue)
             # We make this unicode so that our unicode renderer catch-all picks it up
             # otherwise it would go through as 'str' and we'd have to pick it up too
-            valuestr_ = u' '
+            valuestr_ = ' '
             obj_ = self.mixedclass_(MixedContainer.CategorySimple,
                 MixedContainer.TypeString, 'sp', valuestr_)
             self.content_.append(obj_)

@@ -1,75 +1,102 @@
 [build-system]
-requires = ["setuptools>=61"]
-build-backend = "setuptools.build_meta"
+requires = ["flit_core>=3.7"]
+build-backend = "flit_core.buildapi"
 
+# project metadata
 [project]
 name = "breathe"
-dynamic = ["version"]
-authors = [
-    {name = "Michael Jones", email = "m.pricejones@gmail.com"},
-]
 description = "Sphinx Doxygen renderer"
-license = {text = "BSD-3-Clause"}
+readme = "README.rst"
+urls.Changelog = "https://github.com/breathe-doc/breathe/blob/main/CHANGELOG.rst"
+urls.Code = "https://github.com/breathe-doc/breathe/"
+urls.Download = "https://pypi.org/project/breathe/"
+urls.Documentation = "https://breathe.readthedocs.io/"
+urls.Homepage = "https://www.breathe-doc.org/"
+urls."Issue tracker" = "https://github.com/breathe-doc/breathe/issues"
+license.text = "BSD-3-Clause"
+requires-python = ">=3.7"
+
+# Classifiers list: https://pypi.org/classifiers/
 classifiers = [
-    "Development Status :: 4 - Beta",
+    "Development Status :: 5 - Production/Stable",
     "Environment :: Console",
     "Environment :: Web Environment",
+    "Framework :: Sphinx",
     "Framework :: Sphinx :: Extension",
     "Intended Audience :: Developers",
     "Intended Audience :: Education",
     "License :: OSI Approved :: BSD License",
     "Operating System :: OS Independent",
+    "Programming Language :: Python",
     "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
     "Topic :: Documentation",
+    "Topic :: Documentation :: Sphinx",
+    "Topic :: Software Development",
+    "Topic :: Software Development :: Documentation",
     "Topic :: Text Processing",
     "Topic :: Utilities",
 ]
-requires-python = ">=3.7"
 dependencies = [
+    "Sphinx>=4.0,!=5.0.0",
     "docutils>=0.12",
     "Jinja2>=2.7.3",
     "MarkupSafe>=0.23",
     "Pygments>=1.6",
-    "Sphinx>=4.0,!=5.0.0",
 ]
+dynamic = ["version"]
 
 [project.optional-dependencies]
+docs = [
+    "furo",
+    "sphinx-copybutton",
+    "sphinxcontrib-spelling",
+]
 lint = [
     "black==22.3.0",
-    "flake8",
-    "mypy>=0.900",
+    "flake8>=6.0",
+    "mypy>=1",
+    "types-docutils",
+    "types-Pygments",
 ]
 test = [
-    "pytest",
+    "pytest>=8.0",
 ]
-dev = [
-    "breathe[lint,test]",
-    "furo",
-    "pip-tools>=0.3.5",
-    "types-docutils>=0.14,<0.18",
-    "types-Pygments",
-    "sphinx-copybutton",
-]
+
+[[project.authors]]
+name = "Michael Jones"
+email = "m.pricejones@gmail.com"
 
 [project.scripts]
 breathe-apidoc = "breathe.apidoc:main"
 
-[project.readme]
-text = """\
-Breathe is an extension to reStructuredText and Sphinx to be able to read and
-render `Doxygen <https://www.doxygen.nl>`__ xml output.
-"""
-content-type = "text/x-rst"
+[tool.flit.module]
+name = "breathe"
 
-[project.urls]
-Home = "https://www.breathe-doc.org/"
-Repository = "https://github.com/breathe-doc/breathe"
-
-[tool.setuptools.dynamic]
-version = {attr = "breathe.__init__.__version__"}
-
-[tool.setuptools.packages.find]
-include = ["breathe", "breathe.*"]
+[tool.flit.sdist]
+include = [
+    "LICENSE",
+    "CHANGELOG.rst",
+    "CONTRIBUTING.rst",
+    "CONTRIBUTORS.rst",
+    # Documentation
+    "documentation/",
+    # Tests
+    "tests/",
+    # Utilities
+    "Makefile",
+    "mkrelease",
+]
+exclude = [
+    "documentation/build",
+]
 
 [tool.black]
 line-length = 100
