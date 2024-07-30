@@ -49,7 +49,7 @@ class FileIOError(Exception):
 def parse(inFilename):
     try:
         doc = minidom.parse(inFilename)
-    except IOError as e:
+    except OSError as e:
         raise FileIOError(e)
     except ExpatError as e:
         raise ParseError(e)
