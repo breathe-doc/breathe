@@ -138,7 +138,10 @@ Release
 See the ``mkrelease`` utility in the root of the repository.
 
 Useful vim command for changelog conversion to the git tag format:
-``%s/\v`(#[0-9]+) \<[^`]*`__/\1/g``.
+
+.. code:: vim
+
+   %s/\v`(#[0-9]+) \<[^`]*`__/\1/g
 
 Maintainers
 -----------
