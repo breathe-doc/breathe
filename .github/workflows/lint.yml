@@ -18,7 +18,7 @@ jobs:
 
       - name: install dependencies
         run: |
-          pip install -r requirements/development.txt
+          pip install ".[docs,lint,test]"
 
       - name: lint the source code
         run: make flake8

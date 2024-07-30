@@ -35,6 +35,7 @@ extensions = [
     "sphinx.ext.ifconfig",
     "sphinx.ext.graphviz",
     "sphinx_copybutton",
+    "sphinxcontrib.spelling",
 ]
 
 read_the_docs_build = os.environ.get("READTHEDOCS", None) == "True"
@@ -121,17 +122,6 @@ comparison = os.environ.get("BREATHE_COMPARE", None) == "True"
 if comparison:
     version = "compare"
     release = "compare"
-
-# Only add spelling extension if it is available. We don't know if it is installed as we don't want
-# to put it in pyproject.toml as a dependency as we don't want Breathe to be dependent on it as
-# people should be able to use Breathe without 'spelling'. There might be a better way to handle
-# this.
-try:
-    import sphinxcontrib.spelling
-
-    extensions.append("sphinxcontrib.spelling")
-except ImportError:
-    pass
 
 
 # Configuration for spelling extension

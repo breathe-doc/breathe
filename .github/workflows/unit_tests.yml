@@ -58,7 +58,7 @@ jobs:
 
       - name: install dependencies
         run: |
-          pip install -r requirements/development.txt
+          pip install .[
 
       - name: run the unit tests
         run: make dev-test

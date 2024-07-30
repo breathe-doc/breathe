@@ -19,7 +19,7 @@ jobs:
 
       - name: install dependencies
         run: |
-          pip install -r requirements/development.txt
+          pip install ".[docs,lint,test]"
           sudo apt-get -y update
           sudo apt-get -y install graphviz libclang1-11 libclang-cpp11
 
