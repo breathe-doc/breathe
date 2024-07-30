@@ -1,4 +1,4 @@
-import os
+from pathlib import Path
 
 from breathe.parser import compound, compoundsuper, DoxygenCompoundParser
 from breathe.project import ProjectInfo
@@ -2348,21 +2348,18 @@ class SphinxRenderer:
     def visit_docdotfile(self, node) -> List[Node]:
         """Translate node from doxygen's dotfile command to sphinx's graphviz directive."""
         dotcode = ""
-        dot_file_path = node.name  # type: str
+        dot_file_path = Path(node.name)
         # Doxygen v1.9.3+ uses a relative path to specify the dot file.
         # Previously, Doxygen used an absolute path.
         # This relative path is with respect to the XML_OUTPUT path.
         # Furthermore, Doxygen v1.9.3+ will copy the dot file into the XML_OUTPUT
-        if not os.path.isabs(dot_file_path):
+        if not dot_file_path.is_absolute():
             # Use self.project_info.project_path as the XML_OUTPUT path, and
             # make it absolute with consideration to the conf.py path
             project_path = self.project_info.project_path()
-            dot_file_path = os.path.abspath(
-                os.path.join(self.app.confdir, project_path, dot_file_path)
-            )
+            dot_file_path = Path(self.app.confdir, project_path, dot_file_path).resolve()
         try:
-            with open(dot_file_path, encoding="utf-8") as fp:
-                dotcode = fp.read()
+            dotcode = dot_file_path.read_text(encoding="utf-8")
             if not dotcode.rstrip("\n"):
                 raise RuntimeError("%s found but without any content" % dot_file_path)
         except OSError as exc:

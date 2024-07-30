@@ -17,8 +17,8 @@
 import os
 import sys
 import argparse
-import errno
 import xml.etree.ElementTree
+from pathlib import Path
 
 from breathe import __version__
 
@@ -46,32 +46,24 @@ def print_info(msg, args):
 
 def write_file(name, text, args):
     """Write the output file for module/package <name>."""
-    fname = os.path.join(args.destdir, "%s.%s" % (name, args.suffix))
+    fname = Path(args.destdir, f"{name}.{args.suffix}")
     if args.dryrun:
         print_info("Would create file %s." % fname, args)
         return
-    if not args.force and os.path.isfile(fname):
+    if not args.force and fname.is_file():
         print_info("File %s already exists, skipping." % fname, args)
     else:
         print_info("Creating file %s." % fname, args)
-        if not os.path.exists(os.path.dirname(fname)):
-            try:
-                os.makedirs(os.path.dirname(fname))
-            except OSError as exc:  # Guard against race condition
-                if exc.errno != errno.EEXIST:
-                    raise
+        fname.parent.mkdir(parents=True, exist_ok=True)
         try:
-            with open(fname) as target:
-                orig = target.read()
-                if orig == text:
-                    print_info("File %s up to date, skipping." % fname, args)
-                    return
+            orig = fname.read_text()
+            if orig == text:
+                print_info("File %s up to date, skipping." % fname, args)
+                return
         except FileNotFoundError:
             # Don't mind if it isn't there
             pass
-
-        with open(fname, "w") as target:
-            target.write(text)
+        fname.write_text(text)
 
 
 def format_heading(level, text):
@@ -100,12 +92,12 @@ def create_package_file(package, package_type, package_id, args):
     text = format_heading(1, "%s %s" % (TYPEDICT[package_type], package))
     text += format_directive(package_type, package, args)
 
-    write_file(os.path.join(package_type, package_id), text, args)
+    write_file(Path(package_type, package_id), text, args)
 
 
 def create_modules_toc_file(key, value, args):
     """Create the module's index."""
-    if not os.path.isdir(os.path.join(args.destdir, key)):
+    if not Path(args.destdir, key).is_dir():
         return
     text = format_heading(1, "%s list" % value)
     text += ".. toctree::\n"
@@ -120,7 +112,7 @@ def recurse_tree(args):
     Look for every file in the directory tree and create the corresponding
     ReST files.
     """
-    index = xml.etree.ElementTree.parse(os.path.join(args.rootpath, "index.xml"))
+    index = xml.etree.ElementTree.parse(Path(args.rootpath, "index.xml"))
 
     # Assuming this is a valid Doxygen XML
     for compound in index.getroot():

@@ -1,3 +1,5 @@
+from pathlib import Path
+
 from breathe.directives.class_like import (
     DoxygenStructDirective,
     DoxygenClassDirective,
@@ -26,7 +28,6 @@ from breathe.process import AutoDoxygenProcessHandle
 
 from sphinx.application import Sphinx
 
-import os
 import subprocess
 
 
@@ -94,17 +95,16 @@ def setup(app: Sphinx) -> None:
     app.add_config_value("breathe_separate_member_pages", False, "env")
 
     breathe_css = "breathe.css"
-    if os.path.exists(os.path.join(app.confdir, "_static", breathe_css)):
+    if Path(app.confdir, "_static", breathe_css).exists():
         app.add_css_file(breathe_css)
 
     def write_file(directory, filename, content):
-        # Check the directory exists
-        if not os.path.exists(directory):
-            os.makedirs(directory)
+        # Ensure that the directory exists
+        directory = Path(directory)
+        directory.mkdir(parents=True, exist_ok=True)
 
         # Write the file with the provided contents
-        with open(os.path.join(directory, filename), "w") as f:
-            f.write(content)
+        (directory / filename).write_text(content)
 
     doxygen_handle = AutoDoxygenProcessHandle(
         subprocess.check_call, write_file, project_info_factory

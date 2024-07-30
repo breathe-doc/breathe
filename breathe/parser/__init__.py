@@ -1,7 +1,9 @@
+from pathlib import Path
+
 from . import index
 from . import compound
 
-from breathe import file_state_cache, path_handler
+from breathe import file_state_cache
 from breathe.project import ProjectInfo
 
 from sphinx.application import Sphinx
@@ -34,7 +36,7 @@ class Parser:
 
 class DoxygenIndexParser(Parser):
     def parse(self, project_info: ProjectInfo):
-        filename = path_handler.resolve_path(self.app, project_info.project_path(), "index.xml")
+        filename = Path(self.app.confdir, project_info.project_path(), "index.xml").resolve()
         file_state_cache.update(self.app, filename)
 
         try:
@@ -60,11 +62,11 @@ class DoxygenCompoundParser(Parser):
         self.project_info = project_info
 
     def parse(self, refid: str):
-        filename = path_handler.resolve_path(
-            self.app,
+        filename = Path(
+            self.app.confdir,
             self.project_info.project_path(),
-            "%s.xml" % refid
-        )
+            f"{refid}.xml"
+        ).resolve()
 
         file_state_cache.update(self.app, filename)
 

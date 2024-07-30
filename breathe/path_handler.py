@@ -1,12 +1,12 @@
-from sphinx.application import Sphinx
+from pathlib import Path
 
-import os
+from sphinx.application import Sphinx
 
 
 def includes_directory(file_path: str):
     # Check for backslash or forward slash as we don't know what platform we're on and sometimes
     # the doxygen paths will have forward slash even on Windows.
-    return bool(file_path.count("\\")) or bool(file_path.count("/"))
+    return bool(str(file_path).count("\\")) or bool(str(file_path).count("/"))
 
 
 def resolve_path(app: Sphinx, directory: str, filename: str):
@@ -14,5 +14,4 @@ def resolve_path(app: Sphinx, directory: str, filename: str):
     path is relative, then it is relative to the conf.py directory.
     """
 
-    # os.path.join does the appropriate handling if _project_path is an absolute path
-    return os.path.join(app.confdir, directory, filename)
+    return Path(app.confdir, directory, filename).resolve()

@@ -1,3 +1,5 @@
+from pathlib import Path
+
 from .exception import BreatheError
 
 from sphinx.application import Sphinx
@@ -40,8 +42,7 @@ class AutoProjectInfo:
         projects conf.py directory as specified in the breathe_projects_source config variable.
         """
 
-        # os.path.join does the appropriate handling if _source_path is an absolute path
-        return os.path.join(self.app.confdir, self._source_path, file_)
+        return Path(self.app.confdir, self._source_path, file_).resolve()
 
     def create_project_info(self, project_path):
         """Creates a proper ProjectInfo object based on the information in this AutoProjectInfo"""
