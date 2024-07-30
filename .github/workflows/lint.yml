@@ -7,18 +7,15 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/cache@v3
-        with:
-          path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ hashFiles('requirements/*.txt') }}
-          restore-keys: |
-            ${{ runner.os }}-pip-
+
       - name: set up python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
+        with:
+          cache: 'pip'
 
       - name: install dependencies
         run: |
-          pip install -r requirements/development.txt
+          pip install ".[lint]"
 
       - name: lint the source code
         run: make flake8
@@ -28,6 +25,3 @@ jobs:
 
       - name: type check the source code
         run: make type-check
-
-      - name: check version numbers are in sync
-        run: make version-check

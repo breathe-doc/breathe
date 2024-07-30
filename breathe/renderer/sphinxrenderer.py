@@ -2358,12 +2358,9 @@ class SphinxRenderer:
             # Use self.project_info.project_path as the XML_OUTPUT path, and
             # make it absolute with consideration to the conf.py path
             project_path = self.project_info.project_path()
-            if os.path.isabs(project_path):
-                dot_file_path = os.path.abspath(project_path + os.sep + dot_file_path)
-            else:
-                dot_file_path = os.path.abspath(
-                    self.app.confdir + os.sep + project_path + os.sep + dot_file_path
-                )
+            dot_file_path = os.path.abspath(
+                os.path.join(self.app.confdir, project_path, dot_file_path)
+            )
         try:
             with open(dot_file_path, encoding="utf-8") as fp:
                 dotcode = fp.read()

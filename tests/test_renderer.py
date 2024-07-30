@@ -34,7 +34,7 @@ def app(test_params, app_params, make_app, shared_result):
     """
     args, kwargs = app_params
     assert "srcdir" in kwargs
-    kwargs["srcdir"].makedirs(exist_ok=True)
+    os.makedirs(kwargs["srcdir"], exist_ok=True)
     (kwargs["srcdir"] / "conf.py").write_text("")
     app_ = make_app(*args, **kwargs)
     yield app_

@@ -927,7 +927,7 @@ supermod.docCharType.subclass = docCharTypeSub
 # end class docCharTypeSub
 
 
-class verbatimTypeSub(object):
+class verbatimTypeSub:
     """
     New node type. Structure is largely pillaged from other nodes in order to
     match the set.
@@ -1200,7 +1200,7 @@ def parse(inFilename):
 
     try:
         doc = minidom.parse(inFilename)
-    except IOError as e:
+    except OSError as e:
         raise FileIOError(e)
     except ExpatError as e:
         raise ParseError(e)
