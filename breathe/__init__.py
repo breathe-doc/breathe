@@ -4,7 +4,6 @@ from breathe.renderer.sphinxrenderer import setup as renderer_setup
 
 from sphinx.application import Sphinx
 
-# Keep in sync with setup.py __version__
 __version__ = "4.35.0"
 
 
