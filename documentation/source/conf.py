@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-#
 # BreatheExample documentation build configuration file, created by
 # sphinx-quickstart on Tue Feb  3 18:20:48 2009.
 #

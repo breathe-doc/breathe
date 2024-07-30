@@ -6,20 +6,16 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/cache@v1
-        with:
-          path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ hashFiles('requirements/*.txt') }}
-          restore-keys: |
-            ${{ runner.os }}-pip-
+      - uses: actions/checkout@v4
 
       - name: set up python
-        uses: actions/setup-python@v1
+        uses: actions/setup-python@v5
+        with:
+          cache: 'pip'
 
       - name: install dependencies
         run: |
-          pip install ".[docs,lint,test]"
+          pip install ".[docs]"
           sudo apt-get -y update
           sudo apt-get -y install graphviz libclang1-11 libclang-cpp11
 
