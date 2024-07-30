@@ -17,17 +17,16 @@ jobs:
           - git+https://github.com/sphinx-doc/sphinx.git@master
 
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/cache@v1
-        with:
-          path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ hashFiles('requirements/*.txt') }}
-          restore-keys: |
-            ${{ runner.os }}-pip-
+      - uses: actions/checkout@v4
       - name: set up python ${{ matrix.python-version }}
-        uses: actions/setup-python@v1
+        uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
+          cache: 'pip'
+
+      - name: install dependencies
+        run: |
+          pip install ".[test]"
 
       - name: install sphinx from PyPI or from git
         run: |
@@ -36,10 +35,6 @@ jobs:
           else
               pip install -Iv Sphinx==${{ matrix.sphinx-version }}
           fi
-
-      - name: install dependencies
-        run: |
-          pip install -r requirements/development.txt
 
       - name: run the unit tests
         run: make dev-test
