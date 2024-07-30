@@ -43,6 +43,10 @@ jobs:
           python-version: ${{ matrix.python-version }}
           cache: 'pip'
 
+      - name: install dependencies
+        run: |
+          pip install ".[test]"
+
       - name: install sphinx from PyPI or from git
         run: |
           if echo "${{ matrix.sphinx-version }}"|grep -q git; then
@@ -50,10 +54,6 @@ jobs:
           else
               pip install -Iv Sphinx==${{ matrix.sphinx-version }}
           fi
-
-      - name: install dependencies
-        run: |
-          pip install ".[test]"
 
       - name: run the unit tests
         run: make dev-test
