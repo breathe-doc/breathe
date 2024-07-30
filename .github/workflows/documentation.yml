@@ -1,43 +1,60 @@
-name: build the documentation
-on: [push, pull_request]
+name: Build documentation
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
+  cancel-in-progress: true
+
+env:
+  FORCE_COLOR: "1"
+
 jobs:
   build:
-
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+    - uses: actions/checkout@v4
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3"
 
-      - name: set up python
-        uses: actions/setup-python@v5
-        with:
-          cache: 'pip'
+    - name: Install apt dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install graphviz libclang1-11 libclang-cpp11
 
-      - name: install dependencies
-        run: |
-          pip install ".[docs]"
-          sudo apt-get -y update
-          sudo apt-get -y install graphviz libclang1-11 libclang-cpp11
+    - name: Install doxygen from SourceForge binary archives
+      env:
+        DOXYGEN_VERSION: 1.9.4
+      run: |
+        mkdir doxygen-bin-arc && cd doxygen-bin-arc
+        curl -L https://sourceforge.net/projects/doxygen/files/rel-$DOXYGEN_VERSION/doxygen-$DOXYGEN_VERSION.linux.bin.tar.gz > doxygen.tar.gz
+        gunzip doxygen.tar.gz
+        tar xf doxygen.tar
+        cd doxygen-$DOXYGEN_VERSION
+        sudo make install
 
-      - name: install doxygen from SF binary archives
-        env:
-          DOXYGEN_VERSION: 1.9.4
-        run: |
-          mkdir doxygen-bin-arc && cd doxygen-bin-arc
-          curl -L https://sourceforge.net/projects/doxygen/files/rel-$DOXYGEN_VERSION/doxygen-$DOXYGEN_VERSION.linux.bin.tar.gz > doxygen.tar.gz
-          gunzip doxygen.tar.gz
-          tar xf doxygen.tar
-          cd doxygen-$DOXYGEN_VERSION
-          sudo make install
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        python -m pip install .[docs]
 
-      - name: build the documentation
-        run: |
-          make html
-          rm documentation/build/html/.buildinfo
+    - name: Build the documentation
+      run: |
+        make html
+        rm documentation/build/html/.buildinfo
 
-      - uses: actions/upload-artifact@v3
-        with:
-          name: docs build artifacts
-          path: |
-            documentation/build/html
-            examples/*/*/xml
+    - uses: actions/upload-artifact@v4
+      with:
+        name: docs build artifacts
+        path: |
+          documentation/build/html
+          examples/*/*/xml
