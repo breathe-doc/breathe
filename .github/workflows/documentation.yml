@@ -15,9 +15,9 @@ jobs:
 
       - name: install dependencies
         run: |
+          pip install ".[docs]"
           sudo apt-get -y update
           sudo apt-get -y install graphviz libclang1-11 libclang-cpp11
-          pip install -e .[docs,lint,test]
 
       - name: install doxygen from SF binary archives
         env:

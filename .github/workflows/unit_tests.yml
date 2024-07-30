@@ -53,7 +53,7 @@ jobs:
 
       - name: install dependencies
         run: |
-          pip install ".[docs,lint,test]"
+          pip install ".[test]"
 
       - name: run the unit tests
         run: make dev-test
