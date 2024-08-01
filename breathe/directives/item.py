@@ -100,15 +100,3 @@ class DoxygenEnumValueDirective(_DoxygenBaseItemDirective):
 
 class DoxygenTypedefDirective(_DoxygenBaseItemDirective):
     kind = "typedef"
-
-
-class DoxygenUnionDirective(_DoxygenBaseItemDirective):
-    kind = "union"
-
-    def create_finder_filter(self, namespace: str, name: str) -> Filter:
-        # Unions are stored in the xml file with their fully namespaced name
-        # We're using C++ namespaces here, it might be best to make this file
-        # type dependent
-        #
-        xml_name = "%s::%s" % (namespace, name) if namespace else name
-        return self.filter_factory.create_compound_finder_filter(xml_name, "union")
