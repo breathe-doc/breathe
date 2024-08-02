@@ -963,7 +963,7 @@
       "kind": "union_list_element",
       "allow_text": true,
       "attributes": {
-        "block":  {"type": "#string"}
+        "block":  {"type": "#string", "optional": true}
       }
     },
     "docImageType": {
