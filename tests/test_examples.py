@@ -259,7 +259,7 @@ def doxygen(doxygen_cache):
             check=True,
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT,
-            encoding='utf-8',
+            encoding="utf-8",
         ).stdout
     else:
         exc = ""
