@@ -56,7 +56,7 @@ def write_file(name, text, args):
         print_info("Creating file %s." % fname, args)
         fname.parent.mkdir(parents=True, exist_ok=True)
         try:
-            orig = fname.read_text()
+            orig = fname.read_text(encoding="utf-8")
             if orig == text:
                 print_info("File %s up to date, skipping." % fname, args)
                 return

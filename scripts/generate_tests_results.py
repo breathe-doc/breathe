@@ -161,14 +161,16 @@ class Doxygen:
             raise ValueError("cannot find doxygen executable")
         self.exe = exe
 
-        self.template = (TEST_DATA_DIR / "examples" / "doxyfile_template").read_text()
+        self.template = (TEST_DATA_DIR / "examples" / "doxyfile_template").read_text(
+            encoding="utf-8"
+        )
 
     def run_one(self, tmp_path, outname):
         doxyfile = tmp_path / "Doxyfile"
         doxycontent = self.template.format(output=tmp_path)
         extra_opts = pathlib.Path("extra_dox_opts.txt")
         if extra_opts.exists():
-            doxycontent += extra_opts.read_text()
+            doxycontent += extra_opts.read_text(encoding="utf-8")
         doxyfile.write_text(doxycontent)
 
         subprocess.run([self.exe, doxyfile], check=True)
@@ -255,7 +257,9 @@ def gen_multi_project(dox):
 
         (tmp_path / "conf.py").touch()
         (tmp_path / "index.rst").write_text(
-            (test_input / "input.rst").read_text().format(project_c_path=str(tmp_path / "xmlC"))
+            (test_input / "input.rst")
+            .read_text(encoding="utf-8")
+            .format(project_c_path=str(tmp_path / "xmlC"))
         )
 
         run_sphinx_and_copy_output(

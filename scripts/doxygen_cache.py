@@ -23,14 +23,14 @@ def run_one(p, name, template, exec):
     doxycontent = template.format(output=out_dir)
     extra_opts = pathlib.Path("extra_dox_opts.txt")
     if extra_opts.exists():
-        doxycontent += extra_opts.read_text()
+        doxycontent += extra_opts.read_text(encoding="utf-8")
     doxyfile.write_text(doxycontent)
 
     subprocess.run([exec, doxyfile], check=True)
 
 
 def make_cache():
-    template = (EXAMPLES_DIR / "doxyfile_template").read_text()
+    template = (EXAMPLES_DIR / "doxyfile_template").read_text(encoding="utf-8")
 
     exec = shutil.which("doxygen")
     if exec is None:

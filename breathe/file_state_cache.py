@@ -1,10 +1,10 @@
-from pathlib import Path
+from __future__ import annotations
 
 from sphinx.application import Sphinx
 from sphinx.environment import BuildEnvironment
 
 import os
-from typing import List, Set
+from pathlib import Path
 
 """
 Store the modified time of the various doxygen xml files against the
@@ -46,8 +46,8 @@ def update(app: Sphinx, source_file: str | os.PathLike[str]) -> None:
 
 
 def _get_outdated(
-    app: Sphinx, env: BuildEnvironment, added: Set[str], changed: Set[str], removed: Set[str]
-) -> List[str]:
+    app: Sphinx, env: BuildEnvironment, added: set[str], changed: set[str], removed: set[str]
+) -> list[str]:
     if not hasattr(app.env, "breathe_file_state"):
         return []
 
