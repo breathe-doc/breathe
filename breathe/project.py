@@ -7,6 +7,7 @@ from sphinx.application import Sphinx
 import os
 import os.path
 import fnmatch
+from pathlib import Path
 
 
 from typing import TYPE_CHECKING
@@ -53,8 +54,7 @@ class AutoProjectInfo:
         projects conf.py directory as specified in the breathe_projects_source config variable.
         """
 
-        # os.path.join does the appropriate handling if _source_path is an absolute path
-        return os.path.join(self.app.confdir, self._source_path, file_)
+        return Path(self.app.confdir, self._source_path, file_).resolve()
 
     def create_project_info(self, project_path):
         """Creates a proper ProjectInfo object based on the information in this AutoProjectInfo"""
@@ -125,13 +125,9 @@ class ProjectInfoFactory:
         self.app = app
         # note: don't access self.app.config now, as we are instantiated at setup-time.
 
-        # Assume general build directory is the doctree directory without the last component.
-        # We strip off any trailing slashes so that dirname correctly drops the last part.
+        # Assume general build directory is the parent of the doctree directory.
         # This can be overridden with the breathe_build_directory config variable
-        if isinstance(app.doctreedir, str):
-            self._default_build_dir = os.path.dirname(app.doctreedir.rstrip(os.sep))
-        else:
-            self._default_build_dir = str(app.doctreedir.parent)
+        self._default_build_dir = os.path.dirname(os.path.normpath(app.doctreedir))
         self.project_count = 0
         self.project_info_store: dict[str, ProjectInfo] = {}
         self.project_info_for_auto_store: dict[str, ProjectInfo] = {}

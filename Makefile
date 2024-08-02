@@ -54,7 +54,3 @@ black:
 .PHONY: type-check
 type-check: $(GENERATED_MOD)
 	mypy --warn-redundant-casts --warn-unused-ignores breathe tests
-
-.PHONY: version-check
-version-check:
-	 PYTHONPATH=../:$(PYTHONPATH) python3 scripts/version-check.py

@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-#
 # BreatheExample documentation build configuration file, created by
 # sphinx-quickstart on Tue Feb  3 18:20:48 2009.
 #
@@ -35,6 +33,7 @@ extensions = [
     "sphinx.ext.ifconfig",
     "sphinx.ext.graphviz",
     "sphinx_copybutton",
+    "sphinxcontrib.spelling",
 ]
 
 read_the_docs_build = os.environ.get("READTHEDOCS", None) == "True"
@@ -118,17 +117,6 @@ comparison = os.environ.get("BREATHE_COMPARE", None) == "True"
 if comparison:
     version = "compare"
     release = "compare"
-
-# Only add spelling extension if it is available. We don't know if it is installed as we don't want
-# to put it in the setup.py file as a dependency as we don't want Breathe to be dependent on it as
-# people should be able to use Breathe without 'spelling'. There might be a better way to handle
-# this.
-try:
-    import sphinxcontrib.spelling
-
-    extensions.append("sphinxcontrib.spelling")
-except ImportError:
-    pass
 
 
 # Configuration for spelling extension
@@ -413,5 +401,5 @@ def setup(app):
     # Add hook for building doxygen xml when needed
     app.connect("builder-inited", generate_doxygen_xml)
 
-    app.add_config_value("documentation_build", "development", True)
+    app.add_config_value("documentation_build", "development", "env")
     app.add_config_value("doxygen_version", (0, 0, 0), "env")

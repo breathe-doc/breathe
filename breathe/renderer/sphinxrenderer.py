@@ -1,8 +1,7 @@
 from __future__ import annotations
 
-import os
 from collections import defaultdict
-import sphinx
+from pathlib import Path
 
 from breathe import parser, filetypes
 from breathe.renderer.filter import NodeStack
@@ -609,13 +608,13 @@ def split_name(name: str) -> list[str]:
     return ["".join(subparts) for subparts in parts]
 
 
-def namespace_strip(config, nodes: list[nodes.Node]):
+def namespace_strip(config, nodes_: list[nodes.Node]):
     # In some cases of errors with a declaration there are no nodes
     # (e.g., variable in function), so perhaps skip (see #671).
     # If there are nodes, there should be at least 2.
-    if len(nodes) != 0:
-        assert len(nodes) >= 2
-        rst_node = nodes[1]
+    if len(nodes_) != 0:
+        assert len(nodes_) >= 2
+        rst_node = nodes_[1]
         doc = rst_node.document
         assert doc is not None
         finder = NodeFinder(doc)
@@ -870,7 +869,7 @@ class SphinxRenderer(metaclass=NodeVisitor):
             _debug_indent += 1
 
         self.nesting_level += 1
-        nodes = directive.run()
+        nodes_ = directive.run()
         self.nesting_level -= 1
 
         # TODO: the directive_args seems to be reused between different run_directives
@@ -884,8 +883,8 @@ class SphinxRenderer(metaclass=NodeVisitor):
 
         # Filter out outer class names if we are rendering a member as a part of a class content.
         if self.context.child:
-            namespace_strip(config, nodes)
-        return nodes
+            namespace_strip(config, nodes_)
+        return nodes_
 
     def handle_compounddef_declaration(
         self,
@@ -1091,8 +1090,8 @@ class SphinxRenderer(metaclass=NodeVisitor):
     def create_template_prefix(self, decl: HasTemplateParamList) -> str:
         if not decl.templateparamlist:
             return ""
-        nodes = self.render(decl.templateparamlist)
-        return "template<" + "".join(n.astext() for n in nodes) + ">"
+        nodes_ = self.render(decl.templateparamlist)
+        return "template<" + "".join(n.astext() for n in nodes_) + ">"
 
     def run_domain_directive(self, kind, names):
         assert self.context
@@ -1115,15 +1114,15 @@ class SphinxRenderer(metaclass=NodeVisitor):
             )
             _debug_indent += 1
 
-        nodes = domain_directive.run()
+        nodes_ = domain_directive.run()
 
         if config.breathe_debug_trace_directives:  # pragma: no cover
             _debug_indent -= 1
 
         # Filter out outer class names if we are rendering a member as a part of a class content.
         if self.context.child:
-            namespace_strip(config, nodes)
-        return nodes
+            namespace_strip(config, nodes_)
+        return nodes_
 
     def create_doxygen_target(self, node):
         """Can be overridden to create a target node which uses the doxygen refid information
@@ -1201,7 +1200,7 @@ class SphinxRenderer(metaclass=NodeVisitor):
                 del n.parent[n.parent.index(n)]
                 dest.append(n)
 
-        detailed = []
+        detailed: list[nodes.Node] = []
         for candNode in detailedCand:
             pullup(candNode, nodes.field_list, fieldLists)
             pullup(candNode, nodes.note, admonitions)
@@ -1225,51 +1224,16 @@ class SphinxRenderer(metaclass=NodeVisitor):
                 fieldList.extend(fl)
             fieldLists = [fieldList]
 
-        # collapse retvals into a single return field
-        if len(fieldLists) != 0 and sphinx.version_info[0:2] < (4, 3):  # pyright: ignore
-            others: list[nodes.field] = []
-            retvals: list[nodes.field] = []
-            f: nodes.field
-            fn: nodes.field_name
-            fb: nodes.field_body
-            for f in fieldLists[0]:
-                fn, fb = f
-                assert len(fn) == 1
-                if fn.astext().startswith("returns "):
-                    retvals.append(f)
-                else:
-                    others.append(f)
-            if len(retvals) != 0:
-                items: list[nodes.paragraph] = []
-                for fn, fb in retvals:
-                    # we created the retvals before, so we made this prefix
-                    assert fn.astext().startswith("returns ")
-                    val = nodes.strong("", fn.astext()[8:])
-                    # assumption from visit_docparamlist: fb is a single paragraph or nothing
-                    assert len(fb) <= 1, fb
-                    bodyNodes = [val, nodes.Text(" -- ")]
-                    if len(fb) == 1:
-                        assert isinstance(fb[0], nodes.paragraph)
-                        bodyNodes.extend(fb[0])
-                    items.append(nodes.paragraph("", "", *bodyNodes))
-                # only make a bullet list if there are multiple retvals
-                body: nodes.Element
-                if len(items) == 1:
-                    body = items[0]
-                else:
-                    body = nodes.bullet_list()
-                    for i in items:
-                        body.append(nodes.list_item("", i))
-                fRetvals = nodes.field(
-                    "", nodes.field_name("", "returns"), nodes.field_body("", body)
-                )
-                fl = nodes.field_list("", *others, fRetvals)
-                fieldLists = [fl]
-
+        # using "extend" instead of addition is slightly more verbose but is
+        # needed to get around the mypy issue
+        # https://github.com/python/mypy/issues/3933
         if self.app.config.breathe_order_parameters_first:
-            return detailed + fieldLists + admonitions
+            detailed.extend(fieldLists)
+            detailed.extend(admonitions)
         else:
-            return detailed + admonitions + fieldLists
+            detailed.extend(admonitions)
+            detailed.extend(fieldLists)
+        return detailed
 
     def update_signature(self, signature, obj_type):
         """Update the signature node if necessary, e.g. add qualifiers."""
@@ -1288,7 +1252,7 @@ class SphinxRenderer(metaclass=NodeVisitor):
         obj_type = kwargs.get("objtype", None)
         if obj_type is None:
             obj_type = node.kind.value
-        nodes = self.run_domain_directive(obj_type, [declaration.replace("\n", " ")])
+        nodes_ = self.run_domain_directive(obj_type, [declaration.replace("\n", " ")])
         target = None
         if self.app.env.config.breathe_debug_trace_doxygen_ids:
             target = self.create_doxygen_target(node)
@@ -1297,7 +1261,7 @@ class SphinxRenderer(metaclass=NodeVisitor):
             else:
                 print("{}Doxygen target (old): {}".format("  " * _debug_indent, target[0]["ids"]))
 
-        rst_node = nodes[1]
+        rst_node = nodes_[1]
         doc = rst_node.document
         assert doc is not None
         finder = NodeFinder(doc)
@@ -1318,7 +1282,7 @@ class SphinxRenderer(metaclass=NodeVisitor):
         assert target is not None
         signode.insert(0, target)
         contentnode.extend(description)
-        return nodes
+        return nodes_
 
     @node_handler(parser.Node_DoxygenTypeIndex)
     def visit_doxygen(self, node: parser.Node_DoxygenTypeIndex) -> list[nodes.Node]:
@@ -1352,10 +1316,10 @@ class SphinxRenderer(metaclass=NodeVisitor):
                 names.append(nodeDef.compoundname.split("::")[-1])
             declaration = self.join_nested_name(names)
 
-            nodes = self.handle_compounddef_declaration(
+            nodes_ = self.handle_compounddef_declaration(
                 nodeDef, nodeDef.kind.value, declaration, file_data, new_context, parent_context
             )
-        return nodes
+        return nodes_
 
     def visit_class(self, node: HasRefID) -> list[nodes.Node]:
         # Read in the corresponding xml file and process
@@ -1407,7 +1371,7 @@ class SphinxRenderer(metaclass=NodeVisitor):
                 parser.DoxCompoundKind.interface,
             )
             display_obj_type = "interface" if kind == parser.DoxCompoundKind.interface else None
-            nodes = self.handle_compounddef_declaration(
+            nodes_ = self.handle_compounddef_declaration(
                 nodeDef,
                 nodeDef.kind.value,
                 declaration,
@@ -1417,12 +1381,12 @@ class SphinxRenderer(metaclass=NodeVisitor):
                 display_obj_type,
             )
             if "members-only" in self.context.directive_args[2]:
-                assert len(nodes) >= 2
-                assert isinstance(nodes[1], addnodes.desc)
-                assert len(nodes[1]) >= 2
-                assert isinstance(nodes[1][1], addnodes.desc_content)
-                return nodes[1][1].children
-        return nodes
+                assert len(nodes_) >= 2
+                assert isinstance(nodes_[1], addnodes.desc)
+                assert len(nodes_[1]) >= 2
+                assert isinstance(nodes_[1][1], addnodes.desc_content)
+                return list(nodes_[1][1].children)
+        return nodes_
 
     def visit_namespace(self, node: HasRefID) -> list[nodes.Node]:
         # Read in the corresponding xml file and process
@@ -1445,7 +1409,7 @@ class SphinxRenderer(metaclass=NodeVisitor):
             declaration = self.join_nested_name(names)
 
             display_obj_type = "namespace" if self.get_domain() != "py" else "module"
-            nodes = self.handle_compounddef_declaration(
+            nodes_ = self.handle_compounddef_declaration(
                 nodeDef,
                 nodeDef.kind.value,
                 declaration,
@@ -1454,7 +1418,7 @@ class SphinxRenderer(metaclass=NodeVisitor):
                 parent_context,
                 display_obj_type,
             )
-        return nodes
+        return nodes_
 
     def visit_compound(
         self,
@@ -1533,8 +1497,8 @@ class SphinxRenderer(metaclass=NodeVisitor):
             assert self.context is not None
             self.context.directive_args[1] = [arg]
 
-            nodes = self.run_domain_directive(kind.value, self.context.directive_args[1])
-            rst_node = nodes[1]
+            nodes_ = self.run_domain_directive(kind.value, self.context.directive_args[1])
+            rst_node = nodes_[1]
 
             doc = rst_node.document
             assert doc is not None
@@ -1549,7 +1513,7 @@ class SphinxRenderer(metaclass=NodeVisitor):
                 finder.declarator[0] = addnodes.desc_annotation(kind.value + " ", kind.value + " ")
 
             rst_node.children[0].insert(0, doxygen_target)
-            return nodes, finder.content
+            return nodes_, finder.content
 
         if render_signature is None:
             render_signature = def_render_signature
@@ -1558,7 +1522,7 @@ class SphinxRenderer(metaclass=NodeVisitor):
         with WithContext(self, new_context):
             # Pretend that the signature is being rendered in context of the
             # definition, for proper domain detection
-            nodes, contentnode = render_signature(
+            nodes_, contentnode = render_signature(
                 file_data, self.target_handler.create_target(refid), name, kind
             )
 
@@ -1567,7 +1531,7 @@ class SphinxRenderer(metaclass=NodeVisitor):
                 contentnode.extend(self.render(include, new_context.create_child_context(include)))
 
         contentnode.extend(rendered_data)
-        return nodes
+        return nodes_
 
     def visit_file(self, node: parser.Node_CompoundType) -> list[nodes.Node]:
         def render_signature(
@@ -1575,6 +1539,7 @@ class SphinxRenderer(metaclass=NodeVisitor):
         ) -> tuple[list[nodes.Node], addnodes.desc_content]:
             assert self.context is not None
             options = self.context.directive_args[2]
+            rst_node: nodes.container | addnodes.desc
 
             if "content-only" in options:
                 rst_node = nodes.container()
@@ -2728,7 +2693,7 @@ class SphinxRenderer(metaclass=NodeVisitor):
                 dom = "cpp"
             appendDeclName = True
             if insertDeclNameByParsing:
-                if dom == "cpp" and sphinx.version_info >= (4, 1, 0):  # pyright: ignore
+                if dom == "cpp":
                     parser = cpp.DefinitionParser(
                         "".join(n.astext() for n in nodelist),
                         location=self.state.state_machine.get_source_and_line(),
@@ -2791,13 +2756,11 @@ class SphinxRenderer(metaclass=NodeVisitor):
     def visit_docparamlist(self, node: parser.Node_docParamListType) -> list[nodes.Node]:
         """Parameter/Exception/TemplateParameter documentation"""
 
-        # retval support available on Sphinx >= 4.3
-        has_retval = sphinx.version_info[0:2] >= (4, 3)  # pyright: ignore
         fieldListName = {
             parser.DoxParamListKind.param: "param",
             parser.DoxParamListKind.exception: "throws",
             parser.DoxParamListKind.templateparam: "tparam",
-            parser.DoxParamListKind.retval: "retval" if has_retval else "returns",
+            parser.DoxParamListKind.retval: "retval",
         }
 
         # https://docutils.sourceforge.io/docs/ref/doctree.html#field-list
@@ -2882,24 +2845,18 @@ class SphinxRenderer(metaclass=NodeVisitor):
     def visit_docdotfile(self, node: parser.Node_docImageFileType) -> list[nodes.Node]:
         """Translate node from doxygen's dotfile command to sphinx's graphviz directive."""
         dotcode = ""
-        dot_file_path: str = node.name or ""
+        dot_file_path = Path(node.name or "")
         # Doxygen v1.9.3+ uses a relative path to specify the dot file.
         # Previously, Doxygen used an absolute path.
         # This relative path is with respect to the XML_OUTPUT path.
         # Furthermore, Doxygen v1.9.3+ will copy the dot file into the XML_OUTPUT
-        if not os.path.isabs(dot_file_path):
+        if not dot_file_path.is_absolute():
             # Use self.project_info.project_path as the XML_OUTPUT path, and
             # make it absolute with consideration to the conf.py path
             project_path = self.project_info.project_path()
-            if os.path.isabs(project_path):
-                dot_file_path = os.path.abspath(project_path + os.sep + dot_file_path)
-            else:
-                dot_file_path = os.path.abspath(
-                    str(self.app.confdir) + os.sep + project_path + os.sep + dot_file_path
-                )
+            dot_file_path = Path(self.app.confdir, project_path, dot_file_path).resolve()
         try:
-            with open(dot_file_path, encoding="utf-8") as fp:
-                dotcode = fp.read()
+            dotcode = dot_file_path.read_text(encoding="utf-8")
             if not dotcode.rstrip("\n"):
                 raise RuntimeError("%s found but without any content" % dot_file_path)
         except OSError as exc:

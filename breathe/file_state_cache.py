@@ -1,3 +1,5 @@
+from pathlib import Path
+
 from sphinx.application import Sphinx
 from sphinx.environment import BuildEnvironment
 
@@ -27,19 +29,20 @@ def _getmtime(filename: str):
         raise MTimeError("Cannot find file: %s" % os.path.realpath(filename))
 
 
-def update(app: Sphinx, source_file: str) -> None:
+def update(app: Sphinx, source_file: str | os.PathLike[str]) -> None:
     if not hasattr(app.env, "breathe_file_state"):
         app.env.breathe_file_state = {}  # type: ignore
 
-    new_mtime = _getmtime(source_file)
+    norm_source_file = Path(source_file).resolve().as_posix()
+    new_mtime = _getmtime(norm_source_file)
     mtime, docnames = app.env.breathe_file_state.setdefault(  # type: ignore
-        source_file, (new_mtime, set())
+        norm_source_file, (new_mtime, set())
     )
 
     assert app.env is not None
     docnames.add(app.env.docname)
 
-    app.env.breathe_file_state[source_file] = (new_mtime, docnames)  # type: ignore
+    app.env.breathe_file_state[norm_source_file] = (new_mtime, docnames)  # type: ignore
 
 
 def _get_outdated(

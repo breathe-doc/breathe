@@ -12,7 +12,7 @@ from breathe.renderer import filter
 
 from docutils.parsers.rst.directives import unchanged_required, flag
 
-from typing import Any, TYPE_CHECKING
+from typing import Any, ClassVar, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from collections.abc import Iterable, Mapping
@@ -139,6 +139,8 @@ class _BaseFileDirective(BaseDirective):
     """Base class handle the main work when given the appropriate file and project info to work
     from.
     """
+
+    directive_name: ClassVar[str]
 
     # We use inheritance here rather than a separate object and composition, because so much
     # information is present in the Directive class from the docutils framework that we'd have to

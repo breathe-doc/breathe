@@ -1,70 +1,76 @@
-name: unit tests
-on: [push, pull_request]
+name: Tests
+
+on:
+  push:
+    paths:
+      - ".github/workflows/unit_tests.yml"
+      - "breathe/**"
+      - "tests/**"
+  pull_request:
+    paths:
+      - ".github/workflows/unit_tests.yml"
+      - "breathe/**"
+      - "tests/**"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
+  cancel-in-progress: true
+
+env:
+  FORCE_COLOR: "1"
+  PYTHONDEVMODE: "1"  # -X dev
+  PYTHONWARNDEFAULTENCODING: "1"  # -X warn_default_encoding
+
 jobs:
   cache-doxygen:
     uses: ./.github/workflows/cache_doxygen.yml
 
-  build:
+  test:
     needs: cache-doxygen
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
-        doxygen-version: ['1.9.4', '1.9.7']
-        python-version: ['3.8', '3.9', '3.10', '3.11', '3.12']
+        doxygen-version:
+          - '1.9.4'
+          - '1.9.7'
+        python-version:
+          - '3.9'
+          - '3.10'
+          - '3.11'
+          - '3.12'
         sphinx-version:
-          - '4.3.2'
-          - '4.5.0'
-          - '5.0.2'
-          - '5.1.1'
-          - '5.3.0'
-          - '6.1.3'
-          - '7.2.6'
+          - '6.2'
+          - '7.0'
+          - '7.1'
+          - '7.2'
           # version 7.3 broke up the domain modules into packages, changing
           # where some classes had to be imported from
-          - '7.3.0'
-          - git+https://github.com/sphinx-doc/sphinx.git@master
-        exclude:
-          # Sphinx version 7.2 and up isn't compatible with Python 3.8
-          - python-version: '3.8'
-            sphinx-version: '7.2.6'
-          - python-version: '3.8'
-            sphinx-version: '7.3.0'
-          - python-version: '3.8'
-            sphinx-version: git+https://github.com/sphinx-doc/sphinx.git@master
+          - '7.3'
+          - '7.4'
+          - '8.0'
+          - 'latest'
 
     steps:
-      - uses: actions/checkout@v2
-      - name: set up python ${{ matrix.python-version }}
-        uses: actions/setup-python@v4
+      - uses: actions/checkout@v4
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
           cache: 'pip'
-          cache-dependency-path: |
-            requirements/development.txt
-            requirements/production.txt
-      
-      # the latest sphinxcontrib- packages don't work with Sphinx version 4
-      - name: install sphinx from PyPI with compatible versions of sphinxcontrib- packages
-        if: ${{ startsWith(matrix.sphinx-version, '4.') }}
-        run: >
-          pip install -Iv
-          Sphinx==${{ matrix.sphinx-version }}
-          sphinxcontrib-applehelp==1.0.4
-          sphinxcontrib-devhelp==1.0.2
-          sphinxcontrib-htmlhelp==2.0.1
-          sphinxcontrib-serializinghtml==1.1.5
-          sphinxcontrib-qthelp==1.0.3
 
-      - name: install sphinx from PyPI
-        if: ${{ ! startsWith(matrix.sphinx-version, 'git') && ! startsWith(matrix.sphinx-version, '4.') }}
+      - name: Install Sphinx ${{ matrix.sphinx-version }}
+        if: matrix.sphinx-version != 'latest'
         run: |
-          pip install -Iv Sphinx==${{ matrix.sphinx-version }}
+          python -m pip install -Iv Sphinx==${{ matrix.sphinx-version }}
       
-      - name: install sphinx from git
-        if: startsWith(matrix.sphinx-version, 'git')
+      - name: Install Sphinx master
+        if: matrix.sphinx-version == 'latest'
         run: |
-          pip install ${{ matrix.sphinx-version }}
+          python -m pip install "Sphinx @ git+https://github.com/sphinx-doc/sphinx.git@master"
 
       - uses: actions/cache/restore@v4
         id: cache-doxygen
@@ -73,7 +79,7 @@ jobs:
           fail-on-cache-miss: true
           key: ${{ runner.os }}-doxygen-${{ matrix.doxygen-version }}
 
-      - name: install Doxygen
+      - name: Install doxygen
         # at some point actions/cache/restore@4 started unpacking doxygen.tar.gz
         # automatically and I don't know why -- Rouslan
         run: |
@@ -87,10 +93,17 @@ jobs:
           fi
           sudo make install
 
-      - name: install dependencies and build extension module
+      - name: Install dependencies
         run: |
-          pip install -r requirements/development.txt
-          pip install --editable .
+          pip install --upgrade pip
+          pip install .[test]
 
-      - name: run the unit tests
-        run: make dev-test
+      - name: Test with pytest
+        if: matrix.sphinx-version != 'latest'
+        run: python -m pytest -vv
+        env:
+          PYTHONWARNINGS: "error"  # treat all warnings as errors
+        
+      - name: Test with pytest
+        if: matrix.sphinx-version == 'latest'
+        run: python -m pytest -vv

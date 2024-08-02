@@ -66,6 +66,7 @@ upload()
 (
 	cd -- mkrelease_tmp
 
+	twine check --strict dist/*
 	twine upload -- dist/*
 
 	{
