@@ -94,9 +94,11 @@ jobs:
           sudo make install
 
       - name: Install dependencies
+        # "--editable" is needed so that _parser.py is placed in the local
+        # folder where pytest will import from
         run: |
           pip install --upgrade pip
-          pip install .[test]
+          pip install --editable .[test]
 
       - name: Test with pytest
         if: matrix.sphinx-version != 'latest'
