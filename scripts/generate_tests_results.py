@@ -171,7 +171,7 @@ class Doxygen:
         extra_opts = pathlib.Path("extra_dox_opts.txt")
         if extra_opts.exists():
             doxycontent += extra_opts.read_text(encoding="utf-8")
-        doxyfile.write_text(doxycontent)
+        doxyfile.write_text(doxycontent, encoding="utf-8")
 
         subprocess.run([self.exe, doxyfile], check=True)
         if outname != "xml":
@@ -259,7 +259,8 @@ def gen_multi_project(dox):
         (tmp_path / "index.rst").write_text(
             (test_input / "input.rst")
             .read_text(encoding="utf-8")
-            .format(project_c_path=str(tmp_path / "xmlC"))
+            .format(project_c_path=str(tmp_path / "xmlC")),
+            encoding="utf-8",
         )
 
         run_sphinx_and_copy_output(

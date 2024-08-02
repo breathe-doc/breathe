@@ -278,7 +278,7 @@ def run_doxygen_with_template(doxygen, tmp_path, cache, example_name, output_nam
     extra_opts = pathlib.Path("extra_dox_opts.txt")
     if extra_opts.exists():
         doxycontent += extra_opts.read_text(encoding="utf-8")
-    doxyfile.write_text(doxycontent)
+    doxyfile.write_text(doxycontent, encoding="utf-8")
 
     if cache is not None:
         # instead of passing a different path to breathe_projects.example, the
@@ -355,7 +355,8 @@ def test_multiple_projects(make_app, tmp_path, monkeypatch, doxygen, doxygen_cac
     (tmp_path / "index.rst").write_text(
         (test_input / "input.rst")
         .read_text(encoding="utf-8")
-        .format(project_c_path=str(tmp_path / "xmlC"))
+        .format(project_c_path=str(tmp_path / "xmlC")),
+        encoding="utf-8",
     )
     run_sphinx_and_compare(
         make_app,

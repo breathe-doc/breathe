@@ -104,7 +104,7 @@ def setup(app: Sphinx) -> None:
         directory.mkdir(parents=True, exist_ok=True)
 
         # Write the file with the provided contents
-        (directory / filename).write_text(content)
+        (directory / filename).write_text(content, encoding="utf-8")
 
     doxygen_handle = AutoDoxygenProcessHandle(
         subprocess.check_call, write_file, project_info_factory

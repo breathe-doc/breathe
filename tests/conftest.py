@@ -18,7 +18,7 @@ def app(test_params, app_params, make_app, shared_result):
     args, kwargs = app_params
     assert "srcdir" in kwargs
     pathlib.Path(kwargs["srcdir"]).mkdir(parents=True, exist_ok=True)
-    (kwargs["srcdir"] / "conf.py").write_text("")
+    (kwargs["srcdir"] / "conf.py").write_text("", encoding="utf-8")
     app_ = make_app(*args, **kwargs)
     yield app_
 

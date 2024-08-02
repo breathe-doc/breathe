@@ -24,7 +24,7 @@ def run_one(p, name, template, exec):
     extra_opts = pathlib.Path("extra_dox_opts.txt")
     if extra_opts.exists():
         doxycontent += extra_opts.read_text(encoding="utf-8")
-    doxyfile.write_text(doxycontent)
+    doxyfile.write_text(doxycontent, encoding="utf-8")
 
     subprocess.run([exec, doxyfile], check=True)
 
@@ -42,7 +42,7 @@ def make_cache():
     r = subprocess.run(
         [exec, "--version"], check=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True
     )
-    (CACHE_DIR / "version.txt").write_text(r.stdout)
+    (CACHE_DIR / "version.txt").write_text(r.stdout, encoding="utf-8")
 
     try:
         for p in EXAMPLES_DIR.glob("test_*"):
@@ -60,7 +60,8 @@ def make_cache():
                 output_dir=str(out_dir),
                 input='"auto_class.h" "auto_function.h"',
                 extra="",
-            )
+            ),
+            encoding="utf-8",
         )
 
         subprocess.run([exec, doxyfile], check=True)

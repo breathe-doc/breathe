@@ -63,7 +63,7 @@ def write_file(name, text, args):
         except FileNotFoundError:
             # Don't mind if it isn't there
             pass
-        fname.write_text(text)
+        fname.write_text(text, encoding="utf-8")
 
 
 def format_heading(level, text):
