@@ -193,8 +193,8 @@ def run_sphinx_and_copy_output(tmp_path, input_path, overrides):
 
     # shutil.copyfile(tmp_path / '_build' / 'xml' / 'index.xml', input_path / 'compare_draft.xml')
     # copy index.xml to compare_draft.xml with an extra stylesheet line
-    with open(tmp_path / "_build" / "xml" / "index.xml") as f_in, open(
-        input_path / "compare_draft.xml", "w"
+    with open(tmp_path / "_build" / "xml" / "index.xml", encoding="utf-8") as f_in, open(
+        input_path / "compare_draft.xml", "w", encoding="utf-8"
     ) as f_out:
         itr_in = iter(f_in)
         line = next(itr_in)

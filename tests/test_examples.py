@@ -205,7 +205,7 @@ def compare_xml(generated, input_dir, version):
         XMLEventType.E_TEXT: "text",
     }
 
-    with open(generated) as o_file, open(model) as c_file:
+    with open(generated, encoding="utf-8") as o_file, open(model, encoding="utf-8") as c_file:
         for o, c in zip(filtered_xml(o_file), filtered_xml(c_file)):
             o_type, o_node = o
             c_type, c_node = c

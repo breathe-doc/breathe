@@ -1013,7 +1013,7 @@ def generate_from_json(json_path, template_files) -> None:
     env = make_env(schema)
 
     for i_file, o_file in template_files:
-        with open(i_file) as tfile:
+        with open(i_file, encoding="utf-8") as tfile:
             template_str = tfile.read()
-        with open(o_file, "w") as ofile:
+        with open(o_file, "w", encoding="utf-8") as ofile:
             env.from_string(template_str).stream().dump(ofile)

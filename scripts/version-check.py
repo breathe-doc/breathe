@@ -9,7 +9,7 @@ import re
 import breathe
 
 setup_version = ""
-with open("pyproject.toml") as project:
+with open("pyproject.toml", encoding="utf-8") as project:
     for line in project:
         if line.startswith("version"):
             match = re.search('"([^"]*)"', line)
