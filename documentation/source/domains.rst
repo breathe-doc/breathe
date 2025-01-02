@@ -6,12 +6,6 @@ Breathe has some limited support for Sphinx domains. It tries to output targets
 that the Sphinx domain references expect. This should allow you to use Sphinx
 domain roles like ``:c:func:`foo``` to link to output from Breathe.
 
-The following targets are supported:
-
-* C & C++ functions
-* C++ classes
-
-
 Class Example
 -------------
 
