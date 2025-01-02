@@ -5,7 +5,7 @@ from breathe.renderer.mask import NullMaskFactory
 from breathe.renderer.target import create_target_handler
 
 from docutils.nodes import Node
-from docutils.parsers.rst.directives import unchanged_required, unchanged, flag
+from docutils.parsers.rst.directives import unchanged_required, unchanged, flag, choice
 
 from typing import Any, List
 
@@ -27,6 +27,7 @@ class _DoxygenClassLikeDirective(BaseDirective):
         "outline": flag,
         "no-link": flag,
         "allow-dot-graphs": flag,
+        "subclasses": lambda arg: choice(arg, ["none", "list", "paragraph"]),
     }
     has_content = False
 
