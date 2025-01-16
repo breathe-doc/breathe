@@ -44,4 +44,4 @@ black:
 
 .PHONY: type-check
 type-check:
-	mypy --warn-redundant-casts --warn-unused-ignores breathe tests
+	mypy --warn-redundant-casts --warn-unused-ignores --python-version 3.9 breathe tests
