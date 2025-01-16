@@ -168,6 +168,7 @@ class MockMaskFactory:
 class MockContext:
     def __init__(self, app, node_stack, domain=None, options=[]):
         from docutils.statemachine import StringList
+
         self.domain = domain
         self.node_stack = node_stack
         self.directive_args = [
