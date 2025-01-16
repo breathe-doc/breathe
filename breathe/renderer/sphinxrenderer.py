@@ -920,7 +920,7 @@ class SphinxRenderer:
         if self.app.config.breathe_order_parameters_first:
             return detailed + fieldLists + admonitions
         else:
-            return detailed + admonitions + fieldLists
+            return detailed + admonitions + fieldLists  # type: ignore[operator]
 
     def update_signature(self, signature, obj_type):
         """Update the signature node if necessary, e.g. add qualifiers."""
@@ -1889,7 +1889,7 @@ class SphinxRenderer:
         row = nodes.row()
         cols = self.render_iterable(node.entry)
         elem: Union[nodes.thead, nodes.tbody]
-        if all(col.get("heading", False) for col in cols):
+        if all(col.get("heading", False) for col in cols):  # type: ignore[attr-defined]
             elem = nodes.thead()
         else:
             elem = nodes.tbody()
@@ -1912,9 +1912,9 @@ class SphinxRenderer:
         # "envelop" rows there, namely thead and tbody (eg it will need to be updated
         # if Doxygen one day adds support for tfoot)
 
-        tags: Dict[str, List] = {row.starttag(): [] for row in rows}
+        tags: Dict[str, List] = {row.starttag(): [] for row in rows}  # type: ignore[attr-defined]
         for row in rows:
-            tags[row.starttag()].append(row.next_node())
+            tags[row.starttag()].append(row.next_node())  # type: ignore[attr-defined]
 
         def merge_row_types(root, elem, elems):
             for node in elems:
@@ -2037,7 +2037,7 @@ class SphinxRenderer:
             # Insert Doxygen target into the first signature node.
             if not self.app.env.config.breathe_debug_trace_doxygen_ids:
                 target = self.create_doxygen_target(node)
-            rst_node.children[0].insert(0, target)
+            rst_node.children[0].insert(0, target)  # type: ignore[attr-defined]
 
             finder.content.extend(self.description(node))
             return nodes_
