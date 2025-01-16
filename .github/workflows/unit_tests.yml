@@ -35,14 +35,22 @@ jobs:
           - '3.10'
           - '3.11'
           - '3.12'
+          - '3.13'
         sphinx-version:
           - '6.2'
-          - '7.0'
-          - '7.1'
-          - '7.2'
-          - '7.3'
-          - '7.4'
+          - '7.2' # Ubuntu 24.04
+          - '7.4' # Ubuntu 24.10
           - '8.0'
+          - '8.1' # Ubuntu 25.04
+        exclude:
+          - python-version: '3.9'
+            sphinx-version: '8.0'
+          - python-version: '3.9'
+            sphinx-version: '8.1'
+          - python-version: '3.12'
+            sphinx-version: '6.2'
+          - python-version: '3.13'
+            sphinx-version: '6.2'
 
     steps:
     - uses: actions/checkout@v4
