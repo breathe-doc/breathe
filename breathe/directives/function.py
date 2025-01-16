@@ -166,7 +166,7 @@ class DoxygenFunctionDirective(BaseDirective):
         parser = cpp.DefinitionParser(
             function_description, location=self.get_source_info(), config=self.config
         )
-        paramQual = parser._parse_parameters_and_qualifiers(paramMode="function")
+        paramQual = parser._parse_parameters_and_qualifiers("function")
         # strip everything that doesn't contribute to overloading
 
         def stripParamQual(paramQual):
