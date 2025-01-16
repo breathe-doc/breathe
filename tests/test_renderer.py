@@ -35,7 +35,7 @@ def app(test_params, app_params, make_app, shared_result):
     args, kwargs = app_params
     assert "srcdir" in kwargs
     os.makedirs(kwargs["srcdir"], exist_ok=True)
-    (kwargs["srcdir"] / "conf.py").write_text("")
+    (kwargs["srcdir"] / "conf.py").write_text("", encoding="ascii")
     app_ = make_app(*args, **kwargs)
     yield app_
 
@@ -547,7 +547,7 @@ def get_matches(datafile):
     from xml.dom import minidom
 
     argsstrings = []
-    with open(os.path.join(os.path.dirname(__file__), "data", datafile)) as fid:
+    with open(os.path.join(os.path.dirname(__file__), "data", datafile), encoding="utf-8") as fid:
         xml = fid.read()
     doc = minidom.parseString(xml)
 
