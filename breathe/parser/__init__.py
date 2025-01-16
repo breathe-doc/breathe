@@ -10,7 +10,7 @@ from sphinx.application import Sphinx
 
 
 class ParserError(Exception):
-    def __init__(self, error: Exception, filename: str):
+    def __init__(self, error: Exception, filename: Path):
         super().__init__(error)
 
         self.error = error
@@ -21,7 +21,7 @@ class ParserError(Exception):
 
 
 class FileIOError(Exception):
-    def __init__(self, error: Exception, filename: str):
+    def __init__(self, error: Exception, filename: Path):
         super().__init__(error)
 
         self.error = error
