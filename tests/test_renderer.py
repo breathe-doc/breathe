@@ -35,7 +35,7 @@ def app(test_params, app_params, make_app, shared_result):
     args, kwargs = app_params
     assert "srcdir" in kwargs
     os.makedirs(kwargs["srcdir"], exist_ok=True)
-    (kwargs["srcdir"] / "conf.py").write_text("")
+    (kwargs["srcdir"] / "conf.py").write_text("", encoding="ascii")
     app_ = make_app(*args, **kwargs)
     yield app_
 
@@ -124,7 +124,7 @@ class MockState:
         env.temp_data["docname"] = "mock-doc"
         env.temp_data["breathe_project_info_factory"] = ProjectInfoFactory(app)
         env.temp_data["breathe_parser_factory"] = DoxygenParserFactory(app)
-        settings = frontend.OptionParser(components=(parsers.rst.Parser,)).get_default_values()
+        settings = frontend.get_default_settings(parsers.rst.Parser)
         settings.env = env
         self.document = utils.new_document("", settings)
 
@@ -167,13 +167,14 @@ class MockMaskFactory:
 
 class MockContext:
     def __init__(self, app, node_stack, domain=None, options=[]):
+        from docutils.statemachine import StringList
         self.domain = domain
         self.node_stack = node_stack
         self.directive_args = [
             None,  # name
             None,  # arguments
             options,  # options
-            None,  # content
+            StringList([], items=[]),  # content
             None,  # lineno
             None,  # content_offset
             None,  # block_text
@@ -546,7 +547,7 @@ def get_matches(datafile):
     from xml.dom import minidom
 
     argsstrings = []
-    with open(os.path.join(os.path.dirname(__file__), "data", datafile)) as fid:
+    with open(os.path.join(os.path.dirname(__file__), "data", datafile), encoding="utf-8") as fid:
         xml = fid.read()
     doc = minidom.parseString(xml)
 
