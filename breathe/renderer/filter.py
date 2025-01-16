@@ -119,7 +119,7 @@ This means you end up with filters like this:
         )
 
 Which is to say that we want to let through a compound, with kind group, with name 'mygroup' but
-we're also happy if the node is **not** a compund with kind group. Really we just don't want to let
+we're also happy if the node is **not** a compound with kind group. Really we just don't want to let
 through any compounds with kind group with name other than 'mygroup'. As such, we can rephrase this
 as:
 
@@ -926,7 +926,7 @@ class FilterFactory:
 
     def create_content_filter(self, kind: str, options: Dict[str, Any]) -> Filter:
         """Returns a filter which matches the contents of the or namespace but not the group or
-        namepace name or description.
+        namespace name or description.
 
         This allows the groups to be used to structure sections of the documentation rather than to
         structure and further document groups of documentation

@@ -12,6 +12,6 @@ struct Class {
 
 /** A namespace to demonstrate a namespaced function */
 namespace TestNamespaceFunction {
-/** A function within a namspace. */
+/** A function within a namespace. */
 void namespaceFunc();
 }
