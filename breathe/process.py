@@ -82,7 +82,7 @@ class AutoDoxygenProcessHandle:
         doxygen_aliases: Dict[str, str],
     ) -> str:
         name = auto_project_info.name()
-        full_paths = [auto_project_info.abs_path_to_source_file(f) for f in files]
+        full_paths = [str(auto_project_info.abs_path_to_source_file(f)) for f in files]
 
         options = "\n".join("%s=%s" % pair for pair in doxygen_options.items())
         aliases = "\n".join(
