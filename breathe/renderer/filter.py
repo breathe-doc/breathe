@@ -453,7 +453,7 @@ class FilePathFilter(Filter):
             # If the target_file contains directory separators then
             # match against the same length at the end of the location
             #
-            location_match = location[-len(self.target_file):]
+            location_match = location[-len(self.target_file) :]
             return location_match == self.target_file
         else:
             # If there are no separators, match against the whole filename

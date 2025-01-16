@@ -1204,9 +1204,15 @@ class SphinxRenderer:
 
                 # Set up the title
 
-                if kind in ["group", "page"] and file_data.compounddef and file_data.compounddef.title:
+                if (
+                    kind in ["group", "page"]
+                    and file_data.compounddef
+                    and file_data.compounddef.title
+                ):
                     if "no-title" not in options:
-                        full_title = " ".join([i.getValue() for i in file_data.compounddef.title.content_])
+                        full_title = " ".join(
+                            [i.getValue() for i in file_data.compounddef.title.content_]
+                        )
                         title_signode.append(nodes.emphasis(text=kind))
                         title_signode.append(nodes.Text(" "))
                         title_signode.append(addnodes.desc_name(text=full_title))
