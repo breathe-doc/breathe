@@ -687,7 +687,10 @@ class SphinxRenderer:
         assert isinstance(sig, addnodes.desc_signature)
 
         # Insert the member name for use in Sphinx-generated table of contents.
-        member_name = node.get_name()
+        if node.node_type == "compounddef":
+            member_name = node.compoundname
+        else:
+            member_name = node.name
         if obj_type == "function":
             member_name += "()"
         sig.attributes["_toc_name"] = member_name
