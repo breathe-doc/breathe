@@ -29,7 +29,7 @@ jobs:
     - name: Install apt dependencies
       run: |
         sudo apt-get update
-        sudo apt-get install graphviz libclang1-11 libclang-cpp11
+        sudo apt-get install graphviz
 
     - name: Install doxygen from SourceForge binary archives
       env:
