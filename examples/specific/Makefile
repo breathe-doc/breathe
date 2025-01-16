@@ -26,7 +26,7 @@ projects  = nutshell alias rst inline namespacefile array inheritance \
 			enum define interface xrefsect tables \
 			cpp_anon cpp_concept cpp_enum cpp_union cpp_function cpp_friendclass \
 			cpp_inherited_members cpp_trailing_return_type cpp_constexpr_hax \
-			cpp_function_lookup \
+			cpp_function_lookup cpp_ns_template_specialization \
 			c_file c_struct c_enum c_typedef c_macro c_union membergroups \
 			simplesect code_blocks dot_graphs
 

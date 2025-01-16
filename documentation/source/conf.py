@@ -232,6 +232,7 @@ breathe_projects = {
     "cpp_function_lookup": "../../examples/specific/cpp_function_lookup/xml/",
     "cpp_friendclass": "../../examples/specific/cpp_friendclass/xml/",
     "cpp_inherited_members": "../../examples/specific/cpp_inherited_members/xml/",
+    "cpp_ns_template_specialization": "../../examples/specific/cpp_ns_template_specialization/xml/",
     "cpp_trailing_return_type": "../../examples/specific/cpp_trailing_return_type/xml/",
     "cpp_constexpr_hax": "../../examples/specific/cpp_constexpr_hax/xml/",
     "xrefsect": "../../examples/specific/xrefsect/xml/",

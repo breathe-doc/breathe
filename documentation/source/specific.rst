@@ -239,6 +239,14 @@ C++ Inherited Members
 .. doxygenclass:: B
    :project: cpp_inherited_members
 
+C++ Template Specialization with Namespace
+------------------------------------------
+
+.. cpp:namespace:: @ex_specific_cpp_ns_template_specialization
+
+.. doxygenfile:: cpp_ns_template_specialization.h
+   :project: cpp_ns_template_specialization
+
 C++ Trailing Return Type
 ------------------------
 
