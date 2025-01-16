@@ -38,7 +38,7 @@ git checkout $first
 (cd ../examples/doxygen; make)
 # Clean current sphinx build directory
 make clean
-# Make sure the BUILDDIR variable can be overridden in the Makfile. Required for older commits
+# Make sure the BUILDDIR variable can be overridden in the Makefile. Required for older commits
 sed -i 's/BUILDDIR      = build/BUILDDIR     ?= build/g' Makefile
 # Build into our first comparison directory
 make html BUILDDIR=$firstdir
