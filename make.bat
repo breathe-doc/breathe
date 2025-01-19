@@ -81,7 +81,7 @@ goto end
     goto end
 
 :type-check
-    mypy --warn-redundant-casts --warn-unused-ignores breathe tests
+    mypy breathe tests
     goto end
 
 :version-check

@@ -98,3 +98,18 @@ line-length = 100
 extend-exclude = '''
 ^/breathe/parser/.*
 '''
+
+[tool.mypy]
+python_version = "3.9"
+warn_unused_configs = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+
+[[tool.mypy.overrides]]
+module = [
+    "breathe.parser.compound",
+    "breathe.parser.compoundsuper",
+    "breathe.parser.index",
+    "breathe.parser.indexsuper",
+]
+ignore_errors = true
