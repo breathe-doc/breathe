@@ -881,6 +881,7 @@ class SphinxRenderer:
         return brief + detailed
 
     def detaileddescription(self, node) -> List[Node]:
+        self.context = cast(RenderContext, self.context)
         detailedCand = self.render_optional(node.detaileddescription)
         # all field_lists must be at the top-level of the desc_content, so pull them up
         fieldLists: List[nodes.field_list] = []
@@ -893,9 +894,17 @@ class SphinxRenderer:
 
         detailed = []
         for candNode in detailedCand:
-            pullup(candNode, nodes.field_list, fieldLists)
-            pullup(candNode, nodes.note, admonitions)
-            pullup(candNode, nodes.warning, admonitions)
+            breathe_directive_name = self.context.directive_args[0]
+            pullup_types = self.app.config.breathe_detaileddesc_pullup_types
+            if breathe_directive_name in pullup_types:
+                for nodeTypeString in pullup_types[breathe_directive_name]:
+                    if nodeTypeString == "note":
+                        pullup(candNode, nodes.note, admonitions)
+                    elif nodeTypeString == "warning":
+                        pullup(candNode, nodes.warning, admonitions)
+                    elif nodeTypeString == "fieldlist":
+                        pullup(candNode, nodes.field_list, fieldLists)
+
             # and collapse paragraphs
             for para in candNode.traverse(nodes.paragraph):
                 if (
