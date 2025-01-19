@@ -3,6 +3,7 @@ from pathlib import Path
 from breathe.directives.class_like import (
     DoxygenStructDirective,
     DoxygenClassDirective,
+    DoxygenUnionDirective,
     DoxygenInterfaceDirective,
 )
 from breathe.directives.content_block import (
@@ -16,7 +17,6 @@ from breathe.directives.index import DoxygenIndexDirective, AutoDoxygenIndexDire
 from breathe.directives.item import (
     DoxygenVariableDirective,
     DoxygenDefineDirective,
-    DoxygenUnionDirective,
     DoxygenConceptDirective,
     DoxygenEnumDirective,
     DoxygenEnumValueDirective,
