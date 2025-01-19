@@ -54,7 +54,7 @@ docs = [
     "sphinxcontrib-spelling",
 ]
 lint = [
-    "black==22.3.0",
+    "black==24.10.0",
     "flake8>=6.0",
     "mypy>=1",
     "types-docutils",

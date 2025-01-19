@@ -2,6 +2,7 @@
 A module to house the methods for resolving a code-blocks language based on filename
 (and extension).
 """
+
 from typing import Optional
 import os.path
 
