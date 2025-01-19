@@ -62,7 +62,7 @@ jobs:
         python -m pip install --upgrade pip
         python -m pip install ".[lint]"
     - name: Type check with mypy
-      run: mypy --warn-redundant-casts --warn-unused-ignores --python-version 3.9 breathe tests
+      run: mypy breathe tests
 
   twine:
     runs-on: ubuntu-latest
