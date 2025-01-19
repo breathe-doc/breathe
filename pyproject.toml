@@ -55,7 +55,7 @@ docs = [
 ]
 lint = [
     "black==24.10.0",
-    "flake8>=6.0",
+    "flake8==7.1.1",
     "mypy>=1",
     "types-docutils",
     "types-Pygments",
