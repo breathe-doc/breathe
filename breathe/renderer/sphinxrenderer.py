@@ -2322,7 +2322,7 @@ class SphinxRenderer:
                             if node.kind == "exception":
                                 msg = "Doxygen \\exception commands with multiple names can not be"
                                 msg += " converted to a single :throws: field in Sphinx."
-                                msg += " Exception '{}' suppresed from output.".format(
+                                msg += " Exception '{}' suppressed from output.".format(
                                     "".join(n.astext() for n in thisName)
                                 )
                                 self.state.document.reporter.warning(msg)
@@ -2391,7 +2391,7 @@ class SphinxRenderer:
             if not dotcode.rstrip("\n"):
                 raise RuntimeError("%s found but without any content" % dot_file_path)
         except OSError as exc:
-            # doxygen seems to prevent this from triggering as a non-existant file
+            # doxygen seems to prevent this from triggering as a non-existent file
             # generates no XML output for the corresponding `\dotfile` cmd
             self.state.document.reporter.warning(exc)  # better safe than sorry
         except RuntimeError as exc:

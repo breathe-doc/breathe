@@ -89,7 +89,7 @@ class DoxygenFunctionDirective(BaseDirective):
             ).warn(
                 "doxygenfunction: Unable to resolve function "
                 '"{namespace}{function}" with arguments "{args}".\n'
-                "Could not parse arguments. Parsing eror is\n{cpperror}"
+                "Could not parse arguments. Parsing error is\n{cpperror}"
             )
 
         finder_filter = self.filter_factory.create_function_and_all_friend_finder_filter(
