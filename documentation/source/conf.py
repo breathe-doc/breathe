@@ -37,7 +37,6 @@ extensions = [
 ]
 
 read_the_docs_build = os.environ.get("READTHEDOCS", None) == "True"
-travis_build = os.environ.get("TRAVIS_CI", None) == "True"
 
 # Get version of Doxygen and save it as a tuple
 
@@ -58,16 +57,7 @@ git_tag = subprocess.Popen(["git", "describe", "--tags"], stdout=subprocess.PIPE
 # convert from bytes to string
 git_tag = git_tag.decode("ascii")
 
-if travis_build:
-
-    # Don't attempt to set the path as breathe is installed to virtualenv on travis
-
-    # Set values with simple strings
-    version = "'travis'"
-    release = "'travis'"
-    documentation_build = "travis"
-
-elif read_the_docs_build:
+if read_the_docs_build:
 
     # On RTD we'll be in the 'source' directory
     sys.path.append("../../")
