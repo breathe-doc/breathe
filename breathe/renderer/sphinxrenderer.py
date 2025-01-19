@@ -1956,27 +1956,26 @@ class SphinxRenderer:
                 )
             else:
                 elements = [self.create_template_prefix(node)]
-                if node.static == "yes":
-                    elements.append("static")
-                if node.inline == "yes":
-                    elements.append("inline")
-                if node.kind == "friend":
-                    elements.append("friend")
-                if node.virt in ("virtual", "pure-virtual"):
-                    elements.append("virtual")
-                if node.explicit == "yes":
-                    elements.append("explicit")
                 # TODO: handle constexpr when parser has been updated
                 #       but Doxygen seems to leave it in the type anyway
                 typ = "".join(n.astext() for n in self.render(node.get_type()))
                 # Doxygen sometimes leaves 'static' in the type,
                 # e.g., for "constexpr static auto f()"
                 typ = typ.replace("static ", "")
-                # In Doxygen up to somewhere between 1.8.17 to exclusive 1.9.1
-                # the 'friend' part is also left in the type.
-                # See also #767.
-                if typ.startswith("friend "):
-                    typ = typ[7:]
+                if node.static == "yes":
+                    elements.append("static")
+                if node.inline == "yes":
+                    elements.append("inline")
+                if node.kind == "friend":
+                    # In Doxygen up to somewhere between 1.8.17 to exclusive 1.9.1
+                    # the 'friend' part is also left in the type.
+                    # See also: #767, #916
+                    typ = re.sub(r"(^|\s+)friend(\s+)", r"\1\2", typ)
+                    elements.append("friend")
+                if node.virt in ("virtual", "pure-virtual"):
+                    elements.append("virtual")
+                if node.explicit == "yes":
+                    elements.append("explicit")
                 elements.append(typ)
                 elements.append(name)
                 elements.append(node.get_argsstring())
