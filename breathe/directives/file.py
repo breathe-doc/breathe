@@ -2,13 +2,12 @@ from __future__ import annotations
 
 from docutils.parsers.rst.directives import flag, unchanged_required
 
+from breathe.directives import BaseDirective
+from breathe.project import ProjectError
 from breathe.renderer import RenderContext
+from breathe.renderer.mask import NullMaskFactory
 from breathe.renderer.sphinxrenderer import SphinxRenderer
 from breathe.renderer.target import create_target_handler
-
-from ..directives import BaseDirective
-from ..project import ProjectError
-from ..renderer.mask import NullMaskFactory
 
 
 class _BaseFileDirective(BaseDirective):

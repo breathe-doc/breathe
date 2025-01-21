@@ -6,7 +6,7 @@ from __future__ import annotations
 import sys
 from xml.dom import Node, minidom
 
-from .. import filetypes
+from breathe import filetypes
 
 #
 # User methods

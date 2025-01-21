@@ -4,8 +4,7 @@ from pathlib import Path
 from typing import TYPE_CHECKING
 
 from breathe import file_state_cache
-
-from . import compound, index
+from breathe.parser import compound, index
 
 if TYPE_CHECKING:
     from sphinx.application import Sphinx

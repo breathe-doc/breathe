@@ -7,7 +7,7 @@ from __future__ import annotations
 from xml.dom import minidom
 from xml.parsers.expat import ExpatError
 
-from . import indexsuper as supermod
+from breathe.parser import indexsuper as supermod
 
 
 class DoxygenTypeSub(supermod.DoxygenType):

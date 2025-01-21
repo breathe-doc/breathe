@@ -28,6 +28,7 @@ select = [
     "PGH",   # pygrep-hooks
     "PT",    # flake8-pytest-style
     "TC",    # flake8-type-checking
+    "TID",   # flake8-tidy-imports
     "UP",    # pyupgrade
     "W",     # pycodestyle
 ]
@@ -47,6 +48,9 @@ inline-quotes = "double"
 [lint.flake8-type-checking]
 exempt-modules = []
 strict = true
+
+[lint.flake8-tidy-imports]
+ban-relative-imports = "all"
 
 [lint.isort]
 forced-separate = [

@@ -5,7 +5,7 @@ import os
 from pathlib import Path
 from typing import TYPE_CHECKING
 
-from .exception import BreatheError
+from breathe.exception import BreatheError
 
 if TYPE_CHECKING:
     from sphinx.application import Sphinx
