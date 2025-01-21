@@ -480,7 +480,12 @@ class NamespaceFilter(Filter):
         name = self.name_accessor(node_stack)
 
         try:
-            namespace, name = name.rsplit("::", 1)
+            # strip out any template arguments before splitting on '::', to
+            # avoid errors if a template specialization has qualified arguments
+            # (see examples/specific/cpp_ns_template_specialization)
+            cleaned_name, sep, rest = name.partition("<")
+            namespace, name = cleaned_name.rsplit("::", 1)
+            name += sep + rest
         except ValueError:
             namespace, name = "", name
 

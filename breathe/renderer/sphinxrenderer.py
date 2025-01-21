@@ -1025,12 +1025,15 @@ class SphinxRenderer:
             # Defer to domains specific directive.
 
             names = self.get_qualification()
-            # TODO: this breaks if it's a template specialization
-            #       and one of the arguments contain '::'
+            # strip out any template arguments before splitting on '::', to
+            # avoid errors if a template specialization has qualified arguments
+            # (see examples/specific/cpp_ns_template_specialization)
+            cleaned_name, sep, rest = nodeDef.compoundname.partition("<")
             if self.nesting_level == 0:
-                names.extend(nodeDef.compoundname.split("::"))
+                names.extend(cleaned_name.split("::"))
             else:
-                names.append(nodeDef.compoundname.split("::")[-1])
+                names.append(cleaned_name.split("::")[-1])
+            names[-1] += sep + rest
             decls = [
                 self.create_template_prefix(nodeDef),
                 self.join_nested_name(names),
