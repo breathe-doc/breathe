@@ -17,7 +17,7 @@ except ImportError:
     php = None
 
 try:
-    from sphinx_csharp import csharp as cs  # type: ignore[import-not-found]
+    from sphinx_csharp import csharp as cs  # type: ignore[import-untyped]
 except ImportError:
     cs = None
 
