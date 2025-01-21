@@ -199,12 +199,14 @@ We have to write:
 
 """
 
-from breathe import path_handler
-
-from sphinx.application import Sphinx
+from __future__ import annotations
 
 import os
 from typing import Any, Callable, Dict, List
+
+from sphinx.application import Sphinx
+
+from breathe import path_handler
 
 
 class UnrecognisedKindError(Exception):

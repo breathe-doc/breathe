@@ -14,9 +14,11 @@ http://www.sat.qc.ca/
 :license: BSD, see LICENSE for details.
 """
 
+from __future__ import annotations
+
+import argparse
 import os
 import sys
-import argparse
 import xml.etree.ElementTree
 from pathlib import Path
 

@@ -1,13 +1,15 @@
+from __future__ import annotations
+
+from typing import Any, List
+
+from docutils.nodes import Node
+from docutils.parsers.rst.directives import flag, unchanged, unchanged_required
+
 from breathe.directives import BaseDirective
 from breathe.file_state_cache import MTimeError
 from breathe.project import ProjectError
 from breathe.renderer.mask import NullMaskFactory
 from breathe.renderer.target import create_target_handler
-
-from docutils.nodes import Node
-from docutils.parsers.rst.directives import unchanged_required, unchanged, flag
-
-from typing import Any, List
 
 
 class _DoxygenClassLikeDirective(BaseDirective):

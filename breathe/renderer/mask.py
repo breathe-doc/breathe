@@ -18,6 +18,8 @@ matching.
 
 """
 
+from __future__ import annotations
+
 
 class NoParameterNamesMask:
     def __init__(self, data_object) -> None:

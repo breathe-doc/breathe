@@ -1,12 +1,13 @@
+from __future__ import annotations
+
 from pathlib import Path
 
-from . import index
-from . import compound
+from sphinx.application import Sphinx
 
 from breathe import file_state_cache
 from breathe.project import ProjectInfo
 
-from sphinx.application import Sphinx
+from . import compound, index
 
 
 class ParserError(Exception):

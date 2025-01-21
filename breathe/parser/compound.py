@@ -3,8 +3,9 @@ Generated Mon Feb  9 19:08:05 2009 by generateDS.py.
 This file contains manual modifications.
 """
 
-from xml.dom import minidom
-from xml.dom import Node
+from __future__ import annotations
+
+from xml.dom import Node, minidom
 from xml.parsers.expat import ExpatError
 
 from . import compoundsuper as supermod

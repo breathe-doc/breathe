@@ -7,6 +7,9 @@
 ## Documentation for a function.
 #
 #  More details.
+from __future__ import annotations
+
+
 def func():
     pass
 

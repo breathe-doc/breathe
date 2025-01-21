@@ -1,10 +1,12 @@
-from breathe.finder import ItemFinder, stack
-from breathe.renderer.filter import Filter, FilterFactory
-from breathe.parser import DoxygenCompoundParser
+from __future__ import annotations
+
+from typing import Any, List
 
 from sphinx.application import Sphinx
 
-from typing import Any, List
+from breathe.finder import ItemFinder, stack
+from breathe.parser import DoxygenCompoundParser
+from breathe.renderer.filter import Filter, FilterFactory
 
 
 class DoxygenTypeSubItemFinder(ItemFinder):

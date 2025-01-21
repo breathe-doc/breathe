@@ -1,9 +1,11 @@
-from breathe.project import ProjectInfo
+from __future__ import annotations
+
+from typing import Any, Dict, List, Sequence
 
 from docutils import nodes
 from docutils.nodes import Element
 
-from typing import Any, Dict, List, Sequence
+from breathe.project import ProjectInfo
 
 
 class TargetHandler:

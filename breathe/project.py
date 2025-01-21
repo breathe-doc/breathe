@@ -1,14 +1,13 @@
-from pathlib import Path
+from __future__ import annotations
 
-from .exception import BreatheError
+import fnmatch
+import os
+from pathlib import Path
+from typing import Dict
 
 from sphinx.application import Sphinx
 
-import os
-import fnmatch
-
-
-from typing import Dict
+from .exception import BreatheError
 
 
 class ProjectError(BreatheError):

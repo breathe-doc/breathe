@@ -1,13 +1,11 @@
 from __future__ import annotations
 
-from pathlib import Path
-
-from breathe.project import AutoProjectInfo, ProjectInfoFactory
-
 import os
+from pathlib import Path
 from shlex import quote
 from typing import Callable, Dict, List, Tuple
 
+from breathe.project import AutoProjectInfo, ProjectInfoFactory
 
 AUTOCFG_TEMPLATE = r"""
 PROJECT_NAME     = "{project_name}"

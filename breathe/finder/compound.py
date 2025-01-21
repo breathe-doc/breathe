@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from breathe.finder import ItemFinder, stack
 from breathe.renderer.filter import Filter
 

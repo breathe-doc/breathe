@@ -1,18 +1,18 @@
+from __future__ import annotations
+
+from typing import Any, Dict, List, Optional, Sequence
+
+from docutils import nodes
+from sphinx.directives import SphinxDirective
+
 from breathe.finder.factory import FinderFactory
-from breathe.parser import DoxygenParserFactory
-from breathe.parser import FileIOError, ParserError
-from breathe.project import ProjectInfoFactory, ProjectInfo
-from breathe.renderer import format_parser_error, RenderContext
+from breathe.parser import DoxygenParserFactory, FileIOError, ParserError
+from breathe.project import ProjectInfo, ProjectInfoFactory
+from breathe.renderer import RenderContext, format_parser_error
 from breathe.renderer.filter import Filter, FilterFactory
 from breathe.renderer.mask import MaskFactoryBase
 from breathe.renderer.sphinxrenderer import SphinxRenderer
 from breathe.renderer.target import TargetHandler
-
-from sphinx.directives import SphinxDirective
-
-from docutils import nodes
-
-from typing import Any, Dict, List, Optional, Sequence
 
 
 class _WarningHandler:

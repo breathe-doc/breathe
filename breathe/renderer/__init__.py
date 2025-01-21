@@ -1,5 +1,8 @@
-from docutils import nodes
+from __future__ import annotations
+
 import textwrap
+
+from docutils import nodes
 
 
 def format_parser_error(name, error, filename, state, lineno, do_unicode_warning):

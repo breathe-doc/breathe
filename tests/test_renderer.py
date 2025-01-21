@@ -1,28 +1,30 @@
-import os
-import pytest
+from __future__ import annotations
 
+import os
+
+import pytest
 import sphinx.addnodes
 import sphinx.environment
+from docutils import frontend, nodes, parsers, utils
+from sphinx.testing.fixtures import (
+    app_params,
+    make_app,
+    rootdir,
+    shared_result,
+    sphinx_test_tempdir,
+    test_params,
+)
+
 from breathe.parser.compound import (
+    MixedContainer,
     compounddefTypeSub,
     linkedTextTypeSub,
     memberdefTypeSub,
     paramTypeSub,
     refTypeSub,
-    MixedContainer,
 )
-from breathe.renderer.sphinxrenderer import SphinxRenderer
 from breathe.renderer.filter import OpenFilter
-from docutils import frontend, nodes, parsers, utils
-
-from sphinx.testing.fixtures import (
-    test_params,
-    app_params,
-    make_app,
-    shared_result,
-    sphinx_test_tempdir,
-    rootdir,
-)
+from breathe.renderer.sphinxrenderer import SphinxRenderer
 
 sphinx.locale.init([], "")
 
@@ -116,8 +118,8 @@ class MockMemo:
 
 class MockState:
     def __init__(self, app):
-        from breathe.project import ProjectInfoFactory
         from breathe.parser import DoxygenParserFactory
+        from breathe.project import ProjectInfoFactory
 
         env = sphinx.environment.BuildEnvironment(app)
         env.setup(app)
@@ -516,8 +518,9 @@ def test_render_innergroup(app):
 
 
 def get_directive(app):
-    from breathe.directives.function import DoxygenFunctionDirective
     from docutils.statemachine import StringList
+
+    from breathe.directives.function import DoxygenFunctionDirective
 
     app.config.breathe_separate_member_pages = False
     app.config.breathe_default_project = "test_project"
@@ -542,8 +545,9 @@ def get_directive(app):
 
 
 def get_matches(datafile):
-    from breathe.parser.compoundsuper import sectiondefType
     from xml.dom import minidom
+
+    from breathe.parser.compoundsuper import sectiondefType
 
     argsstrings = []
     with open(os.path.join(os.path.dirname(__file__), "data", datafile), encoding="utf-8") as fid:

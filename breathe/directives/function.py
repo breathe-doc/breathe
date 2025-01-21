@@ -1,24 +1,22 @@
+from __future__ import annotations
+
+import re
+from typing import Any, List, Optional
+
+from docutils import nodes
+from docutils.nodes import Node
+from docutils.parsers.rst.directives import flag, unchanged_required
+from sphinx.domains import cpp
+
 from breathe.directives import BaseDirective
 from breathe.exception import BreatheError
 from breathe.file_state_cache import MTimeError
-from breathe.parser import ParserError, FileIOError
+from breathe.parser import FileIOError, ParserError
 from breathe.project import ProjectError
-from breathe.renderer import format_parser_error, RenderContext
-from breathe.renderer.sphinxrenderer import WithContext
-from breathe.renderer.mask import MaskFactory, NullMaskFactory, NoParameterNamesMask
-from breathe.renderer.sphinxrenderer import SphinxRenderer
+from breathe.renderer import RenderContext, format_parser_error
+from breathe.renderer.mask import MaskFactory, NoParameterNamesMask, NullMaskFactory
+from breathe.renderer.sphinxrenderer import SphinxRenderer, WithContext
 from breathe.renderer.target import create_target_handler
-
-from docutils.nodes import Node
-from docutils.parsers.rst.directives import unchanged_required, flag
-
-from sphinx.domains import cpp
-
-from docutils import nodes
-
-import re
-
-from typing import Any, List, Optional
 
 
 class _NoMatchingFunctionError(BreatheError):

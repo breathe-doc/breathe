@@ -1,12 +1,11 @@
 from __future__ import annotations
 
+import os
 from pathlib import Path
+from typing import List, Set
 
 from sphinx.application import Sphinx
 from sphinx.environment import BuildEnvironment
-
-import os
-from typing import List, Set
 
 """
 Store the modified time of the various doxygen xml files against the

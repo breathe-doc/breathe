@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from breathe.project import ProjectInfo
 from breathe.renderer.filter import Filter
 

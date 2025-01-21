@@ -1,14 +1,15 @@
 #
 # Generated Thu Jun 11 18:44:25 2009 by generateDS.py.
 #
+from __future__ import annotations
 
-import sys
-import os
 import getopt
-from xml.dom import minidom
-from xml.dom import Node
+import os
+import sys
+from xml.dom import Node, minidom
 
 from .. import filetypes
+
 #
 # User methods
 #

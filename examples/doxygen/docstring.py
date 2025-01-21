@@ -4,6 +4,8 @@ Documentation for this module.
 More details.
 """
 
+from __future__ import annotations
+
 
 def func():
     """Documentation for a function.

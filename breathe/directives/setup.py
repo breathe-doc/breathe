@@ -1,34 +1,35 @@
-from pathlib import Path
+from __future__ import annotations
 
-from breathe.directives.class_like import (
-    DoxygenStructDirective,
-    DoxygenClassDirective,
-    DoxygenInterfaceDirective,
-)
-from breathe.directives.content_block import (
-    DoxygenNamespaceDirective,
-    DoxygenGroupDirective,
-    DoxygenPageDirective,
-)
-from breathe.directives.file import DoxygenFileDirective, AutoDoxygenFileDirective
-from breathe.directives.function import DoxygenFunctionDirective
-from breathe.directives.index import DoxygenIndexDirective, AutoDoxygenIndexDirective
-from breathe.directives.item import (
-    DoxygenVariableDirective,
-    DoxygenDefineDirective,
-    DoxygenUnionDirective,
-    DoxygenConceptDirective,
-    DoxygenEnumDirective,
-    DoxygenEnumValueDirective,
-    DoxygenTypedefDirective,
-)
-from breathe.parser import DoxygenParserFactory
-from breathe.project import ProjectInfoFactory
-from breathe.process import AutoDoxygenProcessHandle
+import subprocess
+from pathlib import Path
 
 from sphinx.application import Sphinx
 
-import subprocess
+from breathe.directives.class_like import (
+    DoxygenClassDirective,
+    DoxygenInterfaceDirective,
+    DoxygenStructDirective,
+)
+from breathe.directives.content_block import (
+    DoxygenGroupDirective,
+    DoxygenNamespaceDirective,
+    DoxygenPageDirective,
+)
+from breathe.directives.file import AutoDoxygenFileDirective, DoxygenFileDirective
+from breathe.directives.function import DoxygenFunctionDirective
+from breathe.directives.index import AutoDoxygenIndexDirective, DoxygenIndexDirective
+from breathe.directives.item import (
+    DoxygenConceptDirective,
+    DoxygenDefineDirective,
+    DoxygenEnumDirective,
+    DoxygenEnumValueDirective,
+    DoxygenTypedefDirective,
+    DoxygenUnionDirective,
+    DoxygenVariableDirective,
+)
+from breathe.parser import DoxygenParserFactory
+from breathe.process import AutoDoxygenProcessHandle
+from breathe.project import ProjectInfoFactory
 
 
 def setup(app: Sphinx) -> None:

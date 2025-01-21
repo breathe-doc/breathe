@@ -1,23 +1,24 @@
+from __future__ import annotations
+
 from pathlib import Path
 
-from breathe.parser import compound, compoundsuper, DoxygenCompoundParser
+from docutils import nodes
+from docutils.nodes import Node, TextElement
+from docutils.parsers.rst.states import Text
+from docutils.statemachine import StringList, UnexpectedIndentationError
+from sphinx import addnodes
+from sphinx.application import Sphinx
+from sphinx.directives import ObjectDescription
+from sphinx.domains import c, cpp, python
+from sphinx.ext.graphviz import graphviz
+from sphinx.util import url_re
+from sphinx.util.nodes import nested_parse_with_titles
+
+from breathe.parser import DoxygenCompoundParser, compound, compoundsuper
 from breathe.project import ProjectInfo
 from breathe.renderer import RenderContext
 from breathe.renderer.filter import Filter
 from breathe.renderer.target import TargetHandler
-
-from sphinx import addnodes
-from sphinx.application import Sphinx
-from sphinx.directives import ObjectDescription
-from sphinx.domains import cpp, c, python
-from sphinx.util.nodes import nested_parse_with_titles
-from sphinx.util import url_re
-from sphinx.ext.graphviz import graphviz
-
-from docutils import nodes
-from docutils.nodes import Node, TextElement
-from docutils.statemachine import StringList, UnexpectedIndentationError
-from docutils.parsers.rst.states import Text
 
 try:
     from sphinxcontrib import phpdomain as php  # type: ignore
@@ -31,7 +32,7 @@ except ImportError:
 
 import re
 import textwrap
-from typing import Any, Callable, cast, Dict, List, Optional, Type, Union
+from typing import Any, Callable, Dict, List, Optional, Type, Union, cast
 
 ContentCallback = Callable[[addnodes.desc_content], None]
 Declarator = Union[addnodes.desc_signature, addnodes.desc_signature_line]

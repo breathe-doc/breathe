@@ -3,8 +3,10 @@ A module to house the methods for resolving a code-blocks language based on file
 (and extension).
 """
 
-from typing import Optional
+from __future__ import annotations
+
 import os.path
+from typing import Optional
 
 from pygments.lexers import get_lexer_for_filename
 from pygments.util import ClassNotFound

@@ -1,13 +1,15 @@
-from breathe.finder import ItemFinder
-from breathe.finder import index as indexfinder
-from breathe.finder import compound as compoundfinder
-from breathe.parser import DoxygenParserFactory
-from breathe.project import ProjectInfo
-from breathe.renderer.filter import Filter
+from __future__ import annotations
+
+from typing import Dict, Type
 
 from sphinx.application import Sphinx
 
-from typing import Dict, Type
+from breathe.finder import ItemFinder
+from breathe.finder import compound as compoundfinder
+from breathe.finder import index as indexfinder
+from breathe.parser import DoxygenParserFactory
+from breathe.project import ProjectInfo
+from breathe.renderer.filter import Filter
 
 
 class _CreateCompoundTypeSubFinder:

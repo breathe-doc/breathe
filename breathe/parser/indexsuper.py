@@ -1,11 +1,11 @@
 #
 # Generated Thu Jun 11 18:43:54 2009 by generateDS.py.
 #
+from __future__ import annotations
 
-import sys
 import getopt
-from xml.dom import minidom
-from xml.dom import Node
+import sys
+from xml.dom import Node, minidom
 
 #
 # User methods

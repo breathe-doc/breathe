@@ -1,8 +1,10 @@
+from __future__ import annotations
+
+from sphinx.application import Sphinx
+
 from breathe.directives.setup import setup as directive_setup
 from breathe.file_state_cache import setup as file_state_cache_setup
 from breathe.renderer.sphinxrenderer import setup as renderer_setup
-
-from sphinx.application import Sphinx
 
 __version__ = "4.35.0"
 

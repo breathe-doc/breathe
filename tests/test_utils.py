@@ -1,9 +1,11 @@
+from __future__ import annotations
+
 from unittest import TestCase
 from xml.dom import minidom
 
-from breathe.renderer.sphinxrenderer import get_param_decl, get_definition_without_template_args
-from breathe.parser.compoundsuper import memberdefType
 from breathe import path_handler
+from breathe.parser.compoundsuper import memberdefType
+from breathe.renderer.sphinxrenderer import get_definition_without_template_args, get_param_decl
 
 
 class TestUtils(TestCase):
