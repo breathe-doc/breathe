@@ -9,7 +9,7 @@ quote-style = "double"
 [lint]
 preview = true
 select = [
-#    "C4",    # flake8-comprehensions
+    "C4",    # flake8-comprehensions
 #    "B",     # flake8-bugbear
 #    "D",     # pydocstyle
     "E",     # pycodestyle

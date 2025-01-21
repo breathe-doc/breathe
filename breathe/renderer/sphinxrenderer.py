@@ -313,8 +313,8 @@ class DomainDirectiveFactory:
         elif php is not None and domain == "php":
             separators = php.separators
             arg_0 = args[0]
-            if any([separators["method"] in n for n in args[1]]):
-                if any([separators["attr"] in n for n in args[1]]):
+            if any(separators["method"] in n for n in args[1]):
+                if any(separators["attr"] in n for n in args[1]):
                     arg_0 = "attr"
                 else:
                     arg_0 = "method"
@@ -536,7 +536,7 @@ class SphinxRenderer:
             parts = refid.rsplit("_", 1)
             if len(parts) == 2 and parts[1].startswith("1"):
                 anchorid = parts[1][1:]
-                if len(anchorid) in set([33, 34]) and parts[0].endswith(anchorid):
+                if len(anchorid) in {33, 34} and parts[0].endswith(anchorid):
                     return parts[0][: -len(anchorid)] + parts[1]
                 elif len(anchorid) > 34:
                     index = 0
@@ -1701,14 +1701,14 @@ class SphinxRenderer:
         if node.text.strip().startswith("embed:rst:leading-asterisk"):
             lines = node.text.splitlines()
             # Replace the first * on each line with a blank space
-            lines = map(lambda text: text.replace("*", " ", 1), lines)
+            lines = (text.replace("*", " ", 1) for text in lines)
             node.text = "\n".join(lines)
 
         # do we need to strip leading ///?
         elif node.text.strip().startswith("embed:rst:leading-slashes"):
             lines = node.text.splitlines()
             # Replace the /// on each line with three blank spaces
-            lines = map(lambda text: text.replace("///", "   ", 1), lines)
+            lines = (text.replace("///", "   ", 1) for text in lines)
             node.text = "\n".join(lines)
 
         elif node.text.strip().startswith("embed:rst:inline"):
