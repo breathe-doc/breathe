@@ -16,37 +16,25 @@ env:
   FORCE_COLOR: "1"
 
 jobs:
-  black:
+  ruff:
     runs-on: ubuntu-latest
 
     steps:
     - uses: actions/checkout@v4
-    - name: Set up Python
-      uses: actions/setup-python@v5
       with:
-        python-version: "3"
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        python -m pip install ".[lint]"
-    - name: Format with black
-      run: black --check .
+        persist-credentials: false
 
-  flake8:
-    runs-on: ubuntu-latest
-
-    steps:
-    - uses: actions/checkout@v4
-    - name: Set up Python
-      uses: actions/setup-python@v5
+    - name: Install Ruff
+      uses: astral-sh/ruff-action@v3
       with:
-        python-version: "3"
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        python -m pip install ".[lint]"
-    - name: Lint with flake8
-      run: flake8 breathe
+        args: --version
+        version: 0.9.2
+
+    - name: Lint with Ruff
+      run: ruff check --output-format=github
+
+    - name: Format with Ruff
+      run: ruff format --diff
 
   mypy:
     runs-on: ubuntu-latest

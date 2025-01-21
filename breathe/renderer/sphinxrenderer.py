@@ -782,7 +782,6 @@ class SphinxRenderer:
     # ===================================================================================
 
     def get_fully_qualified_name(self):
-
         names = []
         node_stack = self.context.node_stack
         node = node_stack[0]
@@ -1210,9 +1209,9 @@ class SphinxRenderer:
                     and file_data.compounddef.title
                 ):
                     if "no-title" not in options:
-                        full_title = " ".join(
-                            [i.getValue() for i in file_data.compounddef.title.content_]
-                        )
+                        full_title = " ".join([
+                            i.getValue() for i in file_data.compounddef.title.content_
+                        ])
                         title_signode.append(nodes.emphasis(text=kind))
                         title_signode.append(nodes.Text(" "))
                         title_signode.append(addnodes.desc_name(text=full_title))
@@ -1946,14 +1945,12 @@ class SphinxRenderer:
             if dom == "py":
                 declaration = name + node.get_argsstring()
             elif dom == "cs":
-                declaration = " ".join(
-                    [
-                        self.create_template_prefix(node),
-                        "".join(n.astext() for n in self.render(node.get_type())),
-                        name,
-                        node.get_argsstring(),
-                    ]
-                )
+                declaration = " ".join([
+                    self.create_template_prefix(node),
+                    "".join(n.astext() for n in self.render(node.get_type())),
+                    name,
+                    node.get_argsstring(),
+                ])
             else:
                 elements = [self.create_template_prefix(node)]
                 if node.static == "yes":
@@ -2141,14 +2138,12 @@ class SphinxRenderer:
             if len(initializer) != 0:
                 options["value"] = initializer
         elif dom == "cs":
-            declaration = " ".join(
-                [
-                    self.create_template_prefix(node),
-                    "".join(n.astext() for n in self.render(node.get_type())),
-                    name,
-                    node.get_argsstring(),
-                ]
-            )
+            declaration = " ".join([
+                self.create_template_prefix(node),
+                "".join(n.astext() for n in self.render(node.get_type())),
+                name,
+                node.get_argsstring(),
+            ])
             if node.get_gettable() or node.get_settable():
                 declaration += "{"
                 if node.get_gettable():

@@ -1,17 +1,17 @@
 """
-    breathe.apidoc
-    ~~~~~~~~~~~~~~
+breathe.apidoc
+~~~~~~~~~~~~~~
 
-    Parses doxygen XML tree looking for C/C++ modules and creates ReST files
-    appropriately to create code documentation with Sphinx. It also creates a
-    modules index (See TYPEDICT below.).
+Parses doxygen XML tree looking for C/C++ modules and creates ReST files
+appropriately to create code documentation with Sphinx. It also creates a
+modules index (See TYPEDICT below.).
 
-    This is derived from the "sphinx-autopackage" script, which is:
-    Copyright 2008 Société des arts technologiques (SAT),
-    http://www.sat.qc.ca/
+This is derived from the "sphinx-autopackage" script, which is:
+Copyright 2008 Société des arts technologiques (SAT),
+http://www.sat.qc.ca/
 
-    :copyright: Originally by Sphinx Team, C++ modifications by Tatsuyuki Ishi
-    :license: BSD, see LICENSE for details.
+:copyright: Originally by Sphinx Team, C++ modifications by Tatsuyuki Ishi
+:license: BSD, see LICENSE for details.
 """
 
 import os
@@ -68,9 +68,7 @@ def write_file(name, text, args):
 
 def format_heading(level, text):
     """Create a heading of <level> [1, 2 or 3 supported]."""
-    underlining = ["=", "-", "~"][
-        level - 1
-    ] * len(text)
+    underlining = ["=", "-", "~"][level - 1] * len(text)
     return "%s\n%s\n\n" % (text, underlining)
 
 

@@ -8,7 +8,6 @@ from breathe import path_handler
 
 class TestUtils(TestCase):
     def test_param_decl(self):
-
         # From xml from: examples/specific/parameters.h
         xml = """
         <memberdef>

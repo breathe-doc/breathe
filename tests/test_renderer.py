@@ -496,13 +496,11 @@ def test_render_define_no_initializer(app):
 
 def test_render_innergroup(app):
     refid = "group__innergroup"
-    mock_compound_parser = MockCompoundParser(
-        {
-            refid: WrappedCompoundDef(
-                kind="group", compoundname="InnerGroup", briefdescription="InnerGroup"
-            )
-        }
-    )
+    mock_compound_parser = MockCompoundParser({
+        refid: WrappedCompoundDef(
+            kind="group", compoundname="InnerGroup", briefdescription="InnerGroup"
+        )
+    })
     ref = WrappedRef("InnerGroup", refid=refid)
     compound_def = WrappedCompoundDef(
         kind="group", compoundname="OuterGroup", briefdescription="OuterGroup", innergroup=[ref]
@@ -539,7 +537,7 @@ def get_directive(app):
         ),
         MockState(app),
         MockStateMachine(),
-    )
+    )  # fmt: skip
     return DoxygenFunctionDirective(*cls_args)
 
 

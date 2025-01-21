@@ -1,6 +1,0 @@
-[flake8]
-max-line-length = 100
-exclude = compoundsuper.py,indexsuper.py
-extend-ignore = E203, E231
-per-file-ignores =
-    breathe/parser/index.py:E305

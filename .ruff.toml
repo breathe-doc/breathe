@@ -1,0 +1,79 @@
+target-version = "py39"  # Pin Ruff to Python 3.9
+line-length = 100
+output-format = "full"
+
+extend-exclude = [
+    "breathe/parser/*.py",
+]
+
+[format]
+preview = true
+quote-style = "double"
+
+[lint]
+preview = true
+select = [
+#    "C4",    # flake8-comprehensions
+#    "B",     # flake8-bugbear
+#    "D",     # pydocstyle
+    "E",     # pycodestyle
+    "F",     # pyflakes
+#    "FA",    # flake8-future-annotations
+#    "FLY",   # flynt
+#    "FURB",  # refurb
+    "G",     # flake8-logging-format
+#    "I",     # isort
+    "LOG",   # flake8-logging
+#    "N",     # pep8-naming
+    "PERF",  # perflint
+#    "PGH",   # pygrep-hooks
+#    "PT",    # flake8-pytest-style
+#    "TC",    # flake8-type-checking
+#    "UP",    # pyupgrade
+    "W",     # pycodestyle
+]
+
+[lint.per-file-ignores]
+"breathe/file_state_cache.py" = [
+    "F841",  # Local variable `{name}` is assigned to but never used
+]
+
+"documentation/source/conf.py" = [
+    "E501",  # Line too long
+]
+
+"examples/doxygen/pyexample.py" = [
+    "E266",  # Too many leading `#` before block comment
+]
+
+"tests/test_renderer.py" = [
+    "E501",  # Line too long
+    "F401",  # `{name}` imported but unused
+    "F811",  # Redefinition of unused `{name}`
+    "F841",  # Local variable `{name}` is assigned to but never used
+]
+
+"tests/warnings/source/conf.py" = [
+    "E265",  # Block comment should start with `# `
+    "F401",  # `{name}` imported but unused
+]
+
+[lint.flake8-quotes]
+inline-quotes = "double"
+
+[lint.flake8-type-checking]
+exempt-modules = []
+strict = true
+
+[lint.isort]
+forced-separate = [
+    "tests",
+]
+required-imports = [
+    "from __future__ import annotations",
+]
+
+[lint.pydocstyle]
+convention = "pep257"
+ignore-decorators = ["typing.overload"]
+ignore-var-parameters = true

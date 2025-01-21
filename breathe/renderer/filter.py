@@ -565,16 +565,14 @@ class Glob:
 
 class FilterFactory:
     # C++ style public entries
-    public_kinds = set(
-        [
-            "public-type",
-            "public-func",
-            "public-attrib",
-            "public-slot",
-            "public-static-func",
-            "public-static-attrib",
-        ]
-    )
+    public_kinds = set([
+        "public-type",
+        "public-func",
+        "public-attrib",
+        "public-slot",
+        "public-static-func",
+        "public-static-attrib",
+    ])
 
     def __init__(self, app: Sphinx) -> None:
         self.app = app

@@ -121,7 +121,7 @@ class DoxygenFunctionDirective(BaseDirective):
             node_stack = self._resolve_function(matches, args, project_info)
         except _NoMatchingFunctionError:
             return warning.warn(
-                'doxygenfunction: Cannot find function "{namespace}{function}" ' "{tail}"
+                'doxygenfunction: Cannot find function "{namespace}{function}" {tail}'
             )
         except _UnableToResolveFunctionError as error:
             message = (
@@ -232,14 +232,12 @@ class DoxygenFunctionDirective(BaseDirective):
             # this part should be kept in sync with visit_function in sphinxrenderer
             name = node.get_name()
             # assume we are only doing this for C++ declarations
-            declaration = " ".join(
-                [
-                    object_renderer.create_template_prefix(node),
-                    "".join(n.astext() for n in object_renderer.render(node.get_type())),
-                    name,
-                    node.get_argsstring(),
-                ]
-            )
+            declaration = " ".join([
+                object_renderer.create_template_prefix(node),
+                "".join(n.astext() for n in object_renderer.render(node.get_type())),
+                name,
+                node.get_argsstring(),
+            ])
         parser = cpp.DefinitionParser(
             declaration, location=self.get_source_info(), config=self.config
         )

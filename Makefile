@@ -34,13 +34,10 @@ test:
 dev-test:
 	cd tests && PYTHONPATH=../:$(PYTHONPATH) python3 -m pytest -v
 
-.PHONY: flake8
-flake8:
-	flake8 breathe
-
-.PHONY: black
-black:
-	black --check .
+.PHONY: ruff
+ruff:
+	ruff check
+	ruff format
 
 .PHONY: type-check
 type-check:

@@ -7,8 +7,7 @@ if "%1" == "clean"          goto clean
 if "%1" == "distclean"      goto distclean
 if "%1" == "test"           goto test
 if "%1" == "dev-test"       goto dev-test
-if "%1" == "flake8"         goto flake8
-if "%1" == "black"          goto black
+if "%1" == "ruff"           goto ruff
 if "%1" == "type-check"     goto type-check
 if "%1" == "version-check"  goto version-check
 if "%1" == "all"            goto all
@@ -72,12 +71,9 @@ goto end
     cd ..
     goto end
 
-:flake8
-    flake8 breathe
-    goto end
-
-:black
-    black --check .
+:ruff
+    ruff check
+    ruff format
     goto end
 
 :type-check
