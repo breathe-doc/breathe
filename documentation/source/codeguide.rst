@@ -103,7 +103,7 @@ Doing the Parsing
 ~~~~~~~~~~~~~~~~~
 
 To get things up and running quickly, I have used the `generateDS
-<http://www.rexx.com/~dkuhlman/generateDS.html>`_ project to help create
+<https://pypi.org/project/generateDS/>`_ project to help create
 classes to parse the doxygen xml output. The script automatically creates the
 ``compound.py``, ``compoundsuper.py``, ``index.py`` and ``indexsuper.py`` files
 that you can see inside ``breathe/parser/doxygen``.

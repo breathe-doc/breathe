@@ -19,7 +19,7 @@ relies on the Doxygen's xml output.
    .. warning::
 
       This documentation is built from the latest `Breathe github project
-      <https://github.com/michaeljones/breathe>`_ code. It does not necessarily
+      <https://github.com/breathe-doc/breathe/>`_ code. It does not necessarily
       reflect a released version of Breathe on PyPI.
 
 .. only:: documentation_build_development
@@ -28,7 +28,7 @@ relies on the Doxygen's xml output.
 
       This build of the documentation is not from a specific tagged release of
       Breathe. It reflects a work in progress state of Breathe. Please see the
-      `github repository <https://github.com/michaeljones/breathe>`_ for a more
+      `github repository <https://github.com/breathe-doc/breathe/>`_ for a more
       official source of information.
 
 
@@ -98,14 +98,14 @@ Download
 
 Breathe is available from:
 
-* `PyPI, the Python Package Index <http://pypi.python.org/pypi/breathe>`_
-* `Github <https://github.com/michaeljones/breathe>`_
+* `PyPI, the Python Package Index <https://pypi.org/project/breathe/>`_
+* `Github <https://github.com/breathe-doc/breathe/>`_
 
 License
 -------
 
 Breathe is under the `BSD license
-<https://github.com/michaeljones/breathe/blob/master/LICENSE>`_.
+<https://github.com/breathe-doc/breathe/blob/master/LICENSE>`_.
 
 In a Nutshell
 -------------

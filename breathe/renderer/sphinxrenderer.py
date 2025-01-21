@@ -354,7 +354,7 @@ class NodeFinder(nodes.SparseNodeVisitor):
     def visit_desc_signature(self, node):
         # Find the last signature node because it contains the actual declarator
         # rather than "template <...>". In Sphinx 1.4.1 we'll be able to use sphinx_cpp_tagname:
-        # https://github.com/michaeljones/breathe/issues/242
+        # https://github.com/breathe-doc/breathe/issues/242
         self.declarator = node
 
     def visit_desc_signature_line(self, node):
@@ -1507,7 +1507,7 @@ class SphinxRenderer:
                 break
             nodelist.pop()
 
-        # https://github.com/michaeljones/breathe/issues/827
+        # https://github.com/breathe-doc/breathe/issues/827
         # verbatim nodes should not be in a paragraph:
         if len(nodelist) == 1 and isinstance(nodelist[0], nodes.literal_block):
             return nodelist
@@ -2187,7 +2187,7 @@ class SphinxRenderer:
 
         typ = "".join(n.astext() for n in self.render(node.get_type()))
         # in Doxygen < 1.9 the 'friend' part is there, but afterwards not
-        # https://github.com/michaeljones/breathe/issues/616
+        # https://github.com/breathe-doc/breathe/issues/616
         assert typ in ("friend class", "friend struct", "class", "struct")
         if not typ.startswith("friend "):
             typ = "friend " + typ

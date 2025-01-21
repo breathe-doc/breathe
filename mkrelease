@@ -15,7 +15,7 @@ hash twine
 # Melvin Vermeeren <vermeeren@vermwa.re>
 PGP_KEY='8AED 5802 1FEA CDD5 F27B  A0E6 A72F 6277 16EA 9D96'
 
-REPO_WWW='https://github.com/michaeljones/breathe'
+REPO_WWW='https://github.com/breathe-doc/breathe/'
 
 help()
 {

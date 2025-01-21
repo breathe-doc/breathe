@@ -41,15 +41,15 @@ Download
 --------
 
 Breathe is available from github and `PyPI, the Python Package Index
-<http://pypi.python.org/pypi/breathe>`_. It can be installed with::
+<https://pypi.org/project/breathe/>`_. It can be installed with::
 
     pip install breathe
 
 Documentation
 -------------
 
-The documentation is available `here <http://breathe.readthedocs.org/>`__. Thank
-you to the people running `Read the Docs <http://readthedocs.org>`_ for such an
+The documentation is available `here <https://breathe.readthedocs.io/>`__. Thank
+you to the people running `Read the Docs <https://readthedocs.org>`_ for such an
 excellent service.
 
 The source for the documentation is in the ``documentation`` folder if you want
@@ -99,8 +99,8 @@ Mailing List Archives
 The archive for the Google groups list can be found
 `here <https://groups.google.com/forum/#!forum/sphinx-breathe>`__.
 
-The previous mailing list was on `librelist.com <http://librelist.com>`__ and the
-archives are available `here <http://librelist.com/browser/breathe/>`__.
+The previous mailing list was on `librelist.com <https://librelist.com>`__ and the
+archives are available `here <https://librelist.com/browser/breathe/>`__.
 
 Please post new questions as GitHub issues.
 
@@ -123,7 +123,7 @@ Examples of projects that use Breathe:
 - `Zephyr Project <https://github.com/zephyrproject-rtos/zephyr>`_
 - `Plaid ML <https://github.com/plaidml/plaidml>`_
 - `Sony's Neural Network Libraries <https://github.com/sony/nnabla>`_
-- `fmt <http://fmtlib.net/latest>`_
+- `fmt <https://fmt.dev/latest/>`_
 
 Release
 -------
@@ -156,4 +156,4 @@ Changelog
 ---------
 
 See the `CHANGELOG.rst
-<https://github.com/michaeljones/breathe/blob/master/CHANGELOG.rst>`_
+<https://github.com/breathe-doc/breathe/blob/master/CHANGELOG.rst>`_

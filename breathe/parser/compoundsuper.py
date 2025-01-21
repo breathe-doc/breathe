@@ -40,7 +40,7 @@ except ImportError as exp:
 
 #
 # If you have installed IPython you can uncomment and use the following.
-# IPython is available from http://ipython.scipy.org/.
+# IPython is available from https://ipython.org/.
 #
 
 ## from IPython.Shell import IPShellEmbed
