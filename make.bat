@@ -77,7 +77,7 @@ goto end
     goto end
 
 :type-check
-    mypy breathe tests
+    mypy
     goto end
 
 :version-check

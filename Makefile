@@ -41,4 +41,4 @@ ruff:
 
 .PHONY: type-check
 type-check:
-	mypy breathe tests
+	mypy
