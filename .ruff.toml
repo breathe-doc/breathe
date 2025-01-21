@@ -23,7 +23,7 @@ select = [
 #    "N",     # pep8-naming
     "PERF",  # perflint
 #    "PGH",   # pygrep-hooks
-#    "PT",    # flake8-pytest-style
+    "PT",    # flake8-pytest-style
 #    "TC",    # flake8-type-checking
 #    "UP",    # pyupgrade
     "W",     # pycodestyle

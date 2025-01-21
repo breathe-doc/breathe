@@ -32,7 +32,7 @@ sphinx.locale.init([], "")
 TESTS_ROOT = Path(__file__).resolve().parent
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture
 def app(test_params, app_params, make_app, shared_result):
     """
     Based on sphinx.testing.fixtures.app
@@ -278,7 +278,8 @@ def check_exception(func, message):
     except Exception as e:
         exception = e
     print(str(exception))
-    assert exception and str(exception) == message
+    assert exception
+    assert str(exception) == message
 
 
 def test_find_node():
