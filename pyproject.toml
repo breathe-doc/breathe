@@ -43,7 +43,7 @@ classifiers = [
     "Topic :: Utilities",
 ]
 dependencies = [
-    "Sphinx>=6.2",
+    "Sphinx>=7.2",
 ]
 dynamic = ["version"]
 

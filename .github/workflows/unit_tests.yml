@@ -37,10 +37,8 @@ jobs:
           - '3.12'
           - '3.13'
         sphinx-version:
-          - '6.2'
           - '7.2' # Ubuntu 24.04
           - '7.4' # Ubuntu 24.10
-          - '8.0'
           - '8.1' # Ubuntu 25.04
         exclude:
           - python-version: '3.9'
