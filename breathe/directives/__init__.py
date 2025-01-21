@@ -25,7 +25,7 @@ class _WarningHandler:
         raw_text: str,
         *,
         rendered_nodes: Optional[Sequence[nodes.Node]] = None,
-        unformatted_suffix: str = ""
+        unformatted_suffix: str = "",
     ) -> List[nodes.Node]:
         raw_text = self.format(raw_text) + unformatted_suffix
         if rendered_nodes is None:

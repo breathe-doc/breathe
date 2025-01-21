@@ -26,7 +26,7 @@ def format_parser_error(name, error, filename, state, lineno, do_unicode_warning
             "",
             nodes.paragraph("", "", nodes.Text(warning)),
             nodes.paragraph("", "", nodes.Text(explanation)),
-            *unicode_explanation
+            *unicode_explanation,
         ),
         state.document.reporter.warning(
             warning + explanation + unicode_explanation_text, line=lineno
