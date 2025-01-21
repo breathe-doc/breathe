@@ -18,7 +18,7 @@ from breathe.renderer.sphinxrenderer import SphinxRenderer, WithContext
 from breathe.renderer.target import create_target_handler
 
 if TYPE_CHECKING:
-    from typing import Any, List, Optional
+    from typing import Any
 
     from docutils.nodes import Node
 
@@ -28,7 +28,7 @@ class _NoMatchingFunctionError(BreatheError):
 
 
 class _UnableToResolveFunctionError(BreatheError):
-    def __init__(self, signatures: List[str]) -> None:
+    def __init__(self, signatures: list[str]) -> None:
         self.signatures = signatures
 
 
@@ -43,7 +43,7 @@ class DoxygenFunctionDirective(BaseDirective):
     has_content = False
     final_argument_whitespace = True
 
-    def run(self) -> List[Node]:
+    def run(self) -> list[Node]:
         # Extract namespace, function name, and parameters
         # Regex explanation:
         # 1. (?:<something>::)?
@@ -99,7 +99,7 @@ class DoxygenFunctionDirective(BaseDirective):
         )
 
         # TODO: find a more specific type for the Doxygen nodes
-        matchesAll: List[Any] = []
+        matchesAll: list[Any] = []
         finder.filter_(finder_filter, matchesAll)
         matches = []
         for m in matchesAll:
@@ -160,7 +160,7 @@ class DoxygenFunctionDirective(BaseDirective):
             self.directive_args,
         )
 
-    def _parse_args(self, function_description: str) -> Optional[cpp.ASTParametersQualifiers]:
+    def _parse_args(self, function_description: str) -> cpp.ASTParametersQualifiers | None:
         # Note: the caller must catch cpp.DefinitionError
         if function_description == "":
             return None
@@ -246,7 +246,7 @@ class DoxygenFunctionDirective(BaseDirective):
         ast = parser.parse_declaration("function", "function")
         return str(ast)
 
-    def _resolve_function(self, matches, args: Optional[cpp.ASTParametersQualifiers], project_info):
+    def _resolve_function(self, matches, args: cpp.ASTParametersQualifiers | None, project_info):
         if not matches:
             raise _NoMatchingFunctionError()
 

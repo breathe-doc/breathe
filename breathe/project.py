@@ -8,8 +8,6 @@ from typing import TYPE_CHECKING
 from .exception import BreatheError
 
 if TYPE_CHECKING:
-    from typing import Dict
-
     from sphinx.application import Sphinx
 
 
@@ -117,9 +115,9 @@ class ProjectInfoFactory:
         # This can be overridden with the breathe_build_directory config variable
         self._default_build_dir = os.path.dirname(os.path.normpath(app.doctreedir))
         self.project_count = 0
-        self.project_info_store: Dict[str, ProjectInfo] = {}
-        self.project_info_for_auto_store: Dict[str, AutoProjectInfo] = {}
-        self.auto_project_info_store: Dict[str, AutoProjectInfo] = {}
+        self.project_info_store: dict[str, ProjectInfo] = {}
+        self.project_info_for_auto_store: dict[str, AutoProjectInfo] = {}
+        self.auto_project_info_store: dict[str, AutoProjectInfo] = {}
 
     @property
     def build_dir(self) -> str:

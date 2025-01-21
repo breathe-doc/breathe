@@ -6,7 +6,7 @@ from breathe.finder import ItemFinder, stack
 from breathe.renderer.filter import FilterFactory
 
 if TYPE_CHECKING:
-    from typing import Any, List
+    from typing import Any
 
     from sphinx.application import Sphinx
 
@@ -49,7 +49,7 @@ class CompoundTypeSubItemFinder(ItemFinder):
         # Descend to member children
         members = self.data_object.get_member()
         # TODO: find a more precise type for the Doxygen nodes
-        member_matches: List[Any] = []
+        member_matches: list[Any] = []
         for member in members:
             member_finder = self.item_finder_factory.create_finder(member)
             member_finder.filter_(node_stack, filter_, member_matches)

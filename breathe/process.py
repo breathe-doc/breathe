@@ -6,7 +6,7 @@ from shlex import quote
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from typing import Callable, Dict, List, Tuple
+    from typing import Callable
 
     from breathe.project import AutoProjectInfo, ProjectInfoFactory
 
@@ -34,7 +34,7 @@ ALIASES += inlinerst="\verbatim embed:rst:inline"
 class ProjectData:
     """Simple handler for the files and project_info for each project."""
 
-    def __init__(self, auto_project_info: AutoProjectInfo, files: List[str]) -> None:
+    def __init__(self, auto_project_info: AutoProjectInfo, files: list[str]) -> None:
         self.auto_project_info = auto_project_info
         self.files = files
 
@@ -52,11 +52,11 @@ class AutoDoxygenProcessHandle:
 
     def generate_xml(
         self,
-        projects_source: Dict[str, Tuple[str, List[str]]],
-        doxygen_options: Dict[str, str],
-        doxygen_aliases: Dict[str, str],
+        projects_source: dict[str, tuple[str, list[str]]],
+        doxygen_options: dict[str, str],
+        doxygen_aliases: dict[str, str],
     ) -> None:
-        project_files: Dict[str, ProjectData] = {}
+        project_files: dict[str, ProjectData] = {}
 
         # First collect together all the files which need to be doxygen processed for each project
         for project_name, file_structure in projects_source.items():
@@ -78,9 +78,9 @@ class AutoDoxygenProcessHandle:
     def process(
         self,
         auto_project_info: AutoProjectInfo,
-        files: List[str],
-        doxygen_options: Dict[str, str],
-        doxygen_aliases: Dict[str, str],
+        files: list[str],
+        doxygen_options: dict[str, str],
+        doxygen_aliases: dict[str, str],
     ) -> str:
         name = auto_project_info.name()
         full_paths = [str(auto_project_info.abs_path_to_source_file(f)) for f in files]

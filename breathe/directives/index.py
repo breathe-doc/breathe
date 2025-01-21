@@ -13,8 +13,6 @@ from breathe.renderer.sphinxrenderer import SphinxRenderer
 from breathe.renderer.target import create_target_handler
 
 if TYPE_CHECKING:
-    from typing import List
-
     from docutils.nodes import Node
 
 
@@ -105,7 +103,7 @@ class AutoDoxygenIndexDirective(_BaseIndexDirective):
     }
     has_content = False
 
-    def run(self) -> List[Node]:
+    def run(self) -> list[Node]:
         """Extract the project info from the auto project info store and pass it to the helper
         method.
         """

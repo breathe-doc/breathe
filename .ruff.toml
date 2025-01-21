@@ -8,6 +8,9 @@ quote-style = "double"
 
 [lint]
 preview = true
+ignore = [
+    "UP031",  # Use format specifiers instead of percent format
+]
 select = [
     "C4",    # flake8-comprehensions
 #    "B",     # flake8-bugbear
@@ -25,7 +28,7 @@ select = [
 #    "PGH",   # pygrep-hooks
     "PT",    # flake8-pytest-style
     "TC",    # flake8-type-checking
-#    "UP",    # pyupgrade
+    "UP",    # pyupgrade
     "W",     # pycodestyle
 ]
 

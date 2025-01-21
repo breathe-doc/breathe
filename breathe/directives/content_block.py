@@ -13,7 +13,7 @@ from breathe.renderer.sphinxrenderer import SphinxRenderer
 from breathe.renderer.target import create_target_handler
 
 if TYPE_CHECKING:
-    from typing import Any, List
+    from typing import Any
 
     from docutils.nodes import Node
 
@@ -38,7 +38,7 @@ class _DoxygenContentBlockDirective(BaseDirective):
     }
     has_content = False
 
-    def run(self) -> List[Node]:
+    def run(self) -> list[Node]:
         name = self.arguments[0]
 
         try:
@@ -56,7 +56,7 @@ class _DoxygenContentBlockDirective(BaseDirective):
         finder_filter = self.filter_factory.create_finder_filter(self.kind, name)
 
         # TODO: find a more specific type for the Doxygen nodes
-        matches: List[Any] = []
+        matches: list[Any] = []
         finder.filter_(finder_filter, matches)
 
         # It shouldn't be possible to have too many matches as namespaces & groups in their nature
@@ -76,7 +76,7 @@ class _DoxygenContentBlockDirective(BaseDirective):
                 node_stack[0], project_info
             )
             # TODO: find a more specific type for the Doxygen nodes
-            contents: List[Any] = []
+            contents: list[Any] = []
             contents_finder.filter_(filter_, contents)
 
             # Replaces matches with our new starting points
@@ -85,7 +85,7 @@ class _DoxygenContentBlockDirective(BaseDirective):
         target_handler = create_target_handler(self.options, project_info, self.state.document)
         filter_ = self.filter_factory.create_render_filter(self.kind, self.options)
 
-        node_list: List[Node] = []
+        node_list: list[Node] = []
         for node_stack in matches:
             object_renderer = SphinxRenderer(
                 self.parser_factory.app,

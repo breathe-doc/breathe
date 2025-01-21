@@ -207,7 +207,7 @@ from typing import TYPE_CHECKING
 from breathe import path_handler
 
 if TYPE_CHECKING:
-    from typing import Any, Callable, Dict, List
+    from typing import Any, Callable
 
     from sphinx.application import Sphinx
 
@@ -292,19 +292,19 @@ class Accessor:
     def __call__(self, node_stack):
         raise NotImplementedError
 
-    def __eq__(self, value: str) -> "InFilter":  # type: ignore
+    def __eq__(self, value: str) -> InFilter:  # type: ignore
         return InFilter(self, [value])
 
-    def __ne__(self, value: str) -> "NotFilter":  # type: ignore
+    def __ne__(self, value: str) -> NotFilter:  # type: ignore
         return NotFilter(InFilter(self, [value]))
 
-    def is_one_of(self, collection: List[str]) -> "InFilter":
+    def is_one_of(self, collection: list[str]) -> InFilter:
         return InFilter(self, collection)
 
-    def has_content(self) -> "HasContentFilter":
+    def has_content(self) -> HasContentFilter:
         return HasContentFilter(self)
 
-    def endswith(self, options: List[str]) -> "EndsWithFilter":
+    def endswith(self, options: list[str]) -> EndsWithFilter:
         return EndsWithFilter(self, options)
 
 
@@ -379,13 +379,13 @@ class Filter:
     def allow(self, node_stack) -> bool:
         raise NotImplementedError
 
-    def __and__(self, other: "Filter") -> "AndFilter":
+    def __and__(self, other: Filter) -> AndFilter:
         return AndFilter(self, other)
 
-    def __or__(self, other: "Filter") -> "OrFilter":
+    def __or__(self, other: Filter) -> OrFilter:
         return OrFilter(self, other)
 
-    def __invert__(self) -> "NotFilter":
+    def __invert__(self) -> NotFilter:
         return NotFilter(self)
 
 
@@ -412,7 +412,7 @@ class EndsWithFilter(Filter):
     iterable parameter.
     """
 
-    def __init__(self, accessor: Accessor, options: List[str]):
+    def __init__(self, accessor: Accessor, options: list[str]):
         self.accessor = accessor
         self.options = options
 
@@ -427,7 +427,7 @@ class EndsWithFilter(Filter):
 class InFilter(Filter):
     """Checks if what is returned from the accessor is 'in' in the members"""
 
-    def __init__(self, accessor: Accessor, members: List[str]) -> None:
+    def __init__(self, accessor: Accessor, members: list[str]) -> None:
         self.accessor = accessor
         self.members = members
 
@@ -545,7 +545,7 @@ class IfFilter(Filter):
 
 
 class Gather(Filter):
-    def __init__(self, accessor: Accessor, names: List[str]):
+    def __init__(self, accessor: Accessor, names: list[str]):
         self.accessor = accessor
         self.names = names
 
@@ -582,7 +582,7 @@ class FilterFactory:
     def __init__(self, app: Sphinx) -> None:
         self.app = app
 
-    def create_render_filter(self, kind: str, options: Dict[str, Any]) -> Filter:
+    def create_render_filter(self, kind: str, options: dict[str, Any]) -> Filter:
         """Render filter for group & namespace blocks"""
 
         if kind not in ["group", "page", "namespace"]:
@@ -621,7 +621,7 @@ class FilterFactory:
             & self.create_outline_filter(filter_options)
         )
 
-    def create_class_filter(self, target: str, options: Dict[str, Any]) -> Filter:
+    def create_class_filter(self, target: str, options: dict[str, Any]) -> Filter:
         """Content filter for classes based on various directive options"""
 
         # Generate new dictionary from defaults
@@ -637,7 +637,7 @@ class FilterFactory:
             self.create_show_filter(filter_options),
         )
 
-    def create_innerclass_filter(self, options: Dict[str, Any], outerclass: str = "") -> Filter:
+    def create_innerclass_filter(self, options: dict[str, Any], outerclass: str = "") -> Filter:
         """
         :param outerclass: Should be the class/struct being target by the directive calling this
                            code. If it is a group or namespace directive then it should be left
@@ -693,7 +693,7 @@ class FilterFactory:
         # to check the parent's type as well
         return innerclass | public_innerclass_filter | description
 
-    def create_show_filter(self, options: Dict[str, Any]) -> Filter:
+    def create_show_filter(self, options: dict[str, Any]) -> Filter:
         """Currently only handles the header-file entry"""
 
         try:
@@ -716,7 +716,7 @@ class FilterFactory:
         )
 
     def _create_description_filter(
-        self, allow: bool, level: str, options: Dict[str, Any]
+        self, allow: bool, level: str, options: dict[str, Any]
     ) -> Filter:
         """Whether or not we allow descriptions is determined by the calling function and we just do
         whatever the 'allow' function parameter tells us.
@@ -736,7 +736,7 @@ class FilterFactory:
 
         return description_filter
 
-    def _create_public_members_filter(self, options: Dict[str, Any]) -> Filter:
+    def _create_public_members_filter(self, options: dict[str, Any]) -> Filter:
         node = Node()
         node_is_memberdef = node.node_type == "memberdef"
         node_is_public = node.prot == "public"
@@ -771,7 +771,7 @@ class FilterFactory:
         return public_members_filter
 
     def _create_non_public_members_filter(
-        self, prot: str, option_name: str, options: Dict[str, Any]
+        self, prot: str, option_name: str, options: dict[str, Any]
     ) -> Filter:
         """'prot' is the doxygen xml term for 'public', 'protected' and 'private' categories."""
 
@@ -791,7 +791,7 @@ class FilterFactory:
             filter_ = ~is_memberdef | node_is_public
         return filter_
 
-    def _create_undoc_members_filter(self, options: Dict[str, Any]) -> Filter:
+    def _create_undoc_members_filter(self, options: dict[str, Any]) -> Filter:
         node = Node()
         node_is_memberdef = node.node_type == "memberdef"
 
@@ -806,7 +806,7 @@ class FilterFactory:
             undoc_members_filter = OpenFilter()
         return undoc_members_filter
 
-    def create_class_member_filter(self, options: Dict[str, Any]) -> Filter:
+    def create_class_member_filter(self, options: dict[str, Any]) -> Filter:
         """Content filter based on :members: and :private-members: classes"""
 
         # I can't fully explain the filtering of descriptions here. More testing needed to figure
@@ -836,15 +836,15 @@ class FilterFactory:
         allowed_members = (public_members | protected_members | private_members) & undoc_members
         return allowed_members | description
 
-    def create_outline_filter(self, options: Dict[str, Any]) -> Filter:
+    def create_outline_filter(self, options: dict[str, Any]) -> Filter:
         if "outline" in options:
             node = Node()
             return ~node.node_type.is_one_of(["description", "inc"])
         else:
             return OpenFilter()
 
-    def create_file_filter(self, filename: str, options: Dict[str, Any]) -> Filter:
-        valid_names: List[str] = []
+    def create_file_filter(self, filename: str, options: dict[str, Any]) -> Filter:
+        valid_names: list[str] = []
 
         filter_ = AndFilter(
             NotFilter(
@@ -927,7 +927,7 @@ class FilterFactory:
         )
         return AndFilter(self.create_outline_filter(options), filter_)
 
-    def create_content_filter(self, kind: str, options: Dict[str, Any]) -> Filter:
+    def create_content_filter(self, kind: str, options: dict[str, Any]) -> Filter:
         """Returns a filter which matches the contents of the or namespace but not the group or
         namespace name or description.
 
@@ -962,7 +962,7 @@ class FilterFactory:
 
         return public_members | public_innerclass
 
-    def create_index_filter(self, options: Dict[str, Any]) -> Filter:
+    def create_index_filter(self, options: dict[str, Any]) -> Filter:
         filter_ = AndFilter(
             NotFilter(
                 AndFilter(

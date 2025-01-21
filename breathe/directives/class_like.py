@@ -11,7 +11,7 @@ from breathe.renderer.mask import NullMaskFactory
 from breathe.renderer.target import create_target_handler
 
 if TYPE_CHECKING:
-    from typing import Any, List
+    from typing import Any
 
     from docutils.nodes import Node
 
@@ -36,7 +36,7 @@ class _DoxygenClassLikeDirective(BaseDirective):
     }
     has_content = False
 
-    def run(self) -> List[Node]:
+    def run(self) -> list[Node]:
         name = self.arguments[0]
 
         try:
@@ -54,7 +54,7 @@ class _DoxygenClassLikeDirective(BaseDirective):
         finder_filter = self.filter_factory.create_compound_finder_filter(name, self.kind)
 
         # TODO: find a more specific type for the Doxygen nodes
-        matches: List[Any] = []
+        matches: list[Any] = []
         finder.filter_(finder_filter, matches)
 
         if len(matches) == 0:

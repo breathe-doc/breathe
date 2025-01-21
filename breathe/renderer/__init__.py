@@ -47,7 +47,7 @@ class RenderContext:
         self.domain = domain
         self.child = child
 
-    def create_child_context(self, data_object) -> "RenderContext":
+    def create_child_context(self, data_object) -> RenderContext:
         node_stack = self.node_stack[:]
         node_stack.insert(0, self.mask_factory.mask(data_object))
         return RenderContext(node_stack, self.mask_factory, self.directive_args, self.domain, True)

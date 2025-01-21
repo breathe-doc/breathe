@@ -253,7 +253,7 @@ def find_node(nodes, name):
     """
     found_nodes = find_nodes(nodes, name)
     if len(found_nodes) != 1:
-        raise Exception("the number of nodes {0} is {1}".format(name, len(found_nodes)))
+        raise Exception(f"the number of nodes {name} is {len(found_nodes)}")
     return found_nodes[0]
 
 

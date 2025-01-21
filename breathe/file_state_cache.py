@@ -5,8 +5,6 @@ from pathlib import Path
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from typing import List, Set
-
     from sphinx.application import Sphinx
     from sphinx.environment import BuildEnvironment
 
@@ -50,8 +48,8 @@ def update(app: Sphinx, source_file: str | os.PathLike[str]) -> None:
 
 
 def _get_outdated(
-    app: Sphinx, env: BuildEnvironment, added: Set[str], changed: Set[str], removed: Set[str]
-) -> List[str]:
+    app: Sphinx, env: BuildEnvironment, added: set[str], changed: set[str], removed: set[str]
+) -> list[str]:
     if not hasattr(app.env, "breathe_file_state"):
         return []
 

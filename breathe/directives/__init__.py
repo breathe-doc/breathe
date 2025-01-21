@@ -12,7 +12,8 @@ from breathe.renderer.filter import FilterFactory
 from breathe.renderer.sphinxrenderer import SphinxRenderer
 
 if TYPE_CHECKING:
-    from typing import Any, Dict, List, Optional, Sequence
+    from collections.abc import Sequence
+    from typing import Any
 
     from breathe.parser import DoxygenParserFactory
     from breathe.project import ProjectInfo, ProjectInfoFactory
@@ -22,7 +23,7 @@ if TYPE_CHECKING:
 
 
 class _WarningHandler:
-    def __init__(self, state, context: Dict[str, Any]) -> None:
+    def __init__(self, state, context: dict[str, Any]) -> None:
         self.state = state
         self.context = context
 
@@ -30,9 +31,9 @@ class _WarningHandler:
         self,
         raw_text: str,
         *,
-        rendered_nodes: Optional[Sequence[nodes.Node]] = None,
+        rendered_nodes: Sequence[nodes.Node] | None = None,
         unformatted_suffix: str = "",
-    ) -> List[nodes.Node]:
+    ) -> list[nodes.Node]:
         raw_text = self.format(raw_text) + unformatted_suffix
         if rendered_nodes is None:
             rendered_nodes = [nodes.paragraph("", "", nodes.Text(raw_text))]
@@ -81,11 +82,11 @@ class BaseDirective(SphinxDirective):
     def kind(self) -> str:
         raise NotImplementedError
 
-    def create_warning(self, project_info: Optional[ProjectInfo], **kwargs) -> _WarningHandler:
+    def create_warning(self, project_info: ProjectInfo | None, **kwargs) -> _WarningHandler:
         if project_info:
-            tail = 'in doxygen xml output for project "{project}" from directory: {path}'.format(
-                project=project_info.name(), path=project_info.project_path()
-            )
+            proj_name = project_info.name()
+            proj_path = project_info.project_path()
+            tail = f'in doxygen xml output for project "{proj_name}" from directory: {proj_path}'
         else:
             tail = ""
 
@@ -100,7 +101,7 @@ class BaseDirective(SphinxDirective):
         target_handler: TargetHandler,
         mask_factory: MaskFactoryBase,
         directive_args,
-    ) -> List[nodes.Node]:
+    ) -> list[nodes.Node]:
         "Standard render process used by subclasses"
 
         try:

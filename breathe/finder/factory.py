@@ -6,8 +6,6 @@ from breathe.finder import compound as compoundfinder
 from breathe.finder import index as indexfinder
 
 if TYPE_CHECKING:
-    from typing import Dict, Type
-
     from sphinx.application import Sphinx
 
     from breathe.finder import ItemFinder
@@ -27,7 +25,7 @@ class _CreateCompoundTypeSubFinder:
 
 
 class DoxygenItemFinderFactory:
-    def __init__(self, finders: Dict[str, Type[ItemFinder]], project_info: ProjectInfo):
+    def __init__(self, finders: dict[str, type[ItemFinder]], project_info: ProjectInfo):
         self.finders = finders
         self.project_info = project_info
 
@@ -65,7 +63,7 @@ class FinderFactory:
         return self.create_finder_from_root(root, project_info)
 
     def create_finder_from_root(self, root, project_info: ProjectInfo) -> Finder:
-        finders: Dict[str, Type[ItemFinder]] = {
+        finders: dict[str, type[ItemFinder]] = {
             "doxygen": indexfinder.DoxygenTypeSubItemFinder,
             "compound": _CreateCompoundTypeSubFinder(self.app, self.parser_factory),  # type: ignore
             "member": indexfinder.MemberTypeSubItemFinder,

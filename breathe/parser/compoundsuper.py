@@ -8117,7 +8117,7 @@ class docParamName(GeneratedsSuper):
                         MixedContainer.CategoryText,
                         MixedContainer.TypeNone,
                         "",
-                        "[{}] ".format(d.value),
+                        f"[{d.value}] ",
                     ),
                 )
 
