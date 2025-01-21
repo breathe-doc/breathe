@@ -9,31 +9,34 @@ from . import indexsuper as supermod
 
 
 class DoxygenTypeSub(supermod.DoxygenType):
-
     node_type = "doxygen"
 
     def __init__(self, version=None, compound=None):
         supermod.DoxygenType.__init__(self, version, compound)
+
+
 supermod.DoxygenType.subclass = DoxygenTypeSub
 # end class DoxygenTypeSub
 
 
 class CompoundTypeSub(supermod.CompoundType):
-
     node_type = "compound"
 
-    def __init__(self, kind=None, refid=None, name='', member=None):
+    def __init__(self, kind=None, refid=None, name="", member=None):
         supermod.CompoundType.__init__(self, kind, refid, name, member)
+
+
 supermod.CompoundType.subclass = CompoundTypeSub
 # end class CompoundTypeSub
 
 
 class MemberTypeSub(supermod.MemberType):
-
     node_type = "member"
 
-    def __init__(self, kind=None, refid=None, name=''):
+    def __init__(self, kind=None, refid=None, name=""):
         supermod.MemberType.__init__(self, kind, refid, name)
+
+
 supermod.MemberType.subclass = MemberTypeSub
 # end class MemberTypeSub
 

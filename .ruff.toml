@@ -2,10 +2,6 @@ target-version = "py39"  # Pin Ruff to Python 3.9
 line-length = 100
 output-format = "full"
 
-extend-exclude = [
-    "breathe/parser/*.py",
-]
-
 [format]
 preview = true
 quote-style = "double"
@@ -36,6 +32,18 @@ select = [
 [lint.per-file-ignores]
 "breathe/file_state_cache.py" = [
     "F841",  # Local variable `{name}` is assigned to but never used
+]
+
+"breathe/parser/compound.py" = [
+    "PERF401"  # Use a list comprehension to create a transformed list
+]
+
+"breathe/parser/{compound,index}super.py" = [
+    "E266",  # Too many leading `#` before block comment
+    "F401",  # `{name}` imported but unused
+    "F821",  # Undefined name `basestring`
+    "F841",  # Local variable `{name}` is assigned to but never used
+    "PERF401"  # Use a list comprehension to create a transformed list
 ]
 
 "documentation/source/conf.py" = [

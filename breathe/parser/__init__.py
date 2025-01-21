@@ -17,7 +17,7 @@ class ParserError(Exception):
         self.filename = filename
 
     def __str__(self):
-        return ("file %s: %s" % (self.filename, self.error))
+        return "file %s: %s" % (self.filename, self.error)
 
 
 class FileIOError(Exception):
@@ -55,17 +55,14 @@ class DoxygenIndexParser(Parser):
 
 
 class DoxygenCompoundParser(Parser):
-    def __init__(self, app: Sphinx, cache,
-                 project_info: ProjectInfo) -> None:
+    def __init__(self, app: Sphinx, cache, project_info: ProjectInfo) -> None:
         super().__init__(app, cache)
 
         self.project_info = project_info
 
     def parse(self, refid: str):
         filename = Path(
-            self.app.confdir,
-            self.project_info.project_path(),
-            f"{refid}.xml"
+            self.app.confdir, self.project_info.project_path(), f"{refid}.xml"
         ).resolve()
 
         file_state_cache.update(self.app, filename)
