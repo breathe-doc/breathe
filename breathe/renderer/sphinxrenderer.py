@@ -2106,7 +2106,7 @@ class SphinxRenderer:
             #   contain the full text. If a @typedef was used instead, the
             #   definition has only the typename, which makes it impossible to
             #   distinguish between them so fallback to "typedef" behavior here.
-            declaration = " ".join([type_, name, node.get_argsstring()])
+            declaration = f"{type_} {name} {node.get_argsstring()}"
         return self.handle_declaration(node, declaration)
 
     def make_initializer(self, node) -> str:
