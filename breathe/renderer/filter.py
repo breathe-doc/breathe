@@ -292,10 +292,10 @@ class Accessor:
     def __call__(self, node_stack):
         raise NotImplementedError
 
-    def __eq__(self, value: str) -> InFilter:  # type: ignore
+    def __eq__(self, value: str) -> InFilter:  # type: ignore[override]
         return InFilter(self, [value])
 
-    def __ne__(self, value: str) -> NotFilter:  # type: ignore
+    def __ne__(self, value: str) -> NotFilter:  # type: ignore[override]
         return NotFilter(InFilter(self, [value]))
 
     def is_one_of(self, collection: list[str]) -> InFilter:

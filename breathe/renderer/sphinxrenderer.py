@@ -12,12 +12,12 @@ from sphinx.util import url_re
 from sphinx.util.nodes import nested_parse_with_titles
 
 try:
-    from sphinxcontrib import phpdomain as php  # type: ignore
+    from sphinxcontrib import phpdomain as php  # type: ignore[import-untyped]
 except ImportError:
     php = None
 
 try:
-    from sphinx_csharp import csharp as cs  # type: ignore
+    from sphinx_csharp import csharp as cs  # type: ignore[import-not-found]
 except ImportError:
     cs = None
 
@@ -67,7 +67,7 @@ class BaseObject:
     # Set the content_callback attribute to a function taking a docutils node.
 
     def transform_content(self, contentnode: addnodes.desc_content) -> None:
-        super().transform_content(contentnode)  # type: ignore
+        super().transform_content(contentnode)  # type: ignore[misc]
         callback = getattr(self, "breathe_content_callback", None)
         if callback is None:
             return
@@ -327,15 +327,15 @@ class DomainDirectiveFactory:
                     arg_0 = "global"
 
             if arg_0 in DomainDirectiveFactory.php_classes:
-                cls, name = DomainDirectiveFactory.php_classes[arg_0]  # type: ignore
+                cls, name = DomainDirectiveFactory.php_classes[arg_0]  # type: ignore[assignment]
             else:
-                cls, name = DomainDirectiveFactory.php_classes_default  # type: ignore
+                cls, name = DomainDirectiveFactory.php_classes_default  # type: ignore[assignment]
 
         elif cs is not None and domain == "cs":
             cls, name = DomainDirectiveFactory.cs_classes[args[0]]
         else:
             domain = "cpp"
-            cls, name = DomainDirectiveFactory.cpp_classes[args[0]]  # type: ignore
+            cls, name = DomainDirectiveFactory.cpp_classes[args[0]]  # type: ignore[assignment]
         # Replace the directive name because domain directives don't know how to handle
         # Breathe's "doxygen" directives.
         assert ":" not in name
@@ -599,7 +599,7 @@ class SphinxRenderer:
         args = [obj_type, [declaration]] + self.context.directive_args[2:]
         directive = DomainDirectiveFactory.create(self.context.domain, args)
         assert issubclass(type(directive), BaseObject)
-        directive.breathe_content_callback = contentCallback  # type: ignore
+        directive.breathe_content_callback = contentCallback  # type: ignore[attr-defined]
 
         # Translate Breathe's no-link option into the standard noindex option.
         if "no-link" in self.context.directive_args[2]:

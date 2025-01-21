@@ -25,7 +25,7 @@ select = [
     "LOG",   # flake8-logging
 #    "N",     # pep8-naming
     "PERF",  # perflint
-#    "PGH",   # pygrep-hooks
+    "PGH",   # pygrep-hooks
     "PT",    # flake8-pytest-style
     "TC",    # flake8-type-checking
     "UP",    # pyupgrade

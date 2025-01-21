@@ -65,7 +65,7 @@ class FinderFactory:
     def create_finder_from_root(self, root, project_info: ProjectInfo) -> Finder:
         finders: dict[str, type[ItemFinder]] = {
             "doxygen": indexfinder.DoxygenTypeSubItemFinder,
-            "compound": _CreateCompoundTypeSubFinder(self.app, self.parser_factory),  # type: ignore
+            "compound": _CreateCompoundTypeSubFinder(self.app, self.parser_factory),  # type: ignore[dict-item]
             "member": indexfinder.MemberTypeSubItemFinder,
             "doxygendef": compoundfinder.DoxygenTypeSubItemFinder,
             "compounddef": compoundfinder.CompoundDefTypeSubItemFinder,

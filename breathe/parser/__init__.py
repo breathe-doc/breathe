@@ -91,7 +91,7 @@ class DoxygenParserFactory:
         self.app = app
         # TODO: do we have a base class for all the Doxygen XML node types
         #       that we can use for typing?
-        self.cache = {}  # type: ignore
+        self.cache = {}  # type: ignore[var-annotated]
 
     def create_index_parser(self) -> DoxygenIndexParser:
         return DoxygenIndexParser(self.app, self.cache)

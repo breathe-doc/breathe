@@ -59,6 +59,8 @@ lint = [
     "types-docutils",
     "types-Pygments",
     "pytest>=8.0",  # for mypy
+    "sphinxcontrib-phpdomain",  # for mypy
+    "sphinx-csharp",  # for mypy
 ]
 test = [
     "pytest>=8.0",
@@ -93,6 +95,13 @@ exclude = [
 ]
 
 [tool.mypy]
+files = [
+    "breathe",
+    "examples",
+    "tests",
+]
+show_column_numbers = true
+show_error_context = true
 python_version = "3.9"
 warn_unused_configs = true
 warn_redundant_casts = true
