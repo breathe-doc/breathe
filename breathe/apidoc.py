@@ -209,8 +209,7 @@ Note: By default this script will not overwrite already created files.""",
     parser.add_argument("rootpath", type=str, help="The directory contains index.xml")
     args = parser.parse_args()
 
-    if args.suffix.startswith("."):
-        args.suffix = args.suffix[1:]
+    args.suffix = args.suffix.removeprefix(".")
     if not os.path.isdir(args.rootpath):
         print("%s is not a directory." % args.rootpath, file=sys.stderr)
         sys.exit(1)

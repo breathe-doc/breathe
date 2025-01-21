@@ -319,7 +319,7 @@ class DomainDirectiveFactory:
                 else:
                     arg_0 = "method"
             else:
-                if arg_0 in ["variable"]:
+                if arg_0 == "variable":
                     arg_0 = "global"
 
             if arg_0 in DomainDirectiveFactory.php_classes:
@@ -389,7 +389,7 @@ def get_param_decl(param):
         return " ".join(result)
 
     param_type = to_string(param.type_)
-    param_name = param.declname if param.declname else param.defname
+    param_name = param.declname or param.defname
     if not param_name:
         param_decl = param_type
     else:
@@ -1225,7 +1225,7 @@ class SphinxRenderer:
 
             rst_node.document = self.state.document
             rst_node["objtype"] = kind
-            rst_node["domain"] = self.get_domain() if self.get_domain() else "cpp"
+            rst_node["domain"] = self.get_domain() or "cpp"
 
             contentnode = addnodes.desc_content()
             rst_node.append(contentnode)
@@ -1846,7 +1846,7 @@ class SphinxRenderer:
 
         descnode = addnodes.desc()
         descnode["objtype"] = "xrefsect"
-        descnode["domain"] = self.get_domain() if self.get_domain() else "cpp"
+        descnode["domain"] = self.get_domain() or "cpp"
         descnode += signode
         descnode += contentnode
 
@@ -1857,7 +1857,7 @@ class SphinxRenderer:
         for varlistentry, listitem in zip(node.varlistentries, node.listitems):
             descnode = addnodes.desc()
             descnode["objtype"] = "varentry"
-            descnode["domain"] = self.get_domain() if self.get_domain() else "cpp"
+            descnode["domain"] = self.get_domain() or "cpp"
             signode = addnodes.desc_signature()
             signode += self.render_optional(varlistentry)
             descnode += signode
@@ -1973,11 +1973,8 @@ class SphinxRenderer:
                 # In Doxygen up to somewhere between 1.8.17 to exclusive 1.9.1
                 # the 'friend' part is also left in the type.
                 # See also #767.
-                if typ.startswith("friend "):
-                    typ = typ[7:]
-                elements.append(typ)
-                elements.append(name)
-                elements.append(node.get_argsstring())
+                typ = typ.removeprefix("friend ")
+                elements.extend((typ, name, node.get_argsstring()))
                 declaration = " ".join(elements)
             nodes_ = self.handle_declaration(node, declaration)
             return nodes_
@@ -2165,10 +2162,7 @@ class SphinxRenderer:
             typename = typename.replace("static ", "")
             if dom == "c" and "::" in typename:
                 typename = typename.replace("::", ".")
-            elements.append(typename)
-            elements.append(name)
-            elements.append(node.get_argsstring())
-            elements.append(self.make_initializer(node))
+            elements.extend((typename, name, node.get_argsstring(), self.make_initializer(node)))
             declaration = " ".join(elements)
         if not dom or dom in ("c", "cpp", "py", "cs"):
             return self.handle_declaration(node, declaration, options=options)
@@ -2181,7 +2175,7 @@ class SphinxRenderer:
 
         desc = addnodes.desc()
         desc["objtype"] = "friendclass"
-        desc["domain"] = self.get_domain() if self.get_domain() else "cpp"
+        desc["domain"] = self.get_domain() or "cpp"
         signode = addnodes.desc_signature()
         desc += signode
 

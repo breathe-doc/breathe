@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import os
+from pathlib import Path
 
 import pytest
 import sphinx.addnodes
@@ -27,6 +28,8 @@ from breathe.renderer.filter import OpenFilter
 from breathe.renderer.sphinxrenderer import SphinxRenderer
 
 sphinx.locale.init([], "")
+
+TESTS_ROOT = Path(__file__).resolve().parent
 
 
 @pytest.fixture(scope="function")
@@ -550,8 +553,7 @@ def get_matches(datafile):
     from breathe.parser.compoundsuper import sectiondefType
 
     argsstrings = []
-    with open(os.path.join(os.path.dirname(__file__), "data", datafile), encoding="utf-8") as fid:
-        xml = fid.read()
+    xml = TESTS_ROOT.joinpath("data", datafile).read_text(encoding="utf-8")
     doc = minidom.parseString(xml)
 
     sectiondef = sectiondefType.factory()
