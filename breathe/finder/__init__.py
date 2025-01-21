@@ -1,7 +1,10 @@
 from __future__ import annotations
 
-from breathe.project import ProjectInfo
-from breathe.renderer.filter import Filter
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from breathe.project import ProjectInfo
+    from breathe.renderer.filter import Filter
 
 
 def stack(element, list_):

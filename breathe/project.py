@@ -3,11 +3,14 @@ from __future__ import annotations
 import fnmatch
 import os
 from pathlib import Path
-from typing import Dict
-
-from sphinx.application import Sphinx
+from typing import TYPE_CHECKING
 
 from .exception import BreatheError
+
+if TYPE_CHECKING:
+    from typing import Dict
+
+    from sphinx.application import Sphinx
 
 
 class ProjectError(BreatheError):

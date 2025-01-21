@@ -3,9 +3,12 @@ from __future__ import annotations
 import os
 from pathlib import Path
 from shlex import quote
-from typing import Callable, Dict, List, Tuple
+from typing import TYPE_CHECKING
 
-from breathe.project import AutoProjectInfo, ProjectInfoFactory
+if TYPE_CHECKING:
+    from typing import Callable, Dict, List, Tuple
+
+    from breathe.project import AutoProjectInfo, ProjectInfoFactory
 
 AUTOCFG_TEMPLATE = r"""
 PROJECT_NAME     = "{project_name}"

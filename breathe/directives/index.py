@@ -1,8 +1,7 @@
 from __future__ import annotations
 
-from typing import List
+from typing import TYPE_CHECKING
 
-from docutils.nodes import Node
 from docutils.parsers.rst.directives import flag, unchanged_required
 
 from breathe.directives import BaseDirective
@@ -12,6 +11,11 @@ from breathe.renderer import RenderContext, format_parser_error
 from breathe.renderer.mask import NullMaskFactory
 from breathe.renderer.sphinxrenderer import SphinxRenderer
 from breathe.renderer.target import create_target_handler
+
+if TYPE_CHECKING:
+    from typing import List
+
+    from docutils.nodes import Node
 
 
 class RootDataObject:

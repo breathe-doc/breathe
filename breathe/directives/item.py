@@ -1,16 +1,21 @@
 from __future__ import annotations
 
-from typing import Any, List
+from typing import TYPE_CHECKING
 
-from docutils.nodes import Node
 from docutils.parsers.rst.directives import flag, unchanged_required
 
 from breathe.directives import BaseDirective
 from breathe.file_state_cache import MTimeError
 from breathe.project import ProjectError
-from breathe.renderer.filter import Filter
 from breathe.renderer.mask import NullMaskFactory
 from breathe.renderer.target import create_target_handler
+
+if TYPE_CHECKING:
+    from typing import Any, List
+
+    from docutils.nodes import Node
+
+    from breathe.renderer.filter import Filter
 
 
 class _DoxygenBaseItemDirective(BaseDirective):

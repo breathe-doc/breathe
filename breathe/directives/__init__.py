@@ -1,18 +1,24 @@
 from __future__ import annotations
 
-from typing import Any, Dict, List, Optional, Sequence
+from typing import TYPE_CHECKING
 
 from docutils import nodes
 from sphinx.directives import SphinxDirective
 
 from breathe.finder.factory import FinderFactory
-from breathe.parser import DoxygenParserFactory, FileIOError, ParserError
-from breathe.project import ProjectInfo, ProjectInfoFactory
+from breathe.parser import FileIOError, ParserError
 from breathe.renderer import RenderContext, format_parser_error
-from breathe.renderer.filter import Filter, FilterFactory
-from breathe.renderer.mask import MaskFactoryBase
+from breathe.renderer.filter import FilterFactory
 from breathe.renderer.sphinxrenderer import SphinxRenderer
-from breathe.renderer.target import TargetHandler
+
+if TYPE_CHECKING:
+    from typing import Any, Dict, List, Optional, Sequence
+
+    from breathe.parser import DoxygenParserFactory
+    from breathe.project import ProjectInfo, ProjectInfoFactory
+    from breathe.renderer.filter import Filter
+    from breathe.renderer.mask import MaskFactoryBase
+    from breathe.renderer.target import TargetHandler
 
 
 class _WarningHandler:

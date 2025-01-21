@@ -2,10 +2,13 @@ from __future__ import annotations
 
 import os
 from pathlib import Path
-from typing import List, Set
+from typing import TYPE_CHECKING
 
-from sphinx.application import Sphinx
-from sphinx.environment import BuildEnvironment
+if TYPE_CHECKING:
+    from typing import List, Set
+
+    from sphinx.application import Sphinx
+    from sphinx.environment import BuildEnvironment
 
 """
 Store the modified time of the various doxygen xml files against the

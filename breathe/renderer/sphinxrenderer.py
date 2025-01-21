@@ -3,22 +3,13 @@ from __future__ import annotations
 from pathlib import Path
 
 from docutils import nodes
-from docutils.nodes import Node, TextElement
 from docutils.parsers.rst.states import Text
 from docutils.statemachine import StringList, UnexpectedIndentationError
 from sphinx import addnodes
-from sphinx.application import Sphinx
-from sphinx.directives import ObjectDescription
 from sphinx.domains import c, cpp, python
 from sphinx.ext.graphviz import graphviz
 from sphinx.util import url_re
 from sphinx.util.nodes import nested_parse_with_titles
-
-from breathe.parser import DoxygenCompoundParser, compound, compoundsuper
-from breathe.project import ProjectInfo
-from breathe.renderer import RenderContext
-from breathe.renderer.filter import Filter
-from breathe.renderer.target import TargetHandler
 
 try:
     from sphinxcontrib import phpdomain as php  # type: ignore
@@ -32,7 +23,20 @@ except ImportError:
 
 import re
 import textwrap
-from typing import Any, Callable, Dict, List, Optional, Type, Union, cast
+from typing import TYPE_CHECKING, Callable, Union, cast
+
+if TYPE_CHECKING:
+    from typing import Any, Dict, List, Optional, Type
+
+    from docutils.nodes import Node, TextElement
+    from sphinx.application import Sphinx
+    from sphinx.directives import ObjectDescription
+
+    from breathe.parser import DoxygenCompoundParser, compound, compoundsuper
+    from breathe.project import ProjectInfo
+    from breathe.renderer import RenderContext
+    from breathe.renderer.filter import Filter
+    from breathe.renderer.target import TargetHandler
 
 ContentCallback = Callable[[addnodes.desc_content], None]
 Declarator = Union[addnodes.desc_signature, addnodes.desc_signature_line]
@@ -304,8 +308,8 @@ class DomainDirectiveFactory:
 
     @staticmethod
     def create(domain: str, args) -> ObjectDescription:
-        cls = cast(Type[ObjectDescription], None)
-        name = cast(str, None)
+        cls = cast("Type[ObjectDescription]", None)
+        name = cast("str", None)
         if domain == "c":
             cls, name = DomainDirectiveFactory.c_classes[args[0]]
         elif domain == "py":
@@ -570,7 +574,7 @@ class SphinxRenderer:
             except AttributeError:
                 return None
 
-        self.context = cast(RenderContext, self.context)
+        self.context = cast("RenderContext", self.context)
         node_stack = self.context.node_stack
         node = node_stack[0]
         # An enumvalue node doesn't have location, so use its parent node for detecting
@@ -591,7 +595,7 @@ class SphinxRenderer:
     def run_directive(
         self, obj_type: str, declaration: str, contentCallback: ContentCallback, options={}
     ) -> List[Node]:
-        self.context = cast(RenderContext, self.context)
+        self.context = cast("RenderContext", self.context)
         args = [obj_type, [declaration]] + self.context.directive_args[2:]
         directive = DomainDirectiveFactory.create(self.context.domain, args)
         assert issubclass(type(directive), BaseObject)
@@ -979,7 +983,7 @@ class SphinxRenderer:
         file_data = self.compound_parser.parse(node.refid)
         nodeDef = file_data.compounddef
 
-        self.context = cast(RenderContext, self.context)
+        self.context = cast("RenderContext", self.context)
         parent_context = self.context.create_child_context(file_data)
         new_context = parent_context.create_child_context(nodeDef)
 
@@ -1008,7 +1012,7 @@ class SphinxRenderer:
         file_data = self.compound_parser.parse(node.refid)
         nodeDef = file_data.compounddef
 
-        self.context = cast(RenderContext, self.context)
+        self.context = cast("RenderContext", self.context)
         parent_context = self.context.create_child_context(file_data)
         new_context = parent_context.create_child_context(nodeDef)
 
@@ -1074,7 +1078,7 @@ class SphinxRenderer:
         file_data = self.compound_parser.parse(node.refid)
         nodeDef = file_data.compounddef
 
-        self.context = cast(RenderContext, self.context)
+        self.context = cast("RenderContext", self.context)
         parent_context = self.context.create_child_context(file_data)
         new_context = parent_context.create_child_context(file_data.compounddef)
 
@@ -1124,7 +1128,7 @@ class SphinxRenderer:
             if not dom or dom in ("c", "cpp", "py", "cs"):
                 return self.visit_namespace(node)
 
-        self.context = cast(RenderContext, self.context)
+        self.context = cast("RenderContext", self.context)
         parent_context = self.context.create_child_context(file_data)
         new_context = parent_context.create_child_context(file_data.compounddef)
         rendered_data = self.render(file_data, parent_context)
@@ -1187,7 +1191,7 @@ class SphinxRenderer:
 
     def visit_file(self, node) -> List[Node]:
         def render_signature(file_data, doxygen_target, name, kind):
-            self.context = cast(RenderContext, self.context)
+            self.context = cast("RenderContext", self.context)
             options = self.context.directive_args[2]
 
             if "content-only" in options:
@@ -1281,7 +1285,7 @@ class SphinxRenderer:
     ]
 
     def visit_compounddef(self, node) -> List[Node]:
-        self.context = cast(RenderContext, self.context)
+        self.context = cast("RenderContext", self.context)
         options = self.context.directive_args[2]
         section_order = None
         if "sections" in options:
@@ -1374,7 +1378,7 @@ class SphinxRenderer:
     section_titles = dict(sections)
 
     def visit_sectiondef(self, node) -> List[Node]:
-        self.context = cast(RenderContext, self.context)
+        self.context = cast("RenderContext", self.context)
         options = self.context.directive_args[2]
         node_list = []
         node_list.extend(self.render_optional(node.description))
@@ -1982,7 +1986,7 @@ class SphinxRenderer:
             # Get full function signature for the domain directive.
             param_list = []
             for param in node.param:
-                self.context = cast(RenderContext, self.context)
+                self.context = cast("RenderContext", self.context)
                 param = self.context.mask_factory.mask(param)
                 param_decl = get_param_decl(param)
                 param_list.append(param_decl)
@@ -2009,7 +2013,7 @@ class SphinxRenderer:
             if node.virt == "pure-virtual":
                 signature += "= 0"
 
-            self.context = cast(RenderContext, self.context)
+            self.context = cast("RenderContext", self.context)
             self.context.directive_args[1] = [signature]
 
             nodes_ = self.run_domain_directive(node.kind, self.context.directive_args[1])
@@ -2574,11 +2578,11 @@ class SphinxRenderer:
 
     def render(self, node, context: Optional[RenderContext] = None) -> List[Node]:
         if context is None:
-            self.context = cast(RenderContext, self.context)
+            self.context = cast("RenderContext", self.context)
             context = self.context.create_child_context(node)
         with WithContext(self, context):
             result: List[Node] = []
-            self.context = cast(RenderContext, self.context)
+            self.context = cast("RenderContext", self.context)
             if not self.filter_.allow(self.context.node_stack):
                 pass
             elif isinstance(node, str):

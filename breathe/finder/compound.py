@@ -1,7 +1,11 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 from breathe.finder import ItemFinder, stack
-from breathe.renderer.filter import Filter
+
+if TYPE_CHECKING:
+    from breathe.renderer.filter import Filter
 
 
 class DoxygenTypeSubItemFinder(ItemFinder):

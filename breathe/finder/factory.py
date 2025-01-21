@@ -1,15 +1,19 @@
 from __future__ import annotations
 
-from typing import Dict, Type
+from typing import TYPE_CHECKING
 
-from sphinx.application import Sphinx
-
-from breathe.finder import ItemFinder
 from breathe.finder import compound as compoundfinder
 from breathe.finder import index as indexfinder
-from breathe.parser import DoxygenParserFactory
-from breathe.project import ProjectInfo
-from breathe.renderer.filter import Filter
+
+if TYPE_CHECKING:
+    from typing import Dict, Type
+
+    from sphinx.application import Sphinx
+
+    from breathe.finder import ItemFinder
+    from breathe.parser import DoxygenParserFactory
+    from breathe.project import ProjectInfo
+    from breathe.renderer.filter import Filter
 
 
 class _CreateCompoundTypeSubFinder:

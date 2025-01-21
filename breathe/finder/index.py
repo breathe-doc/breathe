@@ -1,12 +1,17 @@
 from __future__ import annotations
 
-from typing import Any, List
-
-from sphinx.application import Sphinx
+from typing import TYPE_CHECKING
 
 from breathe.finder import ItemFinder, stack
-from breathe.parser import DoxygenCompoundParser
-from breathe.renderer.filter import Filter, FilterFactory
+from breathe.renderer.filter import FilterFactory
+
+if TYPE_CHECKING:
+    from typing import Any, List
+
+    from sphinx.application import Sphinx
+
+    from breathe.parser import DoxygenCompoundParser
+    from breathe.renderer.filter import Filter
 
 
 class DoxygenTypeSubItemFinder(ItemFinder):

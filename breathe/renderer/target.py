@@ -1,11 +1,15 @@
 from __future__ import annotations
 
-from typing import Any, Dict, List, Sequence
+from typing import TYPE_CHECKING
 
 from docutils import nodes
-from docutils.nodes import Element
 
-from breathe.project import ProjectInfo
+if TYPE_CHECKING:
+    from typing import Any, Dict, List, Sequence
+
+    from docutils.nodes import Element
+
+    from breathe.project import ProjectInfo
 
 
 class TargetHandler:

@@ -24,7 +24,7 @@ select = [
     "PERF",  # perflint
 #    "PGH",   # pygrep-hooks
     "PT",    # flake8-pytest-style
-#    "TC",    # flake8-type-checking
+    "TC",    # flake8-type-checking
 #    "UP",    # pyupgrade
     "W",     # pycodestyle
 ]

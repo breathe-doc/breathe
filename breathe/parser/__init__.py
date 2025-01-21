@@ -1,13 +1,16 @@
 from __future__ import annotations
 
 from pathlib import Path
-
-from sphinx.application import Sphinx
+from typing import TYPE_CHECKING
 
 from breathe import file_state_cache
-from breathe.project import ProjectInfo
 
 from . import compound, index
+
+if TYPE_CHECKING:
+    from sphinx.application import Sphinx
+
+    from breathe.project import ProjectInfo
 
 
 class ParserError(Exception):

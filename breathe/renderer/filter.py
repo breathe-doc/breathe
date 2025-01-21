@@ -202,11 +202,14 @@ We have to write:
 from __future__ import annotations
 
 import os
-from typing import Any, Callable, Dict, List
-
-from sphinx.application import Sphinx
+from typing import TYPE_CHECKING
 
 from breathe import path_handler
+
+if TYPE_CHECKING:
+    from typing import Any, Callable, Dict, List
+
+    from sphinx.application import Sphinx
 
 
 class UnrecognisedKindError(Exception):
