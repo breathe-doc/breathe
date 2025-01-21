@@ -3,8 +3,6 @@
 #
 from __future__ import annotations
 
-import getopt
-import os
 import sys
 from xml.dom import Node, minidom
 
@@ -19,7 +17,7 @@ from .. import filetypes
 
 try:
     from generatedssuper import GeneratedsSuper
-except ImportError as exp:
+except ImportError:
 
     class GeneratedsSuper:
         def format_string(self, input_data, input_name=""):
@@ -70,7 +68,7 @@ def showIndent(outfile, level):
 
 
 def quote_xml(inStr):
-    s1 = isinstance(inStr, basestring) and inStr or "%s" % inStr
+    s1 = isinstance(inStr, str) and inStr or "%s" % inStr
     s1 = s1.replace("&", "&amp;")
     s1 = s1.replace("<", "&lt;")
     s1 = s1.replace(">", "&gt;")
@@ -78,7 +76,7 @@ def quote_xml(inStr):
 
 
 def quote_attrib(inStr):
-    s1 = isinstance(inStr, basestring) and inStr or "%s" % inStr
+    s1 = isinstance(inStr, str) and inStr or "%s" % inStr
     s1 = s1.replace("&", "&amp;")
     s1 = s1.replace("<", "&lt;")
     s1 = s1.replace(">", "&gt;")
@@ -2504,10 +2502,7 @@ class enumvalueType(GeneratedsSuper):
 
     def buildChildren(self, child_, nodeName_):
         if child_.nodeType == Node.ELEMENT_NODE and nodeName_ == "name":
-            value_ = []
-            for text_ in child_.childNodes:
-                value_.append(text_.nodeValue)
-            valuestr_ = "".join(value_)
+            valuestr_ = "".join(text_.nodeValue for text_ in child_.childNodes)
             obj_ = self.mixedclass_(
                 MixedContainer.CategorySimple, MixedContainer.TypeString, "name", valuestr_
             )
@@ -3771,9 +3766,8 @@ class highlightType(GeneratedsSuper):
 
     def buildChildren(self, child_, nodeName_):
         if child_.nodeType == Node.ELEMENT_NODE and nodeName_ == "sp":
-            value_ = []
-            for text_ in child_.childNodes:
-                value_.append(text_.nodeValue)
+            # value_ = [text_.nodeValue for text_ in child_.childNodes]
+
             # We make this unicode so that our unicode renderer catch-all picks it up
             # otherwise it would go through as 'str' and we'd have to pick it up too
             valuestr_ = " "

@@ -33,40 +33,12 @@ select = [
 ]
 
 [lint.per-file-ignores]
-"breathe/file_state_cache.py" = [
-    "F841",  # Local variable `{name}` is assigned to but never used
-]
-
-"breathe/parser/compound.py" = [
-    "PERF401"  # Use a list comprehension to create a transformed list
-]
-
 "breathe/parser/{compound,index}super.py" = [
     "E266",  # Too many leading `#` before block comment
-    "F401",  # `{name}` imported but unused
-    "F821",  # Undefined name `basestring`
-    "F841",  # Local variable `{name}` is assigned to but never used
-    "PERF401"  # Use a list comprehension to create a transformed list
-]
-
-"documentation/source/conf.py" = [
-    "E501",  # Line too long
 ]
 
 "examples/doxygen/pyexample.py" = [
     "E266",  # Too many leading `#` before block comment
-]
-
-"tests/test_renderer.py" = [
-    "E501",  # Line too long
-    "F401",  # `{name}` imported but unused
-    "F811",  # Redefinition of unused `{name}`
-    "F841",  # Local variable `{name}` is assigned to but never used
-]
-
-"tests/warnings/source/conf.py" = [
-    "E265",  # Block comment should start with `# `
-    "F401",  # `{name}` imported but unused
 ]
 
 [lint.flake8-quotes]

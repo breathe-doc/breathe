@@ -7,14 +7,6 @@ import pytest
 import sphinx.addnodes
 import sphinx.environment
 from docutils import frontend, nodes, parsers, utils
-from sphinx.testing.fixtures import (
-    app_params,
-    make_app,
-    rootdir,
-    shared_result,
-    sphinx_test_tempdir,
-    test_params,
-)
 
 from breathe.parser.compound import (
     MixedContainer,
@@ -56,9 +48,9 @@ def app(test_params, app_params, make_app, shared_result):
 
 
 class WrappedDoxygenNode:
-    """
-    A base class for test wrappers of Doxygen nodes. It allows setting all attributes via keyword arguments
-    in the constructor.
+    """A base class for test wrappers of Doxygen nodes.
+
+    It allows setting all attributes via keyword arguments in the constructor.
     """
 
     def __init__(self, cls, *args, **kwargs):
@@ -86,7 +78,8 @@ class WrappedLinkedText(linkedTextTypeSub, WrappedDoxygenNode):
 
 
 class WrappedMemberDef(memberdefTypeSub, WrappedDoxygenNode):
-    """A test wrapper of Doxygen class/file/namespace member symbol such as a function declaration."""
+    """A test wrapper of Doxygen class/file/namespace member symbol
+    such as a function declaration."""
 
     def __init__(self, **kwargs):
         WrappedDoxygenNode.__init__(self, memberdefTypeSub, **kwargs)
@@ -575,7 +568,7 @@ def test_resolve_overrides(app):
     # Verify that the exact arguments returns one override
     for args in argsstrings:
         ast_param = cls._parse_args(args)
-        ret = cls._resolve_function(matches, ast_param, None)
+        _ = cls._resolve_function(matches, ast_param, None)
 
 
 def test_ellipsis(app):
@@ -584,4 +577,4 @@ def test_ellipsis(app):
 
     # Verify that parsing an ellipsis works
     ast_param = cls._parse_args(argsstrings[0])
-    ret = cls._resolve_function(matches, ast_param, None)
+    _ = cls._resolve_function(matches, ast_param, None)

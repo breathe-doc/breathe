@@ -3,7 +3,6 @@
 #
 from __future__ import annotations
 
-import getopt
 import sys
 from xml.dom import Node, minidom
 
@@ -16,7 +15,7 @@ from xml.dom import Node, minidom
 
 try:
     from generatedssuper import GeneratedsSuper
-except ImportError as exp:
+except ImportError:
 
     class GeneratedsSuper:
         def format_string(self, input_data, input_name=""):
@@ -67,7 +66,7 @@ def showIndent(outfile, level):
 
 
 def quote_xml(inStr):
-    s1 = isinstance(inStr, basestring) and inStr or "%s" % inStr
+    s1 = isinstance(inStr, str) and inStr or "%s" % inStr
     s1 = s1.replace("&", "&amp;")
     s1 = s1.replace("<", "&lt;")
     s1 = s1.replace(">", "&gt;")
@@ -75,7 +74,7 @@ def quote_xml(inStr):
 
 
 def quote_attrib(inStr):
-    s1 = isinstance(inStr, basestring) and inStr or "%s" % inStr
+    s1 = isinstance(inStr, str) and inStr or "%s" % inStr
     s1 = s1.replace("&", "&amp;")
     s1 = s1.replace("<", "&lt;")
     s1 = s1.replace(">", "&gt;")

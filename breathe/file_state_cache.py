@@ -37,7 +37,7 @@ def update(app: Sphinx, source_file: str | os.PathLike[str]) -> None:
 
     norm_source_file = Path(source_file).resolve().as_posix()
     new_mtime = _getmtime(norm_source_file)
-    mtime, docnames = app.env.breathe_file_state.setdefault(  # type: ignore[attr-defined]
+    _mtime, docnames = app.env.breathe_file_state.setdefault(  # type: ignore[attr-defined]
         norm_source_file, (new_mtime, set())
     )
 

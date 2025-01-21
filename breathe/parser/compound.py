@@ -383,10 +383,7 @@ class enumvalueTypeSub(supermod.enumvalueType):
     def buildChildren(self, child_, nodeName_):
         # Get text from <name> child and put it in self.name
         if child_.nodeType == Node.ELEMENT_NODE and nodeName_ == "name":
-            value_ = []
-            for text_ in child_.childNodes:
-                value_.append(text_.nodeValue)
-            valuestr_ = "".join(value_)
+            valuestr_ = "".join(text_.nodeValue for text_ in child_.childNodes)
             self.name = valuestr_
         elif child_.nodeType == Node.ELEMENT_NODE and nodeName_ == "briefdescription":
             obj_ = supermod.descriptionType.factory()
