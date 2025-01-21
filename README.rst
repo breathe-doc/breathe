@@ -148,9 +148,9 @@ See `CONTRIBUTORS </CONTRIBUTORS.rst>`_ for the full list.
 Acknowledgements
 ----------------
 
-- Dimitri van Heesch for `Doxygen <http://www.stack.nl/~dimitri/doxygen/>`_.
-- Georg Brandl for `Sphinx <http://sphinx-doc.org>`_.
-- David Goodger for `Docutils <http://docutils.sourceforge.net/>`_ and reStructuredText.
+- Dimitri van Heesch for `Doxygen <https://www.doxygen.nl/>`_.
+- Georg Brandl for `Sphinx <https://www.sphinx-doc.org/>`_.
+- David Goodger for `Docutils <https://docutils.sourceforge.io/>`_ and reStructuredText.
 
 Changelog
 ---------

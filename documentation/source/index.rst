@@ -14,7 +14,7 @@ who enjoy using Sphinx but work with languages other than Python. The system
 relies on the Doxygen's xml output.
 
 
-.. ifconfig:: documentation_build == 'readthedocs_latest'
+.. only:: documentation_build_readthedocs_latest
 
    .. warning::
 
@@ -22,7 +22,7 @@ relies on the Doxygen's xml output.
       <https://github.com/michaeljones/breathe>`_ code. It does not necessarily
       reflect a released version of Breathe on PyPI.
 
-.. ifconfig:: documentation_build == 'development'
+.. only:: documentation_build_development
 
    .. warning::
 
