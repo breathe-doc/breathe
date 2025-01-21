@@ -20,16 +20,8 @@ This should work:
 
 It produces this output:
 
-.. ifconfig:: doxygen_version < (1, 9, 2)
-
-   .. error::
-      The Doxygen version used to generate these docs does not support C++20 Concepts.
-      Please upgrade to using Doxygen v1.9.2 or newer.
-
-.. ifconfig:: doxygen_version > (1, 9, 1)
-
-   .. doxygenconcept:: Hashable
-      :project: cpp_concept
+.. doxygenconcept:: Hashable
+   :project: cpp_concept
 
 Failing Example
 ---------------

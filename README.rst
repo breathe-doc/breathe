@@ -91,7 +91,7 @@ branch.
 Requirements
 ------------
 
-Breathe requires Python 3.9+, Sphinx 7.2+, and Doxygen 1.9+.
+Breathe requires Python 3.9+, Sphinx 7.2+, and Doxygen 1.9.2+.
 
 Mailing List Archives
 ---------------------
