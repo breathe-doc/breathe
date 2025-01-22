@@ -5,6 +5,7 @@ import os.path
 from ..renderer.mask import NullMaskFactory
 from ..directives import BaseDirective
 from breathe import project, path_handler, renderer, parser
+from breathe.cpp_util import split_name
 
 from breathe.renderer.sphinxrenderer import SphinxRenderer
 from breathe.renderer.target import create_target_handler
@@ -41,7 +42,7 @@ def location_matches(location: parser.Node_locationType | None, target_file: str
 
 
 def namespace_matches(name: str, node: parser.Node_compounddefType):
-    to_find = name.rpartition("::")[0]
+    to_find = "::".join(split_name(name)[:-1])
     return any(to_find == "".join(ns) for ns in node.innernamespace) or any(
         to_find == "".join(ns) for ns in node.innerclass
     )

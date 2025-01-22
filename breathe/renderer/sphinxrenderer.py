@@ -5,6 +5,7 @@ from pathlib import Path
 
 from breathe import parser, filetypes
 from breathe.renderer.filter import NodeStack
+from breathe.cpp_util import split_name
 
 from sphinx import addnodes
 from sphinx.domains import cpp, c, python
@@ -32,7 +33,7 @@ from typing import (
     TYPE_CHECKING,
     Union,
 )
-from collections.abc import Iterable, Iterator, Sequence
+from collections.abc import Iterable, Sequence
 
 
 php: Any
@@ -555,57 +556,6 @@ def get_simplesects(node: parser.Node_docParaType) -> Iterable[parser.Node_docSi
 def get_images(node: parser.Node_docParaType) -> Iterable[parser.Node_docImageType]:
     pairs = map(parser.tag_name_value, node)  # type: ignore
     return (value for name, value in pairs if name == "image")  # type: ignore
-
-
-RE_NAME_PART = re.compile(r"([<>()[\]]|::)")
-
-
-def _check_pair(dest: list[str], tokens: Iterator[str], start: str, end: str) -> bool:
-    if dest[-1] == start:
-        for tok in tokens:
-            dest.append(tok)
-            if tok == end:
-                break
-            # If we're inside angle brackets, we assume "<" and ">" are brackets
-            # and not comparison operators. Once we're inside other brackets, we
-            # only need to worry about recursive brackets and can ignore the
-            # other types.
-            if start == "<":
-                _check_all_pairs(dest, tokens)
-            else:
-                _check_pair(dest, tokens, start, end)
-        return True
-    return False
-
-
-def _check_all_pairs(dest: list[str], tokens: Iterator[str]) -> None:
-    if not _check_pair(dest, tokens, "<", ">"):
-        if not _check_pair(dest, tokens, "(", ")"):
-            if not _check_pair(dest, tokens, "[", "]"):
-                _check_pair(dest, tokens, "{", "}")
-
-
-def split_name(name: str) -> list[str]:
-    """Split a qualified C++ name into the namespace components.
-
-    E.g. turn "A<B::C>::D::E<(F>G::H),(I<J)>" into
-    ["A<B::C>","D","E<(F>G::H),(I<J)>"]
-
-    This can produce incorrect results if any of the template paramters are
-    strings containing brackets.
-    """
-    last: list[str] = []
-    parts = [last]
-    tokens = iter(RE_NAME_PART.split(name))
-    for tok in tokens:
-        if tok == "::":
-            last = []
-            parts.append(last)
-        else:
-            last.append(tok)
-            _check_all_pairs(last, tokens)
-
-    return ["".join(subparts) for subparts in parts]
 
 
 def namespace_strip(config, nodes_: list[nodes.Node]):
