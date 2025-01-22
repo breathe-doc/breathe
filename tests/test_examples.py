@@ -16,7 +16,7 @@ from typing import Any
 
 sphinx_path: Any
 
-if sphinx.version_info < (7, 2, 6):
+if sphinx.version_info < (7, 2, 0):
     from sphinx.testing.path import path as sphinx_path
 else:
     sphinx_path = pathlib.Path

@@ -53,6 +53,11 @@ jobs:
           - '7.4'
           - '8.0'
           - 'latest'
+        exclude:
+          - python-version: '3.9'
+            sphinx-version: '8.0'
+          - python-version: '3.9'
+            sphinx-version: 'latest'
 
     steps:
       - uses: actions/checkout@v4
