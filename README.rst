@@ -128,13 +128,11 @@ Examples of projects that use Breathe:
 Release
 -------
 
-See the ``mkrelease`` utility in the root of the repository.
-
-Useful vim command for changelog conversion to the git tag format:
-
-.. code:: vim
-
-   %s/\v`(#[0-9]+) \<[^`]*`__/\1/g
+1. Update `CHANGELOG.rst` and create the git tag (`vX.Y.Z`).
+2. Push the tag to GitHub.
+3. The `create-release.yml` workflow will publish the release to PyPI.
+4. Go to https://github.com/breathe-doc/breathe/tags, select the new tag,
+   and click the "Create release from tag" button to publish a GitHub release.
 
 Maintainers
 -----------
