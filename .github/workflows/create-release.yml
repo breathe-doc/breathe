@@ -22,7 +22,7 @@ jobs:
     runs-on: ubuntu-latest
     name: PyPI Release
     environment: release
-    if: github.repository_owner == 'sphinx-doc'
+    if: github.repository_owner == 'breathe-doc'
     permissions:
       id-token: write  # for PyPI trusted publishing
     steps:
