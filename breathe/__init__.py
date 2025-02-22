@@ -9,7 +9,7 @@ from breathe.renderer.sphinxrenderer import setup as renderer_setup
 if TYPE_CHECKING:
     from sphinx.application import Sphinx
 
-__version__ = "4.35.0"
+__version__ = "4.36.0"
 
 
 def setup(app: Sphinx):

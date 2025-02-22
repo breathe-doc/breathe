@@ -3,6 +3,30 @@ Change Log
 
 Inspired by `Keepachangelog.com <https://keepachangelog.com/>`__.
 
+- 2025-02-22 - **Breathe v4.36.0**
+
+  - Update `test_renderer` so that tests pass with Sphinx 7.2.
+    `#976 <https://github.com/breathe-doc/breathe/pull/976>`__
+  - Fix PosixPath issue with Sphinx 7.2.
+    `#964 <https://github.com/breathe-doc/breathe/pull/964>`__
+  - Avoid `RemovedInSphinx80Warning` in path-manipulation code.
+    `#977 <https://github.com/breathe-doc/breathe/pull/977>`__
+  - Require Sphinx 7.2 or later, Python 3.9 or later,
+     and  Doxygen 1.9.2 or later.
+    `#887 <https://github.com/breathe-doc/breathe/pull/887>`__,
+    `#946 <https://github.com/breathe-doc/breathe/pull/946>`__
+    `#955 <https://github.com/breathe-doc/breathe/pull/955>`__
+  - Begin to use pathlib.
+  - Resolve full title for doxygenpage and doxygengroup
+    and allow for omitting the title all together
+    `#939 <https://github.com/breathe-doc/breathe/pull/939>`__
+  - Insert signature name for use with Sphinx Table of Contents
+    `#959 <https://github.com/breathe-doc/breathe/pull/959>`__
+  - Fix test failure with latest Sphinx master.
+    `#1010 <https://github.com/breathe-doc/breathe/pull/1010>`__
+  - Fix error in template specialization with qualified arguments
+    `#1010 <https://github.com/breathe-doc/breathe/pull/1012>`__
+
 - 2023-02-28 - **Breathe v4.35.0**
 
   - Pull lone literal blocks in paragraphs up to produce correct doctree.
