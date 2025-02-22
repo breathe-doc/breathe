@@ -1,0 +1,55 @@
+name: Create release
+
+on:
+  push:
+    tags:
+    - "v*"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
+  cancel-in-progress: true
+
+env:
+  FORCE_COLOR: "1"
+  UV_SYSTEM_PYTHON: "1"  # make uv do global installs
+
+jobs:
+  publish-pypi:
+    runs-on: ubuntu-latest
+    name: PyPI Release
+    environment: release
+    if: github.repository_owner == 'sphinx-doc'
+    permissions:
+      id-token: write  # for PyPI trusted publishing
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3"
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          version: latest
+          enable-cache: false
+
+      - name: Install build dependencies (pypa/build, twine)
+        run: uv pip install build "twine>=5.1"
+
+      - name: Build distribution
+        run: python -m build
+
+      - name: Check distribution
+        run: |
+          twine check --strict dist/*
+
+      - name: Upload to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
