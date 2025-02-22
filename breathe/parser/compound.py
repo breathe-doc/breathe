@@ -182,6 +182,19 @@ class sectiondefTypeSub(supermod.sectiondefType):
     def __init__(self, kind=None, header="", description=None, memberdef=None):
         supermod.sectiondefType.__init__(self, kind, header, description, memberdef)
 
+    def build(self, node_):
+        super().build(node_)
+
+        to_be_removed = []
+        for index, member1 in enumerate(self.memberdef[:-1]):
+            refids = [base.refid for base in member1.reimplements]
+            for member2 in self.memberdef[index + 1:]:
+                member2_refids = [base.refid for base in member2.reimplements]
+                if any(refid in member2_refids for refid in refids):
+                    to_be_removed.append(member2)
+
+        for member in to_be_removed:
+            self.memberdef.remove(member)
 
 supermod.sectiondefType.subclass = sectiondefTypeSub
 # end class sectiondefTypeSub
