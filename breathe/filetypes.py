@@ -12,7 +12,7 @@ from pygments.util import ClassNotFound
 
 
 def get_pygments_alias(filename: str) -> str | None:
-    "Find first pygments alias from filename"
+    """Find first pygments alias from filename."""
     try:
         lexer_cls = get_lexer_for_filename(filename)
         return lexer_cls.aliases[0]  # type: ignore[attr-defined]
@@ -21,7 +21,7 @@ def get_pygments_alias(filename: str) -> str | None:
 
 
 def get_extension(filename: str) -> str:
-    "Get extension from filename"
+    """Get extension from filename."""
     # If the filename is just '.ext' then we get ('.ext', '') so we fall back to first part if
     # the second isn't there
     (first, second) = os.path.splitext(filename)
