@@ -1216,13 +1216,14 @@ class docParaTypeSub(supermod.docParaType):
             obj_ = supermod.docDotType.factory()
             obj_.build(child_)
             self.content.append(obj_)
-        elif child_.nodeType == Node.ELEMENT_NODE and (
-            nodeName_ == "ndash" or nodeName_ == "mdash"
-        ):
-            # inject a emphasized dash unicode char as a placeholder/flag for rendering
-            # later. See visit_docblockquote()
+        elif child_.nodeType == Node.ELEMENT_NODE and nodeName_ == "ndash":
             obj_ = self.mixedclass_(
-                MixedContainer.CategoryText, MixedContainer.TypeText, "", "&#8212;"
+                MixedContainer.CategoryText, MixedContainer.TypeText, "", "--"
+            )
+            self.content.append(obj_)
+        elif child_.nodeType == Node.ELEMENT_NODE and nodeName_ == "mdash":
+            obj_ = self.mixedclass_(
+                MixedContainer.CategoryText, MixedContainer.TypeText, "", "---"
             )
             self.content.append(obj_)
         else:
