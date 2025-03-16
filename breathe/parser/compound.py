@@ -1217,14 +1217,10 @@ class docParaTypeSub(supermod.docParaType):
             obj_.build(child_)
             self.content.append(obj_)
         elif child_.nodeType == Node.ELEMENT_NODE and nodeName_ == "ndash":
-            obj_ = self.mixedclass_(
-                MixedContainer.CategoryText, MixedContainer.TypeText, "", "--"
-            )
+            obj_ = self.mixedclass_(MixedContainer.CategoryText, MixedContainer.TypeText, "", "--")
             self.content.append(obj_)
         elif child_.nodeType == Node.ELEMENT_NODE and nodeName_ == "mdash":
-            obj_ = self.mixedclass_(
-                MixedContainer.CategoryText, MixedContainer.TypeText, "", "---"
-            )
+            obj_ = self.mixedclass_(MixedContainer.CategoryText, MixedContainer.TypeText, "", "---")
             self.content.append(obj_)
         else:
             obj_ = None
