@@ -206,7 +206,7 @@ class DoxygenFunctionDirective(BaseDirective):
     def _create_function_signature(
         self, node_stack, project_info, filter_, target_handler, mask_factory, directive_args
     ) -> str:
-        "Standard render process used by subclasses"
+        """Standard render process used by subclasses."""
 
         try:
             object_renderer = SphinxRenderer(
