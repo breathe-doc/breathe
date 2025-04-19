@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<?xml-stylesheet href="../../docutils.css"?>
+<document>
+    <container classes="breathe-sectiondef" objtype="func">
+        <rubric classes="breathe-sectiondef-title">Functions</rubric>
+        <index entries="['single',\ 'f_issue_441\ (C++\ function)',\ '_CPPv411f_issue_441v',\ '',\ None]"></index>
+        <desc classes="cpp function" desctype="function" domain="cpp" objtype="function">
+            <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><reference internal="True" refid="_CPPv46Thingy" reftitle="Thingy"><desc_sig_name classes="n">Thingy</desc_sig_name></reference><desc_sig_space classes="w"> </desc_sig_space><desc_sig_punctuation classes="p">*</desc_sig_punctuation><desc_name classes="sig-name descname"><desc_sig_name classes="n">f_issue_441</desc_sig_name></desc_name><desc_parameterlist></desc_parameterlist></desc_signature_line></desc_signature>
+            <desc_content>
+                <paragraph>Function that creates a thingy. </paragraph>
+            </desc_content>
+        </desc>
+    </container>
+    <index entries="['single',\ 'Thingy\ (C++\ class)',\ '_CPPv46Thingy',\ '',\ None]"></index>
+    <desc classes="cpp class" desctype="class" domain="cpp" objtype="class">
+        <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword classes="k">class</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">Thingy</desc_sig_name></desc_name></desc_signature_line></desc_signature>
+        <desc_content>
+            <paragraph>needed for references in global function return type </paragraph>
+        </desc_content>
+    </desc>
+</document>
