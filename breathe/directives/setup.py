@@ -1,9 +1,15 @@
+<<<<<<< HEAD
 from __future__ import annotations
 
 import subprocess
 from pathlib import Path
 from typing import TYPE_CHECKING
 
+||||||| 542ae9b
+=======
+from pathlib import Path
+
+>>>>>>> memberdef-in-groups
 from breathe.directives.class_like import (
     DoxygenClassDirective,
     DoxygenInterfaceDirective,
@@ -26,12 +32,31 @@ from breathe.directives.item import (
     DoxygenUnionDirective,
     DoxygenVariableDirective,
 )
+<<<<<<< HEAD
 from breathe.parser import DoxygenParserFactory
+||||||| 542ae9b
+from breathe.parser import DoxygenParserFactory
+from breathe.project import ProjectInfoFactory
+=======
+from breathe.parser import DoxygenParser
+from breathe.project import ProjectInfoFactory
+>>>>>>> memberdef-in-groups
 from breathe.process import AutoDoxygenProcessHandle
 from breathe.project import ProjectInfoFactory
 
+<<<<<<< HEAD
 if TYPE_CHECKING:
     from sphinx.application import Sphinx
+||||||| 542ae9b
+from sphinx.application import Sphinx
+
+import os
+import subprocess
+=======
+from sphinx.application import Sphinx
+
+import subprocess
+>>>>>>> memberdef-in-groups
 
 
 def setup(app: Sphinx) -> None:
@@ -63,14 +88,14 @@ def setup(app: Sphinx) -> None:
     # note: the project_info_factory also contains some caching stuff
     # TODO: is that actually safe for when reading in parallel?
     project_info_factory = ProjectInfoFactory(app)
-    parser_factory = DoxygenParserFactory(app)
+    dox_parser = DoxygenParser(app)
 
     def set_temp_data(
-        app: Sphinx, project_info_factory=project_info_factory, parser_factory=parser_factory
+        app: Sphinx, project_info_factory=project_info_factory, parser_factory=dox_parser
     ):
         assert app.env is not None
         app.env.temp_data["breathe_project_info_factory"] = project_info_factory
-        app.env.temp_data["breathe_parser_factory"] = parser_factory
+        app.env.temp_data["breathe_dox_parser"] = parser_factory
 
     app.connect("source-read", lambda app, docname, source: set_temp_data(app))
 
@@ -107,7 +132,14 @@ def setup(app: Sphinx) -> None:
         directory.mkdir(parents=True, exist_ok=True)
 
         # Write the file with the provided contents
+<<<<<<< HEAD
         (directory / filename).write_text(content)
+||||||| 542ae9b
+        with open(os.path.join(directory, filename), "w") as f:
+            f.write(content)
+=======
+        (directory / filename).write_text(content, encoding="utf-8")
+>>>>>>> memberdef-in-groups
 
     doxygen_handle = AutoDoxygenProcessHandle(
         subprocess.check_call, write_file, project_info_factory

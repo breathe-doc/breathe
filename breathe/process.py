@@ -1,9 +1,27 @@
+<<<<<<< HEAD
 from __future__ import annotations
+||||||| 542ae9b
+from breathe.project import AutoProjectInfo, ProjectInfoFactory
+=======
+from __future__ import annotations
+
+from breathe.project import AutoProjectInfo, ProjectInfoFactory
+>>>>>>> memberdef-in-groups
 
 import os
 from pathlib import Path
 from shlex import quote
+<<<<<<< HEAD
 from typing import TYPE_CHECKING
+||||||| 542ae9b
+from typing import Callable, Dict, List, Tuple
+=======
+from pathlib import Path
+from typing import Callable, TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from collections.abc import Mapping
+>>>>>>> memberdef-in-groups
 
 if TYPE_CHECKING:
     from typing import Callable
@@ -52,9 +70,19 @@ class AutoDoxygenProcessHandle:
 
     def generate_xml(
         self,
+<<<<<<< HEAD
         projects_source: dict[str, tuple[str, list[str]]],
         doxygen_options: dict[str, str],
         doxygen_aliases: dict[str, str],
+||||||| 542ae9b
+        projects_source: Dict[str, Tuple[str, List[str]]],
+        doxygen_options: Dict[str, str],
+        doxygen_aliases: Dict[str, str],
+=======
+        projects_source: Mapping[str, tuple[str, list[str]]],
+        doxygen_options: Mapping[str, str],
+        doxygen_aliases: Mapping[str, str],
+>>>>>>> memberdef-in-groups
     ) -> None:
         project_files: dict[str, ProjectData] = {}
 
@@ -78,9 +106,19 @@ class AutoDoxygenProcessHandle:
     def process(
         self,
         auto_project_info: AutoProjectInfo,
+<<<<<<< HEAD
         files: list[str],
         doxygen_options: dict[str, str],
         doxygen_aliases: dict[str, str],
+||||||| 542ae9b
+        files: List[str],
+        doxygen_options: Dict[str, str],
+        doxygen_aliases: Dict[str, str],
+=======
+        files: list[str],
+        doxygen_options: Mapping[str, str],
+        doxygen_aliases: Mapping[str, str],
+>>>>>>> memberdef-in-groups
     ) -> str:
         name = auto_project_info.name()
         full_paths = [str(auto_project_info.abs_path_to_source_file(f)) for f in files]

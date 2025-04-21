@@ -19,6 +19,13 @@ from __future__ import annotations
 import argparse
 import os
 import sys
+<<<<<<< HEAD
+||||||| 542ae9b
+import argparse
+import errno
+=======
+import argparse
+>>>>>>> memberdef-in-groups
 import xml.etree.ElementTree
 from pathlib import Path
 
@@ -58,14 +65,35 @@ def write_file(name, text, args):
         print_info("Creating file %s." % fname, args)
         fname.parent.mkdir(parents=True, exist_ok=True)
         try:
+<<<<<<< HEAD
             orig = fname.read_text()
             if orig == text:
                 print_info("File %s up to date, skipping." % fname, args)
                 return
+||||||| 542ae9b
+            with open(fname, "r") as target:
+                orig = target.read()
+                if orig == text:
+                    print_info("File %s up to date, skipping." % fname, args)
+                    return
+=======
+            orig = fname.read_text(encoding="utf-8")
+            if orig == text:
+                print_info("File %s up to date, skipping." % fname, args)
+                return
+>>>>>>> memberdef-in-groups
         except FileNotFoundError:
             # Don't mind if it isn't there
             pass
+<<<<<<< HEAD
         fname.write_text(text)
+||||||| 542ae9b
+
+        with open(fname, "w") as target:
+            target.write(text)
+=======
+        fname.write_text(text, encoding="utf-8")
+>>>>>>> memberdef-in-groups
 
 
 def format_heading(level, text):
@@ -128,6 +156,7 @@ class TypeAction(argparse.Action):
         self.metavar = ",".join(TYPEDICT.keys())
 
     def __call__(self, parser, namespace, values, option_string=None):
+        assert isinstance(values, str)
         value_list = values.split(",")
         for value in value_list:
             if value not in TYPEDICT:

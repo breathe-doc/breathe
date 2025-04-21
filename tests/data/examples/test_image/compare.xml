@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<?xml-stylesheet href="../../docutils.css"?>
+<document>
+    <index entries="['single',\ 'ImageClass\ (C++\ class)',\ '_CPPv410ImageClass',\ '',\ None]"></index>
+    <desc classes="cpp class" desctype="class" domain="cpp" objtype="class">
+        <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword classes="k">class</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">ImageClass</desc_sig_name></desc_name></desc_signature_line></desc_signature>
+        <desc_content>
+            <paragraph>This is a class with an image in the description. </paragraph>
+            <paragraph>It renders like this:</paragraph>
+            <paragraph><image candidates="{'*': 'xml/pixel.png'}" uri="xml/pixel.png"></image></paragraph>
+            <paragraph>Breathe &amp; Sphinx should automatically copy the image from the doxygen output directory into the _images folder of the Sphinx output. </paragraph>
+        </desc_content>
+    </desc>
+</document>

@@ -1,22 +1,73 @@
+<<<<<<< HEAD
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
 from docutils.parsers.rst.directives import flag, unchanged, unchanged_required
 
+||||||| 542ae9b
+=======
+from __future__ import annotations
+
+>>>>>>> memberdef-in-groups
 from breathe.directives import BaseDirective
 from breathe.file_state_cache import MTimeError
 from breathe.project import ProjectError
+from breathe.renderer import filter
 from breathe.renderer.mask import NullMaskFactory
 from breathe.renderer.target import create_target_handler
 
+<<<<<<< HEAD
 if TYPE_CHECKING:
     from typing import Any
+||||||| 542ae9b
+from docutils.nodes import Node
+from docutils.parsers.rst.directives import unchanged_required, unchanged, flag
+=======
+from docutils.parsers.rst.directives import unchanged_required, unchanged, flag
+>>>>>>> memberdef-in-groups
 
+<<<<<<< HEAD
     from docutils.nodes import Node
+||||||| 542ae9b
+from typing import Any, List
+=======
+from typing import cast, ClassVar, TYPE_CHECKING
+
+if TYPE_CHECKING:
+    import sys
+
+    if sys.version_info >= (3, 11):
+        from typing import NotRequired, TypedDict
+    else:
+        from typing_extensions import NotRequired, TypedDict
+    from docutils.nodes import Node
+
+    DoxClassOptions = TypedDict(
+        "DoxClassOptions",
+        {
+            "path": str,
+            "project": str,
+            "members": NotRequired[str],
+            "membergroups": str,
+            "members-only": NotRequired[None],
+            "protected-members": NotRequired[None],
+            "private-members": NotRequired[None],
+            "undoc-members": NotRequired[None],
+            "show": str,
+            "outline": NotRequired[None],
+            "no-link": NotRequired[None],
+            "allow-dot-graphs": NotRequired[None],
+        },
+    )
+else:
+    DoxClassOptions = None
+>>>>>>> memberdef-in-groups
 
 
 class _DoxygenClassLikeDirective(BaseDirective):
+    kind: ClassVar[str]
+
     required_arguments = 1
     optional_arguments = 0
     final_argument_whitespace = True
@@ -38,31 +89,44 @@ class _DoxygenClassLikeDirective(BaseDirective):
 
     def run(self) -> list[Node]:
         name = self.arguments[0]
+        options = cast(DoxClassOptions, self.options)
 
         try:
-            project_info = self.project_info_factory.create_project_info(self.options)
+            project_info = self.project_info_factory.create_project_info(options)
         except ProjectError as e:
             warning = self.create_warning(None, kind=self.kind)
             return warning.warn("doxygen{kind}: %s" % e)
 
         try:
-            finder = self.finder_factory.create_finder(project_info)
+            d_index = self.get_doxygen_index(project_info)
         except MTimeError as e:
             warning = self.create_warning(None, kind=self.kind)
             return warning.warn("doxygen{kind}: %s" % e)
 
+<<<<<<< HEAD
         finder_filter = self.filter_factory.create_compound_finder_filter(name, self.kind)
 
         # TODO: find a more specific type for the Doxygen nodes
         matches: list[Any] = []
         finder.filter_(finder_filter, matches)
+||||||| 542ae9b
+        finder_filter = self.filter_factory.create_compound_finder_filter(name, self.kind)
+
+        # TODO: find a more specific type for the Doxygen nodes
+        matches: List[Any] = []
+        finder.filter_(finder_filter, matches)
+=======
+        matches: list[filter.FinderMatch] = list(
+            filter.compound_finder_filter(name, self.kind, d_index)
+        )
+>>>>>>> memberdef-in-groups
 
         if len(matches) == 0:
             warning = self.create_warning(project_info, name=name, kind=self.kind)
             return warning.warn('doxygen{kind}: Cannot find class "{name}" {tail}')
 
-        target_handler = create_target_handler(self.options, project_info, self.state.document)
-        filter_ = self.filter_factory.create_class_filter(name, self.options)
+        target_handler = create_target_handler(options, project_info, self.state.document)
+        filter_ = filter.create_class_filter(self.app, name, options)
 
         mask_factory = NullMaskFactory()
         return self.render(

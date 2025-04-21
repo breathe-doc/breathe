@@ -1,0 +1,2 @@
+.. doxygenclass:: InlineTest
+    :members:

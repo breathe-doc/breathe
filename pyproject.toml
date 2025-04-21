@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 [build-system]
 requires = ["flit_core>=3.7"]
 build-backend = "flit_core.buildapi"
@@ -115,3 +116,92 @@ module = [
     "breathe.parser.indexsuper",
 ]
 ignore_errors = true
+||||||| 542ae9b
+[tool.black]
+line-length = 100
+extend-exclude = '''
+^/breathe/parser/.*
+'''
+=======
+[build-system]
+requires = ["setuptools", "jinja2"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "breathe"
+description = "Sphinx Doxygen renderer"
+readme = "README.rst"
+license.text = "BSD-3-Clause"
+requires-python = ">=3.9"
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Environment :: Console",
+    "Environment :: Web Environment",
+    "Framework :: Sphinx",
+    "Framework :: Sphinx :: Extension",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Education",
+    "License :: OSI Approved :: BSD License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Documentation",
+    "Topic :: Documentation :: Sphinx",
+    "Topic :: Software Development",
+    "Topic :: Software Development :: Documentation",
+    "Topic :: Text Processing",
+    "Topic :: Utilities",
+]
+
+# Keep in sync with breathe/__init__.py __version__
+version = "4.35.0"
+
+dependencies = [
+    "Sphinx>=6.2"
+]
+
+[project.urls]
+Changelog = "https://github.com/breathe-doc/breathe/blob/main/CHANGELOG.rst"
+Code = "https://github.com/breathe-doc/breathe/"
+Download = "https://pypi.org/project/breathe/"
+Documentation = "https://breathe.readthedocs.io/"
+Homepage = "https://www.breathe-doc.org/"
+"Issue tracker" = "https://github.com/breathe-doc/breathe/issues"
+
+[project.optional-dependencies]
+docs = [
+    "furo",
+    "sphinx-copybutton",
+    "sphinxcontrib-spelling",
+]
+lint = [
+    "black==22.3.0",
+    "flake8>=6.0",
+    "mypy>=1",
+    "types-docutils",
+    "types-Pygments",
+    "pytest>=8.0",  # for mypy
+]
+test = [
+    "pytest>=8.0",
+    "Sphinx[test]",
+]
+
+[[project.authors]]
+name = "Michael Jones"
+email = "m.pricejones@gmail.com"
+
+[project.scripts]
+breathe-apidoc = "breathe.apidoc:main"
+
+[tool.black]
+line-length = 100
+extend-exclude = '''
+^/examples/.* | ^/tests/data/.*
+'''
+>>>>>>> memberdef-in-groups

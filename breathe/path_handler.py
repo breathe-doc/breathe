@@ -1,10 +1,22 @@
+<<<<<<< HEAD
 from __future__ import annotations
+||||||| 542ae9b
+from sphinx.application import Sphinx
+=======
+from pathlib import Path
+>>>>>>> memberdef-in-groups
 
+<<<<<<< HEAD
 from pathlib import Path
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from sphinx.application import Sphinx
+||||||| 542ae9b
+import os
+=======
+from sphinx.application import Sphinx
+>>>>>>> memberdef-in-groups
 
 
 def includes_directory(file_path: str):

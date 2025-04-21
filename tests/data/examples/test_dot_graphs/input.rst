@@ -1,0 +1,1 @@
+.. doxygenpage:: dotgraphs
