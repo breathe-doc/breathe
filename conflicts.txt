@@ -1,0 +1,47 @@
+	both modified:   .github/workflows/documentation.yml
+	both modified:   .github/workflows/lint.yml
+	both modified:   .github/workflows/unit_tests.yml
+	both modified:   Makefile
+	both modified:   README.rst
+	both modified:   breathe-apidoc.py
+	both modified:   breathe/__init__.py
+	both modified:   breathe/apidoc.py
+	both modified:   breathe/directives/__init__.py
+	both modified:   breathe/directives/class_like.py
+	both modified:   breathe/directives/content_block.py
+	both modified:   breathe/directives/file.py
+	both modified:   breathe/directives/function.py
+	both modified:   breathe/directives/index.py
+	both modified:   breathe/directives/item.py
+	both modified:   breathe/directives/setup.py
+	both modified:   breathe/file_state_cache.py
+	both modified:   breathe/filetypes.py
+	both modified:   breathe/finder/__init__.py
+	both modified:   breathe/finder/compound.py
+	both modified:   breathe/finder/factory.py
+	both modified:   breathe/finder/index.py
+	deleted by them: breathe/parser/__init__.py
+	deleted by them: breathe/parser/compound.py
+	deleted by them: breathe/parser/compoundsuper.py
+	deleted by them: breathe/parser/index.py
+	deleted by them: breathe/parser/indexsuper.py
+	both modified:   breathe/path_handler.py
+	both modified:   breathe/process.py
+	both modified:   breathe/project.py
+	both modified:   breathe/renderer/__init__.py
+	both modified:   breathe/renderer/filter.py
+	both modified:   breathe/renderer/mask.py
+	both modified:   breathe/renderer/sphinxrenderer.py
+	both modified:   breathe/renderer/target.py
+	both added:      documentation/make.bat
+	both modified:   documentation/source/conf.py
+	both added:      make.bat
+	deleted by us:   mkrelease
+	both modified:   pyproject.toml
+	deleted by us:   scripts/version-check.py
+	deleted by us:   setup.cfg
+	deleted by us:   setup.py
+	both added:      tests/conftest.py
+	both modified:   tests/test_renderer.py
+	both modified:   tests/test_utils.py
+	both modified:   tests/warnings/source/conf.p
