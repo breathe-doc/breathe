@@ -112,12 +112,12 @@ class DoxygenCompound:
                     for ev in m.enumvalue:
                         self.enumvalue_by_id[ev.id] = (ev, m, s, c)
                 for m in s.member:
-                    if parser and project_info:
-                        # Parse the referenced compound (group) XML
-                        group_compound = parser.parse_compound(m.refid.rsplit(sep='_', maxsplit=1)[0], project_info)
-                        # Get the memberdef from the group compound
-                        if m.refid in group_compound.members_by_id:
-                            self.members_by_id[m.refid] = group_compound.members_by_id[m.refid]
+                    # Parse the referenced compound (group) XML
+                    group_compound = parser.parse_compound(
+                        m.refid.rsplit(sep="_", maxsplit=1)[0], project_info
+                    )
+                    # Get the memberdef from the group compound
+                    self.members_by_id.update(group_compound.members_by_id)
 
 
 def _parse_common(filename: str, right_tag: str) -> Node_DoxygenType | Node_DoxygenTypeIndex:
