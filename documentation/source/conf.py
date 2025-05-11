@@ -22,6 +22,7 @@ sys.path.append(str(PROJECT_ROOT))
 extensions = [
     "breathe",
     "sphinx.ext.graphviz",
+    "sphinx.ext.imgconverter",
     "sphinx_copybutton",
     "sphinxcontrib.spelling",
 ]
