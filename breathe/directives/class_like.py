@@ -87,7 +87,7 @@ class _DoxygenClassLikeDirective(BaseDirective):
             warning = self.create_warning(project_info, name=name, kind=self.kind)
             return warning.warn('doxygen{kind}: Cannot find class "{name}" {tail}')
 
-        target_handler = create_target_handler(options, project_info, self.state.document)
+        target_handler = create_target_handler(options, self.env)
         filter_ = filter.create_class_filter(self.app, name, options)
 
         mask_factory = NullMaskFactory()

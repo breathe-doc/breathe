@@ -112,7 +112,7 @@ class _DoxygenBaseItemDirective(BaseDirective):
             warning = self.create_warning(project_info, kind=self.kind, display_name=display_name)
             return warning.warn('doxygen{kind}: Cannot find {kind} "{display_name}" {tail}')
 
-        target_handler = create_target_handler(options, project_info, self.state.document)
+        target_handler = create_target_handler(options, self.env)
         filter_ = filter.create_outline_filter(options)
 
         node_stack = matches[0]

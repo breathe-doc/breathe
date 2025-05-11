@@ -1095,7 +1095,7 @@ class SphinxRenderer(metaclass=NodeVisitor):
         """
 
         refid = self.get_refid(node.id)
-        return self.target_handler.create_target(refid)
+        return self.target_handler(self.document, refid)
 
     def title(self, node) -> list[nodes.Node]:
         nodes_ = []
@@ -1486,7 +1486,7 @@ class SphinxRenderer(metaclass=NodeVisitor):
             # Pretend that the signature is being rendered in context of the
             # definition, for proper domain detection
             nodes_, contentnode = render_signature(
-                file_data, self.target_handler.create_target(refid), name, kind
+                file_data, self.target_handler(self.document, refid), name, kind
             )
 
         if file_data.compounddef[0].includes:

@@ -194,7 +194,7 @@ class DoxygenFunctionDirective(BaseDirective):
                 "Candidate function could not be parsed. Parsing error is\n{cpperror}"
             )
 
-        target_handler = create_target_handler(options, project_info, self.state.document)
+        target_handler = create_target_handler(options, self.env)
         filter_ = filter.create_outline_filter(options)
 
         return self.render(
@@ -308,7 +308,7 @@ class DoxygenFunctionDirective(BaseDirective):
 
             # Render the matches to docutils nodes
             target_handler = create_target_handler(
-                {"no-link": ""}, project_info, self.state.document
+                {"no-link": ""}, self.env
             )
             filter_ = filter.create_outline_filter(text_options)
             mask_factory = mask.MaskFactory({parser.Node_paramType: mask.no_parameter_names})

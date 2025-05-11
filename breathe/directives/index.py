@@ -65,7 +65,7 @@ class _BaseIndexDirective(BaseDirective):
         except parser.FileIOError as e:
             return format_parser_error(self.name, e.error, e.filename, self.state, self.lineno)
 
-        target_handler = create_target_handler(self.options, project_info, self.state.document)
+        target_handler = create_target_handler(self.options, self.env)
         filter_ = create_index_filter(self.options)
 
         object_renderer = SphinxRenderer(

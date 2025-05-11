@@ -171,7 +171,7 @@ class _DoxygenContentBlockDirective(BaseDirective):
             # Replaces matches with our new starting points
             matches = contents
 
-        target_handler = create_target_handler(options, project_info, self.state.document)
+        target_handler = create_target_handler(options, self.env)
         filter_ = create_render_filter(self.app, self.kind, options)
 
         node_list: list[Node] = []
