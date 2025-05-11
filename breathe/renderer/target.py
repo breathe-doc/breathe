@@ -31,8 +31,7 @@ class _RealTargetHandler:
         return [target]
 
 
-def create_target_handler(
-    options: Mapping[str, Any], env: BuildEnvironment) -> TargetHandler:
+def create_target_handler(options: Mapping[str, Any], env: BuildEnvironment) -> TargetHandler:
     if "no-link" in options:
         return lambda document, refid: []
     return _RealTargetHandler(env)

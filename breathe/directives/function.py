@@ -307,9 +307,7 @@ class DoxygenFunctionDirective(BaseDirective):
             text_options = {"no-link": "", "outline": ""}
 
             # Render the matches to docutils nodes
-            target_handler = create_target_handler(
-                {"no-link": ""}, self.env
-            )
+            target_handler = create_target_handler({"no-link": ""}, self.env)
             filter_ = filter.create_outline_filter(text_options)
             mask_factory = mask.MaskFactory({parser.Node_paramType: mask.no_parameter_names})
 
