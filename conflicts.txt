@@ -1,4 +1,3 @@
-	both modified:   breathe/finder/compound.py
 	both modified:   breathe/finder/factory.py
 	both modified:   breathe/finder/index.py
 	deleted by them: breathe/parser/__init__.py

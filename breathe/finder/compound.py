@@ -1,16 +1,3 @@
-<<<<<<< HEAD
-from __future__ import annotations
-
-from typing import TYPE_CHECKING
-
-from breathe.finder import ItemFinder, stack
-
-if TYPE_CHECKING:
-    from breathe.renderer.filter import Filter
-||||||| 542ae9b
-from breathe.finder import ItemFinder, stack
-from breathe.renderer.filter import Filter
-=======
 from __future__ import annotations
 
 from breathe.finder import ItemFinder
@@ -21,7 +8,6 @@ from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from breathe.renderer.filter import DoxFilter, FinderMatch
->>>>>>> memberdef-in-groups
 
 
 class DoxygenTypeSubItemFinder(ItemFinder[parser.Node_DoxygenType]):
