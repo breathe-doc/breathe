@@ -1,21 +1,20 @@
 from __future__ import annotations
 
 import re
+from typing import TYPE_CHECKING, Any, Optional, cast
+
+from docutils import nodes
+from docutils.parsers.rst.directives import flag, unchanged_required
+from sphinx.domains import cpp
+
+from breathe import parser
 from breathe.directives import BaseDirective
 from breathe.exception import BreatheError
 from breathe.file_state_cache import MTimeError
-from breathe import parser
 from breathe.project import ProjectError
-from breathe.renderer import RenderContext, mask, TaggedNode, filter
-from breathe.renderer.sphinxrenderer import WithContext
-from breathe.renderer.sphinxrenderer import SphinxRenderer
+from breathe.renderer import RenderContext, TaggedNode, filter, mask
+from breathe.renderer.sphinxrenderer import SphinxRenderer, WithContext
 from breathe.renderer.target import create_target_handler
-
-from docutils.parsers.rst.directives import unchanged_required, flag
-from docutils import nodes
-from sphinx.domains import cpp
-
-from typing import Any, cast, List, Optional, TYPE_CHECKING
 
 if TYPE_CHECKING:
     cppast: Any
@@ -33,9 +32,10 @@ if TYPE_CHECKING:
         from typing import NotRequired, TypedDict
     else:
         from typing_extensions import NotRequired, TypedDict
-    from breathe import project
     from docutils.nodes import Node
     from sphinx.application import Sphinx
+
+    from breathe import project
 
     DoxFunctionOptions = TypedDict(
         "DoxFunctionOptions",
@@ -111,7 +111,7 @@ class DoxygenFunctionDirective(BaseDirective):
         function_name = match.group(2).strip()
         argsStr = match.group(3)
 
-        options = cast(DoxFunctionOptions, self.options)
+        options = cast("DoxFunctionOptions", self.options)
 
         try:
             project_info = self.project_info_factory.create_project_info(options)

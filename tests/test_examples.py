@@ -1,18 +1,18 @@
 from __future__ import annotations
 
-import os
-from xml.parsers import expat
-import pytest
-import pathlib
-import subprocess
-import shutil
-import enum
 import dataclasses
+import enum
+import os
+import pathlib
+import shutil
+import subprocess
+from typing import Any
+from xml.parsers import expat
+
+import pytest
 import sphinx
 
 from breathe.process import AutoDoxygenProcessHandle
-
-from typing import Any
 
 sphinx_path: Any
 

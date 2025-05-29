@@ -1,31 +1,34 @@
-## @package pyexample
+# @package pyexample
 #  Documentation for this module.
 #
 #  More details.
 
-## Documentation for a function.
+# Documentation for a function.
 #
 #  More details.
+from __future__ import annotations
+
+
 def func():
     pass
 
 
-## Documentation for a class.
+# Documentation for a class.
 #
 #  More details.
 class PyClass:
 
-    ## The constructor.
+    # The constructor.
     def __init__(self):
         self._memVar = 0
 
-    ## Documentation for a method.
+    # Documentation for a method.
     #  @param self The object pointer.
     def PyMethod(self):
         pass
 
-    ## A class variable.
+    # A class variable.
     classVar = 0
 
-    ## @var _memVar
+    # @var _memVar
     #  a member variable

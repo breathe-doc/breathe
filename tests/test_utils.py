@@ -1,7 +1,9 @@
+from __future__ import annotations
+
 from unittest import TestCase
 
-from breathe.renderer.sphinxrenderer import get_param_decl, get_definition_without_template_args
-from breathe import path_handler, parser
+from breathe import parser, path_handler
+from breathe.renderer.sphinxrenderer import get_definition_without_template_args, get_param_decl
 
 
 class TestUtils(TestCase):

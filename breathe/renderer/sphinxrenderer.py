@@ -1,20 +1,25 @@
 from __future__ import annotations
 
+import re
+import textwrap
 from collections import defaultdict
+from collections.abc import Iterable, Sequence
 from pathlib import Path
-
-from breathe import parser, filetypes
-from breathe.renderer.filter import NodeStack
-from breathe.cpp_util import split_name
-
-from sphinx import addnodes
-from sphinx.domains import cpp, c, python
-from sphinx.util.nodes import nested_parse_with_titles
-from sphinx.util import url_re
-from sphinx.ext.graphviz import graphviz
+from typing import (
+    TYPE_CHECKING,
+    Any,
+    Callable,
+    ClassVar,
+    Generic,
+    Literal,
+    Protocol,
+    Type,
+    TypeVar,
+    Union,
+    cast,
+)
 
 from docutils import nodes
-from docutils.statemachine import StringList, UnexpectedIndentationError
 from docutils.parsers.rst.states import Text
 from docutils.statemachine import StringList, UnexpectedIndentationError
 from sphinx import addnodes
@@ -23,24 +28,9 @@ from sphinx.ext.graphviz import graphviz
 from sphinx.util import url_re
 from sphinx.util.nodes import nested_parse_with_titles
 
-import re
-import textwrap
-from typing import (
-    Any,
-    Callable,
-    cast,
-    ClassVar,
-    Generic,
-    Literal,
-    Optional,
-    Protocol,
-    Type,
-    TypeVar,
-    TYPE_CHECKING,
-    Union,
-)
-from collections.abc import Iterable, Sequence
-
+from breathe import filetypes, parser
+from breathe.cpp_util import split_name
+from breathe.renderer.filter import NodeStack
 
 php: Any
 try:
@@ -58,13 +48,13 @@ except ImportError:
 T = TypeVar("T")
 
 if TYPE_CHECKING:
-    from breathe.project import ProjectInfo
-    from breathe.renderer import RenderContext, DataObject
-    from breathe.renderer.filter import DoxFilter
-    from breathe.renderer.target import TargetHandler
-
     from sphinx.application import Sphinx
     from sphinx.directives import ObjectDescription
+
+    from breathe.project import ProjectInfo
+    from breathe.renderer import DataObject, RenderContext
+    from breathe.renderer.filter import DoxFilter
+    from breathe.renderer.target import TargetHandler
 
     class HasRefID(Protocol):
         @property
@@ -92,7 +82,7 @@ DeclaratorCallback = Callable[[Declarator], None]
 _debug_indent = 0
 
 _findall_compat = cast(
-    Callable, getattr(nodes.Node, "findall", getattr(nodes.Node, "traverse", None))
+    "Callable", getattr(nodes.Node, "findall", getattr(nodes.Node, "traverse", None))
 )
 
 
@@ -446,7 +436,7 @@ def get_param_decl(param: parser.Node_paramType) -> str:
         return " ".join(result)
 
     param_type = to_string(param.type)
-    param_name = param.declname if param.declname else param.defname
+    param_name = param.declname or param.defname
     if not param_name:
         param_decl = param_type
     else:
@@ -2329,7 +2319,7 @@ class SphinxRenderer(metaclass=NodeVisitor):
         row = nodes.row()
         cols = self.render_iterable(node.entry)
         elem: Union[nodes.thead, nodes.tbody]
-        if all(cast(nodes.Element, col).get("heading", False) for col in cols):
+        if all(cast("nodes.Element", col).get("heading", False) for col in cols):
             elem = nodes.thead()
         else:
             elem = nodes.tbody()
@@ -2478,7 +2468,7 @@ class SphinxRenderer(metaclass=NodeVisitor):
 
             # the type is cast to "Any" to get around missing typing info in
             # docutils 0.20.1
-            cast(Any, rst_node.children[0]).insert(0, target)
+            cast("Any", rst_node.children[0]).insert(0, target)
 
             finder.content.extend(self.description(node))
             return nodes_

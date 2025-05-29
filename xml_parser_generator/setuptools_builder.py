@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+from __future__ import annotations
 
 import os.path
 
@@ -6,7 +6,6 @@ import os.path
 #     from setuptools.command.build import build
 # except ImportError:
 #     from distutils.command.build import build
-
 # from setuptools.command.build_ext import build_ext
 from setuptools.command.build_py import build_py
 
@@ -19,10 +18,7 @@ from distutils import log
 from distutils.dir_util import mkpath
 
 # from distutils.util import split_quoted
-
-
 import make_parser
-
 
 # extra_user_options = [
 #     ("cpp-opts=", None, "extra command line arguments for the compiler"),

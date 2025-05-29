@@ -1,17 +1,17 @@
 from __future__ import annotations
 
-from breathe.directives import BaseDirective
+from typing import TYPE_CHECKING, Any
+
+from docutils.nodes import Node
+from docutils.parsers.rst.directives import flag, unchanged_required
+
 from breathe import parser
+from breathe.directives import BaseDirective
 from breathe.project import ProjectError
-from breathe.renderer import format_parser_error, RenderContext, TaggedNode, filter
+from breathe.renderer import RenderContext, TaggedNode, filter, format_parser_error
 from breathe.renderer.mask import NullMaskFactory
 from breathe.renderer.sphinxrenderer import SphinxRenderer
 from breathe.renderer.target import create_target_handler
-
-from docutils.nodes import Node
-from docutils.parsers.rst.directives import unchanged_required, flag
-
-from typing import Any, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from collections.abc import Mapping

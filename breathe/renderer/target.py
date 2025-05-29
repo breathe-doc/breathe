@@ -1,12 +1,14 @@
 from __future__ import annotations
 
-from docutils import nodes
+from typing import TYPE_CHECKING, Any
 
-from typing import Any, TYPE_CHECKING
+from docutils import nodes
 
 if TYPE_CHECKING:
     from collections.abc import Mapping, Sequence
+
     from docutils.nodes import Element
+
     from breathe.project import ProjectInfo
 
 

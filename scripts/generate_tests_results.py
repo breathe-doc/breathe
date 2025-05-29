@@ -10,17 +10,18 @@ are either unimportant for ensuring correctness of Breathe or has a value that
 depends on an unimportant factor, such as the exact version of Sphinx, or the
 directories of input files.
 """
+from __future__ import annotations
 
 import os
 import os.path
 import pathlib
-import subprocess
 import shutil
+import subprocess
+import tempfile
+
 import docutils.nodes
 import docutils.writers.docutils_xml
-import tempfile
 from sphinx.testing.util import SphinxTestApp
-
 
 TEST_DATA_DIR = pathlib.Path(__file__).parent.parent / "tests" / "data"
 CSS_PATH = TEST_DATA_DIR / "docutils.css"
@@ -202,7 +203,7 @@ def run_sphinx_and_copy_output(tmp_path, input_path, overrides):
         f_out.write(line)
         # os.path.relpath must be used instead of Path.relative_to because the
         # latter requires that CSS_PATH is below input_path
-        f_out.write(f'<?xml-stylesheet href="{os.path.relpath(CSS_PATH,input_path)}"?>\n')
+        f_out.write(f'<?xml-stylesheet href="{os.path.relpath(CSS_PATH, input_path)}"?>\n')
 
         line = next(itr_in)
         # the next line is a comment with the docutils version, which we don't

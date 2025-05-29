@@ -1,13 +1,13 @@
 from __future__ import annotations
 
-from typing import Generic, TYPE_CHECKING, TypeVar
+from typing import TYPE_CHECKING, Generic, TypeVar
 
 if TYPE_CHECKING:
-    from breathe.project import ProjectInfo
-    from breathe.finder.factory import FinderCreatorMap
-    from breathe.renderer.filter import DoxFilter, FinderMatch
-    from breathe.renderer import TaggedNode, T_data_object
     from breathe import parser
+    from breathe.finder.factory import FinderCreatorMap
+    from breathe.project import ProjectInfo
+    from breathe.renderer import T_data_object, TaggedNode
+    from breathe.renderer.filter import DoxFilter, FinderMatch
 else:
     T_data_object = TypeVar("T_data_object", covariant=True)
 

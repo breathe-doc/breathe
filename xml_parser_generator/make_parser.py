@@ -3,15 +3,14 @@ XML"""
 
 from __future__ import annotations
 
-import re
-import json
-import enum
-import dataclasses
-import functools
-import keyword
 import collections
-
-from typing import Any, Callable, cast, Literal, NamedTuple, NoReturn, TYPE_CHECKING, TypeVar
+import dataclasses
+import enum
+import functools
+import json
+import keyword
+import re
+from typing import TYPE_CHECKING, Any, Callable, Literal, NamedTuple, NoReturn, TypeVar, cast
 
 import jinja2
 
@@ -488,7 +487,7 @@ def resolve_refs(schema: Schema) -> tuple[list[str], list[str]]:
 
     for name, r in schema.roots.items():
         elements.add(name)
-        schema.roots[name] = check_element_type_defined(name, cast(str, r))
+        schema.roots[name] = check_element_type_defined(name, cast("str", r))
 
     for typename, t in schema.types.items():
         if not t.name:
@@ -497,17 +496,17 @@ def resolve_refs(schema: Schema) -> tuple[list[str], list[str]]:
         if isinstance(t, ElementType):
             # TODO: check for recursive bases
             for i, b in enumerate(t.bases):
-                b_type = schema.types.get(cast(str, b))
+                b_type = schema.types.get(cast("str", b))
                 if b_type is None:
                     raise ValueError(f'type "{typename}" has undefined base "{b}"')
                 if not isinstance(b_type, ElementType):
                     raise ValueError(f'"{b}" cannot be used as a base')
                 if isinstance(b_type, ListElement):
                     if not isinstance(t, ListElement):
-                        raise ValueError(f"non-list elements cannot use list elements as bases")
+                        raise ValueError("non-list elements cannot use list elements as bases")
                     if b_type.content_type != t.content_type:
                         raise ValueError(
-                            f"list elements of one type cannot use list elements of another type as bases"
+                            "list elements of one type cannot use list elements of another type as bases"
                         )
                 t.bases[i] = b_type
             for name, child in t.children.items():
@@ -516,18 +515,18 @@ def resolve_refs(schema: Schema) -> tuple[list[str], list[str]]:
                     child.py_name = name
                 check_py_name(child.py_name)
                 elements.add(name)
-                child.type = check_element_type_defined(f"{typename}.{name}", cast(str, child.type))
+                child.type = check_element_type_defined(f"{typename}.{name}", cast("str", child.type))
             for name, attr in t.attributes.items():
                 attr.name = name
                 if not attr.py_name:
                     attr.py_name = name
                 check_py_name(attr.py_name)
                 attributes.add(name)
-                t.attributes[name].type = check_attr_type_ref(schema, cast(str, attr.type), name)
+                t.attributes[name].type = check_attr_type_ref(schema, cast("str", attr.type), name)
             if isinstance(t, ListElement):
                 for name, r in t.content.items():
                     elements.add(name)
-                    t.content[name] = check_element_type_defined(f"{typename}.{name}", cast(str, r))
+                    t.content[name] = check_element_type_defined(f"{typename}.{name}", cast("str", r))
 
     elements.update(schema.roots)
 
@@ -574,7 +573,7 @@ def make_env(schema: Schema) -> jinja2.Environment:
     def field_count(t) -> int:
         if not isinstance(t, ElementType):
             return 0
-        return len(t.attributes) + len(t.children) + sum(cast(int, field_count(b)) for b in t.bases)
+        return len(t.attributes) + len(t.children) + sum(cast("int", field_count(b)) for b in t.bases)
 
     for t in schema.types.values():
         # if isinstance(t, SchemaEnum):
@@ -737,7 +736,7 @@ def make_env(schema: Schema) -> jinja2.Environment:
 
     for t in schema.types.values():
         t.add_sorted(sorted_types, visited_types)
-        if isinstance(t, ElementType) and any(field_count(cast(ElementType, b)) for b in t.bases):
+        if isinstance(t, ElementType) and any(field_count(cast("ElementType", b)) for b in t.bases):
             # the code was written to support this but it has never been tested
             raise ValueError(
                 'elements having bases that have "attributes" or "children" are not currently supported'
@@ -821,7 +820,7 @@ def get_json_value(
     if r is _NO_DEFAULT:
         if default is _NO_DEFAULT:
             raise ValueError(f'missing value for "{context}.{key}"')
-        return cast(T, default)
+        return cast("T", default)
     return conv(r, context)
 
 

@@ -1,17 +1,18 @@
 from __future__ import annotations
 
-from breathe.finder import index as indexfinder
-from breathe.finder import compound as compoundfinder
+from typing import TYPE_CHECKING, Callable, Union
+
 from breathe import parser
+from breathe.finder import compound as compoundfinder
+from breathe.finder import index as indexfinder
 from breathe.renderer import TaggedNode
 
-from typing import Callable, TYPE_CHECKING, Union
-
 if TYPE_CHECKING:
-    from breathe.renderer.filter import DoxFilter, FinderMatch
-    from breathe.project import ProjectInfo
-    from breathe.finder import ItemFinder
     from sphinx.application import Sphinx
+
+    from breathe.finder import ItemFinder
+    from breathe.project import ProjectInfo
+    from breathe.renderer.filter import DoxFilter, FinderMatch
 
     ItemFinderCreator = Callable[[ProjectInfo, TaggedNode, "FinderCreatorMap"], ItemFinder]
     FinderCreatorMap = dict[type[parser.NodeOrValue], ItemFinderCreator]

@@ -45,12 +45,12 @@ allows all other non-Node_memberdefType nodes to pass through as you don't want 
 
 from __future__ import annotations
 
-from breathe import parser, renderer
+from collections.abc import Container, Iterable, Mapping
+from typing import TYPE_CHECKING, Any, Callable, SupportsIndex, TypeVar
 
 from sphinx.application import Sphinx
 
-from typing import Any, Callable, SupportsIndex, TYPE_CHECKING, TypeVar
-from collections.abc import Container, Iterable, Mapping
+from breathe import parser, renderer
 
 if TYPE_CHECKING:
     import sys

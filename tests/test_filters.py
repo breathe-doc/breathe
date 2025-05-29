@@ -1,12 +1,12 @@
 from __future__ import annotations
 
 import os.path
-import pytest
 from typing import NamedTuple
+
+import pytest
 
 from breathe import parser
 from breathe.renderer import TaggedNode, filter
-
 
 DEFAULT_OPTS = {"path": "", "project": "", "membergroups": "", "show": ""}
 

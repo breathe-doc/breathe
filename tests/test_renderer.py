@@ -1,16 +1,16 @@
 from __future__ import annotations
 
 import os
+from typing import TYPE_CHECKING
 
-import sphinx.locale
+import docutils.parsers.rst
 import sphinx.addnodes
 import sphinx.environment
-from breathe import parser, renderer
-from breathe.renderer.sphinxrenderer import SphinxRenderer
-import docutils.parsers.rst
+import sphinx.locale
 from docutils import frontend, nodes, utils
 
-from typing import TYPE_CHECKING
+from breathe import parser, renderer
+from breathe.renderer.sphinxrenderer import SphinxRenderer
 
 if TYPE_CHECKING:
     from breathe.renderer import filter
@@ -33,8 +33,8 @@ class MockMemo:
 
 class MockState:
     def __init__(self, app):
-        from breathe.project import ProjectInfoFactory
         from breathe.parser import DoxygenParser
+        from breathe.project import ProjectInfoFactory
 
         env = sphinx.environment.BuildEnvironment(app)
         env.setup(app)
@@ -89,7 +89,6 @@ class MockMaskFactory:
 
 class MockContext:
     def __init__(self, app, node_stack, domain=None, options=[]):
-        from docutils.statemachine import StringList
 
         self.domain = domain
         self.node_stack = node_stack

@@ -1,13 +1,14 @@
 from __future__ import annotations
 
-from docutils import nodes
-from typing import Generic, NamedTuple, TYPE_CHECKING, TypeVar, Union
 import textwrap
+from typing import TYPE_CHECKING, Generic, NamedTuple, TypeVar, Union
+
+from docutils import nodes
 
 if TYPE_CHECKING:
     from breathe import parser
-    from breathe.renderer import mask
     from breathe.directives.index import RootDataObject
+    from breathe.renderer import mask
 
     DataObject = Union[parser.NodeOrValue, RootDataObject]
     T_data_object = TypeVar("T_data_object", bound=DataObject, covariant=True)

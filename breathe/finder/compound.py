@@ -1,10 +1,11 @@
 from __future__ import annotations
 
-from breathe.finder import ItemFinder
-from breathe.renderer.filter import NodeStack
-from breathe import parser
-from breathe.renderer import TaggedNode
 from typing import TYPE_CHECKING
+
+from breathe import parser
+from breathe.finder import ItemFinder
+from breathe.renderer import TaggedNode
+from breathe.renderer.filter import NodeStack
 
 if TYPE_CHECKING:
     from breathe.renderer.filter import DoxFilter, FinderMatch

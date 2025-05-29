@@ -1,15 +1,8 @@
 from __future__ import annotations
 
 import pathlib
+
 import pytest
-from sphinx.testing.fixtures import (
-    test_params,
-    app_params,
-    make_app,
-    shared_result,
-    sphinx_test_tempdir,
-    rootdir,
-)
 
 
 @pytest.fixture(scope="function")

@@ -2,23 +2,25 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from breathe.finder import factory
-from breathe import parser
-from breathe.renderer import format_parser_error, RenderContext
-from breathe.renderer.sphinxrenderer import SphinxRenderer
-
 from docutils import nodes
 from sphinx.directives import SphinxDirective
 
+from breathe import parser
+from breathe.finder import factory
+from breathe.renderer import RenderContext, format_parser_error
+from breathe.renderer.sphinxrenderer import SphinxRenderer
+
 if TYPE_CHECKING:
+    from collections.abc import Sequence
+
+    from sphinx.application import Sphinx
+
     from breathe.parser import DoxygenParser
-    from breathe.project import ProjectInfoFactory, ProjectInfo
+    from breathe.project import ProjectInfo, ProjectInfoFactory
     from breathe.renderer import TaggedNode
     from breathe.renderer.filter import DoxFilter
     from breathe.renderer.mask import MaskFactoryBase
     from breathe.renderer.target import TargetHandler
-    from sphinx.application import Sphinx
-    from collections.abc import Sequence
 
 
 class _WarningHandler:

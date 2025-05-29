@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from breathe.directives import BaseDirective
 from breathe.file_state_cache import MTimeError
 from breathe.project import ProjectError
@@ -6,7 +8,6 @@ from breathe.renderer.mask import NullMaskFactory
 from breathe.renderer.target import create_target_handler
 
 if TYPE_CHECKING:
-    from typing import Any, List
 
     import sys
 

@@ -1,14 +1,14 @@
 from __future__ import annotations
 
-from .exception import BreatheError
-
+import fnmatch
 import os
 import os.path
-import fnmatch
 from pathlib import Path
 from typing import TYPE_CHECKING
 
 from breathe.exception import BreatheError
+
+from .exception import BreatheError
 
 if TYPE_CHECKING:
     import sys

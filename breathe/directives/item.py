@@ -1,20 +1,18 @@
 from __future__ import annotations
 
+from breathe import parser
 from breathe.directives import BaseDirective
 from breathe.file_state_cache import MTimeError
 from breathe.project import ProjectError, ProjectInfo
+from breathe.renderer import TaggedNode, filter
 from breathe.renderer.mask import NullMaskFactory
 from breathe.renderer.target import create_target_handler
-from breathe.renderer import filter
-from breathe import parser
-from breathe.renderer import TaggedNode
 
 if TYPE_CHECKING:
-    from typing import Any
 
     from docutils.nodes import Node
 
-from typing import cast, ClassVar, TYPE_CHECKING
+from typing import TYPE_CHECKING, ClassVar, cast
 
 if TYPE_CHECKING:
     import sys
@@ -89,7 +87,7 @@ class _DoxygenBaseItemDirective(BaseDirective):
         )
 
     def run(self) -> list[Node]:
-        options = cast(DoxBaseItemOptions, self.options)
+        options = cast("DoxBaseItemOptions", self.options)
 
         namespace, _, name = self.arguments[0].rpartition("::")
 

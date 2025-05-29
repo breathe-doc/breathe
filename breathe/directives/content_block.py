@@ -1,5 +1,8 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING, ClassVar, Literal, cast
+
+from breathe import parser
 from breathe.directives import BaseDirective
 from breathe.file_state_cache import MTimeError
 from breathe.project import ProjectError
@@ -7,9 +10,6 @@ from breathe.renderer import RenderContext, filter
 from breathe.renderer.mask import NullMaskFactory
 from breathe.renderer.sphinxrenderer import SphinxRenderer
 from breathe.renderer.target import create_target_handler
-from breathe import parser
-
-from typing import cast, ClassVar, Any, Literal, TYPE_CHECKING
 
 if TYPE_CHECKING:
     import sys
@@ -18,8 +18,9 @@ if TYPE_CHECKING:
         from typing import NotRequired, TypedDict
     else:
         from typing_extensions import NotRequired, TypedDict
-    from breathe.finder.factory import FinderRoot
     from sphinx.application import Sphinx
+
+    from breathe.finder.factory import FinderRoot
 
     DoxContentBlockOptions = TypedDict(
         "DoxContentBlockOptions",
@@ -127,7 +128,7 @@ class _DoxygenContentBlockDirective(BaseDirective):
 
     def run(self) -> list[Node]:
         name = self.arguments[0]
-        options = cast(DoxContentBlockOptions, self.options)
+        options = cast("DoxContentBlockOptions", self.options)
 
         try:
             project_info = self.project_info_factory.create_project_info(options)
@@ -159,7 +160,7 @@ class _DoxygenContentBlockDirective(BaseDirective):
             # Having found the compound node for the namespace or group in the index we want to grab
             # the contents of it which match the filter
             contents_finder = self.create_finder_from_root(
-                cast(FinderRoot, node_stack[0].value), project_info
+                cast("FinderRoot", node_stack[0].value), project_info
             )
 
             contents: list[filter.FinderMatch] = []

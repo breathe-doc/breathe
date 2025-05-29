@@ -1,4 +1,5 @@
 """Run Doxygen on all test samples and save the results."""
+from __future__ import annotations
 
 import os
 import pathlib
@@ -6,7 +7,6 @@ import shutil
 import subprocess
 
 from breathe.process import AUTOCFG_TEMPLATE
-
 
 PROJECT_DIR = pathlib.Path(__file__).parent.parent
 DATA_DIR = PROJECT_DIR / "tests" / "data"

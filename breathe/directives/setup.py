@@ -1,4 +1,9 @@
+from __future__ import annotations
+
+import subprocess
 from pathlib import Path
+
+from sphinx.application import Sphinx
 
 from breathe.directives.class_like import (
     DoxygenClassDirective,
@@ -23,13 +28,8 @@ from breathe.directives.item import (
     DoxygenVariableDirective,
 )
 from breathe.parser import DoxygenParser
-from breathe.project import ProjectInfoFactory
 from breathe.process import AutoDoxygenProcessHandle
 from breathe.project import ProjectInfoFactory
-
-from sphinx.application import Sphinx
-
-import subprocess
 
 
 def setup(app: Sphinx) -> None:

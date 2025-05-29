@@ -1,17 +1,16 @@
 from __future__ import annotations
 
-from breathe.project import AutoProjectInfo, ProjectInfoFactory
-
 import os
 from pathlib import Path
 from shlex import quote
-from pathlib import Path
 from typing import TYPE_CHECKING
 
+from breathe.project import AutoProjectInfo, ProjectInfoFactory
+
 if TYPE_CHECKING:
+    from collections.abc import Mapping
     from typing import Callable
 
-    from collections.abc import Mapping
     from breathe.project import AutoProjectInfo, ProjectInfoFactory
 
 AUTOCFG_TEMPLATE = r"""
