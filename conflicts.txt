@@ -1,4 +1,3 @@
-	both modified:   breathe/renderer/filter.py
 	both modified:   breathe/renderer/mask.py
 	both modified:   breathe/renderer/sphinxrenderer.py
 	both modified:   breathe/renderer/target.py
