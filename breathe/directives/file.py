@@ -1,10 +1,3 @@
-<<<<<<< HEAD
-from __future__ import annotations
-||||||| 542ae9b
-from ..renderer.mask import NullMaskFactory
-from ..directives import BaseDirective
-from ..project import ProjectError
-=======
 from __future__ import annotations
 
 import os.path
@@ -13,28 +6,11 @@ from ..renderer.mask import NullMaskFactory
 from ..directives import BaseDirective
 from breathe import project, path_handler, renderer, parser
 from breathe.cpp_util import split_name
->>>>>>> memberdef-in-groups
 
-<<<<<<< HEAD
-from docutils.parsers.rst.directives import flag, unchanged_required
-
-from breathe.directives import BaseDirective
-from breathe.project import ProjectError
-from breathe.renderer import RenderContext
-from breathe.renderer.mask import NullMaskFactory
-||||||| 542ae9b
-from breathe.renderer import RenderContext
-=======
->>>>>>> memberdef-in-groups
 from breathe.renderer.sphinxrenderer import SphinxRenderer
 from breathe.renderer.target import create_target_handler
 from breathe.renderer import filter
 
-<<<<<<< HEAD
-||||||| 542ae9b
-from docutils.parsers.rst.directives import unchanged_required, flag
-
-=======
 from docutils.parsers.rst.directives import unchanged_required, flag
 
 from typing import Any, ClassVar, TYPE_CHECKING
@@ -159,7 +135,6 @@ def file_finder_filter(
                 continue
             matches.append([renderer.TaggedNode(None, cd)])
 
->>>>>>> memberdef-in-groups
 
 class _BaseFileDirective(BaseDirective):
     """Base class handle the main work when given the appropriate file and project info to work
