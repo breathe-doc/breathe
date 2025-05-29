@@ -1,63 +1,16 @@
-<<<<<<< HEAD
 from __future__ import annotations
 
 import re
-from typing import TYPE_CHECKING
-
-from docutils import nodes
-from docutils.parsers.rst.directives import flag, unchanged_required
-from sphinx.domains import cpp
-
-||||||| 542ae9b
-=======
-from __future__ import annotations
-
-import re
->>>>>>> memberdef-in-groups
 from breathe.directives import BaseDirective
 from breathe.exception import BreatheError
 from breathe.file_state_cache import MTimeError
-<<<<<<< HEAD
-from breathe.parser import FileIOError, ParserError
-||||||| 542ae9b
-from breathe.parser import ParserError, FileIOError
-=======
 from breathe import parser
->>>>>>> memberdef-in-groups
 from breathe.project import ProjectError
-<<<<<<< HEAD
-from breathe.renderer import RenderContext, format_parser_error
-from breathe.renderer.mask import MaskFactory, NoParameterNamesMask, NullMaskFactory
-from breathe.renderer.sphinxrenderer import SphinxRenderer, WithContext
-||||||| 542ae9b
-from breathe.renderer import format_parser_error, RenderContext
-from breathe.renderer.sphinxrenderer import WithContext
-from breathe.renderer.mask import MaskFactory, NullMaskFactory, NoParameterNamesMask
-from breathe.renderer.sphinxrenderer import SphinxRenderer
-=======
 from breathe.renderer import RenderContext, mask, TaggedNode, filter
 from breathe.renderer.sphinxrenderer import WithContext
 from breathe.renderer.sphinxrenderer import SphinxRenderer
->>>>>>> memberdef-in-groups
 from breathe.renderer.target import create_target_handler
 
-<<<<<<< HEAD
-if TYPE_CHECKING:
-    from typing import Any
-
-    from docutils.nodes import Node
-||||||| 542ae9b
-from docutils.nodes import Node
-from docutils.parsers.rst.directives import unchanged_required, flag
-
-from sphinx.domains import cpp
-
-from docutils import nodes
-
-import re
-
-from typing import Any, List, Optional
-=======
 from docutils.parsers.rst.directives import unchanged_required, flag
 from docutils import nodes
 from sphinx.domains import cpp
@@ -90,7 +43,6 @@ if TYPE_CHECKING:
     )
 else:
     DoxFunctionOptions = None
->>>>>>> memberdef-in-groups
 
 
 class _NoMatchingFunctionError(BreatheError):
@@ -194,19 +146,7 @@ class DoxygenFunctionDirective(BaseDirective):
             self.app, namespace, function_name, self.dox_parser, project_info, d_index, matchesAll
         )
 
-<<<<<<< HEAD
-        # TODO: find a more specific type for the Doxygen nodes
-        matchesAll: list[Any] = []
-        finder.filter_(finder_filter, matchesAll)
-        matches = []
-||||||| 542ae9b
-        # TODO: find a more specific type for the Doxygen nodes
-        matchesAll: List[Any] = []
-        finder.filter_(finder_filter, matchesAll)
-        matches = []
-=======
         matches: list[filter.FinderMatch] = []
->>>>>>> memberdef-in-groups
         for m in matchesAll:
             # only take functions and friend functions
             # ignore friend classes
@@ -266,13 +206,7 @@ class DoxygenFunctionDirective(BaseDirective):
             self.directive_args,
         )
 
-<<<<<<< HEAD
-    def _parse_args(self, function_description: str) -> cpp.ASTParametersQualifiers | None:
-||||||| 542ae9b
-    def _parse_args(self, function_description: str) -> Optional[cpp.ASTParametersQualifiers]:
-=======
     def _parse_args(self, function_description: str) -> Optional[cppast.ASTParametersQualifiers]:
->>>>>>> memberdef-in-groups
         # Note: the caller must catch cpp.DefinitionError
         if function_description == "":
             return None
@@ -344,25 +278,6 @@ class DoxygenFunctionDirective(BaseDirective):
             # this part should be kept in sync with visit_function in sphinxrenderer
             name = node.name
             # assume we are only doing this for C++ declarations
-<<<<<<< HEAD
-            declaration = " ".join([
-                object_renderer.create_template_prefix(node),
-                "".join(n.astext() for n in object_renderer.render(node.get_type())),
-                name,
-                node.get_argsstring(),
-            ])
-        parser = cpp.DefinitionParser(
-||||||| 542ae9b
-            declaration = " ".join(
-                [
-                    object_renderer.create_template_prefix(node),
-                    "".join(n.astext() for n in object_renderer.render(node.get_type())),
-                    name,
-                    node.get_argsstring(),
-                ]
-            )
-        parser = cpp.DefinitionParser(
-=======
             declaration = " ".join(
                 [
                     object_renderer.create_template_prefix(node),
@@ -372,24 +287,17 @@ class DoxygenFunctionDirective(BaseDirective):
                 ]
             )
         cpp_parser = cpp.DefinitionParser(
->>>>>>> memberdef-in-groups
             declaration, location=self.get_source_info(), config=self.config
         )
         ast = cpp_parser.parse_declaration("function", "function")
         return str(ast)
 
-<<<<<<< HEAD
-    def _resolve_function(self, matches, args: cpp.ASTParametersQualifiers | None, project_info):
-||||||| 542ae9b
-    def _resolve_function(self, matches, args: Optional[cpp.ASTParametersQualifiers], project_info):
-=======
     def _resolve_function(
         self,
         matches: list[filter.FinderMatch],
         args: cppast.ASTParametersQualifiers | None,
         project_info: project.ProjectInfo,
     ):
->>>>>>> memberdef-in-groups
         if not matches:
             raise _NoMatchingFunctionError()
 
