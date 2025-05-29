@@ -18,13 +18,7 @@ matching.
 
 """
 
-<<<<<<< HEAD
 from __future__ import annotations
-
-||||||| 542ae9b
-=======
-from __future__ import annotations
->>>>>>> memberdef-in-groups
 
 from typing import Callable
 from breathe import parser
