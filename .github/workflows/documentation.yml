@@ -1,30 +1,3 @@
-<<<<<<< HEAD
-name: Build documentation
-
-on:
-  push:
-  pull_request:
-  workflow_dispatch:
-
-permissions:
-  contents: read
-
-concurrency:
-  group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
-  cancel-in-progress: true
-
-env:
-  FORCE_COLOR: "1"
-
-jobs:
-  build:
-||||||| 542ae9b
-name: build the documentation
-on: [push, pull_request]
-jobs:
-  build:
-
-=======
 name: Build documentation
 
 on:
@@ -49,91 +22,28 @@ jobs:
 
   build:
     needs: cache-doxygen
->>>>>>> memberdef-in-groups
     runs-on: ubuntu-latest
 
     steps:
-<<<<<<< HEAD
-    - uses: actions/checkout@v4
-    - name: Set up Python
-      uses: actions/setup-python@v5
-      with:
-        python-version: "3"
-||||||| 542ae9b
-      - uses: actions/checkout@v2
-      - uses: actions/cache@v1
-        with:
-          path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ hashFiles('requirements/*.txt') }}
-          restore-keys: |
-            ${{ runner.os }}-pip-
-=======
     - uses: actions/checkout@v4
     - name: Set up Python
       uses: actions/setup-python@v5
       with:
         python-version: "3"
         cache: 'pip'
->>>>>>> memberdef-in-groups
 
-<<<<<<< HEAD
-    - name: Install apt dependencies
-      run: |
-        sudo apt-get update
-        sudo apt-get install graphviz
-||||||| 542ae9b
-      - name: set up python
-        uses: actions/setup-python@v1
-=======
     - name: Install apt dependencies
       run: |
         sudo apt-get -y update
         sudo apt-get -y install graphviz libclang1-11 libclang-cpp11
->>>>>>> memberdef-in-groups
 
-<<<<<<< HEAD
-    - name: Install Doxygen from GitHub releases
-      env:
-        DOXYGEN_VERSION: 1.9.4
-      run: |
-        mkdir doxygen-bin-arc && cd doxygen-bin-arc
-        curl -LsSf https://github.com/doxygen/doxygen/releases/download/Release_${DOXYGEN_VERSION//./_}/doxygen-$DOXYGEN_VERSION.linux.bin.tar.gz > doxygen.tar.gz
-        gunzip doxygen.tar.gz
-        tar xf doxygen.tar
-        cd doxygen-$DOXYGEN_VERSION
-        sudo make install
-||||||| 542ae9b
-      - name: install dependencies
-        run: |
-          pip install -r requirements/development.txt
-          sudo apt-get -y update
-          sudo apt-get -y install graphviz libclang1-11 libclang-cpp11
-=======
     - uses: actions/cache/restore@v4
       id: cache-doxygen
       with:
         path: doxygen-bin-arc
         fail-on-cache-miss: true
         key: ${{ runner.os }}-doxygen-${{ env.DOXYGEN_VERSION }}
->>>>>>> memberdef-in-groups
 
-<<<<<<< HEAD
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        python -m pip install .[docs]
-||||||| 542ae9b
-      - name: install doxygen from SF binary archives
-        env:
-          DOXYGEN_VERSION: 1.9.4
-        run: |
-          mkdir doxygen-bin-arc && cd doxygen-bin-arc
-          curl -L https://sourceforge.net/projects/doxygen/files/rel-$DOXYGEN_VERSION/doxygen-$DOXYGEN_VERSION.linux.bin.tar.gz > doxygen.tar.gz
-          gunzip doxygen.tar.gz
-          tar xf doxygen.tar
-          cd doxygen-$DOXYGEN_VERSION
-          sudo make install
-=======
     - name: Install doxygen
       # at some point actions/cache/restore@4 started unpacking doxygen.tar.gz
       # automatically and I don't know why -- Rouslan
@@ -147,40 +57,12 @@ jobs:
           cd doxygen-${{ env.DOXYGEN_VERSION }}
         fi
         sudo make install
->>>>>>> memberdef-in-groups
 
-<<<<<<< HEAD
-    - name: Build the documentation
-      run: |
-        make html
-        rm documentation/build/html/.buildinfo
-||||||| 542ae9b
-      - name: build the documentation
-        run: |
-          make html
-          rm documentation/build/html/.buildinfo
-=======
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
         python -m pip install .[docs]
->>>>>>> memberdef-in-groups
 
-<<<<<<< HEAD
-    - uses: actions/upload-artifact@v4
-      with:
-        name: docs build artifacts
-        path: |
-          documentation/build/html
-          examples/*/*/xml
-||||||| 542ae9b
-      - uses: actions/upload-artifact@v2
-        with:
-          name: docs build artifacts
-          path: |
-            documentation/build/html
-            examples/*/*/xml
-=======
     - name: Build the documentation
       run: |
         make html
@@ -192,4 +74,3 @@ jobs:
         path: |
           documentation/build/html
           examples/*/*/xml
->>>>>>> memberdef-in-groups
