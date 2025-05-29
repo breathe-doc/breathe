@@ -1,6 +1,5 @@
 	both added:      documentation/make.bat
 	both modified:   documentation/source/conf.py
-	both added:      make.bat
 	deleted by us:   mkrelease
 	both modified:   pyproject.toml
 	deleted by us:   scripts/version-check.py
