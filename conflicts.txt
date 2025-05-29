@@ -1,4 +1,3 @@
-	both modified:   breathe/project.py
 	both modified:   breathe/renderer/__init__.py
 	both modified:   breathe/renderer/filter.py
 	both modified:   breathe/renderer/mask.py
