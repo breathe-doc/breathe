@@ -1,39 +1,15 @@
-<<<<<<< HEAD
-from __future__ import annotations
-
-from typing import TYPE_CHECKING
-
-from breathe.finder import ItemFinder, stack
-from breathe.renderer.filter import FilterFactory
-||||||| 542ae9b
-from breathe.finder import ItemFinder, stack
-from breathe.renderer.filter import Filter, FilterFactory
-from breathe.parser import DoxygenCompoundParser
-=======
 from __future__ import annotations
 
 from breathe.finder import ItemFinder
 from breathe.renderer.filter import NodeStack
 from breathe import parser
 from breathe.renderer import TaggedNode
->>>>>>> memberdef-in-groups
 
-if TYPE_CHECKING:
-    from typing import Any
-
-<<<<<<< HEAD
-    from sphinx.application import Sphinx
-
-    from breathe.parser import DoxygenCompoundParser
-    from breathe.renderer.filter import Filter
-||||||| 542ae9b
-from typing import Any, List
-=======
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from breathe.renderer.filter import DoxFilter, FinderMatch
->>>>>>> memberdef-in-groups
+    from typing import Any
 
 
 class DoxygenTypeSubItemFinder(ItemFinder[parser.Node_DoxygenTypeIndex]):
@@ -66,19 +42,9 @@ class CompoundTypeSubItemFinder(ItemFinder[parser.Node_CompoundType]):
             matches.append(node_stack)
 
         # Descend to member children
-<<<<<<< HEAD
-        members = self.data_object.get_member()
-        # TODO: find a more precise type for the Doxygen nodes
-        member_matches: list[Any] = []
-||||||| 542ae9b
-        members = self.data_object.get_member()
-        # TODO: find a more precise type for the Doxygen nodes
-        member_matches: List[Any] = []
-=======
         members = self.node.value.member
 
         member_matches: list[FinderMatch] = []
->>>>>>> memberdef-in-groups
         for member in members:
             self.run_filter(filter_, member_matches, node_stack, member)
 

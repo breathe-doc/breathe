@@ -1,4 +1,3 @@
-	both modified:   breathe/finder/index.py
 	deleted by them: breathe/parser/__init__.py
 	deleted by them: breathe/parser/compound.py
 	deleted by them: breathe/parser/compoundsuper.py
