@@ -1,6 +1,5 @@
 name: Lint source code
 
-<<<<<<< HEAD
 on:
   push:
   pull_request:
@@ -18,177 +17,62 @@ env:
 
 jobs:
   ruff:
-||||||| 542ae9b
-=======
-on:
-  push:
-  pull_request:
-  workflow_dispatch:
-
-permissions:
-  contents: read
-
-concurrency:
-  group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
-  cancel-in-progress: true
-
-env:
-  FORCE_COLOR: "1"
-
-jobs:
-  black:
->>>>>>> memberdef-in-groups
     runs-on: ubuntu-latest
 
     steps:
-<<<<<<< HEAD
     - uses: actions/checkout@v4
       with:
         persist-credentials: false
-||||||| 542ae9b
-      - uses: actions/checkout@v2
-      - uses: actions/cache@v1
-        with:
-          path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ hashFiles('requirements/*.txt') }}
-          restore-keys: |
-            ${{ runner.os }}-pip-
-      - name: set up python
-        uses: actions/setup-python@v1
-=======
-    - uses: actions/checkout@v4
-    - name: Set up Python
-      uses: actions/setup-python@v5
-      with:
-        python-version: "3"
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        python -m pip install "black==22.3.0"
-    - name: Format with black
-      run: black --check .
->>>>>>> memberdef-in-groups
 
-<<<<<<< HEAD
     - name: Install Ruff
       uses: astral-sh/ruff-action@v3
       with:
         args: --version
         version: 0.9.2
-||||||| 542ae9b
-      - name: install dependencies
-        run: |
-          pip install -r requirements/development.txt
-=======
-  flake8:
-    runs-on: ubuntu-latest
->>>>>>> memberdef-in-groups
 
-<<<<<<< HEAD
     - name: Lint with Ruff
       run: ruff check --output-format=github
-||||||| 542ae9b
-      - name: lint the source code
-        run: make flake8
-=======
-    steps:
-    - uses: actions/checkout@v4
-    - name: Set up Python
-      uses: actions/setup-python@v5
-      with:
-        python-version: "3"
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        python -m pip install --upgrade "flake8>=6"
-    - name: Lint with flake8
-      run: flake8 breathe
->>>>>>> memberdef-in-groups
 
-<<<<<<< HEAD
     - name: Format with Ruff
       run: ruff format --diff
-||||||| 542ae9b
-      - name: check source code formatting
-        run: make black
-=======
-  mypy:
-    runs-on: ubuntu-latest
->>>>>>> memberdef-in-groups
 
-<<<<<<< HEAD
   mypy:
     runs-on: ubuntu-latest
-||||||| 542ae9b
-      - name: type check the source code
-        run: make type-check
-=======
     steps:
     - uses: actions/checkout@v4
+
     - name: Set up Python
       uses: actions/setup-python@v5
       with:
         python-version: "3"
+
     - name: Install dependencies
       # "--editable" is needed so that _parser.py is placed in the local folder
       # where pytest will import from
       run: |
         python -m pip install --upgrade pip
         python -m pip install --editable ".[lint]"
+
     - name: Type check with mypy
       run: mypy --warn-redundant-casts --warn-unused-ignores breathe tests
->>>>>>> memberdef-in-groups
-
-<<<<<<< HEAD
-    steps:
-    - uses: actions/checkout@v4
-    - name: Set up Python
-      uses: actions/setup-python@v5
-      with:
-        python-version: "3"
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        python -m pip install ".[lint]"
-    - name: Type check with mypy
-      run: mypy
 
   twine:
     runs-on: ubuntu-latest
 
     steps:
     - uses: actions/checkout@v4
-    - name: Set up Python
-      uses: actions/setup-python@v5
-      with:
-        python-version: "3"
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        python -m pip install --upgrade twine build
-    - name: Lint with twine
-      run: |
-        python -m build .
-        twine check dist/*
-||||||| 542ae9b
-      - name: check version numbers are in sync
-        run: make version-check
-=======
-  twine:
-    runs-on: ubuntu-latest
 
-    steps:
-    - uses: actions/checkout@v4
     - name: Set up Python
       uses: actions/setup-python@v5
       with:
         python-version: "3"
+
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
         python -m pip install --upgrade twine build
+
     - name: Lint with twine
       run: |
         python -m build .
         twine check dist/*
->>>>>>> memberdef-in-groups
