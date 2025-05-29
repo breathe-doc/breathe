@@ -1,4 +1,3 @@
-	both modified:   documentation/source/conf.py
 	deleted by us:   mkrelease
 	both modified:   pyproject.toml
 	deleted by us:   scripts/version-check.py
