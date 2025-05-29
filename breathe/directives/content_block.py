@@ -1,15 +1,5 @@
-<<<<<<< HEAD
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
-
-from docutils.parsers.rst.directives import flag, unchanged_required
-
-||||||| 542ae9b
-=======
-from __future__ import annotations
-
->>>>>>> memberdef-in-groups
 from breathe.directives import BaseDirective
 from breathe.file_state_cache import MTimeError
 from breathe.project import ProjectError
@@ -19,15 +9,7 @@ from breathe.renderer.sphinxrenderer import SphinxRenderer
 from breathe.renderer.target import create_target_handler
 from breathe import parser
 
-if TYPE_CHECKING:
-    from typing import Any
-
-<<<<<<< HEAD
-    from docutils.nodes import Node
-||||||| 542ae9b
-from typing import Any, List
-=======
-from typing import cast, ClassVar, Literal, TYPE_CHECKING
+from typing import cast, ClassVar, Any, Literal, TYPE_CHECKING
 
 if TYPE_CHECKING:
     import sys
@@ -119,7 +101,6 @@ def create_content_filter(kind: Literal["group", "page", "namespace"]) -> filter
         )
 
     return filter_
->>>>>>> memberdef-in-groups
 
 
 class _DoxygenContentBlockDirective(BaseDirective):
@@ -160,23 +141,9 @@ class _DoxygenContentBlockDirective(BaseDirective):
             warning = self.create_warning(None, kind=self.kind)
             return warning.warn("doxygen{kind}: %s" % e)
 
-<<<<<<< HEAD
-        finder_filter = self.filter_factory.create_finder_filter(self.kind, name)
-
-        # TODO: find a more specific type for the Doxygen nodes
-        matches: list[Any] = []
-        finder.filter_(finder_filter, matches)
-||||||| 542ae9b
-        finder_filter = self.filter_factory.create_finder_filter(self.kind, name)
-
-        # TODO: find a more specific type for the Doxygen nodes
-        matches: List[Any] = []
-        finder.filter_(finder_filter, matches)
-=======
         matches: list[filter.FinderMatch] = list(
             filter.compound_finder_filter(name, self.kind, d_index)
         )
->>>>>>> memberdef-in-groups
 
         # It shouldn't be possible to have too many matches as namespaces & groups in their nature
         # are merged together if there are multiple declarations, so we only check for no matches
@@ -194,16 +161,8 @@ class _DoxygenContentBlockDirective(BaseDirective):
             contents_finder = self.create_finder_from_root(
                 cast(FinderRoot, node_stack[0].value), project_info
             )
-<<<<<<< HEAD
-            # TODO: find a more specific type for the Doxygen nodes
-            contents: list[Any] = []
-||||||| 542ae9b
-            # TODO: find a more specific type for the Doxygen nodes
-            contents: List[Any] = []
-=======
 
             contents: list[filter.FinderMatch] = []
->>>>>>> memberdef-in-groups
             contents_finder.filter_(filter_, contents)
 
             # Replaces matches with our new starting points
