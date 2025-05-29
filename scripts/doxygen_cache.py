@@ -1,4 +1,5 @@
 """Run Doxygen on all test samples and save the results."""
+
 from __future__ import annotations
 
 import os

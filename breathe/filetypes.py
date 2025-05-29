@@ -2,6 +2,7 @@
 A module to house the methods for resolving a code-blocks language based on filename
 (and extension).
 """
+
 from __future__ import annotations
 
 import os.path

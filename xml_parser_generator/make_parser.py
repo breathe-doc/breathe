@@ -515,7 +515,9 @@ def resolve_refs(schema: Schema) -> tuple[list[str], list[str]]:
                     child.py_name = name
                 check_py_name(child.py_name)
                 elements.add(name)
-                child.type = check_element_type_defined(f"{typename}.{name}", cast("str", child.type))
+                child.type = check_element_type_defined(
+                    f"{typename}.{name}", cast("str", child.type)
+                )
             for name, attr in t.attributes.items():
                 attr.name = name
                 if not attr.py_name:
@@ -526,7 +528,9 @@ def resolve_refs(schema: Schema) -> tuple[list[str], list[str]]:
             if isinstance(t, ListElement):
                 for name, r in t.content.items():
                     elements.add(name)
-                    t.content[name] = check_element_type_defined(f"{typename}.{name}", cast("str", r))
+                    t.content[name] = check_element_type_defined(
+                        f"{typename}.{name}", cast("str", r)
+                    )
 
     elements.update(schema.roots)
 
@@ -573,7 +577,9 @@ def make_env(schema: Schema) -> jinja2.Environment:
     def field_count(t) -> int:
         if not isinstance(t, ElementType):
             return 0
-        return len(t.attributes) + len(t.children) + sum(cast("int", field_count(b)) for b in t.bases)
+        return (
+            len(t.attributes) + len(t.children) + sum(cast("int", field_count(b)) for b in t.bases)
+        )
 
     for t in schema.types.values():
         # if isinstance(t, SchemaEnum):
@@ -742,62 +748,56 @@ def make_env(schema: Schema) -> jinja2.Environment:
                 'elements having bases that have "attributes" or "children" are not currently supported'
             )
 
-    tmpl_env.tests.update(
-        {
-            "element": (lambda x: isinstance(x, ElementType)),
-            "tagonly_e": (lambda x: isinstance(x, TagOnlyElement)),
-            "list_e": list_type_or_base,
-            "builtin_t": (lambda x: isinstance(x, BuiltinType)),
-            "enumeration_t": (lambda x: isinstance(x, SchemaEnum)),
-            "char_enum_t": (lambda x: isinstance(x, SchemaCharEnum)),
-            "appends_str": (lambda x: isinstance(x, AddsToStringType)),
-            "code_point_t": (lambda x: isinstance(x, CodePointType)),
-            "sp_t": (lambda x: isinstance(x, CodePointType)),
-            "used_directly": used_directly,
-            "allow_text": allow_text,
-            "has_attributes": has_attributes,
-            "has_children": has_children,
-            "has_children_or_content": has_children_or_content,
-            "has_fields": lambda x: field_count(x) > 0,
-            "has_children_or_tuple_content": has_children_or_tuple_content,
-            "needs_finish_fields_call": needs_finish_fields_call,
-            "needs_finish_call": needs_finish_call,
-            "content_bare": content_type(ContentType.bare),
-            "content_tuple": content_type(ContentType.tuple),
-            "content_union": content_type(ContentType.union),
-            "optional": optional,
-            "array_field": array_field,
-        }
-    )
-    tmpl_env.filters.update(
-        {
-            "field_count": field_count,
-            "base_offsets": base_offsets,
-            "children": children,
-            "attributes": get_attributes,
-            "content": content,
-            "error": error,
-            "Once": Once,
-        }
-    )
-    tmpl_env.globals.update(
-        {
-            "types": sorted_types,
-            "root_elements": list(schema.roots.items()),
-            "element_names": elements,
-            "attribute_names": attributes,
-            "py_field_names": py_field_names,
-            # "e_hash": generate_hash(elements),
-            # "a_hash": generate_hash(attributes),
-            # "py_f_hash": generate_hash(py_field_names),
-            "union_tag_names": sorted(tag_names),
-            "char_enum_chars": {c: i for i, c in enumerate(sorted(char_enum_chars))},
-            "list_element_field_counts": list(list_element_field_counts),
-            "tagonly_and_tuple_field_counts": list(tagonly_and_tuple_field_counts),
-            "tuple_field_counts": list(tuple_field_counts),
-            "OtherAttrAction": OtherAttrAction,
-        }
-    )
+    tmpl_env.tests.update({
+        "element": (lambda x: isinstance(x, ElementType)),
+        "tagonly_e": (lambda x: isinstance(x, TagOnlyElement)),
+        "list_e": list_type_or_base,
+        "builtin_t": (lambda x: isinstance(x, BuiltinType)),
+        "enumeration_t": (lambda x: isinstance(x, SchemaEnum)),
+        "char_enum_t": (lambda x: isinstance(x, SchemaCharEnum)),
+        "appends_str": (lambda x: isinstance(x, AddsToStringType)),
+        "code_point_t": (lambda x: isinstance(x, CodePointType)),
+        "sp_t": (lambda x: isinstance(x, CodePointType)),
+        "used_directly": used_directly,
+        "allow_text": allow_text,
+        "has_attributes": has_attributes,
+        "has_children": has_children,
+        "has_children_or_content": has_children_or_content,
+        "has_fields": lambda x: field_count(x) > 0,
+        "has_children_or_tuple_content": has_children_or_tuple_content,
+        "needs_finish_fields_call": needs_finish_fields_call,
+        "needs_finish_call": needs_finish_call,
+        "content_bare": content_type(ContentType.bare),
+        "content_tuple": content_type(ContentType.tuple),
+        "content_union": content_type(ContentType.union),
+        "optional": optional,
+        "array_field": array_field,
+    })
+    tmpl_env.filters.update({
+        "field_count": field_count,
+        "base_offsets": base_offsets,
+        "children": children,
+        "attributes": get_attributes,
+        "content": content,
+        "error": error,
+        "Once": Once,
+    })
+    tmpl_env.globals.update({
+        "types": sorted_types,
+        "root_elements": list(schema.roots.items()),
+        "element_names": elements,
+        "attribute_names": attributes,
+        "py_field_names": py_field_names,
+        # "e_hash": generate_hash(elements),
+        # "a_hash": generate_hash(attributes),
+        # "py_f_hash": generate_hash(py_field_names),
+        "union_tag_names": sorted(tag_names),
+        "char_enum_chars": {c: i for i, c in enumerate(sorted(char_enum_chars))},
+        "list_element_field_counts": list(list_element_field_counts),
+        "tagonly_and_tuple_field_counts": list(tagonly_and_tuple_field_counts),
+        "tuple_field_counts": list(tuple_field_counts),
+        "OtherAttrAction": OtherAttrAction,
+    })
 
     return tmpl_env
 

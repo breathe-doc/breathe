@@ -23,7 +23,7 @@ def node_repr(self: Node) -> str:  # pragma: no cover
     if isinstance(self, list):
         pos = ", ".join(map(repr, self))
         fields.append(f"[{pos}]")
-    fields.extend(f"{field}={getattr(self,field)!r}" for field in cls._fields)
+    fields.extend(f"{field}={getattr(self, field)!r}" for field in cls._fields)
     inner = ", ".join(fields)
     return f"{cls.__name__}({inner})"
 
@@ -75,9 +75,9 @@ class FileIOError(RuntimeError):
 class DoxygenIndex:
     def __init__(self, root: Node_DoxygenTypeIndex):
         self.root = root
-        self.compounds: collections.defaultdict[
-            str, list[Node_CompoundType]
-        ] = collections.defaultdict(list)
+        self.compounds: collections.defaultdict[str, list[Node_CompoundType]] = (
+            collections.defaultdict(list)
+        )
         self.members: collections.defaultdict[
             str, list[tuple[Node_MemberType, Node_CompoundType]]
         ] = collections.defaultdict(list)
@@ -114,7 +114,9 @@ class DoxygenCompound:
                 for m in s.member:
                     if parser and project_info:
                         # Parse the referenced compound (group) XML
-                        group_compound = parser.parse_compound(m.refid.rsplit(sep='_', maxsplit=1)[0], project_info)
+                        group_compound = parser.parse_compound(
+                            m.refid.rsplit(sep="_", maxsplit=1)[0], project_info
+                        )
                         # Get the memberdef from the group compound
                         if m.refid in group_compound.members_by_id:
                             self.members_by_id[m.refid] = group_compound.members_by_id[m.refid]
@@ -180,13 +182,11 @@ class DoxygenParser:
 
 
 @overload
-def tag_name_value(x: TaggedValue[T_covar, U_covar]) -> tuple[T_covar, U_covar]:
-    ...
+def tag_name_value(x: TaggedValue[T_covar, U_covar]) -> tuple[T_covar, U_covar]: ...
 
 
 @overload
-def tag_name_value(x: str) -> tuple[None, str]:
-    ...
+def tag_name_value(x: str) -> tuple[None, str]: ...
 
 
 def tag_name_value(x: TaggedValue[T_covar, U_covar] | str) -> tuple[T_covar | None, U_covar | str]:

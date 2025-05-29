@@ -81,31 +81,28 @@ def xml_stream(infile):
         nonlocal pending_text
 
         if pending_text:
-            pending_events.append(
-                (
-                    XMLEventType.E_TEXT,
-                    XMLTextElement(pending_text, p.CurrentLineNumber, p.CurrentColumnNumber),
-                )
-            )
+            pending_events.append((
+                XMLEventType.E_TEXT,
+                XMLTextElement(pending_text, p.CurrentLineNumber, p.CurrentColumnNumber),
+            ))
             pending_text = ""
 
     def handle_start(name, attr):
         dispatch_text()
 
-        pending_events.append(
-            (
-                XMLEventType.E_START,
-                XMLElement(name, attr, p.CurrentLineNumber, p.CurrentColumnNumber),
-            )
-        )
+        pending_events.append((
+            XMLEventType.E_START,
+            XMLElement(name, attr, p.CurrentLineNumber, p.CurrentColumnNumber),
+        ))
 
     p.StartElementHandler = handle_start
 
     def handle_end(_):
         dispatch_text()
-        pending_events.append(
-            (XMLEventType.E_END, XMLElementEnd(p.CurrentLineNumber, p.CurrentColumnNumber))
-        )
+        pending_events.append((
+            XMLEventType.E_END,
+            XMLElementEnd(p.CurrentLineNumber, p.CurrentColumnNumber),
+        ))
 
     p.EndElementHandler = handle_end
 
@@ -209,14 +206,14 @@ def compare_xml(generated, input_dir, version):
         for o, c in zip(filtered_xml(o_file), filtered_xml(c_file)):
             o_type, o_node = o
             c_type, c_node = c
-            assert (
-                o_type == c_type
-            ), f"at line {o_node.line_no}: found {event_str[o_type]} when expecting {event_str[c_type]}"
+            assert o_type == c_type, (
+                f"at line {o_node.line_no}: found {event_str[o_type]} when expecting {event_str[c_type]}"
+            )
 
             if o_type == XMLEventType.E_START:
-                assert (
-                    o_node.name == c_node.name
-                ), f"wrong tag at line {o_node.line_no}: expected {c_node.name}, found {o_node.name}"
+                assert o_node.name == c_node.name, (
+                    f"wrong tag at line {o_node.line_no}: expected {c_node.name}, found {o_node.name}"
+                )
 
                 # ignore extra attributes in o_node
                 for key, value in c_node.attr.items():
@@ -230,13 +227,13 @@ def compare_xml(generated, input_dir, version):
 
                     assert key in o_node.attr, f"missing attribute at line {o_node.line_no}: {key}"
                     o_value = o_node.attr[key]
-                    assert attr_compare(
-                        key, o_value, value
-                    ), f'wrong value for attribute "{key}" at line {o_node.line_no}: expected "{value}", found "{o_value}"'
+                    assert attr_compare(key, o_value, value), (
+                        f'wrong value for attribute "{key}" at line {o_node.line_no}: expected "{value}", found "{o_value}"'
+                    )
             elif o_type == XMLEventType.E_TEXT:
-                assert (
-                    o_node.value == c_node.value
-                ), f'wrong content at line {o_node.line_no}: expected "{c_node.value}", found "{o_node.value}"'
+                assert o_node.value == c_node.value, (
+                    f'wrong content at line {o_node.line_no}: expected "{c_node.value}", found "{o_node.value}"'
+                )
 
 
 @pytest.fixture(scope="module")

@@ -278,14 +278,12 @@ class DoxygenFunctionDirective(BaseDirective):
             # this part should be kept in sync with visit_function in sphinxrenderer
             name = node.name
             # assume we are only doing this for C++ declarations
-            declaration = " ".join(
-                [
-                    object_renderer.create_template_prefix(node),
-                    "".join(n.astext() for n in object_renderer.render(node.type)),
-                    name,
-                    node.argsstring or "",
-                ]
-            )
+            declaration = " ".join([
+                object_renderer.create_template_prefix(node),
+                "".join(n.astext() for n in object_renderer.render(node.type)),
+                name,
+                node.argsstring or "",
+            ])
         cpp_parser = cpp.DefinitionParser(
             declaration, location=self.get_source_info(), config=self.config
         )

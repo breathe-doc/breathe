@@ -8,7 +8,6 @@ from breathe.renderer.mask import NullMaskFactory
 from breathe.renderer.target import create_target_handler
 
 if TYPE_CHECKING:
-
     import sys
 
     if sys.version_info >= (3, 11):

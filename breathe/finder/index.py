@@ -8,7 +8,6 @@ from breathe.renderer import TaggedNode
 from breathe.renderer.filter import NodeStack
 
 if TYPE_CHECKING:
-
     from breathe.renderer.filter import DoxFilter, FinderMatch
 
 

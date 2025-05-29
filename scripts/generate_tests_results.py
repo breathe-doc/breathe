@@ -10,6 +10,7 @@ are either unimportant for ensuring correctness of Breathe or has a value that
 depends on an unimportant factor, such as the exact version of Sphinx, or the
 directories of input files.
 """
+
 from __future__ import annotations
 
 import os
@@ -31,39 +32,37 @@ C_FILE_SUFFIXES = frozenset((".h", ".c", ".hpp", ".cpp"))
 # if either of these are changed, tests/data/examples/README.rst should be
 # updated
 IGNORED_ELEMENTS = frozenset(())
-IGNORED_ATTRIBUTES = frozenset(
-    (
-        "ids",
-        "names",
-        "no-contents-entry",
-        "no-index",
-        "no-index-entry",
-        "no-typesetting",
-        "nocontentsentry",
-        "noindex",
-        "noindexentry",
-        "is_multiline",
-        "multi_line_parameter_list",
-        "add_permalink",
-        "xml:space",
-        "source",
-        "translation_progress",
-        "options",
-        "original_uri",
-        "_toc_name",
-        "_toc_parts",
-        "xmlns:c",
-        "xmlns:changeset",
-        "xmlns:citation",
-        "xmlns:cpp",
-        "xmlns:index",
-        "xmlns:js",
-        "xmlns:math",
-        "xmlns:py",
-        "xmlns:rst",
-        "xmlns:std",
-    )
-)
+IGNORED_ATTRIBUTES = frozenset((
+    "ids",
+    "names",
+    "no-contents-entry",
+    "no-index",
+    "no-index-entry",
+    "no-typesetting",
+    "nocontentsentry",
+    "noindex",
+    "noindexentry",
+    "is_multiline",
+    "multi_line_parameter_list",
+    "add_permalink",
+    "xml:space",
+    "source",
+    "translation_progress",
+    "options",
+    "original_uri",
+    "_toc_name",
+    "_toc_parts",
+    "xmlns:c",
+    "xmlns:changeset",
+    "xmlns:citation",
+    "xmlns:cpp",
+    "xmlns:index",
+    "xmlns:js",
+    "xmlns:math",
+    "xmlns:py",
+    "xmlns:rst",
+    "xmlns:std",
+))
 
 DEFAULT_CONF = {
     "project": "test",
@@ -194,9 +193,10 @@ def run_sphinx_and_copy_output(tmp_path, input_path, overrides):
 
     # shutil.copyfile(tmp_path / '_build' / 'xml' / 'index.xml', input_path / 'compare_draft.xml')
     # copy index.xml to compare_draft.xml with an extra stylesheet line
-    with open(tmp_path / "_build" / "xml" / "index.xml", encoding="utf-8") as f_in, open(
-        input_path / "compare_draft.xml", "w", encoding="utf-8"
-    ) as f_out:
+    with (
+        open(tmp_path / "_build" / "xml" / "index.xml", encoding="utf-8") as f_in,
+        open(input_path / "compare_draft.xml", "w", encoding="utf-8") as f_out,
+    ):
         itr_in = iter(f_in)
         line = next(itr_in)
         assert line and line.startswith("<?xml ")

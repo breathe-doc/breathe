@@ -9,7 +9,6 @@ from breathe.renderer.mask import NullMaskFactory
 from breathe.renderer.target import create_target_handler
 
 if TYPE_CHECKING:
-
     from docutils.nodes import Node
 
 from typing import TYPE_CHECKING, ClassVar, cast
@@ -171,17 +170,15 @@ class DoxygenEnumValueDirective(_DoxygenBaseItemDirective):
             ev, mdef, sdef, cdef = dc.enumvalue_by_id[m.refid]
 
             TN = TaggedNode
-            matches.append(
-                [
-                    TN("enumvalue", ev),
-                    TN("memberdef", mdef),
-                    TN("sectiondef", sdef),
-                    TN("compounddef", cdef),
-                    TN("doxygen", dc.root),
-                    TN("compound", c),
-                    TN("doxygenindex", index.root),
-                ]
-            )
+            matches.append([
+                TN("enumvalue", ev),
+                TN("memberdef", mdef),
+                TN("sectiondef", sdef),
+                TN("compounddef", cdef),
+                TN("doxygen", dc.root),
+                TN("compound", c),
+                TN("doxygenindex", index.root),
+            ])
 
 
 class DoxygenTypedefDirective(_DoxygenBaseItemDirective):

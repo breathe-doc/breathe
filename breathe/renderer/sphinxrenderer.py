@@ -58,22 +58,19 @@ if TYPE_CHECKING:
 
     class HasRefID(Protocol):
         @property
-        def refid(self) -> str:
-            ...
+        def refid(self) -> str: ...
 
     class HasTemplateParamList(Protocol):
         @property
-        def templateparamlist(self) -> parser.Node_templateparamlistType | None:
-            ...
+        def templateparamlist(self) -> parser.Node_templateparamlistType | None: ...
 
     class HasDescriptions(Protocol):
         @property
-        def briefdescription(self) -> parser.Node_descriptionType | None:
-            ...
+        def briefdescription(self) -> parser.Node_descriptionType | None: ...
 
         @property
-        def detaileddescription(self) -> parser.Node_descriptionType | None:
-            ...
+        def detaileddescription(self) -> parser.Node_descriptionType | None: ...
+
 
 ContentCallback = Callable[[addnodes.desc_content], None]
 Declarator = Union[addnodes.desc_signature, addnodes.desc_signature_line]
@@ -603,7 +600,7 @@ class TaggedNodeHandler(Generic[T_sphinxrenderer, T]):
 
 def node_handler(node: type[parser.NodeOrValue]):
     def inner(
-        f: Callable[[T_sphinxrenderer, T], list[nodes.Node]]
+        f: Callable[[T_sphinxrenderer, T], list[nodes.Node]],
     ) -> Callable[[T_sphinxrenderer, T], list[nodes.Node]]:
         handler: NodeHandler = f if isinstance(f, NodeHandler) else NodeHandler(f)
         handler.nodes.add(node)
@@ -614,7 +611,7 @@ def node_handler(node: type[parser.NodeOrValue]):
 
 def tagged_node_handler(node: type[parser.NodeOrValue]):
     def inner(
-        f: Callable[[T_sphinxrenderer, str, T], list[nodes.Node]]
+        f: Callable[[T_sphinxrenderer, str, T], list[nodes.Node]],
     ) -> Callable[[T_sphinxrenderer, str, T], list[nodes.Node]]:
         handler: TaggedNodeHandler = f if isinstance(f, TaggedNodeHandler) else TaggedNodeHandler(f)
         handler.nodes.add(node)
@@ -1125,18 +1122,16 @@ class SphinxRenderer(metaclass=NodeVisitor):
                 content.append(
                     parser.TaggedValue[Literal["para"], parser.Node_docParaType](
                         "para",
-                        parser.Node_docParaType(
-                            [
-                                parser.TaggedValue[
-                                    Literal["parameterlist"], parser.Node_docParamListType
-                                ](
-                                    "parameterlist",
-                                    parser.Node_docParamListType(
-                                        params, kind=parser.DoxParamListKind.param
-                                    ),
-                                )
-                            ]
-                        ),
+                        parser.Node_docParaType([
+                            parser.TaggedValue[
+                                Literal["parameterlist"], parser.Node_docParamListType
+                            ](
+                                "parameterlist",
+                                parser.Node_docParamListType(
+                                    params, kind=parser.DoxParamListKind.param
+                                ),
+                            )
+                        ]),
                     )
                 )
                 title = None
@@ -2373,14 +2368,12 @@ class SphinxRenderer(metaclass=NodeVisitor):
             if dom == "py":
                 declaration = name + (node.argsstring or "")
             elif dom == "cs":
-                declaration = " ".join(
-                    [
-                        self.create_template_prefix(node),
-                        "".join(n.astext() for n in self.render(node.type)),
-                        name,
-                        node.argsstring or "",
-                    ]
-                )
+                declaration = " ".join([
+                    self.create_template_prefix(node),
+                    "".join(n.astext() for n in self.render(node.type)),
+                    name,
+                    node.argsstring or "",
+                ])
             else:
                 elements = [self.create_template_prefix(node)]
                 if node.static:
@@ -2578,14 +2571,12 @@ class SphinxRenderer(metaclass=NodeVisitor):
             if len(initializer) != 0:
                 options["value"] = initializer
         elif dom == "cs":
-            declaration = " ".join(
-                [
-                    self.create_template_prefix(node),
-                    "".join(n.astext() for n in self.render(node.type)),
-                    name,
-                    node.argsstring or "",
-                ]
-            )
+            declaration = " ".join([
+                self.create_template_prefix(node),
+                "".join(n.astext() for n in self.render(node.type)),
+                name,
+                node.argsstring or "",
+            ])
             if node.gettable or node.settable:
                 declaration += "{"
                 if node.gettable:

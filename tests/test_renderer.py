@@ -89,7 +89,6 @@ class MockMaskFactory:
 
 class MockContext:
     def __init__(self, app, node_stack, domain=None, options=[]):
-
         self.domain = domain
         self.node_stack = node_stack
         self.directive_args = [
@@ -444,17 +443,15 @@ def test_render_define_no_initializer(app):
 
 def test_render_innergroup(app):
     refid = "group__innergroup"
-    mock_compound_parser = MockCompoundParser(
-        {
-            refid: parser.Node_compounddefType(
-                kind=parser.DoxCompoundKind.group,
-                compoundname="InnerGroup",
-                briefdescription=parser.Node_descriptionType(["InnerGroup"]),
-                id="",
-                prot=parser.DoxProtectionKind.public,
-            )
-        }
-    )
+    mock_compound_parser = MockCompoundParser({
+        refid: parser.Node_compounddefType(
+            kind=parser.DoxCompoundKind.group,
+            compoundname="InnerGroup",
+            briefdescription=parser.Node_descriptionType(["InnerGroup"]),
+            id="",
+            prot=parser.DoxProtectionKind.public,
+        )
+    })
     ref = parser.Node_refType(["InnerGroup"], refid=refid)
     compound_def = parser.Node_compounddefType(
         kind=parser.DoxCompoundKind.group,
