@@ -1,4 +1,3 @@
-	both modified:   breathe/directives/setup.py
 	both modified:   breathe/file_state_cache.py
 	both modified:   breathe/filetypes.py
 	both modified:   breathe/finder/__init__.py

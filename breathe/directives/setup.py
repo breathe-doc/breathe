@@ -1,15 +1,5 @@
-<<<<<<< HEAD
-from __future__ import annotations
-
-import subprocess
-from pathlib import Path
-from typing import TYPE_CHECKING
-
-||||||| 542ae9b
-=======
 from pathlib import Path
 
->>>>>>> memberdef-in-groups
 from breathe.directives.class_like import (
     DoxygenClassDirective,
     DoxygenInterfaceDirective,
@@ -32,31 +22,14 @@ from breathe.directives.item import (
     DoxygenUnionDirective,
     DoxygenVariableDirective,
 )
-<<<<<<< HEAD
-from breathe.parser import DoxygenParserFactory
-||||||| 542ae9b
-from breathe.parser import DoxygenParserFactory
-from breathe.project import ProjectInfoFactory
-=======
 from breathe.parser import DoxygenParser
 from breathe.project import ProjectInfoFactory
->>>>>>> memberdef-in-groups
 from breathe.process import AutoDoxygenProcessHandle
 from breathe.project import ProjectInfoFactory
 
-<<<<<<< HEAD
-if TYPE_CHECKING:
-    from sphinx.application import Sphinx
-||||||| 542ae9b
-from sphinx.application import Sphinx
-
-import os
-import subprocess
-=======
 from sphinx.application import Sphinx
 
 import subprocess
->>>>>>> memberdef-in-groups
 
 
 def setup(app: Sphinx) -> None:
@@ -132,14 +105,7 @@ def setup(app: Sphinx) -> None:
         directory.mkdir(parents=True, exist_ok=True)
 
         # Write the file with the provided contents
-<<<<<<< HEAD
-        (directory / filename).write_text(content)
-||||||| 542ae9b
-        with open(os.path.join(directory, filename), "w") as f:
-            f.write(content)
-=======
         (directory / filename).write_text(content, encoding="utf-8")
->>>>>>> memberdef-in-groups
 
     doxygen_handle = AutoDoxygenProcessHandle(
         subprocess.check_call, write_file, project_info_factory
