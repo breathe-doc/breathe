@@ -1,4 +1,3 @@
-	both modified:   breathe/directives/index.py
 	both modified:   breathe/directives/item.py
 	both modified:   breathe/directives/setup.py
 	both modified:   breathe/file_state_cache.py

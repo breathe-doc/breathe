@@ -1,44 +1,13 @@
-<<<<<<< HEAD
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
-
-from docutils.parsers.rst.directives import flag, unchanged_required
-
-||||||| 542ae9b
-=======
-from __future__ import annotations
-
->>>>>>> memberdef-in-groups
 from breathe.directives import BaseDirective
-<<<<<<< HEAD
-from breathe.parser import FileIOError, ParserError
-||||||| 542ae9b
-from breathe.parser import ParserError, FileIOError
-=======
 from breathe import parser
->>>>>>> memberdef-in-groups
 from breathe.project import ProjectError
-<<<<<<< HEAD
-from breathe.renderer import RenderContext, format_parser_error
-||||||| 542ae9b
-from breathe.renderer import format_parser_error, RenderContext
-=======
 from breathe.renderer import format_parser_error, RenderContext, TaggedNode, filter
->>>>>>> memberdef-in-groups
 from breathe.renderer.mask import NullMaskFactory
 from breathe.renderer.sphinxrenderer import SphinxRenderer
 from breathe.renderer.target import create_target_handler
 
-<<<<<<< HEAD
-if TYPE_CHECKING:
-    from docutils.nodes import Node
-||||||| 542ae9b
-from docutils.nodes import Node
-from docutils.parsers.rst.directives import unchanged_required, flag
-
-from typing import List
-=======
 from docutils.nodes import Node
 from docutils.parsers.rst.directives import unchanged_required, flag
 
@@ -46,7 +15,6 @@ from typing import Any, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from collections.abc import Mapping
->>>>>>> memberdef-in-groups
 
 
 class RootDataObject:
