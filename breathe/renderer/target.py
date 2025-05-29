@@ -1,33 +1,13 @@
-<<<<<<< HEAD
 from __future__ import annotations
-
-from typing import TYPE_CHECKING
-||||||| 542ae9b
-from breathe.project import ProjectInfo
-=======
-from __future__ import annotations
->>>>>>> memberdef-in-groups
 
 from docutils import nodes
 
-<<<<<<< HEAD
-if TYPE_CHECKING:
-    from collections.abc import Sequence
-    from typing import Any
-
-    from docutils.nodes import Element
-
-    from breathe.project import ProjectInfo
-||||||| 542ae9b
-from typing import Any, Dict, List, Sequence
-=======
 from typing import Any, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from collections.abc import Mapping, Sequence
     from docutils.nodes import Element
     from breathe.project import ProjectInfo
->>>>>>> memberdef-in-groups
 
 
 class TargetHandler:
@@ -58,13 +38,7 @@ class _NullTargetHandler(TargetHandler):
 
 
 def create_target_handler(
-<<<<<<< HEAD
-    options: dict[str, Any], project_info: ProjectInfo, document: nodes.document
-||||||| 542ae9b
-    options: Dict[str, Any], project_info: ProjectInfo, document: nodes.document
-=======
     options: Mapping[str, Any], project_info: ProjectInfo, document: nodes.document
->>>>>>> memberdef-in-groups
 ) -> TargetHandler:
     if "no-link" in options:
         return _NullTargetHandler()
