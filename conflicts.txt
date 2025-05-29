@@ -1,8 +1,4 @@
-	deleted by us:   mkrelease
 	both modified:   pyproject.toml
-	deleted by us:   scripts/version-check.py
-	deleted by us:   setup.cfg
-	deleted by us:   setup.py
 	both added:      tests/conftest.py
 	both modified:   tests/test_renderer.py
 	both modified:   tests/test_utils.py
