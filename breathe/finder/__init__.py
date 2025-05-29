@@ -1,15 +1,3 @@
-<<<<<<< HEAD
-from __future__ import annotations
-
-from typing import TYPE_CHECKING
-
-if TYPE_CHECKING:
-    from breathe.project import ProjectInfo
-    from breathe.renderer.filter import Filter
-||||||| 542ae9b
-from breathe.project import ProjectInfo
-from breathe.renderer.filter import Filter
-=======
 from __future__ import annotations
 
 from typing import Generic, TYPE_CHECKING, TypeVar
@@ -22,7 +10,6 @@ if TYPE_CHECKING:
     from breathe import parser
 else:
     T_data_object = TypeVar("T_data_object", covariant=True)
->>>>>>> memberdef-in-groups
 
 
 class ItemFinder(Generic[T_data_object]):
