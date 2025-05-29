@@ -1,28 +1,12 @@
-<<<<<<< HEAD
-from __future__ import annotations
-||||||| 542ae9b
-from sphinx.application import Sphinx
-from sphinx.environment import BuildEnvironment
-=======
 from __future__ import annotations
 
-from sphinx.application import Sphinx
-from sphinx.environment import BuildEnvironment
->>>>>>> memberdef-in-groups
-
-import os
-<<<<<<< HEAD
 from pathlib import Path
 from typing import TYPE_CHECKING
+import os
 
 if TYPE_CHECKING:
     from sphinx.application import Sphinx
     from sphinx.environment import BuildEnvironment
-||||||| 542ae9b
-from typing import List, Set
-=======
-from pathlib import Path
->>>>>>> memberdef-in-groups
 
 """
 Store the modified time of the various doxygen xml files against the
@@ -51,33 +35,16 @@ def update(app: Sphinx, source_file: str | os.PathLike[str]) -> None:
     if not hasattr(app.env, "breathe_file_state"):
         app.env.breathe_file_state = {}  # type: ignore[attr-defined]
 
-<<<<<<< HEAD
     norm_source_file = Path(source_file).resolve().as_posix()
     new_mtime = _getmtime(norm_source_file)
-    _mtime, docnames = app.env.breathe_file_state.setdefault(  # type: ignore[attr-defined]
+    mtime, docnames = app.env.breathe_file_state.setdefault(  # type: ignore[attr-defined]
         norm_source_file, (new_mtime, set())
-||||||| 542ae9b
-    new_mtime = _getmtime(source_file)
-    mtime, docnames = app.env.breathe_file_state.setdefault(  # type: ignore
-        source_file, (new_mtime, set())
-=======
-    norm_source_file = Path(source_file).resolve().as_posix()
-    new_mtime = _getmtime(norm_source_file)
-    mtime, docnames = app.env.breathe_file_state.setdefault(  # type: ignore
-        norm_source_file, (new_mtime, set())
->>>>>>> memberdef-in-groups
     )
 
     assert app.env is not None
     docnames.add(app.env.docname)
 
-<<<<<<< HEAD
     app.env.breathe_file_state[norm_source_file] = (new_mtime, docnames)  # type: ignore[attr-defined]
-||||||| 542ae9b
-    app.env.breathe_file_state[source_file] = (new_mtime, docnames)  # type: ignore
-=======
-    app.env.breathe_file_state[norm_source_file] = (new_mtime, docnames)  # type: ignore
->>>>>>> memberdef-in-groups
 
 
 def _get_outdated(
