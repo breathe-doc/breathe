@@ -1,8 +1,3 @@
-	deleted by them: breathe/parser/__init__.py
-	deleted by them: breathe/parser/compound.py
-	deleted by them: breathe/parser/compoundsuper.py
-	deleted by them: breathe/parser/index.py
-	deleted by them: breathe/parser/indexsuper.py
 	both modified:   breathe/path_handler.py
 	both modified:   breathe/process.py
 	both modified:   breathe/project.py
