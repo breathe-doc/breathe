@@ -1,54 +1,10 @@
 from __future__ import annotations
 
-<<<<<<< HEAD
-import os
-from pathlib import Path
-
-import pytest
-||||||| 542ae9b
-=======
 import os
 
 import sphinx.locale
->>>>>>> memberdef-in-groups
 import sphinx.addnodes
 import sphinx.environment
-<<<<<<< HEAD
-from docutils import frontend, nodes, parsers, utils
-
-from breathe.parser.compound import (
-    MixedContainer,
-    compounddefTypeSub,
-    linkedTextTypeSub,
-    memberdefTypeSub,
-    paramTypeSub,
-    refTypeSub,
-)
-from breathe.renderer.filter import OpenFilter
-from breathe.renderer.sphinxrenderer import SphinxRenderer
-||||||| 542ae9b
-from breathe.parser.compound import (
-    compounddefTypeSub,
-    linkedTextTypeSub,
-    memberdefTypeSub,
-    paramTypeSub,
-    refTypeSub,
-    MixedContainer,
-)
-from breathe.renderer.sphinxrenderer import SphinxRenderer
-from breathe.renderer.filter import OpenFilter
-from docutils import frontend, nodes, parsers, utils
-
-from sphinx.testing.fixtures import (
-    test_params,
-    app_params,
-    make_app,
-    shared_result,
-    sphinx_test_tempdir,
-    rootdir,
-)
-from sphinx.testing.path import path
-=======
 from breathe import parser, renderer
 from breathe.renderer.sphinxrenderer import SphinxRenderer
 import docutils.parsers.rst
@@ -59,184 +15,14 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from breathe.renderer import filter
 
->>>>>>> memberdef-in-groups
 
 sphinx.locale.init([], "")
-<<<<<<< HEAD
-
-TESTS_ROOT = Path(__file__).resolve().parent
-
-
-@pytest.fixture
-def app(test_params, app_params, make_app, shared_result):
-    """
-    Based on sphinx.testing.fixtures.app
-    """
-    args, kwargs = app_params
-    assert "srcdir" in kwargs
-    os.makedirs(kwargs["srcdir"], exist_ok=True)
-    (kwargs["srcdir"] / "conf.py").write_text("", encoding="ascii")
-    app_ = make_app(*args, **kwargs)
-    yield app_
-
-    print("# testroot:", kwargs.get("testroot", "root"))
-    print("# builder:", app_.builder.name)
-    print("# srcdir:", app_.srcdir)
-    print("# outdir:", app_.outdir)
-    print("# status:", "\n" + app_._status.getvalue())
-    print("# warning:", "\n" + app_._warning.getvalue())
-
-    if test_params["shared_result"]:
-        shared_result.store(test_params["shared_result"], app_)
-
-
-class WrappedDoxygenNode:
-    """A base class for test wrappers of Doxygen nodes.
-
-    It allows setting all attributes via keyword arguments in the constructor.
-    """
-
-    def __init__(self, cls, *args, **kwargs):
-        if cls:
-            cls.__init__(self, args)
-        for name, value in kwargs.items():
-            if not hasattr(self, name):
-                raise AttributeError("invalid attribute " + name)
-            setattr(self, name, value)
-
-
-class WrappedMixedContainer(MixedContainer, WrappedDoxygenNode):
-    """A test wrapper of Doxygen mixed container."""
-
-    def __init__(self, **kwargs):
-        MixedContainer.__init__(self, None, None, None, None)
-        WrappedDoxygenNode.__init__(self, None, **kwargs)
-
-
-class WrappedLinkedText(linkedTextTypeSub, WrappedDoxygenNode):
-    """A test wrapper of Doxygen linked text."""
-
-    def __init__(self, **kwargs):
-        WrappedDoxygenNode.__init__(self, linkedTextTypeSub, **kwargs)
-
-
-class WrappedMemberDef(memberdefTypeSub, WrappedDoxygenNode):
-    """A test wrapper of Doxygen class/file/namespace member symbol
-    such as a function declaration."""
-
-    def __init__(self, **kwargs):
-        WrappedDoxygenNode.__init__(self, memberdefTypeSub, **kwargs)
-
-
-class WrappedParam(paramTypeSub, WrappedDoxygenNode):
-    """A test wrapper of Doxygen parameter."""
-
-    def __init__(self, **kwargs):
-        WrappedDoxygenNode.__init__(self, paramTypeSub, **kwargs)
-
-
-class WrappedRef(refTypeSub, WrappedDoxygenNode):
-    """A test wrapper of Doxygen ref."""
-
-    def __init__(self, node_name, **kwargs):
-        WrappedDoxygenNode.__init__(self, refTypeSub, node_name, **kwargs)
-
-
-class WrappedCompoundDef(compounddefTypeSub, WrappedDoxygenNode):
-    """A test wrapper of Doxygen compound definition."""
-
-    def __init__(self, **kwargs):
-        WrappedDoxygenNode.__init__(self, compounddefTypeSub, **kwargs)
-||||||| 542ae9b
-
-
-@pytest.fixture(scope="function")
-def app(test_params, app_params, make_app, shared_result):
-    """
-    Based on sphinx.testing.fixtures.app
-    """
-    args, kwargs = app_params
-    assert "srcdir" in kwargs
-    kwargs["srcdir"].makedirs(exist_ok=True)
-    (kwargs["srcdir"] / "conf.py").write_text("")
-    app_ = make_app(*args, **kwargs)
-    yield app_
-
-    print("# testroot:", kwargs.get("testroot", "root"))
-    print("# builder:", app_.builder.name)
-    print("# srcdir:", app_.srcdir)
-    print("# outdir:", app_.outdir)
-    print("# status:", "\n" + app_._status.getvalue())
-    print("# warning:", "\n" + app_._warning.getvalue())
-
-    if test_params["shared_result"]:
-        shared_result.store(test_params["shared_result"], app_)
-
-
-class WrappedDoxygenNode:
-    """
-    A base class for test wrappers of Doxygen nodes. It allows setting all attributes via keyword arguments
-    in the constructor.
-    """
-
-    def __init__(self, cls, *args, **kwargs):
-        if cls:
-            cls.__init__(self, args)
-        for name, value in kwargs.items():
-            if not hasattr(self, name):
-                raise AttributeError("invalid attribute " + name)
-            setattr(self, name, value)
-
-
-class WrappedMixedContainer(MixedContainer, WrappedDoxygenNode):
-    """A test wrapper of Doxygen mixed container."""
-
-    def __init__(self, **kwargs):
-        MixedContainer.__init__(self, None, None, None, None)
-        WrappedDoxygenNode.__init__(self, None, **kwargs)
-
-
-class WrappedLinkedText(linkedTextTypeSub, WrappedDoxygenNode):
-    """A test wrapper of Doxygen linked text."""
-
-    def __init__(self, **kwargs):
-        WrappedDoxygenNode.__init__(self, linkedTextTypeSub, **kwargs)
-
-
-class WrappedMemberDef(memberdefTypeSub, WrappedDoxygenNode):
-    """A test wrapper of Doxygen class/file/namespace member symbol such as a function declaration."""
-
-    def __init__(self, **kwargs):
-        WrappedDoxygenNode.__init__(self, memberdefTypeSub, **kwargs)
-
-
-class WrappedParam(paramTypeSub, WrappedDoxygenNode):
-    """A test wrapper of Doxygen parameter."""
-
-    def __init__(self, **kwargs):
-        WrappedDoxygenNode.__init__(self, paramTypeSub, **kwargs)
-
-
-class WrappedRef(refTypeSub, WrappedDoxygenNode):
-    """A test wrapper of Doxygen ref."""
-
-    def __init__(self, node_name, **kwargs):
-        WrappedDoxygenNode.__init__(self, refTypeSub, node_name, **kwargs)
-
-
-class WrappedCompoundDef(compounddefTypeSub, WrappedDoxygenNode):
-    """A test wrapper of Doxygen compound definition."""
-
-    def __init__(self, **kwargs):
-        WrappedDoxygenNode.__init__(self, compounddefTypeSub, **kwargs)
-=======
 COMMON_ARGS_memberdefType = {
     "id": "",
     "prot": parser.DoxProtectionKind.public,
     "static": False,
     "location": parser.Node_locationType(file="", line=0),
 }
->>>>>>> memberdef-in-groups
 
 
 class MockMemo:
@@ -247,28 +33,13 @@ class MockMemo:
 
 class MockState:
     def __init__(self, app):
-<<<<<<< HEAD
-        from breathe.parser import DoxygenParserFactory
-        from breathe.project import ProjectInfoFactory
-||||||| 542ae9b
-        from breathe.project import ProjectInfoFactory
-        from breathe.parser import DoxygenParserFactory
-=======
         from breathe.project import ProjectInfoFactory
         from breathe.parser import DoxygenParser
->>>>>>> memberdef-in-groups
 
         env = sphinx.environment.BuildEnvironment(app)
         env.setup(app)
         env.temp_data["docname"] = "mock-doc"
         env.temp_data["breathe_project_info_factory"] = ProjectInfoFactory(app)
-<<<<<<< HEAD
-        env.temp_data["breathe_parser_factory"] = DoxygenParserFactory(app)
-        settings = frontend.get_default_settings(parsers.rst.Parser)
-||||||| 542ae9b
-        env.temp_data["breathe_parser_factory"] = DoxygenParserFactory(app)
-        settings = frontend.OptionParser(components=(parsers.rst.Parser,)).get_default_values()
-=======
         env.temp_data["breathe_dox_parser"] = DoxygenParser(app)
         if hasattr(frontend, "get_default_settings"):
             settings = frontend.get_default_settings(docutils.parsers.rst.Parser)
@@ -276,7 +47,6 @@ class MockState:
             settings = frontend.OptionParser(
                 components=(docutils.parsers.rst.Parser,)
             ).get_default_values()
->>>>>>> memberdef-in-groups
         settings.env = env
         self.document = utils.new_document("", settings)
 
@@ -327,13 +97,7 @@ class MockContext:
             None,  # name
             None,  # arguments
             options,  # options
-<<<<<<< HEAD
-            StringList([], items=[]),  # content
-||||||| 542ae9b
-            None,  # content
-=======
             "",  # content
->>>>>>> memberdef-in-groups
             None,  # lineno
             None,  # content_offset
             None,  # block_text
@@ -681,27 +445,6 @@ def test_render_define_no_initializer(app):
 
 def test_render_innergroup(app):
     refid = "group__innergroup"
-<<<<<<< HEAD
-    mock_compound_parser = MockCompoundParser({
-        refid: WrappedCompoundDef(
-            kind="group", compoundname="InnerGroup", briefdescription="InnerGroup"
-        )
-    })
-    ref = WrappedRef("InnerGroup", refid=refid)
-    compound_def = WrappedCompoundDef(
-        kind="group", compoundname="OuterGroup", briefdescription="OuterGroup", innergroup=[ref]
-||||||| 542ae9b
-    mock_compound_parser = MockCompoundParser(
-        {
-            refid: WrappedCompoundDef(
-                kind="group", compoundname="InnerGroup", briefdescription="InnerGroup"
-            )
-        }
-    )
-    ref = WrappedRef("InnerGroup", refid=refid)
-    compound_def = WrappedCompoundDef(
-        kind="group", compoundname="OuterGroup", briefdescription="OuterGroup", innergroup=[ref]
-=======
     mock_compound_parser = MockCompoundParser(
         {
             refid: parser.Node_compounddefType(
@@ -721,7 +464,6 @@ def test_render_innergroup(app):
         innergroup=[ref],
         id="",
         prot=parser.DoxProtectionKind.public,
->>>>>>> memberdef-in-groups
     )
     assert all(
         el.astext() != "InnerGroup"
@@ -760,33 +502,11 @@ def get_directive(app):
     return DoxygenFunctionDirective(*cls_args)
 
 
-<<<<<<< HEAD
-def get_matches(datafile):
-    from xml.dom import minidom
-
-    from breathe.parser.compoundsuper import sectiondefType
-
-||||||| 542ae9b
-def get_matches(datafile):
-    from breathe.parser.compoundsuper import sectiondefType
-    from xml.dom import minidom
-
-=======
 def get_matches(datafile) -> tuple[list[str], list[filter.FinderMatch]]:
->>>>>>> memberdef-in-groups
     argsstrings = []
-<<<<<<< HEAD
-    xml = TESTS_ROOT.joinpath("data", datafile).read_text(encoding="utf-8")
-    doc = minidom.parseString(xml)
-||||||| 542ae9b
-    with open(os.path.join(os.path.dirname(__file__), "data", datafile)) as fid:
-        xml = fid.read()
-    doc = minidom.parseString(xml)
-=======
     with open(os.path.join(os.path.dirname(__file__), "data", datafile), "rb") as fid:
         doc = parser.parse_file(fid)
     assert isinstance(doc.value, parser.Node_DoxygenType)
->>>>>>> memberdef-in-groups
 
     sectiondef = doc.value.compounddef[0].sectiondef[0]
     for child in sectiondef.memberdef:
