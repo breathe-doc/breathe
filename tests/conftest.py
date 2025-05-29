@@ -1,9 +1,5 @@
-<<<<<<< HEAD
 from __future__ import annotations
 
-pytest_plugins = ["sphinx.testing.fixtures"]
-||||||| 542ae9b
-=======
 import pathlib
 import pytest
 from sphinx.testing.fixtures import (
@@ -37,4 +33,3 @@ def app(test_params, app_params, make_app, shared_result):
 
     if test_params["shared_result"]:
         shared_result.store(test_params["shared_result"], app_)
->>>>>>> memberdef-in-groups

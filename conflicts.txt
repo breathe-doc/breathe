@@ -1,4 +1,3 @@
-	both added:      tests/conftest.py
 	both modified:   tests/test_renderer.py
 	both modified:   tests/test_utils.py
 	both modified:   tests/warnings/source/conf.p
