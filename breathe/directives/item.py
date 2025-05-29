@@ -1,25 +1,8 @@
-<<<<<<< HEAD
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
-
-from docutils.parsers.rst.directives import flag, unchanged_required
-
-||||||| 542ae9b
-=======
-from __future__ import annotations
-
->>>>>>> memberdef-in-groups
 from breathe.directives import BaseDirective
 from breathe.file_state_cache import MTimeError
-<<<<<<< HEAD
-from breathe.project import ProjectError
-||||||| 542ae9b
-from breathe.project import ProjectError
-from breathe.renderer.filter import Filter
-=======
 from breathe.project import ProjectError, ProjectInfo
->>>>>>> memberdef-in-groups
 from breathe.renderer.mask import NullMaskFactory
 from breathe.renderer.target import create_target_handler
 from breathe.renderer import filter
@@ -31,11 +14,6 @@ if TYPE_CHECKING:
 
     from docutils.nodes import Node
 
-<<<<<<< HEAD
-    from breathe.renderer.filter import Filter
-||||||| 542ae9b
-from typing import Any, List
-=======
 from typing import cast, ClassVar, TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -79,7 +57,6 @@ def enumvalue_finder_filter(
             TN("compound", c),
             TN("doxygenindex", index.root),
         ]
->>>>>>> memberdef-in-groups
 
 
 class _DoxygenBaseItemDirective(BaseDirective):
@@ -111,24 +88,10 @@ class _DoxygenBaseItemDirective(BaseDirective):
             )
         )
 
-<<<<<<< HEAD
-    def run(self) -> list[Node]:
-        try:
-            namespace, name = self.arguments[0].rsplit("::", 1)
-        except ValueError:
-            namespace, name = "", self.arguments[0]
-||||||| 542ae9b
-    def run(self) -> List[Node]:
-        try:
-            namespace, name = self.arguments[0].rsplit("::", 1)
-        except ValueError:
-            namespace, name = "", self.arguments[0]
-=======
     def run(self) -> list[Node]:
         options = cast(DoxBaseItemOptions, self.options)
 
         namespace, _, name = self.arguments[0].rpartition("::")
->>>>>>> memberdef-in-groups
 
         try:
             project_info = self.project_info_factory.create_project_info(options)
@@ -142,22 +105,8 @@ class _DoxygenBaseItemDirective(BaseDirective):
             warning = self.create_warning(None, kind=self.kind)
             return warning.warn("doxygen{kind}: %s" % e)
 
-<<<<<<< HEAD
-        finder_filter = self.create_finder_filter(namespace, name)
-
-        # TODO: find a more specific type for the Doxygen nodes
-        matches: list[Any] = []
-        finder.filter_(finder_filter, matches)
-||||||| 542ae9b
-        finder_filter = self.create_finder_filter(namespace, name)
-
-        # TODO: find a more specific type for the Doxygen nodes
-        matches: List[Any] = []
-        finder.filter_(finder_filter, matches)
-=======
         matches: list[filter.FinderMatch] = []
         self.finder_filter(namespace, name, project_info, d_index, matches)
->>>>>>> memberdef-in-groups
 
         if len(matches) == 0:
             display_name = "%s::%s" % (namespace, name) if namespace else name
