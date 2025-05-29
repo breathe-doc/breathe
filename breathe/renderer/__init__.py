@@ -1,15 +1,8 @@
-<<<<<<< HEAD
-from __future__ import annotations
-
-||||||| 542ae9b
-from docutils import nodes
-=======
 from __future__ import annotations
 
 from docutils import nodes
->>>>>>> memberdef-in-groups
-import textwrap
 from typing import Generic, NamedTuple, TYPE_CHECKING, TypeVar, Union
+import textwrap
 
 if TYPE_CHECKING:
     from breathe import parser
@@ -20,8 +13,6 @@ if TYPE_CHECKING:
     T_data_object = TypeVar("T_data_object", bound=DataObject, covariant=True)
 else:
     T_data_object = TypeVar("T_data_object", covariant=True)
-
-from docutils import nodes
 
 
 def format_parser_error(
@@ -86,15 +77,9 @@ class RenderContext:
         self.domain = domain
         self.child = child
 
-<<<<<<< HEAD
-    def create_child_context(self, data_object) -> RenderContext:
-||||||| 542ae9b
-    def create_child_context(self, data_object) -> "RenderContext":
-=======
     def create_child_context(
         self, data_object: parser.NodeOrValue, tag: str | None = None
     ) -> RenderContext:
->>>>>>> memberdef-in-groups
         node_stack = self.node_stack[:]
         node_stack.insert(0, TaggedNode(tag, self.mask_factory.mask(data_object)))
         return RenderContext(node_stack, self.mask_factory, self.directive_args, self.domain, True)
