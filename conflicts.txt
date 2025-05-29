@@ -1,4 +1,3 @@
-	both modified:   Makefile
 	both modified:   README.rst
 	both modified:   breathe-apidoc.py
 	both modified:   breathe/__init__.py

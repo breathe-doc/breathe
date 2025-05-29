@@ -49,17 +49,5 @@ ruff:
 	ruff format
 
 .PHONY: type-check
-<<<<<<< HEAD
-type-check:
-	mypy
-||||||| 542ae9b
-type-check:
-	mypy --warn-redundant-casts --warn-unused-ignores breathe tests
-
-.PHONY: version-check
-version-check:
-	 PYTHONPATH=../:$(PYTHONPATH) python3 scripts/version-check.py
-=======
 type-check: $(GENERATED_MOD)
 	mypy --warn-redundant-casts --warn-unused-ignores breathe tests
->>>>>>> memberdef-in-groups
