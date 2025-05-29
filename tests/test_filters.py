@@ -131,7 +131,7 @@ def test_specific_class_members(app, members):
 #     filter_ = filter.create_file_filter(
 #         app, "sample.hpp", DEFAULT_OPTS, init_valid_names=("Sample", "Sample::Inner")
 #     )
-#     assert filter_(filter.NodeStack([TaggedNode("innerclass", ref_outer), TaggedNode(None, compounddef)]))
+#     assert filter_(filter.NodeStack([TaggedNode("innerclass", ref_outer), TaggedNode(None, compounddef)]))  # noqa: E501
 #     assert not filter_(
 #         filter.NodeStack([TaggedNode("innerclass", ref_inner), TaggedNode(None, compounddef)])
 #     )

@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Callable, Union
+from typing import TYPE_CHECKING
 
 from breathe import parser
 from breathe.finder import compound as compoundfinder
@@ -8,6 +8,8 @@ from breathe.finder import index as indexfinder
 from breathe.renderer import TaggedNode
 
 if TYPE_CHECKING:
+    from typing import Callable, Union
+
     from sphinx.application import Sphinx
 
     from breathe.finder import ItemFinder

@@ -2,8 +2,7 @@ from __future__ import annotations
 
 import subprocess
 from pathlib import Path
-
-from sphinx.application import Sphinx
+from typing import TYPE_CHECKING
 
 from breathe.directives.class_like import (
     DoxygenClassDirective,
@@ -30,6 +29,9 @@ from breathe.directives.item import (
 from breathe.parser import DoxygenParser
 from breathe.process import AutoDoxygenProcessHandle
 from breathe.project import ProjectInfoFactory
+
+if TYPE_CHECKING:
+    from sphinx.application import Sphinx
 
 
 def setup(app: Sphinx) -> None:

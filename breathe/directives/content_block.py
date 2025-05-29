@@ -1,6 +1,8 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, ClassVar, Literal, cast
+from typing import TYPE_CHECKING, cast
+
+from docutils.parsers.rst.directives import flag, unchanged_required
 
 from breathe import parser
 from breathe.directives import BaseDirective
@@ -15,9 +17,11 @@ if TYPE_CHECKING:
     import sys
 
     if sys.version_info >= (3, 11):
-        from typing import NotRequired, TypedDict
+        from typing import ClassVar, Literal, NotRequired, TypedDict
     else:
         from typing_extensions import NotRequired, TypedDict
+
+    from docutils.nodes import Node
     from sphinx.application import Sphinx
 
     from breathe.finder.factory import FinderRoot

@@ -1,25 +1,28 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING, cast
+
+from docutils.parsers.rst.directives import flag, unchanged_required
+
 from breathe import parser
 from breathe.directives import BaseDirective
 from breathe.file_state_cache import MTimeError
-from breathe.project import ProjectError, ProjectInfo
+from breathe.project import ProjectError
 from breathe.renderer import TaggedNode, filter
 from breathe.renderer.mask import NullMaskFactory
 from breathe.renderer.target import create_target_handler
 
 if TYPE_CHECKING:
-    from docutils.nodes import Node
-
-from typing import TYPE_CHECKING, ClassVar, cast
-
-if TYPE_CHECKING:
     import sys
 
+    from docutils.nodes import Node
+
     if sys.version_info >= (3, 11):
-        from typing import NotRequired, TypedDict
+        from typing import ClassVar, NotRequired, TypedDict
     else:
         from typing_extensions import NotRequired, TypedDict
+
+    from breathe.project import ProjectInfo
 
     DoxBaseItemOptions = TypedDict(
         "DoxBaseItemOptions",

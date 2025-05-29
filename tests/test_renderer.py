@@ -499,15 +499,12 @@ def get_directive(app):
 
 
 def get_matches(datafile) -> tuple[list[str], list[filter.FinderMatch]]:
-    argsstrings = []
     with open(os.path.join(os.path.dirname(__file__), "data", datafile), "rb") as fid:
         doc = parser.parse_file(fid)
     assert isinstance(doc.value, parser.Node_DoxygenType)
 
     sectiondef = doc.value.compounddef[0].sectiondef[0]
-    for child in sectiondef.memberdef:
-        if child.argsstring:
-            argsstrings.append(child.argsstring)
+    argsstrings = [child.argsstring for child in sectiondef.memberdef if child.argsstring]
     matches = [
         [renderer.TaggedNode(None, m), renderer.TaggedNode(None, sectiondef)]
         for m in sectiondef.memberdef

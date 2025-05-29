@@ -1,21 +1,21 @@
 from __future__ import annotations
 
 import os.path
-from typing import TYPE_CHECKING, Any, ClassVar
+from typing import TYPE_CHECKING
 
 from docutils.parsers.rst.directives import flag, unchanged_required
 
 from breathe import parser, path_handler, project, renderer
 from breathe.cpp_util import split_name
+from breathe.directives import BaseDirective
 from breathe.renderer import filter
+from breathe.renderer.mask import NullMaskFactory
 from breathe.renderer.sphinxrenderer import SphinxRenderer
 from breathe.renderer.target import create_target_handler
 
-from ..directives import BaseDirective
-from ..renderer.mask import NullMaskFactory
-
 if TYPE_CHECKING:
     from collections.abc import Iterable, Mapping
+    from typing import Any, ClassVar
 
     from docutils.nodes import Node
 

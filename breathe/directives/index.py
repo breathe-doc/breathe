@@ -1,8 +1,7 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING
 
-from docutils.nodes import Node
 from docutils.parsers.rst.directives import flag, unchanged_required
 
 from breathe import parser
@@ -15,6 +14,9 @@ from breathe.renderer.target import create_target_handler
 
 if TYPE_CHECKING:
     from collections.abc import Mapping
+    from typing import Any
+
+    from docutils.nodes import Node
 
 
 class RootDataObject:

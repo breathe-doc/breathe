@@ -1,18 +1,19 @@
-# flake8: noqa
+# ruff: noqa: F403, F405, PGH003, UP024
 
 from __future__ import annotations
 
-import reprlib
 import collections
+import reprlib
+from typing import TYPE_CHECKING, NamedTuple, overload
+
 from breathe import file_state_cache, path_handler
-from breathe.project import ProjectInfo
 from breathe._parser import *
 
-from sphinx.application import Sphinx
-
-from typing import overload, NamedTuple, TYPE_CHECKING
-
 if TYPE_CHECKING:
+    from sphinx.application import Sphinx
+
+    from breathe.project import ProjectInfo
+
     NodeOrValue = Node | str | None
 
 

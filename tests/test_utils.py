@@ -58,13 +58,13 @@ class TestUtils(TestCase):
 
         memberdef = doc.value.compounddef[0].sectiondef[0].memberdef[0]
 
-        self.assertEqual(get_param_decl(memberdef.param[0]), "int a")
-        self.assertEqual(get_param_decl(memberdef.param[1]), "float b")
-        self.assertEqual(get_param_decl(memberdef.param[2]), "int * c")
-        self.assertEqual(get_param_decl(memberdef.param[3]), "int(**p)[3]")
-        self.assertEqual(get_param_decl(memberdef.param[4]), "MyClass a")
-        self.assertEqual(get_param_decl(memberdef.param[5]), "MyClass  * b")
-        self.assertEqual(get_param_decl(memberdef.param[6]), "int(&r)[3]")
+        assert get_param_decl(memberdef.param[0]) == "int a"
+        assert get_param_decl(memberdef.param[1]) == "float b"
+        assert get_param_decl(memberdef.param[2]) == "int * c"
+        assert get_param_decl(memberdef.param[3]) == "int(**p)[3]"
+        assert get_param_decl(memberdef.param[4]) == "MyClass a"
+        assert get_param_decl(memberdef.param[5]) == "MyClass  * b"
+        assert get_param_decl(memberdef.param[6]) == "int(&r)[3]"
 
     def test_definition_without_template_args(self):
         def get_definition(definition, name, bitfield=""):
@@ -76,14 +76,14 @@ class TestUtils(TestCase):
 
             return get_definition_without_template_args(MockDataObject(definition, name, bitfield))
 
-        self.assertEqual("void A::foo", get_definition("void A<T>::foo", "foo"))
+        assert "void A::foo" == get_definition("void A<T>::foo", "foo")
         # Template arguments in the return type should be preserved:
-        self.assertEqual("Result<T> A::f", get_definition("Result<T> A::f", "f"))
+        assert "Result<T> A::f" == get_definition("Result<T> A::f", "f")
         # Nested template arguments:
-        self.assertEqual("Result<T> A::f", get_definition("Result<T> A< B<C> >::f", "f"))
+        assert "Result<T> A::f" == get_definition("Result<T> A< B<C> >::f", "f")
 
         # Bit fields
-        self.assertEqual("int f : 3", get_definition("int f", "f", "3"))
+        assert "int f : 3" == get_definition("int f", "f", "3")
 
 
 def test_definition_without_template_args():

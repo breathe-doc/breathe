@@ -10,12 +10,14 @@ import functools
 import json
 import keyword
 import re
-from typing import TYPE_CHECKING, Any, Callable, Literal, NamedTuple, NoReturn, TypeVar, cast
+from pathlib import Path
+from typing import TYPE_CHECKING, NamedTuple, TypeVar, cast
 
 import jinja2
 
 if TYPE_CHECKING:
     from collections.abc import Iterable, Sequence
+    from typing import Any, Callable, Literal, NoReturn
 
 T = TypeVar("T")
 
@@ -49,16 +51,16 @@ class ContentType(enum.Enum):
 
     bare = enum.auto()
     """Child values are added directly to the array.
-    
+
     There can only be one child type, which can be an element or text.
     """
 
     tuple = enum.auto()
     """Child elements are grouped into named tuple-like objects.
-    
+
     Each batch of child elements must appear in order in the XML document. Text
     content is not allowed.
-    
+
     Currently, tuple child element names must be valid Python identifiers as
     there isn't a way to have different field names.
     """
@@ -77,7 +79,7 @@ class TypeRef:
 
     py_name: str
     """The Python field name that will hold the parsed value.
-    
+
     This will be different from "name" if "name" is not a valid Python
     identifier.
     """
@@ -93,7 +95,7 @@ class TypeRef:
 
     min_items: Literal[0] | Literal[1]
     """If this is zero, the element is optional.
-    
+
     This can only be zero or one.
     """
 
@@ -135,7 +137,7 @@ class Attribute:
 
     py_name: str
     """The Python field name that will hold the parsed value.
-    
+
     This will be different from "name" if "name" is not a valid Python
     identifier.
     """
@@ -148,7 +150,7 @@ class Attribute:
 
     optional: bool
     """Whether the attribute may be omitted.
-    
+
     Fields corresponding to omitted attributes are set to None.
     """
 
@@ -506,7 +508,8 @@ def resolve_refs(schema: Schema) -> tuple[list[str], list[str]]:
                         raise ValueError("non-list elements cannot use list elements as bases")
                     if b_type.content_type != t.content_type:
                         raise ValueError(
-                            "list elements of one type cannot use list elements of another type as bases"
+                            "list elements of one type cannot use list elements "
+                            "of another type as bases"
                         )
                 t.bases[i] = b_type
             for name, child in t.children.items():
@@ -745,7 +748,8 @@ def make_env(schema: Schema) -> jinja2.Environment:
         if isinstance(t, ElementType) and any(field_count(cast("ElementType", b)) for b in t.bases):
             # the code was written to support this but it has never been tested
             raise ValueError(
-                'elements having bases that have "attributes" or "children" are not currently supported'
+                'elements having bases that have "attributes" or "children"'
+                " are not currently supported"
             )
 
     tmpl_env.tests.update({
@@ -985,7 +989,8 @@ def check_type(x, context: str) -> SchemaType:
         return make_char_enumeration(x, context)
 
     raise ValueError(
-        f'"{context}.kind" must be "tag_only_element", "list_element", "mixed_element" or "enumeration"'
+        f'"{context}.kind" must be "tag_only_element", "list_element", '
+        '"mixed_element" or "enumeration"'
     )
 
 
@@ -1012,7 +1017,6 @@ def generate_from_json(json_path, template_files) -> None:
     env = make_env(schema)
 
     for i_file, o_file in template_files:
-        with open(i_file, encoding="utf-8") as tfile:
-            template_str = tfile.read()
+        template_str = Path(i_file).read_text(encoding="utf-8")
         with open(o_file, "w", encoding="utf-8") as ofile:
             env.from_string(template_str).stream().dump(ofile)

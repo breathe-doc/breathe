@@ -12,6 +12,7 @@ from breathe.renderer.sphinxrenderer import SphinxRenderer
 
 if TYPE_CHECKING:
     from collections.abc import Sequence
+    from typing import Any
 
     from sphinx.application import Sphinx
 

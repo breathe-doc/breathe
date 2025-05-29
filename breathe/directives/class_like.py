@@ -1,5 +1,9 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING, cast
+
+from docutils.parsers.rst.directives import flag, unchanged, unchanged_required
+
 from breathe.directives import BaseDirective
 from breathe.file_state_cache import MTimeError
 from breathe.project import ProjectError
@@ -11,7 +15,7 @@ if TYPE_CHECKING:
     import sys
 
     if sys.version_info >= (3, 11):
-        from typing import NotRequired, TypedDict
+        from typing import ClassVar, NotRequired, TypedDict
     else:
         from typing_extensions import NotRequired, TypedDict
     from docutils.nodes import Node
@@ -61,7 +65,7 @@ class _DoxygenClassLikeDirective(BaseDirective):
 
     def run(self) -> list[Node]:
         name = self.arguments[0]
-        options = cast(DoxClassOptions, self.options)
+        options = cast("DoxClassOptions", self.options)
 
         try:
             project_info = self.project_info_factory.create_project_info(options)

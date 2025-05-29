@@ -20,9 +20,12 @@ matching.
 
 from __future__ import annotations
 
-from typing import Callable
+from typing import TYPE_CHECKING
 
 from breathe import parser
+
+if TYPE_CHECKING:
+    from typing import Callable
 
 
 def no_parameter_names(node: parser.NodeOrValue) -> parser.Node_paramType:

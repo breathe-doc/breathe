@@ -45,18 +45,18 @@ allows all other non-Node_memberdefType nodes to pass through as you don't want 
 
 from __future__ import annotations
 
-from collections.abc import Container, Iterable, Mapping
-from typing import TYPE_CHECKING, Any, Callable, SupportsIndex, TypeVar
-
-from sphinx.application import Sphinx
+from typing import TYPE_CHECKING
 
 from breathe import parser, renderer
 
 if TYPE_CHECKING:
     import sys
+    from collections.abc import Container, Iterable, Mapping
+
+    from sphinx.application import Sphinx
 
     if sys.version_info >= (3, 11):
-        from typing import TypeAlias
+        from typing import Any, Callable, SupportsIndex, TypeAlias, TypeVar
     else:
         from typing_extensions import TypeAlias
 
@@ -261,7 +261,7 @@ def create_innerclass_filter(options: DoxNamespaceOptions, outerclass: str = "")
             prefix = ("%s::" % outerclass) if outerclass else ""
 
             # Matches sphinx-autodoc behaviour of comma separated values
-            members = set(["%s%s" % (prefix, x.strip()) for x in members_str.split(",")])
+            members = {"%s%s" % (prefix, x.strip()) for x in members_str.split(",")}
         else:
             allowed.add(parser.DoxProtectionKind.public)
 

@@ -8,19 +8,12 @@ from typing import TYPE_CHECKING
 
 from breathe.exception import BreatheError
 
-from .exception import BreatheError
-
 if TYPE_CHECKING:
-    import sys
-
     from sphinx.application import Sphinx
 
-    if sys.version_info >= (3, 11):
-        from typing import TypedDict
-    else:
-        from typing_extensions import TypedDict
-
-    ProjectOptions = TypedDict("ProjectOptions", {"path": str, "project": str})
+    class ProjectOptions:
+        path: str
+        project: str
 
 
 class ProjectError(BreatheError):

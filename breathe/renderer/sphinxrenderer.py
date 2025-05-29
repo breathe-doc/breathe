@@ -3,17 +3,12 @@ from __future__ import annotations
 import re
 import textwrap
 from collections import defaultdict
-from collections.abc import Iterable, Sequence
 from pathlib import Path
 from typing import (
     TYPE_CHECKING,
-    Any,
     Callable,
-    ClassVar,
     Generic,
     Literal,
-    Protocol,
-    Type,
     TypeVar,
     Union,
     cast,
@@ -48,6 +43,13 @@ except ImportError:
 T = TypeVar("T")
 
 if TYPE_CHECKING:
+    from collections.abc import Iterable, Sequence
+    from typing import (
+        Any,
+        ClassVar,
+        Protocol,
+    )
+
     from sphinx.application import Sphinx
     from sphinx.directives import ObjectDescription
 
@@ -275,7 +277,7 @@ if cs is not None or TYPE_CHECKING:
 
 class DomainDirectiveFactory:
     # A mapping from node kinds to domain directives and their names.
-    cpp_classes: dict[str, tuple[Type[ObjectDescription], str]] = {
+    cpp_classes: dict[str, tuple[type[ObjectDescription], str]] = {
         "variable": (CPPMemberObject, "var"),
         "class": (CPPClassObject, "class"),
         "struct": (CPPClassObject, "struct"),
@@ -294,7 +296,7 @@ class DomainDirectiveFactory:
         "enumvalue": (CPPEnumeratorObject, "enumerator"),
         "define": (CMacroObject, "macro"),
     }
-    c_classes: dict[str, tuple[Type[ObjectDescription], str]] = {
+    c_classes: dict[str, tuple[type[ObjectDescription], str]] = {
         "variable": (CMemberObject, "var"),
         "function": (CFunctionObject, "function"),
         "define": (CMacroObject, "macro"),
@@ -304,7 +306,7 @@ class DomainDirectiveFactory:
         "enumvalue": (CEnumeratorObject, "enumerator"),
         "typedef": (CTypeObject, "type"),
     }
-    python_classes: dict[str, tuple[Type[ObjectDescription], str]] = {
+    python_classes: dict[str, tuple[type[ObjectDescription], str]] = {
         # TODO: PyFunction is meant for module-level functions
         #       and PyAttribute is meant for class attributes, not module-level variables.
         #       Somehow there should be made a distinction at some point to get the correct
@@ -315,7 +317,7 @@ class DomainDirectiveFactory:
         "namespace": (PyClasslike, "class"),
     }
 
-    php_classes: dict[str, tuple[Type[ObjectDescription], str]]
+    php_classes: dict[str, tuple[type[ObjectDescription], str]]
     if php is not None:
         php_classes = {
             "function": (PHPNamespaceLevel, "function"),
@@ -326,7 +328,7 @@ class DomainDirectiveFactory:
         }
         php_classes_default = php_classes["class"]  # Directive when no matching ones were found
 
-    cs_classes: dict[str, tuple[Type[ObjectDescription], str]]
+    cs_classes: dict[str, tuple[type[ObjectDescription], str]]
     if cs is not None:
         cs_classes = {
             # 'doxygen-name': (CSharp class, key in CSharpDomain.object_types)
@@ -348,7 +350,7 @@ class DomainDirectiveFactory:
 
     @staticmethod
     def create(domain: str, args) -> ObjectDescription:
-        cls: Type[ObjectDescription]
+        cls: type[ObjectDescription]
         name: str
         if domain == "c":
             cls, name = DomainDirectiveFactory.c_classes[args[0]]
@@ -536,18 +538,18 @@ def get_content(node: parser.Node_docParaType):
 
 
 def get_parameterlists(node: parser.Node_docParaType) -> Iterable[parser.Node_docParamListType]:
-    pairs = map(parser.tag_name_value, node)  # type: ignore
-    return (value for name, value in pairs if name == "parameterlist")  # type: ignore
+    pairs = map(parser.tag_name_value, node)
+    return (value for name, value in pairs if name == "parameterlist")
 
 
 def get_simplesects(node: parser.Node_docParaType) -> Iterable[parser.Node_docSimpleSectType]:
-    pairs = map(parser.tag_name_value, node)  # type: ignore
-    return (value for name, value in pairs if name == "simplesect")  # type: ignore
+    pairs = map(parser.tag_name_value, node)
+    return (value for name, value in pairs if name == "simplesect")
 
 
 def get_images(node: parser.Node_docParaType) -> Iterable[parser.Node_docImageType]:
-    pairs = map(parser.tag_name_value, node)  # type: ignore
-    return (value for name, value in pairs if name == "image")  # type: ignore
+    pairs = map(parser.tag_name_value, node)
+    return (value for name, value in pairs if name == "image")
 
 
 def namespace_strip(config, nodes_: list[nodes.Node]):
@@ -953,9 +955,7 @@ class SphinxRenderer(metaclass=NodeVisitor):
         names: list[str] = []
         for node in self.qualification_stack[1:]:
             if config.breathe_debug_trace_qualification:
-                print(
-                    "{}{}".format(_debug_indent * "  ", debug_print_node(node))  # pyright: ignore
-                )
+                print("{}{}".format(_debug_indent * "  ", debug_print_node(node)))
             if isinstance(node, parser.Node_refType) and len(names) == 0:
                 if config.breathe_debug_trace_qualification:
                     print("{}{}".format(_debug_indent * "  ", "res="))
@@ -1103,19 +1103,18 @@ class SphinxRenderer(metaclass=NodeVisitor):
         brief = self.render_optional(node.briefdescription)
         descr = node.detaileddescription
         if isinstance(node, parser.Node_memberdefType):
-            params = []
-            for p in node.param:
-                if p.briefdescription:
-                    params.append(
-                        parser.Node_docParamListItem(
-                            parameterdescription=p.briefdescription,
-                            parameternamelist=[
-                                parser.Node_docParamNameList(
-                                    parametername=[parser.Node_docParamName([p.declname or ""])]
-                                )
-                            ],
+            params = [
+                parser.Node_docParamListItem(
+                    parameterdescription=p.briefdescription,
+                    parameternamelist=[
+                        parser.Node_docParamNameList(
+                            parametername=[parser.Node_docParamName([p.declname or ""])]
                         )
-                    )
+                    ],
+                )
+                for p in node.param
+                if p.briefdescription
+            ]
 
             if params:
                 content: list[parser.ListItem_descriptionType] = []
@@ -1166,7 +1165,7 @@ class SphinxRenderer(metaclass=NodeVisitor):
                     para.replace_self(para.children)
 
             # and remove empty top-level paragraphs
-            if isinstance(candNode, nodes.paragraph) and len(candNode) == 0:  # pyright: ignore
+            if isinstance(candNode, nodes.paragraph) and len(candNode) == 0:
                 continue
             detailed.append(candNode)
 
@@ -1296,7 +1295,7 @@ class SphinxRenderer(metaclass=NodeVisitor):
             # strip out any template arguments before splitting on '::', to
             # avoid errors if a template specialization has qualified arguments
             # (see examples/specific/cpp_ns_template_specialization)
-            cleaned_name, sep, rest = nodeDef.compoundname.partition("<")
+            cleaned_name, _sep, _rest = nodeDef.compoundname.partition("<")
             cname = split_name(cleaned_name)
             if self.nesting_level == 0:
                 names.extend(cname)
@@ -1534,7 +1533,7 @@ class SphinxRenderer(metaclass=NodeVisitor):
 
             rst_node.document = self.state.document
             rst_node["objtype"] = kind.value
-            rst_node["domain"] = self.get_domain() if self.get_domain() else "cpp"
+            rst_node["domain"] = self.get_domain() or "cpp"
 
             contentnode = addnodes.desc_content()
             rst_node.append(contentnode)
@@ -1901,7 +1900,7 @@ class SphinxRenderer(metaclass=NodeVisitor):
     @tagged_node_handler(parser.Node_docMarkupType)
     def visit_docmarkup(self, tag: str, node: parser.Node_docMarkupType) -> list[nodes.Node]:
         nodelist = self.render_tagged_iterable(node)
-        creator: Type[nodes.TextElement] = nodes.inline
+        creator: type[nodes.TextElement] = nodes.inline
         if tag == "emphasis":
             creator = nodes.emphasis
         elif tag == "computeroutput":
@@ -2112,14 +2111,14 @@ class SphinxRenderer(metaclass=NodeVisitor):
         if node.strip().startswith("embed:rst:leading-asterisk"):
             lines: Iterable[str] = node.splitlines()
             # Replace the first * on each line with a blank space
-            lines = map(lambda text: text.replace("*", " ", 1), lines)
+            lines = [text.replace("*", " ", 1) for text in lines]
             node = "\n".join(lines)
 
         # do we need to strip leading ///?
         elif node.strip().startswith("embed:rst:leading-slashes"):
             lines = node.splitlines()
             # Replace the /// on each line with three blank spaces
-            lines = map(lambda text: text.replace("///", "   ", 1), lines)
+            lines = [text.replace("///", "   ", 1) for text in lines]
             node = "\n".join(lines)
 
         elif node.strip().startswith("embed:rst:inline"):
@@ -2313,7 +2312,7 @@ class SphinxRenderer(metaclass=NodeVisitor):
     def visit_docrow(self, node: parser.Node_docRowType) -> list[nodes.Node]:
         row = nodes.row()
         cols = self.render_iterable(node.entry)
-        elem: Union[nodes.thead, nodes.tbody]
+        elem: nodes.thead | nodes.tbody
         if all(cast("nodes.Element", col).get("heading", False) for col in cols):
             elem = nodes.thead()
         else:
@@ -2676,7 +2675,7 @@ class SphinxRenderer(metaclass=NodeVisitor):
                         # the actual nodes don't matter, as it is astext()-ed later
                         nodelist = [nodes.Text(str(ast))]
                         appendDeclName = False
-                    except cpp.DefinitionError:  # pyright: ignore
+                    except cpp.DefinitionError:
                         # happens with "typename ...Args", so for now, just append
                         pass
 

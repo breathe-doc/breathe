@@ -199,7 +199,8 @@ def run_sphinx_and_copy_output(tmp_path, input_path, overrides):
     ):
         itr_in = iter(f_in)
         line = next(itr_in)
-        assert line and line.startswith("<?xml ")
+        assert line
+        assert line.startswith("<?xml ")
         f_out.write(line)
         # os.path.relpath must be used instead of Path.relative_to because the
         # latter requires that CSS_PATH is below input_path

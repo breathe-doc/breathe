@@ -4,10 +4,12 @@ from typing import TYPE_CHECKING
 
 from breathe import parser
 from breathe.finder import ItemFinder
-from breathe.renderer import TaggedNode
 from breathe.renderer.filter import NodeStack
 
 if TYPE_CHECKING:
+    from sphinx.application import Sphinx
+
+    from breathe.renderer import TaggedNode
     from breathe.renderer.filter import DoxFilter, FinderMatch
 
 

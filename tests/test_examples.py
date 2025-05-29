@@ -6,13 +6,16 @@ import os
 import pathlib
 import shutil
 import subprocess
-from typing import Any
+from typing import TYPE_CHECKING
 from xml.parsers import expat
 
 import pytest
 import sphinx
 
 from breathe.process import AutoDoxygenProcessHandle
+
+if TYPE_CHECKING:
+    from typing import Any
 
 sphinx_path: Any
 
@@ -207,12 +210,12 @@ def compare_xml(generated, input_dir, version):
             o_type, o_node = o
             c_type, c_node = c
             assert o_type == c_type, (
-                f"at line {o_node.line_no}: found {event_str[o_type]} when expecting {event_str[c_type]}"
+                f"at line {o_node.line_no}: found {event_str[o_type]} when expecting {event_str[c_type]}"  # noqa: E501
             )
 
             if o_type == XMLEventType.E_START:
                 assert o_node.name == c_node.name, (
-                    f"wrong tag at line {o_node.line_no}: expected {c_node.name}, found {o_node.name}"
+                    f"wrong tag at line {o_node.line_no}: expected {c_node.name}, found {o_node.name}"  # noqa: E501
                 )
 
                 # ignore extra attributes in o_node
@@ -228,11 +231,11 @@ def compare_xml(generated, input_dir, version):
                     assert key in o_node.attr, f"missing attribute at line {o_node.line_no}: {key}"
                     o_value = o_node.attr[key]
                     assert attr_compare(key, o_value, value), (
-                        f'wrong value for attribute "{key}" at line {o_node.line_no}: expected "{value}", found "{o_value}"'
+                        f'wrong value for attribute "{key}" at line {o_node.line_no}: expected "{value}", found "{o_value}"'  # noqa: E501
                     )
             elif o_type == XMLEventType.E_TEXT:
                 assert o_node.value == c_node.value, (
-                    f'wrong content at line {o_node.line_no}: expected "{c_node.value}", found "{o_node.value}"'
+                    f'wrong content at line {o_node.line_no}: expected "{c_node.value}", found "{o_node.value}"'  # noqa: E501
                 )
 
 

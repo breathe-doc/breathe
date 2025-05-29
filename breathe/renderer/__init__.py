@@ -1,11 +1,13 @@
 from __future__ import annotations
 
 import textwrap
-from typing import TYPE_CHECKING, Generic, NamedTuple, TypeVar, Union
+from typing import TYPE_CHECKING, NamedTuple, TypeVar
 
 from docutils import nodes
 
 if TYPE_CHECKING:
+    from typing import Generic, Union
+
     from breathe import parser
     from breathe.directives.index import RootDataObject
     from breathe.renderer import mask

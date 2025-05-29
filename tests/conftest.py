@@ -5,7 +5,7 @@ import pathlib
 import pytest
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture
 def app(test_params, app_params, make_app, shared_result):
     """
     Based on sphinx.testing.fixtures.app

@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import re
-from typing import TYPE_CHECKING, Any, Optional, cast
+from typing import TYPE_CHECKING, cast
 
 from docutils import nodes
 from docutils.parsers.rst.directives import flag, unchanged_required
@@ -12,20 +12,19 @@ from breathe.directives import BaseDirective
 from breathe.exception import BreatheError
 from breathe.file_state_cache import MTimeError
 from breathe.project import ProjectError
-from breathe.renderer import RenderContext, TaggedNode, filter, mask
+from breathe.renderer import RenderContext, filter, mask
 from breathe.renderer.sphinxrenderer import SphinxRenderer, WithContext
 from breathe.renderer.target import create_target_handler
 
 if TYPE_CHECKING:
+    from typing import Any
+
     cppast: Any
-else:
     try:
         from sphinx.domains.cpp import _ast as cppast
     except ImportError:
         cppast = cpp
 
-
-if TYPE_CHECKING:
     import sys
 
     if sys.version_info >= (3, 11):
@@ -36,6 +35,7 @@ if TYPE_CHECKING:
     from sphinx.application import Sphinx
 
     from breathe import project
+    from breathe.renderer import TaggedNode
 
     DoxFunctionOptions = TypedDict(
         "DoxFunctionOptions",
@@ -128,7 +128,7 @@ class DoxygenFunctionDirective(BaseDirective):
         # Extract arguments from the function name.
         try:
             args = self._parse_args(argsStr)
-        except cpp.DefinitionError as e:  # pyright: ignore
+        except cpp.DefinitionError as e:
             return self.create_warning(
                 project_info,
                 namespace="%s::" % namespace if namespace else "",
@@ -186,7 +186,7 @@ class DoxygenFunctionDirective(BaseDirective):
             warning_nodes = [nodes.paragraph("", "", nodes.Text(formatted_message)), block]
             result = warning.warn(message, rendered_nodes=warning_nodes, unformatted_suffix=text)
             return result
-        except cpp.DefinitionError as error:  # pyright: ignore
+        except cpp.DefinitionError as error:
             warning.context["cpperror"] = str(error)
             return warning.warn(
                 "doxygenfunction: Unable to resolve function "
@@ -206,7 +206,7 @@ class DoxygenFunctionDirective(BaseDirective):
             self.directive_args,
         )
 
-    def _parse_args(self, function_description: str) -> Optional[cppast.ASTParametersQualifiers]:
+    def _parse_args(self, function_description: str) -> cppast.ASTParametersQualifiers | None:
         # Note: the caller must catch cpp.DefinitionError
         if function_description == "":
             return None
