@@ -1,41 +1,14 @@
 from __future__ import annotations
 
-<<<<<<< HEAD
 from typing import TYPE_CHECKING
-||||||| 542ae9b
-from sphinx.directives import SphinxDirective
-=======
+
 from breathe.finder import factory
 from breathe import parser
 from breathe.renderer import format_parser_error, RenderContext
 from breathe.renderer.sphinxrenderer import SphinxRenderer
 
-from sphinx.directives import SphinxDirective  # pyright: ignore
->>>>>>> memberdef-in-groups
-
 from docutils import nodes
 from sphinx.directives import SphinxDirective
-
-<<<<<<< HEAD
-from breathe.finder.factory import FinderFactory
-from breathe.parser import FileIOError, ParserError
-from breathe.renderer import RenderContext, format_parser_error
-from breathe.renderer.filter import FilterFactory
-from breathe.renderer.sphinxrenderer import SphinxRenderer
-
-if TYPE_CHECKING:
-    from collections.abc import Sequence
-    from typing import Any
-
-    from breathe.parser import DoxygenParserFactory
-    from breathe.project import ProjectInfo, ProjectInfoFactory
-    from breathe.renderer.filter import Filter
-    from breathe.renderer.mask import MaskFactoryBase
-    from breathe.renderer.target import TargetHandler
-||||||| 542ae9b
-from typing import Any, Dict, List, Optional, Sequence
-=======
-from typing import Any, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from breathe.parser import DoxygenParser
@@ -46,7 +19,6 @@ if TYPE_CHECKING:
     from breathe.renderer.target import TargetHandler
     from sphinx.application import Sphinx
     from collections.abc import Sequence
->>>>>>> memberdef-in-groups
 
 
 class _WarningHandler:
