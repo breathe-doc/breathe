@@ -1,15 +1,3 @@
-<<<<<<< HEAD
-from __future__ import annotations
-
-from typing import TYPE_CHECKING
-
-from docutils.parsers.rst.directives import flag, unchanged, unchanged_required
-
-||||||| 542ae9b
-=======
-from __future__ import annotations
-
->>>>>>> memberdef-in-groups
 from breathe.directives import BaseDirective
 from breathe.file_state_cache import MTimeError
 from breathe.project import ProjectError
@@ -17,24 +5,9 @@ from breathe.renderer import filter
 from breathe.renderer.mask import NullMaskFactory
 from breathe.renderer.target import create_target_handler
 
-<<<<<<< HEAD
 if TYPE_CHECKING:
-    from typing import Any
-||||||| 542ae9b
-from docutils.nodes import Node
-from docutils.parsers.rst.directives import unchanged_required, unchanged, flag
-=======
-from docutils.parsers.rst.directives import unchanged_required, unchanged, flag
->>>>>>> memberdef-in-groups
+    from typing import Any, List
 
-<<<<<<< HEAD
-    from docutils.nodes import Node
-||||||| 542ae9b
-from typing import Any, List
-=======
-from typing import cast, ClassVar, TYPE_CHECKING
-
-if TYPE_CHECKING:
     import sys
 
     if sys.version_info >= (3, 11):
@@ -62,7 +35,6 @@ if TYPE_CHECKING:
     )
 else:
     DoxClassOptions = None
->>>>>>> memberdef-in-groups
 
 
 class _DoxygenClassLikeDirective(BaseDirective):
@@ -103,23 +75,9 @@ class _DoxygenClassLikeDirective(BaseDirective):
             warning = self.create_warning(None, kind=self.kind)
             return warning.warn("doxygen{kind}: %s" % e)
 
-<<<<<<< HEAD
-        finder_filter = self.filter_factory.create_compound_finder_filter(name, self.kind)
-
-        # TODO: find a more specific type for the Doxygen nodes
-        matches: list[Any] = []
-        finder.filter_(finder_filter, matches)
-||||||| 542ae9b
-        finder_filter = self.filter_factory.create_compound_finder_filter(name, self.kind)
-
-        # TODO: find a more specific type for the Doxygen nodes
-        matches: List[Any] = []
-        finder.filter_(finder_filter, matches)
-=======
         matches: list[filter.FinderMatch] = list(
             filter.compound_finder_filter(name, self.kind, d_index)
         )
->>>>>>> memberdef-in-groups
 
         if len(matches) == 0:
             warning = self.create_warning(project_info, name=name, kind=self.kind)

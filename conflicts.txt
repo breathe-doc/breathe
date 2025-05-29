@@ -1,4 +1,3 @@
-	both modified:   breathe/directives/class_like.py
 	both modified:   breathe/directives/content_block.py
 	both modified:   breathe/directives/file.py
 	both modified:   breathe/directives/function.py
