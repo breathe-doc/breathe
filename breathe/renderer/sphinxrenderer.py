@@ -1308,7 +1308,11 @@ class SphinxRenderer(metaclass=NodeVisitor):
             # Defer to domains specific directive.
 
             names = self.get_qualification()
-            cname = split_name(nodeDef.compoundname)
+            # strip out any template arguments before splitting on '::', to
+            # avoid errors if a template specialization has qualified arguments
+            # (see examples/specific/cpp_ns_template_specialization)
+            cleaned_name, sep, rest = nodeDef.compoundname.partition("<")
+            cname = split_name(cleaned_name)
             if self.nesting_level == 0:
                 names.extend(cname)
             else:
@@ -1524,9 +1528,22 @@ class SphinxRenderer(metaclass=NodeVisitor):
                 title_signode.extend(targets)
 
                 # Set up the title
-                title_signode.append(nodes.emphasis(text=kind.value))
-                title_signode.append(nodes.Text(" "))
-                title_signode.append(addnodes.desc_name(text=name))
+                if (
+                    kind.value in ["group", "page"]
+                    and file_data.compounddef
+                    and file_data.compounddef.title
+                ):
+                    if "no-title" not in options:
+                        full_title = " ".join([
+                            i.getValue() for i in file_data.compounddef.title.content_
+                        ])
+                        title_signode.append(nodes.emphasis(text=kind.value))
+                        title_signode.append(nodes.Text(" "))
+                        title_signode.append(addnodes.desc_name(text=full_title))
+                else:
+                    title_signode.append(nodes.emphasis(text=kind.value))
+                    title_signode.append(nodes.Text(" "))
+                    title_signode.append(addnodes.desc_name(text=name))
 
                 rst_node.append(title_signode)
 
