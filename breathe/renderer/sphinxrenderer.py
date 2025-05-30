@@ -85,6 +85,19 @@ _findall_compat = cast(
 )
 
 
+# Doxygen sometimes leaves 'static' in the type, e.g., for "constexpr static
+# auto f()"
+# In Doxygen up to somewhere between 1.8.17 to exclusive 1.9.1 the 'friend' part
+# is also left in the type. See also #767.
+# Until version 1.11, Doxygen left constexpr (I haven't checked consteval or
+# constinit) in the type.
+QUALIFIERS_TO_REMOVE = re.compile(r"\b(static|friend|constexpr|consteval|constinit) ")
+
+
+def strip_legacy_qualifiers(x):
+    return QUALIFIERS_TO_REMOVE.sub("", x)
+
+
 class WithContext:
     def __init__(self, parent: SphinxRenderer, context: RenderContext):
         self.context = context
@@ -1087,7 +1100,7 @@ class SphinxRenderer(metaclass=NodeVisitor):
         """
 
         refid = self.get_refid(node.id)
-        return self.target_handler.create_target(refid)
+        return self.target_handler(self.document, refid)
 
     def title(self, node) -> list[nodes.Node]:
         nodes_ = []
@@ -1481,7 +1494,7 @@ class SphinxRenderer(metaclass=NodeVisitor):
             # Pretend that the signature is being rendered in context of the
             # definition, for proper domain detection
             nodes_, contentnode = render_signature(
-                file_data, self.target_handler.create_target(refid), name, kind
+                file_data, self.target_handler(self.document, refid), name, kind
             )
 
         if file_data.compounddef[0].includes:
@@ -1940,11 +1953,11 @@ class SphinxRenderer(metaclass=NodeVisitor):
             ):
                 actual_d += 1
 
-        title = node.title or ""
+        title_nodes = self.render_tagged_iterable(node.title) if node.title else []
         if actual_d == depth:
             section = nodes.section()
             section["ids"].append(self.get_refid(node.id))
-            section += nodes.title(title, title)
+            section += nodes.title("", "", *title_nodes)
             section += self.create_doxygen_target(node)
             section += self.render_tagged_iterable(node)
             return [section]
@@ -1957,7 +1970,7 @@ class SphinxRenderer(metaclass=NodeVisitor):
             # it because it's what visit_docheading does. It shouldn't come up
             # often, anyway.
             #     -- Rouslan
-            content: list[nodes.Node] = [nodes.emphasis(text=title)]
+            content: list[nodes.Node] = [nodes.emphasis("", "", *title_nodes)]
             content.extend(self.create_doxygen_target(node))
             content.extend(self.render_tagged_iterable(node))
             return content
@@ -2374,16 +2387,12 @@ class SphinxRenderer(metaclass=NodeVisitor):
                     elements.append("virtual")
                 if node.explicit:
                     elements.append("explicit")
-                # TODO: handle constexpr when parser has been updated
-                #       but Doxygen seems to leave it in the type anyway
-                typ = "".join(n.astext() for n in self.render(node.type))
-                # Doxygen sometimes leaves 'static' in the type,
-                # e.g., for "constexpr static auto f()"
-                typ = typ.replace("static ", "")
-                # In Doxygen up to somewhere between 1.8.17 to exclusive 1.9.1
-                # the 'friend' part is also left in the type.
-                # See also #767.
-                typ = typ.removeprefix("friend ")
+                if node.constexpr:
+                    elements.append("constexpr")
+                if node.consteval:
+                    elements.append("consteval")
+
+                typ = strip_legacy_qualifiers("".join(n.astext() for n in self.render(node.type)))
                 elements.extend((typ, name, node.argsstring or ""))
                 declaration = " ".join(elements)
             return self.handle_declaration(node, node.kind.value, declaration)
@@ -2579,10 +2588,13 @@ class SphinxRenderer(metaclass=NodeVisitor):
                 elements.append("static")
             if node.mutable:
                 elements.append("mutable")
-            typename = "".join(n.astext() for n in self.render(node.type))
-            # Doxygen sometimes leaves 'static' in the type,
-            # e.g., for "constexpr static int i"
-            typename = typename.replace("static ", "")
+            if node.constexpr:
+                elements.append("constexpr")
+            if node.consteval:
+                elements.append("consteval")
+            if node.constinit:
+                elements.append("constinit")
+            typename = strip_legacy_qualifiers("".join(n.astext() for n in self.render(node.type)))
             if dom == "c" and "::" in typename:
                 typename = typename.replace("::", ".")
             elements.extend((typename, name, node.argsstring or "", self.make_initializer(node)))

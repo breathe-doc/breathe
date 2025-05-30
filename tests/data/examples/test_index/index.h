@@ -3,7 +3,7 @@ int A;
 
 using B = long;
 
-auto C(auto x) -> A;
+auto C(auto x) -> B;
 
 template<typename T> void D();
 

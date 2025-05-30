@@ -159,7 +159,7 @@ class _BaseFileDirective(BaseDirective):
             warning = self.create_warning(None, file=file_, directivename=self.directive_name)
             return warning.warn('{directivename}: Cannot find file "{file} {tail}')
 
-        target_handler = create_target_handler(self.options, project_info, self.state.document)
+        target_handler = create_target_handler(self.options, self.env)
         filter_ = create_file_filter(file_, self.options)
 
         node_list: list[Node] = []

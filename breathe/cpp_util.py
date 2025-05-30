@@ -40,7 +40,7 @@ def split_name(name: str) -> list[str]:
     E.g. turn "A<B::C>::D::E<(F>G::H),(I<J)>" into
     ["A<B::C>","D","E<(F>G::H),(I<J)>"]
 
-    This can produce incorrect results if any of the template paramters are
+    This can produce incorrect results if any of the template parameters are
     strings containing brackets.
     """
     last: list[str] = []

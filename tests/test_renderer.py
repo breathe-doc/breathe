@@ -113,7 +113,7 @@ class MockTargetHandler:
     def __init__(self):
         pass
 
-    def create_target(self, refid):
+    def __call__(self, document, refid):
         return []
 
 

@@ -434,8 +434,8 @@ def _raise_missing_attribute_error(state: _ParseState, name: str, /):
 def _raise_duplicate_element_error(state: _ParseState, name: str, /):
     state.raise_parse_error(f'"{name}" cannot appear more than once in this context')
 
-def _raise_missing_element_error(state: _ParseState, name: str, /):
-    state.raise_parse_error(f'missing "{name}" child')
+def _raise_missing_element_error(state: _ParseState, parent: Any, name: str, /):
+    state.raise_parse_error(f'"{parent}" missing "{name}" child')
 
 def _raise_empty_list_element_error(state: _ParseState, name: str, /):
     state.raise_parse_error(f'at least one "{name}" child is required')
@@ -699,7 +699,7 @@ def _node_class_finish_fields__{$ type $}(state: _ParseState, obj, /) -> None:
         _raise_empty_list_element_error(state,"{$ ref.name $}")
 //%             else
     if not hasattr(obj, "{$ ref.py_name $}"):
-        _raise_missing_element_error(state,"{$ ref.name $}")
+        _raise_missing_element_error(state, obj, "{$ ref.name $}")
 //%             endif
 //%           elif not ref.is_list
     if not hasattr(obj, "{$ ref.py_name $}"):

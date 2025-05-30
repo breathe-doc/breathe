@@ -107,7 +107,8 @@
     "tableofcontentsType": {
       "kind": "tag_only_element",
       "children": {
-        "tocsect":              {"type": "tableofcontentsKindType", "is_list": true, "min_items": 1}
+        "tocsect":              {"type": "tableofcontentsKindType", "is_list": true, "min_items": 1},
+        "tableofcontents":      {"type": "tableofcontentsType", "is_list": true, "min_items": 0}
       }
     },
     "linkedTextType": {
@@ -188,6 +189,8 @@
         "bound":                {"type": "#DoxBool", "optional": true},
         "const":                {"type": "#DoxBool", "optional": true},
         "constexpr":            {"type": "#DoxBool", "optional": true},
+        "consteval":            {"type": "#DoxBool", "optional": true},
+        "constinit":            {"type": "#DoxBool", "optional": true},
         "constrained":          {"type": "#DoxBool", "optional": true},
         "explicit":             {"type": "#DoxBool", "optional": true},
         "extern":               {"type": "#DoxBool", "optional": true},
@@ -202,7 +205,9 @@
         "maybevoid":            {"type": "#DoxBool", "optional": true},
         "mutable":              {"type": "#DoxBool", "optional": true},
         "new":                  {"type": "#DoxBool", "optional": true},
+        "nodiscard":            {"type": "#DoxBool", "optional": true},
         "noexcept":             {"type": "#DoxBool", "optional": true},
+        "noexceptexpression":   {"type": "#string",  "optional": true},
         "optional":             {"type": "#DoxBool", "optional": true},
         "privategettable":      {"type": "#DoxBool", "optional": true},
         "privatesettable":      {"type": "#DoxBool", "optional": true},
@@ -302,7 +307,7 @@
       "kind": "union_list_element",
       "allow_text": true,
       "content": {
-        "para":                 "#string",
+        "para":                 "docParaType",
         "sect1":                "docSect1Type"
       }
     },
@@ -313,7 +318,7 @@
         "id":                   {"type": "#string"}
       },
       "children": {
-        "title":                {"type": "#string", "min_items": 0}
+        "title":                {"type": "docTitleType", "min_items": 0}
       },
       "content": {
         "para":                 "docParaType",
@@ -377,7 +382,7 @@
       "kind": "union_list_element",
       "allow_text": true,
       "content": {
-        "para":                 "#string",
+        "para":                 "docParaType",
         "sect2":                "docSect2Type"
       }
     },
@@ -388,7 +393,7 @@
         "id":                   {"type": "#string"}
       },
       "children": {
-        "title":                {"type": "#string"}
+        "title":                {"type": "docTitleType"}
       },
       "content": {
         "para":                 "docParaType",
@@ -403,7 +408,7 @@
         "id":                   {"type": "#string"}
       },
       "children": {
-        "title":                {"type": "#string"}
+        "title":                {"type": "docTitleType"}
       },
       "content": {
         "para":                 "docParaType",
@@ -415,7 +420,7 @@
       "kind": "union_list_element",
       "allow_text": true,
       "content": {
-        "para":                 "#string",
+        "para":                 "docParaType",
         "sect3":                "docSect3Type"
       }
     },
@@ -426,18 +431,48 @@
         "id":                   {"type": "#string"}
       },
       "children": {
-        "title":                {"type": "#string"}
+        "title":                {"type": "docTitleType"}
       },
       "content": {
         "para":                 "docParaType",
+        "sect5":                "docSect5Type",
         "internal":             "docInternalS4Type"
+      }
+    },
+    "docSect5Type": {
+      "kind": "union_list_element",
+      "allow_text": true,
+      "attributes": {
+        "id":                   {"type": "#string"}
+      },
+      "children": {
+        "title":                {"type": "docTitleType"}
+      },
+      "content": {
+        "para":                 "docParaType",
+        "sect6":                "docSect6Type",
+        "internal":             "docInternalS5Type"
+      }
+    },
+    "docSect6Type": {
+      "kind": "union_list_element",
+      "allow_text": true,
+      "attributes": {
+        "id":                   {"type": "#string"}
+      },
+      "children": {
+        "title":                {"type": "docTitleType"}
+      },
+      "content": {
+        "para":                 "docParaType",
+        "internal":             "docInternalS6Type"
       }
     },
     "docInternalS3Type": {
       "kind": "union_list_element",
       "allow_text": true,
       "content": {
-        "para":                 "#string",
+        "para":                 "docParaType",
         "sect3":                "docSect4Type"
       }
     },
@@ -445,12 +480,29 @@
       "kind": "union_list_element",
       "allow_text": true,
       "content": {
-        "para":                 "#string"
+        "para":                 "docParaType",
+        "sect5":                "docSect4Type"
+      }
+    },
+    "docInternalS5Type": {
+      "kind": "union_list_element",
+      "allow_text": true,
+      "content": {
+        "para":                 "docParaType",
+        "sect6":                "docSect4Type"
+      }
+    },
+    "docInternalS6Type": {
+      "kind": "union_list_element",
+      "allow_text": true,
+      "content": {
+        "para":                 "docParaType"
       }
     },
     "docListItemType": {
       "kind": "list_element",
       "attributes": {
+        "override":             {"type": "DoxCheck", "optional": true},
         "value":                {"type": "#integer", "optional": true}
       },
       "content": {
@@ -487,7 +539,8 @@
       }
     },
     "docTocItemType": {
-      "kind": "union_list_element","allow_text": true,
+      "kind": "union_list_element",
+      "allow_text": true,
       "attributes": {
         "id":                   {"type": "#string"}
       }
@@ -623,7 +676,8 @@
       ]
     },
     "docTitleCmdGroup": {
-      "kind": "union_list_element","allow_text": true,
+      "kind": "union_list_element",
+      "allow_text": true,
       "content": {
         "ulink": "docURLLink",
         "bold": "docMarkupType",
@@ -906,7 +960,8 @@
       }
     },
     "docCmdGroup": {
-      "kind": "union_list_element","allow_text": true,
+      "kind": "union_list_element",
+      "allow_text": true,
       "bases": ["docTitleCmdGroup"],
       "content": {
         "hruler": "#empty",
@@ -926,6 +981,7 @@
         "dotfile": "docImageFileType",
         "mscfile": "docImageFileType",
         "diafile": "docImageFileType",
+        "plantumlfile": "docImageFileType",
         "toclist": "docTocListType",
         "language": "docLanguageType",
         "parameterlist": "docParamListType",
@@ -1331,6 +1387,7 @@
         "invariant",
         "remark",
         "attention",
+        "important",
         "par",
         "rcs"
       ]
@@ -1367,7 +1424,8 @@
         "git",
         "hcl",
         "regex",
-        "ebnf"
+        "ebnf",
+        "files"
       ]
     },
     "DoxParamListKind": {
@@ -1424,6 +1482,13 @@
         {"xml": "protected-inheritance", "id": "protected_inheritance"},
         {"xml": "private-inheritance", "id": "private_inheritance"},
         {"xml": "type-constraint", "id": "type_constraint"}
+      ]
+    },
+    "DoxCheck": {
+      "kind": "enumeration",
+      "values": [
+        "checked",
+        "unchecked"
       ]
     },
     "DoxOlType": {
