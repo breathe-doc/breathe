@@ -7,6 +7,11 @@ from docutils import nodes
 from docutils.parsers.rst.directives import flag, unchanged_required
 from sphinx.domains import cpp
 
+try:
+    from sphinx.domains.cpp import _ast as cppast
+except ImportError:
+    cppast = cpp
+
 from breathe import parser
 from breathe.directives import BaseDirective
 from breathe.exception import BreatheError
@@ -17,20 +22,13 @@ from breathe.renderer.sphinxrenderer import SphinxRenderer, WithContext
 from breathe.renderer.target import create_target_handler
 
 if TYPE_CHECKING:
-    from typing import Any
-
-    cppast: Any
-    try:
-        from sphinx.domains.cpp import _ast as cppast
-    except ImportError:
-        cppast = cpp
-
     import sys
 
     if sys.version_info >= (3, 11):
         from typing import NotRequired, TypedDict
     else:
         from typing_extensions import NotRequired, TypedDict
+
     from docutils.nodes import Node
     from sphinx.application import Sphinx
 
