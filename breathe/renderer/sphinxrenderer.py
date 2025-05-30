@@ -898,7 +898,7 @@ class SphinxRenderer(metaclass=NodeVisitor):
         assert isinstance(sig, addnodes.desc_signature)
 
         # Insert the member name for use in Sphinx-generated table of contents.
-        if node.node_type == "compounddef":
+        if isinstance(node, parser.Node_compounddefType):
             member_name = node.compoundname
         else:
             member_name = node.name
@@ -1512,22 +1512,11 @@ class SphinxRenderer(metaclass=NodeVisitor):
                 title_signode.extend(targets)
 
                 # Set up the title
-                if (
-                    kind.value in ["group", "page"]
-                    and file_data.compounddef
-                    and file_data.compounddef.title
-                ):
-                    if "no-title" not in options:
-                        full_title = " ".join([
-                            i.getValue() for i in file_data.compounddef.title.content_
-                        ])
-                        title_signode.append(nodes.emphasis(text=kind.value))
-                        title_signode.append(nodes.Text(" "))
-                        title_signode.append(addnodes.desc_name(text=full_title))
-                else:
-                    title_signode.append(nodes.emphasis(text=kind.value))
-                    title_signode.append(nodes.Text(" "))
-                    title_signode.append(addnodes.desc_name(text=name))
+                #
+                # TODO: Restore the functionality introduced in https://github.com/breathe-doc/breathe/pull/939
+                title_signode.append(nodes.emphasis(text=kind.value))
+                title_signode.append(nodes.Text(" "))
+                title_signode.append(addnodes.desc_name(text=name))
 
                 rst_node.append(title_signode)
 

@@ -3,6 +3,14 @@ from __future__ import annotations
 import pathlib
 
 import pytest
+from sphinx.testing.fixtures import (
+    app_params,
+    make_app,
+    rootdir,
+    shared_result,
+    sphinx_test_tempdir,
+    test_params,
+)
 
 
 @pytest.fixture

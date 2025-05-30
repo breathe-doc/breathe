@@ -54,7 +54,9 @@ lint = [
     "types-Pygments",
     "pytest>=8.0",  # for mypy
     "sphinxcontrib-phpdomain",  # for mypy
-    "sphinx-csharp",  # for mypy
+    # The API that we depend on is only implemented in rogerbarton's fork of sphinx-csharp
+    # and not in the one that is published to PyPI
+    "sphinx-csharp @ git+https://github.com/rogerbarton/sphinx-csharp.git",  # for mypy
 ]
 test = [
     "pytest>=8.0",

@@ -35,9 +35,14 @@ clean:
 	$(MAKE) -C examples/tinyxml $@
 	$(MAKE) -C examples/specific $@
 
+.PHONY: parser
+parser:
+	echo "Generating _parser.py from xml_parser_generator/schema.json"
+	python3 xml_parser_generator/setuptools_builder.py
+
 .PHONY: test
-test:
-	cd tests && python3 -m pytest -v
+test: parser
+	cd tests && python3 -m pytest -v --maxfail=1
 
 .PHONY: dev-test
 dev-test: $(GENERATED_MOD)
