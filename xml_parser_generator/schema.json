@@ -393,7 +393,7 @@
         "id":                   {"type": "#string"}
       },
       "children": {
-        "title":                {"type": "docTitleType"}
+        "title":                {"type": "docTitleType", "min_items": 0}
       },
       "content": {
         "para":                 "docParaType",
@@ -408,7 +408,7 @@
         "id":                   {"type": "#string"}
       },
       "children": {
-        "title":                {"type": "docTitleType"}
+        "title":                {"type": "docTitleType", "min_items": 0}
       },
       "content": {
         "para":                 "docParaType",
@@ -431,7 +431,7 @@
         "id":                   {"type": "#string"}
       },
       "children": {
-        "title":                {"type": "docTitleType"}
+        "title":                {"type": "docTitleType", "min_items": 0}
       },
       "content": {
         "para":                 "docParaType",
@@ -446,7 +446,7 @@
         "id":                   {"type": "#string"}
       },
       "children": {
-        "title":                {"type": "docTitleType"}
+        "title":                {"type": "docTitleType", "min_items": 0}
       },
       "content": {
         "para":                 "docParaType",
@@ -461,7 +461,7 @@
         "id":                   {"type": "#string"}
       },
       "children": {
-        "title":                {"type": "docTitleType"}
+        "title":                {"type": "docTitleType", "min_items": 0}
       },
       "content": {
         "para":                 "docParaType",
