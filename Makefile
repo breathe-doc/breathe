@@ -24,6 +24,9 @@ $(GENERATED_MOD): \
 		xml_parser_generator/make_parser.py
 	python3 xml_parser_generator/setuptools_builder.py
 
+.PHONY: parser
+parser: $(GENERATED_MOD)
+
 .PHONY: distclean
 distclean: clean
 	$(MAKE) -C documentation clean
@@ -35,13 +38,8 @@ clean:
 	$(MAKE) -C examples/tinyxml $@
 	$(MAKE) -C examples/specific $@
 
-.PHONY: parser
-parser:
-	echo "Generating _parser.py from xml_parser_generator/schema.json"
-	python3 xml_parser_generator/setuptools_builder.py
-
 .PHONY: test
-test: parser
+test: $(GENERATED_MOD)
 	cd tests && python3 -m pytest -v --maxfail=1
 
 .PHONY: dev-test
