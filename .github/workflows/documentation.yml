@@ -35,7 +35,7 @@ jobs:
     - name: Install apt dependencies
       run: |
         sudo apt-get -y update
-        sudo apt-get -y install graphviz libclang1-11 libclang-cpp11
+        sudo apt-get -y install graphviz
 
     - uses: actions/cache/restore@v4
       id: cache-doxygen
