@@ -3,18 +3,23 @@ from __future__ import annotations
 import pathlib
 
 import pytest
+
+# Register sphinx fixtures
+#
+# Disable ruff warnings about unused imports as the import is the registration (I think)
 from sphinx.testing.fixtures import (
-    app_params,
-    make_app,
-    rootdir,
-    shared_result,
-    sphinx_test_tempdir,
-    test_params,
+    app_params,  # noqa: F401
+    make_app,  # noqa: F401
+    rootdir,  # noqa: F401
+    shared_result,  # noqa: F401
+    sphinx_test_tempdir,  # noqa: F401
+    test_params,  # noqa: F401
 )
 
 
+# Disable ruff warnings about unused arguments as they are there by convention (I assume)
 @pytest.fixture
-def app(test_params, app_params, make_app, shared_result):
+def app(test_params, app_params, make_app, shared_result):  # noqa: F811
     """
     Based on sphinx.testing.fixtures.app
     """
