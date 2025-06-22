@@ -1,11 +1,6 @@
 name: Tests
 
 on:
-  push:
-    paths:
-      - ".github/workflows/unit_tests.yml"
-      - "breathe/**"
-      - "tests/**"
   pull_request:
     paths:
       - ".github/workflows/unit_tests.yml"

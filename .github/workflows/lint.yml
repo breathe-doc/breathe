@@ -1,7 +1,6 @@
 name: Lint source code
 
 on:
-  push:
   pull_request:
   workflow_dispatch:
 
