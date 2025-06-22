@@ -504,7 +504,7 @@ class InlineText(Text):
     """
 
     patterns = {"inlinetext": r""}
-    initial_transitions = [("inlinetext",)]
+    initial_transitions = [("inlinetext", "text")]
 
     def indent(self, match, context, next_state):
         """
