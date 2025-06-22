@@ -30,6 +30,9 @@ jobs:
         args: --version
         version: 0.9.2
 
+    - name: Generate parser
+      run: make parser
+
     - name: Lint with Ruff
       run: ruff check --output-format=github
 
@@ -53,6 +56,9 @@ jobs:
         python -m pip install --upgrade pip
         python -m pip install --editable ".[lint]"
 
+    - name: Generate parser
+      run: make parser
+
     - name: Type check with mypy
       run: mypy --warn-redundant-casts --warn-unused-ignores breathe tests
 
@@ -71,6 +77,9 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         python -m pip install --upgrade twine build
+
+    - name: Generate parser
+      run: make parser
 
     - name: Lint with twine
       run: |

@@ -10,6 +10,7 @@ from breathe import file_state_cache, path_handler
 from breathe._parser import *
 
 if TYPE_CHECKING:
+    import sys
     from typing import Union
 
     from sphinx.application import Sphinx
