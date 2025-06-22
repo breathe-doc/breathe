@@ -23,7 +23,7 @@ $(GENERATED_MOD): \
 		xml_parser_generator/module_template.py.in \
 		xml_parser_generator/make_parser.py
 	python3 xml_parser_generator/setuptools_builder.py
-	ruff $(GENERATED_MOD)
+	ruff format $(GENERATED_MOD)
 
 .PHONY: parser
 parser: $(GENERATED_MOD)
