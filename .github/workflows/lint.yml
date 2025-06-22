@@ -38,7 +38,9 @@ jobs:
         python -m pip install --editable ".[build]"
 
     - name: Generate parser
-      run: make parser
+      run: |
+        make parser
+        make format-parser
 
     - name: Lint with Ruff
       run: ruff check --output-format=github
