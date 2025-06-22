@@ -14,15 +14,16 @@ from breathe.renderer.target import create_target_handler
 
 if TYPE_CHECKING:
     import sys
+    from typing import ClassVar
 
     from docutils.nodes import Node
 
     if sys.version_info >= (3, 11):
-        from typing import ClassVar, NotRequired, TypedDict
+        from typing import NotRequired, TypedDict
     else:
         from typing_extensions import NotRequired, TypedDict
 
-    from breathe.project import ProjectInfo
+    from breathe.project import ProjectInfo, ProjectOptions
 
     DoxBaseItemOptions = TypedDict(
         "DoxBaseItemOptions",
@@ -94,7 +95,9 @@ class _DoxygenBaseItemDirective(BaseDirective):
         namespace, _, name = self.arguments[0].rpartition("::")
 
         try:
-            project_info = self.project_info_factory.create_project_info(options)
+            project_info = self.project_info_factory.create_project_info(
+                cast("ProjectOptions", options)
+            )
         except ProjectError as e:
             warning = self.create_warning(None, kind=self.kind)
             return warning.warn("doxygen{kind}: %s" % e)

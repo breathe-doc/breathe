@@ -15,9 +15,10 @@ from breathe.renderer.target import create_target_handler
 
 if TYPE_CHECKING:
     import sys
+    from typing import ClassVar, Literal
 
     if sys.version_info >= (3, 11):
-        from typing import ClassVar, Literal, NotRequired, TypedDict
+        from typing import NotRequired, TypedDict
     else:
         from typing_extensions import NotRequired, TypedDict
 
@@ -25,6 +26,7 @@ if TYPE_CHECKING:
     from sphinx.application import Sphinx
 
     from breathe.finder.factory import FinderRoot
+    from breathe.project import ProjectOptions
 
     DoxContentBlockOptions = TypedDict(
         "DoxContentBlockOptions",
@@ -45,6 +47,7 @@ if TYPE_CHECKING:
     )
 else:
     DoxContentBlockOptions = None
+    ProjectOptions = None
     FinderRoot = None
 
 
@@ -135,7 +138,9 @@ class _DoxygenContentBlockDirective(BaseDirective):
         options = cast("DoxContentBlockOptions", self.options)
 
         try:
-            project_info = self.project_info_factory.create_project_info(options)
+            project_info = self.project_info_factory.create_project_info(
+                cast("ProjectOptions", options)
+            )
         except ProjectError as e:
             warning = self.create_warning(None, kind=self.kind)
             return warning.warn("doxygen{kind}: %s" % e)

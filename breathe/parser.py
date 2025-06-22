@@ -10,11 +10,18 @@ from breathe import file_state_cache, path_handler
 from breathe._parser import *
 
 if TYPE_CHECKING:
+    from typing import Union
+
     from sphinx.application import Sphinx
 
     from breathe.project import ProjectInfo
 
-    NodeOrValue = Node | str | None
+    if sys.version_info >= (3, 10):
+        from typing import TypeAlias
+    else:
+        from typing_extensions import TypeAlias
+
+    NodeOrValue: TypeAlias = Union[Node, str, None]
 
 
 @reprlib.recursive_repr()

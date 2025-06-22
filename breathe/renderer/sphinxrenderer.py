@@ -29,13 +29,13 @@ from breathe.renderer.filter import NodeStack
 
 php: Any
 try:
-    from sphinxcontrib import phpdomain as php  # type: ignore[import-untyped]
+    from sphinxcontrib import phpdomain as php  # type: ignore[import-untyped, no-redef]
 except ImportError:
     php = None
 
 cs: Any
 try:
-    from sphinx_csharp import csharp as cs  # type: ignore[import-untyped]
+    from sphinx_csharp import csharp as cs  # type: ignore[import-untyped, no-redef]
 except ImportError:
     cs = None
 
@@ -551,18 +551,18 @@ def get_content(node: parser.Node_docParaType):
 
 
 def get_parameterlists(node: parser.Node_docParaType) -> Iterable[parser.Node_docParamListType]:
-    pairs = map(parser.tag_name_value, node)
-    return (value for name, value in pairs if name == "parameterlist")
+    pairs = map(parser.tag_name_value, node)  # type: ignore[arg-type]
+    return (value for name, value in pairs if name == "parameterlist")  # type: ignore[misc]
 
 
 def get_simplesects(node: parser.Node_docParaType) -> Iterable[parser.Node_docSimpleSectType]:
-    pairs = map(parser.tag_name_value, node)
-    return (value for name, value in pairs if name == "simplesect")
+    pairs = map(parser.tag_name_value, node)  # type: ignore[arg-type]
+    return (value for name, value in pairs if name == "simplesect")  # type: ignore[misc]
 
 
 def get_images(node: parser.Node_docParaType) -> Iterable[parser.Node_docImageType]:
-    pairs = map(parser.tag_name_value, node)
-    return (value for name, value in pairs if name == "image")
+    pairs = map(parser.tag_name_value, node)  # type: ignore[arg-type]
+    return (value for name, value in pairs if name == "image")  # type: ignore[misc]
 
 
 def namespace_strip(config, nodes_: list[nodes.Node]):

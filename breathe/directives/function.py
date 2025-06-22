@@ -6,11 +6,7 @@ from typing import TYPE_CHECKING, cast
 from docutils import nodes
 from docutils.parsers.rst.directives import flag, unchanged_required
 from sphinx.domains import cpp
-
-try:
-    from sphinx.domains.cpp import _ast as cppast
-except ImportError:
-    cppast = cpp
+from sphinx.domains.cpp import _ast as cppast
 
 from breathe import parser
 from breathe.directives import BaseDirective
@@ -33,6 +29,7 @@ if TYPE_CHECKING:
     from sphinx.application import Sphinx
 
     from breathe import project
+    from breathe.project import ProjectOptions
     from breathe.renderer import TaggedNode
 
     DoxFunctionOptions = TypedDict(
@@ -112,7 +109,9 @@ class DoxygenFunctionDirective(BaseDirective):
         options = cast("DoxFunctionOptions", self.options)
 
         try:
-            project_info = self.project_info_factory.create_project_info(options)
+            project_info = self.project_info_factory.create_project_info(
+                cast("ProjectOptions", options)
+            )
         except ProjectError as e:
             warning = self.create_warning(None)
             return warning.warn("doxygenfunction: %s" % e)

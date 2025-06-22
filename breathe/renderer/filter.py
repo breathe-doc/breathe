@@ -52,11 +52,12 @@ from breathe import parser, renderer
 if TYPE_CHECKING:
     import sys
     from collections.abc import Container, Iterable, Mapping
+    from typing import Any, Callable, SupportsIndex, Union
 
     from sphinx.application import Sphinx
 
     if sys.version_info >= (3, 11):
-        from typing import Any, Callable, SupportsIndex, TypeAlias, TypeVar
+        from typing import Any, TypeAlias
     else:
         from typing_extensions import TypeAlias
 
@@ -71,9 +72,9 @@ if TYPE_CHECKING:
 
     DoxIndexFilter: TypeAlias = Callable[[parser.DoxygenIndex], FinderMatchItr]
 
-    DoxNamespaceOptions: TypeAlias = DoxClassOptions | DoxContentBlockOptions
+    DoxNamespaceOptions: TypeAlias = Union[DoxClassOptions, DoxContentBlockOptions]
 
-    T_options = TypeVar("T_options", DoxClassOptions, DoxContentBlockOptions)
+    T_options = Union[DoxClassOptions, DoxContentBlockOptions]
 
 
 CLASS_LIKE_COMPOUNDDEF = (

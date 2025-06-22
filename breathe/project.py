@@ -9,9 +9,11 @@ from typing import TYPE_CHECKING
 from breathe.exception import BreatheError
 
 if TYPE_CHECKING:
+    from collections import UserDict
+
     from sphinx.application import Sphinx
 
-    class ProjectOptions:
+    class ProjectOptions(UserDict):
         path: str
         project: str
 

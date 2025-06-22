@@ -13,12 +13,16 @@ from breathe.renderer.target import create_target_handler
 
 if TYPE_CHECKING:
     import sys
+    from typing import ClassVar
 
     if sys.version_info >= (3, 11):
-        from typing import ClassVar, NotRequired, TypedDict
+        from typing import NotRequired, TypedDict
     else:
         from typing_extensions import NotRequired, TypedDict
+
     from docutils.nodes import Node
+
+    from breathe.project import ProjectOptions
 
     DoxClassOptions = TypedDict(
         "DoxClassOptions",
@@ -39,6 +43,7 @@ if TYPE_CHECKING:
     )
 else:
     DoxClassOptions = None
+    ProjectOptions = None
 
 
 class _DoxygenClassLikeDirective(BaseDirective):
@@ -68,7 +73,9 @@ class _DoxygenClassLikeDirective(BaseDirective):
         options = cast("DoxClassOptions", self.options)
 
         try:
-            project_info = self.project_info_factory.create_project_info(options)
+            project_info = self.project_info_factory.create_project_info(
+                cast("ProjectOptions", options)
+            )
         except ProjectError as e:
             warning = self.create_warning(None, kind=self.kind)
             return warning.warn("doxygen{kind}: %s" % e)

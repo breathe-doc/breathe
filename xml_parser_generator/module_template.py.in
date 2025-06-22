@@ -1,5 +1,3 @@
-# flake8: noqa
-
 """
 Python module to parse Doxygen's XML output.
 
@@ -83,16 +81,27 @@ function:
 from __future__ import annotations
 
 import enum
-import warnings
 import functools
-from collections.abc import Iterable, Sequence
-from xml.parsers import expat
+import warnings
 from typing import (
-    Any, Callable, ClassVar, Generic, Literal, NamedTuple, NoReturn, TYPE_CHECKING, TypeVar
+    TYPE_CHECKING,
+    Literal,
+    NamedTuple,
 )
+from xml.parsers import expat
 
 if TYPE_CHECKING:
     import sys
+    from collections.abc import Iterable, Sequence
+    from typing import (
+        Any,
+        Callable,
+        ClassVar,
+        Generic,
+        NoReturn,
+        TypeVar,
+        Union,
+    )
 
     if sys.version_info >= (3, 11):
         from typing import TypeAlias
@@ -174,11 +183,11 @@ else:
 //%       set members = type.py_union_list(true)|sort
 //%       if members|length > 1
 if TYPE_CHECKING:
-    ListItem_{$ type $}: TypeAlias = (
+    ListItem_{$ type $}: TypeAlias = Union[
 //%         for m in members
-        {$ '| ' if not loop.first $}{$ m $}
+        {$ ', ' if not loop.first $}{$ m $}
 //%         endfor
-)
+    ]
 
 //%       endif
 //%     endif
