@@ -106,7 +106,13 @@ jobs:
       # folder where pytest will import from
       run: |
         pip install --upgrade pip
+        pip install --editable .[build]
         pip install --editable .[test]
+
+    - name: Generate parser
+      run: |
+        make parser
+        make format-parser
 
     - name: Test with pytest
       if: matrix.sphinx-version != 'latest'
