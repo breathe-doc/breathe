@@ -1537,7 +1537,7 @@ class SphinxRenderer(metaclass=NodeVisitor):
                             addnodes.desc_name(text=file_data.compounddef[0].title)
                         )
                 else:
-                    title_signode.append(nodes.emphasis(text=kind))
+                    title_signode.append(nodes.emphasis(text=kind.value))
                     title_signode.append(nodes.Text(" "))
                     title_signode.append(addnodes.desc_name(text=name))
 
