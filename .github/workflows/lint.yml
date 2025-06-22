@@ -30,6 +30,13 @@ jobs:
         args: --version
         version: 0.9.2
 
+    - name: Install dependencies
+      # "--editable" is needed so that _parser.py is placed in the local folder
+      # where pytest will import from
+      run: |
+        python -m pip install --upgrade pip
+        python -m pip install --editable ".[build]"
+
     - name: Generate parser
       run: make parser
 
@@ -54,6 +61,7 @@ jobs:
       # where pytest will import from
       run: |
         python -m pip install --upgrade pip
+        python -m pip install --editable ".[build]"
         python -m pip install --editable ".[lint]"
 
     - name: Generate parser
@@ -74,9 +82,12 @@ jobs:
         python-version: "3"
 
     - name: Install dependencies
+      # "--editable" is needed so that _parser.py is placed in the local folder
+      # where pytest will import from
       run: |
         python -m pip install --upgrade pip
         python -m pip install --upgrade twine build
+        python -m pip install --editable ".[build]"
 
     - name: Generate parser
       run: make parser

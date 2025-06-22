@@ -42,6 +42,9 @@ dependencies = [
 dynamic = ["version"]
 
 [project.optional-dependencies]
+build = [
+    "setuptools>=80.9.0"
+]
 docs = [
     "furo",
     "sphinx-copybutton",
