@@ -107,7 +107,6 @@ jobs:
     - name: Generate parser
       run: |
         make parser
-        make format-parser
 
     - name: Test with pytest
       if: matrix.sphinx-version != 'latest'
