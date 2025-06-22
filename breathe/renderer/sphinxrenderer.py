@@ -24,6 +24,7 @@ from sphinx.util import url_re
 from sphinx.util.nodes import nested_parse_with_titles
 
 from breathe import filetypes, parser
+from breathe._parser import DoxCompoundKind
 from breathe.cpp_util import split_name
 from breathe.renderer.filter import NodeStack
 
@@ -1526,10 +1527,19 @@ class SphinxRenderer(metaclass=NodeVisitor):
 
                 # Set up the title
                 #
-                # TODO: Restore the functionality introduced in https://github.com/breathe-doc/breathe/pull/939
-                title_signode.append(nodes.emphasis(text=kind.value))
-                title_signode.append(nodes.Text(" "))
-                title_signode.append(addnodes.desc_name(text=name))
+                # For groups & pages we render the 'title' instead of the 'name'
+                # as it more human friendly
+                if kind in [DoxCompoundKind.group, DoxCompoundKind.page] and file_data.compounddef:
+                    if "no-title" not in options:
+                        title_signode.append(nodes.emphasis(text=kind.value))
+                        title_signode.append(nodes.Text(" "))
+                        title_signode.append(
+                            addnodes.desc_name(text=file_data.compounddef[0].title)
+                        )
+                else:
+                    title_signode.append(nodes.emphasis(text=kind))
+                    title_signode.append(nodes.Text(" "))
+                    title_signode.append(addnodes.desc_name(text=name))
 
                 rst_node.append(title_signode)
 
