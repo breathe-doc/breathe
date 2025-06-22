@@ -20,6 +20,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-doxygen-
 
+        # TODO: Change to using github release downloads if possible
       - name: download Doxygen from SF binary archives
         if: steps.cache-doxygen.outputs.cache-hit != 'true'
         run: |

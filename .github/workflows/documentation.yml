@@ -63,6 +63,9 @@ jobs:
         python -m pip install --upgrade pip
         python -m pip install --editable .[build]
         python -m pip install .[docs]
+        # Remove the version of breathe that is automatically installed by the previous commands
+        # as it confuses the build. This build should pick up breathe from the repo source
+        python -m pip uninstall --yes breathe
 
     - name: Build the documentation
       run: |

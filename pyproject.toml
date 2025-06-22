@@ -115,6 +115,7 @@ warn_unused_configs = true
 warn_redundant_casts = true
 warn_unused_ignores = true
 
+# TODO: Remove if possible
 [[tool.mypy.overrides]]
 module = [
     "breathe.parser.compound",
