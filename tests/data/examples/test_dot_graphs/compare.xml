@@ -2,7 +2,7 @@
 <?xml-stylesheet href="../../docutils.css"?>
 <document>
     <desc domain="cpp" objtype="page">
-        <desc_signature classes="sig sig-object cpp"><target></target><emphasis>page</emphasis> <desc_name classes="sig-name descname">dotgraphs</desc_name></desc_signature>
+        <desc_signature classes="sig sig-object cpp"><target></target><emphasis>page</emphasis> <desc_name classes="sig-name descname">Dot Graph Demonstrations</desc_name></desc_signature>
         <desc_content>
             <section>
                 <title>Using @dot command</title>
