@@ -2,7 +2,7 @@
 <?xml-stylesheet href="../../docutils.css"?>
 <document>
     <desc domain="cpp" objtype="group">
-        <desc_signature classes="sig sig-object cpp"><target></target><emphasis>group</emphasis> <desc_name classes="sig-name descname">mygroup</desc_name></desc_signature>
+        <desc_signature classes="sig sig-object cpp"><target></target><emphasis>group</emphasis> <desc_name classes="sig-name descname">My Group</desc_name></desc_signature>
         <desc_content>
             <paragraph>This is the first group. </paragraph>
             <container classes="breathe-sectiondef" objtype="func">
@@ -48,7 +48,7 @@
         </desc_content>
     </desc>
     <desc domain="cpp" objtype="group">
-        <desc_signature classes="sig sig-object cpp"><target></target><emphasis>group</emphasis> <desc_name classes="sig-name descname">innergroup</desc_name></desc_signature>
+        <desc_signature classes="sig sig-object cpp"><target></target><emphasis>group</emphasis> <desc_name classes="sig-name descname">Inner Group</desc_name></desc_signature>
         <desc_content>
             <paragraph>This is an inner group. </paragraph>
             <index entries="['single',\ 'InnerGroupClassTest\ (C++\ class)',\ '_CPPv419InnerGroupClassTest',\ '',\ None]"></index>

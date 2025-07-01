@@ -39,31 +39,31 @@
         </desc>
     </container>
     <desc domain="cpp" objtype="page">
-        <desc_signature classes="sig sig-object cpp"><target></target><emphasis>page</emphasis> <desc_name classes="sig-name descname">todo</desc_name></desc_signature>
+        <desc_signature classes="sig sig-object cpp"><target></target><emphasis>page</emphasis> <desc_name classes="sig-name descname">Todo List</desc_name></desc_signature>
         <desc_content>
             <paragraph><desc domain="cpp" objtype="varentry"><desc_signature classes="sig sig-object cpp">Member <reference internal="True" refid="xrefsect_8h_1aaabc1fc395849c996ef721dee24a4d15"><inline classes="std std-ref">unimplemented</inline></reference>  (void)</desc_signature><desc_content><paragraph><target></target>Implement this function. </paragraph></desc_content></desc></paragraph>
         </desc_content>
     </desc>
     <desc domain="cpp" objtype="page">
-        <desc_signature classes="sig sig-object cpp"><target></target><emphasis>page</emphasis> <desc_name classes="sig-name descname">bug</desc_name></desc_signature>
+        <desc_signature classes="sig sig-object cpp"><target></target><emphasis>page</emphasis> <desc_name classes="sig-name descname">Bug List</desc_name></desc_signature>
         <desc_content>
             <paragraph><desc domain="cpp" objtype="varentry"><desc_signature classes="sig sig-object cpp">Member <reference internal="True" refid="xrefsect_8h_1a4af8f2780237883e0fd8ce8c7cda364a"><inline classes="std std-ref">buggy_function</inline></reference>  (int param)</desc_signature><desc_content><paragraph><target></target>Does not work yet.</paragraph></desc_content></desc></paragraph>
         </desc_content>
     </desc>
     <desc domain="cpp" objtype="page">
-        <desc_signature classes="sig sig-object cpp"><target></target><emphasis>page</emphasis> <desc_name classes="sig-name descname">test</desc_name></desc_signature>
+        <desc_signature classes="sig sig-object cpp"><target></target><emphasis>page</emphasis> <desc_name classes="sig-name descname">Test List</desc_name></desc_signature>
         <desc_content>
             <paragraph><desc domain="cpp" objtype="varentry"><desc_signature classes="sig sig-object cpp">Member <reference internal="True" refid="xrefsect_8h_1a4af8f2780237883e0fd8ce8c7cda364a"><inline classes="std std-ref">buggy_function</inline></reference>  (int param)</desc_signature><desc_content><paragraph><target></target>Add proper unit testing first. </paragraph></desc_content></desc></paragraph>
         </desc_content>
     </desc>
     <desc domain="cpp" objtype="page">
-        <desc_signature classes="sig sig-object cpp"><target></target><emphasis>page</emphasis> <desc_name classes="sig-name descname">deprecated</desc_name></desc_signature>
+        <desc_signature classes="sig sig-object cpp"><target></target><emphasis>page</emphasis> <desc_name classes="sig-name descname">Deprecated List</desc_name></desc_signature>
         <desc_content>
             <paragraph><desc domain="cpp" objtype="varentry"><desc_signature classes="sig sig-object cpp">Member <reference internal="True" refid="xrefsect_8h_1a726ec28ea097364e46ca633d7f33596c"><inline classes="std std-ref">old_function</inline></reference>  (void)</desc_signature><desc_content><paragraph><target></target>Should not be used on new code. </paragraph></desc_content></desc></paragraph>
         </desc_content>
     </desc>
     <desc domain="cpp" objtype="page">
-        <desc_signature classes="sig sig-object cpp"><target></target><emphasis>page</emphasis> <desc_name classes="sig-name descname">xrefsample</desc_name></desc_signature>
+        <desc_signature classes="sig sig-object cpp"><target></target><emphasis>page</emphasis> <desc_name classes="sig-name descname">xref Sample</desc_name></desc_signature>
         <desc_content>
             <paragraph><desc domain="cpp" objtype="varentry"><desc_signature classes="sig sig-object cpp">Member <reference internal="True" refid="xrefsect_8h_1a1d47f2d2bb9f6df76e98126ba67d012d"><inline classes="std std-ref">sample_xrefitem_function</inline></reference>  (void)</desc_signature><desc_content><paragraph><target></target> This text shows up in the xref output. </paragraph></desc_content></desc></paragraph>
         </desc_content>

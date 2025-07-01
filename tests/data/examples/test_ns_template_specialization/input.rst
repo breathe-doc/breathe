@@ -1,1 +1,0 @@
-.. doxygenfile:: ns_template_specialization.h
