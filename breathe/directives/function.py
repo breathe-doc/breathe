@@ -6,7 +6,6 @@ from typing import TYPE_CHECKING, cast
 from docutils import nodes
 from docutils.parsers.rst.directives import flag, unchanged_required
 from sphinx.domains import cpp
-from sphinx.domains.cpp import _ast as cppast
 
 from breathe import parser
 from breathe.directives import BaseDirective
@@ -19,6 +18,7 @@ from breathe.renderer.target import create_target_handler
 
 if TYPE_CHECKING:
     import sys
+    from types import ModuleType
 
     if sys.version_info >= (3, 11):
         from typing import NotRequired, TypedDict
@@ -32,12 +32,19 @@ if TYPE_CHECKING:
     from breathe.project import ProjectOptions
     from breathe.renderer import TaggedNode
 
+    cppast: ModuleType
+
     DoxFunctionOptions = TypedDict(
         "DoxFunctionOptions",
         {"path": str, "project": str, "outline": NotRequired[None], "no-link": NotRequired[None]},
     )
 else:
     DoxFunctionOptions = None
+
+try:
+    from sphinx.domains.cpp import _ast as cppast
+except ImportError:
+    cppast = cpp
 
 
 class _NoMatchingFunctionError(BreatheError):
@@ -203,7 +210,7 @@ class DoxygenFunctionDirective(BaseDirective):
             self.directive_args,
         )
 
-    def _parse_args(self, function_description: str) -> cppast.ASTParametersQualifiers | None:
+    def _parse_args(self, function_description: str) -> cppast.ASTParametersQualifiers | None:  # type: ignore[name-defined]
         # Note: the caller must catch cpp.DefinitionError
         if function_description == "":
             return None
@@ -290,7 +297,7 @@ class DoxygenFunctionDirective(BaseDirective):
     def _resolve_function(
         self,
         matches: list[filter.FinderMatch],
-        args: cppast.ASTParametersQualifiers | None,
+        args: cppast.ASTParametersQualifiers | None,  # type: ignore[name-defined]
         project_info: project.ProjectInfo,
     ):
         if not matches:
