@@ -8,21 +8,21 @@ How It Works
 There are three main sections to Breathe: parser, finders and renderers.
 Briefly:
 
-   **parser**
-      Responsible for reading the doxygen xml output and creating objects
-      representing the data. Found in ``breathe.parser``.
-      
-   **finders**
-      Responsible for finding reference objects within the output from the
-      parser. Found in ``breathe.finder``.
+**parser**
+   Responsible for reading the doxygen xml output and creating objects
+   representing the data. Found in ``breathe.parser``.
 
-   **renderers**
-      Responsible for producing reStructuredText nodes to represent the objects
-      that the finders have found. The renderers generally descend through the
-      object hierarchies rendering the objects, their children, their children's
-      children and so on. Found in ``breathe.renderer``.
+**finders**
+   Responsible for finding reference objects within the output from the
+   parser. Found in ``breathe.finder``.
 
-The following flow chart shows how the different components of Breathe transform 
+**renderers**
+   Responsible for producing reStructuredText nodes to represent the objects
+   that the finders have found. The renderers generally descend through the
+   object hierarchies rendering the objects, their children, their children's
+   children and so on. Found in ``breathe.renderer``.
+
+The following flow chart shows how the different components of Breathe transform
 data. The shaded region indicates which components are part of Breathe.
 
 .. image:: ../assets/BreatheFlowChart.svg
