@@ -1,0 +1,2 @@
+.. doxygenindex::
+.. doxygenfile:: index.h
