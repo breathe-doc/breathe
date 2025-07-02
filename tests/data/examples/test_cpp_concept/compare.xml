@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<?xml-stylesheet href="../../docutils.css"?>
+<document>
+    <index entries="['single',\ 'Hashable\ (C++\ concept)',\ '_CPPv4I0E8Hashable',\ '',\ None]"></index>
+    <desc classes="cpp concept" desctype="concept" domain="cpp" objtype="concept">
+        <desc_signature classes="sig sig-object cpp"><target></target><desc_signature_line><desc_sig_keyword classes="k">template</desc_sig_keyword><desc_sig_punctuation classes="p">&lt;</desc_sig_punctuation><desc_sig_keyword classes="k">typename</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">T</desc_sig_name></desc_name><desc_sig_punctuation classes="p">&gt;</desc_sig_punctuation></desc_signature_line><desc_signature_line><desc_sig_keyword classes="k">concept</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">Hashable</desc_sig_name></desc_name></desc_signature_line></desc_signature>
+        <desc_content>
+        </desc_content>
+    </desc>
+</document>

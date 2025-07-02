@@ -1,7 +1,6 @@
 name: Build documentation
 
 on:
-  push:
   pull_request:
   workflow_dispatch:
 
@@ -13,10 +12,15 @@ concurrency:
   cancel-in-progress: true
 
 env:
+  DOXYGEN_VERSION: 1.9.4
   FORCE_COLOR: "1"
 
 jobs:
+  cache-doxygen:
+    uses: ./.github/workflows/cache_doxygen.yml
+
   build:
+    needs: cache-doxygen
     runs-on: ubuntu-latest
 
     steps:
@@ -25,30 +29,46 @@ jobs:
       uses: actions/setup-python@v5
       with:
         python-version: "3"
+        cache: 'pip'
 
     - name: Install apt dependencies
       run: |
-        sudo apt-get update
-        sudo apt-get install graphviz
+        sudo apt-get -y update
+        sudo apt-get -y install graphviz
 
-    - name: Install Doxygen from GitHub releases
-      env:
-        DOXYGEN_VERSION: 1.9.4
+    - uses: actions/cache/restore@v4
+      id: cache-doxygen
+      with:
+        path: doxygen-bin-arc
+        fail-on-cache-miss: true
+        key: ${{ runner.os }}-doxygen-${{ env.DOXYGEN_VERSION }}
+
+    - name: Install doxygen
+      # at some point actions/cache/restore@4 started unpacking doxygen.tar.gz
+      # automatically and I don't know why -- Rouslan
       run: |
-        mkdir doxygen-bin-arc && cd doxygen-bin-arc
-        curl -LsSf https://github.com/doxygen/doxygen/releases/download/Release_${DOXYGEN_VERSION//./_}/doxygen-$DOXYGEN_VERSION.linux.bin.tar.gz > doxygen.tar.gz
-        gunzip doxygen.tar.gz
-        tar xf doxygen.tar
-        cd doxygen-$DOXYGEN_VERSION
+        cd doxygen-bin-arc
+        if test -d doxygen; then
+          cd doxygen
+        else
+          gunzip doxygen.tar.gz
+          tar xf doxygen.tar
+          cd doxygen-${{ env.DOXYGEN_VERSION }}
+        fi
         sudo make install
 
-    - name: Install dependencies
+    - name: Install Python dependencies
       run: |
         python -m pip install --upgrade pip
+        python -m pip install --editable .[build]
         python -m pip install .[docs]
+        # Remove the version of breathe that is automatically installed by the previous commands
+        # as it confuses the build. This build should pick up breathe from the repo source
+        python -m pip uninstall --yes breathe
 
     - name: Build the documentation
       run: |
+        make parser
         make html
         rm documentation/build/html/.buildinfo
 

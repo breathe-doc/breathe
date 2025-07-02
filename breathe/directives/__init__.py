@@ -5,19 +5,21 @@ from typing import TYPE_CHECKING
 from docutils import nodes
 from sphinx.directives import SphinxDirective
 
-from breathe.finder.factory import FinderFactory
-from breathe.parser import FileIOError, ParserError
+from breathe import parser
+from breathe.finder import factory
 from breathe.renderer import RenderContext, format_parser_error
-from breathe.renderer.filter import FilterFactory
 from breathe.renderer.sphinxrenderer import SphinxRenderer
 
 if TYPE_CHECKING:
     from collections.abc import Sequence
     from typing import Any
 
-    from breathe.parser import DoxygenParserFactory
+    from sphinx.application import Sphinx
+
+    from breathe.parser import DoxygenParser
     from breathe.project import ProjectInfo, ProjectInfoFactory
-    from breathe.renderer.filter import Filter
+    from breathe.renderer import TaggedNode
+    from breathe.renderer.filter import DoxFilter
     from breathe.renderer.mask import MaskFactoryBase
     from breathe.renderer.target import TargetHandler
 
@@ -67,20 +69,20 @@ class BaseDirective(SphinxDirective):
         return self.env.temp_data["breathe_project_info_factory"]
 
     @property
-    def parser_factory(self) -> DoxygenParserFactory:
-        return self.env.temp_data["breathe_parser_factory"]
+    def dox_parser(self) -> DoxygenParser:
+        return self.env.temp_data["breathe_dox_parser"]
 
     @property
-    def finder_factory(self) -> FinderFactory:
-        return FinderFactory(self.env.app, self.parser_factory)
+    def app(self) -> Sphinx:
+        return self.env.app
 
-    @property
-    def filter_factory(self) -> FilterFactory:
-        return FilterFactory(self.env.app)
+    def get_doxygen_index(self, project_info: ProjectInfo) -> parser.DoxygenIndex:
+        return self.dox_parser.parse_index(project_info)
 
-    @property
-    def kind(self) -> str:
-        raise NotImplementedError
+    def create_finder_from_root(
+        self, root: factory.FinderRoot, project_info: ProjectInfo
+    ) -> factory.Finder:
+        return factory.create_finder_from_root(self.env.app, self.dox_parser, root, project_info)
 
     def create_warning(self, project_info: ProjectInfo | None, **kwargs) -> _WarningHandler:
         if project_info:
@@ -95,9 +97,9 @@ class BaseDirective(SphinxDirective):
 
     def render(
         self,
-        node_stack,
+        node_stack: list[TaggedNode],
         project_info: ProjectInfo,
-        filter_: Filter,
+        filter_: DoxFilter,
         target_handler: TargetHandler,
         mask_factory: MaskFactoryBase,
         directive_args,
@@ -106,23 +108,25 @@ class BaseDirective(SphinxDirective):
 
         try:
             object_renderer = SphinxRenderer(
-                self.parser_factory.app,
+                self.dox_parser.app,
                 project_info,
-                node_stack,
+                [tn.value for tn in node_stack],
                 self.state,
                 self.state.document,
                 target_handler,
-                self.parser_factory.create_compound_parser(project_info),
+                self.dox_parser,
                 filter_,
             )
-        except ParserError as e:
+        except parser.ParserError as e:
             return format_parser_error(
-                "doxygenclass", e.error, e.filename, self.state, self.lineno, True
+                "doxygenclass", e.message, e.filename, self.state, self.lineno, True
             )
-        except FileIOError as e:
+        except parser.FileIOError as e:
             return format_parser_error(
                 "doxygenclass", e.error, e.filename, self.state, self.lineno, True
             )
 
         context = RenderContext(node_stack, mask_factory, directive_args)
-        return object_renderer.render(node_stack[0], context)
+        node = node_stack[0].value
+        assert isinstance(node, parser.Node)
+        return object_renderer.render(node, context)

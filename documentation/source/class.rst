@@ -87,12 +87,12 @@ declaration:
 
 .. code-block:: rst
 
-   .. doxygenclass:: TemplateClass
+   .. doxygenclass:: SecondTemplateClass
       :project: template_specialisation
 
 Produces this output:
 
-.. doxygenclass:: TemplateClass
+.. doxygenclass:: SecondTemplateClass
    :project: template_specialisation
 
 Note the spacing inside the ``<>``, it's important: there must be a

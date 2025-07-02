@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<?xml-stylesheet href="../../docutils.css"?>
+<document>
+    <index entries="['single',\ 'HeadingsTest1\ (C++\ class)',\ '_CPPv413HeadingsTest1',\ '',\ None]"></index>
+    <desc classes="cpp class" desctype="class" domain="cpp" objtype="class">
+        <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword classes="k">class</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">HeadingsTest1</desc_sig_name></desc_name></desc_signature_line></desc_signature>
+        <desc_content>
+            <paragraph>This is a documentation. </paragraph>
+            <paragraph>This is more documentation.</paragraph>
+            <paragraph><emphasis>Header</emphasis></paragraph>
+            <paragraph>Text</paragraph>
+            <paragraph><emphasis>Header <strong>Bold Header Text</strong></emphasis></paragraph>
+            <paragraph>Text</paragraph>
+            <emphasis>Header</emphasis>
+            <target refid="class_headings_test1_1autotoc_md0"></target>
+            <paragraph>Text</paragraph>
+            <emphasis>Header</emphasis>
+            <target refid="class_headings_test1_1autotoc_md1"></target>
+            <paragraph>Text </paragraph>
+        </desc_content>
+    </desc>
+    <index entries="['single',\ 'HeadingsTest2\ (C++\ class)',\ '_CPPv413HeadingsTest2',\ '',\ None]"></index>
+    <desc classes="cpp class" desctype="class" domain="cpp" objtype="class">
+        <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword classes="k">class</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">HeadingsTest2</desc_sig_name></desc_name></desc_signature_line></desc_signature>
+        <desc_content>
+            <section>
+                <title>Header 1</title>
+                <target refid="class_headings_test2_1autotoc_md2"></target>
+                <paragraph>Blah</paragraph>
+                <section>
+                    <title>Header 2</title>
+                    <target refid="class_headings_test2_1autotoc_md3"></target>
+                    <paragraph>Blah blah</paragraph>
+                    <section>
+                        <title>Header 3</title>
+                        <target refid="class_headings_test2_1autotoc_md4"></target>
+                        <paragraph>Blah blah blah </paragraph>
+                    </section>
+                </section>
+            </section>
+        </desc_content>
+    </desc>
+    <index entries="['single',\ 'HeadingsTest3\ (C++\ class)',\ '_CPPv413HeadingsTest3',\ '',\ None]"></index>
+    <desc classes="cpp class" desctype="class" domain="cpp" objtype="class">
+        <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword classes="k">class</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">HeadingsTest3</desc_sig_name></desc_name></desc_signature_line></desc_signature>
+        <desc_content>
+            <emphasis>Header3</emphasis>
+            <target refid="class_headings_test3_1autotoc_md5"></target>
+            <paragraph>Text </paragraph>
+        </desc_content>
+    </desc>
+    <index entries="['single',\ 'HeadingsTest4\ (C++\ class)',\ '_CPPv413HeadingsTest4',\ '',\ None]"></index>
+    <desc classes="cpp class" desctype="class" domain="cpp" objtype="class">
+        <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword classes="k">class</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">HeadingsTest4</desc_sig_name></desc_name></desc_signature_line></desc_signature>
+        <desc_content>
+            <section>
+                <title>Header 1</title>
+                <target refid="class_headings_test4_1autotoc_md6"></target>
+                <paragraph>Text</paragraph>
+                <emphasis>Header 3</emphasis>
+                <target refid="class_headings_test4_1autotoc_md7"></target>
+                <paragraph>Text text text </paragraph>
+            </section>
+        </desc_content>
+    </desc>
+</document>

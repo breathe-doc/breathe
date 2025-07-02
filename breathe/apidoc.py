@@ -58,14 +58,14 @@ def write_file(name, text, args):
         print_info("Creating file %s." % fname, args)
         fname.parent.mkdir(parents=True, exist_ok=True)
         try:
-            orig = fname.read_text()
+            orig = fname.read_text(encoding="utf-8")
             if orig == text:
                 print_info("File %s up to date, skipping." % fname, args)
                 return
         except FileNotFoundError:
             # Don't mind if it isn't there
             pass
-        fname.write_text(text)
+        fname.write_text(text, encoding="utf-8")
 
 
 def format_heading(level, text):
@@ -128,6 +128,7 @@ class TypeAction(argparse.Action):
         self.metavar = ",".join(TYPEDICT.keys())
 
     def __call__(self, parser, namespace, values, option_string=None):
+        assert isinstance(values, str)
         value_list = values.split(",")
         for value in value_list:
             if value not in TYPEDICT:

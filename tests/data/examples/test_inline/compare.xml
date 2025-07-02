@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<?xml-stylesheet href="../../docutils.css"?>
+<document>
+    <index entries="['single',\ 'InlineTest\ (C++\ class)',\ '_CPPv410InlineTest',\ '',\ None]"></index>
+    <desc classes="cpp class" desctype="class" domain="cpp" objtype="class">
+        <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword classes="k">class</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">InlineTest</desc_sig_name></desc_name></desc_signature_line></desc_signature>
+        <desc_content>
+            <paragraph>A class to demonstrate inline documentation syntax. </paragraph>
+            <container classes="breathe-sectiondef" objtype="public-func">
+                <rubric classes="breathe-sectiondef-title">Public Functions</rubric>
+                <index entries="['single',\ 'InlineTest::member\ (C++\ function)',\ '_CPPv4N10InlineTest6memberEci',\ '',\ None]"></index>
+                <desc classes="cpp function" desctype="function" domain="cpp" objtype="function">
+                    <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword classes="k">const</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_sig_keyword_type classes="kt">char</desc_sig_keyword_type><desc_sig_space classes="w"> </desc_sig_space><desc_sig_punctuation classes="p">*</desc_sig_punctuation><desc_name classes="sig-name descname"><desc_sig_name classes="n">member</desc_sig_name></desc_name><desc_parameterlist><desc_parameter noemph="True"><desc_sig_keyword_type classes="kt">char</desc_sig_keyword_type><desc_sig_space classes="w"> </desc_sig_space><desc_sig_name classes="n sig-param">c</desc_sig_name></desc_parameter><desc_parameter noemph="True"><desc_sig_keyword_type classes="kt">int</desc_sig_keyword_type><desc_sig_space classes="w"> </desc_sig_space><desc_sig_name classes="n sig-param">n</desc_sig_name></desc_parameter></desc_parameterlist></desc_signature_line></desc_signature>
+                    <desc_content>
+                        <paragraph>A member function. </paragraph>
+                        <paragraph>Details about member function</paragraph>
+                        <field_list>
+                            <field>
+                                <field_name>Parameters</field_name>
+                                <field_body>
+                                    <bullet_list>
+                                        <list_item>
+                                            <paragraph><literal_strong>c</literal_strong> – c a character. </paragraph>
+                                        </list_item>
+                                        <list_item>
+                                            <paragraph><literal_strong>n</literal_strong> – n an integer. </paragraph>
+                                        </list_item>
+                                    </bullet_list>
+                                </field_body>
+                            </field>
+                            <field>
+                                <field_name>Throws</field_name>
+                                <field_body>
+                                    <paragraph><inline><desc_inline classes="cpp-expr sig sig-inline cpp" domain="cpp"><desc_sig_name classes="n">std</desc_sig_name><desc_sig_punctuation classes="p">::</desc_sig_punctuation><desc_sig_name classes="n">out_of_range</desc_sig_name></desc_inline></inline> – parameter is out of range. </paragraph>
+                                </field_body>
+                            </field>
+                            <field>
+                                <field_name>Returns</field_name>
+                                <field_body>
+                                    <paragraph>a character pointer. </paragraph>
+                                </field_body>
+                            </field>
+                        </field_list>
+                    </desc_content>
+                </desc>
+            </container>
+        </desc_content>
+    </desc>
+</document>

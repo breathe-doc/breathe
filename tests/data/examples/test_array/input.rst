@@ -1,0 +1,2 @@
+.. doxygenfunction:: foo
+.. doxygenfunction:: bar

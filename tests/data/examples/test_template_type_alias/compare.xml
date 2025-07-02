@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<?xml-stylesheet href="../../docutils.css"?>
+<document>
+    <container classes="breathe-sectiondef" objtype="typedef">
+        <rubric classes="breathe-sectiondef-title">Typedefs</rubric>
+        <index entries="['single',\ 'IsFuzzy\ (C++\ type)',\ '_CPPv4I0E7IsFuzzy',\ '',\ None]"></index>
+        <desc classes="cpp type" desctype="type" domain="cpp" objtype="type">
+            <desc_signature classes="sig sig-object cpp"><desc_signature_line><desc_sig_keyword classes="k">template</desc_sig_keyword><desc_sig_punctuation classes="p">&lt;</desc_sig_punctuation><desc_sig_keyword classes="k">typename</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">T</desc_sig_name></desc_name><desc_sig_punctuation classes="p">&gt;</desc_sig_punctuation></desc_signature_line><desc_signature_line><target></target><desc_sig_keyword classes="k">using</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">IsFuzzy</desc_sig_name></desc_name><desc_sig_space classes="w"> </desc_sig_space><desc_sig_punctuation classes="p">=</desc_sig_punctuation><desc_sig_space classes="w"> </desc_sig_space><desc_sig_name classes="n">std</desc_sig_name><desc_sig_punctuation classes="p">::</desc_sig_punctuation><desc_sig_name classes="n">is_fuzzy</desc_sig_name><desc_sig_punctuation classes="p">&lt;</desc_sig_punctuation><reference internal="True" refid="_CPPv4I0E7IsFuzzy" reftitle="IsFuzzy::T"><desc_sig_name classes="n">T</desc_sig_name></reference><desc_sig_punctuation classes="p">&gt;</desc_sig_punctuation></desc_signature_line></desc_signature>
+            <desc_content>
+                <paragraph>a type alias with one template argument </paragraph>
+                <field_list>
+                    <field>
+                        <field_name>Template Parameters</field_name>
+                        <field_body>
+                            <paragraph><literal_strong>T</literal_strong> – this is the template parameter </paragraph>
+                        </field_body>
+                    </field>
+                </field_list>
+            </desc_content>
+        </desc>
+        <index entries="['single',\ 'IsFurry\ (C++\ type)',\ '_CPPv4I00_iE7IsFurry',\ '',\ None]"></index>
+        <desc classes="cpp type" desctype="type" domain="cpp" objtype="type">
+            <desc_signature classes="sig sig-object cpp"><desc_signature_line><desc_sig_keyword classes="k">template</desc_sig_keyword><desc_sig_punctuation classes="p">&lt;</desc_sig_punctuation><desc_sig_keyword classes="k">typename</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">T</desc_sig_name></desc_name><desc_sig_punctuation classes="p">,</desc_sig_punctuation><desc_sig_space classes="w"> </desc_sig_space><desc_sig_keyword classes="k">typename</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">U</desc_sig_name></desc_name><desc_sig_punctuation classes="p">,</desc_sig_punctuation><desc_sig_space classes="w"> </desc_sig_space><desc_sig_keyword_type classes="kt">int</desc_sig_keyword_type><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">N</desc_sig_name></desc_name><desc_sig_punctuation classes="p">&gt;</desc_sig_punctuation></desc_signature_line><desc_signature_line><target></target><desc_sig_keyword classes="k">using</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">IsFurry</desc_sig_name></desc_name><desc_sig_space classes="w"> </desc_sig_space><desc_sig_punctuation classes="p">=</desc_sig_punctuation><desc_sig_space classes="w"> </desc_sig_space><desc_sig_name classes="n">std</desc_sig_name><desc_sig_punctuation classes="p">::</desc_sig_punctuation><desc_sig_name classes="n">is_furry</desc_sig_name><desc_sig_punctuation classes="p">&lt;</desc_sig_punctuation><reference internal="True" refid="_CPPv4I00_iE7IsFurry" reftitle="IsFurry::T"><desc_sig_name classes="n">T</desc_sig_name></reference><desc_sig_punctuation classes="p">,</desc_sig_punctuation><desc_sig_space classes="w"> </desc_sig_space><reference internal="True" refid="_CPPv4I00_iE7IsFurry" reftitle="IsFurry::U"><desc_sig_name classes="n">U</desc_sig_name></reference><desc_sig_punctuation classes="p">,</desc_sig_punctuation><desc_sig_space classes="w"> </desc_sig_space><reference internal="True" refid="_CPPv4I00_iE7IsFurry" reftitle="IsFurry::N"><desc_sig_name classes="n">N</desc_sig_name></reference><desc_sig_punctuation classes="p">&gt;</desc_sig_punctuation></desc_signature_line></desc_signature>
+            <desc_content>
+                <paragraph>a type alias with three template arguments </paragraph>
+                <field_list>
+                    <field>
+                        <field_name>Template Parameters</field_name>
+                        <field_body>
+                            <bullet_list>
+                                <list_item>
+                                    <paragraph><literal_strong>T</literal_strong> – this is the first template parameter </paragraph>
+                                </list_item>
+                                <list_item>
+                                    <paragraph><literal_strong>U</literal_strong> – this is the second template parameter </paragraph>
+                                </list_item>
+                                <list_item>
+                                    <paragraph><literal_strong>N</literal_strong> – this is the third template parameter, it is a non-type parameter </paragraph>
+                                </list_item>
+                            </bullet_list>
+                        </field_body>
+                    </field>
+                </field_list>
+            </desc_content>
+        </desc>
+    </container>
+</document>

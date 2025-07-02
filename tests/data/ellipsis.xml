@@ -1,3 +1,6 @@
+<doxygen lang="" version="">
+<compounddef id="" kind="type" prot="public">
+<compoundname></compoundname>
 <sectiondef kind="typedef">
 <memberdef kind="function" id="0" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
   <type>double</type>
@@ -15,6 +18,8 @@
   <param>
     <type>...</type>
   </param>
+  <location file="" line="0"></location>
 </memberdef>
 </sectiondef>
-
+</compounddef>
+</doxygen>

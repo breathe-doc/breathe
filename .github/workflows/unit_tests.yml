@@ -1,11 +1,6 @@
 name: Tests
 
 on:
-  push:
-    paths:
-      - ".github/workflows/unit_tests.yml"
-      - "breathe/**"
-      - "tests/**"
   pull_request:
     paths:
       - ".github/workflows/unit_tests.yml"
@@ -25,11 +20,18 @@ env:
   PYTHONWARNDEFAULTENCODING: "1"  # -X warn_default_encoding
 
 jobs:
+  cache-doxygen:
+    uses: ./.github/workflows/cache_doxygen.yml
+
   test:
+    needs: cache-doxygen
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
+        doxygen-version:
+          - '1.9.4'
+          - '1.9.7'
         python-version:
           - '3.9'
           - '3.10'
@@ -37,18 +39,31 @@ jobs:
           - '3.12'
           - '3.13'
         sphinx-version:
+          - '6.2'
+          - '7.0'
+          - '7.1'
           - '7.2' # Ubuntu 24.04
+          # version 7.3 broke up the domain modules into packages, changing
+          # where some classes had to be imported from
+          - '7.3'
           - '7.4' # Ubuntu 24.10
+          - '8.0'
           - '8.1' # Ubuntu 25.04
+          - '8.2' # Ubuntu 25.04
         exclude:
           - python-version: '3.9'
             sphinx-version: '8.0'
           - python-version: '3.9'
             sphinx-version: '8.1'
-          - python-version: '3.12'
-            sphinx-version: '6.2'
-          - python-version: '3.13'
-            sphinx-version: '6.2'
+          - python-version: '3.9'
+            sphinx-version: '8.2'
+          - python-version: '3.9'
+            sphinx-version: 'latest'
+
+          - python-version: '3.10'
+            sphinx-version: '8.2'
+          - python-version: '3.10'
+            sphinx-version: 'latest'
 
     steps:
     - uses: actions/checkout@v4
@@ -56,30 +71,57 @@ jobs:
       uses: actions/setup-python@v5
       with:
         python-version: ${{ matrix.python-version }}
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        python -m pip install .[test]
+        cache: 'pip'
+
     - name: Install Sphinx ${{ matrix.sphinx-version }}
-      run: python -m pip install --upgrade "Sphinx~=${{ matrix.sphinx-version }}.0"
+      if: matrix.sphinx-version != 'latest'
+      run: |
+        python -m pip install -Iv Sphinx==${{ matrix.sphinx-version }}
+    
+    - name: Install Sphinx master
+      if: matrix.sphinx-version == 'latest'
+      run: |
+        python -m pip install "Sphinx @ git+https://github.com/sphinx-doc/sphinx.git@master"
+
+    - uses: actions/cache/restore@v4
+      id: cache-doxygen
+      with:
+        path: doxygen-bin-arc
+        fail-on-cache-miss: true
+        key: ${{ runner.os }}-doxygen-${{ matrix.doxygen-version }}
+
+    - name: Install doxygen
+      # at some point actions/cache/restore@4 started unpacking doxygen.tar.gz
+      # automatically and I don't know why -- Rouslan
+      run: |
+        cd doxygen-bin-arc
+        if test -d doxygen; then
+          cd doxygen
+        else
+          gunzip doxygen.tar.gz
+          tar xf doxygen.tar
+          cd doxygen-${{ matrix.doxygen-version }}
+        fi
+        sudo make install
+
+    - name: Install dependencies
+      # "--editable" is needed so that _parser.py is placed in the local
+      # folder where pytest will import from
+      run: |
+        pip install --upgrade pip
+        pip install --editable .[build]
+        pip install --editable .[test]
+
+    - name: Generate parser
+      run: |
+        make parser
+
     - name: Test with pytest
+      if: matrix.sphinx-version != 'latest'
       run: python -m pytest -vv
       env:
         PYTHONWARNINGS: "error"  # treat all warnings as errors
-
-  test-latest-sphinx:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v4
-    - name: Set up Python ${{ matrix.python }}
-      uses: actions/setup-python@v5
-      with:
-        python-version: "3"
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        python -m pip install .[test]
-    - name: Install Sphinx master
-      run: python -m pip install "Sphinx @ git+https://github.com/sphinx-doc/sphinx"
+      
     - name: Test with pytest
+      if: matrix.sphinx-version == 'latest'
       run: python -m pytest -vv

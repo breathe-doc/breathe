@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<?xml-stylesheet href="../../docutils.css"?>
+<document>
+    <desc domain="cpp" objtype="page">
+        <desc_signature classes="sig sig-object cpp"><target></target><emphasis>page</emphasis> <desc_name classes="sig-name descname">Dot Graph Demonstrations</desc_name></desc_signature>
+        <desc_content>
+            <section>
+                <title>Using @dot command</title>
+                <target refid="dotgraphs_1dotcmd"></target>
+                <paragraph><figure><graphviz code='&#10;digraph G {&#10;    bgcolor="purple:pink" label="a graph" fontcolor="white"&#10;    subgraph cluster1 {&#10;        fillcolor="blue:cyan" label="a cluster" fontcolor="white" style="filled" gradientangle="270"&#10;        node [shape=box fillcolor="red:yellow" style="filled" gradientangle=90]&#10;    "a node";&#10;   }&#10;}&#10;'></graphviz><caption>basic graph elements</caption></figure></paragraph>
+            </section>
+            <section>
+                <title>Using @dotfile command</title>
+                <target refid="dotgraphs_1dotfilecmd"></target>
+                <paragraph><figure><graphviz code='digraph G {bgcolor="red:cyan" gradientangle=0&#10;&#10;    subgraph cluster_0 {&#10;        style=filled;&#10;        color=lightgrey;&#10;        fillcolor="blue:yellow";&#10;        gradientangle=90;&#10;        node [fillcolor="yellow:green" style=filled gradientangle=270] a0;&#10;        node [fillcolor="green:red"] a1;&#10;        node [fillcolor="red:cyan"] a2;&#10;        node [fillcolor="cyan:blue"] a3;&#10;&#10;        a0 -&gt; a1 -&gt; a2 -&gt; a3;&#10;        label = "process #1";&#10;    }&#10;&#10;    subgraph cluster_1 {&#10;        node [fillcolor="yellow:magenta"&#10;             style=filled gradientangle=270] b0;&#10;        node [fillcolor="magenta:cyan"] b1;&#10;        node [fillcolor="cyan:red"] b2;&#10;        node [fillcolor="red:blue"] b3;&#10;&#10;        b0 -&gt; b1 -&gt; b2 -&gt; b3;&#10;        label = "process #2";&#10;        color=blue&#10;        fillcolor="blue:yellow";&#10;        style=filled;&#10;        gradientangle=90;&#10;    }&#10;    start -&gt; a0;&#10;    start -&gt; b0;&#10;    a1 -&gt; b3;&#10;    b2 -&gt; a3;&#10;    a3 -&gt; a0;&#10;    a3 -&gt; end;&#10;    b3 -&gt; end;&#10;&#10;    start [shape=Mdiamond ,&#10;        fillcolor="yellow:brown",&#10;        gradientangle=90,&#10;        style=radial];&#10;    end [shape=Msquare,&#10;        fillcolor="orange:blue",&#10;        style=radial,&#10;        gradientangle=90];&#10;}&#10;'></graphviz><caption>Captions go here</caption></figure></paragraph>
+            </section>
+        </desc_content>
+    </desc>
+</document>

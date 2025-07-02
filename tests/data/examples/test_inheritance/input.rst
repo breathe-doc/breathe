@@ -1,0 +1,1 @@
+.. doxygenfile:: inheritance.h

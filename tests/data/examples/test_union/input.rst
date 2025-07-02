@@ -1,0 +1,2 @@
+.. doxygenunion:: SeparateUnion
+.. doxygennamespace:: foo

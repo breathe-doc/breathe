@@ -1,0 +1,115 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<!-- don't remove the spaces from briefdescription/detaileddescription, they are
+part of the test -->
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="classSample" kind="class" language="C++" prot="public">
+    <compoundname>Sample</compoundname>
+    <includes local="no">sample.hpp</includes>
+    <sectiondef kind="public-attrib">
+      <memberdef kind="variable" id="classSample_1a16fb7dea2229144983e3a0ee85c42638" prot="public" static="no" mutable="no">
+        <type>int</type>
+        <definition>int public_field</definition>
+        <argsstring></argsstring>
+        <name>public_field</name>
+        <qualifiedname>Sample::public_field</qualifiedname>
+        <briefdescription><para>Something</para></briefdescription>
+        <detaileddescription> </detaileddescription>
+        <inbodydescription></inbodydescription>
+        <location file="sample.hpp" line="3" column="9" bodyfile="sample.hpp" bodystart="3" bodyend="-1"/>
+      </memberdef>
+    </sectiondef>
+    <sectiondef kind="protected-attrib">
+      <memberdef kind="variable" id="classSample_1aa74f9bf144eba684220918da47d9dd3c" prot="protected" static="no" mutable="no">
+        <type>int</type>
+        <definition>int protected_field</definition>
+        <argsstring></argsstring>
+        <name>protected_field</name>
+        <qualifiedname>Sample::protected_field</qualifiedname>
+        <briefdescription>   </briefdescription>
+        <detaileddescription> </detaileddescription>
+        <inbodydescription></inbodydescription>
+        <location file="sample.hpp" line="6" column="9" bodyfile="sample.hpp" bodystart="6" bodyend="-1"/>
+      </memberdef>
+    </sectiondef>
+    <sectiondef kind="private-attrib">
+      <memberdef kind="variable" id="classSample_1aac1a8bab0d52a9682f04aeabf9d6c9a3" prot="private" static="no" mutable="no">
+        <type>int</type>
+        <definition>int private_field</definition>
+        <argsstring></argsstring>
+        <name>private_field</name>
+        <qualifiedname>Sample::private_field</qualifiedname>
+        <briefdescription><para>Something</para></briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription></inbodydescription>
+        <location file="sample.hpp" line="9" column="9" bodyfile="sample.hpp" bodystart="9" bodyend="-1"/>
+      </memberdef>
+    </sectiondef>
+    <sectiondef kind="public-func">
+      <memberdef kind="function" id="classSample_1a2b45c317c9f08980edcaa2e9fe2fd6fa" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>int</type>
+        <definition>int public_method</definition>
+        <argsstring>(int x)</argsstring>
+        <name>public_method</name>
+        <qualifiedname>Sample::public_method</qualifiedname>
+        <param>
+          <type>int</type>
+          <declname>x</declname>
+        </param>
+        <briefdescription> </briefdescription>
+        <detaileddescription> </detaileddescription>
+        <inbodydescription></inbodydescription>
+        <location file="sample.hpp" line="4" column="9"/>
+      </memberdef>
+    </sectiondef>
+    <sectiondef kind="protected-func">
+      <memberdef kind="function" id="classSample_1a616a74c248e6b1ae328239b0a1096412" prot="protected" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>int</type>
+        <definition>int protected_method</definition>
+        <argsstring>(int x)</argsstring>
+        <name>protected_method</name>
+        <qualifiedname>Sample::protected_method</qualifiedname>
+        <param>
+          <type>int</type>
+          <declname>x</declname>
+        </param>
+        <briefdescription><para>Something</para></briefdescription>
+        <detaileddescription> </detaileddescription>
+        <inbodydescription></inbodydescription>
+        <location file="sample.hpp" line="7" column="9"/>
+      </memberdef>
+    </sectiondef>
+    <sectiondef kind="private-func">
+      <memberdef kind="function" id="classSample_1a91d3ebf8bf238bea8c7cef360f4956f3" prot="private" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>int</type>
+        <definition>int private_method</definition>
+        <argsstring>(int x)</argsstring>
+        <name>private_method</name>
+        <qualifiedname>Sample::private_method</qualifiedname>
+        <param>
+          <type>int</type>
+          <declname>x</declname>
+        </param>
+        <briefdescription>
+  
+        </briefdescription>
+        <detaileddescription> </detaileddescription>
+        <inbodydescription></inbodydescription>
+        <location file="sample.hpp" line="10" column="9"/>
+      </memberdef>
+    </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="sample.hpp" line="1" column="1" bodyfile="sample.hpp" bodystart="1" bodyend="11"/>
+    <listofallmembers>
+      <member refid="classSample_1aac1a8bab0d52a9682f04aeabf9d6c9a3" prot="private" virt="non-virtual"><scope>Sample</scope><name>private_field</name></member>
+      <member refid="classSample_1a91d3ebf8bf238bea8c7cef360f4956f3" prot="private" virt="non-virtual"><scope>Sample</scope><name>private_method</name></member>
+      <member refid="classSample_1aa74f9bf144eba684220918da47d9dd3c" prot="protected" virt="non-virtual"><scope>Sample</scope><name>protected_field</name></member>
+      <member refid="classSample_1a616a74c248e6b1ae328239b0a1096412" prot="protected" virt="non-virtual"><scope>Sample</scope><name>protected_method</name></member>
+      <member refid="classSample_1a16fb7dea2229144983e3a0ee85c42638" prot="public" virt="non-virtual"><scope>Sample</scope><name>public_field</name></member>
+      <member refid="classSample_1a2b45c317c9f08980edcaa2e9fe2fd6fa" prot="public" virt="non-virtual"><scope>Sample</scope><name>public_method</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

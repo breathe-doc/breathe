@@ -1,22 +1,54 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, cast
 
 from docutils.parsers.rst.directives import flag, unchanged, unchanged_required
 
 from breathe.directives import BaseDirective
 from breathe.file_state_cache import MTimeError
 from breathe.project import ProjectError
+from breathe.renderer import filter
 from breathe.renderer.mask import NullMaskFactory
 from breathe.renderer.target import create_target_handler
 
 if TYPE_CHECKING:
-    from typing import Any
+    import sys
+    from typing import ClassVar
+
+    if sys.version_info >= (3, 11):
+        from typing import NotRequired, TypedDict
+    else:
+        from typing_extensions import NotRequired, TypedDict
 
     from docutils.nodes import Node
 
+    from breathe.project import ProjectOptions
+
+    DoxClassOptions = TypedDict(
+        "DoxClassOptions",
+        {
+            "path": str,
+            "project": str,
+            "members": NotRequired[str],
+            "membergroups": str,
+            "members-only": NotRequired[None],
+            "protected-members": NotRequired[None],
+            "private-members": NotRequired[None],
+            "undoc-members": NotRequired[None],
+            "show": str,
+            "outline": NotRequired[None],
+            "no-link": NotRequired[None],
+            "allow-dot-graphs": NotRequired[None],
+        },
+    )
+else:
+    DoxClassOptions = None
+    ProjectOptions = None
+
 
 class _DoxygenClassLikeDirective(BaseDirective):
+    kind: ClassVar[str]
+
     required_arguments = 1
     optional_arguments = 0
     final_argument_whitespace = True
@@ -38,31 +70,32 @@ class _DoxygenClassLikeDirective(BaseDirective):
 
     def run(self) -> list[Node]:
         name = self.arguments[0]
+        options = cast("DoxClassOptions", self.options)
 
         try:
-            project_info = self.project_info_factory.create_project_info(self.options)
+            project_info = self.project_info_factory.create_project_info(
+                cast("ProjectOptions", options)
+            )
         except ProjectError as e:
             warning = self.create_warning(None, kind=self.kind)
             return warning.warn("doxygen{kind}: %s" % e)
 
         try:
-            finder = self.finder_factory.create_finder(project_info)
+            d_index = self.get_doxygen_index(project_info)
         except MTimeError as e:
             warning = self.create_warning(None, kind=self.kind)
             return warning.warn("doxygen{kind}: %s" % e)
 
-        finder_filter = self.filter_factory.create_compound_finder_filter(name, self.kind)
-
-        # TODO: find a more specific type for the Doxygen nodes
-        matches: list[Any] = []
-        finder.filter_(finder_filter, matches)
+        matches: list[filter.FinderMatch] = list(
+            filter.compound_finder_filter(name, self.kind, d_index)
+        )
 
         if len(matches) == 0:
             warning = self.create_warning(project_info, name=name, kind=self.kind)
             return warning.warn('doxygen{kind}: Cannot find class "{name}" {tail}')
 
-        target_handler = create_target_handler(self.options, project_info, self.state.document)
-        filter_ = self.filter_factory.create_class_filter(name, self.options)
+        target_handler = create_target_handler(options, self.env)
+        filter_ = filter.create_class_filter(self.app, name, options)
 
         mask_factory = NullMaskFactory()
         return self.render(

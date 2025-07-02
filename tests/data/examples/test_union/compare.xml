@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<?xml-stylesheet href="../../docutils.css"?>
+<document>
+    <index entries="['single',\ 'SeparateUnion\ (C++\ union)',\ '_CPPv413SeparateUnion',\ '',\ None]"></index>
+    <desc classes="cpp union" desctype="union" domain="cpp" objtype="union">
+        <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword classes="k">union</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">SeparateUnion</desc_sig_name></desc_name></desc_signature_line></desc_signature>
+        <desc_content>
+            <paragraph>A union of two values. </paragraph>
+            <container classes="breathe-sectiondef" objtype="public-attrib">
+                <rubric classes="breathe-sectiondef-title">Public Members</rubric>
+                <index entries="['single',\ 'SeparateUnion::size\ (C++\ member)',\ '_CPPv4N13SeparateUnion4sizeE',\ '',\ None]"></index>
+                <desc classes="cpp var" desctype="var" domain="cpp" objtype="var">
+                    <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword_type classes="kt">int</desc_sig_keyword_type><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">size</desc_sig_name></desc_name></desc_signature_line></desc_signature>
+                    <desc_content>
+                        <paragraph>The size of the thing. </paragraph>
+                    </desc_content>
+                </desc>
+                <index entries="['single',\ 'SeparateUnion::depth\ (C++\ member)',\ '_CPPv4N13SeparateUnion5depthE',\ '',\ None]"></index>
+                <desc classes="cpp var" desctype="var" domain="cpp" objtype="var">
+                    <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword_type classes="kt">float</desc_sig_keyword_type><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">depth</desc_sig_name></desc_name></desc_signature_line></desc_signature>
+                    <desc_content>
+                        <paragraph>How deep it is. </paragraph>
+                    </desc_content>
+                </desc>
+            </container>
+        </desc_content>
+    </desc>
+    <index entries="['single',\ 'foo\ (C++\ type)',\ '_CPPv43foo',\ '',\ None]"></index>
+    <desc classes="cpp type" desctype="type" domain="cpp" objtype="type">
+        <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword classes="k">namespace</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">foo</desc_sig_name></desc_name></desc_signature_line></desc_signature>
+        <desc_content>
+            <index entries="['single',\ 'foo::MyUnion\ (C++\ union)',\ '_CPPv4N3foo7MyUnionE',\ '',\ None]"></index>
+            <desc classes="cpp union" desctype="union" domain="cpp" objtype="union">
+                <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword classes="k">union</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">MyUnion</desc_sig_name></desc_name></desc_signature_line></desc_signature>
+                <desc_content>
+                    <paragraph>A union of two values. </paragraph>
+                    <container classes="breathe-sectiondef" objtype="public-attrib">
+                        <rubric classes="breathe-sectiondef-title">Public Members</rubric>
+                        <index entries="['single',\ 'foo::MyUnion::someInt\ (C++\ member)',\ '_CPPv4N3foo7MyUnion7someIntE',\ '',\ None]"></index>
+                        <desc classes="cpp var" desctype="var" domain="cpp" objtype="var">
+                            <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword_type classes="kt">int</desc_sig_keyword_type><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">someInt</desc_sig_name></desc_name></desc_signature_line></desc_signature>
+                            <desc_content>
+                                <paragraph>The int of it all. </paragraph>
+                            </desc_content>
+                        </desc>
+                        <index entries="['single',\ 'foo::MyUnion::someFloat\ (C++\ member)',\ '_CPPv4N3foo7MyUnion9someFloatE',\ '',\ None]"></index>
+                        <desc classes="cpp var" desctype="var" domain="cpp" objtype="var">
+                            <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword_type classes="kt">float</desc_sig_keyword_type><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">someFloat</desc_sig_name></desc_name></desc_signature_line></desc_signature>
+                            <desc_content>
+                                <paragraph>The float side of things. </paragraph>
+                            </desc_content>
+                        </desc>
+                    </container>
+                </desc_content>
+            </desc>
+        </desc_content>
+    </desc>
+</document>

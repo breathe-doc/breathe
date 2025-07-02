@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<?xml-stylesheet href="../../docutils.css"?>
+<document>
+    <index entries="['single',\ 'noop\ (C++\ function)',\ '_CPPv44noopv',\ '',\ None]"></index>
+    <desc classes="cpp function" desctype="function" domain="cpp" objtype="function">
+        <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword_type classes="kt">void</desc_sig_keyword_type><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">noop</desc_sig_name></desc_name><desc_parameterlist></desc_parameterlist></desc_signature_line></desc_signature>
+        <desc_content>
+            <paragraph>x ¡¢£¤¥¦§¨©ª «¬­®¯°±²³´µ¶ ·¸¹º»¼½¾¿À ÁÂÃÄÅÆÇÈÉÊ ËÌÍÎÏÐÑÒÓÔ ÕÖ×ØÙÚÛÜÝÞ ßàáâãäåæçè éêëìíîïðñò óôõö÷øùúûü ýþÿƒΑΒΓΔΕΖΗ ΘΙΚΛΜΝΞΟΠΡΣΤ ΥΦΧΨΩαβγδεζ ηθικλμνξοπρς στυφχψωϑϒϖ• …′″‾⁄℘ℑℜ™ℵ ←↑→↓↔↵⇐⇑⇒⇓⇔∀ ∂∃∅∇∈∉∋∏∑−∗√ ∝∞∠∧∨∩∪∫∴∼≅≈≠ ≡≤≥⊂⊃⊄⊆⊇⊕⊗⊥⋅⌈ ⌉⌊⌋⟨⟩◊♠♣♥♦Œ œŠšŸˆ˜   ‌‍ ‎‏–—‘’‚“”„† ‡‰‹›€™’x </paragraph>
+        </desc_content>
+    </desc>
+</document>

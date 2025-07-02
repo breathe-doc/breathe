@@ -1,6 +1,18 @@
 from __future__ import annotations
 
+import re
+import textwrap
+from collections import defaultdict
 from pathlib import Path
+from typing import (
+    TYPE_CHECKING,
+    Callable,
+    Generic,
+    Literal,
+    TypeVar,
+    Union,
+    cast,
+)
 
 from docutils import nodes
 from docutils.parsers.rst.states import Text
@@ -11,38 +23,80 @@ from sphinx.ext.graphviz import graphviz
 from sphinx.util import url_re
 from sphinx.util.nodes import nested_parse_with_titles
 
+from breathe import filetypes, parser
+from breathe._parser import DoxCompoundKind
+from breathe.cpp_util import split_name
+from breathe.renderer.filter import NodeStack
+
+php: Any
 try:
-    from sphinxcontrib import phpdomain as php  # type: ignore[import-untyped]
+    from sphinxcontrib import phpdomain as php  # type: ignore[import-untyped, no-redef]
 except ImportError:
     php = None
 
+cs: Any
 try:
-    from sphinx_csharp import csharp as cs  # type: ignore[import-untyped]
+    from sphinx_csharp import csharp as cs  # type: ignore[import-untyped, no-redef]
 except ImportError:
     cs = None
 
-import re
-import textwrap
-from typing import TYPE_CHECKING, Callable, Union, cast
+
+T = TypeVar("T")
 
 if TYPE_CHECKING:
-    from typing import Any
+    from collections.abc import Iterable, Sequence
+    from typing import (
+        Any,
+        ClassVar,
+        Protocol,
+    )
 
-    from docutils.nodes import Node, TextElement
     from sphinx.application import Sphinx
     from sphinx.directives import ObjectDescription
 
-    from breathe.parser import DoxygenCompoundParser, compound, compoundsuper
     from breathe.project import ProjectInfo
-    from breathe.renderer import RenderContext
-    from breathe.renderer.filter import Filter
+    from breathe.renderer import DataObject, RenderContext
+    from breathe.renderer.filter import DoxFilter
     from breathe.renderer.target import TargetHandler
+
+    class HasRefID(Protocol):
+        @property
+        def refid(self) -> str: ...
+
+    class HasTemplateParamList(Protocol):
+        @property
+        def templateparamlist(self) -> parser.Node_templateparamlistType | None: ...
+
+    class HasDescriptions(Protocol):
+        @property
+        def briefdescription(self) -> parser.Node_descriptionType | None: ...
+
+        @property
+        def detaileddescription(self) -> parser.Node_descriptionType | None: ...
+
 
 ContentCallback = Callable[[addnodes.desc_content], None]
 Declarator = Union[addnodes.desc_signature, addnodes.desc_signature_line]
 DeclaratorCallback = Callable[[Declarator], None]
 
 _debug_indent = 0
+
+_findall_compat = cast(
+    "Callable", getattr(nodes.Node, "findall", getattr(nodes.Node, "traverse", None))
+)
+
+
+# Doxygen sometimes leaves 'static' in the type, e.g., for "constexpr static
+# auto f()"
+# In Doxygen up to somewhere between 1.8.17 to exclusive 1.9.1 the 'friend' part
+# is also left in the type. See also #767.
+# Until version 1.11, Doxygen left constexpr (I haven't checked consteval or
+# constinit) in the type.
+QUALIFIERS_TO_REMOVE = re.compile(r"\b(static|friend|constexpr|consteval|constinit) ")
+
+
+def strip_legacy_qualifiers(x):
+    return QUALIFIERS_TO_REMOVE.sub("", x)
 
 
 class WithContext:
@@ -65,13 +119,13 @@ class WithContext:
 class BaseObject:
     # Use this class as the first base class to make sure the overrides are used.
     # Set the content_callback attribute to a function taking a docutils node.
+    breathe_content_callback: ContentCallback | None = None
 
     def transform_content(self, contentnode: addnodes.desc_content) -> None:
         super().transform_content(contentnode)  # type: ignore[misc]
-        callback = getattr(self, "breathe_content_callback", None)
-        if callback is None:
+        if self.breathe_content_callback is None:
             return
-        callback(contentnode)
+        self.breathe_content_callback(contentnode)
 
 
 # ----------------------------------------------------------------------------
@@ -165,7 +219,7 @@ class PyClasslike(BaseObject, python.PyClasslike):
 # classes from phpdomain.
 # We use capitalization (and the namespace) to differentiate between the two
 
-if php is not None:
+if php is not None or TYPE_CHECKING:
 
     class PHPNamespaceLevel(BaseObject, php.PhpNamespacelevel):
         """Description of a PHP item *in* a namespace (not the space itself)."""
@@ -184,7 +238,7 @@ if php is not None:
 
 # ----------------------------------------------------------------------------
 
-if cs is not None:
+if cs is not None or TYPE_CHECKING:
 
     class CSharpCurrentNamespace(BaseObject, cs.CSharpCurrentNamespace):
         pass
@@ -237,7 +291,7 @@ if cs is not None:
 
 class DomainDirectiveFactory:
     # A mapping from node kinds to domain directives and their names.
-    cpp_classes = {
+    cpp_classes: dict[str, tuple[type[ObjectDescription], str]] = {
         "variable": (CPPMemberObject, "var"),
         "class": (CPPClassObject, "class"),
         "struct": (CPPClassObject, "struct"),
@@ -256,7 +310,7 @@ class DomainDirectiveFactory:
         "enumvalue": (CPPEnumeratorObject, "enumerator"),
         "define": (CMacroObject, "macro"),
     }
-    c_classes = {
+    c_classes: dict[str, tuple[type[ObjectDescription], str]] = {
         "variable": (CMemberObject, "var"),
         "function": (CFunctionObject, "function"),
         "define": (CMacroObject, "macro"),
@@ -266,7 +320,7 @@ class DomainDirectiveFactory:
         "enumvalue": (CEnumeratorObject, "enumerator"),
         "typedef": (CTypeObject, "type"),
     }
-    python_classes = {
+    python_classes: dict[str, tuple[type[ObjectDescription], str]] = {
         # TODO: PyFunction is meant for module-level functions
         #       and PyAttribute is meant for class attributes, not module-level variables.
         #       Somehow there should be made a distinction at some point to get the correct
@@ -277,6 +331,7 @@ class DomainDirectiveFactory:
         "namespace": (PyClasslike, "class"),
     }
 
+    php_classes: dict[str, tuple[type[ObjectDescription], str]]
     if php is not None:
         php_classes = {
             "function": (PHPNamespaceLevel, "function"),
@@ -287,6 +342,7 @@ class DomainDirectiveFactory:
         }
         php_classes_default = php_classes["class"]  # Directive when no matching ones were found
 
+    cs_classes: dict[str, tuple[type[ObjectDescription], str]]
     if cs is not None:
         cs_classes = {
             # 'doxygen-name': (CSharp class, key in CSharpDomain.object_types)
@@ -308,8 +364,8 @@ class DomainDirectiveFactory:
 
     @staticmethod
     def create(domain: str, args) -> ObjectDescription:
-        cls = cast("type[ObjectDescription]", None)
-        name = cast("str", None)
+        cls: type[ObjectDescription]
+        name: str
         if domain == "c":
             cls, name = DomainDirectiveFactory.c_classes[args[0]]
         elif domain == "py":
@@ -327,15 +383,15 @@ class DomainDirectiveFactory:
                     arg_0 = "global"
 
             if arg_0 in DomainDirectiveFactory.php_classes:
-                cls, name = DomainDirectiveFactory.php_classes[arg_0]  # type: ignore[assignment]
+                cls, name = DomainDirectiveFactory.php_classes[arg_0]
             else:
-                cls, name = DomainDirectiveFactory.php_classes_default  # type: ignore[assignment]
+                cls, name = DomainDirectiveFactory.php_classes_default
 
         elif cs is not None and domain == "cs":
             cls, name = DomainDirectiveFactory.cs_classes[args[0]]
         else:
             domain = "cpp"
-            cls, name = DomainDirectiveFactory.cpp_classes[args[0]]  # type: ignore[assignment]
+            cls, name = DomainDirectiveFactory.cpp_classes[args[0]]
         # Replace the directive name because domain directives don't know how to handle
         # Breathe's "doxygen" directives.
         assert ":" not in name
@@ -346,23 +402,23 @@ class DomainDirectiveFactory:
 class NodeFinder(nodes.SparseNodeVisitor):
     """Find the Docutils desc_signature declarator and desc_content nodes."""
 
-    def __init__(self, document):
+    def __init__(self, document: nodes.document):
         super().__init__(document)
-        self.declarator = None
-        self.content = None
+        self.declarator: Declarator | None = None
+        self.content: addnodes.desc_content | None = None
 
-    def visit_desc_signature(self, node):
+    def visit_desc_signature(self, node: addnodes.desc_signature):
         # Find the last signature node because it contains the actual declarator
         # rather than "template <...>". In Sphinx 1.4.1 we'll be able to use sphinx_cpp_tagname:
         # https://github.com/breathe-doc/breathe/issues/242
         self.declarator = node
 
-    def visit_desc_signature_line(self, node):
+    def visit_desc_signature_line(self, node: addnodes.desc_signature_line):
         # In sphinx 1.5, there is now a desc_signature_line node within the desc_signature
         # This should be used instead
         self.declarator = node
 
-    def visit_desc_content(self, node):
+    def visit_desc_content(self, node: addnodes.desc_content):
         self.content = node
         # The SparseNodeVisitor seems to not actually be universally Sparse,
         # but only for nodes known to Docutils.
@@ -380,19 +436,19 @@ def intersperse(iterable, delimiter):
         yield x
 
 
-def get_param_decl(param):
-    def to_string(node):
+def get_param_decl(param: parser.Node_paramType) -> str:
+    def to_string(node: parser.Node_linkedTextType | None) -> str:
         """Convert Doxygen node content to a string."""
-        result = []
+        result: list[str] = []
         if node is not None:
-            for p in node.content_:
-                value = p.value
-                if not isinstance(value, str):
-                    value = value.valueOf_
-                result.append(value)
+            for p in node:
+                if isinstance(p, str):
+                    result.append(p)
+                else:
+                    result.append(p.value[0])
         return " ".join(result)
 
-    param_type = to_string(param.type_)
+    param_type = to_string(param.type)
     param_name = param.declname or param.defname
     if not param_name:
         param_decl = param_type
@@ -449,7 +505,7 @@ class InlineText(Text):
     """
 
     patterns = {"inlinetext": r""}
-    initial_transitions = [("inlinetext",)]
+    initial_transitions = [("inlinetext", "text")]
 
     def indent(self, match, context, next_state):
         """
@@ -483,22 +539,170 @@ class InlineText(Text):
         return [], next_state, []
 
 
-class SphinxRenderer:
+def get_content(node: parser.Node_docParaType):
+    # Add programlisting nodes to content rather than a separate list,
+    # because programlisting and content nodes can interleave as shown in
+    # https://www.stack.nl/~dimitri/doxygen/manual/examples/include/html/example.html.
+
+    return (
+        item
+        for item in node
+        if parser.tag_name_value(item)[0] not in {"parameterlist", "simplesect", "image"}
+    )
+
+
+def get_parameterlists(node: parser.Node_docParaType) -> Iterable[parser.Node_docParamListType]:
+    pairs = map(parser.tag_name_value, node)  # type: ignore[arg-type]
+    return (value for name, value in pairs if name == "parameterlist")  # type: ignore[misc]
+
+
+def get_simplesects(node: parser.Node_docParaType) -> Iterable[parser.Node_docSimpleSectType]:
+    pairs = map(parser.tag_name_value, node)  # type: ignore[arg-type]
+    return (value for name, value in pairs if name == "simplesect")  # type: ignore[misc]
+
+
+def get_images(node: parser.Node_docParaType) -> Iterable[parser.Node_docImageType]:
+    pairs = map(parser.tag_name_value, node)  # type: ignore[arg-type]
+    return (value for name, value in pairs if name == "image")  # type: ignore[misc]
+
+
+def namespace_strip(config, nodes_: list[nodes.Node]):
+    # In some cases of errors with a declaration there are no nodes
+    # (e.g., variable in function), so perhaps skip (see #671).
+    # If there are nodes, there should be at least 2.
+    if len(nodes_) != 0:
+        assert len(nodes_) >= 2
+        rst_node = nodes_[1]
+        doc = rst_node.document
+        assert doc is not None
+        finder = NodeFinder(doc)
+        rst_node.walk(finder)
+
+        assert finder.declarator
+        # the type is set to "Any" to get around missing typing info in
+        # docutils 0.20.1
+        signode: Any = finder.declarator
+        signode.children = [n for n in signode.children if n.tagname != "desc_addname"]
+
+
+T_sphinxrenderer = TypeVar("T_sphinxrenderer", bound="SphinxRenderer")
+
+
+class NodeHandler(Generic[T_sphinxrenderer, T]):
+    """Dummy callable that associates a set of nodes to a function. This gets
+    unwrapped by NodeVisitor and is never actually called."""
+
+    def __init__(self, handler: Callable[[T_sphinxrenderer, T], list[nodes.Node]]):
+        self.handler = handler
+        self.nodes: set[type[parser.NodeOrValue]] = set()
+
+    def __call__(self, r: T_sphinxrenderer, node: T, /) -> list[nodes.Node]:  # pragma: no cover
+        raise TypeError()
+
+
+class TaggedNodeHandler(Generic[T_sphinxrenderer, T]):
+    """Dummy callable that associates a set of nodes to a function. This gets
+    unwrapped by NodeVisitor and is never actually called."""
+
+    def __init__(self, handler: Callable[[T_sphinxrenderer, str, T], list[nodes.Node]]):
+        self.handler = handler
+        self.nodes: set[type[parser.NodeOrValue]] = set()
+
+    def __call__(
+        self, r: T_sphinxrenderer, tag: str, node: T, /
+    ) -> list[nodes.Node]:  # pragma: no cover
+        raise TypeError()
+
+
+def node_handler(node: type[parser.NodeOrValue]):
+    def inner(
+        f: Callable[[T_sphinxrenderer, T], list[nodes.Node]],
+    ) -> Callable[[T_sphinxrenderer, T], list[nodes.Node]]:
+        handler: NodeHandler = f if isinstance(f, NodeHandler) else NodeHandler(f)
+        handler.nodes.add(node)
+        return handler
+
+    return inner
+
+
+def tagged_node_handler(node: type[parser.NodeOrValue]):
+    def inner(
+        f: Callable[[T_sphinxrenderer, str, T], list[nodes.Node]],
+    ) -> Callable[[T_sphinxrenderer, str, T], list[nodes.Node]]:
+        handler: TaggedNodeHandler = f if isinstance(f, TaggedNodeHandler) else TaggedNodeHandler(f)
+        handler.nodes.add(node)
+        return handler
+
+    return inner
+
+
+class NodeVisitor(type):
+    """Metaclass that collects all methods marked as @node_handler and
+    @tagged_node_handler into the dicts 'node_handlers' and
+    'tagged_node_handlers' respectively, and assigns the dicts to the class"""
+
+    def __new__(cls, name, bases, members):
+        handlers = {}
+        tagged_handlers = {}
+
+        for key, value in members.items():
+            if isinstance(value, NodeHandler):
+                for n in value.nodes:
+                    handlers[n] = value.handler
+                members[key] = value.handler
+            elif isinstance(value, TaggedNodeHandler):
+                for n in value.nodes:
+                    tagged_handlers[n] = value.handler
+                members[key] = value.handler
+
+        members["node_handlers"] = handlers
+        members["tagged_node_handlers"] = tagged_handlers
+
+        return type.__new__(cls, name, bases, members)
+
+
+# class RenderDebugPrint:
+#     def __init__(self,renderer,node):
+#         self.renderer = renderer
+#         renderer._debug_print_depth = 1 + getattr(renderer,'_debug_print_depth',0)
+#         print('  '*renderer._debug_print_depth,type(node))
+#
+#     def __enter__(self):
+#         return self
+#
+#     def __exit__(self,*args):
+#         self.renderer._debug_print_depth -= 1
+
+
+class SphinxRenderer(metaclass=NodeVisitor):
     """
     Doxygen node visitor that converts input into Sphinx/RST representation.
     Each visit method takes a Doxygen node as an argument and returns a list of RST nodes.
     """
 
+    node_handlers: ClassVar[
+        dict[
+            type[parser.NodeOrValue],
+            Callable[[SphinxRenderer, parser.NodeOrValue], list[nodes.Node]],
+        ]
+    ]
+    tagged_node_handlers: ClassVar[
+        dict[
+            type[parser.NodeOrValue],
+            Callable[[SphinxRenderer, str, parser.NodeOrValue], list[nodes.Node]],
+        ]
+    ]
+
     def __init__(
         self,
         app: Sphinx,
         project_info: ProjectInfo,
-        node_stack,
+        node_stack: list[DataObject],
         state,
         document: nodes.document,
         target_handler: TargetHandler,
-        compound_parser: DoxygenCompoundParser,
-        filter_: Filter,
+        dox_parser: parser.DoxygenParser,
+        filter_: DoxFilter,
     ):
         self.app = app
 
@@ -508,7 +712,7 @@ class SphinxRenderer:
         self.state = state
         self.document = document
         self.target_handler = target_handler
-        self.compound_parser = compound_parser
+        self.dox_parser = dox_parser
         self.filter_ = filter_
 
         self.context: RenderContext | None = None
@@ -564,6 +768,9 @@ class SphinxRenderer:
         else:
             return refid
 
+    def parse_compound(self, refid: str) -> parser.Node_DoxygenType:
+        return self.dox_parser.parse_compound(refid, self.project_info).root
+
     def get_domain(self) -> str:
         """Returns the domain for the current node."""
 
@@ -574,16 +781,17 @@ class SphinxRenderer:
             except AttributeError:
                 return None
 
-        self.context = cast("RenderContext", self.context)
+        assert self.context is not None
+
         node_stack = self.context.node_stack
-        node = node_stack[0]
-        # An enumvalue node doesn't have location, so use its parent node for detecting
-        # the domain instead.
-        if isinstance(node, str) or node.node_type == "enumvalue":
-            node = node_stack[1]
+        node = node_stack[0].value
+        # An enumvalueType node doesn't have location, so use its parent node
+        # for detecting the domain instead.
+        if isinstance(node, (str, parser.Node_enumvalueType)):
+            node = node_stack[1].value
         filename = get_filename(node)
-        if not filename and node.node_type == "compound":
-            file_data = self.compound_parser.parse(node.refid)
+        if not filename and isinstance(node, parser.Node_CompoundType):
+            file_data = self.parse_compound(node.refid)
             filename = get_filename(file_data.compounddef)
         return self.project_info.domain_for_file(filename) if filename else ""
 
@@ -594,12 +802,13 @@ class SphinxRenderer:
 
     def run_directive(
         self, obj_type: str, declaration: str, contentCallback: ContentCallback, options={}
-    ) -> list[Node]:
-        self.context = cast("RenderContext", self.context)
+    ) -> list[nodes.Node]:
+        assert self.context is not None
         args = [obj_type, [declaration]] + self.context.directive_args[2:]
         directive = DomainDirectiveFactory.create(self.context.domain, args)
-        assert issubclass(type(directive), BaseObject)
-        directive.breathe_content_callback = contentCallback  # type: ignore[attr-defined]
+
+        assert isinstance(directive, BaseObject)
+        directive.breathe_content_callback = contentCallback
 
         # Translate Breathe's no-link option into the standard noindex option.
         if "no-link" in self.context.directive_args[2]:
@@ -610,7 +819,7 @@ class SphinxRenderer:
         assert self.app.env is not None
         config = self.app.env.config
 
-        if config.breathe_debug_trace_directives:
+        if config.breathe_debug_trace_directives:  # pragma: no cover
             global _debug_indent
             print(
                 "{}Running directive: .. {}:: {}".format(
@@ -629,41 +838,51 @@ class SphinxRenderer:
         for k, v in options.items():
             del directive.options[k]
 
-        if config.breathe_debug_trace_directives:
+        if config.breathe_debug_trace_directives:  # pragma: no cover
             _debug_indent -= 1
 
         # Filter out outer class names if we are rendering a member as a part of a class content.
-        # In some cases of errors with a declaration there are no nodes
-        # (e.g., variable in function), so perhaps skip (see #671).
-        # If there are nodes, there should be at least 2.
-        if len(nodes_) != 0:
-            assert len(nodes_) >= 2, nodes_
-            rst_node = nodes_[1]
-            finder = NodeFinder(rst_node.document)
-            rst_node.walk(finder)
-
-            signode = finder.declarator
-
-            if self.context.child:
-                signode.children = [n for n in signode.children if not n.tagname == "desc_addname"]
+        if self.context.child:
+            namespace_strip(config, nodes_)
         return nodes_
+
+    def handle_compounddef_declaration(
+        self,
+        node: parser.Node_compounddefType,
+        obj_type: str,
+        declaration: str,
+        file_data,
+        new_context,
+        parent_context,
+        display_obj_type: str | None = None,
+    ) -> list[nodes.Node]:
+        def content(contentnode) -> None:
+            if node.includes:
+                for include in node.includes:
+                    contentnode.extend(
+                        self.render(include, new_context.create_child_context(include))
+                    )
+            rendered_data = self.render(file_data, parent_context)
+            contentnode.extend(rendered_data)
+
+        return self.handle_declaration(
+            node, obj_type, declaration, content_callback=content, display_obj_type=display_obj_type
+        )
 
     def handle_declaration(
         self,
-        node,
+        node: parser.Node_compounddefType | parser.Node_memberdefType | parser.Node_enumvalueType,
+        obj_type: str,
         declaration: str,
         *,
-        obj_type: str | None = None,
         content_callback: ContentCallback | None = None,
         display_obj_type: str | None = None,
         declarator_callback: DeclaratorCallback | None = None,
         options={},
-    ) -> list[Node]:
-        if obj_type is None:
-            obj_type = node.kind
+    ) -> list[nodes.Node]:
         if content_callback is None:
 
-            def content(contentnode):
+            def content(contentnode: addnodes.desc_content):
                 contentnode.extend(self.description(node))
 
             content_callback = content
@@ -671,6 +890,7 @@ class SphinxRenderer:
         nodes_ = self.run_directive(obj_type, declaration, content_callback, options)
 
         assert self.app.env is not None
+        target = None
         if self.app.env.config.breathe_debug_trace_doxygen_ids:
             target = self.create_doxygen_target(node)
             if len(target) == 0:
@@ -692,7 +912,7 @@ class SphinxRenderer:
         assert isinstance(sig, addnodes.desc_signature)
 
         # Insert the member name for use in Sphinx-generated table of contents.
-        if node.node_type == "compounddef":
+        if isinstance(node, parser.Node_compounddefType):
             member_name = node.compoundname
         else:
             member_name = node.name
@@ -714,20 +934,15 @@ class SphinxRenderer:
         assert declarator is not None
         if display_obj_type is not None:
             n = declarator[0]
-            newStyle = True
-            # the new style was introduced in Sphinx v4
-            # but only for the C and C++ domains
             if self.get_domain() and self.get_domain() not in ("c", "cpp"):
-                newStyle = False
-            if newStyle:
-                assert isinstance(n, addnodes.desc_sig_keyword)
-                declarator[0] = addnodes.desc_sig_keyword(display_obj_type, display_obj_type)
-            else:
                 assert isinstance(n, addnodes.desc_annotation)
                 assert n.astext()[-1] == " "
                 txt = display_obj_type + " "
                 declarator[0] = addnodes.desc_annotation(txt, txt)
-        if not self.app.env.config.breathe_debug_trace_doxygen_ids:
+            else:
+                assert isinstance(n, addnodes.desc_sig_keyword)
+                declarator[0] = addnodes.desc_sig_keyword(display_obj_type, display_obj_type)
+        if target is None:
             target = self.create_doxygen_target(node)
         declarator.insert(0, target)
         if declarator_callback:
@@ -755,13 +970,19 @@ class SphinxRenderer:
         for node in self.qualification_stack[1:]:
             if config.breathe_debug_trace_qualification:
                 print("{}{}".format(_debug_indent * "  ", debug_print_node(node)))
-            if node.node_type == "ref" and len(names) == 0:
+            if isinstance(node, parser.Node_refType) and len(names) == 0:
                 if config.breathe_debug_trace_qualification:
                     print("{}{}".format(_debug_indent * "  ", "res="))
                 return []
             if (
-                node.node_type == "compound" and node.kind not in ["file", "namespace", "group"]
-            ) or node.node_type == "memberdef":
+                isinstance(node, parser.Node_CompoundType)
+                and node.kind
+                not in [
+                    parser.CompoundKind.file,
+                    parser.CompoundKind.namespace,
+                    parser.CompoundKind.group,
+                ]
+            ) or isinstance(node, parser.Node_memberdefType):
                 # We skip the 'file' entries because the file name doesn't form part of the
                 # qualified name for the identifier. We skip the 'namespace' entries because if we
                 # find an object through the namespace 'compound' entry in the index.xml then we'll
@@ -769,7 +990,10 @@ class SphinxRenderer:
                 # need the 'compounddef' entry because if we find the object through the 'file'
                 # entry in the index.xml file then we need to get the namespace name from somewhere
                 names.append(node.name)
-            if node.node_type == "compounddef" and node.kind == "namespace":
+            if (
+                isinstance(node, parser.Node_compounddefType)
+                and node.kind == parser.DoxCompoundKind.namespace
+            ):
                 # Nested namespaces include their parent namespace(s) in compoundname. ie,
                 # compoundname is 'foo::bar' instead of just 'bar' for namespace 'bar' nested in
                 # namespace 'foo'. We need full compoundname because node_stack doesn't necessarily
@@ -787,20 +1011,31 @@ class SphinxRenderer:
     # ===================================================================================
 
     def get_fully_qualified_name(self):
+        assert self.context
         names = []
         node_stack = self.context.node_stack
         node = node_stack[0]
 
         # If the node is a namespace, use its name because namespaces are skipped in the main loop.
-        if node.node_type == "compound" and node.kind == "namespace":
-            names.append(node.name)
+        if (
+            isinstance(node.value, parser.Node_CompoundType)
+            and node.value.kind == parser.CompoundKind.namespace
+        ):
+            names.append(node.value.name)
 
-        for node in node_stack:
-            if node.node_type == "ref" and len(names) == 0:
-                return node.valueOf_
+        for tval in node_stack:
+            node = tval.value
+            if isinstance(node, parser.Node_refType) and len(names) == 0:
+                return "".join(node)
             if (
-                node.node_type == "compound" and node.kind not in ["file", "namespace", "group"]
-            ) or node.node_type == "memberdef":
+                isinstance(node, parser.Node_CompoundType)
+                and node.kind
+                not in [
+                    parser.CompoundKind.file,
+                    parser.CompoundKind.namespace,
+                    parser.CompoundKind.group,
+                ]
+            ) or isinstance(node, parser.Node_memberdefType):
                 # We skip the 'file' entries because the file name doesn't form part of the
                 # qualified name for the identifier. We skip the 'namespace' entries because if we
                 # find an object through the namespace 'compound' entry in the index.xml then we'll
@@ -808,7 +1043,10 @@ class SphinxRenderer:
                 # need the 'compounddef' entry because if we find the object through the 'file'
                 # entry in the index.xml file then we need to get the namespace name from somewhere
                 names.insert(0, node.name)
-            if node.node_type == "compounddef" and node.kind == "namespace":
+            if (
+                isinstance(node, parser.Node_compounddefType)
+                and node.kind == parser.DoxCompoundKind.namespace
+            ):
                 # Nested namespaces include their parent namespace(s) in compoundname. ie,
                 # compoundname is 'foo::bar' instead of just 'bar' for namespace 'bar' nested in
                 # namespace 'foo'. We need full compoundname because node_stack doesn't necessarily
@@ -818,13 +1056,15 @@ class SphinxRenderer:
 
         return "::".join(names)
 
-    def create_template_prefix(self, decl) -> str:
+    def create_template_prefix(self, decl: HasTemplateParamList) -> str:
         if not decl.templateparamlist:
             return ""
         nodes_ = self.render(decl.templateparamlist)
         return "template<" + "".join(n.astext() for n in nodes_) + ">"
 
     def run_domain_directive(self, kind, names):
+        assert self.context
+
         domain_directive = DomainDirectiveFactory.create(
             self.context.domain, [kind, names] + self.context.directive_args[2:]
         )
@@ -834,7 +1074,7 @@ class SphinxRenderer:
             domain_directive.options["noindex"] = True
 
         config = self.app.env.config
-        if config.breathe_debug_trace_directives:
+        if config.breathe_debug_trace_directives:  # pragma: no cover
             global _debug_indent
             print(
                 "{}Running directive (old): .. {}:: {}".format(
@@ -845,18 +1085,12 @@ class SphinxRenderer:
 
         nodes_ = domain_directive.run()
 
-        if config.breathe_debug_trace_directives:
+        if config.breathe_debug_trace_directives:  # pragma: no cover
             _debug_indent -= 1
 
         # Filter out outer class names if we are rendering a member as a part of a class content.
-        rst_node = nodes_[1]
-        finder = NodeFinder(rst_node.document)
-        rst_node.walk(finder)
-
-        signode = finder.declarator
-
-        if len(names) > 0 and self.context.child:
-            signode.children = [n for n in signode.children if not n.tagname == "desc_addname"]
+        if self.context.child:
+            namespace_strip(config, nodes_)
         return nodes_
 
     def create_doxygen_target(self, node):
@@ -867,9 +1101,9 @@ class SphinxRenderer:
         """
 
         refid = self.get_refid(node.id)
-        return self.target_handler.create_target(refid)
+        return self.target_handler(self.document, refid)
 
-    def title(self, node) -> list[Node]:
+    def title(self, node) -> list[nodes.Node]:
         nodes_ = []
 
         # Variable type or function return type
@@ -879,34 +1113,69 @@ class SphinxRenderer:
         nodes_.append(addnodes.desc_name(text=node.name))
         return nodes_
 
-    def description(self, node) -> list[Node]:
+    def description(self, node: HasDescriptions) -> list[nodes.Node]:
         brief = self.render_optional(node.briefdescription)
-        detailed = self.detaileddescription(node)
+        descr = node.detaileddescription
+        if isinstance(node, parser.Node_memberdefType):
+            params = [
+                parser.Node_docParamListItem(
+                    parameterdescription=p.briefdescription,
+                    parameternamelist=[
+                        parser.Node_docParamNameList(
+                            parametername=[parser.Node_docParamName([p.declname or ""])]
+                        )
+                    ],
+                )
+                for p in node.param
+                if p.briefdescription
+            ]
+
+            if params:
+                content: list[parser.ListItem_descriptionType] = []
+                content.append(
+                    parser.TaggedValue[Literal["para"], parser.Node_docParaType](
+                        "para",
+                        parser.Node_docParaType([
+                            parser.TaggedValue[
+                                Literal["parameterlist"], parser.Node_docParamListType
+                            ](
+                                "parameterlist",
+                                parser.Node_docParamListType(
+                                    params, kind=parser.DoxParamListKind.param
+                                ),
+                            )
+                        ]),
+                    )
+                )
+                title = None
+                if descr is not None:
+                    content.extend(descr)
+                    title = descr.title
+                descr = parser.Node_descriptionType(content, title=title)
+        detailed = self.detaileddescription(descr)
         return brief + detailed
 
-    def detaileddescription(self, node) -> list[Node]:
-        detailedCand = self.render_optional(node.detaileddescription)
+    def detaileddescription(self, descr: parser.Node_descriptionType | None) -> list[nodes.Node]:
+        detailedCand = self.render_optional(descr)
         # all field_lists must be at the top-level of the desc_content, so pull them up
         fieldLists: list[nodes.field_list] = []
-        admonitions: list[Node] = []
+        admonitions: list[nodes.Node] = []
 
         def pullup(node, typ, dest):
-            for n in node.traverse(typ):
+            for n in list(_findall_compat(node, typ)):
                 del n.parent[n.parent.index(n)]
                 dest.append(n)
 
-        detailed = []
+        detailed: list[nodes.Node] = []
         for candNode in detailedCand:
             pullup(candNode, nodes.field_list, fieldLists)
             pullup(candNode, nodes.note, admonitions)
             pullup(candNode, nodes.warning, admonitions)
             # and collapse paragraphs
-            for para in candNode.traverse(nodes.paragraph):
-                if (
-                    para.parent
-                    and len(para.parent) == 1
-                    and isinstance(para.parent, nodes.paragraph)
-                ):
+            for para in _findall_compat(candNode, nodes.paragraph):
+                parent = para.parent
+                assert parent is None or isinstance(parent, nodes.Element)
+                if parent and len(parent) == 1 and isinstance(parent, nodes.paragraph):
                     para.replace_self(para.children)
 
             # and remove empty top-level paragraphs
@@ -921,10 +1190,16 @@ class SphinxRenderer:
                 fieldList.extend(fl)
             fieldLists = [fieldList]
 
+        # using "extend" instead of addition is slightly more verbose but is
+        # needed to get around the mypy issue
+        # https://github.com/python/mypy/issues/3933
         if self.app.config.breathe_order_parameters_first:
-            return detailed + fieldLists + admonitions
+            detailed.extend(fieldLists)
+            detailed.extend(admonitions)
         else:
-            return detailed + admonitions + fieldLists  # type: ignore[operator]
+            detailed.extend(admonitions)
+            detailed.extend(fieldLists)
+        return detailed
 
     def update_signature(self, signature, obj_type):
         """Update the signature node if necessary, e.g. add qualifiers."""
@@ -935,13 +1210,16 @@ class SphinxRenderer:
         else:
             signature.insert(0, annotation)
 
-    def render_declaration(self, node, declaration=None, description=None, **kwargs):
+    def render_declaration(
+        self, node: parser.Node_memberdefType, declaration=None, description=None, **kwargs
+    ):
         if declaration is None:
             declaration = self.get_fully_qualified_name()
         obj_type = kwargs.get("objtype", None)
         if obj_type is None:
-            obj_type = node.kind
+            obj_type = node.kind.value
         nodes_ = self.run_domain_directive(obj_type, [declaration.replace("\n", " ")])
+        target = None
         if self.app.env.config.breathe_debug_trace_doxygen_ids:
             target = self.create_doxygen_target(node)
             if len(target) == 0:
@@ -950,9 +1228,13 @@ class SphinxRenderer:
                 print("{}Doxygen target (old): {}".format("  " * _debug_indent, target[0]["ids"]))
 
         rst_node = nodes_[1]
-        finder = NodeFinder(rst_node.document)
+        doc = rst_node.document
+        assert doc is not None
+        finder = NodeFinder(doc)
         rst_node.walk(finder)
 
+        assert finder.declarator is not None
+        assert finder.content is not None
         signode = finder.declarator
         contentnode = finder.content
 
@@ -963,27 +1245,32 @@ class SphinxRenderer:
             description = self.description(node)
         if not self.app.env.config.breathe_debug_trace_doxygen_ids:
             target = self.create_doxygen_target(node)
+        assert target is not None
         signode.insert(0, target)
         contentnode.extend(description)
         return nodes_
 
-    def visit_doxygen(self, node) -> list[Node]:
-        nodelist: list[Node] = []
+    @node_handler(parser.Node_DoxygenTypeIndex)
+    def visit_doxygen(self, node: parser.Node_DoxygenTypeIndex) -> list[nodes.Node]:
+        nodelist: list[nodes.Node] = []
 
         # Process all the compound children
-        for n in node.get_compound():
+        for n in node.compound:
             nodelist.extend(self.render(n))
         return nodelist
 
-    def visit_doxygendef(self, node) -> list[Node]:
-        return self.render(node.compounddef)
+    @node_handler(parser.Node_DoxygenType)
+    def visit_doxygendef(self, node: parser.Node_DoxygenType) -> list[nodes.Node]:
+        assert len(node.compounddef) == 1
+        return self.render(node.compounddef[0])
 
-    def visit_union(self, node) -> list[Node]:
+    def visit_union(self, node: HasRefID) -> list[nodes.Node]:
         # Read in the corresponding xml file and process
-        file_data = self.compound_parser.parse(node.refid)
-        nodeDef = file_data.compounddef
+        file_data = self.parse_compound(node.refid)
+        assert len(file_data.compounddef) == 1
+        nodeDef = file_data.compounddef[0]
 
-        self.context = cast("RenderContext", self.context)
+        assert self.context is not None
         parent_context = self.context.create_child_context(file_data)
         new_context = parent_context.create_child_context(nodeDef)
 
@@ -995,24 +1282,18 @@ class SphinxRenderer:
                 names.append(nodeDef.compoundname.split("::")[-1])
             declaration = self.join_nested_name(names)
 
-            def content(contentnode):
-                if nodeDef.includes:
-                    for include in nodeDef.includes:
-                        contentnode.extend(
-                            self.render(include, new_context.create_child_context(include))
-                        )
-                rendered_data = self.render(file_data, parent_context)
-                contentnode.extend(rendered_data)
-
-            nodes_ = self.handle_declaration(nodeDef, declaration, content_callback=content)
+            nodes_ = self.handle_compounddef_declaration(
+                nodeDef, nodeDef.kind.value, declaration, file_data, new_context, parent_context
+            )
         return nodes_
 
-    def visit_class(self, node) -> list[Node]:
+    def visit_class(self, node: HasRefID) -> list[nodes.Node]:
         # Read in the corresponding xml file and process
-        file_data = self.compound_parser.parse(node.refid)
-        nodeDef = file_data.compounddef
+        file_data = self.parse_compound(node.refid)
+        assert len(file_data.compounddef) == 1
+        nodeDef = file_data.compounddef[0]
 
-        self.context = cast("RenderContext", self.context)
+        assert self.context is not None
         parent_context = self.context.create_child_context(file_data)
         new_context = parent_context.create_child_context(nodeDef)
 
@@ -1028,12 +1309,12 @@ class SphinxRenderer:
             # strip out any template arguments before splitting on '::', to
             # avoid errors if a template specialization has qualified arguments
             # (see examples/specific/cpp_ns_template_specialization)
-            cleaned_name, sep, rest = nodeDef.compoundname.partition("<")
+            cleaned_name, _sep, _rest = nodeDef.compoundname.partition("<")
+            cname = split_name(cleaned_name)
             if self.nesting_level == 0:
-                names.extend(cleaned_name.split("::"))
+                names.extend(cname)
             else:
-                names.append(cleaned_name.split("::")[-1])
-            names[-1] += sep + rest
+                names.append(cname[-1])
             decls = [
                 self.create_template_prefix(nodeDef),
                 self.join_nested_name(names),
@@ -1048,42 +1329,45 @@ class SphinxRenderer:
                 else:
                     first = False
                 if base.prot is not None and domain != "cs":
-                    decls.append(base.prot)
-                if base.virt == "virtual":
+                    decls.append(base.prot.value)
+                if base.virt == parser.DoxVirtualKind.virtual:
                     decls.append("virtual")
-                decls.append(base.content_[0].value)
+                decls.append(base[0])
             declaration = " ".join(decls)
 
-            def content(contentnode) -> None:
-                if nodeDef.includes:
-                    for include in nodeDef.includes:
-                        contentnode.extend(
-                            self.render(include, new_context.create_child_context(include))
-                        )
-                rendered_data = self.render(file_data, parent_context)
-                contentnode.extend(rendered_data)
-
-            assert kind in ("class", "struct", "interface")
-            display_obj_type = "interface" if kind == "interface" else None
-            nodes_ = self.handle_declaration(
-                nodeDef, declaration, content_callback=content, display_obj_type=display_obj_type
+            assert kind in (
+                parser.DoxCompoundKind.class_,
+                parser.DoxCompoundKind.struct,
+                parser.DoxCompoundKind.interface,
+            )
+            display_obj_type = "interface" if kind == parser.DoxCompoundKind.interface else None
+            nodes_ = self.handle_compounddef_declaration(
+                nodeDef,
+                nodeDef.kind.value,
+                declaration,
+                file_data,
+                new_context,
+                parent_context,
+                display_obj_type,
             )
             if "members-only" in self.context.directive_args[2]:
                 assert len(nodes_) >= 2
                 assert isinstance(nodes_[1], addnodes.desc)
                 assert len(nodes_[1]) >= 2
                 assert isinstance(nodes_[1][1], addnodes.desc_content)
-                return nodes_[1][1].children
+                return list(nodes_[1][1].children)
         return nodes_
 
-    def visit_namespace(self, node) -> list[Node]:
+    def visit_namespace(self, node: HasRefID) -> list[nodes.Node]:
         # Read in the corresponding xml file and process
-        file_data = self.compound_parser.parse(node.refid)
-        nodeDef = file_data.compounddef
+        file_data = self.parse_compound(node.refid)
+        assert len(file_data.compounddef) == 1
+        nodeDef = file_data.compounddef[0]
 
-        self.context = cast("RenderContext", self.context)
+        assert self.context is not None
+
         parent_context = self.context.create_child_context(file_data)
-        new_context = parent_context.create_child_context(file_data.compounddef)
+        new_context = parent_context.create_child_context(nodeDef)
 
         with WithContext(self, new_context):
             # Pretend that the signature is being rendered in context of the
@@ -1095,107 +1379,139 @@ class SphinxRenderer:
                 names.append(nodeDef.compoundname.split("::")[-1])
             declaration = self.join_nested_name(names)
 
-            def content(contentnode):
-                if nodeDef.includes:
-                    for include in nodeDef.includes:
-                        contentnode.extend(
-                            self.render(include, new_context.create_child_context(include))
-                        )
-                rendered_data = self.render(file_data, parent_context)
-                contentnode.extend(rendered_data)
-
             display_obj_type = "namespace" if self.get_domain() != "py" else "module"
-            nodes_ = self.handle_declaration(
-                nodeDef, declaration, content_callback=content, display_obj_type=display_obj_type
+            nodes_ = self.handle_compounddef_declaration(
+                nodeDef,
+                nodeDef.kind.value,
+                declaration,
+                file_data,
+                new_context,
+                parent_context,
+                display_obj_type,
             )
         return nodes_
 
-    def visit_compound(self, node, render_empty_node=True, **kwargs) -> list[Node]:
+    def visit_compound(
+        self,
+        node: HasRefID,
+        render_empty_node=True,
+        *,
+        get_node_info: Callable[[parser.Node_DoxygenType], tuple[str, parser.DoxCompoundKind]]
+        | None = None,
+        render_signature: Callable[
+            [parser.Node_DoxygenType, Sequence[nodes.Element], str, parser.DoxCompoundKind],
+            tuple[list[nodes.Node], addnodes.desc_content],
+        ]
+        | None = None,
+    ) -> list[nodes.Node]:
         # Read in the corresponding xml file and process
-        file_data = self.compound_parser.parse(node.refid)
+        file_data = self.parse_compound(node.refid)
+        assert len(file_data.compounddef) == 1
 
-        def get_node_info(file_data):
-            return node.name, node.kind
+        def def_get_node_info(file_data) -> tuple[str, parser.DoxCompoundKind]:
+            assert isinstance(node, parser.Node_CompoundType)
+            return node.name, parser.DoxCompoundKind(node.kind.value)
 
-        name, kind = kwargs.get("get_node_info", get_node_info)(file_data)
-        if kind == "union":
+        if get_node_info is None:
+            get_node_info = def_get_node_info
+
+        name, kind = get_node_info(file_data)
+        if kind == parser.DoxCompoundKind.union:
             dom = self.get_domain()
             assert not dom or dom in ("c", "cpp")
             return self.visit_union(node)
-        elif kind in ("struct", "class", "interface"):
+        elif kind in (
+            parser.DoxCompoundKind.struct,
+            parser.DoxCompoundKind.class_,
+            parser.DoxCompoundKind.interface,
+        ):
             dom = self.get_domain()
             if not dom or dom in ("c", "cpp", "py", "cs"):
                 return self.visit_class(node)
-        elif kind == "namespace":
+        elif kind == parser.DoxCompoundKind.namespace:
             dom = self.get_domain()
             if not dom or dom in ("c", "cpp", "py", "cs"):
                 return self.visit_namespace(node)
 
-        self.context = cast("RenderContext", self.context)
+        assert self.context is not None
+
         parent_context = self.context.create_child_context(file_data)
-        new_context = parent_context.create_child_context(file_data.compounddef)
+        new_context = parent_context.create_child_context(file_data.compounddef[0])
         rendered_data = self.render(file_data, parent_context)
 
         if not rendered_data and not render_empty_node:
             return []
 
-        def render_signature(file_data, doxygen_target, name, kind):
+        def def_render_signature(
+            file_data: parser.Node_DoxygenType, doxygen_target, name, kind: parser.DoxCompoundKind
+        ) -> tuple[list[nodes.Node], addnodes.desc_content]:
             # Defer to domains specific directive.
 
-            templatePrefix = self.create_template_prefix(file_data.compounddef)
+            assert len(file_data.compounddef) == 1
+            templatePrefix = self.create_template_prefix(file_data.compounddef[0])
             arg = "%s %s" % (templatePrefix, self.get_fully_qualified_name())
 
             # add base classes
-            if kind in ("class", "struct"):
-                bs = []
-                for base in file_data.compounddef.basecompoundref:
-                    b = []
+            if kind in (parser.DoxCompoundKind.class_, parser.DoxCompoundKind.struct):
+                bs: list[str] = []
+                for base in file_data.compounddef[0].basecompoundref:
+                    b: list[str] = []
                     if base.prot is not None:
-                        b.append(base.prot)
-                    if base.virt == "virtual":
+                        b.append(base.prot.value)
+                    if base.virt == parser.DoxVirtualKind.virtual:
                         b.append("virtual")
-                    b.append(base.content_[0].value)
+                    b.append(base[0])
                     bs.append(" ".join(b))
                 if len(bs) != 0:
                     arg += " : "
                     arg += ", ".join(bs)
 
+            assert self.context is not None
             self.context.directive_args[1] = [arg]
 
-            nodes_ = self.run_domain_directive(kind, self.context.directive_args[1])
+            nodes_ = self.run_domain_directive(kind.value, self.context.directive_args[1])
             rst_node = nodes_[1]
 
-            finder = NodeFinder(rst_node.document)
+            doc = rst_node.document
+            assert doc is not None
+            finder = NodeFinder(doc)
             rst_node.walk(finder)
+            assert finder.declarator is not None
+            assert finder.content is not None
 
-            if kind in ("interface", "namespace"):
+            if kind in (parser.CompoundKind.interface, parser.CompoundKind.namespace):
                 # This is not a real C++ declaration type that Sphinx supports,
                 # so we hax the replacement of it.
-                finder.declarator[0] = addnodes.desc_annotation(kind + " ", kind + " ")
+                finder.declarator[0] = addnodes.desc_annotation(kind.value + " ", kind.value + " ")
 
             rst_node.children[0].insert(0, doxygen_target)
             return nodes_, finder.content
 
+        if render_signature is None:
+            render_signature = def_render_signature
+
         refid = self.get_refid(node.refid)
-        render_sig = kwargs.get("render_signature", render_signature)
         with WithContext(self, new_context):
             # Pretend that the signature is being rendered in context of the
             # definition, for proper domain detection
-            nodes_, contentnode = render_sig(
-                file_data, self.target_handler.create_target(refid), name, kind
+            nodes_, contentnode = render_signature(
+                file_data, self.target_handler(self.document, refid), name, kind
             )
 
-        if file_data.compounddef.includes:
-            for include in file_data.compounddef.includes:
+        if file_data.compounddef[0].includes:
+            for include in file_data.compounddef[0].includes:
                 contentnode.extend(self.render(include, new_context.create_child_context(include)))
 
         contentnode.extend(rendered_data)
         return nodes_
 
-    def visit_file(self, node) -> list[Node]:
-        def render_signature(file_data, doxygen_target, name, kind):
-            self.context = cast("RenderContext", self.context)
+    def visit_file(self, node: parser.Node_CompoundType) -> list[nodes.Node]:
+        def render_signature(
+            file_data, doxygen_target, name, kind
+        ) -> tuple[list[nodes.Node], addnodes.desc_content]:
+            assert self.context is not None
             options = self.context.directive_args[2]
+            rst_node: nodes.container | addnodes.desc
 
             if "content-only" in options:
                 rst_node = nodes.container()
@@ -1210,28 +1526,25 @@ class SphinxRenderer:
                 title_signode.extend(targets)
 
                 # Set up the title
-
-                if (
-                    kind in ["group", "page"]
-                    and file_data.compounddef
-                    and file_data.compounddef.title
-                ):
+                #
+                # For groups & pages we render the 'title' instead of the 'name'
+                # as it more human friendly
+                if kind in [DoxCompoundKind.group, DoxCompoundKind.page] and file_data.compounddef:
                     if "no-title" not in options:
-                        full_title = " ".join([
-                            i.getValue() for i in file_data.compounddef.title.content_
-                        ])
-                        title_signode.append(nodes.emphasis(text=kind))
+                        title_signode.append(nodes.emphasis(text=kind.value))
                         title_signode.append(nodes.Text(" "))
-                        title_signode.append(addnodes.desc_name(text=full_title))
+                        title_signode.append(
+                            addnodes.desc_name(text=file_data.compounddef[0].title)
+                        )
                 else:
-                    title_signode.append(nodes.emphasis(text=kind))
+                    title_signode.append(nodes.emphasis(text=kind.value))
                     title_signode.append(nodes.Text(" "))
                     title_signode.append(addnodes.desc_name(text=name))
 
                 rst_node.append(title_signode)
 
             rst_node.document = self.state.document
-            rst_node["objtype"] = kind
+            rst_node["objtype"] = kind.value
             rst_node["domain"] = self.get_domain() or "cpp"
 
             contentnode = addnodes.desc_content()
@@ -1248,47 +1561,64 @@ class SphinxRenderer:
     # If this list is edited, also change the sections option documentation for
     # the doxygen(auto)file directive in documentation/source/file.rst.
     sections = [
-        ("user-defined", "User Defined"),
-        ("public-type", "Public Types"),
-        ("public-func", "Public Functions"),
-        ("public-attrib", "Public Members"),
-        ("public-slot", "Public Slots"),
-        ("signal", "Signals"),
-        ("dcop-func", "DCOP Function"),
-        ("property", "Properties"),
-        ("event", "Events"),
-        ("public-static-func", "Public Static Functions"),
-        ("public-static-attrib", "Public Static Attributes"),
-        ("protected-type", "Protected Types"),
-        ("protected-func", "Protected Functions"),
-        ("protected-attrib", "Protected Attributes"),
-        ("protected-slot", "Protected Slots"),
-        ("protected-static-func", "Protected Static Functions"),
-        ("protected-static-attrib", "Protected Static Attributes"),
-        ("package-type", "Package Types"),
-        ("package-func", "Package Functions"),
-        ("package-attrib", "Package Attributes"),
-        ("package-static-func", "Package Static Functions"),
-        ("package-static-attrib", "Package Static Attributes"),
-        ("private-type", "Private Types"),
-        ("private-func", "Private Functions"),
-        ("private-attrib", "Private Members"),
-        ("private-slot", "Private Slots"),
-        ("private-static-func", "Private Static Functions"),
-        ("private-static-attrib", "Private Static Attributes"),
-        ("friend", "Friends"),
-        ("related", "Related"),
-        ("define", "Defines"),
-        ("prototype", "Prototypes"),
-        ("typedef", "Typedefs"),
-        ("concept", "Concepts"),
-        ("enum", "Enums"),
-        ("func", "Functions"),
-        ("var", "Variables"),
+        (parser.DoxSectionKind.user_defined, "User Defined"),
+        (parser.DoxSectionKind.public_type, "Public Types"),
+        (parser.DoxSectionKind.public_func, "Public Functions"),
+        (parser.DoxSectionKind.public_attrib, "Public Members"),
+        (parser.DoxSectionKind.public_slot, "Public Slots"),
+        (parser.DoxSectionKind.signal, "Signals"),
+        (parser.DoxSectionKind.dcop_func, "DCOP Function"),
+        (parser.DoxSectionKind.property, "Properties"),
+        (parser.DoxSectionKind.event, "Events"),
+        (parser.DoxSectionKind.public_static_func, "Public Static Functions"),
+        (parser.DoxSectionKind.public_static_attrib, "Public Static Attributes"),
+        (parser.DoxSectionKind.protected_type, "Protected Types"),
+        (parser.DoxSectionKind.protected_func, "Protected Functions"),
+        (parser.DoxSectionKind.protected_attrib, "Protected Attributes"),
+        (parser.DoxSectionKind.protected_slot, "Protected Slots"),
+        (parser.DoxSectionKind.protected_static_func, "Protected Static Functions"),
+        (parser.DoxSectionKind.protected_static_attrib, "Protected Static Attributes"),
+        (parser.DoxSectionKind.package_type, "Package Types"),
+        (parser.DoxSectionKind.package_func, "Package Functions"),
+        (parser.DoxSectionKind.package_attrib, "Package Attributes"),
+        (parser.DoxSectionKind.package_static_func, "Package Static Functions"),
+        (parser.DoxSectionKind.package_static_attrib, "Package Static Attributes"),
+        (parser.DoxSectionKind.private_type, "Private Types"),
+        (parser.DoxSectionKind.private_func, "Private Functions"),
+        (parser.DoxSectionKind.private_attrib, "Private Members"),
+        (parser.DoxSectionKind.private_slot, "Private Slots"),
+        (parser.DoxSectionKind.private_static_func, "Private Static Functions"),
+        (parser.DoxSectionKind.private_static_attrib, "Private Static Attributes"),
+        (parser.DoxSectionKind.friend, "Friends"),
+        (parser.DoxSectionKind.related, "Related"),
+        (parser.DoxSectionKind.define, "Defines"),
+        (parser.DoxSectionKind.prototype, "Prototypes"),
+        (parser.DoxSectionKind.typedef, "Typedefs"),
+        # (parser.DoxSectionKind.concept, "Concepts"),
+        (parser.DoxSectionKind.enum, "Enums"),
+        (parser.DoxSectionKind.func, "Functions"),
+        (parser.DoxSectionKind.var, "Variables"),
     ]
 
-    def visit_compounddef(self, node) -> list[Node]:
-        self.context = cast("RenderContext", self.context)
+    def render_iterable(
+        self, iterable: Iterable[parser.NodeOrValue], tag: str | None = None
+    ) -> list[nodes.Node]:
+        output: list[nodes.Node] = []
+        for entry in iterable:
+            output.extend(self.render(entry, tag=tag))
+        return output
+
+    def render_tagged_iterable(
+        self, iterable: Iterable[parser.TaggedValue[str, parser.NodeOrValue] | str]
+    ) -> list[nodes.Node]:
+        output: list[nodes.Node] = []
+        for entry in iterable:
+            output.extend(self.render_tagged(entry))
+        return output
+
+    @node_handler(parser.Node_compounddefType)
+    def visit_compounddef(self, node: parser.Node_compounddefType) -> list[nodes.Node]:
+        assert self.context is not None
         options = self.context.directive_args[2]
         section_order = None
         if "sections" in options:
@@ -1296,9 +1626,9 @@ class SphinxRenderer:
         membergroup_order = None
         if "membergroups" in options:
             membergroup_order = {sec: i for i, sec in enumerate(options["membergroups"].split(" "))}
-        nodemap: dict[int, list[Node]] = {}
+        nodemap: dict[int, list[nodes.Node]] = {}
 
-        def addnode(kind, lam):
+        def addnode(kind: str, lam):
             if section_order is None:
                 nodemap[len(nodemap)] = lam()
             elif kind in section_order:
@@ -1306,18 +1636,26 @@ class SphinxRenderer:
 
         if "members-only" not in options:
             if "allow-dot-graphs" in options:
-                addnode("incdepgraph", lambda: self.render_optional(node.get_incdepgraph()))
-                addnode("invincdepgraph", lambda: self.render_optional(node.get_invincdepgraph()))
                 addnode(
-                    "inheritancegraph", lambda: self.render_optional(node.get_inheritancegraph())
+                    "incdepgraph", lambda: self.render_optional(node.incdepgraph, "incdepgraph")
+                )
+                addnode(
+                    "invincdepgraph",
+                    lambda: self.render_optional(node.invincdepgraph, "invincdepgraph"),
+                )
+                addnode(
+                    "inheritancegraph",
+                    lambda: self.render_optional(node.inheritancegraph, "inheritancegraph"),
                 )
                 addnode(
                     "collaborationgraph",
-                    lambda: self.render_optional(node.get_collaborationgraph()),
+                    lambda: self.render_optional(node.collaborationgraph, "collaborationgraph"),
                 )
 
             addnode("briefdescription", lambda: self.render_optional(node.briefdescription))
-            addnode("detaileddescription", lambda: self.detaileddescription(node))
+            addnode(
+                "detaileddescription", lambda: self.detaileddescription(node.detaileddescription)
+            )
 
             def render_derivedcompoundref(node):
                 if node is None:
@@ -1335,12 +1673,12 @@ class SphinxRenderer:
                 "derivedcompoundref", lambda: render_derivedcompoundref(node.derivedcompoundref)
             )
 
-        section_nodelists: dict[str, list[Node]] = {}
+        section_nodelists: dict[str, list[nodes.Node]] = {}
 
         # Get all sub sections
         for sectiondef in node.sectiondef:
             kind = sectiondef.kind
-            if section_order is not None and kind not in section_order:
+            if section_order is not None and kind.value not in section_order:
                 continue
             header = sectiondef.header
             if membergroup_order is not None and header not in membergroup_order:
@@ -1351,25 +1689,28 @@ class SphinxRenderer:
                 continue
             rst_node = nodes.container(classes=["breathe-sectiondef"])
             rst_node.document = self.state.document
-            rst_node["objtype"] = kind
+            rst_node["objtype"] = kind.value
             rst_node.extend(child_nodes)
             # We store the nodes as a list against the kind in a dictionary as the kind can be
             # 'user-edited' and that can repeat so this allows us to collect all the 'user-edited'
             # entries together
-            section_nodelists.setdefault(kind, []).append(rst_node)
+            section_nodelists.setdefault(kind.value, []).append(rst_node)
 
         # Order the results in an appropriate manner
         for kind, _ in self.sections:
-            addnode(kind, lambda: section_nodelists.get(kind, []))
+            addnode(kind.value, lambda: section_nodelists.get(kind.value, []))
 
         # Take care of innerclasses
-        addnode("innerclass", lambda: self.render_iterable(node.innerclass))
-        addnode("innernamespace", lambda: self.render_iterable(node.innernamespace))
+        addnode("innerclass", lambda: self.render_iterable(node.innerclass, "innerclass"))
+        addnode(
+            "innernamespace", lambda: self.render_iterable(node.innernamespace, "innernamespace")
+        )
 
         if "inner" in options:
-            for node in node.innergroup:
-                file_data = self.compound_parser.parse(node.refid)
-                inner = file_data.compounddef
+            for cnode in node.innergroup:
+                file_data = self.parse_compound(cnode.refid)
+                assert len(file_data.compounddef) == 1
+                inner = file_data.compounddef[0]
                 addnode("innergroup", lambda: self.visit_compounddef(inner))
 
         nodelist = []
@@ -1380,13 +1721,15 @@ class SphinxRenderer:
 
     section_titles = dict(sections)
 
-    def visit_sectiondef(self, node) -> list[Node]:
-        self.context = cast("RenderContext", self.context)
+    @node_handler(parser.Node_sectiondefType)
+    def visit_sectiondef(self, node: parser.Node_sectiondefType) -> list[nodes.Node]:
+        assert self.context is not None
         options = self.context.directive_args[2]
         node_list = []
         node_list.extend(self.render_optional(node.description))
 
         # Get all the memberdef info
+        member_def: Iterable[parser.Node_memberdefType]
         if "sort" in options:
             member_def = sorted(node.memberdef, key=lambda x: x.name)
         else:
@@ -1403,7 +1746,7 @@ class SphinxRenderer:
             # Group" if the user didn't name the section
             # This is different to Doxygen which will track the groups and name
             # them Group1, Group2, Group3, etc.
-            if node.kind == "user-defined":
+            if node.kind == parser.DoxSectionKind.user_defined:
                 if node.header:
                     text = node.header
                 else:
@@ -1417,17 +1760,31 @@ class SphinxRenderer:
                 classes=["breathe-sectiondef-title"],
                 ids=["breathe-section-title-" + idtext],
             )
-            res: list[Node] = [rubric]
+            res: list[nodes.Node] = [rubric]
             return res + node_list
         return []
 
-    def visit_docreftext(self, node) -> list[Node]:
-        nodelist = self.render_iterable(node.content_)
-        if hasattr(node, "para"):
-            nodelist.extend(self.render_iterable(node.para))
+    @node_handler(parser.Node_docRefTextType)
+    @node_handler(parser.Node_refTextType)
+    def visit_docreftext(
+        self, node: parser.Node_docRefTextType | parser.Node_incType | parser.Node_refTextType
+    ) -> list[nodes.Node]:
+        nodelist: list[nodes.Node]
 
-        refid = self.get_refid(node.refid)
+        if isinstance(node, parser.Node_incType):
+            nodelist = self.render_iterable(node)
+        else:
+            nodelist = self.render_tagged_iterable(node)
 
+            # TODO: "para" in compound.xsd is an empty tag; figure out what this
+            # is supposed to do
+            # for name, value in map(parser.tag_name_value, node):
+            #     if name == "para":
+            #         nodelist.extend(self.render(value))
+
+        refid = self.get_refid(node.refid or "")
+
+        assert nodelist
         nodelist = [
             addnodes.pending_xref(
                 "",
@@ -1441,16 +1798,18 @@ class SphinxRenderer:
         ]
         return nodelist
 
-    def visit_docheading(self, node) -> list[Node]:
+    @node_handler(parser.Node_docHeadingType)
+    def visit_docheading(self, node: parser.Node_docHeadingType) -> list[nodes.Node]:
         """Heading renderer.
 
         Renders embedded headlines as emphasized text. Different heading levels
         are not supported.
         """
-        nodelist = self.render_iterable(node.content_)
+        nodelist = self.render_tagged_iterable(node)
         return [nodes.emphasis("", "", *nodelist)]
 
-    def visit_docpara(self, node) -> list[Node]:
+    @node_handler(parser.Node_docParaType)
+    def visit_docpara(self, node: parser.Node_docParaType) -> list[nodes.Node]:
         """
         <para> tags in the Doxygen output tend to contain either text or a single other tag of
         interest. So whilst it looks like we're combined descriptions and program listings and
@@ -1461,12 +1820,14 @@ class SphinxRenderer:
         nodelist = []
 
         if self.context and self.context.directive_args[0] == "doxygenpage":
-            nodelist.extend(self.render_iterable(node.ordered_children))
+            nodelist.extend(self.render_tagged_iterable(node))
         else:
-            contentNodeCands = self.render_iterable(node.content)
+            contentNodeCands = []
+            for item in get_content(node):
+                contentNodeCands.extend(self.render_tagged(item))
             # if there are consecutive nodes.Text we should collapse them
             # and rerender them to ensure the right paragraphifaction
-            contentNodes: list[Node] = []
+            contentNodes: list[nodes.Node] = []
             for n in contentNodeCands:
                 if len(contentNodes) != 0 and isinstance(contentNodes[-1], nodes.Text):
                     if isinstance(n, nodes.Text):
@@ -1475,12 +1836,12 @@ class SphinxRenderer:
                         continue  # we have handled this node
                 contentNodes.append(n)
             nodelist.extend(contentNodes)
-            nodelist.extend(self.render_iterable(node.images))
+            nodelist.extend(self.render_iterable(get_images(node)))
 
-            paramList = self.render_iterable(node.parameterlist)
+            paramList = self.render_iterable(get_parameterlists(node))
             defs = []
             fields = []
-            for n in self.render_iterable(node.simplesects):
+            for n in self.render_iterable(get_simplesects(node)):
                 if isinstance(n, nodes.definition_list_item):
                     defs.append(n)
                 elif isinstance(n, nodes.field_list):
@@ -1514,11 +1875,11 @@ class SphinxRenderer:
 
         return [nodes.paragraph("", "", *nodelist)]
 
-    def visit_docparblock(self, node) -> list[Node]:
-        return self.render_iterable(node.para)
+    visit_docparblock = node_handler(parser.Node_docParBlockType)(render_iterable)
 
-    def visit_docblockquote(self, node) -> list[Node]:
-        nodelist = self.render_iterable(node.para)
+    @node_handler(parser.Node_docBlockQuoteType)
+    def visit_docblockquote(self, node: parser.Node_docBlockQuoteType) -> list[nodes.Node]:
+        nodelist = self.render_iterable(node)
         # catch block quote attributions here; the <ndash/> tag is the only identifier,
         # and it is nested within a subsequent <para> tag
         if nodelist and nodelist[-1].astext().startswith("&#8212;"):
@@ -1528,88 +1889,139 @@ class SphinxRenderer:
             nodelist[-1] = nodes.attribution("", text)
         return [nodes.block_quote("", classes=[], *nodelist)]
 
-    def visit_docimage(self, node) -> list[Node]:
+    @node_handler(parser.Node_docImageType)
+    def visit_docimage(self, node: parser.Node_docImageType) -> list[nodes.Node]:
         """Output docutils image node using name attribute from xml as the uri"""
 
         path_to_image = node.name
-        if not url_re.match(path_to_image):
+        if path_to_image is None:
+            path_to_image = ""
+        elif not url_re.match(path_to_image):
             path_to_image = self.project_info.sphinx_abs_path_to_file(path_to_image)
 
         options = {"uri": path_to_image}
         return [nodes.image("", **options)]
 
-    def visit_docurllink(self, node) -> list[Node]:
+    @node_handler(parser.Node_docURLLink)
+    def visit_docurllink(self, node: parser.Node_docURLLink) -> list[nodes.Node]:
         """Url Link Renderer"""
 
-        nodelist = self.render_iterable(node.content_)
+        nodelist = self.render_tagged_iterable(node)
         return [nodes.reference("", "", refuri=node.url, *nodelist)]
 
-    def visit_docmarkup(self, node) -> list[Node]:
-        nodelist = self.render_iterable(node.content_)
-        creator: type[TextElement] = nodes.inline
-        if node.type_ == "emphasis":
+    @tagged_node_handler(parser.Node_docMarkupType)
+    def visit_docmarkup(self, tag: str, node: parser.Node_docMarkupType) -> list[nodes.Node]:
+        nodelist = self.render_tagged_iterable(node)
+        creator: type[nodes.TextElement] = nodes.inline
+        if tag == "emphasis":
             creator = nodes.emphasis
-        elif node.type_ == "computeroutput":
+        elif tag == "computeroutput":
             creator = nodes.literal
-        elif node.type_ == "bold":
+        elif tag == "bold":
             creator = nodes.strong
-        elif node.type_ == "superscript":
+        elif tag == "superscript":
             creator = nodes.superscript
-        elif node.type_ == "subscript":
+        elif tag == "subscript":
             creator = nodes.subscript
-        elif node.type_ == "center":
+        elif tag == "center":
             print("Warning: does not currently handle 'center' text display")
-        elif node.type_ == "small":
+        elif tag == "small":
             print("Warning: does not currently handle 'small' text display")
         return [creator("", "", *nodelist)]
 
-    def visit_docsectN(self, node) -> list[Node]:
+    @node_handler(parser.Node_docSect1Type)
+    def visit_docsect1(self, node: parser.Node_docSect1Type) -> list[nodes.Node]:
+        return self.visit_docsectN(node, 0)
+
+    @node_handler(parser.Node_docSect2Type)
+    def visit_docsect2(self, node: parser.Node_docSect2Type) -> list[nodes.Node]:
+        return self.visit_docsectN(node, 1)
+
+    @node_handler(parser.Node_docSect3Type)
+    def visit_docsect3(self, node: parser.Node_docSect3Type) -> list[nodes.Node]:
+        return self.visit_docsectN(node, 2)
+
+    def visit_docsectN(
+        self,
+        node: parser.Node_docSect1Type | parser.Node_docSect2Type | parser.Node_docSect3Type,
+        depth: int,
+    ) -> list[nodes.Node]:
         """
-        Docutils titles are defined by their level inside the document so
-        the proper structure is only guaranteed by the Doxygen XML.
+        Docutils titles are defined by their level inside the document.
 
         Doxygen command mapping to XML element name:
         @section == sect1, @subsection == sect2, @subsubsection == sect3
         """
-        section = nodes.section()
-        section["ids"].append(self.get_refid(node.id))
-        section += nodes.title(node.title, node.title)
-        section += self.create_doxygen_target(node)
-        section += self.render_iterable(node.content_)
-        return [section]
+        # sect2 and sect3 elements can appear outside of sect1/sect2 elements so
+        # we need to check how deep we actually are
+        actual_d = 0
+        assert self.context
+        for n in self.context.node_stack[1:]:
+            if isinstance(
+                n.value,
+                (parser.Node_docSect1Type, parser.Node_docSect2Type, parser.Node_docSect3Type),
+            ):
+                actual_d += 1
 
-    def visit_docsimplesect(self, node) -> list[Node]:
+        title_nodes = self.render_tagged_iterable(node.title) if node.title else []
+        if actual_d == depth:
+            section = nodes.section()
+            section["ids"].append(self.get_refid(node.id))
+            section += nodes.title("", "", *title_nodes)
+            section += self.create_doxygen_target(node)
+            section += self.render_tagged_iterable(node)
+            return [section]
+        else:
+            # If the actual depth doesn't match the specified depth, don't
+            # create a section element, just use an emphasis element as the
+            # title.
+            #
+            # This is probably not the best way to handle such a case. I chose
+            # it because it's what visit_docheading does. It shouldn't come up
+            # often, anyway.
+            #     -- Rouslan
+            content: list[nodes.Node] = [nodes.emphasis("", "", *title_nodes)]
+            content.extend(self.create_doxygen_target(node))
+            content.extend(self.render_tagged_iterable(node))
+            return content
+
+    @node_handler(parser.Node_docSimpleSectType)
+    def visit_docsimplesect(self, node: parser.Node_docSimpleSectType) -> list[nodes.Node]:
         """Other Type documentation such as Warning, Note, Returns, etc"""
 
         # for those that should go into a field list, just render them as that,
         # and it will be pulled up later
         nodelist = self.render_iterable(node.para)
 
-        if node.kind in ("pre", "post", "return"):
+        if node.kind in (
+            parser.DoxSimpleSectKind.pre,
+            parser.DoxSimpleSectKind.post,
+            parser.DoxSimpleSectKind.return_,
+        ):
             return [
                 nodes.field_list(
                     "",
                     nodes.field(
                         "",
-                        nodes.field_name("", nodes.Text(node.kind)),
+                        nodes.field_name("", nodes.Text(node.kind.value)),
                         nodes.field_body("", *nodelist),
                     ),
                 )
             ]
-        elif node.kind == "warning":
+        elif node.kind == parser.DoxSimpleSectKind.warning:
             return [nodes.warning("", *nodelist)]
-        elif node.kind == "note":
+        elif node.kind == parser.DoxSimpleSectKind.note:
             return [nodes.note("", *nodelist)]
-        elif node.kind == "see":
+        elif node.kind == parser.DoxSimpleSectKind.see:
             return [addnodes.seealso("", *nodelist)]
-        elif node.kind == "remark":
-            nodelist.insert(0, nodes.title("", nodes.Text(node.kind.capitalize())))
-            return [nodes.admonition("", classes=[node.kind], *nodelist)]
+        elif node.kind == parser.DoxSimpleSectKind.remark:
+            nodelist.insert(0, nodes.title("", nodes.Text(node.kind.value.capitalize())))
+            return [nodes.admonition("", classes=[node.kind.value], *nodelist)]
 
-        if node.kind == "par":
+        if node.kind == parser.DoxSimpleSectKind.par:
             text = self.render(node.title)
         else:
-            text = [nodes.Text(node.kind.capitalize())]
+            text = [nodes.Text(node.kind.value.capitalize())]
         # TODO: is this working as intended? there is something strange with the types
         title = nodes.strong("", "", *text)
 
@@ -1618,13 +2030,12 @@ class SphinxRenderer:
 
         return [nodes.definition_list_item("", term, definition)]
 
-    def visit_doctitle(self, node) -> list[Node]:
-        return self.render_iterable(node.content_)
+    visit_doctitle = node_handler(parser.Node_docTitleType)(render_tagged_iterable)
 
-    def visit_docformula(self, node) -> list[Node]:
-        nodelist: list[Node] = []
-        for item in node.content_:
-            latex = item.getValue()
+    @node_handler(parser.Node_docFormulaType)
+    def visit_docformula(self, node: parser.Node_docFormulaType) -> list[nodes.Node]:
+        nodelist: list[nodes.Node] = []
+        for latex in node:
             docname = self.state.document.settings.env.docname
             # Strip out the doxygen markup that slips through
             # Either inline
@@ -1645,8 +2056,9 @@ class SphinxRenderer:
                 )
         return nodelist
 
-    def visit_listing(self, node) -> list[Node]:
-        nodelist: list[Node] = []
+    @node_handler(parser.Node_listingType)
+    def visit_listing(self, node: parser.Node_listingType) -> list[nodes.Node]:
+        nodelist: list[nodes.Node] = []
         for i, item in enumerate(node.codeline):
             # Put new lines between the lines
             if i:
@@ -1656,15 +2068,18 @@ class SphinxRenderer:
         # Add blank string at the start otherwise for some reason it renders
         # the pending_xref tags around the kind in plain text
         block = nodes.literal_block("", "", *nodelist)
-        if node.domain:
-            block["language"] = node.domain
+        domain = filetypes.get_pygments_alias(node.filename or "") or filetypes.get_extension(
+            node.filename or ""
+        )
+        if domain:
+            block["language"] = domain
         return [block]
 
-    def visit_codeline(self, node) -> list[Node]:
+    @node_handler(parser.Node_codelineType)
+    def visit_codeline(self, node: parser.Node_codelineType) -> list[nodes.Node]:
         return self.render_iterable(node.highlight)
 
-    def visit_highlight(self, node) -> list[Node]:
-        return self.render_iterable(node.content_)
+    visit_highlight = node_handler(parser.Node_highlightType)(render_tagged_iterable)
 
     def _nested_inline_parse_with_titles(self, content, node) -> str:
         """
@@ -1690,10 +2105,10 @@ class SphinxRenderer:
             self.state.memo.title_styles = surrounding_title_styles
             self.state.memo.section_level = surrounding_section_level
 
-    def visit_verbatim(self, node) -> list[Node]:
-        if not node.text.strip().startswith("embed:rst"):
+    def visit_verbatim(self, node: str) -> list[nodes.Node]:
+        if not node.strip().startswith("embed:rst"):
             # Remove trailing new lines. Purely subjective call from viewing results
-            text = node.text.rstrip()
+            text = node.rstrip()
 
             # Handle has a preformatted text
             return [nodes.literal_block(text, text)]
@@ -1705,40 +2120,40 @@ class SphinxRenderer:
         #   However This would have a side-effect for any users who have an rst-block
         #   consisting of a simple bullet list.
         #   For now we just look for an extended embed tag
-        if node.text.strip().startswith("embed:rst:leading-asterisk"):
-            lines = node.text.splitlines()
+        if node.strip().startswith("embed:rst:leading-asterisk"):
+            lines: Iterable[str] = node.splitlines()
             # Replace the first * on each line with a blank space
-            lines = (text.replace("*", " ", 1) for text in lines)
-            node.text = "\n".join(lines)
+            lines = [text.replace("*", " ", 1) for text in lines]
+            node = "\n".join(lines)
 
         # do we need to strip leading ///?
-        elif node.text.strip().startswith("embed:rst:leading-slashes"):
-            lines = node.text.splitlines()
+        elif node.strip().startswith("embed:rst:leading-slashes"):
+            lines = node.splitlines()
             # Replace the /// on each line with three blank spaces
-            lines = (text.replace("///", "   ", 1) for text in lines)
-            node.text = "\n".join(lines)
+            lines = [text.replace("///", "   ", 1) for text in lines]
+            node = "\n".join(lines)
 
-        elif node.text.strip().startswith("embed:rst:inline"):
+        elif node.strip().startswith("embed:rst:inline"):
             # Inline all text inside the verbatim
-            node.text = "".join(node.text.splitlines())
+            node = "".join(node.splitlines())
             is_inline = True
 
         if is_inline:
-            text = node.text.replace("embed:rst:inline", "", 1)
+            node = node.replace("embed:rst:inline", "", 1)
         else:
             # Remove the first line which is "embed:rst[:leading-asterisk]"
-            text = "\n".join(node.text.split("\n")[1:])
+            node = "\n".join(node.split("\n")[1:])
 
             # Remove starting whitespace
-            text = textwrap.dedent(text)
+            node = textwrap.dedent(node)
 
         # Inspired by autodoc.py in Sphinx
         rst = StringList()
-        for line in text.split("\n"):
+        for line in node.split("\n"):
             rst.append(line, "<breathe>")
 
         # Parent node for the generated node subtree
-        rst_node: Node
+        rst_node: nodes.Node
         if is_inline:
             rst_node = nodes.inline()
         else:
@@ -1753,42 +2168,46 @@ class SphinxRenderer:
 
         return [rst_node]
 
-    def visit_inc(self, node: compoundsuper.incType) -> list[Node]:
+    @node_handler(parser.Node_incType)
+    def visit_inc(self, node: parser.Node_incType) -> list[nodes.Node]:
         if not self.app.config.breathe_show_include:
             return []
 
-        compound_link: list[Node] = [nodes.Text(node.content_[0].getValue())]
-        if node.get_refid():
+        compound_link: list[nodes.Node] = [nodes.Text("".join(node))]
+        if node.refid:
             compound_link = self.visit_docreftext(node)
-        if node.local == "yes":
+        if node.local:
             text = [nodes.Text('#include "'), *compound_link, nodes.Text('"')]
         else:
             text = [nodes.Text("#include <"), *compound_link, nodes.Text(">")]
 
         return [nodes.container("", nodes.emphasis("", "", *text))]
 
-    def visit_ref(self, node: compoundsuper.refType) -> list[Node]:
-        def get_node_info(file_data):
-            name = node.content_[0].getValue()
+    @node_handler(parser.Node_refType)
+    def visit_ref(self, node: parser.Node_refType) -> list[nodes.Node]:
+        def get_node_info(file_data: parser.Node_DoxygenType):
+            name = "".join(node)
             name = name.rsplit("::", 1)[-1]
-            return name, file_data.compounddef.kind
+            assert len(file_data.compounddef) == 1
+            return name, file_data.compounddef[0].kind
 
         return self.visit_compound(node, False, get_node_info=get_node_info)
 
-    def visit_doclistitem(self, node) -> list[Node]:
+    @node_handler(parser.Node_docListItemType)
+    def visit_doclistitem(self, node: parser.Node_docListItemType) -> list[nodes.Node]:
         """List item renderer. Render all the children depth-first.
         Upon return expand the children node list into a docutils list-item.
         """
-        nodelist = self.render_iterable(node.para)
+        nodelist = self.render_iterable(node)
         return [nodes.list_item("", *nodelist)]
 
     numeral_kind = ["arabic", "loweralpha", "lowerroman", "upperalpha", "upperroman"]
 
-    def render_unordered(self, children) -> list[Node]:
+    def render_unordered(self, children) -> list[nodes.Node]:
         nodelist_list = nodes.bullet_list("", *children)
         return [nodelist_list]
 
-    def render_enumerated(self, children, nesting_level) -> list[Node]:
+    def render_enumerated(self, children, nesting_level) -> list[nodes.Node]:
         nodelist_list = nodes.enumerated_list("", *children)
         idx = nesting_level % len(SphinxRenderer.numeral_kind)
         nodelist_list["enumtype"] = SphinxRenderer.numeral_kind[idx]
@@ -1796,27 +2215,32 @@ class SphinxRenderer:
         nodelist_list["suffix"] = "."
         return [nodelist_list]
 
-    def visit_doclist(self, node) -> list[Node]:
+    @tagged_node_handler(parser.Node_docListType)
+    def visit_doclist(self, tag: str, node: parser.Node_docListType) -> list[nodes.Node]:
         """List renderer
 
         The specifics of the actual list rendering are handled by the
         decorator around the generic render function.
         Render all the children depth-first."""
         """ Call the wrapped render function. Update the nesting level for the enumerated lists. """
-        if node.node_subtype == "itemized":
-            val = self.render_iterable(node.listitem)
+        if tag == "itemizedlist":
+            val = self.render_iterable(node)
             return self.render_unordered(children=val)
-        elif node.node_subtype == "ordered":
+        elif tag == "orderedlist":
             self.nesting_level += 1
-            val = self.render_iterable(node.listitem)
+            val = self.render_iterable(node)
             self.nesting_level -= 1
             return self.render_enumerated(children=val, nesting_level=self.nesting_level)
         return []
 
-    def visit_compoundref(self, node) -> list[Node]:
-        nodelist = self.render_iterable(node.content_)
-        refid = self.get_refid(node.refid)
+    @node_handler(parser.Node_compoundRefType)
+    def visit_compoundref(self, node: parser.Node_compoundRefType) -> list[nodes.Node]:
+        nodelist: list[nodes.Node] = self.render_iterable(node)
+        refid = None
+        if node.refid is not None:
+            refid = self.get_refid(node.refid)
         if refid is not None:
+            assert nodelist
             nodelist = [
                 addnodes.pending_xref(
                     "",
@@ -1830,7 +2254,8 @@ class SphinxRenderer:
             ]
         return nodelist
 
-    def visit_docxrefsect(self, node) -> list[Node]:
+    @node_handler(parser.Node_docXRefSectType)
+    def visit_docxrefsect(self, node: parser.Node_docXRefSectType) -> list[nodes.Node]:
         assert self.app.env is not None
 
         signode = addnodes.desc_signature()
@@ -1859,32 +2284,35 @@ class SphinxRenderer:
 
         return [descnode]
 
-    def visit_docvariablelist(self, node) -> list[Node]:
-        output: list[Node] = []
-        for varlistentry, listitem in zip(node.varlistentries, node.listitems):
+    @node_handler(parser.Node_docVariableListType)
+    def visit_docvariablelist(self, node: parser.Node_docVariableListType) -> list[nodes.Node]:
+        output: list[nodes.Node] = []
+        for n in node:
             descnode = addnodes.desc()
             descnode["objtype"] = "varentry"
             descnode["domain"] = self.get_domain() or "cpp"
             signode = addnodes.desc_signature()
-            signode += self.render_optional(varlistentry)
+            signode += self.render_optional(n.varlistentry)
             descnode += signode
             contentnode = addnodes.desc_content()
-            contentnode += self.render_iterable(listitem.para)
+            contentnode += self.render_iterable(n.listitem)
             descnode += contentnode
             output.append(descnode)
         return output
 
-    def visit_docvarlistentry(self, node) -> list[Node]:
-        content = node.term.content_
-        return self.render_iterable(content)
+    @node_handler(parser.Node_docVarListEntryType)
+    def visit_docvarlistentry(self, node: parser.Node_docVarListEntryType) -> list[nodes.Node]:
+        return self.render_tagged_iterable(node.term)
 
-    def visit_docanchor(self, node) -> list[Node]:
+    @node_handler(parser.Node_docAnchorType)
+    def visit_docanchor(self, node: parser.Node_docAnchorType) -> list[nodes.Node]:
         return list(self.create_doxygen_target(node))
 
-    def visit_docentry(self, node) -> list[Node]:
+    @node_handler(parser.Node_docEntryType)
+    def visit_docentry(self, node: parser.Node_docEntryType) -> list[nodes.Node]:
         col = nodes.entry()
         col += self.render_iterable(node.para)
-        if node.thead == "yes":
+        if node.thead:
             col["heading"] = True
         if node.rowspan:
             col["morerows"] = int(node.rowspan) - 1
@@ -1892,11 +2320,12 @@ class SphinxRenderer:
             col["morecols"] = int(node.colspan) - 1
         return [col]
 
-    def visit_docrow(self, node) -> list[Node]:
+    @node_handler(parser.Node_docRowType)
+    def visit_docrow(self, node: parser.Node_docRowType) -> list[nodes.Node]:
         row = nodes.row()
         cols = self.render_iterable(node.entry)
         elem: nodes.thead | nodes.tbody
-        if all(col.get("heading", False) for col in cols):  # type: ignore[attr-defined]
+        if all(cast("nodes.Element", col).get("heading", False) for col in cols):
             elem = nodes.thead()
         else:
             elem = nodes.tbody()
@@ -1904,7 +2333,8 @@ class SphinxRenderer:
         elem.append(row)
         return [elem]
 
-    def visit_doctable(self, node) -> list[Node]:
+    @node_handler(parser.Node_docTableType)
+    def visit_doctable(self, node: parser.Node_docTableType) -> list[nodes.Node]:
         table = nodes.table()
         table["classes"] += ["colwidths-auto"]
         tgroup = nodes.tgroup(cols=node.cols)
@@ -1919,9 +2349,10 @@ class SphinxRenderer:
         # "envelop" rows there, namely thead and tbody (eg it will need to be updated
         # if Doxygen one day adds support for tfoot)
 
-        tags: dict[str, list] = {row.starttag(): [] for row in rows}  # type: ignore[attr-defined]
+        tags: defaultdict[str, list] = defaultdict(list)
         for row in rows:
-            tags[row.starttag()].append(row.next_node())  # type: ignore[attr-defined]
+            assert isinstance(row, nodes.Element)
+            tags[row.starttag()].append(row.next_node())
 
         def merge_row_types(root, elem, elems):
             for node in elems:
@@ -1935,61 +2366,51 @@ class SphinxRenderer:
 
         return [table]
 
-    def visit_mixedcontainer(self, node: compoundsuper.MixedContainer) -> list[Node]:
-        return self.render_optional(node.getValue())
+    visit_description = node_handler(parser.Node_descriptionType)(render_tagged_iterable)
 
-    def visit_description(self, node) -> list[Node]:
-        return self.render_iterable(node.content_)
+    visit_linkedtext = node_handler(parser.Node_linkedTextType)(render_tagged_iterable)
 
-    def visit_linkedtext(self, node) -> list[Node]:
-        return self.render_iterable(node.content_)
-
-    def visit_function(self, node) -> list[Node]:
+    def visit_function(self, node: parser.Node_memberdefType) -> list[nodes.Node]:
         dom = self.get_domain()
         if not dom or dom in ("c", "cpp", "py", "cs"):
             names = self.get_qualification()
-            names.append(node.get_name())
+            names.append(node.name)
             name = self.join_nested_name(names)
             if dom == "py":
-                declaration = name + node.get_argsstring()
+                declaration = name + (node.argsstring or "")
             elif dom == "cs":
                 declaration = " ".join([
                     self.create_template_prefix(node),
-                    "".join(n.astext() for n in self.render(node.get_type())),
+                    "".join(n.astext() for n in self.render(node.type)),
                     name,
-                    node.get_argsstring(),
+                    node.argsstring or "",
                 ])
             else:
                 elements = [self.create_template_prefix(node)]
-                if node.static == "yes":
+                if node.static:
                     elements.append("static")
-                if node.inline == "yes":
+                if node.inline:
                     elements.append("inline")
-                if node.kind == "friend":
+                if node.kind == parser.DoxMemberKind.friend:
                     elements.append("friend")
-                if node.virt in ("virtual", "pure-virtual"):
+                if node.virt in (parser.DoxVirtualKind.virtual, parser.DoxVirtualKind.pure_virtual):
                     elements.append("virtual")
-                if node.explicit == "yes":
+                if node.explicit:
                     elements.append("explicit")
-                # TODO: handle constexpr when parser has been updated
-                #       but Doxygen seems to leave it in the type anyway
-                typ = "".join(n.astext() for n in self.render(node.get_type()))
-                # Doxygen sometimes leaves 'static' in the type,
-                # e.g., for "constexpr static auto f()"
-                typ = typ.replace("static ", "")
-                # In Doxygen up to somewhere between 1.8.17 to exclusive 1.9.1
-                # the 'friend' part is also left in the type.
-                # See also #767.
-                typ = typ.removeprefix("friend ")
-                elements.extend((typ, name, node.get_argsstring()))
+                if node.constexpr:
+                    elements.append("constexpr")
+                if node.consteval:
+                    elements.append("consteval")
+
+                typ = strip_legacy_qualifiers("".join(n.astext() for n in self.render(node.type)))
+                elements.extend((typ, name, node.argsstring or ""))
                 declaration = " ".join(elements)
-            nodes_ = self.handle_declaration(node, declaration)
-            return nodes_
+            return self.handle_declaration(node, node.kind.value, declaration)
         else:
             # Get full function signature for the domain directive.
             param_list = []
             for param in node.param:
-                self.context = cast("RenderContext", self.context)
+                assert self.context is not None
                 param = self.context.mask_factory.mask(param)
                 param_decl = get_param_decl(param)
                 param_list.append(param_decl)
@@ -1998,29 +2419,30 @@ class SphinxRenderer:
             signature = f"{templatePrefix}{sig_def}({', '.join(param_list)})"
 
             # Add CV-qualifiers.
-            if node.const == "yes":
+            if node.const:
                 signature += " const"
             # The doxygen xml output doesn't register 'volatile' as the xml attribute for functions
             # until version 1.8.8 so we also check argsstring:
             #     https://bugzilla.gnome.org/show_bug.cgi?id=733451
-            if node.volatile == "yes" or node.argsstring.endswith("volatile"):
+            if node.volatile or (node.argsstring and node.argsstring.endswith("volatile")):
                 signature += " volatile"
 
-            if node.refqual == "lvalue":
+            if node.refqual == parser.DoxRefQualifierKind.lvalue:
                 signature += "&"
-            elif node.refqual == "rvalue":
+            elif node.refqual == parser.DoxRefQualifierKind.rvalue:
                 signature += "&&"
 
             # Add `= 0` for pure virtual members.
-            if node.virt == "pure-virtual":
+            if node.virt == parser.DoxVirtualKind.pure_virtual:
                 signature += "= 0"
 
-            self.context = cast("RenderContext", self.context)
+            assert self.context is not None
             self.context.directive_args[1] = [signature]
 
             nodes_ = self.run_domain_directive(node.kind, self.context.directive_args[1])
 
             assert self.app.env is not None
+            target = None
             if self.app.env.config.breathe_debug_trace_doxygen_ids:
                 target = self.create_doxygen_target(node)
                 if len(target) == 0:
@@ -2031,26 +2453,35 @@ class SphinxRenderer:
                     )
 
             rst_node = nodes_[1]
-            finder = NodeFinder(rst_node.document)
+            assert isinstance(rst_node, nodes.Element)
+            doc = rst_node.document
+            assert doc is not None
+            finder = NodeFinder(doc)
             rst_node.walk(finder)
+            assert finder.content is not None
 
             # Templates have multiple signature nodes in recent versions of Sphinx.
             # Insert Doxygen target into the first signature node.
             if not self.app.env.config.breathe_debug_trace_doxygen_ids:
                 target = self.create_doxygen_target(node)
-            rst_node.children[0].insert(0, target)  # type: ignore[attr-defined]
+            assert target is not None
+
+            # the type is cast to "Any" to get around missing typing info in
+            # docutils 0.20.1
+            cast("Any", rst_node.children[0]).insert(0, target)
 
             finder.content.extend(self.description(node))
             return nodes_
 
-    def visit_define(self, node) -> list[Node]:
+    def visit_define(self, node: parser.Node_memberdefType) -> list[nodes.Node]:
         declaration = node.name
         if node.param:
             declaration += "("
             for i, parameter in enumerate(node.param):
                 if i:
                     declaration += ", "
-                declaration += parameter.defname
+                if parameter.defname:
+                    declaration += parameter.defname
             declaration += ")"
 
         # TODO: remove this once Sphinx supports definitions for macros
@@ -2059,9 +2490,11 @@ class SphinxRenderer:
                 declarator.append(nodes.Text(" "))
                 declarator.extend(self.render(node.initializer))
 
-        return self.handle_declaration(node, declaration, declarator_callback=add_definition)
+        return self.handle_declaration(
+            node, node.kind.value, declaration, declarator_callback=add_definition
+        )
 
-    def visit_enum(self, node) -> list[Node]:
+    def visit_enum(self, node: parser.Node_memberdefType) -> list[nodes.Node]:
         def content(contentnode):
             contentnode.extend(self.description(node))
             values = nodes.emphasis("", nodes.Text("Values:"))
@@ -2074,34 +2507,37 @@ class SphinxRenderer:
         names.append(node.name)
         declaration = self.join_nested_name(names)
         dom = self.get_domain()
-        if (not dom or dom == "cpp") and node.strong == "yes":
+        if (not dom or dom == "cpp") and node.strong:
             # It looks like Doxygen does not make a difference
             # between 'enum class' and 'enum struct',
             # so render them both as 'enum class'.
             obj_type = "enum-class"
-            underlying_type = "".join(n.astext() for n in self.render(node.type_))
+            underlying_type = "".join(n.astext() for n in self.render(node.type))
             if len(underlying_type.strip()) != 0:
                 declaration += " : "
                 declaration += underlying_type
         else:
             obj_type = "enum"
-        return self.handle_declaration(
-            node, declaration, obj_type=obj_type, content_callback=content
-        )
+        return self.handle_declaration(node, obj_type, declaration, content_callback=content)
 
-    def visit_enumvalue(self, node) -> list[Node]:
+    @node_handler(parser.Node_enumvalueType)
+    def visit_enumvalue(self, node: parser.Node_enumvalueType) -> list[nodes.Node]:
         if self.app.config.breathe_show_enumvalue_initializer:
             declaration = node.name + self.make_initializer(node)
         else:
             declaration = node.name
-        return self.handle_declaration(node, declaration, obj_type="enumvalue")
 
-    def visit_typedef(self, node) -> list[Node]:
-        type_ = "".join(n.astext() for n in self.render(node.get_type()))
+        def content(contentnode: addnodes.desc_content):
+            contentnode.extend(self.description(node))
+
+        return self.handle_declaration(node, "enumvalue", declaration, content_callback=content)
+
+    def visit_typedef(self, node: parser.Node_memberdefType) -> list[nodes.Node]:
+        type_ = "".join(n.astext() for n in self.render(node.type))
         names = self.get_qualification()
-        names.append(node.get_name())
+        names.append(node.name)
         name = self.join_nested_name(names)
-        if node.definition.startswith("using "):
+        if node.definition and node.definition.startswith("using "):
             # TODO: looks like Doxygen does not generate the proper XML
             #       for the template parameter list
             declaration = self.create_template_prefix(node)
@@ -2112,12 +2548,12 @@ class SphinxRenderer:
             #   contain the full text. If a @typedef was used instead, the
             #   definition has only the typename, which makes it impossible to
             #   distinguish between them so fallback to "typedef" behavior here.
-            declaration = f"{type_} {name} {node.get_argsstring()}"
-        return self.handle_declaration(node, declaration)
+            declaration = " ".join([type_, name, node.argsstring or ""])
+        return self.handle_declaration(node, node.kind.value, declaration)
 
     def make_initializer(self, node) -> str:
         initializer = node.initializer
-        signature: list[Node] = []
+        signature: list[nodes.Node] = []
         if initializer:
             render_nodes = self.render(initializer)
             # Do not append separators for paragraphs.
@@ -2130,7 +2566,7 @@ class SphinxRenderer:
             signature.extend(render_nodes)
         return "".join(n.astext() for n in signature)
 
-    def visit_variable(self, node) -> list[Node]:
+    def visit_variable(self, node: parser.Node_memberdefType) -> list[nodes.Node]:
         names = self.get_qualification()
         names.append(node.name)
         name = self.join_nested_name(names)
@@ -2144,38 +2580,41 @@ class SphinxRenderer:
         elif dom == "cs":
             declaration = " ".join([
                 self.create_template_prefix(node),
-                "".join(n.astext() for n in self.render(node.get_type())),
+                "".join(n.astext() for n in self.render(node.type)),
                 name,
-                node.get_argsstring(),
+                node.argsstring or "",
             ])
-            if node.get_gettable() or node.get_settable():
+            if node.gettable or node.settable:
                 declaration += "{"
-                if node.get_gettable():
+                if node.gettable:
                     declaration += "get;"
-                if node.get_settable():
+                if node.settable:
                     declaration += "set;"
                 declaration += "}"
             declaration += self.make_initializer(node)
         else:
             elements = [self.create_template_prefix(node)]
-            if node.static == "yes":
+            if node.static:
                 elements.append("static")
-            if node.mutable == "yes":
+            if node.mutable:
                 elements.append("mutable")
-            typename = "".join(n.astext() for n in self.render(node.get_type()))
-            # Doxygen sometimes leaves 'static' in the type,
-            # e.g., for "constexpr static int i"
-            typename = typename.replace("static ", "")
+            if node.constexpr:
+                elements.append("constexpr")
+            if node.consteval:
+                elements.append("consteval")
+            if node.constinit:
+                elements.append("constinit")
+            typename = strip_legacy_qualifiers("".join(n.astext() for n in self.render(node.type)))
             if dom == "c" and "::" in typename:
                 typename = typename.replace("::", ".")
-            elements.extend((typename, name, node.get_argsstring(), self.make_initializer(node)))
+            elements.extend((typename, name, node.argsstring or "", self.make_initializer(node)))
             declaration = " ".join(elements)
         if not dom or dom in ("c", "cpp", "py", "cs"):
-            return self.handle_declaration(node, declaration, options=options)
+            return self.handle_declaration(node, node.kind.value, declaration, options=options)
         else:
             return self.render_declaration(node, declaration)
 
-    def visit_friendclass(self, node) -> list[Node]:
+    def visit_friendclass(self, node: parser.Node_memberdefType) -> list[nodes.Node]:
         dom = self.get_domain()
         assert not dom or dom == "cpp"
 
@@ -2185,7 +2624,7 @@ class SphinxRenderer:
         signode = addnodes.desc_signature()
         desc += signode
 
-        typ = "".join(n.astext() for n in self.render(node.get_type()))
+        typ = "".join(n.astext() for n in self.render(node.type))
         # in Doxygen < 1.9 the 'friend' part is there, but afterwards not
         # https://github.com/breathe-doc/breathe/issues/616
         assert typ in ("friend class", "friend struct", "class", "struct")
@@ -2201,13 +2640,13 @@ class SphinxRenderer:
         return [desc]
 
     def visit_templateparam(
-        self, node: compound.paramTypeSub, *, insertDeclNameByParsing: bool = False
-    ) -> list[Node]:
-        nodelist: list[Node] = []
+        self, node: parser.Node_paramType, *, insertDeclNameByParsing: bool = False
+    ) -> list[nodes.Node]:
+        nodelist: list[nodes.Node] = []
 
         # Parameter type
-        if node.type_:
-            type_nodes = self.render(node.type_)
+        if node.type:
+            type_nodes = self.render(node.type)
             # Render keywords as annotations for consistency with the cpp domain.
             if len(type_nodes) > 0 and isinstance(type_nodes[0], str):
                 first_node = type_nodes[0]
@@ -2273,8 +2712,9 @@ class SphinxRenderer:
 
         return nodelist
 
-    def visit_templateparamlist(self, node: compound.templateparamlistTypeSub) -> list[Node]:
-        nodelist: list[Node] = []
+    @node_handler(parser.Node_templateparamlistType)
+    def visit_templateparamlist(self, node: parser.Node_templateparamlistType) -> list[nodes.Node]:
+        nodelist: list[nodes.Node] = []
         self.output_defname = False
         for i, item in enumerate(node.param):
             if i:
@@ -2283,36 +2723,33 @@ class SphinxRenderer:
         self.output_defname = True
         return nodelist
 
-    def visit_docparamlist(self, node) -> list[Node]:
+    @node_handler(parser.Node_docParamListType)
+    def visit_docparamlist(self, node: parser.Node_docParamListType) -> list[nodes.Node]:
         """Parameter/Exception/TemplateParameter documentation"""
 
         fieldListName = {
-            "param": "param",
-            "exception": "throws",
-            "templateparam": "tparam",
-            "retval": "retval",
+            parser.DoxParamListKind.param: "param",
+            parser.DoxParamListKind.exception: "throws",
+            parser.DoxParamListKind.templateparam: "tparam",
+            parser.DoxParamListKind.retval: "retval",
         }
 
         # https://docutils.sourceforge.io/docs/ref/doctree.html#field-list
         fieldList = nodes.field_list()
-        for item in node.parameteritem:
+        for item in node:
             # TODO: does item.parameternamelist really have more than 1 parametername?
             assert len(item.parameternamelist) <= 1, item.parameternamelist
-            nameNodes: list[Node] = []
+            nameNodes: list[nodes.Node] = []
             parameterDirectionNodes = []
             if len(item.parameternamelist) != 0:
                 paramNameNodes = item.parameternamelist[0].parametername
                 if len(paramNameNodes) != 0:
                     nameNodes = []
                     for paramName in paramNameNodes:
-                        content = paramName.content_
-                        # this is really a list of MixedContainer objects, i.e., a generic object
-                        # we assume there is either 1 or 2 elements, if there is 2 the first is the
-                        # parameter direction
-                        assert len(content) == 1 or len(content) == 2, content
-                        thisName = self.render(content[-1])
+                        assert len(paramName) == 1
+                        thisName = self.render_tagged(paramName[0])
                         if len(nameNodes) != 0:
-                            if node.kind == "exception":
+                            if node.kind == parser.DoxParamListKind.exception:
                                 msg = "Doxygen \\exception commands with multiple names can not be"
                                 msg += " converted to a single :throws: field in Sphinx."
                                 msg += " Exception '{}' suppressed from output.".format(
@@ -2322,11 +2759,14 @@ class SphinxRenderer:
                                 continue
                             nameNodes.append(nodes.Text(", "))
                         nameNodes.extend(thisName)
-                        if len(content) == 2:
+                        if paramName.direction is not None:
                             # note, each paramName node seems to have the same direction,
                             # so just use the last one
-                            dir = "".join(n.astext() for n in self.render(content[0])).strip()
-                            assert dir in ("[in]", "[out]", "[inout]"), ">" + dir + "<"
+                            dir = {
+                                parser.DoxParamDir.in_: "[in]",
+                                parser.DoxParamDir.out: "[out]",
+                                parser.DoxParamDir.inout: "[inout]",
+                            }[paramName.direction]
                             parameterDirectionNodes = [nodes.strong(dir, dir), nodes.Text(" ")]
             # it seems that Sphinx expects the name to be a single node,
             # so let's make it that
@@ -2347,11 +2787,17 @@ class SphinxRenderer:
             fieldList += field
         return [fieldList]
 
-    def visit_docdot(self, node) -> list[Node]:
+    @node_handler(parser.Node_docDotMscType)
+    def visit_docdot(self, node: parser.Node_docDotMscType) -> list[nodes.Node]:
         """Translate node from doxygen's dot command to sphinx's graphviz directive."""
         graph_node = graphviz()
-        if node.content_ and node.content_[0].getValue().rstrip("\n"):
-            graph_node["code"] = node.content_[0].getValue()
+        str_value = ""
+        if len(node):
+            val = node[0]
+            assert isinstance(val, str)
+            str_value = val
+        if str_value.rstrip("\n"):
+            graph_node["code"] = str_value
         else:
             graph_node["code"] = ""  # triggers another warning from sphinx.ext.graphviz
             self.state.document.reporter.warning(
@@ -2366,10 +2812,11 @@ class SphinxRenderer:
             return [nodes.figure("", graph_node, caption_node)]
         return [graph_node]
 
-    def visit_docdotfile(self, node) -> list[Node]:
+    @node_handler(parser.Node_docImageFileType)
+    def visit_docdotfile(self, node: parser.Node_docImageFileType) -> list[nodes.Node]:
         """Translate node from doxygen's dotfile command to sphinx's graphviz directive."""
         dotcode = ""
-        dot_file_path = Path(node.name)
+        dot_file_path = Path(node.name or "")
         # Doxygen v1.9.3+ uses a relative path to specify the dot file.
         # Previously, Doxygen used an absolute path.
         # This relative path is with respect to the XML_OUTPUT path.
@@ -2392,16 +2839,38 @@ class SphinxRenderer:
         graph_node = graphviz()
         graph_node["code"] = dotcode
         graph_node["options"] = {"docname": dot_file_path}
-        caption = "" if not node.content_ else node.content_[0].getValue()
+        caption = "" if len(node) == 0 else parser.tag_name_value(node[0])[1]
         if caption:
+            assert isinstance(caption, str)
             caption_node = nodes.caption(caption, "")
             caption_node += nodes.Text(caption)
             return [nodes.figure("", graph_node, caption_node)]
         return [graph_node]
 
-    def visit_docgraph(self, node: compoundsuper.graphType) -> list[Node]:
+    @tagged_node_handler(parser.Node_graphType)
+    def visit_docgraph(self, tag: str, node: parser.Node_graphType) -> list[nodes.Node]:
         """Create a graph (generated by doxygen - not user-defined) from XML using dot
         syntax."""
+
+        assert self.context
+        parent = self.context.node_stack[1].value
+        assert isinstance(parent, parser.Node_compounddefType)
+
+        direction = "forward"
+        if tag == "incdepgraph":
+            caption = f"Include dependency graph for {parent.compoundname}:"
+        elif tag == "invincdepgraph":
+            direction = "back"
+            caption = (
+                "This graph shows which files directly or indirectly "
+                + f"include {parent.compoundname}:"
+            )
+        elif tag == "inheritancegraph":
+            caption = f"Inheritance diagram for {parent.compoundname}:"
+        else:
+            assert tag == "collaborationgraph"
+            caption = f"Collaboration diagram for {parent.compoundname}:"
+
         # use graphs' legend from doxygen (v1.9.1)
         # most colors can be changed via `graphviz_dot_args` in conf.py
         edge_colors = {
@@ -2422,10 +2891,10 @@ class SphinxRenderer:
         dot += " font=Helvetica padding=2]\n"
         dot += '    edge [color="#1414CE"]\n'
         relations = []
-        for g_node in node.get_node():
-            dot += '    "%s" [label="%s"' % (g_node.get_id(), g_node.get_label())
-            dot += ' tooltip="%s"' % g_node.get_label()
-            if g_node.get_id() == "1":
+        for g_node in node.node:
+            dot += '    "%s" [label="%s"' % (g_node.id, g_node.label)
+            dot += ' tooltip="%s"' % g_node.label
+            if g_node.id == "1":
                 # the disabled grey color is used in doxygen to indicate that the URL is
                 # not set (for the compound in focus). Setting this here doesn't allow
                 # further customization. Maybe remove this since URL is not used?
@@ -2438,13 +2907,13 @@ class SphinxRenderer:
             # dot += ' URL="%s"' % g_node.get_link().get_refid()
             dot += "]\n"
             for child_node in g_node.childnode:
-                edge = f'    "{g_node.get_id()}"'
-                edge += f' -> "{child_node.get_refid()}" ['
-                edge += f"dir={node.get_direction()} "
+                edge = f'    "{g_node.id}"'
+                edge += f' -> "{child_node.refid}" ['
+                edge += f"dir={direction} "
                 # edge labels don't appear in XML (bug?); use tooltip in meantime
-                edge += 'tooltip="%s"' % child_node.get_relation()
-                if child_node.get_relation() in edge_colors.keys():
-                    edge += ' color="#%s"' % edge_colors.get(child_node.get_relation())
+                edge += 'tooltip="%s"' % child_node.relation.value
+                if child_node.relation.value in edge_colors.keys():
+                    edge += ' color="#%s"' % edge_colors.get(child_node.relation.value)
                 edge += "]\n"
                 relations.append(edge)
         for relation in relations:
@@ -2456,100 +2925,65 @@ class SphinxRenderer:
         graph_node["code"] = dot
         graph_node["align"] = "center"
         graph_node["options"] = {}
-        caption = node.get_caption()
         # if caption is first node in a figure, then everything that follows is
         # considered a caption. Use a paragraph followed by a figure to center the
         # graph. This may have illegible side effects for very large graphs.
         caption_node = nodes.paragraph("", nodes.Text(caption))
         return [caption_node, nodes.figure("", graph_node)]
 
-    def visit_unknown(self, node) -> list[Node]:
+    def visit_unknown(self, node) -> list[nodes.Node]:
         """Visit a node of unknown type."""
         return []
 
-    def dispatch_compound(self, node) -> list[Node]:
+    @node_handler(parser.Node_CompoundType)
+    def dispatch_compound(self, node: parser.Node_CompoundType) -> list[nodes.Node]:
         """Dispatch handling of a compound node to a suitable visit method."""
-        if node.kind in ["file", "dir", "page", "example", "group"]:
+        if node.kind in [
+            parser.CompoundKind.file,
+            parser.CompoundKind.dir,
+            parser.CompoundKind.page,
+            parser.CompoundKind.example,
+            parser.CompoundKind.group,
+        ]:
             return self.visit_file(node)
         return self.visit_compound(node)
 
-    def dispatch_memberdef(self, node) -> list[Node]:
+    @node_handler(parser.Node_memberdefType)
+    def dispatch_memberdef(self, node: parser.Node_memberdefType) -> list[nodes.Node]:
         """Dispatch handling of a memberdef node to a suitable visit method."""
-        if node.kind in ("function", "signal", "slot") or (
-            node.kind == "friend" and node.argsstring
-        ):
+        if node.kind in (
+            parser.DoxMemberKind.function,
+            parser.DoxMemberKind.signal,
+            parser.DoxMemberKind.slot,
+        ) or (node.kind == parser.DoxMemberKind.friend and node.argsstring):
             return self.visit_function(node)
-        if node.kind == "enum":
+        if node.kind == parser.DoxMemberKind.enum:
             return self.visit_enum(node)
-        if node.kind == "typedef":
+        if node.kind == parser.DoxMemberKind.typedef:
             return self.visit_typedef(node)
-        if node.kind == "variable":
+        if node.kind == parser.DoxMemberKind.variable:
             return self.visit_variable(node)
-        if node.kind == "property":
+        if node.kind == parser.DoxMemberKind.property:
             # Note: visit like variable for now
             return self.visit_variable(node)
-        if node.kind == "event":
+        if node.kind == parser.DoxMemberKind.event:
             # Note: visit like variable for now
             return self.visit_variable(node)
-        if node.kind == "define":
+        if node.kind == parser.DoxMemberKind.define:
             return self.visit_define(node)
-        if node.kind == "friend":
+        if node.kind == parser.DoxMemberKind.friend:
             # note, friend functions should be dispatched further up
             return self.visit_friendclass(node)
         return self.render_declaration(node, update_signature=self.update_signature)
 
-    # A mapping from node types to corresponding dispatch and visit methods.
-    # Dispatch methods, as the name suggest, dispatch nodes to appropriate visit
-    # methods based on node attributes such as kind.
-    methods: dict[str, Callable[[SphinxRenderer, Any], list[Node]]] = {
-        "doxygen": visit_doxygen,
-        "doxygendef": visit_doxygendef,
-        "compound": dispatch_compound,
-        "compounddef": visit_compounddef,
-        "sectiondef": visit_sectiondef,
-        "memberdef": dispatch_memberdef,
-        "docreftext": visit_docreftext,
-        "docheading": visit_docheading,
-        "docpara": visit_docpara,
-        "docparblock": visit_docparblock,
-        "docimage": visit_docimage,
-        "docurllink": visit_docurllink,
-        "docmarkup": visit_docmarkup,
-        "docsect1": visit_docsectN,
-        "docsect2": visit_docsectN,
-        "docsect3": visit_docsectN,
-        "docsimplesect": visit_docsimplesect,
-        "doctitle": visit_doctitle,
-        "docformula": visit_docformula,
-        "listing": visit_listing,
-        "codeline": visit_codeline,
-        "highlight": visit_highlight,
-        "verbatim": visit_verbatim,
-        "inc": visit_inc,
-        "ref": visit_ref,
-        "doclist": visit_doclist,
-        "doclistitem": visit_doclistitem,
-        "enumvalue": visit_enumvalue,
-        "linkedtext": visit_linkedtext,
-        "compoundref": visit_compoundref,
-        "mixedcontainer": visit_mixedcontainer,
-        "description": visit_description,
-        "templateparamlist": visit_templateparamlist,
-        "docparamlist": visit_docparamlist,
-        "docxrefsect": visit_docxrefsect,
-        "docvariablelist": visit_docvariablelist,
-        "docvarlistentry": visit_docvarlistentry,
-        "docanchor": visit_docanchor,
-        "doctable": visit_doctable,
-        "docrow": visit_docrow,
-        "docentry": visit_docentry,
-        "docdotfile": visit_docdotfile,
-        "docdot": visit_docdot,
-        "graph": visit_docgraph,
-        "docblockquote": visit_docblockquote,
-    }
+    @tagged_node_handler(str)
+    def visit_string(self, tag: str, node: str) -> list[nodes.Node]:
+        if tag == "verbatim":
+            return self.visit_verbatim(node)
+        return self.render_string(node)
 
-    def render_string(self, node: str) -> list[Node]:
+    @node_handler(str)
+    def render_string(self, node: str) -> list[nodes.Node]:
         # Skip any nodes that are pure whitespace
         # Probably need a better way to do this as currently we're only doing
         # it skip whitespace between higher-level nodes, but this will also
@@ -2578,31 +3012,39 @@ class SphinxRenderer:
             return [nodes.Text(node)]
         return []
 
-    def render(self, node, context: RenderContext | None = None) -> list[Node]:
+    def render_tagged(
+        self, item: parser.TaggedValue[str, parser.NodeOrValue] | str
+    ) -> list[nodes.Node]:
+        if isinstance(item, str):
+            return self.render_string(item)
+        return self.render(item.value, None, item.name)
+
+    def render(
+        self, node: parser.NodeOrValue, context: RenderContext | None = None, tag: str | None = None
+    ) -> list[nodes.Node]:
         if context is None:
-            self.context = cast("RenderContext", self.context)
-            context = self.context.create_child_context(node)
+            assert self.context is not None
+            context = self.context.create_child_context(node, tag)
         with WithContext(self, context):
-            result: list[Node] = []
-            self.context = cast("RenderContext", self.context)
-            if not self.filter_.allow(self.context.node_stack):
-                pass
-            elif isinstance(node, str):
-                result = self.render_string(node)
-            else:
-                method = SphinxRenderer.methods.get(node.node_type, SphinxRenderer.visit_unknown)
-                result = method(self, node)
+            assert self.context is not None
+            result: list[nodes.Node] = []
+            if self.filter_(NodeStack(self.context.node_stack)):
+                tmethod = self.tagged_node_handlers.get(type(node))
+                if tmethod is None:
+                    method = self.node_handlers.get(type(node))
+                    if method is None:
+                        method = SphinxRenderer.visit_unknown
+                    result = method(self, node)
+                elif tag is None:
+                    assert isinstance(node, str)
+                    result = self.render_string(node)
+                else:
+                    result = tmethod(self, tag, node)
         return result
 
-    def render_optional(self, node) -> list[Node]:
+    def render_optional(self, node, tag: str | None = None) -> list[nodes.Node]:
         """Render a node that can be None."""
-        return self.render(node) if node else []
-
-    def render_iterable(self, iterable: list) -> list[Node]:
-        output: list[Node] = []
-        for entry in iterable:
-            output.extend(self.render(entry))
-        return output
+        return self.render(node, None, tag) if node is not None else []
 
 
 def setup(app: Sphinx) -> None:

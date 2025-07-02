@@ -41,7 +41,7 @@ make clean
 # Make sure the BUILDDIR variable can be overridden in the Makefile. Required for older commits
 sed -i 's/BUILDDIR      = build/BUILDDIR     ?= build/g' Makefile
 # Build into our first comparison directory
-make html BUILDDIR=$firstdir
+make html BUILDDIR=$firstdir || true
 # Reset the Makefile to its state for this commit
 git checkout Makefile
 
@@ -54,7 +54,7 @@ git checkout $second
 (cd ../examples/doxygen; make)
 make clean
 sed -i 's/BUILDDIR      = build/BUILDDIR     ?= build/g' Makefile
-make html BUILDDIR=$seconddir
+make html BUILDDIR=$seconddir || true
 git checkout Makefile
 
 # Return to our current branch
