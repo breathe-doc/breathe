@@ -1519,12 +1519,14 @@ class SphinxRenderer:
 
     def visit_docblockquote(self, node) -> list[Node]:
         nodelist = self.render_iterable(node.para)
-        # catch block quote attributions here; the <ndash/> tag is the only identifier,
-        # and it is nested within a subsequent <para> tag
-        if nodelist and nodelist[-1].astext().startswith("&#8212;"):
-            # nodes.attribution prepends the author with an emphasized dash.
-            # replace the &#8212; placeholder and strip any leading whitespace.
-            text = nodelist[-1].astext().replace("&#8212;", "").lstrip()
+        # catch block quote attributions here
+        # Markdown doesn't seem to have attribution syntax, so we look for two or more
+        # leading hyphens followed by whitespace in the last line of the block quote.
+        regexp = r"^--+\s+"
+        if nodelist and re.match(regexp, nodelist[-1].astext()):
+            # nodes.attribution prepends the author with an emphasized dash, so we strip off
+            # leading dashes followed by whitespace.
+            text = re.sub(regexp, "", nodelist[-1].astext())
             nodelist[-1] = nodes.attribution("", text)
         return [nodes.block_quote("", classes=[], *nodelist)]
 
