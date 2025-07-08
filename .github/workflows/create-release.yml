@@ -45,7 +45,7 @@ jobs:
         # Install jinja2 to make the parser - probably better to install it via
         # the Sphinx dependency in the pyproject.toml file but I don't know how
         # to do that at the moment
-        run: uv pip install build "twine>=5.1" "jinja2>=3.1.6"
+        run: uv pip install build "twine>=5.1" "jinja2>=3.1.6" setuptools
 
       - name: Generate parser
         run: |
