@@ -3,6 +3,10 @@ Change Log
 
 Inspired by `Keepachangelog.com <https://keepachangelog.com/>`__.
 
+- 2025-07-08 - **Breathe v5.0.0a3**
+
+  Adjust create-release process to generate ``_parser.py`` file.
+
 - 2025-07-08 - **Breathe v5.0.0a2**
 
   - Removed sphinx_csharp git-based dependency
