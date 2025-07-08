@@ -3,9 +3,13 @@ Change Log
 
 Inspired by `Keepachangelog.com <https://keepachangelog.com/>`__.
 
+- 2025-07-08 - **Breathe v5.0.0a4**
+
+  Adjust create-release process to try to generate ``_parser.py`` file.
+
 - 2025-07-08 - **Breathe v5.0.0a3**
 
-  Adjust create-release process to generate ``_parser.py`` file.
+  Adjust create-release process to try to generate ``_parser.py`` file.
 
 - 2025-07-08 - **Breathe v5.0.0a2**
 
