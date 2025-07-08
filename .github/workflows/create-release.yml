@@ -42,7 +42,15 @@ jobs:
           enable-cache: false
 
       - name: Install build dependencies (pypa/build, twine)
-        run: uv pip install build "twine>=5.1"
+        # Install jinja2 to make the parser - probably better to install it via
+        # the Sphinx dependency in the pyproject.toml file but I don't know how
+        # to do that at the moment
+        run: uv pip install build "twine>=5.1" "jinja2>=3.1.6"
+
+      - name: Generate parser
+        run: |
+          make parser
+          make format-parser
 
       - name: Build distribution
         run: python -m build
