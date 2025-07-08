@@ -3,6 +3,29 @@ Change Log
 
 Inspired by `Keepachangelog.com <https://keepachangelog.com/>`__.
 
+- 2025-07-08 - **Breathe v5.0.0a1**
+
+  Alpha release of v5. Contains a significant refactor of the internal logic.
+
+  Thanks to @JasperCraeghs and @Rouslan.
+
+  - Merging long standing refactor branches
+    `#1029 <https://github.com/breathe-doc/breathe/pull/1029>`__
+  - Performance improvements, new tests, more typing annotations and miscellaneous fixes
+    `#967 <https://github.com/breathe-doc/breathe/pull/967>`__
+  - Support members in a Doxygen 1.9.7 group
+    `#934 <https://github.com/breathe-doc/breathe/pull/934>`__
+  - Fix docstring missing quotes
+    `#1020 <https://github.com/breathe-doc/breathe/pull/1020>`__
+  - Fix docstring missing quotes
+    `#1020 <https://github.com/breathe-doc/breathe/pull/1020>`__
+  - Fix some incorrect indents in the document
+    `#1032 <https://github.com/breathe-doc/breathe/pull/1032>`__
+  - Enable imgconverter extension to fix LaTeX documentation build
+    `#1027 <https://github.com/breathe-doc/breathe/pull/1027>`__
+  - Bump astral-sh/setup-uv from 5 to 6 in the github-actions group
+    `#1025 <https://github.com/breathe-doc/breathe/pull/1025>`__
+
 - 2025-02-22 - **Breathe v4.36.0**
 
   - Update `test_renderer` so that tests pass with Sphinx 7.2.
