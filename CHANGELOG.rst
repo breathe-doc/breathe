@@ -3,6 +3,11 @@ Change Log
 
 Inspired by `Keepachangelog.com <https://keepachangelog.com/>`__.
 
+- 2025-07-08 - **Breathe v5.0.0a2**
+
+  - Removed sphinx_csharp git-based dependency
+    `#1035 <https://github.com/breathe-doc/breathe/pull/1035>`__
+
 - 2025-07-08 - **Breathe v5.0.0a1**
 
   Alpha release of v5. Contains a significant refactor of the internal logic.
