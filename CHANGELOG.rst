@@ -3,6 +3,10 @@ Change Log
 
 Inspired by `Keepachangelog.com <https://keepachangelog.com/>`__.
 
+- 2025-07-08 - **Breathe v5.0.0a5**
+
+  Adjust create-release process to include ruff for formatting generated ``_parser.py`` file.
+
 - 2025-07-08 - **Breathe v5.0.0a4**
 
   Adjust create-release process to try to generate ``_parser.py`` file.
