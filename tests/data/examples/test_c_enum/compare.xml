@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="utf-8"?>
+<?xml-stylesheet href="../../docutils.css"?>
+<document>
+    <index entries="['single',\ 'GSM_BackupFormat\ (C++\ enum)',\ '_CPPv416GSM_BackupFormat',\ '',\ None]"></index>
+    <desc classes="cpp enum" desctype="enum" domain="cpp" objtype="enum">
+        <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword classes="k">enum</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">GSM_BackupFormat</desc_sig_name></desc_name></desc_signature_line></desc_signature>
+        <desc_content>
+            <paragraph>Backup data. </paragraph>
+            <paragraph><emphasis>Values:</emphasis></paragraph>
+            <index entries="['single',\ 'GSM_BackupFormat::GSM_Backup_Auto\ (C++\ enumerator)',\ '_CPPv4N16GSM_BackupFormat15GSM_Backup_AutoE',\ '',\ None]"></index>
+            <desc classes="cpp enumerator" desctype="enumerator" domain="cpp" objtype="enumerator">
+                <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword classes="k">enumerator</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">GSM_Backup_Auto</desc_sig_name></desc_name></desc_signature_line></desc_signature>
+                <desc_content>
+                    <paragraph>Compatibility with old gboolean used instead of format. </paragraph>
+                    <paragraph>File type is guessed for extension, non unicode format used for Gammu backup. </paragraph>
+                </desc_content>
+            </desc>
+            <index entries="['single',\ 'GSM_BackupFormat::GSM_Backup_AutoUnicode\ (C++\ enumerator)',\ '_CPPv4N16GSM_BackupFormat22GSM_Backup_AutoUnicodeE',\ '',\ None]"></index>
+            <desc classes="cpp enumerator" desctype="enumerator" domain="cpp" objtype="enumerator">
+                <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword classes="k">enumerator</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">GSM_Backup_AutoUnicode</desc_sig_name></desc_name></desc_signature_line></desc_signature>
+                <desc_content>
+                    <paragraph>Compatibility with old gboolean used instead of format. </paragraph>
+                    <paragraph>File type is guessed for extension, unicode format used for Gammu backup. </paragraph>
+                </desc_content>
+            </desc>
+            <index entries="['single',\ 'GSM_BackupFormat::GSM_Backup_LMB\ (C++\ enumerator)',\ '_CPPv4N16GSM_BackupFormat14GSM_Backup_LMBE',\ '',\ None]"></index>
+            <desc classes="cpp enumerator" desctype="enumerator" domain="cpp" objtype="enumerator">
+                <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword classes="k">enumerator</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">GSM_Backup_LMB</desc_sig_name></desc_name></desc_signature_line></desc_signature>
+                <desc_content>
+                    <paragraph>LMB format, compatible with Logo manager, can store phonebooks and logos. </paragraph>
+                </desc_content>
+            </desc>
+            <index entries="['single',\ 'GSM_BackupFormat::GSM_Backup_VCalendar\ (C++\ enumerator)',\ '_CPPv4N16GSM_BackupFormat20GSM_Backup_VCalendarE',\ '',\ None]"></index>
+            <desc classes="cpp enumerator" desctype="enumerator" domain="cpp" objtype="enumerator">
+                <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword classes="k">enumerator</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">GSM_Backup_VCalendar</desc_sig_name></desc_name></desc_signature_line></desc_signature>
+                <desc_content>
+                    <paragraph>vCalendar standard, can store todo and calendar entries. </paragraph>
+                </desc_content>
+            </desc>
+            <index entries="['single',\ 'GSM_BackupFormat::GSM_Backup_VCard\ (C++\ enumerator)',\ '_CPPv4N16GSM_BackupFormat16GSM_Backup_VCardE',\ '',\ None]"></index>
+            <desc classes="cpp enumerator" desctype="enumerator" domain="cpp" objtype="enumerator">
+                <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword classes="k">enumerator</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">GSM_Backup_VCard</desc_sig_name></desc_name></desc_signature_line></desc_signature>
+                <desc_content>
+                    <paragraph>vCard standard, can store phone phonebook entries. </paragraph>
+                </desc_content>
+            </desc>
+            <index entries="['single',\ 'GSM_BackupFormat::GSM_Backup_LDIF\ (C++\ enumerator)',\ '_CPPv4N16GSM_BackupFormat15GSM_Backup_LDIFE',\ '',\ None]"></index>
+            <desc classes="cpp enumerator" desctype="enumerator" domain="cpp" objtype="enumerator">
+                <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword classes="k">enumerator</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">GSM_Backup_LDIF</desc_sig_name></desc_name></desc_signature_line></desc_signature>
+                <desc_content>
+                    <paragraph>LDIF (LDAP Data Interchange Format), can store phone phonebook entries. </paragraph>
+                </desc_content>
+            </desc>
+            <index entries="['single',\ 'GSM_BackupFormat::GSM_Backup_ICS\ (C++\ enumerator)',\ '_CPPv4N16GSM_BackupFormat14GSM_Backup_ICSE',\ '',\ None]"></index>
+            <desc classes="cpp enumerator" desctype="enumerator" domain="cpp" objtype="enumerator">
+                <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword classes="k">enumerator</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">GSM_Backup_ICS</desc_sig_name></desc_name></desc_signature_line></desc_signature>
+                <desc_content>
+                    <paragraph>iCalendar standard, can store todo and calendar entries. </paragraph>
+                </desc_content>
+            </desc>
+            <index entries="['single',\ 'GSM_BackupFormat::GSM_Backup_Gammu\ (C++\ enumerator)',\ '_CPPv4N16GSM_BackupFormat16GSM_Backup_GammuE',\ '',\ None]"></index>
+            <desc classes="cpp enumerator" desctype="enumerator" domain="cpp" objtype="enumerator">
+                <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword classes="k">enumerator</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">GSM_Backup_Gammu</desc_sig_name></desc_name></desc_signature_line></desc_signature>
+                <desc_content>
+                    <paragraph>Gammu own format can store almost anything from phone. </paragraph>
+                    <paragraph>This is ASCII version of the format, Unicode strings are HEX encoded. Use GSM_Backup_GammuUCS2 instead if possible. </paragraph>
+                </desc_content>
+            </desc>
+            <index entries="['single',\ 'GSM_BackupFormat::GSM_Backup_GammuUCS2\ (C++\ enumerator)',\ '_CPPv4N16GSM_BackupFormat20GSM_Backup_GammuUCS2E',\ '',\ None]"></index>
+            <desc classes="cpp enumerator" desctype="enumerator" domain="cpp" objtype="enumerator">
+                <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword classes="k">enumerator</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">GSM_Backup_GammuUCS2</desc_sig_name></desc_name></desc_signature_line></desc_signature>
+                <desc_content>
+                    <paragraph>Gammu own format can store almost anything from phone. </paragraph>
+                    <paragraph>This is UCS2-BE version of the format. </paragraph>
+                </desc_content>
+            </desc>
+            <index entries="['single',\ 'GSM_BackupFormat::GSM_Backup_VNote\ (C++\ enumerator)',\ '_CPPv4N16GSM_BackupFormat16GSM_Backup_VNoteE',\ '',\ None]"></index>
+            <desc classes="cpp enumerator" desctype="enumerator" domain="cpp" objtype="enumerator">
+                <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword classes="k">enumerator</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">GSM_Backup_VNote</desc_sig_name></desc_name></desc_signature_line></desc_signature>
+                <desc_content>
+                    <paragraph>vNote standard, can store phone notes. </paragraph>
+                </desc_content>
+            </desc>
+        </desc_content>
+    </desc>
+    <index entries="['single',\ 'GSM_Backup_Auto\ (C++\ enumerator)',\ '_CPPv415GSM_Backup_Auto',\ '',\ None]"></index>
+    <desc classes="cpp enumerator" desctype="enumerator" domain="cpp" objtype="enumerator">
+        <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword classes="k">enumerator</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">GSM_Backup_Auto</desc_sig_name></desc_name></desc_signature_line></desc_signature>
+        <desc_content>
+            <paragraph>Compatibility with old gboolean used instead of format. </paragraph>
+            <paragraph>File type is guessed for extension, non unicode format used for Gammu backup. </paragraph>
+        </desc_content>
+    </desc>
+    <index entries="['single',\ 'GSM_Backup_AutoUnicode\ (C++\ enumerator)',\ '_CPPv422GSM_Backup_AutoUnicode',\ '',\ None]"></index>
+    <desc classes="cpp enumerator" desctype="enumerator" domain="cpp" objtype="enumerator">
+        <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword classes="k">enumerator</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">GSM_Backup_AutoUnicode</desc_sig_name></desc_name></desc_signature_line></desc_signature>
+        <desc_content>
+            <paragraph>Compatibility with old gboolean used instead of format. </paragraph>
+            <paragraph>File type is guessed for extension, unicode format used for Gammu backup. </paragraph>
+        </desc_content>
+    </desc>
+    <index entries="['single',\ 'GSM_Backup_LMB\ (C++\ enumerator)',\ '_CPPv414GSM_Backup_LMB',\ '',\ None]"></index>
+    <desc classes="cpp enumerator" desctype="enumerator" domain="cpp" objtype="enumerator">
+        <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword classes="k">enumerator</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">GSM_Backup_LMB</desc_sig_name></desc_name></desc_signature_line></desc_signature>
+        <desc_content>
+            <paragraph>LMB format, compatible with Logo manager, can store phonebooks and logos. </paragraph>
+        </desc_content>
+    </desc>
+    <index entries="['single',\ 'GSM_Backup_VCalendar\ (C++\ enumerator)',\ '_CPPv420GSM_Backup_VCalendar',\ '',\ None]"></index>
+    <desc classes="cpp enumerator" desctype="enumerator" domain="cpp" objtype="enumerator">
+        <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword classes="k">enumerator</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">GSM_Backup_VCalendar</desc_sig_name></desc_name></desc_signature_line></desc_signature>
+        <desc_content>
+            <paragraph>vCalendar standard, can store todo and calendar entries. </paragraph>
+        </desc_content>
+    </desc>
+    <index entries="['single',\ 'GSM_Backup_VCard\ (C++\ enumerator)',\ '_CPPv416GSM_Backup_VCard',\ '',\ None]"></index>
+    <desc classes="cpp enumerator" desctype="enumerator" domain="cpp" objtype="enumerator">
+        <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword classes="k">enumerator</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">GSM_Backup_VCard</desc_sig_name></desc_name></desc_signature_line></desc_signature>
+        <desc_content>
+            <paragraph>vCard standard, can store phone phonebook entries. </paragraph>
+        </desc_content>
+    </desc>
+    <index entries="['single',\ 'GSM_Backup_LDIF\ (C++\ enumerator)',\ '_CPPv415GSM_Backup_LDIF',\ '',\ None]"></index>
+    <desc classes="cpp enumerator" desctype="enumerator" domain="cpp" objtype="enumerator">
+        <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword classes="k">enumerator</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">GSM_Backup_LDIF</desc_sig_name></desc_name></desc_signature_line></desc_signature>
+        <desc_content>
+            <paragraph>LDIF (LDAP Data Interchange Format), can store phone phonebook entries. </paragraph>
+        </desc_content>
+    </desc>
+    <index entries="['single',\ 'GSM_Backup_ICS\ (C++\ enumerator)',\ '_CPPv414GSM_Backup_ICS',\ '',\ None]"></index>
+    <desc classes="cpp enumerator" desctype="enumerator" domain="cpp" objtype="enumerator">
+        <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword classes="k">enumerator</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">GSM_Backup_ICS</desc_sig_name></desc_name></desc_signature_line></desc_signature>
+        <desc_content>
+            <paragraph>iCalendar standard, can store todo and calendar entries. </paragraph>
+        </desc_content>
+    </desc>
+    <index entries="['single',\ 'GSM_Backup_Gammu\ (C++\ enumerator)',\ '_CPPv416GSM_Backup_Gammu',\ '',\ None]"></index>
+    <desc classes="cpp enumerator" desctype="enumerator" domain="cpp" objtype="enumerator">
+        <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword classes="k">enumerator</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">GSM_Backup_Gammu</desc_sig_name></desc_name></desc_signature_line></desc_signature>
+        <desc_content>
+            <paragraph>Gammu own format can store almost anything from phone. </paragraph>
+            <paragraph>This is ASCII version of the format, Unicode strings are HEX encoded. Use GSM_Backup_GammuUCS2 instead if possible. </paragraph>
+        </desc_content>
+    </desc>
+    <index entries="['single',\ 'GSM_Backup_GammuUCS2\ (C++\ enumerator)',\ '_CPPv420GSM_Backup_GammuUCS2',\ '',\ None]"></index>
+    <desc classes="cpp enumerator" desctype="enumerator" domain="cpp" objtype="enumerator">
+        <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword classes="k">enumerator</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">GSM_Backup_GammuUCS2</desc_sig_name></desc_name></desc_signature_line></desc_signature>
+        <desc_content>
+            <paragraph>Gammu own format can store almost anything from phone. </paragraph>
+            <paragraph>This is UCS2-BE version of the format. </paragraph>
+        </desc_content>
+    </desc>
+    <index entries="['single',\ 'GSM_Backup_VNote\ (C++\ enumerator)',\ '_CPPv416GSM_Backup_VNote',\ '',\ None]"></index>
+    <desc classes="cpp enumerator" desctype="enumerator" domain="cpp" objtype="enumerator">
+        <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword classes="k">enumerator</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">GSM_Backup_VNote</desc_sig_name></desc_name></desc_signature_line></desc_signature>
+        <desc_content>
+            <paragraph>vNote standard, can store phone notes. </paragraph>
+        </desc_content>
+    </desc>
+</document>

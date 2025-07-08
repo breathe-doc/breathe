@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<?xml-stylesheet href="../../docutils.css"?>
+<document>
+    <desc domain="cpp" objtype="group">
+        <desc_signature classes="sig sig-object cpp"><target></target><emphasis>group</emphasis> <desc_name classes="sig-name descname">My Group</desc_name></desc_signature>
+        <desc_content>
+            <paragraph>This is the first group. </paragraph>
+            <container classes="breathe-sectiondef" objtype="func">
+                <rubric classes="breathe-sectiondef-title">Functions</rubric>
+                <index entries="['single',\ 'groupedFunction\ (C++\ function)',\ '_CPPv415groupedFunctionv',\ '',\ None]"></index>
+                <desc classes="cpp function" desctype="function" domain="cpp" objtype="function">
+                    <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword_type classes="kt">void</desc_sig_keyword_type><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">groupedFunction</desc_sig_name></desc_name><desc_parameterlist></desc_parameterlist></desc_signature_line></desc_signature>
+                    <desc_content>
+                        <paragraph>This function is in MyGroup. </paragraph>
+                    </desc_content>
+                </desc>
+            </container>
+            <index entries="['single',\ 'GroupedClassTest\ (C++\ class)',\ '_CPPv416GroupedClassTest',\ '',\ None]"></index>
+            <desc classes="cpp class" desctype="class" domain="cpp" objtype="class">
+                <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword classes="k">class</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">GroupedClassTest</desc_sig_name></desc_name></desc_signature_line></desc_signature>
+                <desc_content>
+                    <paragraph>first class inside of namespace </paragraph>
+                    <container classes="breathe-sectiondef" objtype="public-func">
+                        <rubric classes="breathe-sectiondef-title">Public Functions</rubric>
+                        <index entries="['single',\ 'GroupedClassTest::publicFunction\ (C++\ function)',\ '_CPPv4NK16GroupedClassTest14publicFunctionEv',\ '',\ None]"></index>
+                        <desc classes="cpp function" desctype="function" domain="cpp" objtype="function">
+                            <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword classes="k">virtual</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_sig_keyword_type classes="kt">void</desc_sig_keyword_type><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">publicFunction</desc_sig_name></desc_name><desc_parameterlist></desc_parameterlist><desc_sig_space classes="w"> </desc_sig_space><desc_sig_keyword classes="k">const</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_sig_punctuation classes="p">=</desc_sig_punctuation><desc_sig_space classes="w"> </desc_sig_space><desc_sig_literal_number classes="m">0</desc_sig_literal_number></desc_signature_line></desc_signature>
+                            <desc_content>
+                                <paragraph>namespaced class function </paragraph>
+                            </desc_content>
+                        </desc>
+                    </container>
+                    <index entries="['single',\ 'GroupedClassTest::PublicClass\ (C++\ class)',\ '_CPPv4N16GroupedClassTest11PublicClassE',\ '',\ None]"></index>
+                    <desc classes="cpp class" desctype="class" domain="cpp" objtype="class">
+                        <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword classes="k">class</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">PublicClass</desc_sig_name></desc_name></desc_signature_line></desc_signature>
+                        <desc_content>
+                            <paragraph>A protected class. </paragraph>
+                        </desc_content>
+                    </desc>
+                    <index entries="['single',\ 'GroupedClassTest::UndocumentedPublicClass\ (C++\ class)',\ '_CPPv4N16GroupedClassTest23UndocumentedPublicClassE',\ '',\ None]"></index>
+                    <desc classes="cpp class" desctype="class" domain="cpp" objtype="class">
+                        <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword classes="k">class</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">UndocumentedPublicClass</desc_sig_name></desc_name></desc_signature_line></desc_signature>
+                        <desc_content>
+                        </desc_content>
+                    </desc>
+                </desc_content>
+            </desc>
+        </desc_content>
+    </desc>
+    <desc domain="cpp" objtype="group">
+        <desc_signature classes="sig sig-object cpp"><target></target><emphasis>group</emphasis> <desc_name classes="sig-name descname">Inner Group</desc_name></desc_signature>
+        <desc_content>
+            <paragraph>This is an inner group. </paragraph>
+            <index entries="['single',\ 'InnerGroupClassTest\ (C++\ class)',\ '_CPPv419InnerGroupClassTest',\ '',\ None]"></index>
+            <desc classes="cpp class" desctype="class" domain="cpp" objtype="class">
+                <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword classes="k">class</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">InnerGroupClassTest</desc_sig_name></desc_name></desc_signature_line></desc_signature>
+                <desc_content>
+                    <paragraph>inner class inside of namespace </paragraph>
+                    <container classes="breathe-sectiondef" objtype="public-func">
+                        <rubric classes="breathe-sectiondef-title">Public Functions</rubric>
+                        <index entries="['single',\ 'InnerGroupClassTest::function\ (C++\ function)',\ '_CPPv4N19InnerGroupClassTest8functionEv',\ '',\ None]"></index>
+                        <desc classes="cpp function" desctype="function" domain="cpp" objtype="function">
+                            <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword classes="k">inline</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_sig_keyword_type classes="kt">void</desc_sig_keyword_type><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">function</desc_sig_name></desc_name><desc_parameterlist></desc_parameterlist></desc_signature_line></desc_signature>
+                            <desc_content>
+                                <paragraph>inner namespaced class function </paragraph>
+                            </desc_content>
+                        </desc>
+                    </container>
+                </desc_content>
+            </desc>
+        </desc_content>
+    </desc>
+</document>

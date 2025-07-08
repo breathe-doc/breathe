@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="utf-8"?>
+<?xml-stylesheet href="../../docutils.css"?>
+<document>
+    <index entries="['single',\ 'A\ (C++\ class)',\ '_CPPv41A',\ '',\ None]"></index>
+    <desc classes="cpp class" desctype="class" domain="cpp" objtype="class">
+        <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword classes="k">class</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">A</desc_sig_name></desc_name></desc_signature_line></desc_signature>
+        <desc_content>
+            <paragraph>Inheritance diagram for A:</paragraph>
+            <figure>
+                <graphviz align="center" code='digraph {&#10;    graph [bgcolor="#00000000"]&#10;    node [shape=rectangle style=filled fillcolor="#FFFFFF" font=Helvetica padding=2]&#10;    edge [color="#1414CE"]&#10;    "1" [label="A" tooltip="A" fillcolor="#BFBFBF"]&#10;    "2" [label="C" tooltip="C"]&#10;    "3" [label="D" tooltip="D"]&#10;    "4" [label="E" tooltip="E"]&#10;    "2" -&gt; "1" [dir=forward tooltip="public-inheritance"]&#10;    "3" -&gt; "1" [dir=forward tooltip="protected-inheritance" color="#006400"]&#10;    "4" -&gt; "3" [dir=forward tooltip="public-inheritance"]&#10;}'>
+                </graphviz>
+            </figure>
+            <paragraph>Collaboration diagram for A:</paragraph>
+            <figure>
+                <graphviz align="center" code='digraph {&#10;    graph [bgcolor="#00000000"]&#10;    node [shape=rectangle style=filled fillcolor="#FFFFFF" font=Helvetica padding=2]&#10;    edge [color="#1414CE"]&#10;    "1" [label="A" tooltip="A" fillcolor="#BFBFBF"]&#10;    "1" -&gt; "1" [dir=forward tooltip="usage"]&#10;}'>
+                </graphviz>
+            </figure>
+            <paragraph>Subclassed by <reference internal="True" refid="class_c"><inline classes="std std-ref">C</inline></reference>, <reference internal="True" refid="class_d"><inline classes="std std-ref">D</inline></reference></paragraph>
+            <container classes="breathe-sectiondef" objtype="public-attrib">
+                <rubric classes="breathe-sectiondef-title">Public Members</rubric>
+                <index entries="['single',\ 'A::m_self\ (C++\ member)',\ '_CPPv4N1A6m_selfE',\ '',\ None]"></index>
+                <desc classes="cpp var" desctype="var" domain="cpp" objtype="var">
+                    <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><reference internal="True" refid="_CPPv41A" reftitle="A"><desc_sig_name classes="n">A</desc_sig_name></reference><desc_sig_space classes="w"> </desc_sig_space><desc_sig_punctuation classes="p">*</desc_sig_punctuation><desc_name classes="sig-name descname"><desc_sig_name classes="n">m_self</desc_sig_name></desc_name></desc_signature_line></desc_signature>
+                    <desc_content>
+                    </desc_content>
+                </desc>
+            </container>
+        </desc_content>
+    </desc>
+    <index entries="['single',\ 'B\ (C++\ class)',\ '_CPPv41B',\ '',\ None]"></index>
+    <desc classes="cpp class" desctype="class" domain="cpp" objtype="class">
+        <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword classes="k">class</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">B</desc_sig_name></desc_name></desc_signature_line></desc_signature>
+        <desc_content>
+            <paragraph>Inheritance diagram for B:</paragraph>
+            <figure>
+                <graphviz align="center" code='digraph {&#10;    graph [bgcolor="#00000000"]&#10;    node [shape=rectangle style=filled fillcolor="#FFFFFF" font=Helvetica padding=2]&#10;    edge [color="#1414CE"]&#10;    "1" [label="B" tooltip="B" fillcolor="#BFBFBF"]&#10;    "2" [label="D" tooltip="D"]&#10;    "3" [label="E" tooltip="E"]&#10;    "2" -&gt; "1" [dir=forward tooltip="private-inheritance" color="#8B1A1A"]&#10;    "3" -&gt; "2" [dir=forward tooltip="public-inheritance"]&#10;}'>
+                </graphviz>
+            </figure>
+            <paragraph>Collaboration diagram for B:</paragraph>
+            <figure>
+                <graphviz align="center" code='digraph {&#10;    graph [bgcolor="#00000000"]&#10;    node [shape=rectangle style=filled fillcolor="#FFFFFF" font=Helvetica padding=2]&#10;    edge [color="#1414CE"]&#10;    "2" [label="A" tooltip="A"]&#10;    "1" [label="B" tooltip="B" fillcolor="#BFBFBF"]&#10;    "2" -&gt; "2" [dir=forward tooltip="usage"]&#10;    "1" -&gt; "2" [dir=forward tooltip="usage"]&#10;}'>
+                </graphviz>
+            </figure>
+            <paragraph>Subclassed by <reference internal="True" refid="class_d"><inline classes="std std-ref">D</inline></reference></paragraph>
+            <container classes="breathe-sectiondef" objtype="public-attrib">
+                <rubric classes="breathe-sectiondef-title">Public Members</rubric>
+                <index entries="['single',\ 'B::m_a\ (C++\ member)',\ '_CPPv4N1B3m_aE',\ '',\ None]"></index>
+                <desc classes="cpp var" desctype="var" domain="cpp" objtype="var">
+                    <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><reference internal="True" refid="_CPPv41A" reftitle="A"><desc_sig_name classes="n">A</desc_sig_name></reference><desc_sig_space classes="w"> </desc_sig_space><desc_sig_punctuation classes="p">*</desc_sig_punctuation><desc_name classes="sig-name descname"><desc_sig_name classes="n">m_a</desc_sig_name></desc_name></desc_signature_line></desc_signature>
+                    <desc_content>
+                    </desc_content>
+                </desc>
+            </container>
+        </desc_content>
+    </desc>
+    <index entries="['single',\ 'C\ (C++\ class)',\ '_CPPv41C',\ '',\ None]"></index>
+    <desc classes="cpp class" desctype="class" domain="cpp" objtype="class">
+        <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword classes="k">class</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">C</desc_sig_name></desc_name><desc_sig_space classes="w"> </desc_sig_space><desc_sig_punctuation classes="p">:</desc_sig_punctuation><desc_sig_space classes="w"> </desc_sig_space><desc_sig_keyword classes="k">public</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><reference internal="True" refid="_CPPv41A" reftitle="A"><desc_sig_name classes="n">A</desc_sig_name></reference></desc_signature_line></desc_signature>
+        <desc_content>
+            <paragraph>Inheritance diagram for C:</paragraph>
+            <figure>
+                <graphviz align="center" code='digraph {&#10;    graph [bgcolor="#00000000"]&#10;    node [shape=rectangle style=filled fillcolor="#FFFFFF" font=Helvetica padding=2]&#10;    edge [color="#1414CE"]&#10;    "2" [label="A" tooltip="A"]&#10;    "1" [label="C" tooltip="C" fillcolor="#BFBFBF"]&#10;    "1" -&gt; "2" [dir=forward tooltip="public-inheritance"]&#10;}'>
+                </graphviz>
+            </figure>
+            <paragraph>Collaboration diagram for C:</paragraph>
+            <figure>
+                <graphviz align="center" code='digraph {&#10;    graph [bgcolor="#00000000"]&#10;    node [shape=rectangle style=filled fillcolor="#FFFFFF" font=Helvetica padding=2]&#10;    edge [color="#1414CE"]&#10;    "2" [label="A" tooltip="A"]&#10;    "4" [label="B" tooltip="B"]&#10;    "1" [label="C" tooltip="C" fillcolor="#BFBFBF"]&#10;    "3" [label="D" tooltip="D"]&#10;    "2" -&gt; "2" [dir=forward tooltip="usage"]&#10;    "4" -&gt; "2" [dir=forward tooltip="usage"]&#10;    "1" -&gt; "2" [dir=forward tooltip="public-inheritance"]&#10;    "1" -&gt; "3" [dir=forward tooltip="usage"]&#10;    "3" -&gt; "2" [dir=forward tooltip="protected-inheritance" color="#006400"]&#10;    "3" -&gt; "4" [dir=forward tooltip="private-inheritance" color="#8B1A1A"]&#10;    "3" -&gt; "1" [dir=forward tooltip="usage"]&#10;}'>
+                </graphviz>
+            </figure>
+            <container classes="breathe-sectiondef" objtype="public-attrib">
+                <rubric classes="breathe-sectiondef-title">Public Members</rubric>
+                <index entries="['single',\ 'C::m_d\ (C++\ member)',\ '_CPPv4N1C3m_dE',\ '',\ None]"></index>
+                <desc classes="cpp var" desctype="var" domain="cpp" objtype="var">
+                    <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><reference internal="True" refid="_CPPv41D" reftitle="D"><desc_sig_name classes="n">D</desc_sig_name></reference><desc_sig_space classes="w"> </desc_sig_space><desc_sig_punctuation classes="p">*</desc_sig_punctuation><desc_name classes="sig-name descname"><desc_sig_name classes="n">m_d</desc_sig_name></desc_name></desc_signature_line></desc_signature>
+                    <desc_content>
+                    </desc_content>
+                </desc>
+            </container>
+        </desc_content>
+    </desc>
+    <index entries="['single',\ 'D\ (C++\ class)',\ '_CPPv41D',\ '',\ None]"></index>
+    <desc classes="cpp class" desctype="class" domain="cpp" objtype="class">
+        <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword classes="k">class</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">D</desc_sig_name></desc_name><desc_sig_space classes="w"> </desc_sig_space><desc_sig_punctuation classes="p">:</desc_sig_punctuation><desc_sig_space classes="w"> </desc_sig_space><desc_sig_keyword classes="k">protected</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_sig_keyword classes="k">virtual</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><reference internal="True" refid="_CPPv41A" reftitle="A"><desc_sig_name classes="n">A</desc_sig_name></reference><desc_sig_punctuation classes="p">,</desc_sig_punctuation><desc_sig_space classes="w"> </desc_sig_space><desc_sig_keyword classes="k">private</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><reference internal="True" refid="_CPPv41B" reftitle="B"><desc_sig_name classes="n">B</desc_sig_name></reference></desc_signature_line></desc_signature>
+        <desc_content>
+            <paragraph>Inheritance diagram for D:</paragraph>
+            <figure>
+                <graphviz align="center" code='digraph {&#10;    graph [bgcolor="#00000000"]&#10;    node [shape=rectangle style=filled fillcolor="#FFFFFF" font=Helvetica padding=2]&#10;    edge [color="#1414CE"]&#10;    "2" [label="A" tooltip="A"]&#10;    "3" [label="B" tooltip="B"]&#10;    "1" [label="D" tooltip="D" fillcolor="#BFBFBF"]&#10;    "4" [label="E" tooltip="E"]&#10;    "1" -&gt; "2" [dir=forward tooltip="protected-inheritance" color="#006400"]&#10;    "1" -&gt; "3" [dir=forward tooltip="private-inheritance" color="#8B1A1A"]&#10;    "4" -&gt; "1" [dir=forward tooltip="public-inheritance"]&#10;}'>
+                </graphviz>
+            </figure>
+            <paragraph>Collaboration diagram for D:</paragraph>
+            <figure>
+                <graphviz align="center" code='digraph {&#10;    graph [bgcolor="#00000000"]&#10;    node [shape=rectangle style=filled fillcolor="#FFFFFF" font=Helvetica padding=2]&#10;    edge [color="#1414CE"]&#10;    "2" [label="A" tooltip="A"]&#10;    "3" [label="B" tooltip="B"]&#10;    "4" [label="C" tooltip="C"]&#10;    "1" [label="D" tooltip="D" fillcolor="#BFBFBF"]&#10;    "2" -&gt; "2" [dir=forward tooltip="usage"]&#10;    "3" -&gt; "2" [dir=forward tooltip="usage"]&#10;    "4" -&gt; "2" [dir=forward tooltip="public-inheritance"]&#10;    "4" -&gt; "1" [dir=forward tooltip="usage"]&#10;    "1" -&gt; "2" [dir=forward tooltip="protected-inheritance" color="#006400"]&#10;    "1" -&gt; "3" [dir=forward tooltip="private-inheritance" color="#8B1A1A"]&#10;    "1" -&gt; "4" [dir=forward tooltip="usage"]&#10;}'>
+                </graphviz>
+            </figure>
+            <paragraph>Subclassed by <reference internal="True" refid="class_e"><inline classes="std std-ref">E</inline></reference></paragraph>
+            <container classes="breathe-sectiondef" objtype="public-attrib">
+                <rubric classes="breathe-sectiondef-title">Public Members</rubric>
+                <index entries="['single',\ 'D::m_c\ (C++\ member)',\ '_CPPv4N1D3m_cE',\ '',\ None]"></index>
+                <desc classes="cpp var" desctype="var" domain="cpp" objtype="var">
+                    <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><reference internal="True" refid="_CPPv41C" reftitle="C"><desc_sig_name classes="n">C</desc_sig_name></reference><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">m_c</desc_sig_name></desc_name></desc_signature_line></desc_signature>
+                    <desc_content>
+                    </desc_content>
+                </desc>
+            </container>
+        </desc_content>
+    </desc>
+    <index entries="['single',\ 'E\ (C++\ class)',\ '_CPPv41E',\ '',\ None]"></index>
+    <desc classes="cpp class" desctype="class" domain="cpp" objtype="class">
+        <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword classes="k">class</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">E</desc_sig_name></desc_name><desc_sig_space classes="w"> </desc_sig_space><desc_sig_punctuation classes="p">:</desc_sig_punctuation><desc_sig_space classes="w"> </desc_sig_space><desc_sig_keyword classes="k">public</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><reference internal="True" refid="_CPPv41D" reftitle="D"><desc_sig_name classes="n">D</desc_sig_name></reference></desc_signature_line></desc_signature>
+        <desc_content>
+            <paragraph>Inheritance diagram for E:</paragraph>
+            <figure>
+                <graphviz align="center" code='digraph {&#10;    graph [bgcolor="#00000000"]&#10;    node [shape=rectangle style=filled fillcolor="#FFFFFF" font=Helvetica padding=2]&#10;    edge [color="#1414CE"]&#10;    "3" [label="A" tooltip="A"]&#10;    "4" [label="B" tooltip="B"]&#10;    "2" [label="D" tooltip="D"]&#10;    "1" [label="E" tooltip="E" fillcolor="#BFBFBF"]&#10;    "2" -&gt; "3" [dir=forward tooltip="protected-inheritance" color="#006400"]&#10;    "2" -&gt; "4" [dir=forward tooltip="private-inheritance" color="#8B1A1A"]&#10;    "1" -&gt; "2" [dir=forward tooltip="public-inheritance"]&#10;}'>
+                </graphviz>
+            </figure>
+            <paragraph>Collaboration diagram for E:</paragraph>
+            <figure>
+                <graphviz align="center" code='digraph {&#10;    graph [bgcolor="#00000000"]&#10;    node [shape=rectangle style=filled fillcolor="#FFFFFF" font=Helvetica padding=2]&#10;    edge [color="#1414CE"]&#10;    "3" [label="A" tooltip="A"]&#10;    "4" [label="B" tooltip="B"]&#10;    "5" [label="C" tooltip="C"]&#10;    "2" [label="D" tooltip="D"]&#10;    "1" [label="E" tooltip="E" fillcolor="#BFBFBF"]&#10;    "3" -&gt; "3" [dir=forward tooltip="usage"]&#10;    "4" -&gt; "3" [dir=forward tooltip="usage"]&#10;    "5" -&gt; "3" [dir=forward tooltip="public-inheritance"]&#10;    "5" -&gt; "2" [dir=forward tooltip="usage"]&#10;    "2" -&gt; "3" [dir=forward tooltip="protected-inheritance" color="#006400"]&#10;    "2" -&gt; "4" [dir=forward tooltip="private-inheritance" color="#8B1A1A"]&#10;    "2" -&gt; "5" [dir=forward tooltip="usage"]&#10;    "1" -&gt; "2" [dir=forward tooltip="public-inheritance"]&#10;}'>
+                </graphviz>
+            </figure>
+        </desc_content>
+    </desc>
+    <desc domain="cpp" objtype="file">
+        <desc_signature classes="sig sig-object cpp"><target></target><emphasis>file</emphasis> <desc_name classes="sig-name descname">diagrams_a.h</desc_name></desc_signature>
+        <desc_content>
+            <paragraph>This graph shows which files directly or indirectly include diagrams_a.h:</paragraph>
+            <figure>
+                <graphviz align="center" code='digraph {&#10;    graph [bgcolor="#00000000"]&#10;    node [shape=rectangle style=filled fillcolor="#FFFFFF" font=Helvetica padding=2]&#10;    edge [color="#1414CE"]&#10;    "1" [label="diagrams_a.h" tooltip="diagrams_a.h" fillcolor="#BFBFBF"]&#10;    "2" [label="diagrams_d.h" tooltip="diagrams_d.h"]&#10;    "3" [label="diagrams_e.h" tooltip="diagrams_e.h"]&#10;    "1" -&gt; "2" [dir=back tooltip="include"]&#10;    "2" -&gt; "3" [dir=back tooltip="include"]&#10;}'>
+                </graphviz>
+            </figure>
+        </desc_content>
+    </desc>
+    <desc domain="cpp" objtype="file">
+        <desc_signature classes="sig sig-object cpp"><target></target><emphasis>file</emphasis> <desc_name classes="sig-name descname">diagrams_b.h</desc_name></desc_signature>
+        <desc_content>
+            <paragraph>This graph shows which files directly or indirectly include diagrams_b.h:</paragraph>
+            <figure>
+                <graphviz align="center" code='digraph {&#10;    graph [bgcolor="#00000000"]&#10;    node [shape=rectangle style=filled fillcolor="#FFFFFF" font=Helvetica padding=2]&#10;    edge [color="#1414CE"]&#10;    "1" [label="diagrams_b.h" tooltip="diagrams_b.h" fillcolor="#BFBFBF"]&#10;    "2" [label="diagrams_d.h" tooltip="diagrams_d.h"]&#10;    "3" [label="diagrams_e.h" tooltip="diagrams_e.h"]&#10;    "1" -&gt; "2" [dir=back tooltip="include"]&#10;    "2" -&gt; "3" [dir=back tooltip="include"]&#10;}'>
+                </graphviz>
+            </figure>
+        </desc_content>
+    </desc>
+    <desc domain="cpp" objtype="file">
+        <desc_signature classes="sig sig-object cpp"><target></target><emphasis>file</emphasis> <desc_name classes="sig-name descname">diagrams_c.h</desc_name></desc_signature>
+        <desc_content>
+            <paragraph>Include dependency graph for diagrams_c.h:</paragraph>
+            <figure>
+                <graphviz align="center" code='digraph {&#10;    graph [bgcolor="#00000000"]&#10;    node [shape=rectangle style=filled fillcolor="#FFFFFF" font=Helvetica padding=2]&#10;    edge [color="#1414CE"]&#10;    "1" [label="diagrams_c.h" tooltip="diagrams_c.h" fillcolor="#BFBFBF"]&#10;    "1" -&gt; "1" [dir=forward tooltip="include"]&#10;}'>
+                </graphviz>
+            </figure>
+            <paragraph>This graph shows which files directly or indirectly include diagrams_c.h:</paragraph>
+            <figure>
+                <graphviz align="center" code='digraph {&#10;    graph [bgcolor="#00000000"]&#10;    node [shape=rectangle style=filled fillcolor="#FFFFFF" font=Helvetica padding=2]&#10;    edge [color="#1414CE"]&#10;    "1" [label="diagrams_c.h" tooltip="diagrams_c.h" fillcolor="#BFBFBF"]&#10;    "1" -&gt; "1" [dir=back tooltip="include"]&#10;}'>
+                </graphviz>
+            </figure>
+        </desc_content>
+    </desc>
+    <desc domain="cpp" objtype="file">
+        <desc_signature classes="sig sig-object cpp"><target></target><emphasis>file</emphasis> <desc_name classes="sig-name descname">diagrams_d.h</desc_name></desc_signature>
+        <desc_content>
+            <paragraph>Include dependency graph for diagrams_d.h:</paragraph>
+            <figure>
+                <graphviz align="center" code='digraph {&#10;    graph [bgcolor="#00000000"]&#10;    node [shape=rectangle style=filled fillcolor="#FFFFFF" font=Helvetica padding=2]&#10;    edge [color="#1414CE"]&#10;    "2" [label="diagrams_a.h" tooltip="diagrams_a.h"]&#10;    "3" [label="diagrams_b.h" tooltip="diagrams_b.h"]&#10;    "1" [label="diagrams_d.h" tooltip="diagrams_d.h" fillcolor="#BFBFBF"]&#10;    "1" -&gt; "2" [dir=forward tooltip="include"]&#10;    "1" -&gt; "3" [dir=forward tooltip="include"]&#10;}'>
+                </graphviz>
+            </figure>
+            <paragraph>This graph shows which files directly or indirectly include diagrams_d.h:</paragraph>
+            <figure>
+                <graphviz align="center" code='digraph {&#10;    graph [bgcolor="#00000000"]&#10;    node [shape=rectangle style=filled fillcolor="#FFFFFF" font=Helvetica padding=2]&#10;    edge [color="#1414CE"]&#10;    "1" [label="diagrams_d.h" tooltip="diagrams_d.h" fillcolor="#BFBFBF"]&#10;    "2" [label="diagrams_e.h" tooltip="diagrams_e.h"]&#10;    "1" -&gt; "2" [dir=back tooltip="include"]&#10;}'>
+                </graphviz>
+            </figure>
+        </desc_content>
+    </desc>
+    <desc domain="cpp" objtype="file">
+        <desc_signature classes="sig sig-object cpp"><target></target><emphasis>file</emphasis> <desc_name classes="sig-name descname">diagrams_e.h</desc_name></desc_signature>
+        <desc_content>
+            <paragraph>Include dependency graph for diagrams_e.h:</paragraph>
+            <figure>
+                <graphviz align="center" code='digraph {&#10;    graph [bgcolor="#00000000"]&#10;    node [shape=rectangle style=filled fillcolor="#FFFFFF" font=Helvetica padding=2]&#10;    edge [color="#1414CE"]&#10;    "3" [label="diagrams_a.h" tooltip="diagrams_a.h"]&#10;    "4" [label="diagrams_b.h" tooltip="diagrams_b.h"]&#10;    "2" [label="diagrams_d.h" tooltip="diagrams_d.h"]&#10;    "1" [label="diagrams_e.h" tooltip="diagrams_e.h" fillcolor="#BFBFBF"]&#10;    "2" -&gt; "3" [dir=forward tooltip="include"]&#10;    "2" -&gt; "4" [dir=forward tooltip="include"]&#10;    "1" -&gt; "2" [dir=forward tooltip="include"]&#10;}'>
+                </graphviz>
+            </figure>
+        </desc_content>
+    </desc>
+</document>

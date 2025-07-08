@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<document>
+    <index entries="['single',\ 'fun1\ (C++\ function)',\ '_CPPv44fun1v',\ '',\ None]"></index>
+    <desc classes="cpp function" desctype="function" domain="cpp" objtype="function">
+        <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword_type classes="kt">void</desc_sig_keyword_type><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">fun1</desc_sig_name></desc_name><desc_parameterlist></desc_parameterlist></desc_signature_line></desc_signature>
+        <desc_content>
+            <paragraph>Doc for fun1 in project A. </paragraph>
+        </desc_content>
+    </desc>
+    <index entries="['single',\ 'fun1\ (C++\ function)',\ '_CPPv44fun1v',\ '',\ None]"></index>
+    <desc classes="cpp function" desctype="function" domain="cpp" objtype="function">
+        <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword_type classes="kt">void</desc_sig_keyword_type><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">fun1</desc_sig_name></desc_name><desc_parameterlist></desc_parameterlist></desc_signature_line></desc_signature>
+        <desc_content>
+            <paragraph>Doc for fun1 in project B. </paragraph>
+        </desc_content>
+    </desc>
+    <index entries="['single',\ 'fun1\ (C++\ function)',\ '_CPPv44fun1v',\ '',\ None]"></index>
+    <desc classes="cpp function" desctype="function" domain="cpp" objtype="function">
+        <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword_type classes="kt">void</desc_sig_keyword_type><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">fun1</desc_sig_name></desc_name><desc_parameterlist></desc_parameterlist></desc_signature_line></desc_signature>
+        <desc_content>
+            <paragraph>Doc for fun1 in project C. </paragraph>
+        </desc_content>
+    </desc>
+    <index entries="['single',\ 'fun2\ (C++\ function)',\ '_CPPv44fun2v',\ '',\ None]"></index>
+    <desc classes="cpp function" desctype="function" domain="cpp" objtype="function">
+        <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword_type classes="kt">void</desc_sig_keyword_type><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">fun2</desc_sig_name></desc_name><desc_parameterlist></desc_parameterlist></desc_signature_line></desc_signature>
+        <desc_content>
+            <paragraph>Doc for fun2 in project A. </paragraph>
+        </desc_content>
+    </desc>
+    <index entries="['single',\ 'fun2\ (C++\ function)',\ '_CPPv44fun2v',\ '',\ None]"></index>
+    <desc classes="cpp function" desctype="function" domain="cpp" objtype="function">
+        <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword_type classes="kt">void</desc_sig_keyword_type><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">fun2</desc_sig_name></desc_name><desc_parameterlist></desc_parameterlist></desc_signature_line></desc_signature>
+        <desc_content>
+            <paragraph>Doc for fun2 in project B. </paragraph>
+        </desc_content>
+    </desc>
+    <index entries="['single',\ 'fun2\ (C++\ function)',\ '_CPPv44fun2v',\ '',\ None]"></index>
+    <desc classes="cpp function" desctype="function" domain="cpp" objtype="function">
+        <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword_type classes="kt">void</desc_sig_keyword_type><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">fun2</desc_sig_name></desc_name><desc_parameterlist></desc_parameterlist></desc_signature_line></desc_signature>
+        <desc_content>
+            <paragraph>Doc for fun2 in project C. </paragraph>
+        </desc_content>
+    </desc>
+    <index entries="['single',\ 'funA\ (C++\ function)',\ '_CPPv44funAv',\ '',\ None]"></index>
+    <desc classes="cpp function" desctype="function" domain="cpp" objtype="function">
+        <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword_type classes="kt">void</desc_sig_keyword_type><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">funA</desc_sig_name></desc_name><desc_parameterlist></desc_parameterlist></desc_signature_line></desc_signature>
+        <desc_content>
+            <paragraph>Unique function for project A. </paragraph>
+        </desc_content>
+    </desc>
+    <index entries="['single',\ 'funB\ (C++\ function)',\ '_CPPv44funBv',\ '',\ None]"></index>
+    <desc classes="cpp function" desctype="function" domain="cpp" objtype="function">
+        <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword_type classes="kt">void</desc_sig_keyword_type><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">funB</desc_sig_name></desc_name><desc_parameterlist></desc_parameterlist></desc_signature_line></desc_signature>
+        <desc_content>
+            <paragraph>Unique function for project B. </paragraph>
+        </desc_content>
+    </desc>
+    <index entries="['single',\ 'funC\ (C++\ function)',\ '_CPPv44funCv',\ '',\ None]"></index>
+    <desc classes="cpp function" desctype="function" domain="cpp" objtype="function">
+        <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword_type classes="kt">void</desc_sig_keyword_type><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">funC</desc_sig_name></desc_name><desc_parameterlist></desc_parameterlist></desc_signature_line></desc_signature>
+        <desc_content>
+            <paragraph>Unique function for project C. </paragraph>
+        </desc_content>
+    </desc>
+</document>

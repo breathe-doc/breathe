@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<?xml-stylesheet href="../../docutils.css"?>
+<document>
+    <index entries="['single',\ 'BaseA\ (C++\ class)',\ '_CPPv45BaseA',\ '',\ None]"></index>
+    <desc classes="cpp class" desctype="class" domain="cpp" objtype="class">
+        <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword classes="k">class</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">BaseA</desc_sig_name></desc_name></desc_signature_line></desc_signature>
+        <desc_content>
+            <paragraph>Subclassed by <reference internal="True" refid="class_child_v1"><inline classes="std std-ref">ChildV1</inline></reference>, <reference internal="True" refid="class_child_v2"><inline classes="std std-ref">ChildV2</inline></reference>, <reference internal="True" refid="class_main"><inline classes="std std-ref">Main</inline></reference></paragraph>
+        </desc_content>
+    </desc>
+    <index entries="['single',\ 'BaseB\ (C++\ class)',\ '_CPPv45BaseB',\ '',\ None]"></index>
+    <desc classes="cpp class" desctype="class" domain="cpp" objtype="class">
+        <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword classes="k">class</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">BaseB</desc_sig_name></desc_name></desc_signature_line></desc_signature>
+        <desc_content>
+            <paragraph>Subclassed by <reference internal="True" refid="class_main"><inline classes="std std-ref">Main</inline></reference></paragraph>
+        </desc_content>
+    </desc>
+    <index entries="['single',\ 'Main\ (C++\ class)',\ '_CPPv44Main',\ '',\ None]"></index>
+    <desc classes="cpp class" desctype="class" domain="cpp" objtype="class">
+        <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword classes="k">class</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">Main</desc_sig_name></desc_name><desc_sig_space classes="w"> </desc_sig_space><desc_sig_punctuation classes="p">:</desc_sig_punctuation><desc_sig_space classes="w"> </desc_sig_space><desc_sig_keyword classes="k">public</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><reference internal="True" refid="_CPPv45BaseA" reftitle="BaseA"><desc_sig_name classes="n">BaseA</desc_sig_name></reference><desc_sig_punctuation classes="p">,</desc_sig_punctuation><desc_sig_space classes="w"> </desc_sig_space><desc_sig_keyword classes="k">private</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><reference internal="True" refid="_CPPv45BaseB" reftitle="BaseB"><desc_sig_name classes="n">BaseB</desc_sig_name></reference></desc_signature_line></desc_signature>
+        <desc_content>
+            <paragraph>This is the main class we’re interested in. </paragraph>
+            <paragraph>Subclassed by <reference internal="True" refid="class_child_a"><inline classes="std std-ref">ChildA</inline></reference>, <reference internal="True" refid="class_child_b"><inline classes="std std-ref">ChildB</inline></reference></paragraph>
+        </desc_content>
+    </desc>
+    <index entries="['single',\ 'ChildA\ (C++\ class)',\ '_CPPv46ChildA',\ '',\ None]"></index>
+    <desc classes="cpp class" desctype="class" domain="cpp" objtype="class">
+        <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword classes="k">class</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">ChildA</desc_sig_name></desc_name><desc_sig_space classes="w"> </desc_sig_space><desc_sig_punctuation classes="p">:</desc_sig_punctuation><desc_sig_space classes="w"> </desc_sig_space><desc_sig_keyword classes="k">public</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><reference internal="True" refid="_CPPv44Main" reftitle="Main"><desc_sig_name classes="n">Main</desc_sig_name></reference></desc_signature_line></desc_signature>
+        <desc_content>
+        </desc_content>
+    </desc>
+    <index entries="['single',\ 'ChildB\ (C++\ class)',\ '_CPPv46ChildB',\ '',\ None]"></index>
+    <desc classes="cpp class" desctype="class" domain="cpp" objtype="class">
+        <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword classes="k">class</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">ChildB</desc_sig_name></desc_name><desc_sig_space classes="w"> </desc_sig_space><desc_sig_punctuation classes="p">:</desc_sig_punctuation><desc_sig_space classes="w"> </desc_sig_space><desc_sig_keyword classes="k">public</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><reference internal="True" refid="_CPPv44Main" reftitle="Main"><desc_sig_name classes="n">Main</desc_sig_name></reference></desc_signature_line></desc_signature>
+        <desc_content>
+        </desc_content>
+    </desc>
+    <index entries="['single',\ 'ChildV1\ (C++\ class)',\ '_CPPv47ChildV1',\ '',\ None]"></index>
+    <desc classes="cpp class" desctype="class" domain="cpp" objtype="class">
+        <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword classes="k">class</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">ChildV1</desc_sig_name></desc_name><desc_sig_space classes="w"> </desc_sig_space><desc_sig_punctuation classes="p">:</desc_sig_punctuation><desc_sig_space classes="w"> </desc_sig_space><desc_sig_keyword classes="k">public</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_sig_keyword classes="k">virtual</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><reference internal="True" refid="_CPPv45BaseA" reftitle="BaseA"><desc_sig_name classes="n">BaseA</desc_sig_name></reference></desc_signature_line></desc_signature>
+        <desc_content>
+            <paragraph>Subclassed by <reference internal="True" refid="class_child_v3"><inline classes="std std-ref">ChildV3</inline></reference></paragraph>
+        </desc_content>
+    </desc>
+    <index entries="['single',\ 'ChildV2\ (C++\ class)',\ '_CPPv47ChildV2',\ '',\ None]"></index>
+    <desc classes="cpp class" desctype="class" domain="cpp" objtype="class">
+        <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword classes="k">class</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">ChildV2</desc_sig_name></desc_name><desc_sig_space classes="w"> </desc_sig_space><desc_sig_punctuation classes="p">:</desc_sig_punctuation><desc_sig_space classes="w"> </desc_sig_space><desc_sig_keyword classes="k">public</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_sig_keyword classes="k">virtual</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><reference internal="True" refid="_CPPv45BaseA" reftitle="BaseA"><desc_sig_name classes="n">BaseA</desc_sig_name></reference></desc_signature_line></desc_signature>
+        <desc_content>
+            <paragraph>Subclassed by <reference internal="True" refid="class_child_v3"><inline classes="std std-ref">ChildV3</inline></reference></paragraph>
+        </desc_content>
+    </desc>
+    <index entries="['single',\ 'ChildV3\ (C++\ class)',\ '_CPPv47ChildV3',\ '',\ None]"></index>
+    <desc classes="cpp class" desctype="class" domain="cpp" objtype="class">
+        <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword classes="k">class</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">ChildV3</desc_sig_name></desc_name><desc_sig_space classes="w"> </desc_sig_space><desc_sig_punctuation classes="p">:</desc_sig_punctuation><desc_sig_space classes="w"> </desc_sig_space><desc_sig_keyword classes="k">public</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><reference internal="True" refid="_CPPv47ChildV1" reftitle="ChildV1"><desc_sig_name classes="n">ChildV1</desc_sig_name></reference><desc_sig_punctuation classes="p">,</desc_sig_punctuation><desc_sig_space classes="w"> </desc_sig_space><desc_sig_keyword classes="k">private</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><reference internal="True" refid="_CPPv47ChildV2" reftitle="ChildV2"><desc_sig_name classes="n">ChildV2</desc_sig_name></reference></desc_signature_line></desc_signature>
+        <desc_content>
+        </desc_content>
+    </desc>
+</document>

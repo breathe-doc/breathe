@@ -2,13 +2,20 @@ from __future__ import annotations
 
 import fnmatch
 import os
+import os.path
 from pathlib import Path
 from typing import TYPE_CHECKING
 
 from breathe.exception import BreatheError
 
 if TYPE_CHECKING:
+    from collections import UserDict
+
     from sphinx.application import Sphinx
+
+    class ProjectOptions(UserDict):
+        path: str
+        project: str
 
 
 class ProjectError(BreatheError):
@@ -107,6 +114,8 @@ class ProjectInfo:
 
 
 class ProjectInfoFactory:
+    _default_build_dir: str
+
     def __init__(self, app: Sphinx):
         self.app = app
         # note: don't access self.app.config now, as we are instantiated at setup-time.
@@ -116,7 +125,7 @@ class ProjectInfoFactory:
         self._default_build_dir = os.path.dirname(os.path.normpath(app.doctreedir))
         self.project_count = 0
         self.project_info_store: dict[str, ProjectInfo] = {}
-        self.project_info_for_auto_store: dict[str, AutoProjectInfo] = {}
+        self.project_info_for_auto_store: dict[str, ProjectInfo] = {}
         self.auto_project_info_store: dict[str, AutoProjectInfo] = {}
 
     @property
@@ -146,7 +155,7 @@ class ProjectInfoFactory:
                 % config.breathe_default_project
             )
 
-    def create_project_info(self, options) -> ProjectInfo:
+    def create_project_info(self, options: ProjectOptions) -> ProjectInfo:
         config = self.app.config
         name = config.breathe_default_project
 
@@ -177,7 +186,7 @@ class ProjectInfoFactory:
             self.project_info_store[path] = project_info
             return project_info
 
-    def store_project_info_for_auto(self, name: str, project_info: AutoProjectInfo) -> None:
+    def store_project_info_for_auto(self, name: str, project_info: ProjectInfo) -> None:
         """Stores the project info by name for later extraction by the auto directives.
 
         Stored separately to the non-auto project info objects as they should never overlap.
@@ -185,7 +194,7 @@ class ProjectInfoFactory:
 
         self.project_info_for_auto_store[name] = project_info
 
-    def retrieve_project_info_for_auto(self, options) -> AutoProjectInfo:
+    def retrieve_project_info_for_auto(self, options) -> ProjectInfo:
         """Retrieves the project info by name for later extraction by the auto directives.
 
         Looks for the 'project' entry in the options dictionary. This is a less than ideal API but

@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<?xml-stylesheet href="../../docutils.css"?>
+<document>
+    <index entries="['single',\ 'Base\ (C++\ class)',\ '_CPPv44Base',\ '',\ None]"></index>
+    <desc classes="cpp class" desctype="class" domain="cpp" objtype="class">
+        <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword classes="k">class</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">Base</desc_sig_name></desc_name></desc_signature_line></desc_signature>
+        <desc_content>
+            <paragraph><reference internal="True" refid="class_base"><inline classes="std std-ref">Base</inline></reference> class. </paragraph>
+            <paragraph>Subclassed by <reference internal="True" refid="class_a"><inline classes="std std-ref">A</inline></reference>, <reference internal="True" refid="class_b"><inline classes="std std-ref">B</inline></reference></paragraph>
+            <container classes="breathe-sectiondef" objtype="public-func">
+                <rubric classes="breathe-sectiondef-title">Public Functions</rubric>
+                <index entries="['single',\ 'Base::f_issue_356\ (C++\ function)',\ '_CPPv4N4Base11f_issue_356Ev',\ '',\ None]"></index>
+                <desc classes="cpp function" desctype="function" domain="cpp" objtype="function">
+                    <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword_type classes="kt">void</desc_sig_keyword_type><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">f_issue_356</desc_sig_name></desc_name><desc_parameterlist></desc_parameterlist></desc_signature_line></desc_signature>
+                    <desc_content>
+                        <paragraph>Base-class member function. </paragraph>
+                    </desc_content>
+                </desc>
+            </container>
+        </desc_content>
+    </desc>
+    <index entries="['single',\ 'A\ (C++\ class)',\ '_CPPv41A',\ '',\ None]"></index>
+    <desc classes="cpp class" desctype="class" domain="cpp" objtype="class">
+        <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword classes="k">class</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">A</desc_sig_name></desc_name><desc_sig_space classes="w"> </desc_sig_space><desc_sig_punctuation classes="p">:</desc_sig_punctuation><desc_sig_space classes="w"> </desc_sig_space><desc_sig_keyword classes="k">public</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><reference internal="True" refid="_CPPv44Base" reftitle="Base"><desc_sig_name classes="n">Base</desc_sig_name></reference></desc_signature_line></desc_signature>
+        <desc_content>
+            <paragraph>Class <reference internal="True" refid="class_a"><inline classes="std std-ref">A</inline></reference>. </paragraph>
+            <container classes="breathe-sectiondef" objtype="public-func">
+                <rubric classes="breathe-sectiondef-title">Public Functions</rubric>
+                <index entries="['single',\ 'A::f_issue_356\ (C++\ function)',\ '_CPPv4N1A11f_issue_356Ev',\ '',\ None]"></index>
+                <desc classes="cpp function" desctype="function" domain="cpp" objtype="function">
+                    <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword_type classes="kt">void</desc_sig_keyword_type><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">f_issue_356</desc_sig_name></desc_name><desc_parameterlist></desc_parameterlist></desc_signature_line></desc_signature>
+                    <desc_content>
+                        <paragraph>Base-class member function. </paragraph>
+                    </desc_content>
+                </desc>
+            </container>
+        </desc_content>
+    </desc>
+    <index entries="['single',\ 'B\ (C++\ class)',\ '_CPPv41B',\ '',\ None]"></index>
+    <desc classes="cpp class" desctype="class" domain="cpp" objtype="class">
+        <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword classes="k">class</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">B</desc_sig_name></desc_name><desc_sig_space classes="w"> </desc_sig_space><desc_sig_punctuation classes="p">:</desc_sig_punctuation><desc_sig_space classes="w"> </desc_sig_space><desc_sig_keyword classes="k">public</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><reference internal="True" refid="_CPPv44Base" reftitle="Base"><desc_sig_name classes="n">Base</desc_sig_name></reference></desc_signature_line></desc_signature>
+        <desc_content>
+            <paragraph>Class <reference internal="True" refid="class_b"><inline classes="std std-ref">B</inline></reference>. </paragraph>
+            <container classes="breathe-sectiondef" objtype="public-func">
+                <rubric classes="breathe-sectiondef-title">Public Functions</rubric>
+                <index entries="['single',\ 'B::f_issue_356\ (C++\ function)',\ '_CPPv4N1B11f_issue_356Ev',\ '',\ None]"></index>
+                <desc classes="cpp function" desctype="function" domain="cpp" objtype="function">
+                    <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword_type classes="kt">void</desc_sig_keyword_type><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">f_issue_356</desc_sig_name></desc_name><desc_parameterlist></desc_parameterlist></desc_signature_line></desc_signature>
+                    <desc_content>
+                        <paragraph>Base-class member function. </paragraph>
+                    </desc_content>
+                </desc>
+            </container>
+        </desc_content>
+    </desc>
+</document>

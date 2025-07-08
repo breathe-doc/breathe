@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<?xml-stylesheet href="../../docutils.css"?>
+<document>
+    <index entries="['single',\ 'UserDefinedGroupTest\ (C++\ class)',\ '_CPPv420UserDefinedGroupTest',\ '',\ None]"></index>
+    <desc classes="cpp class" desctype="class" domain="cpp" objtype="class">
+        <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword classes="k">class</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">UserDefinedGroupTest</desc_sig_name></desc_name></desc_signature_line></desc_signature>
+        <desc_content>
+            <paragraph>A class. </paragraph>
+            <paragraph>More details about the <reference internal="True" refid="class_user_defined_group_test"><inline classes="std std-ref">UserDefinedGroupTest</inline></reference> class </paragraph>
+            <container classes="breathe-sectiondef" objtype="user-defined">
+                <rubric classes="breathe-sectiondef-title">Custom Group</rubric>
+                <paragraph>Description of custom group </paragraph>
+                <index entries="['single',\ 'UserDefinedGroupTest::func1InCustomGroup\ (C++\ function)',\ '_CPPv4N20UserDefinedGroupTest18func1InCustomGroupEv',\ '',\ None]"></index>
+                <desc classes="cpp function" desctype="function" domain="cpp" objtype="function">
+                    <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword_type classes="kt">void</desc_sig_keyword_type><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">func1InCustomGroup</desc_sig_name></desc_name><desc_parameterlist></desc_parameterlist></desc_signature_line></desc_signature>
+                    <desc_content>
+                        <paragraph>Function 1 in custom group. </paragraph>
+                        <paragraph>Details. </paragraph>
+                    </desc_content>
+                </desc>
+                <index entries="['single',\ 'UserDefinedGroupTest::func2InCustomGroup\ (C++\ function)',\ '_CPPv4N20UserDefinedGroupTest18func2InCustomGroupEv',\ '',\ None]"></index>
+                <desc classes="cpp function" desctype="function" domain="cpp" objtype="function">
+                    <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword_type classes="kt">void</desc_sig_keyword_type><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">func2InCustomGroup</desc_sig_name></desc_name><desc_parameterlist></desc_parameterlist></desc_signature_line></desc_signature>
+                    <desc_content>
+                        <paragraph>Function 2 in custom group. </paragraph>
+                        <paragraph>Details. </paragraph>
+                    </desc_content>
+                </desc>
+            </container>
+            <container classes="breathe-sectiondef" objtype="public-func">
+                <rubric classes="breathe-sectiondef-title">Public Functions</rubric>
+                <index entries="['single',\ 'UserDefinedGroupTest::func1InGroup1\ (C++\ function)',\ '_CPPv4N20UserDefinedGroupTest13func1InGroup1Ev',\ '',\ None]"></index>
+                <desc classes="cpp function" desctype="function" domain="cpp" objtype="function">
+                    <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword_type classes="kt">void</desc_sig_keyword_type><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">func1InGroup1</desc_sig_name></desc_name><desc_parameterlist></desc_parameterlist></desc_signature_line></desc_signature>
+                    <desc_content>
+                        <paragraph>Same documentation for both members. </paragraph>
+                        <paragraph>Details </paragraph>
+                    </desc_content>
+                </desc>
+                <index entries="['single',\ 'UserDefinedGroupTest::ungroupedFunction\ (C++\ function)',\ '_CPPv4N20UserDefinedGroupTest17ungroupedFunctionEv',\ '',\ None]"></index>
+                <desc classes="cpp function" desctype="function" domain="cpp" objtype="function">
+                    <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword_type classes="kt">void</desc_sig_keyword_type><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">ungroupedFunction</desc_sig_name></desc_name><desc_parameterlist></desc_parameterlist></desc_signature_line></desc_signature>
+                    <desc_content>
+                        <paragraph>Function without group. </paragraph>
+                        <paragraph>Details. </paragraph>
+                    </desc_content>
+                </desc>
+            </container>
+        </desc_content>
+    </desc>
+</document>

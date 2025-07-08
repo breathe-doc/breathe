@@ -7,12 +7,6 @@ build-backend = "flit_core.buildapi"
 name = "breathe"
 description = "Sphinx Doxygen renderer"
 readme = "README.rst"
-urls.Changelog = "https://github.com/breathe-doc/breathe/blob/main/CHANGELOG.rst"
-urls.Code = "https://github.com/breathe-doc/breathe/"
-urls.Download = "https://pypi.org/project/breathe/"
-urls.Documentation = "https://breathe.readthedocs.io/"
-urls.Homepage = "https://www.breathe-doc.org/"
-urls."Issue tracker" = "https://github.com/breathe-doc/breathe/issues"
 license.text = "BSD-3-Clause"
 requires-python = ">=3.9"
 
@@ -48,6 +42,9 @@ dependencies = [
 dynamic = ["version"]
 
 [project.optional-dependencies]
+build = [
+    "setuptools>=80.9.0"
+]
 docs = [
     "furo",
     "sphinx-copybutton",
@@ -60,11 +57,22 @@ lint = [
     "types-Pygments",
     "pytest>=8.0",  # for mypy
     "sphinxcontrib-phpdomain",  # for mypy
-    "sphinx-csharp",  # for mypy
+    # The API that we depend on is only implemented in rogerbarton's fork of sphinx-csharp
+    # and not in the one that is published to PyPI
+    "sphinx-csharp @ git+https://github.com/rogerbarton/sphinx-csharp.git",  # for mypy
 ]
 test = [
     "pytest>=8.0",
+    "Sphinx[test]"
 ]
+
+[project.urls]
+Changelog = "https://github.com/breathe-doc/breathe/blob/main/CHANGELOG.rst"
+Code = "https://github.com/breathe-doc/breathe/"
+Download = "https://pypi.org/project/breathe/"
+Documentation = "https://breathe.readthedocs.io/"
+Homepage = "https://www.breathe-doc.org/"
+"Issue tracker" = "https://github.com/breathe-doc/breathe/issues"
 
 [[project.authors]]
 name = "Michael Jones"
@@ -107,6 +115,7 @@ warn_unused_configs = true
 warn_redundant_casts = true
 warn_unused_ignores = true
 
+# TODO: Remove if possible
 [[tool.mypy.overrides]]
 module = [
     "breathe.parser.compound",

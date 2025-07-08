@@ -5,7 +5,10 @@ from pathlib import Path
 from shlex import quote
 from typing import TYPE_CHECKING
 
+from breathe.project import AutoProjectInfo, ProjectInfoFactory
+
 if TYPE_CHECKING:
+    from collections.abc import Mapping
     from typing import Callable
 
     from breathe.project import AutoProjectInfo, ProjectInfoFactory
@@ -52,9 +55,9 @@ class AutoDoxygenProcessHandle:
 
     def generate_xml(
         self,
-        projects_source: dict[str, tuple[str, list[str]]],
-        doxygen_options: dict[str, str],
-        doxygen_aliases: dict[str, str],
+        projects_source: Mapping[str, tuple[str, list[str]]],
+        doxygen_options: Mapping[str, str],
+        doxygen_aliases: Mapping[str, str],
     ) -> None:
         project_files: dict[str, ProjectData] = {}
 
@@ -79,8 +82,8 @@ class AutoDoxygenProcessHandle:
         self,
         auto_project_info: AutoProjectInfo,
         files: list[str],
-        doxygen_options: dict[str, str],
-        doxygen_aliases: dict[str, str],
+        doxygen_options: Mapping[str, str],
+        doxygen_aliases: Mapping[str, str],
     ) -> str:
         name = auto_project_info.name()
         full_paths = [str(auto_project_info.abs_path_to_source_file(f)) for f in files]

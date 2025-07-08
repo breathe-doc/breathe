@@ -1,7 +1,6 @@
 name: Lint source code
 
 on:
-  push:
   pull_request:
   workflow_dispatch:
 
@@ -30,6 +29,18 @@ jobs:
         args: --version
         version: 0.9.2
 
+    - name: Install dependencies
+      # "--editable" is needed so that _parser.py is placed in the local folder
+      # where pytest will import from
+      run: |
+        python -m pip install --upgrade pip
+        python -m pip install --editable ".[build]"
+
+    - name: Generate parser
+      run: |
+        make parser
+        make format-parser
+
     - name: Lint with Ruff
       run: ruff check --output-format=github
 
@@ -38,33 +49,50 @@ jobs:
 
   mypy:
     runs-on: ubuntu-latest
-
     steps:
     - uses: actions/checkout@v4
+
     - name: Set up Python
       uses: actions/setup-python@v5
       with:
         python-version: "3"
+
     - name: Install dependencies
+      # "--editable" is needed so that _parser.py is placed in the local folder
+      # where pytest will import from
       run: |
         python -m pip install --upgrade pip
-        python -m pip install ".[lint]"
+        python -m pip install --editable ".[build]"
+        python -m pip install --editable ".[lint]"
+
+    - name: Generate parser
+      run: make parser
+
     - name: Type check with mypy
-      run: mypy
+      run: mypy --warn-redundant-casts --warn-unused-ignores breathe tests
 
   twine:
     runs-on: ubuntu-latest
 
     steps:
     - uses: actions/checkout@v4
+
     - name: Set up Python
       uses: actions/setup-python@v5
       with:
         python-version: "3"
+
     - name: Install dependencies
+      # "--editable" is needed so that _parser.py is placed in the local folder
+      # where pytest will import from
       run: |
         python -m pip install --upgrade pip
         python -m pip install --upgrade twine build
+        python -m pip install --editable ".[build]"
+
+    - name: Generate parser
+      run: make parser
+
     - name: Lint with twine
       run: |
         python -m build .

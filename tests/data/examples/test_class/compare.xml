@@ -1,0 +1,294 @@
+<?xml version="1.0" encoding="utf-8"?>
+<?xml-stylesheet href="../../docutils.css"?>
+<document>
+    <container classes="breathe-sectiondef" objtype="func">
+        <rubric classes="breathe-sectiondef-title">Functions</rubric>
+        <index entries="['single',\ 'f0\ (C++\ function)',\ '_CPPv4I0E2f0vv',\ '',\ None]"></index>
+        <desc classes="cpp function" desctype="function" domain="cpp" objtype="function">
+            <desc_signature classes="sig sig-object cpp"><desc_signature_line><desc_sig_keyword classes="k">template</desc_sig_keyword><desc_sig_punctuation classes="p">&lt;</desc_sig_punctuation><desc_sig_keyword classes="k">typename</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">T</desc_sig_name></desc_name><desc_sig_punctuation classes="p">&gt;</desc_sig_punctuation></desc_signature_line><desc_signature_line><target></target><desc_sig_keyword_type classes="kt">void</desc_sig_keyword_type><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">f0</desc_sig_name></desc_name><desc_parameterlist></desc_parameterlist></desc_signature_line></desc_signature>
+            <desc_content>
+            </desc_content>
+        </desc>
+        <index entries="['single',\ 'f0&lt;std::string&gt;\ (C++\ function)',\ '_CPPv4IE2f0INSt6stringEEvv',\ '',\ None]"></index>
+        <desc classes="cpp function" desctype="function" domain="cpp" objtype="function">
+            <desc_signature classes="sig sig-object cpp"><desc_signature_line><desc_sig_keyword classes="k">template</desc_sig_keyword><desc_sig_punctuation classes="p">&lt;</desc_sig_punctuation><desc_sig_punctuation classes="p">&gt;</desc_sig_punctuation></desc_signature_line><desc_signature_line><target></target><desc_sig_keyword_type classes="kt">void</desc_sig_keyword_type><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">f0</desc_sig_name></desc_name><desc_sig_punctuation classes="p">&lt;</desc_sig_punctuation><desc_sig_name classes="n">std</desc_sig_name><desc_sig_punctuation classes="p">::</desc_sig_punctuation><desc_sig_name classes="n">string</desc_sig_name><desc_sig_punctuation classes="p">&gt;</desc_sig_punctuation><desc_parameterlist></desc_parameterlist></desc_signature_line></desc_signature>
+            <desc_content>
+            </desc_content>
+        </desc>
+    </container>
+    <index entries="['single',\ 'OuterClass\ (C++\ class)',\ '_CPPv410OuterClass',\ '',\ None]"></index>
+    <desc classes="cpp class" desctype="class" domain="cpp" objtype="class">
+        <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword classes="k">class</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">OuterClass</desc_sig_name></desc_name></desc_signature_line></desc_signature>
+        <desc_content>
+            <paragraph>class outside of namespace </paragraph>
+            <index entries="['single',\ 'OuterClass::InnerClass\ (C++\ class)',\ '_CPPv4N10OuterClass10InnerClassE',\ '',\ None]"></index>
+            <desc classes="cpp class" desctype="class" domain="cpp" objtype="class">
+                <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword classes="k">class</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">InnerClass</desc_sig_name></desc_name></desc_signature_line></desc_signature>
+                <desc_content>
+                    <paragraph>inner class </paragraph>
+                </desc_content>
+            </desc>
+        </desc_content>
+    </desc>
+    <index entries="['single',\ 'ClassTest\ (C++\ class)',\ '_CPPv49ClassTest',\ '',\ None]"></index>
+    <desc classes="cpp class" desctype="class" domain="cpp" objtype="class">
+        <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword classes="k">class</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">ClassTest</desc_sig_name></desc_name></desc_signature_line></desc_signature>
+        <desc_content>
+            <paragraph>class outside of namespace </paragraph>
+            <container classes="breathe-sectiondef" objtype="public-func">
+                <rubric classes="breathe-sectiondef-title">Public Functions</rubric>
+                <index entries="['single',\ 'ClassTest::function\ (C++\ function)',\ '_CPPv4N9ClassTest8functionEi',\ '',\ None]"></index>
+                <desc classes="cpp function" desctype="function" domain="cpp" objtype="function">
+                    <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword_type classes="kt">void</desc_sig_keyword_type><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">function</desc_sig_name></desc_name><desc_parameterlist><desc_parameter noemph="True"><desc_sig_keyword_type classes="kt">int</desc_sig_keyword_type><desc_sig_space classes="w"> </desc_sig_space><desc_sig_name classes="n sig-param">myParameter</desc_sig_name></desc_parameter></desc_parameterlist></desc_signature_line></desc_signature>
+                    <desc_content>
+                        <paragraph>non-namespaced class function </paragraph>
+                        <paragraph>More details in the header file.</paragraph>
+                        <paragraph>More documentation in the impl file </paragraph>
+                    </desc_content>
+                </desc>
+                <index entries="['single',\ 'ClassTest::anotherFunction\ (C++\ function)',\ '_CPPv4N9ClassTest15anotherFunctionEv',\ '',\ None]"></index>
+                <desc classes="cpp function" desctype="function" domain="cpp" objtype="function">
+                    <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword_type classes="kt">void</desc_sig_keyword_type><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">anotherFunction</desc_sig_name></desc_name><desc_parameterlist></desc_parameterlist></desc_signature_line></desc_signature>
+                    <desc_content>
+                        <paragraph>non-namespaced class other function </paragraph>
+                        <paragraph>More documentation in the impl file </paragraph>
+                    </desc_content>
+                </desc>
+                <index entries="['single',\ 'ClassTest::publicFunction\ (C++\ function)',\ '_CPPv4NK9ClassTest14publicFunctionEv',\ '',\ None]"></index>
+                <desc classes="cpp function" desctype="function" domain="cpp" objtype="function">
+                    <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword classes="k">virtual</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_sig_keyword_type classes="kt">void</desc_sig_keyword_type><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">publicFunction</desc_sig_name></desc_name><desc_parameterlist></desc_parameterlist><desc_sig_space classes="w"> </desc_sig_space><desc_sig_keyword classes="k">const</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_sig_punctuation classes="p">=</desc_sig_punctuation><desc_sig_space classes="w"> </desc_sig_space><desc_sig_literal_number classes="m">0</desc_sig_literal_number></desc_signature_line></desc_signature>
+                    <desc_content>
+                        <paragraph>namespaced class function </paragraph>
+                    </desc_content>
+                </desc>
+                <index entries="['single',\ 'ClassTest::undocumentedPublicFunction\ (C++\ function)',\ '_CPPv4NK9ClassTest26undocumentedPublicFunctionEv',\ '',\ None]"></index>
+                <desc classes="cpp function" desctype="function" domain="cpp" objtype="function">
+                    <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword classes="k">virtual</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_sig_keyword_type classes="kt">void</desc_sig_keyword_type><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">undocumentedPublicFunction</desc_sig_name></desc_name><desc_parameterlist></desc_parameterlist><desc_sig_space classes="w"> </desc_sig_space><desc_sig_keyword classes="k">const</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_sig_punctuation classes="p">=</desc_sig_punctuation><desc_sig_space classes="w"> </desc_sig_space><desc_sig_literal_number classes="m">0</desc_sig_literal_number></desc_signature_line></desc_signature>
+                    <desc_content>
+                    </desc_content>
+                </desc>
+            </container>
+            <container classes="breathe-sectiondef" objtype="protected-func">
+                <rubric classes="breathe-sectiondef-title">Protected Functions</rubric>
+                <index entries="['single',\ 'ClassTest::protectedFunction\ (C++\ function)',\ '_CPPv4N9ClassTest17protectedFunctionEv',\ '',\ None]"></index>
+                <desc classes="cpp function" desctype="function" domain="cpp" objtype="function">
+                    <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword classes="k">inline</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_sig_keyword_type classes="kt">void</desc_sig_keyword_type><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">protectedFunction</desc_sig_name></desc_name><desc_parameterlist></desc_parameterlist></desc_signature_line></desc_signature>
+                    <desc_content>
+                        <paragraph>A protected function. </paragraph>
+                    </desc_content>
+                </desc>
+                <index entries="['single',\ 'ClassTest::undocumentedProtectedFunction\ (C++\ function)',\ '_CPPv4N9ClassTest29undocumentedProtectedFunctionEv',\ '',\ None]"></index>
+                <desc classes="cpp function" desctype="function" domain="cpp" objtype="function">
+                    <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword classes="k">inline</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_sig_keyword_type classes="kt">void</desc_sig_keyword_type><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">undocumentedProtectedFunction</desc_sig_name></desc_name><desc_parameterlist></desc_parameterlist></desc_signature_line></desc_signature>
+                    <desc_content>
+                    </desc_content>
+                </desc>
+            </container>
+            <container classes="breathe-sectiondef" objtype="private-func">
+                <rubric classes="breathe-sectiondef-title">Private Functions</rubric>
+                <index entries="['single',\ 'ClassTest::privateFunction\ (C++\ function)',\ '_CPPv4NK9ClassTest15privateFunctionEv',\ '',\ None]"></index>
+                <desc classes="cpp function" desctype="function" domain="cpp" objtype="function">
+                    <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword classes="k">virtual</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_sig_keyword_type classes="kt">void</desc_sig_keyword_type><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">privateFunction</desc_sig_name></desc_name><desc_parameterlist></desc_parameterlist><desc_sig_space classes="w"> </desc_sig_space><desc_sig_keyword classes="k">const</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_sig_punctuation classes="p">=</desc_sig_punctuation><desc_sig_space classes="w"> </desc_sig_space><desc_sig_literal_number classes="m">0</desc_sig_literal_number></desc_signature_line></desc_signature>
+                    <desc_content>
+                        <paragraph>This is a private function. </paragraph>
+                    </desc_content>
+                </desc>
+                <index entries="['single',\ 'ClassTest::undocumentedPrivateFunction\ (C++\ function)',\ '_CPPv4NK9ClassTest27undocumentedPrivateFunctionEv',\ '',\ None]"></index>
+                <desc classes="cpp function" desctype="function" domain="cpp" objtype="function">
+                    <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword classes="k">virtual</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_sig_keyword_type classes="kt">void</desc_sig_keyword_type><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">undocumentedPrivateFunction</desc_sig_name></desc_name><desc_parameterlist></desc_parameterlist><desc_sig_space classes="w"> </desc_sig_space><desc_sig_keyword classes="k">const</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_sig_punctuation classes="p">=</desc_sig_punctuation><desc_sig_space classes="w"> </desc_sig_space><desc_sig_literal_number classes="m">0</desc_sig_literal_number></desc_signature_line></desc_signature>
+                    <desc_content>
+                    </desc_content>
+                </desc>
+            </container>
+            <index entries="['single',\ 'ClassTest::PrivateClass\ (C++\ class)',\ '_CPPv4N9ClassTest12PrivateClassE',\ '',\ None]"></index>
+            <desc classes="cpp class" desctype="class" domain="cpp" objtype="class">
+                <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword classes="k">class</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">PrivateClass</desc_sig_name></desc_name></desc_signature_line></desc_signature>
+                <desc_content>
+                    <paragraph>A private class. </paragraph>
+                </desc_content>
+            </desc>
+            <index entries="['single',\ 'ClassTest::PrivateStruct\ (C++\ struct)',\ '_CPPv4N9ClassTest13PrivateStructE',\ '',\ None]"></index>
+            <desc classes="cpp struct" desctype="struct" domain="cpp" objtype="struct">
+                <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword classes="k">struct</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">PrivateStruct</desc_sig_name></desc_name></desc_signature_line></desc_signature>
+                <desc_content>
+                    <paragraph>A private struct. </paragraph>
+                </desc_content>
+            </desc>
+            <index entries="['single',\ 'ClassTest::ProtectedClass\ (C++\ class)',\ '_CPPv4N9ClassTest14ProtectedClassE',\ '',\ None]"></index>
+            <desc classes="cpp class" desctype="class" domain="cpp" objtype="class">
+                <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword classes="k">class</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">ProtectedClass</desc_sig_name></desc_name></desc_signature_line></desc_signature>
+                <desc_content>
+                    <paragraph>A protected class. </paragraph>
+                </desc_content>
+            </desc>
+            <index entries="['single',\ 'ClassTest::ProtectedStruct\ (C++\ struct)',\ '_CPPv4N9ClassTest15ProtectedStructE',\ '',\ None]"></index>
+            <desc classes="cpp struct" desctype="struct" domain="cpp" objtype="struct">
+                <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword classes="k">struct</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">ProtectedStruct</desc_sig_name></desc_name></desc_signature_line></desc_signature>
+                <desc_content>
+                    <paragraph>A protected struct. </paragraph>
+                </desc_content>
+            </desc>
+            <index entries="['single',\ 'ClassTest::PublicClass\ (C++\ class)',\ '_CPPv4N9ClassTest11PublicClassE',\ '',\ None]"></index>
+            <desc classes="cpp class" desctype="class" domain="cpp" objtype="class">
+                <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword classes="k">class</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">PublicClass</desc_sig_name></desc_name></desc_signature_line></desc_signature>
+                <desc_content>
+                    <paragraph>A public class. </paragraph>
+                </desc_content>
+            </desc>
+            <index entries="['single',\ 'ClassTest::PublicStruct\ (C++\ struct)',\ '_CPPv4N9ClassTest12PublicStructE',\ '',\ None]"></index>
+            <desc classes="cpp struct" desctype="struct" domain="cpp" objtype="struct">
+                <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword classes="k">struct</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">PublicStruct</desc_sig_name></desc_name></desc_signature_line></desc_signature>
+                <desc_content>
+                    <paragraph>A public struct. </paragraph>
+                </desc_content>
+            </desc>
+            <index entries="['single',\ 'ClassTest::UndocumentedPrivateClass\ (C++\ class)',\ '_CPPv4N9ClassTest24UndocumentedPrivateClassE',\ '',\ None]"></index>
+            <desc classes="cpp class" desctype="class" domain="cpp" objtype="class">
+                <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword classes="k">class</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">UndocumentedPrivateClass</desc_sig_name></desc_name></desc_signature_line></desc_signature>
+                <desc_content>
+                </desc_content>
+            </desc>
+            <index entries="['single',\ 'ClassTest::UndocumentedPrivateStruct\ (C++\ struct)',\ '_CPPv4N9ClassTest25UndocumentedPrivateStructE',\ '',\ None]"></index>
+            <desc classes="cpp struct" desctype="struct" domain="cpp" objtype="struct">
+                <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword classes="k">struct</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">UndocumentedPrivateStruct</desc_sig_name></desc_name></desc_signature_line></desc_signature>
+                <desc_content>
+                </desc_content>
+            </desc>
+            <index entries="['single',\ 'ClassTest::UndocumentedProtectedClass\ (C++\ class)',\ '_CPPv4N9ClassTest26UndocumentedProtectedClassE',\ '',\ None]"></index>
+            <desc classes="cpp class" desctype="class" domain="cpp" objtype="class">
+                <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword classes="k">class</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">UndocumentedProtectedClass</desc_sig_name></desc_name></desc_signature_line></desc_signature>
+                <desc_content>
+                </desc_content>
+            </desc>
+            <index entries="['single',\ 'ClassTest::UndocumentedProtectedStruct\ (C++\ struct)',\ '_CPPv4N9ClassTest27UndocumentedProtectedStructE',\ '',\ None]"></index>
+            <desc classes="cpp struct" desctype="struct" domain="cpp" objtype="struct">
+                <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword classes="k">struct</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">UndocumentedProtectedStruct</desc_sig_name></desc_name></desc_signature_line></desc_signature>
+                <desc_content>
+                </desc_content>
+            </desc>
+            <index entries="['single',\ 'ClassTest::UndocumentedPublicClass\ (C++\ class)',\ '_CPPv4N9ClassTest23UndocumentedPublicClassE',\ '',\ None]"></index>
+            <desc classes="cpp class" desctype="class" domain="cpp" objtype="class">
+                <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword classes="k">class</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">UndocumentedPublicClass</desc_sig_name></desc_name></desc_signature_line></desc_signature>
+                <desc_content>
+                </desc_content>
+            </desc>
+            <index entries="['single',\ 'ClassTest::UndocumentedPublicStruct\ (C++\ struct)',\ '_CPPv4N9ClassTest24UndocumentedPublicStructE',\ '',\ None]"></index>
+            <desc classes="cpp struct" desctype="struct" domain="cpp" objtype="struct">
+                <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword classes="k">struct</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">UndocumentedPublicStruct</desc_sig_name></desc_name></desc_signature_line></desc_signature>
+                <desc_content>
+                </desc_content>
+            </desc>
+        </desc_content>
+    </desc>
+    <index entries="['single',\ 'TestNamespaceClasses\ (C++\ type)',\ '_CPPv420TestNamespaceClasses',\ '',\ None]"></index>
+    <desc classes="cpp type" desctype="type" domain="cpp" objtype="type">
+        <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword classes="k">namespace</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">TestNamespaceClasses</desc_sig_name></desc_name></desc_signature_line></desc_signature>
+        <desc_content>
+            <index entries="['single',\ 'TestNamespaceClasses::ClassTest\ (C++\ class)',\ '_CPPv4N20TestNamespaceClasses9ClassTestE',\ '',\ None]"></index>
+            <desc classes="cpp class" desctype="class" domain="cpp" objtype="class">
+                <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword classes="k">class</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">ClassTest</desc_sig_name></desc_name></desc_signature_line></desc_signature>
+                <desc_content>
+                    <paragraph>second class inside of namespace </paragraph>
+                    <container classes="breathe-sectiondef" objtype="public-func">
+                        <rubric classes="breathe-sectiondef-title">Public Functions</rubric>
+                        <index entries="['single',\ 'TestNamespaceClasses::ClassTest::function\ (C++\ function)',\ '_CPPv4N20TestNamespaceClasses9ClassTest8functionEv',\ '',\ None]"></index>
+                        <desc classes="cpp function" desctype="function" domain="cpp" objtype="function">
+                            <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword classes="k">inline</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_sig_keyword_type classes="kt">void</desc_sig_keyword_type><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">function</desc_sig_name></desc_name><desc_parameterlist></desc_parameterlist></desc_signature_line></desc_signature>
+                            <desc_content>
+                                <paragraph>second namespaced class function </paragraph>
+                            </desc_content>
+                        </desc>
+                        <index entries="['single',\ 'TestNamespaceClasses::ClassTest::anotherFunction\ (C++\ function)',\ '_CPPv4N20TestNamespaceClasses9ClassTest15anotherFunctionEv',\ '',\ None]"></index>
+                        <desc classes="cpp function" desctype="function" domain="cpp" objtype="function">
+                            <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword classes="k">inline</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_sig_keyword_type classes="kt">void</desc_sig_keyword_type><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">anotherFunction</desc_sig_name></desc_name><desc_parameterlist></desc_parameterlist></desc_signature_line></desc_signature>
+                            <desc_content>
+                                <paragraph>second namespaced class other function </paragraph>
+                            </desc_content>
+                        </desc>
+                    </container>
+                </desc_content>
+            </desc>
+            <index entries="['single',\ 'TestNamespaceClasses::NamespacedClassTest\ (C++\ class)',\ '_CPPv4N20TestNamespaceClasses19NamespacedClassTestE',\ '',\ None]"></index>
+            <desc classes="cpp class" desctype="class" domain="cpp" objtype="class">
+                <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword classes="k">class</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">NamespacedClassTest</desc_sig_name></desc_name></desc_signature_line></desc_signature>
+                <desc_content>
+                    <paragraph>first class inside of namespace </paragraph>
+                    <container classes="breathe-sectiondef" objtype="public-func">
+                        <rubric classes="breathe-sectiondef-title">Public Functions</rubric>
+                        <index entries="['single',\ 'TestNamespaceClasses::NamespacedClassTest::function\ (C++\ function)',\ '_CPPv4NK20TestNamespaceClasses19NamespacedClassTest8functionEv',\ '',\ None]"></index>
+                        <desc classes="cpp function" desctype="function" domain="cpp" objtype="function">
+                            <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword classes="k">virtual</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_sig_keyword_type classes="kt">void</desc_sig_keyword_type><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">function</desc_sig_name></desc_name><desc_parameterlist></desc_parameterlist><desc_sig_space classes="w"> </desc_sig_space><desc_sig_keyword classes="k">const</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_sig_punctuation classes="p">=</desc_sig_punctuation><desc_sig_space classes="w"> </desc_sig_space><desc_sig_literal_number classes="m">0</desc_sig_literal_number></desc_signature_line></desc_signature>
+                            <desc_content>
+                                <paragraph>namespaced class function </paragraph>
+                            </desc_content>
+                        </desc>
+                        <index entries="['single',\ 'TestNamespaceClasses::NamespacedClassTest::NamespacedClassTest\ (C++\ function)',\ '_CPPv4N20TestNamespaceClasses19NamespacedClassTest19NamespacedClassTestEv',\ '',\ None]"></index>
+                        <desc classes="cpp function" desctype="function" domain="cpp" objtype="function">
+                            <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword classes="k">inline</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_sig_keyword classes="k">explicit</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">NamespacedClassTest</desc_sig_name></desc_name><desc_parameterlist></desc_parameterlist></desc_signature_line></desc_signature>
+                            <desc_content>
+                            </desc_content>
+                        </desc>
+                        <index entries="['single',\ 'TestNamespaceClasses::NamespacedClassTest::anotherFunction\ (C++\ function)',\ '_CPPv4N20TestNamespaceClasses19NamespacedClassTest15anotherFunctionEv',\ '',\ None]"></index>
+                        <desc classes="cpp function" desctype="function" domain="cpp" objtype="function">
+                            <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword classes="k">inline</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_sig_keyword_type classes="kt">void</desc_sig_keyword_type><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">anotherFunction</desc_sig_name></desc_name><desc_parameterlist></desc_parameterlist></desc_signature_line></desc_signature>
+                            <desc_content>
+                                <paragraph>namespaced class other function </paragraph>
+                            </desc_content>
+                        </desc>
+                    </container>
+                    <container classes="breathe-sectiondef" objtype="public-static-func">
+                        <rubric classes="breathe-sectiondef-title">Public Static Functions</rubric>
+                        <index entries="['single',\ 'TestNamespaceClasses::NamespacedClassTest::functionS\ (C++\ function)',\ '_CPPv4N20TestNamespaceClasses19NamespacedClassTest9functionSEv',\ '',\ None]"></index>
+                        <desc classes="cpp function" desctype="function" domain="cpp" objtype="function">
+                            <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword classes="k">static</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_sig_keyword_type classes="kt">void</desc_sig_keyword_type><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">functionS</desc_sig_name></desc_name><desc_parameterlist></desc_parameterlist></desc_signature_line></desc_signature>
+                            <desc_content>
+                            </desc_content>
+                        </desc>
+                    </container>
+                </desc_content>
+            </desc>
+        </desc_content>
+    </desc>
+    <index entries="['single',\ 'NS1\ (C++\ type)',\ '_CPPv43NS1',\ '',\ None]"></index>
+    <desc classes="cpp type" desctype="type" domain="cpp" objtype="type">
+        <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword classes="k">namespace</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">NS1</desc_sig_name></desc_name></desc_signature_line></desc_signature>
+        <desc_content>
+            <container classes="breathe-sectiondef" objtype="func">
+                <rubric classes="breathe-sectiondef-title">Functions</rubric>
+                <index entries="['single',\ 'NS1::f1\ (C++\ function)',\ '_CPPv4I0EN3NS12f1Evv',\ '',\ None]"></index>
+                <desc classes="cpp function" desctype="function" domain="cpp" objtype="function">
+                    <desc_signature classes="sig sig-object cpp"><desc_signature_line><desc_sig_keyword classes="k">template</desc_sig_keyword><desc_sig_punctuation classes="p">&lt;</desc_sig_punctuation><desc_sig_keyword classes="k">typename</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">T</desc_sig_name></desc_name><desc_sig_punctuation classes="p">&gt;</desc_sig_punctuation></desc_signature_line><desc_signature_line><target></target><desc_sig_keyword_type classes="kt">void</desc_sig_keyword_type><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">f1</desc_sig_name></desc_name><desc_parameterlist></desc_parameterlist></desc_signature_line></desc_signature>
+                    <desc_content>
+                    </desc_content>
+                </desc>
+                <index entries="['single',\ 'NS1::f1&lt;std::string&gt;\ (C++\ function)',\ '_CPPv4IEN3NS12f1INSt6stringEEEvv',\ '',\ None]"></index>
+                <desc classes="cpp function" desctype="function" domain="cpp" objtype="function">
+                    <desc_signature classes="sig sig-object cpp"><desc_signature_line><desc_sig_keyword classes="k">template</desc_sig_keyword><desc_sig_punctuation classes="p">&lt;</desc_sig_punctuation><desc_sig_punctuation classes="p">&gt;</desc_sig_punctuation></desc_signature_line><desc_signature_line><target></target><desc_sig_keyword_type classes="kt">void</desc_sig_keyword_type><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">f1</desc_sig_name></desc_name><desc_sig_punctuation classes="p">&lt;</desc_sig_punctuation><desc_sig_name classes="n">std</desc_sig_name><desc_sig_punctuation classes="p">::</desc_sig_punctuation><desc_sig_name classes="n">string</desc_sig_name><desc_sig_punctuation classes="p">&gt;</desc_sig_punctuation><desc_parameterlist></desc_parameterlist></desc_signature_line></desc_signature>
+                    <desc_content>
+                    </desc_content>
+                </desc>
+            </container>
+            <index entries="['single',\ 'NS1::NS2\ (C++\ type)',\ '_CPPv4N3NS13NS2E',\ '',\ None]"></index>
+            <desc classes="cpp type" desctype="type" domain="cpp" objtype="type">
+                <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword classes="k">namespace</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">NS2</desc_sig_name></desc_name></desc_signature_line></desc_signature>
+                <desc_content>
+                    <container classes="breathe-sectiondef" objtype="func">
+                        <rubric classes="breathe-sectiondef-title">Functions</rubric>
+                        <index entries="['single',\ 'NS1::NS2::f2\ (C++\ function)',\ '_CPPv4I0EN3NS13NS22f2Evv',\ '',\ None]"></index>
+                        <desc classes="cpp function" desctype="function" domain="cpp" objtype="function">
+                            <desc_signature classes="sig sig-object cpp"><desc_signature_line><desc_sig_keyword classes="k">template</desc_sig_keyword><desc_sig_punctuation classes="p">&lt;</desc_sig_punctuation><desc_sig_keyword classes="k">typename</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">T</desc_sig_name></desc_name><desc_sig_punctuation classes="p">&gt;</desc_sig_punctuation></desc_signature_line><desc_signature_line><target></target><desc_sig_keyword_type classes="kt">void</desc_sig_keyword_type><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">f2</desc_sig_name></desc_name><desc_parameterlist></desc_parameterlist></desc_signature_line></desc_signature>
+                            <desc_content>
+                            </desc_content>
+                        </desc>
+                        <index entries="['single',\ 'NS1::NS2::f2&lt;std::string&gt;\ (C++\ function)',\ '_CPPv4IEN3NS13NS22f2INSt6stringEEEvv',\ '',\ None]"></index>
+                        <desc classes="cpp function" desctype="function" domain="cpp" objtype="function">
+                            <desc_signature classes="sig sig-object cpp"><desc_signature_line><desc_sig_keyword classes="k">template</desc_sig_keyword><desc_sig_punctuation classes="p">&lt;</desc_sig_punctuation><desc_sig_punctuation classes="p">&gt;</desc_sig_punctuation></desc_signature_line><desc_signature_line><target></target><desc_sig_keyword_type classes="kt">void</desc_sig_keyword_type><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">f2</desc_sig_name></desc_name><desc_sig_punctuation classes="p">&lt;</desc_sig_punctuation><desc_sig_name classes="n">std</desc_sig_name><desc_sig_punctuation classes="p">::</desc_sig_punctuation><desc_sig_name classes="n">string</desc_sig_name><desc_sig_punctuation classes="p">&gt;</desc_sig_punctuation><desc_parameterlist></desc_parameterlist></desc_signature_line></desc_signature>
+                            <desc_content>
+                            </desc_content>
+                        </desc>
+                    </container>
+                </desc_content>
+            </desc>
+        </desc_content>
+    </desc>
+</document>
