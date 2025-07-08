@@ -58,8 +58,9 @@ lint = [
     "pytest>=8.0",  # for mypy
     "sphinxcontrib-phpdomain",  # for mypy
     # The API that we depend on is only implemented in rogerbarton's fork of sphinx-csharp
-    # and not in the one that is published to PyPI
-    "sphinx-csharp @ git+https://github.com/rogerbarton/sphinx-csharp.git",  # for mypy
+    # and not in the one that is published to PyPI. But we can't publish Breathe to PyPI with
+    # a listed git dependency so we comment it out for the moment
+    # "sphinx-csharp @ git+https://github.com/rogerbarton/sphinx-csharp.git",  # for mypy
 ]
 test = [
     "pytest>=8.0",

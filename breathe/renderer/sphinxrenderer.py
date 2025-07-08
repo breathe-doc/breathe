@@ -36,7 +36,10 @@ except ImportError:
 
 cs: Any
 try:
-    from sphinx_csharp import csharp as cs  # type: ignore[import-untyped, no-redef]
+    # The only valid types for sphinx_csharp are in a git repo so we can't easily rely
+    # on them as we can't publish with a git repo dependency so we tell mypy to ignore
+    # an import failure here
+    from sphinx_csharp import csharp as cs  # type: ignore[import-not-found, no-redef]
 except ImportError:
     cs = None
 
