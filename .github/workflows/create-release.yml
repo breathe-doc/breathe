@@ -41,6 +41,12 @@ jobs:
           version: latest
           enable-cache: false
 
+      - name: Install Ruff
+        uses: astral-sh/ruff-action@v3
+        with:
+          args: --version
+          version: 0.9.2
+
       - name: Install build dependencies (pypa/build, twine)
         # Install jinja2 to make the parser - probably better to install it via
         # the Sphinx dependency in the pyproject.toml file but I don't know how
