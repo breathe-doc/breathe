@@ -1309,11 +1309,7 @@ class SphinxRenderer(metaclass=NodeVisitor):
             # Defer to domains specific directive.
 
             names = self.get_qualification()
-            # strip out any template arguments before splitting on '::', to
-            # avoid errors if a template specialization has qualified arguments
-            # (see examples/specific/cpp_ns_template_specialization)
-            cleaned_name, _sep, _rest = nodeDef.compoundname.partition("<")
-            cname = split_name(cleaned_name)
+            cname = split_name(nodeDef.compoundname)
             if self.nesting_level == 0:
                 names.extend(cname)
             else:
