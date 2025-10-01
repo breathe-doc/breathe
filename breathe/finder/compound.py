@@ -34,6 +34,9 @@ class CompoundDefTypeSubItemFinder(ItemFinder[parser.Node_compounddefType]):
         for innerclass in self.node.value.innerclass:
             self.run_filter(filter_, matches, node_stack, innerclass, "innerclass")
 
+        for innerconcept in self.node.value.innerconcept:
+            self.run_filter(filter_, matches, node_stack, innerconcept, "innerconcept")
+
 
 class SectionDefTypeSubItemFinder(ItemFinder[parser.Node_sectiondefType]):
     def filter_(self, ancestors, filter_: DoxFilter, matches: list[FinderMatch]) -> None:
