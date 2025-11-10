@@ -27,7 +27,7 @@ from breathe.directives.item import (
     DoxygenVariableDirective,
 )
 from breathe.parser import DoxygenParser
-from breathe.process import AutoDoxygenProcessHandle
+from breathe.process import AutoDoxygenProcessHandle, AutoDoxygenCache
 from breathe.project import ProjectInfoFactory
 
 if TYPE_CHECKING:
@@ -114,10 +114,13 @@ def setup(app: Sphinx) -> None:
     )
 
     def doxygen_hook(app: Sphinx):
+        if not hasattr(app.env, "breathe_doxygen_cache"):
+            app.env.breathe_doxygen_cache = AutoDoxygenCache()
         doxygen_handle.generate_xml(
             app.config.breathe_projects_source,
             app.config.breathe_doxygen_config_options,
             app.config.breathe_doxygen_aliases,
+            app.env.breathe_doxygen_cache,
         )
 
     app.connect("builder-inited", doxygen_hook)
