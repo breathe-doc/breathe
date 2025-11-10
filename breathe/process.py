@@ -5,8 +5,8 @@ from pathlib import Path
 from shlex import quote
 from typing import TYPE_CHECKING
 
-from breathe.project import AutoProjectInfo, ProjectInfoFactory
 from breathe.file_state_cache import MTimeError
+from breathe.project import AutoProjectInfo, ProjectInfoFactory
 
 if TYPE_CHECKING:
     from collections.abc import Mapping
@@ -42,9 +42,10 @@ class ProjectData:
         self.auto_project_info = auto_project_info
         self.files = files
 
+
 class AutoDoxygenCache:
     """Simple handler for the doxygen cache information."""
-    
+
     @staticmethod
     def _getmtime(filename: str):
         try:
@@ -61,7 +62,7 @@ class AutoDoxygenCache:
             return False  # No files to check, so no update needed?
         name = info.name()
         try:
-             #TODO: Are project names unique?
+            # TODO: Are project names unique?
             cached_time = self._cache[name]
         except KeyError:
             return True  # Project not cached yet
@@ -79,6 +80,7 @@ class AutoDoxygenCache:
             return
         mtime = max(self._getmtime(file_) for file_ in full_paths)
         self._cache[name] = mtime
+
 
 class AutoDoxygenProcessHandle:
     def __init__(
@@ -142,13 +144,13 @@ class AutoDoxygenProcessHandle:
 
         build_dir = Path(auto_project_info.build_dir(), "breathe", "doxygen")
         project_path = os.path.join(build_dir, name, "xml")
-        
-        if not doxygen_cache.needs_update(auto_project_info, files): 
-            #TODO: Should we also pass the config into the cache check, to see if that has changed?
+
+        if not doxygen_cache.needs_update(auto_project_info, files):
+            # TODO: Should we also pass the config into the cache check, to see if that has changed?
             return project_path
 
         cfgfile = f"{name}.cfg"
-        
+
         self.write_file(build_dir, cfgfile, cfg)
 
         # Shell-escape the cfg file name to try to avoid any issue where the name might include

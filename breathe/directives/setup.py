@@ -27,7 +27,7 @@ from breathe.directives.item import (
     DoxygenVariableDirective,
 )
 from breathe.parser import DoxygenParser
-from breathe.process import AutoDoxygenProcessHandle, AutoDoxygenCache
+from breathe.process import AutoDoxygenCache, AutoDoxygenProcessHandle
 from breathe.project import ProjectInfoFactory
 
 if TYPE_CHECKING:
