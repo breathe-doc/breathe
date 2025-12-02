@@ -70,6 +70,7 @@ class _DoxygenBaseItemDirective(BaseDirective):
         "project": unchanged_required,
         "outline": flag,
         "no-link": flag,
+        "noindex": flag,
     }
     has_content = False
 
