@@ -1705,6 +1705,7 @@ class SphinxRenderer(metaclass=NodeVisitor):
 
         # Take care of innerclasses
         addnode("innerclass", lambda: self.render_iterable(node.innerclass, "innerclass"))
+        addnode("innerconcept", lambda: self.render_iterable(node.innerconcept, "innerconcept"))
         addnode(
             "innernamespace", lambda: self.render_iterable(node.innernamespace, "innernamespace")
         )
