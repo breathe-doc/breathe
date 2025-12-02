@@ -5,6 +5,7 @@ from pathlib import Path
 from shlex import quote
 from typing import TYPE_CHECKING
 
+from breathe.file_state_cache import MTimeError
 from breathe.project import AutoProjectInfo, ProjectInfoFactory
 
 if TYPE_CHECKING:
@@ -42,6 +43,45 @@ class ProjectData:
         self.files = files
 
 
+class AutoDoxygenCache:
+    """Simple handler for the doxygen cache information."""
+
+    @staticmethod
+    def _getmtime(filename: str):
+        try:
+            return os.path.getmtime(filename)
+        except OSError:
+            raise MTimeError("Cannot find file: %s" % os.path.realpath(filename))
+
+    def __init__(self) -> None:
+        self._cache: dict[str, float] = {}
+
+    def needs_update(self, info: AutoProjectInfo, files: list[str]) -> bool:
+        """Check if any file is newer than the cached time for the provided project info."""
+        if not files:
+            return False  # No files to check, so no update needed?
+        name = info.name()
+        try:
+            # TODO: Are project names unique?
+            cached_time = self._cache[name]
+        except KeyError:
+            return True  # Project not cached yet
+
+        full_paths = [str(info.abs_path_to_source_file(f)) for f in files]
+        max_mtime = max(self._getmtime(file_) for file_ in full_paths)
+        return max_mtime > cached_time
+
+    def update_cache(self, info: AutoProjectInfo, files: list[str]) -> None:
+        """Update the cache entry for the provided project info."""
+        name = info.name()
+        full_paths = [str(info.abs_path_to_source_file(f)) for f in files]
+        if len(full_paths) == 0:
+            self._cache[name] = 0.0
+            return
+        mtime = max(self._getmtime(file_) for file_ in full_paths)
+        self._cache[name] = mtime
+
+
 class AutoDoxygenProcessHandle:
     def __init__(
         self,
@@ -58,6 +98,7 @@ class AutoDoxygenProcessHandle:
         projects_source: Mapping[str, tuple[str, list[str]]],
         doxygen_options: Mapping[str, str],
         doxygen_aliases: Mapping[str, str],
+        doxygen_cache: AutoDoxygenCache,
     ) -> None:
         project_files: dict[str, ProjectData] = {}
 
@@ -73,7 +114,7 @@ class AutoDoxygenProcessHandle:
         # a directory in the Sphinx build area
         for project_name, data in project_files.items():
             project_path = self.process(
-                data.auto_project_info, data.files, doxygen_options, doxygen_aliases
+                data.auto_project_info, data.files, doxygen_options, doxygen_aliases, doxygen_cache
             )
             project_info = data.auto_project_info.create_project_info(project_path)
             self.project_info_factory.store_project_info_for_auto(project_name, project_info)
@@ -84,6 +125,7 @@ class AutoDoxygenProcessHandle:
         files: list[str],
         doxygen_options: Mapping[str, str],
         doxygen_aliases: Mapping[str, str],
+        doxygen_cache: AutoDoxygenCache,
     ) -> str:
         name = auto_project_info.name()
         full_paths = [str(auto_project_info.abs_path_to_source_file(f)) for f in files]
@@ -101,7 +143,14 @@ class AutoDoxygenProcessHandle:
         )
 
         build_dir = Path(auto_project_info.build_dir(), "breathe", "doxygen")
+        project_path = os.path.join(build_dir, name, "xml")
+
+        if not doxygen_cache.needs_update(auto_project_info, files):
+            # TODO: Should we also pass the config into the cache check, to see if that has changed?
+            return project_path
+
         cfgfile = f"{name}.cfg"
+
         self.write_file(build_dir, cfgfile, cfg)
 
         # Shell-escape the cfg file name to try to avoid any issue where the name might include
@@ -109,4 +158,5 @@ class AutoDoxygenProcessHandle:
         # Windows. See issue #271
         self.run_process(f"doxygen {quote(cfgfile)}", cwd=build_dir, shell=True)
 
-        return os.path.join(build_dir, name, "xml")
+        doxygen_cache.update_cache(auto_project_info, files)
+        return project_path
