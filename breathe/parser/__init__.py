@@ -40,7 +40,7 @@ class Parser:
 
 class DoxygenIndexParser(Parser):
     def parse(self, project_info: ProjectInfo):
-        filename = resolve_path(self.app, project_info.project_path(), "index.xml")
+        filename = resolve_path(self.app.confdir, project_info.project_path(), "index.xml")
         file_state_cache.update(self.app, filename)
 
         try:
@@ -65,8 +65,7 @@ class DoxygenCompoundParser(Parser):
         self.project_info = project_info
 
     def parse(self, refid: str):
-        filename = resolve_path(self.app, self.project_info.project_path(), f"{refid}.xml")
-
+        filename = resolve_path(self.app.confdir, self.project_info.project_path(), f"{refid}.xml")
         file_state_cache.update(self.app, filename)
 
         try:

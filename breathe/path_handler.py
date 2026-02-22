@@ -2,10 +2,6 @@ from __future__ import annotations
 
 from functools import lru_cache
 from pathlib import Path
-from typing import TYPE_CHECKING
-
-if TYPE_CHECKING:
-    from sphinx.application import Sphinx
 
 
 def includes_directory(file_path: str):
@@ -14,9 +10,11 @@ def includes_directory(file_path: str):
     return bool(str(file_path).count("\\")) or bool(str(file_path).count("/"))
 
 
-@lru_cache(maxsize=2048)
-def _resolved_path(confdir: str, dir: str, filename: str) -> Path:
-    """Memoized version of Path.resolve() to avoid redundant filesystem operations.
+@lru_cache()
+def resolve_path(confdir: str, directory: str, filename: str) -> Path:
+    """Returns a full path to the filename in the given directory assuming that if the directory
+    path is relative, then it is relative to the conf.py directory.
+    It is memoized to avoid redundant filesystem operations.
 
     Args:
         confdir: Path to the conf.py directory
@@ -26,12 +24,4 @@ def _resolved_path(confdir: str, dir: str, filename: str) -> Path:
     Returns:
         Resolved Path object
     """
-    return Path(confdir, dir, filename).resolve()
-
-
-def resolve_path(app: Sphinx, directory: str, filename: str) -> Path:
-    """Returns a full path to the filename in the given directory assuming that if the directory
-    path is relative, then it is relative to the conf.py directory.
-    """
-
-    return _resolved_path(app.confdir, directory, filename)
+    return Path(confdir, directory, filename).resolve()

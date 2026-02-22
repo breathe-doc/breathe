@@ -43,7 +43,7 @@ class AutoProjectInfo:
         projects conf.py directory as specified in the breathe_projects_source config variable.
         """
 
-        return resolve_path(self.app, self._source_path, file_)
+        return resolve_path(self.app.confdir, self._source_path, file_)
 
     def create_project_info(self, project_path):
         """Creates a proper ProjectInfo object based on the information in this AutoProjectInfo"""
