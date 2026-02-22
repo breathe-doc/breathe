@@ -6,6 +6,7 @@ from pathlib import Path
 from typing import TYPE_CHECKING
 
 from breathe.exception import BreatheError
+from breathe.path_handler import resolve_path
 
 if TYPE_CHECKING:
     from sphinx.application import Sphinx
@@ -42,7 +43,7 @@ class AutoProjectInfo:
         projects conf.py directory as specified in the breathe_projects_source config variable.
         """
 
-        return Path(self.app.confdir, self._source_path, file_).resolve()
+        return resolve_path(self.app, self._source_path, file_)
 
     def create_project_info(self, project_path):
         """Creates a proper ProjectInfo object based on the information in this AutoProjectInfo"""

@@ -5,6 +5,7 @@ from typing import TYPE_CHECKING
 
 from breathe import file_state_cache
 from breathe.parser import compound, index
+from breathe.path_handler import resolve_path
 
 if TYPE_CHECKING:
     from sphinx.application import Sphinx
@@ -39,7 +40,7 @@ class Parser:
 
 class DoxygenIndexParser(Parser):
     def parse(self, project_info: ProjectInfo):
-        filename = Path(self.app.confdir, project_info.project_path(), "index.xml").resolve()
+        filename = resolve_path(self.app, project_info.project_path(), "index.xml")
         file_state_cache.update(self.app, filename)
 
         try:
@@ -64,9 +65,7 @@ class DoxygenCompoundParser(Parser):
         self.project_info = project_info
 
     def parse(self, refid: str):
-        filename = Path(
-            self.app.confdir, self.project_info.project_path(), f"{refid}.xml"
-        ).resolve()
+        filename = resolve_path(self.app, self.project_info.project_path(), f"{refid}.xml")
 
         file_state_cache.update(self.app, filename)
 

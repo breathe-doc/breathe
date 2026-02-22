@@ -5,6 +5,7 @@ from pathlib import Path
 from docutils import nodes
 from docutils.parsers.rst.states import Text
 from docutils.statemachine import StringList, UnexpectedIndentationError
+from breathe.path_handler import resolve_path
 from sphinx import addnodes
 from sphinx.domains import c, cpp, python
 from sphinx.ext.graphviz import graphviz
@@ -2378,7 +2379,7 @@ class SphinxRenderer:
             # Use self.project_info.project_path as the XML_OUTPUT path, and
             # make it absolute with consideration to the conf.py path
             project_path = self.project_info.project_path()
-            dot_file_path = Path(self.app.confdir, project_path, dot_file_path).resolve()
+            dot_file_path = resolve_path(self.app, project_path, str(dot_file_path))
         try:
             dotcode = dot_file_path.read_text(encoding="utf-8")
             if not dotcode.rstrip("\n"):
