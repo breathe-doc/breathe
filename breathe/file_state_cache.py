@@ -31,11 +31,13 @@ def _getmtime(filename: str):
         raise MTimeError("Cannot find file: %s" % os.path.realpath(filename))
 
 
-def update(app: Sphinx, source_file: str | os.PathLike[str]) -> None:
+def update(app: Sphinx, source_file: Path) -> None:
+    # The source file should have already been processed with resolve_path
+    assert source_file.is_absolute()
     if not hasattr(app.env, "breathe_file_state"):
         app.env.breathe_file_state = {}  # type: ignore[attr-defined]
 
-    norm_source_file = Path(source_file).resolve().as_posix()
+    norm_source_file = source_file.as_posix()
     new_mtime = _getmtime(norm_source_file)
     _mtime, docnames = app.env.breathe_file_state.setdefault(  # type: ignore[attr-defined]
         norm_source_file, (new_mtime, set())
