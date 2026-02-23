@@ -1,8 +1,7 @@
 from __future__ import annotations
 
-from functools import lru_cache
 from pathlib import Path
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 from breathe import file_state_cache
 from breathe.parser import compound, index
@@ -33,31 +32,48 @@ class FileIOError(Exception):
         self.filename = filename
 
 
+# Within-execution memoization that does not touch fstat
+_ephemeral_parse_cache: dict[Path, Any] = {}
+
+
 class Parser:
     def __init__(self, app: Sphinx, cache):
         self.app = app
         self.cache = cache
 
+    def _cached_parse(self, module, project_info: ProjectInfo, rel_filename: str):
+        filename = resolve_path(self.app.confdir, project_info.project_path(), rel_filename)
+        try:
+            return _ephemeral_parse_cache[filename]
+        except KeyError:
+            pass
+
+        # Get from persistent cache
+        file_state_cache.update(self.app, filename)
+        try:
+            result = self.cache[filename]
+        except KeyError:
+            pass
+        else:
+            _ephemeral_parse_cache[filename] = result
+            return result
+
+        # Not cached: parse it afresh
+        try:
+            result = module.parse(filename)
+        except module.ParseError as e:
+            raise ParserError(e, filename)
+        except module.FileIOError as e:
+            raise FileIOError(e, filename)
+        else:
+            self.cache[filename] = result
+            _ephemeral_parse_cache[filename] = result
+            return result
+
 
 class DoxygenIndexParser(Parser):
-    @lru_cache(maxsize=32768)
     def parse(self, project_info: ProjectInfo):
-        filename = resolve_path(self.app.confdir, project_info.project_path(), "index.xml")
-        file_state_cache.update(self.app, filename)
-
-        try:
-            # Try to get from our cache
-            return self.cache[filename]
-        except KeyError:
-            # If that fails, parse it afresh
-            try:
-                result = index.parse(filename)
-                self.cache[filename] = result
-                return result
-            except index.ParseError as e:
-                raise ParserError(e, filename)
-            except index.FileIOError as e:
-                raise FileIOError(e, filename)
+        return self._cached_parse(index, project_info, "index.xml")
 
 
 class DoxygenCompoundParser(Parser):
@@ -66,24 +82,8 @@ class DoxygenCompoundParser(Parser):
 
         self.project_info = project_info
 
-    @lru_cache(maxsize=32768)
     def parse(self, refid: str):
-        filename = resolve_path(self.app.confdir, self.project_info.project_path(), f"{refid}.xml")
-        file_state_cache.update(self.app, filename)
-
-        try:
-            # Try to get from our cache
-            return self.cache[filename]
-        except KeyError:
-            # If that fails, parse it afresh
-            try:
-                result = compound.parse(filename)
-                self.cache[filename] = result
-                return result
-            except compound.ParseError as e:
-                raise ParserError(e, filename)
-            except compound.FileIOError as e:
-                raise FileIOError(e, filename)
+        return self._cached_parse(compound, self.project_info, refid + ".xml")
 
 
 class DoxygenParserFactory:
