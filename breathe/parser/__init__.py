@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from functools import lru_cache
 from pathlib import Path
 from typing import TYPE_CHECKING
 
@@ -39,6 +40,7 @@ class Parser:
 
 
 class DoxygenIndexParser(Parser):
+    @lru_cache(maxsize=32768)
     def parse(self, project_info: ProjectInfo):
         filename = resolve_path(self.app.confdir, project_info.project_path(), "index.xml")
         file_state_cache.update(self.app, filename)
@@ -64,6 +66,7 @@ class DoxygenCompoundParser(Parser):
 
         self.project_info = project_info
 
+    @lru_cache(maxsize=32768)
     def parse(self, refid: str):
         filename = resolve_path(self.app.confdir, self.project_info.project_path(), f"{refid}.xml")
         file_state_cache.update(self.app, filename)

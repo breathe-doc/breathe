@@ -10,7 +10,7 @@ def includes_directory(file_path: str):
     return bool(str(file_path).count("\\")) or bool(str(file_path).count("/"))
 
 
-@lru_cache()
+@lru_cache(maxsize=32768)
 def resolve_path(confdir: str, directory: str, filename: str) -> Path:
     """Returns a full path to the filename in the given directory assuming that if the directory
     path is relative, then it is relative to the conf.py directory.
