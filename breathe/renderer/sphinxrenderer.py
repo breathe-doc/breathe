@@ -2563,7 +2563,7 @@ class SphinxRenderer(metaclass=NodeVisitor):
             if not isinstance(render_nodes[0], nodes.paragraph):
                 separator = " "
                 assert isinstance(render_nodes[0], nodes.Text)
-                if not render_nodes[0].startswith("="):
+                if not render_nodes[0].lstrip().startswith("="):
                     separator += "= "
                 signature.append(nodes.Text(separator))
             signature.extend(render_nodes)
