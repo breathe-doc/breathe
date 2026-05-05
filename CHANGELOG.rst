@@ -3,6 +3,13 @@ Change Log
 
 Inspired by `Keepachangelog.com <https://keepachangelog.com/>`__.
 
+- Unreleased
+
+  - Added ``-M, --markdown`` option to ``breathe-apidoc`` to generate Markdown
+    (MyST) output files instead of reStructuredText. When used, the default file
+    suffix is automatically changed to ``.md`` and directives use MyST fenced
+    directive syntax.
+
 - 2025-07-08 - **Breathe v5.0.0a5**
 
   Adjust create-release process to include ruff for formatting generated ``_parser.py`` file.
