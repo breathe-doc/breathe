@@ -2,9 +2,9 @@
 breathe.apidoc
 ~~~~~~~~~~~~~~
 
-Parses doxygen XML tree looking for C/C++ modules and creates ReST files
-appropriately to create code documentation with Sphinx. It also creates a
-modules index (See TYPEDICT below.).
+Parses doxygen XML tree looking for C/C++ modules and creates ReST or
+Markdown (MyST) files appropriately to create code documentation with Sphinx.
+It also creates a modules index (See TYPEDICT below.).
 
 This is derived from the "sphinx-autopackage" script, which is:
 Copyright 2008 Société des arts technologiques (SAT),
@@ -68,19 +68,29 @@ def write_file(name, text, args):
         fname.write_text(text, encoding="utf-8")
 
 
-def format_heading(level, text):
+def format_heading(level, text, markdown=False):
     """Create a heading of <level> [1, 2 or 3 supported]."""
+    if markdown:
+        return "%s %s\n\n" % ("#" * level, text)
     underlining = ["=", "-", "~"][level - 1] * len(text)
     return "%s\n%s\n\n" % (text, underlining)
 
 
 def format_directive(package_type, package, args):
     """Create the breathe directive and add the options."""
-    directive = ".. doxygen%s:: %s\n" % (package_type, package)
-    if args.project:
-        directive += "   :project: %s\n" % args.project
-    if args.members and package_type in MEMBERS_TYPES:
-        directive += "   :members:\n"
+    if args.markdown:
+        directive = "```{doxygen%s} %s\n" % (package_type, package)
+        if args.project:
+            directive += ":project: %s\n" % args.project
+        if args.members and package_type in MEMBERS_TYPES:
+            directive += ":members:\n"
+        directive += "```\n"
+    else:
+        directive = ".. doxygen%s:: %s\n" % (package_type, package)
+        if args.project:
+            directive += "   :project: %s\n" % args.project
+        if args.members and package_type in MEMBERS_TYPES:
+            directive += "   :members:\n"
     return directive
 
 
@@ -89,7 +99,7 @@ def create_package_file(package, package_type, package_id, args):
     # Skip over types that weren't requested
     if package_type not in args.outtypes:
         return
-    text = format_heading(1, "%s %s" % (TYPEDICT[package_type], package))
+    text = format_heading(1, "%s %s" % (TYPEDICT[package_type], package), markdown=args.markdown)
     text += format_directive(package_type, package, args)
 
     write_file(Path(package_type, package_id), text, args)
@@ -99,10 +109,16 @@ def create_modules_toc_file(key, value, args):
     """Create the module's index."""
     if not Path(args.destdir, key).is_dir():
         return
-    text = format_heading(1, "%s list" % value)
-    text += ".. toctree::\n"
-    text += "   :glob:\n\n"
-    text += "   %s/*\n" % key
+    text = format_heading(1, "%s list" % value, markdown=args.markdown)
+    if args.markdown:
+        text += "```{toctree}\n"
+        text += ":glob:\n\n"
+        text += "%s/*\n" % key
+        text += "```\n"
+    else:
+        text += ".. toctree::\n"
+        text += "   :glob:\n\n"
+        text += "   %s/*\n" % key
 
     write_file("%slist" % key, text, args)
 
@@ -140,8 +156,8 @@ def main():
     """Parse and check the command line arguments."""
     parser = argparse.ArgumentParser(
         description="""\
-Parse XML created by Doxygen in <rootpath> and create one reST file with
-breathe generation directives per definition in the <DESTDIR>.
+Parse XML created by Doxygen in <rootpath> and create one reST (or Markdown)
+file with breathe generation directives per definition in the <DESTDIR>.
 
 Note: By default this script will not overwrite already created files.""",
         formatter_class=argparse.RawDescriptionHelpFormatter,
@@ -202,6 +218,13 @@ Note: By default this script will not overwrite already created files.""",
         help="types of output to generate, comma-separated list",
     )
     parser.add_argument(
+        "-M",
+        "--markdown",
+        action="store_true",
+        dest="markdown",
+        help="Generate Markdown (MyST) output instead of reStructuredText",
+    )
+    parser.add_argument(
         "-q", "--quiet", action="store_true", dest="quiet", help="suppress informational messages"
     )
     parser.add_argument(
@@ -210,6 +233,8 @@ Note: By default this script will not overwrite already created files.""",
     parser.add_argument("rootpath", type=str, help="The directory contains index.xml")
     args = parser.parse_args()
 
+    if args.markdown and args.suffix == "rst":
+        args.suffix = "md"
     args.suffix = args.suffix.removeprefix(".")
     if not os.path.isdir(args.rootpath):
         print("%s is not a directory." % args.rootpath, file=sys.stderr)
