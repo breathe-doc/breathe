@@ -209,7 +209,8 @@ def test_find_node():
     section.children = [foo, desc, bar]
     assert find_node(section, "description") == desc
     check_exception(
-        lambda: find_node([section, desc], "description"), "the number of nodes description is 2"
+        lambda: find_node([section, desc], "description"),
+        "the number of nodes description is 2",
     )
     check_exception(lambda: find_node([], "description"), "the number of nodes description is 0")
     check_exception(lambda: find_node([section], "unknown"), "the number of nodes unknown is 0")
@@ -217,7 +218,12 @@ def test_find_node():
 
 
 def render(
-    app, member_def, domain=None, show_define_initializer=False, dox_parser=None, options=[]
+    app,
+    member_def,
+    domain=None,
+    show_define_initializer=False,
+    dox_parser=None,
+    options=[],
 ):
     """Render Doxygen *member_def* with *renderer_class*."""
 
@@ -439,6 +445,22 @@ def test_render_define_no_initializer(app):
     )
     signature = find_node(render(app, member_def), "desc_signature")
     assert signature.astext() == "USE_MILK"
+
+
+def test_render_variable_initializer_with_leading_space(app):
+    member_def = parser.Node_memberdefType(
+        kind=parser.DoxMemberKind.variable,
+        definition="Limit AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+        type=parser.Node_linkedTextType(["Limit"]),
+        name="AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+        initializer=parser.Node_linkedTextType([f"{' ' * 85}= \nLimit::HIGH"]),
+        **COMMON_ARGS_memberdefType,
+    )
+    signature = find_node(render(app, member_def), "desc_signature")
+    assert (
+        signature.astext()
+        == "Limit AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA = Limit::HIGH"
+    )
 
 
 def test_render_innergroup(app):
