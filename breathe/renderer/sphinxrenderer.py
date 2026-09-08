@@ -554,16 +554,12 @@ def get_content(node: parser.Node_docParaType):
     )
 
 
-def get_parameterlists(
-    node: parser.Node_docParaType,
-) -> Iterable[parser.Node_docParamListType]:
+def get_parameterlists(node: parser.Node_docParaType) -> Iterable[parser.Node_docParamListType]:
     pairs = map(parser.tag_name_value, node)  # type: ignore[arg-type]
     return (value for name, value in pairs if name == "parameterlist")  # type: ignore[misc]
 
 
-def get_simplesects(
-    node: parser.Node_docParaType,
-) -> Iterable[parser.Node_docSimpleSectType]:
+def get_simplesects(node: parser.Node_docParaType) -> Iterable[parser.Node_docSimpleSectType]:
     pairs = map(parser.tag_name_value, node)  # type: ignore[arg-type]
     return (value for name, value in pairs if name == "simplesect")  # type: ignore[misc]
 
@@ -808,11 +804,7 @@ class SphinxRenderer(metaclass=NodeVisitor):
         return sep.join(names)
 
     def run_directive(
-        self,
-        obj_type: str,
-        declaration: str,
-        contentCallback: ContentCallback,
-        options={},
+        self, obj_type: str, declaration: str, contentCallback: ContentCallback, options={}
     ) -> list[nodes.Node]:
         assert self.context is not None
         args = [obj_type, [declaration]] + self.context.directive_args[2:]
@@ -877,16 +869,12 @@ class SphinxRenderer(metaclass=NodeVisitor):
             contentnode.extend(rendered_data)
 
         return self.handle_declaration(
-            node,
-            obj_type,
-            declaration,
-            content_callback=content,
-            display_obj_type=display_obj_type,
+            node, obj_type, declaration, content_callback=content, display_obj_type=display_obj_type
         )
 
     def handle_declaration(
         self,
-        node: (parser.Node_compounddefType | parser.Node_memberdefType | parser.Node_enumvalueType),
+        node: parser.Node_compounddefType | parser.Node_memberdefType | parser.Node_enumvalueType,
         obj_type: str,
         declaration: str,
         *,
@@ -1152,8 +1140,7 @@ class SphinxRenderer(metaclass=NodeVisitor):
                         "para",
                         parser.Node_docParaType([
                             parser.TaggedValue[
-                                Literal["parameterlist"],
-                                parser.Node_docParamListType,
+                                Literal["parameterlist"], parser.Node_docParamListType
                             ](
                                 "parameterlist",
                                 parser.Node_docParamListType(
@@ -1227,11 +1214,7 @@ class SphinxRenderer(metaclass=NodeVisitor):
             signature.insert(0, annotation)
 
     def render_declaration(
-        self,
-        node: parser.Node_memberdefType,
-        declaration=None,
-        description=None,
-        **kwargs,
+        self, node: parser.Node_memberdefType, declaration=None, description=None, **kwargs
     ):
         if declaration is None:
             declaration = self.get_fully_qualified_name()
@@ -1303,12 +1286,7 @@ class SphinxRenderer(metaclass=NodeVisitor):
             declaration = self.join_nested_name(names)
 
             nodes_ = self.handle_compounddef_declaration(
-                nodeDef,
-                nodeDef.kind.value,
-                declaration,
-                file_data,
-                new_context,
-                parent_context,
+                nodeDef, nodeDef.kind.value, declaration, file_data, new_context, parent_context
             )
         return nodes_
 
@@ -1421,21 +1399,13 @@ class SphinxRenderer(metaclass=NodeVisitor):
         node: HasRefID,
         render_empty_node=True,
         *,
-        get_node_info: (
-            Callable[[parser.Node_DoxygenType], tuple[str, parser.DoxCompoundKind]] | None
-        ) = None,
-        render_signature: (
-            Callable[
-                [
-                    parser.Node_DoxygenType,
-                    Sequence[nodes.Element],
-                    str,
-                    parser.DoxCompoundKind,
-                ],
-                tuple[list[nodes.Node], addnodes.desc_content],
-            ]
-            | None
-        ) = None,
+        get_node_info: Callable[[parser.Node_DoxygenType], tuple[str, parser.DoxCompoundKind]]
+        | None = None,
+        render_signature: Callable[
+            [parser.Node_DoxygenType, Sequence[nodes.Element], str, parser.DoxCompoundKind],
+            tuple[list[nodes.Node], addnodes.desc_content],
+        ]
+        | None = None,
     ) -> list[nodes.Node]:
         # Read in the corresponding xml file and process
         file_data = self.parse_compound(node.refid)
@@ -1476,10 +1446,7 @@ class SphinxRenderer(metaclass=NodeVisitor):
             return []
 
         def def_render_signature(
-            file_data: parser.Node_DoxygenType,
-            doxygen_target,
-            name,
-            kind: parser.DoxCompoundKind,
+            file_data: parser.Node_DoxygenType, doxygen_target, name, kind: parser.DoxCompoundKind
         ) -> tuple[list[nodes.Node], addnodes.desc_content]:
             # Defer to domains specific directive.
 
@@ -1673,8 +1640,7 @@ class SphinxRenderer(metaclass=NodeVisitor):
         if "members-only" not in options:
             if "allow-dot-graphs" in options:
                 addnode(
-                    "incdepgraph",
-                    lambda: self.render_optional(node.incdepgraph, "incdepgraph"),
+                    "incdepgraph", lambda: self.render_optional(node.incdepgraph, "incdepgraph")
                 )
                 addnode(
                     "invincdepgraph",
@@ -1691,8 +1657,7 @@ class SphinxRenderer(metaclass=NodeVisitor):
 
             addnode("briefdescription", lambda: self.render_optional(node.briefdescription))
             addnode(
-                "detaileddescription",
-                lambda: self.detaileddescription(node.detaileddescription),
+                "detaileddescription", lambda: self.detaileddescription(node.detaileddescription)
             )
 
             def render_derivedcompoundref(node):
@@ -1703,16 +1668,12 @@ class SphinxRenderer(metaclass=NodeVisitor):
                     return []
                 return [
                     nodes.paragraph(
-                        "",
-                        "",
-                        nodes.Text("Subclassed by "),
-                        *intersperse(output, nodes.Text(", ")),
+                        "", "", nodes.Text("Subclassed by "), *intersperse(output, nodes.Text(", "))
                     )
                 ]
 
             addnode(
-                "derivedcompoundref",
-                lambda: render_derivedcompoundref(node.derivedcompoundref),
+                "derivedcompoundref", lambda: render_derivedcompoundref(node.derivedcompoundref)
             )
 
         section_nodelists: dict[str, list[nodes.Node]] = {}
@@ -1745,8 +1706,7 @@ class SphinxRenderer(metaclass=NodeVisitor):
         # Take care of innerclasses
         addnode("innerclass", lambda: self.render_iterable(node.innerclass, "innerclass"))
         addnode(
-            "innernamespace",
-            lambda: self.render_iterable(node.innernamespace, "innernamespace"),
+            "innernamespace", lambda: self.render_iterable(node.innernamespace, "innernamespace")
         )
 
         if "inner" in options:
@@ -1810,8 +1770,7 @@ class SphinxRenderer(metaclass=NodeVisitor):
     @node_handler(parser.Node_docRefTextType)
     @node_handler(parser.Node_refTextType)
     def visit_docreftext(
-        self,
-        node: (parser.Node_docRefTextType | parser.Node_incType | parser.Node_refTextType),
+        self, node: parser.Node_docRefTextType | parser.Node_incType | parser.Node_refTextType
     ) -> list[nodes.Node]:
         nodelist: list[nodes.Node]
 
@@ -1987,7 +1946,7 @@ class SphinxRenderer(metaclass=NodeVisitor):
 
     def visit_docsectN(
         self,
-        node: (parser.Node_docSect1Type | parser.Node_docSect2Type | parser.Node_docSect3Type),
+        node: parser.Node_docSect1Type | parser.Node_docSect2Type | parser.Node_docSect3Type,
         depth: int,
     ) -> list[nodes.Node]:
         """
@@ -2003,11 +1962,7 @@ class SphinxRenderer(metaclass=NodeVisitor):
         for n in self.context.node_stack[1:]:
             if isinstance(
                 n.value,
-                (
-                    parser.Node_docSect1Type,
-                    parser.Node_docSect2Type,
-                    parser.Node_docSect3Type,
-                ),
+                (parser.Node_docSect1Type, parser.Node_docSect2Type, parser.Node_docSect3Type),
             ):
                 actual_d += 1
 
@@ -2090,13 +2045,7 @@ class SphinxRenderer(metaclass=NodeVisitor):
             if latex.startswith("$") and latex.endswith("$"):
                 latex = latex[1:-1]
                 nodelist.append(
-                    nodes.math(
-                        text=latex,
-                        label=None,
-                        nowrap=False,
-                        docname=docname,
-                        number=None,
-                    )
+                    nodes.math(text=latex, label=None, nowrap=False, docname=docname, number=None)
                 )
             # Else we're multiline
             else:
@@ -2105,11 +2054,7 @@ class SphinxRenderer(metaclass=NodeVisitor):
 
                 nodelist.append(
                     nodes.math_block(
-                        text=latex,
-                        label=None,
-                        nowrap=False,
-                        docname=docname,
-                        number=None,
+                        text=latex, label=None, nowrap=False, docname=docname, number=None
                     )
                 )
         return nodelist
@@ -2451,10 +2396,7 @@ class SphinxRenderer(metaclass=NodeVisitor):
                     elements.append("inline")
                 if node.kind == parser.DoxMemberKind.friend:
                     elements.append("friend")
-                if node.virt in (
-                    parser.DoxVirtualKind.virtual,
-                    parser.DoxVirtualKind.pure_virtual,
-                ):
+                if node.virt in (parser.DoxVirtualKind.virtual, parser.DoxVirtualKind.pure_virtual):
                     elements.append("virtual")
                 if node.explicit:
                     elements.append("explicit")
@@ -2828,10 +2770,7 @@ class SphinxRenderer(metaclass=NodeVisitor):
                                 parser.DoxParamDir.out: "[out]",
                                 parser.DoxParamDir.inout: "[inout]",
                             }[paramName.direction]
-                            parameterDirectionNodes = [
-                                nodes.strong(dir, dir),
-                                nodes.Text(" "),
-                            ]
+                            parameterDirectionNodes = [nodes.strong(dir, dir), nodes.Text(" ")]
             # it seems that Sphinx expects the name to be a single node,
             # so let's make it that
             txt = fieldListName[node.kind] + " "
@@ -3084,10 +3023,7 @@ class SphinxRenderer(metaclass=NodeVisitor):
         return self.render(item.value, None, item.name)
 
     def render(
-        self,
-        node: parser.NodeOrValue,
-        context: RenderContext | None = None,
-        tag: str | None = None,
+        self, node: parser.NodeOrValue, context: RenderContext | None = None, tag: str | None = None
     ) -> list[nodes.Node]:
         if context is None:
             assert self.context is not None
