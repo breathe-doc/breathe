@@ -85,7 +85,7 @@ def create_render_filter(
 
 def create_content_filter(kind: Literal["group", "page", "namespace"]) -> filter.DoxFilter:
     """Returns a filter which matches the contents of the or namespace but not the group or
-    namepace name or description.
+    namespace name or description.
 
     This allows the groups to be used to structure sections of the documentation rather than to
     structure and further document groups of documentation
