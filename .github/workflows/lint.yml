@@ -55,7 +55,7 @@ jobs:
     - name: Set up Python
       uses: actions/setup-python@v6
       with:
-        python-version: "3"
+        python-version: "3.9"
 
     - name: Install dependencies
       # "--editable" is needed so that _parser.py is placed in the local folder

@@ -52,10 +52,10 @@ docs = [
 ]
 lint = [
     "ruff==0.9.2",
-    "mypy>=1",
+    "mypy>=1,<1.10",
     "types-docutils",
     "types-Pygments",
-    "pytest>=8.0",  # for mypy
+    "pytest>=8.0,<9",  # for mypy
     "sphinxcontrib-phpdomain",  # for mypy
     # The API that we depend on is only implemented in rogerbarton's fork of sphinx-csharp
     # and not in the one that is published to PyPI. But we can't publish Breathe to PyPI with
@@ -63,7 +63,7 @@ lint = [
     # "sphinx-csharp @ git+https://github.com/rogerbarton/sphinx-csharp.git",  # for mypy
 ]
 test = [
-    "pytest>=8.0",
+    "pytest>=8.0,<9",
     "Sphinx[test]"
 ]
 

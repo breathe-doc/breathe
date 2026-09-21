@@ -38,10 +38,8 @@ jobs:
           - '3.11'
           - '3.12'
           - '3.13'
+          - '3.14'
         sphinx-version:
-          - '6.2'
-          - '7.0'
-          - '7.1'
           - '7.2' # Ubuntu 24.04
           # version 7.3 broke up the domain modules into packages, changing
           # where some classes had to be imported from
@@ -111,6 +109,12 @@ jobs:
         pip install --upgrade pip
         pip install --editable .[build]
         pip install --editable .[test]
+
+    - name: Version info
+      run: |
+        echo 'python: ' && python --version
+        echo 'sphinx: ' && sphinx-build --version
+        echo 'doxygen: ' && doxygen --version
 
     - name: Generate parser
       run: |
