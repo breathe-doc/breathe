@@ -5,13 +5,12 @@ from pathlib import Path
 from shlex import quote
 from typing import TYPE_CHECKING
 
-from breathe.project import AutoProjectInfo, ProjectInfoFactory
-
 if TYPE_CHECKING:
     from collections.abc import Mapping
     from typing import Callable
 
     from breathe.project import AutoProjectInfo, ProjectInfoFactory
+
 
 AUTOCFG_TEMPLATE = r"""
 PROJECT_NAME     = "{project_name}"
