@@ -29,7 +29,7 @@ extensions = [
 
 master_doc = "index"
 project = "Breathe"
-copyright = "2009-2025, Michael Jones"
+project_copyright = "2009-%Y, Michael Jones"
 
 if os.getenv("BREATHE_COMPARE") == "True":
     # If we're doing a comparison then set the version & release to 'compare'
