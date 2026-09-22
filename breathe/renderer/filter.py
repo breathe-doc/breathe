@@ -295,18 +295,15 @@ def create_class_filter(app: Sphinx, target: str, options: DoxClassOptions) -> D
     o_filter = create_outline_filter(filter_options)
     s_filter = create_show_filter(filter_options)
 
-    return (
-        lambda nstack: cm_filter(nstack)
-        and ic_filter(nstack)
-        and o_filter(nstack)
-        and s_filter(nstack)
+    return lambda nstack: (
+        cm_filter(nstack) and ic_filter(nstack) and o_filter(nstack) and s_filter(nstack)
     )
 
 
 def create_outline_filter(options: Mapping[str, Any]) -> DoxFilter:
     if "outline" in options:
-        return lambda nstack: not isinstance(
-            nstack.node, (parser.Node_descriptionType, parser.Node_incType)
+        return lambda nstack: (
+            not isinstance(nstack.node, (parser.Node_descriptionType, parser.Node_incType))
         )
 
     return lambda nstack: True
