@@ -453,7 +453,7 @@ def test_render_variable_initializer_with_leading_space(app):
         definition="Limit AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
         type=parser.Node_linkedTextType(["Limit"]),
         name="AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
-        initializer=parser.Node_linkedTextType([f"{' ' * 85}= \nLimit::HIGH"]),
+        initializer=parser.Node_linkedTextType([f"{' ' * 85}= \n", 'Limit::HIGH']),
         **COMMON_ARGS_memberdefType,
     )
     signature = find_node(render(app, member_def), "desc_signature")
