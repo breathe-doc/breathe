@@ -1,7 +1,9 @@
 version: 2
 
-python:
-  version: 3
+build:
+  os: ubuntu-24.04
+  tools:
+    python: "3.14"
 
 sphinx:
   builder: html
