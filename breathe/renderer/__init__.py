@@ -28,7 +28,8 @@ def format_parser_error(
     unicode_explanation = []
     if do_unicode_warning:
         unicode_explanation_text = (
-            textwrap.dedent(
+            textwrap
+            .dedent(
                 """
         Parsing errors are often due to unicode errors associated with the encoding of the original
         source files. Doxygen propagates invalid characters from the input source files to the

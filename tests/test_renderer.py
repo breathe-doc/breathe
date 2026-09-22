@@ -447,6 +447,22 @@ def test_render_define_no_initializer(app):
     assert signature.astext() == "USE_MILK"
 
 
+def test_render_variable_initializer_with_leading_space(app):
+    member_def = parser.Node_memberdefType(
+        kind=parser.DoxMemberKind.variable,
+        definition="Limit AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+        type=parser.Node_linkedTextType(["Limit"]),
+        name="AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+        initializer=parser.Node_linkedTextType([f"{' ' * 85}= \n", "Limit::HIGH"]),
+        **COMMON_ARGS_memberdefType,
+    )
+    signature = find_node(render(app, member_def), "desc_signature")
+    assert (
+        signature.astext()
+        == "Limit AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA = Limit::HIGH"
+    )
+
+
 def test_render_innergroup(app):
     refid = "group__innergroup"
     mock_compound_parser = MockCompoundParser({
