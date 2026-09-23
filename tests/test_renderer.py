@@ -4,13 +4,14 @@ import os
 from typing import TYPE_CHECKING
 
 import docutils.parsers.rst
+import pytest
 import sphinx.addnodes
 import sphinx.environment
 import sphinx.locale
 from docutils import frontend, nodes, utils
 
 from breathe import parser, renderer
-from breathe.renderer.sphinxrenderer import SphinxRenderer
+from breathe.renderer.sphinxrenderer import SphinxRenderer, strip_legacy_qualifiers
 
 if TYPE_CHECKING:
     from breathe.renderer import filter
@@ -321,6 +322,32 @@ def test_render_using_alias(app):
     )
     signature = find_node(render(app, member_def), "desc_signature")
     assert signature.astext() == "using foo = int"
+
+
+@pytest.mark.parametrize("qualifier", ["static", "friend", "constexpr", "consteval", "constinit"])
+def test_strip_legacy_qualifiers(qualifier):
+    assert strip_legacy_qualifiers(qualifier) == ""
+    assert strip_legacy_qualifiers(f"{qualifier} int") == "int"
+    assert strip_legacy_qualifiers(f"{qualifier}\tint") == "int"
+    assert strip_legacy_qualifiers(f"{qualifier}\nint") == "int"
+    assert strip_legacy_qualifiers(f"{qualifier}_type") == f"{qualifier}_type"
+    assert strip_legacy_qualifiers(f"type_{qualifier}") == f"type_{qualifier}"
+
+
+def test_render_constexpr_constructor(app):
+    member_def = parser.Node_memberdefType(
+        kind=parser.DoxMemberKind.function,
+        definition="Widget::Widget",
+        type=parser.Node_linkedTextType(["constexpr"]),
+        name="Widget",
+        argsstring="()",
+        inline=True,
+        constexpr=True,
+        **COMMON_ARGS_memberdefType,
+    )
+    signature = find_node(render(app, member_def), "desc_signature")
+    assert signature.astext() == "inline constexpr Widget()"
+    assert not app._warning.getvalue()
 
 
 def test_render_const_func(app):
