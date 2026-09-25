@@ -1550,7 +1550,12 @@ class SphinxRenderer(metaclass=NodeVisitor):
             rst_node["objtype"] = kind.value
             rst_node["domain"] = self.get_domain() or "cpp"
 
-            contentnode = addnodes.desc_content()
+            contentnode: nodes.Node
+            if "content-only" in options:
+                contentnode = nodes.paragraph()
+            else:
+                contentnode = addnodes.desc_content()
+
             rst_node.append(contentnode)
 
             return [rst_node], contentnode
