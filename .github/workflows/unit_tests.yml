@@ -86,7 +86,7 @@ jobs:
       with:
         path: doxygen-bin-arc
         fail-on-cache-miss: true
-        key: ${{ runner.os }}-doxygen-${{ matrix.doxygen-version }}
+        key: ${{ runner.os }}-doxygen-${{ matrix.doxygen-version }}-v1
 
     - name: Install doxygen
       # at some point actions/cache/restore@4 started unpacking doxygen.tar.gz
