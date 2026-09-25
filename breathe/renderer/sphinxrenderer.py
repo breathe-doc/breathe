@@ -2630,9 +2630,9 @@ class SphinxRenderer(metaclass=NodeVisitor):
         typ = "".join(n.astext() for n in self.render(node.type))
         # in Doxygen < 1.9 the 'friend' part is there, but afterwards not
         # https://github.com/breathe-doc/breathe/issues/616
-        assert typ in ("friend class", "friend struct", "class", "struct")
-        if not typ.startswith("friend "):
-            typ = "friend " + typ
+        assert typ in ("friend class", "friend struct", "class", "struct", "friend")
+        if not typ.startswith("friend"):
+            typ = "friend " + typ.lstrip()
         signode += addnodes.desc_annotation(typ, typ)
         signode += nodes.Text(" ")
         # expr = cpp.CPPExprRole(asCode=False)

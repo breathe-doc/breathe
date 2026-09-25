@@ -579,3 +579,15 @@ def test_ellipsis(app):
     # Verify that parsing an ellipsis works
     ast_param = cls._parse_args(argsstrings[0])
     _ = cls._resolve_function(matches, ast_param, None)
+
+
+def test_cxx11_extended_friend(app):
+    member_def = parser.Node_memberdefType(
+        kind=parser.DoxMemberKind.friend,
+        type=parser.Node_linkedTextType(["friend"]),
+        definition=parser.Node_linkedTextType(["friend Outer"]),
+        name="Outer",
+        **COMMON_ARGS_memberdefType,
+    )
+    signature = find_node(render(app, member_def), "desc_signature")
+    assert signature.astext() == "friend Outer"
