@@ -95,7 +95,7 @@ _findall_compat = cast(
 # is also left in the type. See also #767.
 # Until version 1.11, Doxygen left constexpr (I haven't checked consteval or
 # constinit) in the type.
-QUALIFIERS_TO_REMOVE = re.compile(r"\b(static|friend|constexpr|consteval|constinit) ")
+QUALIFIERS_TO_REMOVE = re.compile(r"\b(static|friend|constexpr|consteval|constinit)(?:\s+|$)")
 
 
 def strip_legacy_qualifiers(x):
