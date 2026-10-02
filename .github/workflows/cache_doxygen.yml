@@ -11,7 +11,7 @@ jobs:
       matrix:
         doxygen-version: ['1.9.4', '1.9.7']
     steps:
-      - uses: actions/cache/restore@v5
+      - uses: actions/cache/restore@v6
         id: cache-doxygen
         with:
           path: doxygen-bin-arc
@@ -28,7 +28,7 @@ jobs:
           version_underscores=$(echo ${{ matrix.doxygen-version }} | tr "." "_")
           curl -L https://github.com/doxygen/doxygen/releases/download/Release_${version_underscores}/doxygen-${{ matrix.doxygen-version }}.linux.bin.tar.gz > doxygen.tar.gz
 
-      - uses: actions/cache/save@v5
+      - uses: actions/cache/save@v6
         if: steps.cache-doxygen.outputs.cache-hit != 'true'
         with:
           path: doxygen-bin-arc
