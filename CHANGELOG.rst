@@ -3,6 +3,19 @@ Change Log
 
 Inspired by `Keepachangelog.com <https://keepachangelog.com/>`__.
 
+- 2026-10-02 - **Breathe v5.1.0**
+
+  - Dropped support for Sphinx 6.2, 7.0 & 7.1 and added python 3.14
+    `#1068 <https://github.com/breathe-doc/breathe/pull/1068>`__
+  - Strip leading spaces when making initializer
+    `#1072 <https://github.com/breathe-doc/breathe/pull/1072>`__
+  - Fix duplicate constexpr qualifiers on constructors
+    `#1082 <https://github.com/breathe-doc/breathe/pull/1082>`__
+  - Handle C++11 extended friend declarations
+    `#1073 <https://github.com/breathe-doc/breathe/pull/1073>`__
+  - Keep template arguments in class template specialization names
+    `#1074 <https://github.com/breathe-doc/breathe/pull/1074>`__
+
 - 2026-09-21 - **Breathe v5.0.0**
 
   No changes.
