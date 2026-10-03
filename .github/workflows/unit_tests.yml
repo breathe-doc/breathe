@@ -107,8 +107,7 @@ jobs:
       # folder where pytest will import from
       run: |
         pip install --upgrade pip
-        pip install --editable .[build]
-        pip install --editable .[test]
+        pip install --editable . --group build --group tests
 
     - name: Version info
       run: |

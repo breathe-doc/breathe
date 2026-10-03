@@ -41,7 +41,7 @@ dependencies = [
 ]
 dynamic = ["version"]
 
-[project.optional-dependencies]
+[dependency-groups]
 build = [
     "setuptools>=80.9.0"
 ]
@@ -62,9 +62,15 @@ lint = [
     # a listed git dependency so we comment it out for the moment
     # "sphinx-csharp @ git+https://github.com/rogerbarton/sphinx-csharp.git",  # for mypy
 ]
-test = [
+tests = [
     "pytest>=8.0,<9",
-    "Sphinx[test]"
+    "Sphinx"
+]
+dev = [
+    {include-group = "build"},
+    {include-group = "docs"},
+    {include-group = "lint"},
+    {include-group = "tests"},
 ]
 
 [project.urls]
