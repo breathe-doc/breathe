@@ -63,8 +63,8 @@ lint = [
     # "sphinx-csharp @ git+https://github.com/rogerbarton/sphinx-csharp.git",  # for mypy
 ]
 tests = [
+    "defusedxml>=0.7.1",  # for secure XML/HTML parsing
     "pytest>=8.0,<9",
-    "Sphinx"
 ]
 dev = [
     {include-group = "build"},
