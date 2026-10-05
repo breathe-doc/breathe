@@ -1,0 +1,341 @@
+<?xml version="1.0" encoding="utf-8"?>
+<?xml-stylesheet href="../../docutils.css"?>
+<document>
+    <index entries="['single',\ 'E\ (C++\ struct)',\ '_CPPv41E',\ '',\ None]"></index>
+    <desc classes="cpp struct" desctype="struct" domain="cpp" objtype="struct">
+        <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword classes="k">struct</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">E</desc_sig_name></desc_name></desc_signature_line></desc_signature>
+        <desc_content>
+            <container classes="breathe-sectiondef" objtype="public-attrib">
+                <rubric classes="breathe-sectiondef-title">Public Members</rubric>
+                <index entries="['single',\ 'E::F\ (C++\ member)',\ '_CPPv4N1E1FE',\ '',\ None]"></index>
+                <desc classes="cpp var" desctype="var" domain="cpp" objtype="var">
+                    <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword_type classes="kt">char</desc_sig_keyword_type><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">F</desc_sig_name></desc_name></desc_signature_line></desc_signature>
+                    <desc_content>
+                    </desc_content>
+                </desc>
+            </container>
+        </desc_content>
+    </desc>
+    <index entries="['single',\ 'G::J\ (C++\ class)',\ '_CPPv4I0EN1G1JE',\ '',\ None]"></index>
+    <desc classes="cpp class" desctype="class" domain="cpp" objtype="class">
+        <desc_signature classes="sig sig-object cpp"><desc_signature_line><desc_sig_keyword classes="k">template</desc_sig_keyword><desc_sig_punctuation classes="p">&lt;</desc_sig_punctuation><desc_sig_keyword classes="k">typename</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">T</desc_sig_name></desc_name><desc_sig_punctuation classes="p">&gt;</desc_sig_punctuation></desc_signature_line><desc_signature_line><target></target><desc_sig_keyword classes="k">class</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">J</desc_sig_name></desc_name></desc_signature_line></desc_signature>
+        <desc_content>
+            <container classes="breathe-sectiondef" objtype="public-attrib">
+                <rubric classes="breathe-sectiondef-title">Public Members</rubric>
+                <index entries="['single',\ 'G::J::K\ (C++\ member)',\ '_CPPv4N1G1J1KE',\ '',\ None]"></index>
+                <desc classes="cpp var" desctype="var" domain="cpp" objtype="var">
+                    <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><reference internal="True" refid="_CPPv4I0EN1G1JE" reftitle="G::J::T"><desc_sig_name classes="n">T</desc_sig_name></reference><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">K</desc_sig_name></desc_name><desc_sig_punctuation classes="p">[</desc_sig_punctuation><reference internal="True" refid="_CPPv4N1G1HE" reftitle="G::H"><desc_sig_name classes="n">H</desc_sig_name></reference><desc_sig_punctuation classes="p">]</desc_sig_punctuation></desc_signature_line></desc_signature>
+                    <desc_content>
+                    </desc_content>
+                </desc>
+            </container>
+            <container classes="breathe-sectiondef" objtype="friend">
+                <rubric classes="breathe-sectiondef-title">Friends</rubric>
+                <index entries="['single',\ 'G::J::operator==\ (C++\ function)',\ '_CPPv4N1G1JeqE1J1J',\ '',\ None]"></index>
+                <desc classes="cpp function" desctype="function" domain="cpp" objtype="function">
+                    <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword classes="k">static</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_sig_keyword classes="k">inline</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_sig_keyword classes="k">friend</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_sig_keyword_type classes="kt">bool</desc_sig_keyword_type><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_keyword classes="k">operator</desc_sig_keyword><desc_sig_operator classes="o">==</desc_sig_operator></desc_name><desc_parameterlist><desc_parameter noemph="True"><reference internal="True" refid="_CPPv4I0EN1G1JE" reftitle="G::J"><desc_sig_name classes="n">J</desc_sig_name></reference><desc_sig_space classes="w"> </desc_sig_space><desc_sig_name classes="n sig-param">ja</desc_sig_name></desc_parameter><desc_parameter noemph="True"><reference internal="True" refid="_CPPv4I0EN1G1JE" reftitle="G::J"><desc_sig_name classes="n">J</desc_sig_name></reference><desc_sig_space classes="w"> </desc_sig_space><desc_sig_name classes="n sig-param">jb</desc_sig_name></desc_parameter></desc_parameterlist></desc_signature_line></desc_signature>
+                    <desc_content>
+                    </desc_content>
+                </desc>
+            </container>
+        </desc_content>
+    </desc>
+    <index entries="['single',\ 'G::L\ (C++\ struct)',\ '_CPPv4I0EN1G1LE',\ '',\ None]"></index>
+    <desc classes="cpp struct" desctype="struct" domain="cpp" objtype="struct">
+        <desc_signature classes="sig sig-object cpp"><desc_signature_line><desc_sig_keyword classes="k">template</desc_sig_keyword><desc_sig_punctuation classes="p">&lt;</desc_sig_punctuation><desc_sig_keyword classes="k">typename</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">T</desc_sig_name></desc_name><desc_sig_punctuation classes="p">&gt;</desc_sig_punctuation></desc_signature_line><desc_signature_line><target></target><desc_sig_keyword classes="k">struct</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">L</desc_sig_name></desc_name></desc_signature_line></desc_signature>
+        <desc_content>
+            <container classes="breathe-sectiondef" objtype="public-static-attrib">
+                <rubric classes="breathe-sectiondef-title">Public Static Attributes</rubric>
+                <index entries="['single',\ 'G::L::M\ (C++\ member)',\ '_CPPv4N1G1L1ME',\ '',\ None]"></index>
+                <desc classes="cpp var" desctype="var" domain="cpp" objtype="var">
+                    <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword classes="k">static</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_sig_keyword classes="k">constexpr</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_sig_keyword_type classes="kt">bool</desc_sig_keyword_type><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">M</desc_sig_name></desc_name><desc_sig_space classes="w"> </desc_sig_space><desc_sig_punctuation classes="p">=</desc_sig_punctuation><desc_sig_space classes="w"> </desc_sig_space><desc_sig_keyword classes="k">false</desc_sig_keyword></desc_signature_line></desc_signature>
+                    <desc_content>
+                    </desc_content>
+                </desc>
+            </container>
+        </desc_content>
+    </desc>
+    <index entries="['single',\ 'G::L&lt;J&lt;T&gt;&gt;\ (C++\ struct)',\ '_CPPv4I0EN1G1LI1JI1TEEE',\ '',\ None]"></index>
+    <desc classes="cpp struct" desctype="struct" domain="cpp" objtype="struct">
+        <desc_signature classes="sig sig-object cpp"><desc_signature_line><desc_sig_keyword classes="k">template</desc_sig_keyword><desc_sig_punctuation classes="p">&lt;</desc_sig_punctuation><desc_sig_keyword classes="k">typename</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">T</desc_sig_name></desc_name><desc_sig_punctuation classes="p">&gt;</desc_sig_punctuation></desc_signature_line><desc_signature_line><target></target><desc_sig_keyword classes="k">struct</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">L</desc_sig_name></desc_name><desc_sig_punctuation classes="p">&lt;</desc_sig_punctuation><reference internal="True" refid="_CPPv4I0EN1G1JE" reftitle="G::J"><desc_sig_name classes="n">J</desc_sig_name></reference><desc_sig_punctuation classes="p">&lt;</desc_sig_punctuation><reference internal="True" refid="_CPPv4I0EN1G1LI1JI1TEEE" reftitle="G::L&lt;J&lt;T&gt;&gt;::T"><desc_sig_name classes="n">T</desc_sig_name></reference><desc_sig_punctuation classes="p">&gt;</desc_sig_punctuation><desc_sig_punctuation classes="p">&gt;</desc_sig_punctuation></desc_signature_line></desc_signature>
+        <desc_content>
+            <container classes="breathe-sectiondef" objtype="public-static-attrib">
+                <rubric classes="breathe-sectiondef-title">Public Static Attributes</rubric>
+                <index entries="['single',\ 'G::L&lt;J&lt;T&gt;&gt;::M\ (C++\ member)',\ '_CPPv4N1G1LI1JI1TEE1ME',\ '',\ None]"></index>
+                <desc classes="cpp var" desctype="var" domain="cpp" objtype="var">
+                    <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword classes="k">static</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_sig_keyword classes="k">constexpr</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_sig_keyword_type classes="kt">bool</desc_sig_keyword_type><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">M</desc_sig_name></desc_name><desc_sig_space classes="w"> </desc_sig_space><desc_sig_punctuation classes="p">=</desc_sig_punctuation><desc_sig_space classes="w"> </desc_sig_space><desc_sig_keyword classes="k">true</desc_sig_keyword></desc_signature_line></desc_signature>
+                    <desc_content>
+                    </desc_content>
+                </desc>
+            </container>
+        </desc_content>
+    </desc>
+    <index entries="['single',\ 'G::N\ (C++\ concept)',\ '_CPPv4I0EN1G1NE',\ '',\ None]"></index>
+    <desc classes="cpp concept" desctype="concept" domain="cpp" objtype="concept">
+        <desc_signature classes="sig sig-object cpp"><target></target><desc_signature_line><desc_sig_keyword classes="k">template</desc_sig_keyword><desc_sig_punctuation classes="p">&lt;</desc_sig_punctuation><desc_sig_keyword classes="k">typename</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">T</desc_sig_name></desc_name><desc_sig_punctuation classes="p">&gt;</desc_sig_punctuation></desc_signature_line><desc_signature_line><desc_sig_keyword classes="k">concept</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">N</desc_sig_name></desc_name></desc_signature_line></desc_signature>
+        <desc_content>
+        </desc_content>
+    </desc>
+    <index entries="['single',\ 'G\ (C++\ type)',\ '_CPPv41G',\ '',\ None]"></index>
+    <desc classes="cpp type" desctype="type" domain="cpp" objtype="type">
+        <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword classes="k">namespace</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">G</desc_sig_name></desc_name></desc_signature_line></desc_signature>
+        <desc_content>
+            <container classes="breathe-sectiondef" objtype="typedef">
+                <rubric classes="breathe-sectiondef-title">Typedefs</rubric>
+                <index entries="['single',\ 'G::O\ (C++\ type)',\ '_CPPv4N1G1OE',\ '',\ None]"></index>
+                <desc classes="cpp type" desctype="type" domain="cpp" objtype="type">
+                    <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword classes="k">typedef</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_sig_keyword_type classes="kt">void</desc_sig_keyword_type><desc_sig_space classes="w"> </desc_sig_space><desc_sig_punctuation classes="p">(</desc_sig_punctuation><desc_sig_punctuation classes="p">*</desc_sig_punctuation><desc_name classes="sig-name descname"><desc_sig_name classes="n">O</desc_sig_name></desc_name><desc_sig_punctuation classes="p">)</desc_sig_punctuation><desc_sig_punctuation classes="p">(</desc_sig_punctuation><reference internal="True" refid="_CPPv41B" reftitle="B"><desc_sig_name classes="n">B</desc_sig_name></reference><desc_sig_punctuation classes="p">)</desc_sig_punctuation></desc_signature_line></desc_signature>
+                    <desc_content>
+                    </desc_content>
+                </desc>
+            </container>
+            <container classes="breathe-sectiondef" objtype="var">
+                <rubric classes="breathe-sectiondef-title">Variables</rubric>
+                <index entries="['single',\ 'G::H\ (C++\ member)',\ '_CPPv4N1G1HE',\ '',\ None]"></index>
+                <desc classes="cpp var" desctype="var" domain="cpp" objtype="var">
+                    <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword classes="k">constexpr</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_sig_keyword_type classes="kt">unsigned</desc_sig_keyword_type><desc_sig_space classes="w"> </desc_sig_space><desc_sig_keyword_type classes="kt">int</desc_sig_keyword_type><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">H</desc_sig_name></desc_name><desc_sig_space classes="w"> </desc_sig_space><desc_sig_punctuation classes="p">=</desc_sig_punctuation><desc_sig_space classes="w"> </desc_sig_space><desc_sig_literal_number classes="m">12</desc_sig_literal_number></desc_signature_line></desc_signature>
+                    <desc_content>
+                    </desc_content>
+                </desc>
+                <index entries="['single',\ 'G::I\ (C++\ member)',\ '_CPPv4N1G1IE',\ '',\ None]"></index>
+                <desc classes="cpp var" desctype="var" domain="cpp" objtype="var">
+                    <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword_type classes="kt">int</desc_sig_keyword_type><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">I</desc_sig_name></desc_name></desc_signature_line></desc_signature>
+                    <desc_content>
+                    </desc_content>
+                </desc>
+            </container>
+        </desc_content>
+    </desc>
+    <desc domain="cpp" objtype="file">
+        <desc_signature classes="sig sig-object cpp"><target></target><emphasis>file</emphasis> <desc_name classes="sig-name descname">index.h</desc_name></desc_signature>
+        <desc_content>
+            <container classes="breathe-sectiondef" objtype="define">
+                <rubric classes="breathe-sectiondef-title">Defines</rubric>
+                <index entries="['single',\ 'P\ (C\ macro)',\ 'c.P',\ '',\ None]"></index>
+                <desc classes="cpp macro" desctype="macro" domain="cpp" objtype="macro">
+                    <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_name classes="sig-name descname"><desc_sig_name classes="n">P</desc_sig_name></desc_name></desc_signature_line></desc_signature>
+                    <desc_content>
+                    </desc_content>
+                </desc>
+            </container>
+            <container classes="breathe-sectiondef" objtype="typedef">
+                <rubric classes="breathe-sectiondef-title">Typedefs</rubric>
+                <index entries="['single',\ 'B\ (C++\ type)',\ '_CPPv41B',\ '',\ None]"></index>
+                <desc classes="cpp type" desctype="type" domain="cpp" objtype="type">
+                    <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword classes="k">using</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">B</desc_sig_name></desc_name><desc_sig_space classes="w"> </desc_sig_space><desc_sig_punctuation classes="p">=</desc_sig_punctuation><desc_sig_space classes="w"> </desc_sig_space><desc_sig_keyword_type classes="kt">long</desc_sig_keyword_type></desc_signature_line></desc_signature>
+                    <desc_content>
+                    </desc_content>
+                </desc>
+            </container>
+            <container classes="breathe-sectiondef" objtype="enum">
+                <rubric classes="breathe-sectiondef-title">Enums</rubric>
+                <index entries="['single',\ 'Q\ (C++\ enum)',\ '_CPPv41Q',\ '',\ None]"></index>
+                <desc classes="cpp enum" desctype="enum" domain="cpp" objtype="enum">
+                    <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword classes="k">enum</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">Q</desc_sig_name></desc_name></desc_signature_line></desc_signature>
+                    <desc_content>
+                        <paragraph><emphasis>Values:</emphasis></paragraph>
+                        <index entries="['single',\ 'Q::R\ (C++\ enumerator)',\ '_CPPv4N1Q1RE',\ '',\ None]"></index>
+                        <desc classes="cpp enumerator" desctype="enumerator" domain="cpp" objtype="enumerator">
+                            <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword classes="k">enumerator</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">R</desc_sig_name></desc_name></desc_signature_line></desc_signature>
+                            <desc_content>
+                            </desc_content>
+                        </desc>
+                        <index entries="['single',\ 'Q::S\ (C++\ enumerator)',\ '_CPPv4N1Q1SE',\ '',\ None]"></index>
+                        <desc classes="cpp enumerator" desctype="enumerator" domain="cpp" objtype="enumerator">
+                            <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword classes="k">enumerator</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">S</desc_sig_name></desc_name></desc_signature_line></desc_signature>
+                            <desc_content>
+                            </desc_content>
+                        </desc>
+                    </desc_content>
+                </desc>
+            </container>
+            <container classes="breathe-sectiondef" objtype="func">
+                <rubric classes="breathe-sectiondef-title">Functions</rubric>
+                <index entries="['single',\ 'C\ (C++\ function)',\ '_CPPv41CDa',\ '',\ None]"></index>
+                <desc classes="cpp function" desctype="function" domain="cpp" objtype="function">
+                    <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><reference internal="True" refid="_CPPv41B" reftitle="B"><desc_sig_name classes="n">B</desc_sig_name></reference><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">C</desc_sig_name></desc_name><desc_parameterlist><desc_parameter noemph="True"><desc_sig_keyword_type classes="kt">auto</desc_sig_keyword_type><desc_sig_space classes="w"> </desc_sig_space><desc_sig_name classes="n sig-param">x</desc_sig_name></desc_parameter></desc_parameterlist></desc_signature_line></desc_signature>
+                    <desc_content>
+                    </desc_content>
+                </desc>
+                <index entries="['single',\ 'D\ (C++\ function)',\ '_CPPv4I0E1Dvv',\ '',\ None]"></index>
+                <desc classes="cpp function" desctype="function" domain="cpp" objtype="function">
+                    <desc_signature classes="sig sig-object cpp"><desc_signature_line><desc_sig_keyword classes="k">template</desc_sig_keyword><desc_sig_punctuation classes="p">&lt;</desc_sig_punctuation><desc_sig_keyword classes="k">typename</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">T</desc_sig_name></desc_name><desc_sig_punctuation classes="p">&gt;</desc_sig_punctuation></desc_signature_line><desc_signature_line><target></target><desc_sig_keyword_type classes="kt">void</desc_sig_keyword_type><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">D</desc_sig_name></desc_name><desc_parameterlist></desc_parameterlist></desc_signature_line></desc_signature>
+                    <desc_content>
+                    </desc_content>
+                </desc>
+            </container>
+            <container classes="breathe-sectiondef" objtype="var">
+                <rubric classes="breathe-sectiondef-title">Variables</rubric>
+                <index entries="['single',\ 'A\ (C++\ member)',\ '_CPPv41A',\ '',\ None]"></index>
+                <desc classes="cpp var" desctype="var" domain="cpp" objtype="var">
+                    <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword_type classes="kt">int</desc_sig_keyword_type><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">A</desc_sig_name></desc_name></desc_signature_line></desc_signature>
+                    <desc_content>
+                    </desc_content>
+                </desc>
+            </container>
+        </desc_content>
+    </desc>
+    <container classes="breathe-sectiondef" objtype="define">
+        <rubric classes="breathe-sectiondef-title">Defines</rubric>
+        <index entries="['single',\ 'P\ (C\ macro)',\ 'c.P',\ '',\ None]"></index>
+        <desc classes="cpp macro" desctype="macro" domain="cpp" objtype="macro">
+            <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_name classes="sig-name descname"><desc_sig_name classes="n">P</desc_sig_name></desc_name></desc_signature_line></desc_signature>
+            <desc_content>
+            </desc_content>
+        </desc>
+    </container>
+    <container classes="breathe-sectiondef" objtype="typedef">
+        <rubric classes="breathe-sectiondef-title">Typedefs</rubric>
+        <index entries="['single',\ 'B\ (C++\ type)',\ '_CPPv41B',\ '',\ None]"></index>
+        <desc classes="cpp type" desctype="type" domain="cpp" objtype="type">
+            <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword classes="k">using</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">B</desc_sig_name></desc_name><desc_sig_space classes="w"> </desc_sig_space><desc_sig_punctuation classes="p">=</desc_sig_punctuation><desc_sig_space classes="w"> </desc_sig_space><desc_sig_keyword_type classes="kt">long</desc_sig_keyword_type></desc_signature_line></desc_signature>
+            <desc_content>
+            </desc_content>
+        </desc>
+    </container>
+    <container classes="breathe-sectiondef" objtype="enum">
+        <rubric classes="breathe-sectiondef-title">Enums</rubric>
+        <index entries="['single',\ 'Q\ (C++\ enum)',\ '_CPPv41Q',\ '',\ None]"></index>
+        <desc classes="cpp enum" desctype="enum" domain="cpp" objtype="enum">
+            <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword classes="k">enum</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">Q</desc_sig_name></desc_name></desc_signature_line></desc_signature>
+            <desc_content>
+                <paragraph><emphasis>Values:</emphasis></paragraph>
+                <index entries="['single',\ 'Q::R\ (C++\ enumerator)',\ '_CPPv4N1Q1RE',\ '',\ None]"></index>
+                <desc classes="cpp enumerator" desctype="enumerator" domain="cpp" objtype="enumerator">
+                    <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword classes="k">enumerator</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">R</desc_sig_name></desc_name></desc_signature_line></desc_signature>
+                    <desc_content>
+                    </desc_content>
+                </desc>
+                <index entries="['single',\ 'Q::S\ (C++\ enumerator)',\ '_CPPv4N1Q1SE',\ '',\ None]"></index>
+                <desc classes="cpp enumerator" desctype="enumerator" domain="cpp" objtype="enumerator">
+                    <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword classes="k">enumerator</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">S</desc_sig_name></desc_name></desc_signature_line></desc_signature>
+                    <desc_content>
+                    </desc_content>
+                </desc>
+            </desc_content>
+        </desc>
+    </container>
+    <container classes="breathe-sectiondef" objtype="func">
+        <rubric classes="breathe-sectiondef-title">Functions</rubric>
+        <index entries="['single',\ 'C\ (C++\ function)',\ '_CPPv41CDa',\ '',\ None]"></index>
+        <desc classes="cpp function" desctype="function" domain="cpp" objtype="function">
+            <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><reference internal="True" refid="_CPPv41B" reftitle="B"><desc_sig_name classes="n">B</desc_sig_name></reference><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">C</desc_sig_name></desc_name><desc_parameterlist><desc_parameter noemph="True"><desc_sig_keyword_type classes="kt">auto</desc_sig_keyword_type><desc_sig_space classes="w"> </desc_sig_space><desc_sig_name classes="n sig-param">x</desc_sig_name></desc_parameter></desc_parameterlist></desc_signature_line></desc_signature>
+            <desc_content>
+            </desc_content>
+        </desc>
+        <index entries="['single',\ 'D\ (C++\ function)',\ '_CPPv4I0E1Dvv',\ '',\ None]"></index>
+        <desc classes="cpp function" desctype="function" domain="cpp" objtype="function">
+            <desc_signature classes="sig sig-object cpp"><desc_signature_line><desc_sig_keyword classes="k">template</desc_sig_keyword><desc_sig_punctuation classes="p">&lt;</desc_sig_punctuation><desc_sig_keyword classes="k">typename</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">T</desc_sig_name></desc_name><desc_sig_punctuation classes="p">&gt;</desc_sig_punctuation></desc_signature_line><desc_signature_line><target></target><desc_sig_keyword_type classes="kt">void</desc_sig_keyword_type><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">D</desc_sig_name></desc_name><desc_parameterlist></desc_parameterlist></desc_signature_line></desc_signature>
+            <desc_content>
+            </desc_content>
+        </desc>
+    </container>
+    <container classes="breathe-sectiondef" objtype="var">
+        <rubric classes="breathe-sectiondef-title">Variables</rubric>
+        <index entries="['single',\ 'A\ (C++\ member)',\ '_CPPv41A',\ '',\ None]"></index>
+        <desc classes="cpp var" desctype="var" domain="cpp" objtype="var">
+            <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword_type classes="kt">int</desc_sig_keyword_type><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">A</desc_sig_name></desc_name></desc_signature_line></desc_signature>
+            <desc_content>
+            </desc_content>
+        </desc>
+    </container>
+    <index entries="['single',\ 'E\ (C++\ struct)',\ '_CPPv41E',\ '',\ None]"></index>
+    <desc classes="cpp struct" desctype="struct" domain="cpp" objtype="struct">
+        <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword classes="k">struct</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">E</desc_sig_name></desc_name></desc_signature_line></desc_signature>
+        <desc_content>
+            <container classes="breathe-sectiondef" objtype="public-attrib">
+                <rubric classes="breathe-sectiondef-title">Public Members</rubric>
+                <index entries="['single',\ 'E::F\ (C++\ member)',\ '_CPPv4N1E1FE',\ '',\ None]"></index>
+                <desc classes="cpp var" desctype="var" domain="cpp" objtype="var">
+                    <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword_type classes="kt">char</desc_sig_keyword_type><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">F</desc_sig_name></desc_name></desc_signature_line></desc_signature>
+                    <desc_content>
+                    </desc_content>
+                </desc>
+            </container>
+        </desc_content>
+    </desc>
+    <index entries="['single',\ 'G\ (C++\ type)',\ '_CPPv41G',\ '',\ None]"></index>
+    <desc classes="cpp type" desctype="type" domain="cpp" objtype="type">
+        <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword classes="k">namespace</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">G</desc_sig_name></desc_name></desc_signature_line></desc_signature>
+        <desc_content>
+            <container classes="breathe-sectiondef" objtype="typedef">
+                <rubric classes="breathe-sectiondef-title">Typedefs</rubric>
+                <index entries="['single',\ 'G::O\ (C++\ type)',\ '_CPPv4N1G1OE',\ '',\ None]"></index>
+                <desc classes="cpp type" desctype="type" domain="cpp" objtype="type">
+                    <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword classes="k">typedef</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_sig_keyword_type classes="kt">void</desc_sig_keyword_type><desc_sig_space classes="w"> </desc_sig_space><desc_sig_punctuation classes="p">(</desc_sig_punctuation><desc_sig_punctuation classes="p">*</desc_sig_punctuation><desc_name classes="sig-name descname"><desc_sig_name classes="n">O</desc_sig_name></desc_name><desc_sig_punctuation classes="p">)</desc_sig_punctuation><desc_sig_punctuation classes="p">(</desc_sig_punctuation><reference internal="True" refid="_CPPv41B" reftitle="B"><desc_sig_name classes="n">B</desc_sig_name></reference><desc_sig_punctuation classes="p">)</desc_sig_punctuation></desc_signature_line></desc_signature>
+                    <desc_content>
+                    </desc_content>
+                </desc>
+            </container>
+            <container classes="breathe-sectiondef" objtype="var">
+                <rubric classes="breathe-sectiondef-title">Variables</rubric>
+                <index entries="['single',\ 'G::H\ (C++\ member)',\ '_CPPv4N1G1HE',\ '',\ None]"></index>
+                <desc classes="cpp var" desctype="var" domain="cpp" objtype="var">
+                    <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword classes="k">constexpr</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_sig_keyword_type classes="kt">unsigned</desc_sig_keyword_type><desc_sig_space classes="w"> </desc_sig_space><desc_sig_keyword_type classes="kt">int</desc_sig_keyword_type><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">H</desc_sig_name></desc_name><desc_sig_space classes="w"> </desc_sig_space><desc_sig_punctuation classes="p">=</desc_sig_punctuation><desc_sig_space classes="w"> </desc_sig_space><desc_sig_literal_number classes="m">12</desc_sig_literal_number></desc_signature_line></desc_signature>
+                    <desc_content>
+                    </desc_content>
+                </desc>
+                <index entries="['single',\ 'G::I\ (C++\ member)',\ '_CPPv4N1G1IE',\ '',\ None]"></index>
+                <desc classes="cpp var" desctype="var" domain="cpp" objtype="var">
+                    <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword_type classes="kt">int</desc_sig_keyword_type><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">I</desc_sig_name></desc_name></desc_signature_line></desc_signature>
+                    <desc_content>
+                    </desc_content>
+                </desc>
+            </container>
+            <index entries="['single',\ 'G::J\ (C++\ class)',\ '_CPPv4I0EN1G1JE',\ '',\ None]"></index>
+            <desc classes="cpp class" desctype="class" domain="cpp" objtype="class">
+                <desc_signature classes="sig sig-object cpp"><desc_signature_line><desc_sig_keyword classes="k">template</desc_sig_keyword><desc_sig_punctuation classes="p">&lt;</desc_sig_punctuation><desc_sig_keyword classes="k">typename</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">T</desc_sig_name></desc_name><desc_sig_punctuation classes="p">&gt;</desc_sig_punctuation></desc_signature_line><desc_signature_line><target></target><desc_sig_keyword classes="k">class</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">J</desc_sig_name></desc_name></desc_signature_line></desc_signature>
+                <desc_content>
+                    <container classes="breathe-sectiondef" objtype="public-attrib">
+                        <rubric classes="breathe-sectiondef-title">Public Members</rubric>
+                        <index entries="['single',\ 'G::J::K\ (C++\ member)',\ '_CPPv4N1G1J1KE',\ '',\ None]"></index>
+                        <desc classes="cpp var" desctype="var" domain="cpp" objtype="var">
+                            <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><reference internal="True" refid="_CPPv4I0EN1G1JE" reftitle="G::J::T"><desc_sig_name classes="n">T</desc_sig_name></reference><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">K</desc_sig_name></desc_name><desc_sig_punctuation classes="p">[</desc_sig_punctuation><reference internal="True" refid="_CPPv4N1G1HE" reftitle="G::H"><desc_sig_name classes="n">H</desc_sig_name></reference><desc_sig_punctuation classes="p">]</desc_sig_punctuation></desc_signature_line></desc_signature>
+                            <desc_content>
+                            </desc_content>
+                        </desc>
+                    </container>
+                    <container classes="breathe-sectiondef" objtype="friend">
+                        <rubric classes="breathe-sectiondef-title">Friends</rubric>
+                        <index entries="['single',\ 'G::J::operator==\ (C++\ function)',\ '_CPPv4N1G1JeqE1J1J',\ '',\ None]"></index>
+                        <desc classes="cpp function" desctype="function" domain="cpp" objtype="function">
+                            <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword classes="k">static</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_sig_keyword classes="k">inline</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_sig_keyword classes="k">friend</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_sig_keyword_type classes="kt">bool</desc_sig_keyword_type><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_keyword classes="k">operator</desc_sig_keyword><desc_sig_operator classes="o">==</desc_sig_operator></desc_name><desc_parameterlist><desc_parameter noemph="True"><reference internal="True" refid="_CPPv4I0EN1G1JE" reftitle="G::J"><desc_sig_name classes="n">J</desc_sig_name></reference><desc_sig_space classes="w"> </desc_sig_space><desc_sig_name classes="n sig-param">ja</desc_sig_name></desc_parameter><desc_parameter noemph="True"><reference internal="True" refid="_CPPv4I0EN1G1JE" reftitle="G::J"><desc_sig_name classes="n">J</desc_sig_name></reference><desc_sig_space classes="w"> </desc_sig_space><desc_sig_name classes="n sig-param">jb</desc_sig_name></desc_parameter></desc_parameterlist></desc_signature_line></desc_signature>
+                            <desc_content>
+                            </desc_content>
+                        </desc>
+                    </container>
+                </desc_content>
+            </desc>
+            <index entries="['single',\ 'G::L\ (C++\ struct)',\ '_CPPv4I0EN1G1LE',\ '',\ None]"></index>
+            <desc classes="cpp struct" desctype="struct" domain="cpp" objtype="struct">
+                <desc_signature classes="sig sig-object cpp"><desc_signature_line><desc_sig_keyword classes="k">template</desc_sig_keyword><desc_sig_punctuation classes="p">&lt;</desc_sig_punctuation><desc_sig_keyword classes="k">typename</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">T</desc_sig_name></desc_name><desc_sig_punctuation classes="p">&gt;</desc_sig_punctuation></desc_signature_line><desc_signature_line><target></target><desc_sig_keyword classes="k">struct</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">L</desc_sig_name></desc_name></desc_signature_line></desc_signature>
+                <desc_content>
+                    <container classes="breathe-sectiondef" objtype="public-static-attrib">
+                        <rubric classes="breathe-sectiondef-title">Public Static Attributes</rubric>
+                        <index entries="['single',\ 'G::L::M\ (C++\ member)',\ '_CPPv4N1G1L1ME',\ '',\ None]"></index>
+                        <desc classes="cpp var" desctype="var" domain="cpp" objtype="var">
+                            <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword classes="k">static</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_sig_keyword classes="k">constexpr</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_sig_keyword_type classes="kt">bool</desc_sig_keyword_type><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">M</desc_sig_name></desc_name><desc_sig_space classes="w"> </desc_sig_space><desc_sig_punctuation classes="p">=</desc_sig_punctuation><desc_sig_space classes="w"> </desc_sig_space><desc_sig_keyword classes="k">false</desc_sig_keyword></desc_signature_line></desc_signature>
+                            <desc_content>
+                            </desc_content>
+                        </desc>
+                    </container>
+                </desc_content>
+            </desc>
+            <index entries="['single',\ 'G::L&lt;J&lt;T&gt;&gt;\ (C++\ struct)',\ '_CPPv4I0EN1G1LI1JI1TEEE',\ '',\ None]"></index>
+            <desc classes="cpp struct" desctype="struct" domain="cpp" objtype="struct">
+                <desc_signature classes="sig sig-object cpp"><desc_signature_line><desc_sig_keyword classes="k">template</desc_sig_keyword><desc_sig_punctuation classes="p">&lt;</desc_sig_punctuation><desc_sig_keyword classes="k">typename</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">T</desc_sig_name></desc_name><desc_sig_punctuation classes="p">&gt;</desc_sig_punctuation></desc_signature_line><desc_signature_line><target></target><desc_sig_keyword classes="k">struct</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">L</desc_sig_name></desc_name><desc_sig_punctuation classes="p">&lt;</desc_sig_punctuation><reference internal="True" refid="_CPPv4I0EN1G1JE" reftitle="G::J"><desc_sig_name classes="n">J</desc_sig_name></reference><desc_sig_punctuation classes="p">&lt;</desc_sig_punctuation><reference internal="True" refid="_CPPv4I0EN1G1LI1JI1TEEE" reftitle="G::L&lt;J&lt;T&gt;&gt;::T"><desc_sig_name classes="n">T</desc_sig_name></reference><desc_sig_punctuation classes="p">&gt;</desc_sig_punctuation><desc_sig_punctuation classes="p">&gt;</desc_sig_punctuation></desc_signature_line></desc_signature>
+                <desc_content>
+                    <container classes="breathe-sectiondef" objtype="public-static-attrib">
+                        <rubric classes="breathe-sectiondef-title">Public Static Attributes</rubric>
+                        <index entries="['single',\ 'G::L&lt;J&lt;T&gt;&gt;::M\ (C++\ member)',\ '_CPPv4N1G1LI1JI1TEE1ME',\ '',\ None]"></index>
+                        <desc classes="cpp var" desctype="var" domain="cpp" objtype="var">
+                            <desc_signature classes="sig sig-object cpp"><desc_signature_line><target></target><desc_sig_keyword classes="k">static</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_sig_keyword classes="k">constexpr</desc_sig_keyword><desc_sig_space classes="w"> </desc_sig_space><desc_sig_keyword_type classes="kt">bool</desc_sig_keyword_type><desc_sig_space classes="w"> </desc_sig_space><desc_name classes="sig-name descname"><desc_sig_name classes="n">M</desc_sig_name></desc_name><desc_sig_space classes="w"> </desc_sig_space><desc_sig_punctuation classes="p">=</desc_sig_punctuation><desc_sig_space classes="w"> </desc_sig_space><desc_sig_keyword classes="k">true</desc_sig_keyword></desc_signature_line></desc_signature>
+                            <desc_content>
+                            </desc_content>
+                        </desc>
+                    </container>
+                </desc_content>
+            </desc>
+        </desc_content>
+    </desc>
+</document>
