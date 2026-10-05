@@ -580,9 +580,7 @@ def make_env(schema: Schema) -> jinja2.Environment:
     def field_count(t) -> int:
         if not isinstance(t, ElementType):
             return 0
-        return (
-            len(t.attributes) + len(t.children) + sum(cast("int", field_count(b)) for b in t.bases)
-        )
+        return len(t.attributes) + len(t.children) + sum(field_count(b) for b in t.bases)
 
     for t in schema.types.values():
         # if isinstance(t, SchemaEnum):
@@ -1019,4 +1017,4 @@ def generate_from_json(json_path, template_files) -> None:
     for i_file, o_file in template_files:
         template_str = Path(i_file).read_text(encoding="utf-8")
         with open(o_file, "w", encoding="utf-8") as ofile:
-            env.from_string(template_str).stream().dump(ofile)
+            env.from_string(template_str).stream().dump(ofile)  # type: ignore[arg-type]

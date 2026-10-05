@@ -1,6 +1,8 @@
 [build-system]
-requires = ["flit_core>=3.7"]
-build-backend = "flit_core.buildapi"
+# ``breathe/_parser.py`` is generated during the build by
+# ``xml_parser_generator``, which requires ``jinja2``.
+requires = ["setuptools>=80.9.0", "jinja2>=3.1.6"]
+build-backend = "setuptools.build_meta"
 
 # project metadata
 [project]
@@ -42,9 +44,6 @@ dependencies = [
 dynamic = ["version"]
 
 [project.optional-dependencies]
-build = [
-    "setuptools>=80.9.0"
-]
 docs = [
     "furo",
     "sphinx-copybutton",
@@ -82,26 +81,29 @@ email = "m.pricejones@gmail.com"
 [project.scripts]
 breathe-apidoc = "breathe.apidoc:main"
 
-[tool.flit.module]
-name = "breathe"
+# The `_parser.py` module is generated from `xml_parser_generator/schema.json`
+# by the custom `build_py` command below. It is part of the `breathe` package
+# data and is (re)generated opportunistically at build time rather than being
+# committed to the repository.
+[tool.setuptools]
+packages = [
+    "breathe",
+    "breathe.directives",
+    "breathe.finder",
+    "breathe.renderer",
+    "xml_parser_generator",
+]
+include-package-data = true
 
-[tool.flit.sdist]
-include = [
-    "LICENSE",
-    "CHANGELOG.rst",
-    "CONTRIBUTING.rst",
-    "CONTRIBUTORS.rst",
-    # Documentation
-    "documentation/",
-    # Tests
-    "tests/",
-    # Utilities
-    "Makefile",
-    "mkrelease",
-]
-exclude = [
-    "documentation/build",
-]
+[tool.setuptools.cmdclass]
+build_py = "breathe._build.CustomBuildPy"
+
+[tool.setuptools.package-data]
+breathe = ["_parser.py"]
+xml_parser_generator = ["schema.json", "module_template.py.in", "make_parser.py"]
+
+[tool.setuptools.dynamic]
+version = {attr = "breathe.__version__"}
 
 [tool.mypy]
 files = [

@@ -3,3 +3,15 @@ include requirements/*.txt tests/*.py
 graft tests/data
 exclude breathe/_parser.py
 global-exclude *.py[cod]
+
+# Files needed by the build backend to (re)generate breathe/_parser.py when
+# building from an sdist, plus miscellaneous project files.
+include LICENSE
+include CHANGELOG.rst
+include CONTRIBUTING.rst
+include CONTRIBUTORS.rst
+include Makefile
+include make.bat
+include justfile
+recursive-include documentation *
+prune documentation/build

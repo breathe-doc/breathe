@@ -30,15 +30,14 @@ jobs:
         # Version should be automatically discovered from pyproject.toml
 
     - name: Install dependencies
-      # "--editable" is needed so that _parser.py is placed in the local folder
-      # where pytest will import from
+      # The setuptools build backend generates breathe/_parser.py at build
+      # time, including for editable installs.
       run: |
         python -m pip install --upgrade pip
-        python -m pip install --editable ".[build]"
+        python -m pip install --editable "."
 
-    - name: Generate parser
+    - name: Format parser
       run: |
-        make parser
         make format-parser
 
     - name: Lint with Ruff
@@ -58,15 +57,11 @@ jobs:
         python-version: "3.9"
 
     - name: Install dependencies
-      # "--editable" is needed so that _parser.py is placed in the local folder
-      # where pytest will import from
+      # The setuptools build backend generates breathe/_parser.py at build
+      # time, including for editable installs.
       run: |
         python -m pip install --upgrade pip
-        python -m pip install --editable ".[build]"
         python -m pip install --editable ".[lint]"
-
-    - name: Generate parser
-      run: make parser
 
     - name: Type check with mypy
       run: mypy --warn-redundant-casts --warn-unused-ignores breathe tests
@@ -83,15 +78,9 @@ jobs:
         python-version: "3"
 
     - name: Install dependencies
-      # "--editable" is needed so that _parser.py is placed in the local folder
-      # where pytest will import from
       run: |
         python -m pip install --upgrade pip
         python -m pip install --upgrade twine build
-        python -m pip install --editable ".[build]"
-
-    - name: Generate parser
-      run: make parser
 
     - name: Lint with twine
       run: |

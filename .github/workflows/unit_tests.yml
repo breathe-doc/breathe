@@ -103,11 +103,10 @@ jobs:
         sudo make install
 
     - name: Install dependencies
-      # "--editable" is needed so that _parser.py is placed in the local
-      # folder where pytest will import from
+      # The setuptools build backend generates breathe/_parser.py at build
+      # time, including for editable installs.
       run: |
         pip install --upgrade pip
-        pip install --editable .[build]
         pip install --editable .[test]
 
     - name: Version info
@@ -115,10 +114,6 @@ jobs:
         echo 'python: ' && python --version
         echo 'sphinx: ' && sphinx-build --version
         echo 'doxygen: ' && doxygen --version
-
-    - name: Generate parser
-      run: |
-        make parser
 
     - name: Test with pytest
       if: matrix.sphinx-version != 'latest'

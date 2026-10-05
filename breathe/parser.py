@@ -3,14 +3,54 @@
 from __future__ import annotations
 
 import collections
+import importlib.util
 import reprlib
+import sys
+from pathlib import Path
 from typing import TYPE_CHECKING, NamedTuple, overload
 
 from breathe import file_state_cache, path_handler
-from breathe._parser import *
+
+
+def _ensure_parser_generated() -> None:
+    """Generate ``breathe/_parser.py`` if it is missing.
+
+    ``_parser.py`` is generated at build time by the setuptools backend
+    (``xml_parser_generator``). Some tools -- notably uv -- cache editable
+    builds and skip rebuilding, which can leave the generated module absent
+    from the source tree. Generating it lazily here keeps an in-place checkout
+    usable in those cases.
+    """
+    if importlib.util.find_spec("breathe._parser") is not None:
+        return
+
+    parser_path = Path(__file__).with_name("_parser.py")
+
+    # ``xml_parser_generator`` is a build-time-only tool that lives next to the
+    # source tree; it is not installed as a run-time dependency. If it is not
+    # present (e.g. an installed wheel) the generated module should already
+    # exist, so silently do nothing here.
+    generator_root = parser_path.parent.parent / "xml_parser_generator"
+    if not (generator_root / "make_parser.py").is_file():
+        return
+
+    if str(generator_root.parent) not in sys.path:
+        sys.path.insert(0, str(generator_root.parent))
+
+    from xml_parser_generator import make_parser
+
+    make_parser.generate_from_json(
+        str(generator_root / "schema.json"),
+        [(str(generator_root / "module_template.py.in"), str(parser_path))],
+    )
+
+
+# ``_ensure_parser_generated`` must run before ``_parser`` can be imported.
+_ensure_parser_generated()
+
+from breathe._parser import *  # noqa: E402
 
 if TYPE_CHECKING:
-    import sys
     from typing import Union
 
     from sphinx.application import Sphinx
