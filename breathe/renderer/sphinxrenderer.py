@@ -1120,6 +1120,16 @@ class SphinxRenderer(metaclass=NodeVisitor):
         brief = self.render_optional(node.briefdescription)
         descr = node.detaileddescription
         if isinstance(node, parser.Node_memberdefType):
+            if (
+                self.app.env.config.breathe_show_decl_file_include
+                and node.location
+                and node.location.file
+            ):
+                text = "#include <" + node.location.file + ">"
+                literal = nodes.literal_block("", nodes.Text(text))
+                literal["language"] = "c"
+                brief += [literal]
+
             params = [
                 parser.Node_docParamListItem(
                     parameterdescription=p.briefdescription,
