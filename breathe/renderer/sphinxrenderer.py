@@ -2121,15 +2121,17 @@ class SphinxRenderer(metaclass=NodeVisitor):
         #   For now we just look for an extended embed tag
         if node.strip().startswith("embed:rst:leading-asterisk"):
             lines: Iterable[str] = node.splitlines()
-            # Replace the first * on each line with a blank space
-            lines = [text.replace("*", " ", 1) for text in lines]
+            # Replace the leading * on each line with a blank space. Only a
+            # leading asterisk is comment decoration; any other asterisk on the
+            # line belongs to the content and must be kept.
+            lines = [re.sub(r"^(\s*)\*", r"\1 ", text) for text in lines]
             node = "\n".join(lines)
 
         # do we need to strip leading ///?
         elif node.strip().startswith("embed:rst:leading-slashes"):
             lines = node.splitlines()
-            # Replace the /// on each line with three blank spaces
-            lines = [text.replace("///", "   ", 1) for text in lines]
+            # Replace the leading /// on each line with three blank spaces
+            lines = [re.sub(r"^(\s*)///", r"\1   ", text) for text in lines]
             node = "\n".join(lines)
 
         elif node.strip().startswith("embed:rst:inline"):
