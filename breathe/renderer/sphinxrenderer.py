@@ -312,6 +312,7 @@ class DomainDirectiveFactory:
         "namespace": (CPPTypeObject, "type"),
         "enumvalue": (CPPEnumeratorObject, "enumerator"),
         "define": (CMacroObject, "macro"),
+        "property": (CPPMemberObject, "member"),
     }
     c_classes: dict[str, tuple[type[ObjectDescription], str]] = {
         "variable": (CMemberObject, "var"),
