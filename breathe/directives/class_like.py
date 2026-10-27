@@ -64,6 +64,7 @@ class _DoxygenClassLikeDirective(BaseDirective):
         "show": unchanged_required,
         "outline": flag,
         "no-link": flag,
+        "noindex": flag,
         "allow-dot-graphs": flag,
     }
     has_content = False
