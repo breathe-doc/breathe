@@ -41,7 +41,7 @@ dependencies = [
 ]
 dynamic = ["version"]
 
-[project.optional-dependencies]
+[dependency-groups]
 build = [
     "setuptools>=80.9.0"
 ]
@@ -59,9 +59,15 @@ lint = [
     "sphinxcontrib-phpdomain",  # for mypy
     "sphinx-csharp>=1.0.0; python_version >= '3.11'",  # for mypy
 ]
-test = [
+tests = [
     "pytest>=8.0,<9",
-    "Sphinx[test]"
+    "Sphinx[test]",
+]
+dev = [
+    {include-group = "build"},
+    {include-group = "docs"},
+    {include-group = "lint"},
+    {include-group = "tests"},
 ]
 
 [project.urls]
