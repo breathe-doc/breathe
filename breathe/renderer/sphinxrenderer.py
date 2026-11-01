@@ -2555,7 +2555,7 @@ class SphinxRenderer(metaclass=NodeVisitor):
                 # it emits "<type>int(*)</type>", "<name>FuncPtr</name>" and
                 # "<argsstring>(int a, int b)</argsstring>". Splice the name
                 # into the declarator to form a valid declaration.
-                base = type_.rstrip()[:-3].rstrip()
+                base = type_.rstrip().removesuffix("(*)").rstrip()
                 declaration = f"{base} (*{name}){node.argsstring or ''}"
             else:
                 # Everything else: plain typedefs, and the older Doxygen form of
