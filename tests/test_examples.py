@@ -9,6 +9,7 @@ import subprocess
 from xml.parsers import expat
 
 import pytest
+import sphinx.util.parallel
 
 from breathe.process import AutoDoxygenProcessHandle
 
@@ -344,3 +345,77 @@ def test_multiple_projects(make_app, tmp_path, monkeypatch, doxygen, doxygen_cac
         {"breathe_projects": {"A": str(tmp_path / "xmlA"), "B": str(tmp_path / "xmlB")}},
         doxygen.version,
     )
+
+
+# Sphinx < 8.1 only reads in parallel when there are more than five documents.
+DOCNAMES = {f"doc{i}" for i in range(6)}
+
+
+@pytest.fixture
+def rebuild_project(make_app, tmp_path, monkeypatch, doxygen, doxygen_cache):
+    """Set up documents that use the same Doxygen XML and return a function to build them.
+
+    The function builds incrementally and returns the documents that were read, and the
+    groups of documents read by each parallel reader process.
+    """
+    test_input = TEST_DATA_DIR / "examples" / "test_class"
+    monkeypatch.chdir(test_input)
+    run_doxygen_with_template(doxygen, tmp_path, doxygen_cache, test_input.name, "xml")
+    (tmp_path / "index.rst").write_text(
+        ".. toctree::\n\n" + "".join(f"   {d}\n" for d in sorted(DOCNAMES)), encoding="utf-8"
+    )
+    for docname in DOCNAMES:
+        (tmp_path / f"{docname}.rst").write_text(
+            f"{docname}\n====\n\n.. doxygenfile:: class.h\n", encoding="utf-8"
+        )
+    (tmp_path / "conf.py").touch()
+
+    def build(parallel: int):
+        app = make_app(
+            buildername="xml",
+            srcdir=tmp_path,
+            parallel=parallel,
+            confoverrides=conf_overrides({"breathe_projects": {"example": str(tmp_path / "xml")}}),
+        )
+        read: set[str] = set()
+        merges: list[set[str]] = []
+        app.connect("env-before-read-docs", lambda app, env, docs: read.update(docs))
+        app.connect("env-merge-info", lambda app, env, docs, other: merges.append(set(docs)))
+        app.build()
+        return app, read - {"index"}, merges
+
+    return build
+
+
+def bump_mtime(path: pathlib.Path) -> None:
+    # Explicitly move the time forward, file systems may have a coarse resolution.
+    mtime = path.stat().st_mtime + 10
+    os.utime(path, (mtime, mtime))
+
+
+@pytest.mark.parametrize("parallel", [0, 2], ids=["serial", "parallel"])
+def test_xml_change_rereads_documents(rebuild_project, tmp_path, parallel):
+    """Every document that uses a modified Doxygen XML file is reread."""
+    if parallel and not sphinx.util.parallel.parallel_available:
+        pytest.skip("parallel builds are not available")
+    _, _, merges = rebuild_project(parallel)
+    if parallel:
+        # The documents must be split between reader processes to test merging their state.
+        assert len(merges) > 1
+
+    bump_mtime(tmp_path / "xml" / "class_8h.xml")
+    _, read, _ = rebuild_project(parallel)
+    assert read == DOCNAMES
+
+
+def test_partial_rebuild_keeps_file_state(rebuild_project, tmp_path):
+    """Rereading some documents in parallel keeps the state recorded for the others."""
+    if not sphinx.util.parallel.parallel_available:
+        pytest.skip("parallel builds are not available")
+    rebuild_project(2)
+
+    bump_mtime(tmp_path / "doc1.rst")
+    app, read, _ = rebuild_project(2)
+    assert read == {"doc1"}
+    xml_file = (tmp_path / "xml" / "class_8h.xml").resolve().as_posix()
+    assert app.env.breathe_file_state[xml_file][1] == DOCNAMES

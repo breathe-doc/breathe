@@ -155,12 +155,14 @@ class DoxygenParser:
 
     def _get_project_data(self, project_info: ProjectInfo) -> ProjectData:
         key = project_info.project_path()
+        filename = path_handler.resolve_path(self.app, project_info.project_path(), "index.xml")
+
+        # Record the file for the current document even when it is already parsed, so that
+        # every document that uses it is rebuilt when it changes.
+        file_state_cache.update(self.app, filename)
+
         r = self.parsed_data.get(key)
         if r is None:
-            filename = path_handler.resolve_path(self.app, project_info.project_path(), "index.xml")
-
-            file_state_cache.update(self.app, filename)
-
             n = _parse_common(filename, "doxygenindex")
             assert isinstance(n, Node_DoxygenTypeIndex)
             r = ProjectData(DoxygenIndex(n), {})
@@ -172,14 +174,12 @@ class DoxygenParser:
 
     def parse_compound(self, refid: str, project_info: ProjectInfo) -> DoxygenCompound:
         cache = self._get_project_data(project_info).compound_cache
+        filename = path_handler.resolve_path(self.app, project_info.project_path(), f"{refid}.xml")
+
+        file_state_cache.update(self.app, filename)
+
         r = cache.get(refid)
         if r is None:
-            filename = path_handler.resolve_path(
-                self.app, project_info.project_path(), f"{refid}.xml"
-            )
-
-            file_state_cache.update(self.app, filename)
-
             n = _parse_common(filename, "doxygen")
             assert isinstance(n, Node_DoxygenType)
             # Pass parser instance to allow looking up referenced compounds

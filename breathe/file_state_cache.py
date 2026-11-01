@@ -76,6 +76,36 @@ def _purge_doc(app: Sphinx, env: BuildEnvironment, docname: str) -> None:
         del app.env.breathe_file_state[filename]
 
 
+def _merge_info(
+    app: Sphinx, env: BuildEnvironment, docnames: set[str], other: BuildEnvironment
+) -> None:
+    """Merge the state recorded by a parallel reader process into the main environment.
+
+    In parallel builds, each reader process records the Doxygen XML files that its documents
+    read in its own copy of the environment. This adds those documents to the main
+    environment's state, which is what is saved for later builds to detect modified files.
+    """
+    other_state = getattr(other, "breathe_file_state", None)
+    if not other_state:
+        return
+    if not hasattr(env, "breathe_file_state"):
+        env.breathe_file_state = {}  # type: ignore[attr-defined]
+
+    for filename, (other_mtime, other_docnames) in other_state.items():
+        # The rest of the other state is a copy of what the main environment already has.
+        new_docnames = other_docnames & set(docnames)
+        if not new_docnames:
+            continue
+        mtime, existing = env.breathe_file_state.get(  # type: ignore[attr-defined]
+            filename, (other_mtime, set())
+        )
+        env.breathe_file_state[filename] = (  # type: ignore[attr-defined]
+            max(mtime, other_mtime),
+            existing | new_docnames,
+        )
+
+
 def setup(app: Sphinx):
     app.connect("env-get-outdated", _get_outdated)
     app.connect("env-purge-doc", _purge_doc)
+    app.connect("env-merge-info", _merge_info)
