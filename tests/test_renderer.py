@@ -312,6 +312,19 @@ def test_render_c_function_typedef(app):
     # it should only be used for a top-level function
 
 
+def test_render_c_function_pointer_typedef(app):
+    member_def = parser.Node_memberdefType(
+        kind=parser.DoxMemberKind.typedef,
+        definition="typedef int (*FuncPtr)(int a, int b)",
+        type=parser.Node_linkedTextType(["int(*)"]),
+        name="FuncPtr",
+        argsstring="(int a, int b)",
+        **COMMON_ARGS_memberdefType,
+    )
+    signature = find_node(render(app, member_def, domain="c"), "desc_signature")
+    assert signature.astext() == "typedef int (*FuncPtr)(int a, int b)"
+
+
 def test_render_using_alias(app):
     member_def = parser.Node_memberdefType(
         kind=parser.DoxMemberKind.typedef,

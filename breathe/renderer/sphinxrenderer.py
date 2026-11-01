@@ -2544,7 +2544,21 @@ class SphinxRenderer(metaclass=NodeVisitor):
             #   contain the full text. If a @typedef was used instead, the
             #   definition has only the typename, which makes it impossible to
             #   distinguish between them so fallback to "typedef" behavior here.
-            declaration = " ".join([type_, name, node.argsstring or ""])
+            if type_.rstrip().endswith("(*)"):
+                # Doxygen splits a pointer-to-function typedef into an empty
+                # pointer declarator "(*)" in <type> and the parameter list in
+                # <argsstring>, e.g. for
+                #   "typedef int (*FuncPtr)(int a, int b);"
+                # it emits "<type>int(*)</type>", "<name>FuncPtr</name>" and
+                # "<argsstring>(int a, int b)</argsstring>". Splice the name
+                # into the declarator to form a valid declaration.
+                base = type_.rstrip().removesuffix("(*)").rstrip()
+                declaration = f"{base} (*{name}){node.argsstring or ''}"
+            else:
+                # Everything else: plain typedefs, and the older Doxygen form of
+                # a pointer-to-function typedef, where the opening "(*" stays in
+                # <type> and the closing ")" is prefixed to <argsstring>.
+                declaration = " ".join([type_, name, node.argsstring or ""])
         return self.handle_declaration(node, node.kind.value, declaration)
 
     def make_initializer(self, node) -> str:
