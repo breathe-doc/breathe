@@ -128,10 +128,14 @@ def file_finder_filter(
     matches: list[filter.FinderMatch],
 ) -> None:
     for c in index.file_compounds:
-        if not path_matches(c.name, filename):
+        if os.path.basename(c.name) != os.path.basename(filename):
             continue
         for cd in d_parser.parse_compound(c.refid, project_info).root.compounddef:
-            if cd.kind != parser.DoxCompoundKind.file:
+            if (
+                cd.kind != parser.DoxCompoundKind.file
+                or cd.location is None
+                or not path_matches(cd.location.file, filename)
+            ):
                 continue
             matches.append([renderer.TaggedNode(None, cd)])
 
@@ -154,10 +158,10 @@ class _BaseFileDirective(BaseDirective):
 
         if len(matches) > 1:
             warning = self.create_warning(None, file=file_, directivename=self.directive_name)
-            return warning.warn('{directivename}: Found multiple matches for file "{file} {tail}')
+            return warning.warn('{directivename}: Found multiple matches for file "{file} {tail}"')
         elif not matches:
             warning = self.create_warning(None, file=file_, directivename=self.directive_name)
-            return warning.warn('{directivename}: Cannot find file "{file} {tail}')
+            return warning.warn('{directivename}: Cannot find file "{file} {tail}"')
 
         target_handler = create_target_handler(self.options, self.env)
         filter_ = create_file_filter(file_, self.options)
