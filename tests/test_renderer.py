@@ -604,3 +604,47 @@ def test_cxx11_extended_friend(app):
     )
     signature = find_node(render(app, member_def), "desc_signature")
     assert signature.astext() == "friend Outer"
+
+
+class CapturingState(MockState):
+    """A MockState that keeps the reStructuredText handed to nested_parse."""
+
+    def __init__(self, app):
+        super().__init__(app)
+        self.parsed_lines = []
+
+    def nested_parse(self, content, content_offset, contentnode, match_titles=1):
+        self.parsed_lines.extend(content)
+
+
+@pytest.mark.parametrize(
+    ("tag", "marker", "code"),
+    [
+        ("leading-asterisk", "*", "return x * 2;"),
+        ("leading-slashes", "///", "int x;  ///< the x value"),
+    ],
+    ids=["leading-asterisk", "leading-slashes"],
+)
+def test_verbatim_strips_only_leading_marker(app, tag, marker, code):
+    # Only a marker at the start of a line is comment decoration. The same
+    # characters further along the line, or on a line that has no decoration
+    # at all, are content and must be kept.
+    no_marker = " " * len(marker)
+    verbatim = "\n".join([
+        f"embed:rst:{tag}",
+        f"{marker}    Some example code::",
+        f"{marker}",
+        f"{marker}       {code}",
+        f"{no_marker}       {code}",
+    ])
+    state = CapturingState(app)
+    sphinx_renderer = SphinxRenderer(
+        app, None, [], state, state.document, MockTargetHandler(), None, (lambda nstack: True)
+    )
+    sphinx_renderer.visit_verbatim(verbatim)
+    assert state.parsed_lines == [
+        "Some example code::",
+        "",
+        f"   {code}",
+        f"   {code}",
+    ]
