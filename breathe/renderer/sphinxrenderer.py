@@ -360,6 +360,8 @@ class DomainDirectiveFactory:
             "attribute": (CSharpAttribute, "attr"),
             # Fallback to cpp domain
             "typedef": (CPPTypeObject, "type"),
+            # C# has no macro directive; render preprocessor symbols as C macros
+            "define": (CMacroObject, "macro"),
         }
 
     @staticmethod
