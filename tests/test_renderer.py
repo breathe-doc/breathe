@@ -487,6 +487,17 @@ def test_render_define_no_initializer(app):
     assert signature.astext() == "USE_MILK"
 
 
+def test_render_csharp_define(app):
+    # https://github.com/breathe-doc/breathe/issues/1094
+    pytest.importorskip("sphinx_csharp")
+    sphinx.addnodes.setup(app)
+    member_def = parser.Node_memberdefType(
+        kind=parser.DoxMemberKind.define, name="DEBUGX", **COMMON_ARGS_memberdefType
+    )
+    signature = find_node(render(app, member_def, domain="cs"), "desc_signature")
+    assert signature.astext() == "DEBUGX"
+
+
 def test_render_variable_initializer_with_leading_space(app):
     member_def = parser.Node_memberdefType(
         kind=parser.DoxMemberKind.variable,
