@@ -37,6 +37,7 @@ jobs:
           - '3.12'
           - '3.13'
           - '3.14'
+          - '3.15'
         sphinx-version:
           - '7.2' # Ubuntu 24.04
           # version 7.3 broke up the domain modules into packages, changing
