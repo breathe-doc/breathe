@@ -8,7 +8,7 @@ name = "breathe"
 description = "Sphinx Doxygen renderer"
 readme = "README.rst"
 license.text = "BSD-3-Clause"
-requires-python = ">=3.9"
+requires-python = ">=3.11"
 
 # Classifiers list: https://pypi.org/classifiers/
 classifiers = [
@@ -24,11 +24,11 @@ classifiers = [
     "Programming Language :: Python",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3 :: Only",
-    "Programming Language :: Python :: 3.9",
-    "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Programming Language :: Python :: 3.15",
     "Topic :: Documentation",
     "Topic :: Documentation :: Sphinx",
     "Topic :: Software Development",
@@ -57,7 +57,7 @@ lint = [
     "types-Pygments",
     "pytest>=8.0,<9",  # for mypy
     "sphinxcontrib-phpdomain",  # for mypy
-    "sphinx-csharp>=1.0.0; python_version >= '3.11'",  # for mypy
+    "sphinx-csharp>=1.0.0",  # for mypy
 ]
 tests = [
     "pytest>=8.0,<9",
