@@ -6,6 +6,7 @@ on:
       - ".github/workflows/unit_tests.yml"
       - "breathe/**"
       - "tests/**"
+      - "pyproject.toml"
 
 permissions:
   contents: read
