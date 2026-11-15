@@ -30,8 +30,8 @@ jobs:
       fail-fast: false
       matrix:
         doxygen-version:
-          - '1.9.4'
-          - '1.9.7'
+          - '1.9.4' # Debian 12
+          - '1.9.8' # Ubuntu 24.04 + Debian 13
         python-version:
           - '3.11'
           - '3.12'
