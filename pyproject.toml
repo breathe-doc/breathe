@@ -52,7 +52,7 @@ docs = [
 ]
 lint = [
     "ruff==0.16.8",
-    "mypy>=1,<1.10",
+    "mypy>=2,<3",
     "types-docutils",
     "types-Pygments",
     "pytest>=8.0,<9",  # for mypy
@@ -114,7 +114,7 @@ files = [
 ]
 show_column_numbers = true
 show_error_context = true
-python_version = "3.9"
+python_version = "3.11"
 warn_unused_configs = true
 warn_redundant_casts = true
 warn_unused_ignores = true

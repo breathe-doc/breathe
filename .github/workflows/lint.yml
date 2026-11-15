@@ -68,7 +68,7 @@ jobs:
       run: make parser
 
     - name: Type check with mypy
-      run: mypy --warn-redundant-casts --warn-unused-ignores breathe tests
+      run: mypy breathe tests
 
   twine:
     runs-on: ubuntu-latest
