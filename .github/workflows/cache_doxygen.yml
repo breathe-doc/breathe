@@ -9,7 +9,9 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        doxygen-version: ['1.9.4', '1.9.7']
+        doxygen-version:
+          - '1.9.4' # Debian 12
+          - '1.9.8' # Ubuntu 24.04 + Debian 13
     steps:
       - uses: actions/cache/restore@v6
         id: cache-doxygen
