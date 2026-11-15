@@ -6,11 +6,16 @@ import os
 import pathlib
 import shutil
 import subprocess
+from typing import TYPE_CHECKING
 from xml.parsers import expat
 
 import pytest
 
 from breathe.process import AutoDoxygenProcessHandle
+
+if TYPE_CHECKING:
+    from collections.abc import Iterator
+    from pathlib import Path
 
 C_FILE_SUFFIXES = frozenset((".h", ".c", ".hpp", ".cpp"))
 IGNORED_ELEMENTS: frozenset[str] = frozenset(())
@@ -115,7 +120,7 @@ def xml_stream(infile):
             pending_events.clear()
 
 
-def get_individual_tests():
+def get_individual_tests() -> Iterator[Path]:
     return (TEST_DATA_DIR / "examples").glob("test_*")
 
 
@@ -287,7 +292,7 @@ def run_sphinx_and_compare(make_app, tmp_path, test_input, overrides, version):
     compare_xml(tmp_path / "_build" / "xml" / "index.xml", test_input, version)
 
 
-@pytest.mark.parametrize("test_input", get_individual_tests(), ids=(lambda x: x.name[5:]))
+@pytest.mark.parametrize("test_input", list(get_individual_tests()), ids=(lambda x: x.name[5:]))
 def test_example(make_app, tmp_path, test_input, monkeypatch, doxygen, doxygen_cache):
     monkeypatch.chdir(test_input)
 
