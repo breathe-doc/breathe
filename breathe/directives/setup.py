@@ -90,6 +90,7 @@ def setup(app: Sphinx) -> None:
     app.add_config_value("breathe_show_define_initializer", False, "env")
     app.add_config_value("breathe_show_enumvalue_initializer", False, "env")
     app.add_config_value("breathe_show_include", True, "env")
+    app.add_config_value("breathe_show_decl_file_include", False, "env")
     app.add_config_value("breathe_implementation_filename_extensions", [".c", ".cc", ".cpp"], "env")
     app.add_config_value("breathe_doxygen_config_options", {}, "env")
     app.add_config_value("breathe_doxygen_aliases", {}, "env")
