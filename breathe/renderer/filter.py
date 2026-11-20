@@ -273,7 +273,7 @@ def create_innerclass_filter(options: DoxNamespaceOptions, outerclass: str = "")
         return (
             not (
                 isinstance(node, parser.Node_refType)
-                and nstack.tag == "innerclass"
+                and nstack.tag in ["innerclass", "innerconcept"]
                 and isinstance(parent, parser.Node_compounddefType)
                 and parent.kind in CLASS_LIKE_COMPOUNDDEF
             )
